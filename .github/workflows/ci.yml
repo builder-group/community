@@ -62,7 +62,6 @@ jobs:
 
       - name: 🧩 Install Dependencies
         id: install-deps
-        shell: bash
         run: pnpm install
 
       # Build & Lint
@@ -73,4 +72,5 @@ jobs:
 
       - name: 🏗️ Build
         id: build-monorepo
+        shell: bash
         run: pnpm build
