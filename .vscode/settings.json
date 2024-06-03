@@ -1,7 +1,50 @@
 {
-  "eslint.workingDirectories": [
-    {
-      "mode": "auto"
-    }
-  ]
+	// Editor settings
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": false,
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "explicit"
+	},
+
+	// Search settings
+	"search.exclude": {
+		"**/node_modules": true,
+		"**/dist": true,
+		"**/.next": true
+	},
+
+	// File associations
+	"files.associations": {
+		"*.scss": "postcss",
+		"*.ts": "typescript",
+		"*.tsconfig.json": "jsonc" // Allows comments in tsconfig.json
+	},
+
+	// File nesting in explorer
+	"explorer.fileNesting.enabled": true,
+	"explorer.fileNesting.patterns": {
+		"*.ts": "${capture}.js, ${capture}.test.ts",
+		"*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts, ${capture}.test.js",
+		"*.jsx": "${capture}.js",
+		"*.tsx": "${capture}.ts, ${capture}.stories.tsx",
+		".npmrc": ".nvmrc, .yarnrc.yml",
+		".gitignore": ".eslintignore, .prettierignore, .dockerignore",
+		"README.md": "CONTRIBUTING.md, CODE_OF_CONDUCT.md",
+		".eslintrc.js": ".eslintcache",
+		"package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, pnpm-workspace.yaml, .pnp.cjs, .pnp.loader.mjs",
+		"tsconfig.json": "tsconfig.*.json"
+	},
+
+	// ESLint settings
+	"eslint.workingDirectories": [
+		{
+			"mode": "auto"
+		}
+	],
+
+	// Tailwind CSS settings
+	"tailwindCSS.experimental.classRegex": [
+		["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
+		["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+	]
 }

@@ -1,0 +1,8 @@
+{
+	"extends": "@ibg/config/node.tsconfig.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./src"
+	},
+	"include": ["src"]
+}

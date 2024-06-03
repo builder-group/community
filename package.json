@@ -1,20 +1,42 @@
 {
-  "name": "monorepo",
-  "private": true,
-  "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
-  },
-  "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
-    "prettier": "^3.2.5",
-    "turbo": "latest"
-  },
-  "packageManager": "pnpm@8.9.0",
-  "engines": {
-    "node": ">=18"
-  }
+	"name": "monorepo",
+	"description": "Monorepo for inbeta.group",
+	"private": true,
+	"scripts": {
+		"build": "pnpm build:cli && turbo run build",
+		"build:cli": "turbo run build --filter=cli && chmod +x ./scripts/cli.sh && pnpm run cli:hello",
+		"clean": "turbo run clean && shx rm -rf node_modules",
+		"install:clean": "pnpm run clean && pnpm install",
+		"lint": "turbo lint",
+		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
+		"cli:hello": "sh ./scripts/cli.sh hello"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/inbeta-group/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://github.com/inbeta-group/monorepo/issues"
+	},
+	"homepage": "https://inbeta.group/?source=github",
+	"devDependencies": {
+		"@changesets/cli": "^2.27.5",
+		"@ianvs/prettier-plugin-sort-imports": "^4.2.1",
+		"@ibg/cli": "workspace:*",
+		"@ibg/config": "workspace:*",
+		"eslint": "^8.57.0",
+		"prettier": "^3.3.0",
+		"prettier-plugin-tailwindcss": "^0.6.1",
+		"shx": "^0.3.4",
+		"turbo": "latest",
+		"typescript": "^5.4.5",
+		"vitest": "^1.6.0"
+	},
+	"packageManager": "pnpm@9.0.6",
+	"engines": {
+		"node": ">=18"
+	}
 }

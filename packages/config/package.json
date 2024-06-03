@@ -1,0 +1,31 @@
+{
+	"name": "@ibg/config",
+	"description": "Shared configuration for inbeta.group monorepo",
+	"version": "0.0.2",
+	"private": true,
+	"scripts": {},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/inbeta-group/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://github.com/inbeta-group/monorepo/issues"
+	},
+	"homepage": "https://inbeta.group/?source=github",
+	"dependencies": {
+		"@vercel/style-guide": "^5.0.1",
+		"eslint-config-turbo": "^1.10.16",
+		"vite-tsconfig-paths": "^4.2.1"
+	},
+	"peerDependencies": {
+		"@next/eslint-plugin-next": "^14.0.1",
+		"@remix-run/eslint-config": "^2.2.0"
+	},
+	"devDependencies": {
+		"@next/eslint-plugin-next": "^14.0.1",
+		"@remix-run/eslint-config": "^2.2.0"
+	}
+}

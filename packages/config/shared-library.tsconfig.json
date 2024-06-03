@@ -1,0 +1,22 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"display": "Shared Library",
+	"extends": "./base.tsconfig.json",
+	"compilerOptions": {
+		// Language and Environmet
+		"target": "esnext",
+		"lib": ["esnext"],
+
+		// Modules
+		"module": "commonjs",
+		"moduleResolution": "node",
+
+		// Javascript Support
+		"allowJs": true,
+
+		// Emit
+		"outDir": "./dist",
+		"rootDir": "./src"
+	},
+	"include": ["src"]
+}

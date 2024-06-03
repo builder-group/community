@@ -1,0 +1,23 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"display": "React Library",
+	"extends": "./base.tsconfig.json",
+	"compilerOptions": {
+		// Language and Environmet
+		"target": "es6",
+		"lib": ["dom", "dom.Iterable", "es2015"],
+		"jsx": "react-jsx",
+
+		// Modules
+		"module": "esnext",
+		"moduleResolution": "node",
+
+		// Javascript Support
+		"allowJs": true,
+
+		// Emit
+		"outDir": "./dist",
+		"rootDir": "./src"
+	},
+	"include": ["src"]
+}
