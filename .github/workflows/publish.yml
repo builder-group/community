@@ -91,7 +91,7 @@ jobs:
 
       - name: 📣 Notify Discord
         if: steps.changesets.outputs.published == 'true'
-        uses: tsickert/discord-webhook@v6
+        uses: tsickert/discord-webhook@v6.0.0
         with:
           webhook-url: ${{ env.DISCORD_WEBHOOK_URL }}
           content: "A new version of ${GITHUB_REPOSITORY} was published!"
