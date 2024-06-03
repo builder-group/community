@@ -46,7 +46,7 @@ jobs:
         id: setup-pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: ${{ matrix.pnpm-version }}
+          # version: ${{ matrix.pnpm-version }} # Defined in package.json
           run_install: false
 
       - name: 🎈 Get pnpm store directory
@@ -71,6 +71,7 @@ jobs:
 
       - name: 🏗️ Build
         id: build-monorepo
+        shell: bash
         run: pnpm build
 
       # Publish
@@ -91,7 +92,7 @@ jobs:
 
       - name: 📣 Notify Discord
         if: steps.changesets.outputs.published == 'true'
-        uses: tsickert/discord-webhook@v6
+        uses: tsickert/discord-webhook@v6.0.0
         with:
           webhook-url: ${{ env.DISCORD_WEBHOOK_URL }}
           content: "A new version of ${GITHUB_REPOSITORY} was published!"

@@ -14,7 +14,7 @@ DIR="$(dirname "$0")"
 
 # Find the absolute path to the monorepo's root directory
 chmod +x "$DIR/find_monorepo_root.sh"
-source "$DIR/find_monorepo_root.sh"
+. "$DIR/find_monorepo_root.sh"
 MONOREPO_ROOT=$(find_monorepo_root)
 echo "👉 Monorepo root found at: $MONOREPO_ROOT"
 

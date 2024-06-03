@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"build": "pnpm build:cli && turbo run build",
-		"build:cli": "turbo run build --filter=cli && chmod +x ./scripts/cli.sh && pnpm run cli:hello",
+		"build:cli": "turbo run build --filter=cli && pnpm run cli:hello",
 		"packages:version": "changeset version && changeset publish",
 		"packages:publish": "changeset publish",
 		"packages:bump": "changeset",
@@ -12,7 +12,7 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "turbo lint",
 		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
-		"cli:hello": "sh ./scripts/cli.sh hello"
+		"cli:hello": "chmod +x ./scripts/cli.sh && sh ./scripts/cli.sh hello"
 	},
 	"repository": {
 		"type": "git",
