@@ -75,6 +75,14 @@ jobs:
 
       # Publish
 
+      - name: 🦋 Creating .npmrc
+        run: |
+          cat << EOF > "$HOME/.npmrc"
+          //registry.npmjs.org/:_authToken=$NPM_TOKEN
+          EOF
+        env:
+          NPM_TOKEN: ${{ env.NPM_TOKEN }}
+
       - name: 🦋 Create Publish Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
