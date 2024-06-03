@@ -1,5 +1,11 @@
 # @ibg/config
 
+## 0.0.4
+
+### Patch Changes
+
+- [#4](https://github.com/inbeta-group/monorepo/pull/4) [`f3b1bee`](https://github.com/inbeta-group/monorepo/commit/f3b1bee1b5a2753de6fc68413bd4f798224845cc) Thanks [@bennoinbeta](https://github.com/bennoinbeta)! - init
+
 ## 0.0.3
 
 ### Patch Changes
