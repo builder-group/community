@@ -1,0 +1,15 @@
+{
+	"$schema": "https://unpkg.com/@changesets/config@3.0.1/schema.json",
+	"changelog": ["@changesets/changelog-github", { "repo": "inbeta-group/monorepo" }],
+	"commit": false,
+	"fixed": [],
+	"linked": [],
+	"access": "restricted",
+	"baseBranch": "develop",
+	"updateInternalDependencies": "patch",
+	"ignore": [],
+	"privatePackages": {
+		"version": true,
+		"tag": true
+	}
+}

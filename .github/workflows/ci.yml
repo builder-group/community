@@ -1,0 +1,75 @@
+name: 🧪 CI 
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+jobs:
+  lint_and_build:
+    name: 🧪 Lint and Build
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [lts/*]
+        pnpm-version: [latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: ⬇️ Checkout
+        id: checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      # Setup node
+      # https://github.com/actions/setup-node
+
+      - name: 🟢 Setup node ${{ matrix.node-version }}
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Setup pnpm & Install dependencies
+      # https://github.com/pnpm/action-setup?tab=readme-ov-file#use-cache-to-reduce-installation-time
+
+      - name: 🥡 Setup pnpm ${{ matrix.pnpm-version }}
+        id: setup-pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ matrix.pnpm-version }}
+          run_install: false
+
+      - name: 🎈 Get pnpm store directory
+        id: get-pnpm-store-dir
+        run: |
+          echo "PNPM_STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: 🔆 Cache pnpm modules
+        id: cache-pnpm-modules
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PNPM_STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: 🧩 Install Dependencies
+        id: install-deps
+        run: pnpm install
+
+      # Build & Lint
+
+      - name: 🌟 Lint
+        id: lint
+        run: pnpm lint
+
+      - name: 🏗️ Build
+        id: build-monorepo
+        run: pnpm build

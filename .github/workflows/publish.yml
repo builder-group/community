@@ -1,0 +1,97 @@
+name: 🚀 Publish
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+jobs:
+  publish:
+    name: 🚀 Publish
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version: [lts/*]
+        pnpm-version: [latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: ⬇️ Checkout
+        id: checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      # Setup node
+      # https://github.com/actions/setup-node
+
+      - name: 🟢 Setup node ${{ matrix.node-version }}
+        id: setup-node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Setup pnpm & Install dependencies
+      # https://github.com/pnpm/action-setup?tab=readme-ov-file#use-cache-to-reduce-installation-time
+
+      - name: 🥡 Setup pnpm ${{ matrix.pnpm-version }}
+        id: setup-pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ matrix.pnpm-version }}
+          run_install: false
+
+      - name: 🎈 Get pnpm store directory
+        id: get-pnpm-store-dir
+        run: |
+          echo "PNPM_STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: 🔆 Cache pnpm modules
+        id: cache-pnpm-modules
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PNPM_STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: 🧩 Install Dependencies
+        id: install-deps
+        run: pnpm install
+
+      # Build
+
+      - name: 🏗️ Build
+        id: build-monorepo
+        run: pnpm build
+
+      # Publish
+
+      - name: 🦋 Create Publish Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          title: "chore(publish): version packages 🦋"
+          publish: pnpm packages:publish
+          version: pnpm packages:version
+          commit: "chore(publish): version packages 🦋 [skip ci]"
+        env:
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ env.NPM_TOKEN }}
+
+      # Notify
+
+      - name: 📣 Notify Discord
+        if: steps.changesets.outputs.published == 'true'
+        uses: tsickert/discord-webhook@v6
+        with:
+          webhook-url: ${{ env.DISCORD_WEBHOOK_URL }}
+          content: "A new version of ${GITHUB_REPOSITORY} was published!"
