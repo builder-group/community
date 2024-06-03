@@ -1,7 +1,7 @@
 {
 	"name": "@ibg/logger",
 	"description": "Logger",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"private": true,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",

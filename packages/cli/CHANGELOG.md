@@ -1,5 +1,11 @@
 # @ibg/cli
 
+## 0.0.5
+
+### Patch Changes
+
+- [#7](https://github.com/inbeta-group/monorepo/pull/7) [`79fbbad`](https://github.com/inbeta-group/monorepo/commit/79fbbad63c2d70436724b3a5d9b9ff0aea7b2143) Thanks [@bennoinbeta](https://github.com/bennoinbeta)! - test
+
 ## 0.0.4
 
 ### Patch Changes
