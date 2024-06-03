@@ -65,6 +65,7 @@ jobs:
 
       - name: 🧩 Install Dependencies
         id: install-deps
+        shell: bash
         run: pnpm install
 
       # Build
