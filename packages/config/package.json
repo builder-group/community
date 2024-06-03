@@ -2,7 +2,7 @@
 	"name": "@ibg/config",
 	"description": "Shared configuration for inbeta.group monorepo",
 	"version": "0.0.5",
-	"private": true,
+	"private": false,
 	"scripts": {},
 	"repository": {
 		"type": "git",

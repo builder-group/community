@@ -87,11 +87,23 @@ jobs:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ env.NPM_TOKEN }}
 
-      # Notify
+      # Post Publish Actions
 
       - name: 📣 Notify Discord
         if: steps.changesets.outputs.published == 'true'
         uses: tsickert/discord-webhook@v6.0.0
         with:
           webhook-url: ${{ env.DISCORD_WEBHOOK_URL }}
-          content: "A new version of ${GITHUB_REPOSITORY} was published!"
+          content: "New versions of @ibg were published!"
+
+      - name: 🔄 Merge main into develop
+        if: steps.changesets.outputs.published == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.repos.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base: 'develop',
+              head: 'main',
+            });

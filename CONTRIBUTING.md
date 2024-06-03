@@ -24,7 +24,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"name": "@ibg/template",
 	"description": "Description of the package",
 	"version": "0.0.1",
-	"private": true,
+	"private": true, // Or false if package should be published to NPM
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
 		"start:dev": "tsc -w",
