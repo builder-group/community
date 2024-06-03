@@ -2,7 +2,7 @@
 	"name": "@ibg/logger",
 	"description": "Logger",
 	"version": "0.0.5",
-	"private": true,
+	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
 		"start:dev": "tsc -w",
