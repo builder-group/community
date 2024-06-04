@@ -74,6 +74,7 @@ jobs:
         run: pnpm build
 
       # Publish
+      # https://github.com/changesets/action?tab=readme-ov-file#with-publishing
 
       - name: 🦋 Creating .npmrc
         run: |

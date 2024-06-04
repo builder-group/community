@@ -1,6 +1,6 @@
 {
 	"name": "@ibg/config",
-	"description": "Shared configuration for inbeta.group monorepo",
+	"description": "Shared configurations for inbeta.group packages",
 	"version": "0.0.6",
 	"private": false,
 	"scripts": {},

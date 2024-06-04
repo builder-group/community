@@ -1,6 +1,6 @@
 {
-	"name": "@ibg/logger",
-	"description": "Logger",
+	"name": "feature-logger",
+	"description": "Straightforward and feature based logger library",
 	"version": "0.0.6",
 	"private": false,
 	"scripts": {
@@ -9,8 +9,7 @@
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
-		"test": "vitest run",
-		"update:deps": "pnpm update --latest"
+		"test": "vitest run"
 	},
 	"source": "./src/index.ts",
 	"main": "./dist/cjs/index.js",
@@ -28,8 +27,7 @@
 	},
 	"homepage": "https://inbeta.group/?source=github",
 	"devDependencies": {
-		"@ibg/config": "workspace:*",
-		"@types/node": "^20.8.10"
+		"@ibg/config": "workspace:*"
 	},
 	"files": [
 		"dist",
