@@ -158,6 +158,9 @@ importers:
       '@ibg/config':
         specifier: workspace:*
         version: link:../config
+      '@types/node':
+        specifier: ^20.8.10
+        version: 20.8.10
 
   packages/feature-state:
     dependencies:

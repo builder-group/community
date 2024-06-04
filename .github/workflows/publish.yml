@@ -6,6 +6,7 @@ on:
       - main
   repository_dispatch:
     types: [publish-trigger]
+  workflow_dispatch:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
