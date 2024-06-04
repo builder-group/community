@@ -1,0 +1,61 @@
+{
+	"name": "figma-connect",
+	"description": "Straightforward and typesafe communication between Figma app (iframe) and plugin (sandbox)",
+	"version": "0.0.1",
+	"private": false,
+	"scripts": {
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"start:dev": "tsc -w",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"exports": {
+		"./app": {
+			"source": "./src/app/index.ts",
+			"require": "./dist/app/cjs/index.js",
+			"import": "./dist/app/esm/index.js",
+			"types": "./dist/types/app/index.d.ts"
+		},
+		"./plugin": {
+			"source": "./src/plugin/index.ts",
+			"require": "./dist/plugin/cjs/index.js",
+			"import": "./dist/plugin/esm/index.js",
+			"types": "./dist/types/plugin/index.d.ts"
+		}
+	},
+	"typesVersions": {
+		"*": {
+			"app": [
+				"./dist/types/app/index.d.ts"
+			],
+			"plugin": [
+				"./dist/types/plugin/index.d.ts"
+			]
+		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/inbeta-group/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://github.com/inbeta-group/monorepo/issues"
+	},
+	"homepage": "https://inbeta.group/?source=package-json",
+	"dependencies": {
+		"@ibg/utils": "workspace:*"
+	},
+	"devDependencies": {
+		"@ibg/config": "workspace:*",
+		"@figma/plugin-typings": "^1.82.0",
+		"@types/node": "^20.8.10"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	]
+}

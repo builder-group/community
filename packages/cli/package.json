@@ -12,23 +12,22 @@
 		"lint": "eslint --ext .js,.ts,.jsx,.tsx src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"update:deps": "pnpm update --latest"
+		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"source": "./src/index.ts",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/dyndotart/monorepo.git"
+		"url": "https://github.com/inbeta-group/monorepo.git"
 	},
 	"keywords": [],
 	"author": "@bennoinbeta",
 	"license": "AGPL-3.0-or-later",
 	"bugs": {
-		"url": "https://github.com/dyndotart/monorepo/issues"
+		"url": "https://github.com/inbeta-group/monorepo/issues"
 	},
-	"homepage": "https://dyn.art/?source=github",
+	"homepage": "https://inbeta.group/?source=package-json",
 	"dependencies": {
 		"@oclif/core": "^3.9.2",
 		"@rollup/plugin-commonjs": "^25.0.7",

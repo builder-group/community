@@ -1,0 +1,37 @@
+name: 🚀 Initiate Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to merge into main'
+        required: true
+        default: 'develop'
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  initiate_publish:
+    name: 🚀 Initiate Publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout
+        id: checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: 🔄 Merge develop into main
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.repos.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base: 'main',
+              head: '${{ github.event.inputs.branch }}',
+            });

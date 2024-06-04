@@ -1,4 +1,4 @@
-// https://github.com/dyndotart/monorepo/blob/develop/packages/utils/src/short-id.ts
+// https://github.com/inbeta-group/monorepo/blob/develop/packages/utils/src/short-id.ts
 
 /**
  * Generates a 16-character unique identifier.
