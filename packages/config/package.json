@@ -1,7 +1,7 @@
 {
 	"name": "@ibg/config",
 	"description": "Shared configurations for inbeta.group packages",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"private": false,
 	"scripts": {
 		"lint": "eslint --ext .js,.ts,.jsx,.tsx src/",

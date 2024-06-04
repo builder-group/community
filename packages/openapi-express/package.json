@@ -1,7 +1,7 @@
 {
 	"name": "openapi-express",
 	"description": "Express Router with OpenApi types",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
