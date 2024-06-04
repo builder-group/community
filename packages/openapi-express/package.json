@@ -2,14 +2,15 @@
 	"name": "openapi-express",
 	"description": "Express Router with OpenApi types",
 	"version": "0.0.1",
-	"private": true,
+	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
 		"start:dev": "tsc -w",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
-		"test": "vitest run"
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest"
 	},
 	"source": "./src/index.ts",
 	"main": "./dist/cjs/index.js",

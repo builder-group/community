@@ -3,7 +3,12 @@
 	"description": "Shared configurations for inbeta.group packages",
 	"version": "0.0.7",
 	"private": false,
-	"scripts": {},
+	"scripts": {
+		"lint": "eslint --ext .js,.ts,.jsx,.tsx src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"update:latest": "pnpm update --latest"
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/inbeta-group/monorepo.git"

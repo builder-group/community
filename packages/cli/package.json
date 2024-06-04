@@ -12,7 +12,8 @@
 		"lint": "eslint --ext .js,.ts,.jsx,.tsx src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"update:latest": "pnpm update --latest"
 	},
 	"source": "./src/index.ts",
 	"main": "./dist/index.js",
@@ -29,30 +30,30 @@
 	},
 	"homepage": "https://inbeta.group/?source=package-json",
 	"dependencies": {
-		"@oclif/core": "^3.9.2",
-		"@rollup/plugin-commonjs": "^25.0.7",
+		"@oclif/core": "^3.26.9",
+		"@rollup/plugin-commonjs": "^25.0.8",
 		"@rollup/plugin-html": "^1.0.3",
 		"@rollup/plugin-json": "^6.1.0",
 		"@rollup/plugin-node-resolve": "^15.2.3",
 		"@rollup/plugin-replace": "^5.0.5",
 		"chalk": "^4.1.2",
-		"dotenv": "^16.3.1",
+		"dotenv": "^16.4.5",
 		"execa": "^8.0.1",
 		"figlet": "^1.7.0",
 		"lodash": "^4.17.21",
 		"maxmin": "^4.0.0",
-		"rollup": "^4.2.0",
+		"rollup": "^4.18.0",
 		"rollup-plugin-bundle-size": "^1.0.3",
-		"rollup-plugin-esbuild": "^6.1.0",
-		"rollup-plugin-license": "^3.2.0",
+		"rollup-plugin-esbuild": "^6.1.1",
+		"rollup-plugin-license": "^3.4.0",
 		"rollup-plugin-node-externals": "^5.1.3",
 		"rollup-plugin-postcss": "^4.0.2"
 	},
 	"devDependencies": {
-		"@types/figlet": "^1.5.7",
-		"@types/lodash": "^4.14.200",
-		"@types/node": "^20.8.10",
-		"type-fest": "^4.6.0"
+		"@types/figlet": "^1.5.8",
+		"@types/lodash": "^4.17.4",
+		"@types/node": "^20.14.1",
+		"type-fest": "^4.18.3"
 	},
 	"files": [
 		"dist",

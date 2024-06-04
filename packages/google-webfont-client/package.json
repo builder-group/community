@@ -1,11 +1,12 @@
 {
-	"name": "feature-fetch",
-	"description": "Straightforward and feature based fetch wrapper library",
-	"version": "0.0.2",
+	"name": "google-webfonts-client",
+	"description": "Google Webfont fetch client",
+	"version": "0.0.1",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
 		"start:dev": "tsc -w",
+		"gen:openapi": "npx openapi-typescript ./resources/openapi-v1.json -o ./src/gen/v1.ts",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
@@ -28,14 +29,13 @@
 	},
 	"homepage": "https://inbeta.group/?source=package-json",
 	"dependencies": {
-		"@ibg/utils": "workspace:*",
-		"ts-results-es": "4.1.0-alpha.1",
-		"url-parse": "^1.5.10"
+		"feature-fetch": "^0.0.2"
 	},
 	"devDependencies": {
-		"@ibg/config": "workspace:*",
-		"@types/node": "^20.8.10",
-		"@types/url-parse": "^1.4.11"
+		"@ibg/config": "^0.0.7",
+		"@types/node": "^20.14.1",
+		"dotenv": "^16.4.5",
+		"openapi-typescript": "^6.7.6"
 	},
 	"files": [
 		"dist",
