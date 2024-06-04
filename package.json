@@ -12,6 +12,7 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "turbo lint",
 		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
+		"update:latest": "turbo run update:latest",
 		"cli:hello": "chmod +x ./scripts/cli.sh && sh ./scripts/cli.sh hello"
 	},
 	"repository": {

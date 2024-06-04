@@ -1,8 +1,6 @@
-import type { TPrimitive, TUnionToIntersection } from '@ibg/utils';
+import type { TPrimitive } from '@ibg/utils';
 
-// =============================================================================
-// State
-// =============================================================================
+import type { TFeatureKeys, TSelectFeatures } from './features';
 
 export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> = {
 	_features: string[];
@@ -62,46 +60,6 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	_notify: (process: boolean) => void;
 } & TSelectFeatures<GValue, GSelectedFeatureKeys>;
 
-// =============================================================================
-// Features
-// =============================================================================
-
-export interface TFeatures<GValue = unknown> {
-	base: { _: null }; // TODO: Placeholder Feature: Figure out how to make the TS infer work with [] (empty array -> no feature)
-	undo: { undo: () => void; _history: GValue[] };
-	multiundo: {
-		multiundo: (count: number) => void;
-	};
-	persist: { persist: () => Promise<boolean>; deletePersisted: () => Promise<boolean> };
-}
-
-export type TFeatureKeys<GValue = unknown> = keyof TFeatures<GValue>;
-
-export type TSelectFeatureObjects<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> = {
-	[K in GSelectedFeatureKeys[number]]: TFeatures<GValue>[K];
-};
-
-export type TSelectFeatures<
-	GValue,
-	GSelectedFeatureKeys extends TFeatureKeys<GValue>[],
-	GSelectedFeatureObjects extends TSelectFeatureObjects<
-		GValue,
-		GSelectedFeatureKeys
-	> = TSelectFeatureObjects<GValue, GSelectedFeatureKeys>
-> = TUnionToIntersection<GSelectedFeatureObjects[keyof GSelectedFeatureObjects]>;
-
-export type TEnforceFeatures<
-	GFeatureKeys extends TFeatureKeys[],
-	GToEnforceFeatureKeys extends TFeatureKeys[]
-> =
-	Exclude<GToEnforceFeatureKeys, GFeatureKeys> extends never
-		? GFeatureKeys
-		: GFeatureKeys | Exclude<GToEnforceFeatureKeys, GFeatureKeys>;
-
-// =============================================================================
-// Listener
-// =============================================================================
-
 type TListenerCallback<GValue> = (value: TReadonlyIfObject<GValue>) => Promise<void> | void;
 export interface TListener<GValue> {
 	callback: TListenerCallback<GValue>;
@@ -109,10 +67,6 @@ export interface TListener<GValue> {
 }
 
 export type TListenerQueueItem<GValue = unknown> = { value: GValue } & TListener<GValue>;
-
-// =============================================================================
-// Helper
-// =============================================================================
 
 export type TReadonlyIfObject<GValue> = GValue extends undefined
 	? GValue

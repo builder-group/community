@@ -1,11 +1,10 @@
 import { Err, Ok } from 'ts-results-es';
 import { toArray } from '@ibg/utils';
 
-import type { TFetchClient, TFetchClientConfig, TFetchClientOptions, TURLParams } from '../types';
+import { ServiceException } from '../exceptions';
 import {
 	buildUrl,
 	FetchHeaders,
-	fetchWithRetries,
 	mapErrorToNetworkException,
 	mapErrorToServiceException,
 	mapResponseToRequestException,
@@ -13,9 +12,10 @@ import {
 	processRequestMiddlewares,
 	serializeBody,
 	serializeQueryParams
-} from '../utils';
+} from '../helper';
+import type { TFetchClient, TFetchClientConfig, TFetchClientOptions, TURLParams } from '../types';
 
-export function createFetchClient<GPaths extends {} = {}>(
+export function createFetchClient<GPaths extends object = object>(
 	options: TFetchClientOptions = {}
 ): TFetchClient<['base'], GPaths> {
 	const config: TFetchClientConfig = {
@@ -24,10 +24,11 @@ export function createFetchClient<GPaths extends {} = {}>(
 		headers: options.headers != null ? new FetchHeaders(options.headers) : new FetchHeaders(),
 		bodySerializer: options.bodySerializer ?? serializeBody,
 		querySerializer: options.querySerializer ?? serializeQueryParams,
-		middleware: toArray(options.middleware ?? [])
+		middleware: toArray(options.middleware ?? []),
+		fetch: options.fetch ?? typeof fetch === 'function' ? fetch : undefined
 	};
 
-	// Apply default content type header
+	// Apply default headers
 	if (!config.headers.has('Content-Type')) {
 		config.headers.set('Content-Type', 'application/json; charset=utf-8');
 	}
@@ -62,18 +63,26 @@ export function createFetchClient<GPaths extends {} = {}>(
 				query: queryParams
 			};
 
-			// Build request init object
 			const mergedHeaders = FetchHeaders.merge(headers, this._config.headers);
+
+			// Serialize body
+			let serializedBody = body;
+			if (body != null) {
+				try {
+					serializedBody = bodySerializer(body, mergedHeaders.get('Content-Type') ?? undefined);
+				} catch (error) {
+					return Err(mapErrorToServiceException(error, '#ERR_SERIALIZE_BODY'));
+				}
+			}
+
+			// Build request init object
 			let requestInit: RequestInit = {
 				redirect: 'follow',
 				...this._config.fetchProps,
 				...fetchProps,
 				method,
 				headers: mergedHeaders.toHeadersInit(),
-				body:
-					body != null
-						? bodySerializer(body, mergedHeaders.get('Content-Type') ?? undefined)
-						: undefined
+				body: serializedBody
 			};
 
 			// Remove `Content-Type` if serialized body is FormData.
@@ -107,12 +116,15 @@ export function createFetchClient<GPaths extends {} = {}>(
 				querySerializer
 			});
 
+			const baseFetch = this._config.fetch;
+			if (baseFetch == null) {
+				return Err(new ServiceException('#ERR_MISSING_FETCH'));
+			}
+
 			// Send request
 			let response: Response;
 			try {
-				response = await fetchWithRetries(finalUrl, {
-					requestInit
-				});
+				response = await baseFetch(finalUrl, requestInit);
 			} catch (error) {
 				return Err(mapErrorToNetworkException(error));
 			}

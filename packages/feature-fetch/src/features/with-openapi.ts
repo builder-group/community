@@ -1,7 +1,7 @@
 import type { TEnforceFeatures, TFeatureKeys, TFetchClient, TSelectFeatures } from '../types';
 
 export function withOpenApi<
-	GPaths extends {},
+	GPaths extends object,
 	GSelectedFeatureKeys extends TFeatureKeys[] = ['base']
 >(
 	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base']>, GPaths>
@@ -9,31 +9,23 @@ export function withOpenApi<
 	fetchClient._features.push('openapi');
 
 	const openApiFeature: TSelectFeatures<['openapi'], GPaths> = {
-		get(this: TFetchClient<['base'], GPaths>, path, options = {} as any) {
-			return this._baseFetch(path as string, 'GET', {
-				...options,
-				querySerializer: options.querySerializer as any
-			});
+		get(this: TFetchClient<['base'], GPaths>, path, options) {
+			return this._baseFetch(path as string, 'GET', options as any);
 		},
-		post(this: TFetchClient<['base'], GPaths>, path, body, options = {} as any) {
+		post(this: TFetchClient<['base'], GPaths>, path, body, options) {
 			return this._baseFetch(path as string, 'POST', {
-				...options,
-				body,
-				querySerializer: options.querySerializer as any
+				...(options as any),
+				body
 			});
 		},
-		put(this: TFetchClient<['base'], GPaths>, path, body, options = {} as any) {
+		put(this: TFetchClient<['base'], GPaths>, path, body, options) {
 			return this._baseFetch(path as string, 'PUT', {
-				...options,
-				body,
-				querySerializer: options.querySerializer as any
+				...(options as any),
+				body
 			});
 		},
-		del(this: TFetchClient<['base'], GPaths>, path, options = {} as any) {
-			return this._baseFetch(path as string, 'DELETE', {
-				...options,
-				querySerializer: options.querySerializer as any
-			});
+		del(this: TFetchClient<['base'], GPaths>, path, options) {
+			return this._baseFetch(path as string, 'DELETE', options as any);
 		}
 	};
 

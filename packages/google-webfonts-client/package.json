@@ -1,0 +1,44 @@
+{
+	"name": "google-webfonts-client",
+	"description": "Google Webfont fetch client",
+	"version": "0.0.1",
+	"private": false,
+	"scripts": {
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"start:dev": "tsc -w",
+		"gen:openapi": "npx openapi-typescript ./resources/openapi-v1.json -o ./src/gen/v1.ts",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest"
+	},
+	"source": "./src/index.ts",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/inbeta-group/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "AGPL-3.0-or-later",
+	"bugs": {
+		"url": "https://github.com/inbeta-group/monorepo/issues"
+	},
+	"homepage": "https://inbeta.group/?source=package-json",
+	"dependencies": {
+		"feature-fetch": "^0.0.2"
+	},
+	"devDependencies": {
+		"@ibg/config": "^0.0.7",
+		"@types/node": "^20.14.1",
+		"dotenv": "^16.4.5",
+		"openapi-typescript": "^6.7.6"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	]
+}

@@ -27,6 +27,7 @@ export function createState<GValue>(value: GValue, deferred = true): TState<GVal
 			// Undbind
 			return () => {
 				const index = this._listeners.indexOf(listener);
+				// eslint-disable-next-line no-bitwise -- .
 				if (~index) {
 					this._listeners.splice(index, 1);
 				}

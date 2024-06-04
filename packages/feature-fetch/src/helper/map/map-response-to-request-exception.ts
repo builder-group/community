@@ -9,7 +9,7 @@ export async function mapResponseToRequestException(
 	try {
 		const contentType = response.headers.get('Content-Type');
 
-		let errorData: any;
+		let errorData: unknown;
 		let errorCode: TErrorCode;
 		let errorDescription: string | undefined;
 		if (contentType && contentType.includes('application/json')) {
@@ -19,7 +19,7 @@ export async function mapResponseToRequestException(
 		} else {
 			errorData = await response.text();
 			errorCode = defaultErrorCode;
-			errorDescription = errorData;
+			errorDescription = errorData as string;
 		}
 
 		return new RequestException(errorCode, response.status, {
@@ -30,7 +30,7 @@ export async function mapResponseToRequestException(
 	} catch (error) {
 		return new RequestException(defaultErrorCode, response.status, {
 			description: 'Error processing response',
-			data: error as any,
+			data: error,
 			response
 		});
 	}

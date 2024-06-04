@@ -1,15 +1,29 @@
 import { sleep } from '@ibg/utils';
 
-// TODO: Resolve retries with middleware! so make them optional
+import type { TBaseFetch, TEnforceFeatures, TFeatureKeys, TFetchClient } from '../types';
+
+export function withRetries<GSelectedFeatureKeys extends TFeatureKeys[]>(
+	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base']>>,
+	options: { maxRetries?: number; retryCount?: number }
+): TFetchClient<['retries', ...GSelectedFeatureKeys]> {
+	fetchClient._features.push('retries');
+
+	const { maxRetries = 3, retryCount = 0 } = options;
+
+	const baseFetch = fetchClient._config.fetch;
+	if (baseFetch != null) {
+		fetchClient._config.fetch = (url, requestInit) =>
+			fetchWithRetries(url, { requestInit, maxRetries, retryCount, fetch: baseFetch });
+	}
+
+	return fetchClient as TFetchClient<['retries', ...GSelectedFeatureKeys]>;
+}
+
 export async function fetchWithRetries(
 	url: URL | string,
-	options: {
-		requestInit?: RequestInit;
-		maxRetries?: number;
-		retryCount?: number;
-	} = {}
+	config: TFetchWithRetriesConfig
 ): Promise<Response> {
-	const { requestInit, maxRetries = 3, retryCount = 0 } = options;
+	const { requestInit, maxRetries, retryCount, fetch: baseFetch } = config;
 	try {
 		// Send request
 		const response = await fetch(url, requestInit);
@@ -18,6 +32,7 @@ export async function fetchWithRetries(
 		if (response.status === 429 && maxRetries > 0) {
 			await sleep(calculateRateLimitTimeout(response));
 			return fetchWithRetries(url, {
+				fetch: baseFetch,
 				requestInit,
 				maxRetries: maxRetries - 1,
 				retryCount: retryCount + 1
@@ -30,6 +45,7 @@ export async function fetchWithRetries(
 		if (maxRetries > 0) {
 			await sleep(calculateNetworkErrorTimeout(retryCount));
 			return fetchWithRetries(url, {
+				fetch: baseFetch,
 				requestInit,
 				maxRetries: maxRetries - 1,
 				retryCount: retryCount + 1
@@ -39,6 +55,13 @@ export async function fetchWithRetries(
 		// If backoff strategy retries are exhausted, throw the network error
 		throw error;
 	}
+}
+
+interface TFetchWithRetriesConfig {
+	fetch: TBaseFetch;
+	requestInit?: RequestInit;
+	maxRetries: number;
+	retryCount: number;
 }
 
 function calculateRateLimitTimeout(response: Response): number {

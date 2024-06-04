@@ -1,5 +1,5 @@
-import type { TParseAs } from './api';
-import type { TFetchOptions, TFetchResponse } from './client';
+import type { TParseAs } from '../api';
+import type { TFetchOptions, TFetchResponse } from '../fetch-client';
 
 // =============================================================================
 // API Request

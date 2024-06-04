@@ -4,11 +4,11 @@
  * @param  queryParams - An object to be serialized
  * @returns - Returns serialized query parameters
  */
-export function serializeQueryParams(queryParams = {}) {
+export function serializeQueryParams(queryParams: Record<string, unknown> = {}): string {
 	if (typeof URLSearchParams === 'function') {
 		const searchParams = new URLSearchParams();
 		for (const [key, value] of Object.entries(queryParams)) {
-			if (value !== undefined && value !== null) {
+			if (value != null) {
 				searchParams.set(key, String(value));
 			}
 		}
