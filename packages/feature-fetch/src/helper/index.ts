@@ -1,5 +1,4 @@
 export * from './FetchHeaders';
-export * from './fetch-with-retries';
 export * from './has-features';
 export * from './is-status-code';
 export * from './map';

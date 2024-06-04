@@ -1,16 +1,19 @@
 import type { Result } from 'ts-results-es';
 
 import type { NetworkException, RequestException, ServiceException } from '../exceptions';
-import type { FetchHeaders } from '../utils';
+import type { FetchHeaders } from '../helper';
 import type { TParseAs, TRequestMethod } from './api';
 import type { TFeatureKeys, TSelectFeatures } from './features';
 
-export type TFetchClient<GSelectedFeatureKeys extends TFeatureKeys[], GPaths extends {} = {}> = {
+export type TFetchClient<
+	GSelectedFeatureKeys extends TFeatureKeys[],
+	GPaths extends object = object
+> = {
 	_features: string[];
 	_config: TFetchClientConfig;
 	_baseFetch: <
-		GSuccessResponseBody = any,
-		GErrorResponseBody = any,
+		GSuccessResponseBody = unknown,
+		GErrorResponseBody = unknown,
 		GParseAs extends TParseAs = 'json'
 	>(
 		path: string,
@@ -28,15 +31,18 @@ export interface TBaseFetchClientConfig {
 	querySerializer: TQuerySerializer;
 	bodySerializer: TBodySerializer;
 	fetchProps: Omit<RequestInit, 'body' | 'method' | 'headers'>;
+	fetch?: TBaseFetch;
 }
+
+export type TBaseFetch = (url: URL | string, init?: RequestInit) => ReturnType<typeof fetch>;
 
 export type TFetchClientConfig = {
 	headers: FetchHeaders;
 	middleware: TRequestMiddleware[];
 } & TBaseFetchClientConfig;
 
-export type TFetchClientOptions = Partial<TFetchClientConfig> & {
-	headers?: RequestInit['headers'];
+export type TFetchClientOptions = Partial<TBaseFetchClientConfig> & {
+	headers?: RequestInit['headers'] | FetchHeaders;
 	middleware?: TRequestMiddleware | TRequestMiddleware[];
 };
 
@@ -49,7 +55,7 @@ export type TQuerySerializer<
 > = (query: GQueryParams) => string;
 
 export type TBodySerializer<
-	GBody = any,
+	GBody = unknown,
 	GResult extends RequestInit['body'] = RequestInit['body']
 > = (body: GBody, contentType?: string) => GResult;
 
@@ -107,14 +113,14 @@ export type TResponseBodyWithParseAs<
 > = GParseAs extends 'json'
 	? GResponseBody
 	: GParseAs extends 'text'
-	? Awaited<ReturnType<Response['text']>>
-	: GParseAs extends 'blob'
-	? Awaited<ReturnType<Response['blob']>>
-	: GParseAs extends 'arrayBuffer'
-	? Awaited<ReturnType<Response['arrayBuffer']>>
-	: GParseAs extends 'stream'
-	? Response['body']
-	: never;
+		? Awaited<ReturnType<Response['text']>>
+		: GParseAs extends 'blob'
+			? Awaited<ReturnType<Response['blob']>>
+			: GParseAs extends 'arrayBuffer'
+				? Awaited<ReturnType<Response['arrayBuffer']>>
+				: GParseAs extends 'stream'
+					? Response['body']
+					: never;
 
 export interface TFetchResponseSuccess<GSuccessResponseBody, GParseAs extends TParseAs> {
 	data: TResponseBodyWithParseAs<GSuccessResponseBody, GParseAs>;

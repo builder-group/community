@@ -1,6 +1,6 @@
 import { ServiceException, type TErrorCode } from './ServiceException';
 
-export class RequestException<GData = any> extends ServiceException {
+export class RequestException<GData = unknown> extends ServiceException {
 	public readonly status: number;
 	public readonly response?: Response;
 	public readonly data?: GData;
