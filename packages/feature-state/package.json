@@ -2,7 +2,7 @@
 	"name": "feature-state",
 	"description": "Straightforward and feature based state management library for ReactJs",
 	"version": "0.0.1",
-	"private": true,
+	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
 		"start:dev": "tsc -w",

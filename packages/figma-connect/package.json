@@ -1,8 +1,8 @@
 {
-	"name": "figma-bridge",
+	"name": "figma-connect",
 	"description": "Straightforward and typesafe communication between Figma app and plugin",
 	"version": "0.0.1",
-	"private": true,
+	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
 		"start:dev": "tsc -w",
