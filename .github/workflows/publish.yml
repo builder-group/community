@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  # Note: Runs on the default branch so develop (Thus e.g. github.ref is develop)
-  repository_dispatch:
-    types: [publish-trigger]
   workflow_dispatch:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}

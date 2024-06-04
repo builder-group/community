@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Branch to merge into main'
+        description: 'Target branch'
         required: true
         default: 'develop'
 
@@ -25,27 +25,17 @@ jobs:
           token: ${{ env.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: 🔄 Merge develop into main
+      - name: 🔄 Create Merge Request
         uses: actions/github-script@v7
         with:
           script: |
-            github.rest.repos.merge({
+            github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              base: 'main',
               head: '${{ github.event.inputs.branch }}',
+              base: 'main',
+              title: 'Merge ${{ github.event.inputs.branch }} into main',
+              body: 'Automatically created merge request from workflow',
+              maintainer_can_modify: true
             });
-      
-      # Push from Action does not trigger subsequent action
-      # https://github.com/orgs/community/discussions/25702
-      # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#repository_dispatch
-      - name: 🔄 Trigger Publish Workflow
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.repos.createDispatchEvent({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              event_type: 'publish-trigger',
-              client_payload: {}
-            });
+
