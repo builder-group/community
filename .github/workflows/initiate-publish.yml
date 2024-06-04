@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Branch to merge into main'
+        description: 'Target branch'
         required: true
         default: 'develop'
 
@@ -34,7 +34,6 @@ jobs:
               repo: context.repo.repo,
               head: '${{ github.event.inputs.branch }}'
               base: 'main',
-              head: 'develop',
               title: 'Merge ${{ github.event.inputs.branch }} into main',
               body: 'Automatically created merge request from workflow',
               maintainer_can_modify: true
