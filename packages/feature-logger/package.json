@@ -27,7 +27,8 @@
 	},
 	"homepage": "https://inbeta.group/?source=github",
 	"devDependencies": {
-		"@ibg/config": "workspace:*"
+		"@ibg/config": "workspace:*",
+		"@types/node": "^20.8.10"
 	},
 	"files": [
 		"dist",
