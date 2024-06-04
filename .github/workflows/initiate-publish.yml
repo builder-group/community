@@ -32,7 +32,7 @@ jobs:
             github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              head: '${{ github.event.inputs.branch }}'
+              head: '${{ github.event.inputs.branch }}',
               base: 'main',
               title: 'Merge ${{ github.event.inputs.branch }} into main',
               body: 'Automatically created merge request from workflow',
