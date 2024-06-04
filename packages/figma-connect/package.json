@@ -1,7 +1,7 @@
 {
 	"name": "figma-connect",
 	"description": "Straightforward and typesafe communication between Figma app (iframe) and plugin (sandbox)",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
