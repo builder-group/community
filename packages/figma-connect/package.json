@@ -51,9 +51,9 @@
 		"@ibg/utils": "workspace:*"
 	},
 	"devDependencies": {
+		"@figma/plugin-typings": "^1.94.0",
 		"@ibg/config": "workspace:*",
-		"@figma/plugin-typings": "^1.82.0",
-		"@types/node": "^20.8.10"
+		"@types/node": "^20.14.1"
 	},
 	"files": [
 		"dist",
