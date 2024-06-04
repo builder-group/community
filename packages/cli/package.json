@@ -1,7 +1,7 @@
 {
 	"name": "@ibg/cli",
 	"description": "CLI tool for inbeta.group monorepo",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"private": false,
 	"bin": {
 		"ibg": "./bin/run"
