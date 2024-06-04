@@ -29,10 +29,10 @@
 	},
 	"homepage": "https://inbeta.group/?source=package-json",
 	"dependencies": {
-		"feature-fetch": "^0.0.2"
+		"feature-fetch": "workspace:*"
 	},
 	"devDependencies": {
-		"@ibg/config": "^0.0.7",
+		"@ibg/config": "workspace:*",
 		"@types/node": "^20.14.1",
 		"dotenv": "^16.4.5",
 		"openapi-typescript": "^6.7.6"
