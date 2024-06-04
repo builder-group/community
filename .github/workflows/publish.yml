@@ -90,12 +90,13 @@ jobs:
 
       - name: 🦋 Create Publish Pull Request or Publish to npm
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v1.4.7
         with:
           title: "chore(publish): version packages 🦋"
           publish: pnpm packages:publish
           version: pnpm packages:version
           commit: "chore(publish): version packages 🦋 [skip ci]"
+          branch: "main"
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ env.NPM_TOKEN }}
