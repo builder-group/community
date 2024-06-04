@@ -1,6 +1,6 @@
 {
 	"name": "figma-connect",
-	"description": "Straightforward and typesafe communication between Figma app and plugin",
+	"description": "Straightforward and typesafe communication between Figma app (iframe) and plugin (sandbox)",
 	"version": "0.0.1",
 	"private": false,
 	"scripts": {

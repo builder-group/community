@@ -7,7 +7,7 @@
 		"build:cli": "turbo run build --filter=cli && pnpm run cli:hello",
 		"packages:version": "changeset version && changeset publish",
 		"packages:publish": "changeset publish",
-		"packages:changeset": "changeset",
+		"packages:change": "changeset",
 		"clean": "turbo run clean && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "turbo lint",
