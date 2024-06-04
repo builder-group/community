@@ -17,7 +17,7 @@ module.exports = {
 	importOrder: [
 		// External packages
 		'<THIRD_PARTY_MODULES>',
-		// Dyn packages
+		// inbeta.group packages
 		'^@ibg/',
 		// Internal packages
 		'^@/',

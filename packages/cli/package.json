@@ -60,13 +60,13 @@
 		"README.md"
 	],
 	"oclif": {
-		"bin": "dyn-cli",
-		"dirname": "dyn-cli",
+		"bin": "ibg",
+		"dirname": "ibg",
 		"commands": "./dist/commands",
 		"topicSeparator": " ",
 		"topics": {
 			"bundle": {
-				"description": "Bundle dyn.art packages"
+				"description": "Bundle packages"
 			}
 		}
 	}
