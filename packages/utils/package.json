@@ -1,7 +1,7 @@
 {
 	"name": "@ibg/utils",
 	"description": "Tree shakable utility functions for inbeta.group packages",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
