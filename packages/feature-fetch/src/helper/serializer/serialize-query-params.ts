@@ -1,9 +1,5 @@
-/**
- * Serializes an object into URL query parameters.
- *
- * @param  queryParams - An object to be serialized
- * @returns - Returns serialized query parameters
- */
+// TODO: Support https://swagger.io/docs/specification/serialization/#query
+
 export function serializeQueryParams(queryParams: Record<string, unknown> = {}): string {
 	if (typeof URLSearchParams === 'function') {
 		const searchParams = new URLSearchParams();

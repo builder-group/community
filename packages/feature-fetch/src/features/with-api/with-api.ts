@@ -1,4 +1,4 @@
-import type { TEnforceFeatures, TFeatureKeys, TFetchClient, TSelectFeatures } from '../types';
+import type { TEnforceFeatures, TFeatureKeys, TFetchClient, TSelectFeatures } from '../../types';
 
 export function withApi<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base']>>

@@ -1,10 +1,10 @@
 import type { TUnionToIntersection } from '@ibg/utils';
 
-import type { TApiFeature } from './api-client';
-import type { TOpenApiFeature } from './openapi-client';
+import type { TApiFeature } from './api';
+import type { TOpenApiFeature } from './openapi';
 
-export * from './api-client';
-export * from './openapi-client';
+export * from './api';
+export * from './openapi';
 
 export type TFeatures<GPaths extends object = object> = {
 	base: { _: null }; // TODO: Placeholder Feature: Figure out how to make the TS infer work with [] (empty array -> no feature)

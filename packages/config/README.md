@@ -1,10 +1,52 @@
 # `@ibg/config`
 
-## 🙏 Contribution
+A collection of ESLint, Vite and Typescript configurations.
+
+# 📖 Usage
+
+## Typescript
+
+`tsconfig.json`
+```json
+{
+	"extends": "@ibg/config/react-library.tsconfig.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"declarationDir": "./dist/types",
+	},
+	"include": ["src"]
+}
+```
+
+## ESLint
+
+`.eslintrc.js`
+```js
+/**
+ * @type {import('eslint').Linter.Config}
+ */
+module.exports = {
+	root: true,
+	extends: [require.resolve('@ibg/config/eslint/react-internal'), 'plugin:storybook/recommended']
+};
+```
+
+## Vitest
+
+`vitest.config.js`
+```js
+const { defineConfig, mergeConfig } = require('vitest/config');
+const { nodeConfig } = require('@ibg/config/vite/node.config');
+
+module.exports = mergeConfig(nodeConfig, defineConfig({}));
+```
+
+# 🙏 Contribution
 
 ### Debugging ESLint Configuration
 
-If you are encountering issues or unexpected behavior with ESLint, you can use the following command to output the final configuration ESLint is using for a specific file. This can be helpful for debugging configuration issues.
+If you are encountering issues or unexpected behavior with ESLint, you can use the following command to output the final configuration. 
 
 ```bash
 npx eslint --print-config ./some/file/to/test/on.ts
@@ -22,8 +64,8 @@ TypeScript configurations are placed at the root to allow easy referencing from 
 }
 ```
 
-This setup bypasses limitations in TypeScript's module resolution mechanism when using the `extends` field.
+Node: Extending nested configuration didn't work.
 
-## 🌟 Credits
+# 🌟 Credits
 
 This configuration is based on the [`turbo-basic`](https://github.com/vercel/turbo/tree/main/examples/basic) starter template and will be kept in sync with it as the Vercel team knows better than me what configurations settings are best for NextJs apps and co. Also [`tsconfig/bases`](https://github.com/tsconfig/bases) was a source of inspiration.

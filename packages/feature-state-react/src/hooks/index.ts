@@ -1,1 +1,1 @@
-export * from './use-dyn-state';
+export * from './use-feature-state';

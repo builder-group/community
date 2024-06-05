@@ -1,103 +1,113 @@
 # `@ibg/cli`
+> Status: Experimental
 
-## > `ibg bundle`
+A CLI tool for bundling TypeScript libraries with presets, powered by Rollup and Esbuild.
 
-### Auto-reading `exports` in `package.json` for Bundling
+### Motivation
+Eliminate the hassle of manual configuring Rollup by providing a flexible Rollup wrapper with preset configurations for Figma Plugin, Rust (Wasm), and Typescript library bundling. 
 
-The `@ibg/cli` bundler can automatically interpret the exports field in your `package.json` to deduce appropriate input and output paths for bundling.
+### Alternatives
+- [tsup](https://github.com/egoist/tsup)
 
-#### Recognized `exports` Formats
+# 📖 Usage
 
-1. **Object-based Mappings (Nested Conditions or Subpaths)**:
+## Bundle Files
 
-   - Specify exports for specific conditions or subpaths.
-     ```json
-     {
-     	"exports": {
-     		"package1": {
-     			"import": "./feature.mjs",
-     			"require": "./feature.cjs"
-     		}
-     	}
-     }
-     ```
+To bundle your files, run:
+```bash
+ibg bundle
+```
 
-2. **Top-level Fields**:
-   - The bundler will automatically consider `source`, `main`, and `module` fields if no specific export conditions are found.
-     ```json
-     {
-     	"source": "./src/index.ts",
-     	"main": "./dist/cjs/index.js",
-     	"module": "./dist/esm/index.js"
-     }
-     ```
+Define the source file and output locations in `package.json`:
+```json
+{
+  "source": "./src/index.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts"
+}
+```
+Output:
+- `dist/esm`: ESM bundle
+- `dist/cjs`: CommonJS bundle
+- `dist/types`: TypeScript types
 
-#### Recommendations
+### Multiple Files
 
-- **TypeScript Source**: If you're using TypeScript, ensure you specify the main TypeScript file in the `source` field.
-- **Entry Points**: The bundler primarily looks at the `main` and `module` fields for determining the entry points for CommonJS and ES Module formats, respectively.
-- **Explicit Paths**: While the bundler tries its best to auto-determine paths, for the most predictable results, ensure that you specify the input and output paths explicitly.
+To bundle multiple files, use the `exports` field:
+```json
+{
+  "exports": {
+    "./package1": {
+      "source": "./src/index.ts",
+      "main": "./dist/package1/cjs/index.js",
+      "module": "./dist/package1/esm/index.js",
+      "types": "./dist/package1/types/index.d.ts"
+    }
+  }
+}
+```
+Output:
+- `dist/package1/esm`: ESM bundle
+- `dist/package1/cjs`: CommonJS bundle
+- `dist/package1/types`: TypeScript types
 
-### **Merging Rollup Configurations with Placeholders**
+### Custom Configuration
 
-The `@ibg/cli` bundler offers a unique way to combine two Rollup configurations. By designating plugin placeholders in one configuration, you can replace them with actual plugin instances from a secondary configuration. This flexibility allows you to deftly adjust the plugin order or replace plugins without restructuring your entire setup.
+Expand the preset configuration via a `dyn.config.js` file.
 
-The merging behavior is by default `base` but you can change it with the `--pluginTemplate` option:
+#### Add Rollup plugins
 
-#### **1. Using `--pluginTemplate=override`**
+The `@ibg/cli` allows combining two Rollup configurations using plugin placeholders.
 
-Here, the `overrideConfig` acts as the template. Its placeholders are filled by plugins from `baseConfig`.
+- **`override`** (`isBase = false`): Fill placeholders in `overrideConfig` with plugins from `baseConfig`.
+  ```javascript
+  // Base Configuration (rollup.config.base.js)
+  export default {
+    plugins: [nodeExternals(), commonjs(), 'import-css', typescriptPaths(), esbuild()]
+  };
 
-**Base Configuration (`rollup.config.base.ts`):**
+  // Override Configuration (rollup.config.js)
+  export default {
+    plugins: [css()]
+  };
 
-```javascript
-export default {
-	plugins: [
-		nodeExternals(),
-		commonjs(),
-		'import-css', // Ignored if 'override'
-		typescriptPaths(),
-		esbuild()
-	]
+  // Result
+  plugins: [nodeExternals(), commonjs(), css(), typescriptPaths(), esbuild()];
+  ```
+
+- **`base`** (`isBase = true`): Fill placeholders in `baseConfig` with plugins from `overrideConfig`.
+  ```javascript
+  // Base Configuration (rollup.config.base.js)
+  export default {
+    plugins: [nodeExternals(), commonjs(), 'import-css', typescriptPaths(), esbuild()]
+  };
+
+  // Override Configuration (rollup.config.js)
+  export default {
+    plugins: ['node-externals', 'commonjs', css(), 'resolve-typescript-paths', 'esbuild']
+  };
+
+  // Result
+  plugins: [nodeExternals(), commonjs(), css(), typescriptPaths(), esbuild()];
+  ```
+
+In the below example we expand the preset library Rollup config with the `rollup-plugin-preserve-directives` plugin.
+
+```js
+/**
+ * @type {import('@ibg/cli').TDynConfig}
+ */
+module.exports = {
+	library: {
+		rollupConfig: {
+			isBase: false,
+			options: {
+				plugins: [preserveDirectives()]
+			}
+		}
+	}
 };
 ```
 
-**Override Configuration (`rollup.config.js`):**
 
-```javascript
-export default {
-	plugins: ['node-externals', 'commonjs', css(), 'resolve-typescript-paths', 'esbuild']
-};
-```
-
-**Merged Configuration (using `--pluginTemplate=override`):**
-
-```javascript
-plugins: [nodeExternals(), commonjs(), css(), typescriptPaths(), esbuild()];
-```
-
-#### **2. Using `--pluginTemplate=base`**
-
-In this scenario, the `baseConfig` is the template. Its placeholders are filled with plugins from the `overrideConfig`.
-
-**Base Configuration (`rollup.config.base.ts`):**
-
-```javascript
-export default {
-	plugins: [nodeExternals(), commonjs(), 'import-css', typescriptPaths(), esbuild()]
-};
-```
-
-**Override Configuration (`rollup.config.js`):**
-
-```javascript
-export default {
-	plugins: [css()]
-};
-```
-
-**Merged Configuration (using `--pluginTemplate=base`):**
-
-```javascript
-plugins: [nodeExternals(), commonjs(), css(), typescriptPaths(), esbuild()];
-```

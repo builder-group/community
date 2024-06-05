@@ -60,7 +60,7 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	_notify: (process: boolean) => void;
 } & TSelectFeatures<GValue, GSelectedFeatureKeys>;
 
-type TListenerCallback<GValue> = (value: TReadonlyIfObject<GValue>) => Promise<void> | void;
+type TListenerCallback<GValue> = (value: TReadonlyIfObject<GValue>) => void;
 export interface TListener<GValue> {
 	callback: TListenerCallback<GValue>;
 	level: number;

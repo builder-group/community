@@ -1,6 +1,6 @@
-import URL from 'url-parse';
+import Url from 'url-parse';
 
-import { mapErrorToServiceException } from '../map';
+import { mapErrorToServiceException } from '../mapper';
 
 export function parseAndValidateUrl(
 	urlString: string,
@@ -10,16 +10,12 @@ export function parseAndValidateUrl(
 	origin: string;
 } {
 	try {
-		const url = new URL(urlString);
+		const url = new Url(urlString);
 		return {
-			path: `${url.pathname}${withSuffix ? url.query + url.hash : ''}` as `/${string}`,
+			path: `${url.pathname}${withSuffix ? `${url.query}${url.hash}` : ''}` as `/${string}`,
 			origin: url.origin
 		};
 	} catch (error) {
-		throw mapErrorToServiceException(
-			error,
-			'#ERR_RESOLVE_URL',
-			`Failed to resolve url: ${urlString}`
-		);
+		throw mapErrorToServiceException(error, '#ERR_PARSE_URL', `Failed to parse url: ${urlString}`);
 	}
 }

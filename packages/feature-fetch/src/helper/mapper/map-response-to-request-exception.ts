@@ -12,7 +12,7 @@ export async function mapResponseToRequestException(
 		let errorData: unknown;
 		let errorCode: TErrorCode;
 		let errorDescription: string | undefined;
-		if (contentType && contentType.includes('application/json')) {
+		if (contentType?.includes('application/json')) {
 			errorData = await response.json();
 			errorCode = getErrorCode(errorData) ?? defaultErrorCode;
 			errorDescription = getErrorDescription(errorData) ?? undefined;

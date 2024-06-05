@@ -1,7 +1,7 @@
 import { Err, Ok } from 'ts-results-es';
 import { toArray } from '@ibg/utils';
 
-import { ServiceException } from '../exceptions';
+import { ServiceException } from './exceptions';
 import {
 	buildUrl,
 	FetchHeaders,
@@ -12,8 +12,8 @@ import {
 	processRequestMiddlewares,
 	serializeBody,
 	serializeQueryParams
-} from '../helper';
-import type { TFetchClient, TFetchClientConfig, TFetchClientOptions, TURLParams } from '../types';
+} from './helper';
+import type { TFetchClient, TFetchClientConfig, TFetchClientOptions, TUrlParams } from './types';
 
 export function createFetchClient<GPaths extends object = object>(
 	options: TFetchClientOptions = {}
@@ -45,20 +45,20 @@ export function createFetchClient<GPaths extends object = object>(
 				pathParams,
 				queryParams,
 				body = undefined,
-				pathPrefix = this._config.prefixUrl,
+				prefixUrl = this._config.prefixUrl,
 				fetchProps = {},
 				middlewareProps
 			} = baseFetchOptions;
 			const headers = new FetchHeaders(baseFetchOptions.headers);
 
-			// Parse and validate URL to ensure that even if path is a full URL and baseUrl is an empty string,
+			// Parse and validate Url to ensure that even if path is a full URL and baseUrl is an empty string,
 			// the finalPath and origin can still be correctly extracted
 			const { path: parsedPath, origin } = parseAndValidateUrl(
-				`${pathPrefix}${path}`,
+				`${prefixUrl}${path}`,
 				queryParams == null
 			);
 
-			const urlParams: TURLParams = {
+			const urlParams: TUrlParams = {
 				path: pathParams,
 				query: queryParams
 			};
@@ -133,12 +133,17 @@ export function createFetchClient<GPaths extends object = object>(
 			if (response.ok) {
 				let data: any = response.body;
 				if (parseAs !== 'stream') {
-					const cloned = typeof response.clone === 'function' ? response.clone() : response; // Clone method not supported by Figma sandbox environment
 					try {
 						data =
-							typeof cloned[parseAs] === 'function' ? await cloned[parseAs]() : await cloned.text();
+							typeof response[parseAs] === 'function'
+								? await response[parseAs]()
+								: await response.text();
 					} catch (error) {
-						data = cloned.text();
+						return Err(
+							new ServiceException('#ERR_PARSE_RESPONSE', {
+								message: `Failed to parse response to '${parseAs}'`
+							})
+						);
 					}
 				}
 				return Ok({ data, response });

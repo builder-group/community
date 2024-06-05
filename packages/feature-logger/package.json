@@ -1,6 +1,6 @@
 {
 	"name": "feature-logger",
-	"description": "Straightforward and feature based logger library",
+	"description": "Straightforward, typesafe, and feature-based logging library",
 	"version": "0.0.8",
 	"private": false,
 	"scripts": {

@@ -1,6 +1,6 @@
 {
 	"name": "feature-state",
-	"description": "Straightforward and feature based state management library for ReactJs",
+	"description": "Straightforward, typesafe, and feature-based state management library for ReactJs",
 	"version": "0.0.3",
 	"private": false,
 	"scripts": {

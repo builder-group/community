@@ -1,9 +1,12 @@
 import type { TParseAs } from '../api';
 import type { TFetchOptions, TFetchResponse } from '../fetch-client';
 
-// =============================================================================
-// API Request
-// =============================================================================
+export interface TApiFeature {
+	get: TApiGet;
+	put: TApiPut;
+	post: TApiPost;
+	del: TApiDelete;
+}
 
 export type TApiGet = <
 	GSucessResponseBody = unknown,
@@ -17,7 +20,7 @@ export type TApiGet = <
 export type TApiPost = <
 	GSuccessResponseBody = unknown,
 	GErrorResponseBody = unknown,
-	GRequestBody extends RequestInit['body'] = any,
+	GRequestBody extends RequestInit['body'] | Record<string, unknown> = Record<string, unknown>,
 	GParseAs extends TParseAs = 'json'
 >(
 	path: string,
@@ -28,7 +31,7 @@ export type TApiPost = <
 export type TApiPut = <
 	GSuccessResponseBody = unknown,
 	GErrorResponseBody = unknown,
-	GRequestBody extends RequestInit['body'] = any,
+	GRequestBody extends RequestInit['body'] | Record<string, unknown> = Record<string, unknown>,
 	GParseAs extends TParseAs = 'json'
 >(
 	path: string,
@@ -44,14 +47,3 @@ export type TApiDelete = <
 	path: string,
 	options?: TFetchOptions<GParseAs>
 ) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
-
-// =============================================================================
-// API Feature
-// =============================================================================
-
-export interface TApiFeature {
-	get: TApiGet;
-	put: TApiPut;
-	post: TApiPost;
-	del: TApiDelete;
-}

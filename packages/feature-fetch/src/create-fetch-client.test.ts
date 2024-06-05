@@ -1,7 +1,12 @@
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
-import { baseUrl, server, useMockRequestHandler } from '../__tests__/use-mock-request-handler';
 import { createFetchClient } from './create-fetch-client';
+
+const server = setupServer();
+
+const BASE_URL = 'https://api.example.com';
 
 describe('createFetchClient', () => {
 	beforeAll(() => {
@@ -15,15 +20,18 @@ describe('createFetchClient', () => {
 	});
 
 	it('should make a GET request successfully', async () => {
-		useMockRequestHandler({
-			baseUrl,
-			method: 'get',
-			path: '/test',
-			body: { message: 'Success' },
-			status: 200
-		});
+		server.use(
+			http.get(new URL('/test', BASE_URL).toString(), () => {
+				return HttpResponse.json(
+					{ message: 'Success' },
+					{
+						status: 200
+					}
+				);
+			})
+		);
 
-		const client = createFetchClient({ prefixUrl: baseUrl });
+		const client = createFetchClient({ prefixUrl: BASE_URL });
 		const result = await client._baseFetch('/test', 'GET', {});
 
 		expect(result.isOk()).toBe(true);
@@ -31,15 +39,18 @@ describe('createFetchClient', () => {
 	});
 
 	it('should handle network errors gracefully', async () => {
-		useMockRequestHandler({
-			baseUrl,
-			method: 'get',
-			path: '/test',
-			status: 500,
-			body: { code: 500, message: 'Internal Server Error' }
-		});
+		server.use(
+			http.get(new URL('/test', BASE_URL).toString(), () => {
+				return HttpResponse.json(
+					{ code: 500, message: 'Internal Server Error' },
+					{
+						status: 500
+					}
+				);
+			})
+		);
 
-		const client = createFetchClient({ prefixUrl: baseUrl });
+		const client = createFetchClient({ prefixUrl: BASE_URL });
 		const result = await client._baseFetch('/test', 'GET', {});
 
 		expect(result.isErr()).toBe(true);

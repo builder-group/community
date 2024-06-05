@@ -13,7 +13,7 @@ class MockStorage<GValue> implements StorageInterface<GValue> {
 	}
 
 	async load(key: string): Promise<GValue | typeof FAILED_TO_LOAD_IDENTIFIER> {
-		return this.store[key] || FAILED_TO_LOAD_IDENTIFIER;
+		return this.store[key] ?? FAILED_TO_LOAD_IDENTIFIER;
 	}
 
 	async delete(key: string): Promise<boolean> {

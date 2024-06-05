@@ -71,11 +71,11 @@ export type TRequestMiddleware = (
 
 export interface TRequestMiddlewareData {
 	requestInit: RequestInit;
-	queryParams: TURLParams['query'];
-	pathParams: TURLParams['path'];
+	queryParams: TUrlParams['query'];
+	pathParams: TUrlParams['path'];
 }
 
-export interface TURLParams {
+export interface TUrlParams {
 	query?: Record<string, unknown> | null;
 	path?: Record<string, unknown> | null;
 }
@@ -87,14 +87,14 @@ export interface TURLParams {
 export interface TBaseFetchOptions<GParseAs extends TParseAs> {
 	parseAs?: GParseAs | TParseAs; // '| TParseAs' to fix VsCode autocomplete
 	headers?: RequestInit['headers'];
-	pathPrefix?: string;
+	prefixUrl?: string;
 	fetchProps?: Omit<RequestInit, 'body' | 'method'>;
 	middlewareProps?: unknown;
 }
 
 export type TFetchOptions<GParseAs extends TParseAs> = {
-	queryParams?: TURLParams['query'];
-	pathParams?: TURLParams['path'];
+	queryParams?: TUrlParams['query'];
+	pathParams?: TUrlParams['path'];
 	querySerializer?: TQuerySerializer;
 	bodySerializer?: TBodySerializer;
 } & TBaseFetchOptions<GParseAs>;

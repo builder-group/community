@@ -1,24 +1,24 @@
-import type { TQuerySerializer, TURLParams } from '../../types';
-import { serializeQueryParams } from '../serialize';
+import type { TQuerySerializer, TUrlParams } from '../../types';
+import { serializeQueryParams } from '../serializer';
 
-export function buildUrl(baseURL: string, options: TBuildURIOptions): string {
+export function buildUrl(baseUrl: string, options: TBuildUrlOptions): string {
 	const {
 		path = '',
 		params: { query: queryParams = {}, path: pathParams = {} } = {},
 		querySerializer = serializeQueryParams
 	} = options;
-	const sanitizedBaseURL = sanitizeBaseURL(baseURL);
+	const sanitizedBaseURL = sanitizeBaseUrl(baseUrl);
 	const pathWithParams = injectPathParams(path, pathParams ?? undefined);
-	const finalURL = appendQueryParams(
+	const finalUrl = appendQueryParams(
 		`${sanitizedBaseURL}${pathWithParams}`,
 		querySerializer,
 		queryParams ?? undefined
 	);
-	return finalURL;
+	return finalUrl;
 }
 
 // Removes trailing slash from the base URL
-function sanitizeBaseURL(baseUrl: string): string {
+function sanitizeBaseUrl(baseUrl: string): string {
 	return baseUrl.replace(/\/$/, '');
 }
 
@@ -46,8 +46,8 @@ function appendQueryParams(
 	return path;
 }
 
-interface TBuildURIOptions {
+interface TBuildUrlOptions {
 	path?: `/${string}`;
-	params?: TURLParams;
+	params?: TUrlParams;
 	querySerializer?: TQuerySerializer;
 }

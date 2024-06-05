@@ -1,7 +1,7 @@
 import { describe, it } from 'vitest';
 
-import type { paths } from '../__tests__/resources/mock-openapi-types';
-import { createFetchClient } from '../factories/create-fetch-client';
+import type { paths } from '../../__tests__/resources/mock-openapi-types';
+import { createFetchClient } from '../../create-fetch-client';
 import { withOpenApi } from './with-openapi';
 
 describe('withOpenApi function tests', () => {

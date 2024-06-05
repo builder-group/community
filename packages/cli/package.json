@@ -1,6 +1,6 @@
 {
 	"name": "@ibg/cli",
-	"description": "CLI tool for inbeta.group monorepo",
+	"description": "CLI to bundle Typescript libraries with presets, powered by Rollup and Esbuild",
 	"version": "0.0.8",
 	"private": false,
 	"bin": {

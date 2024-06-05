@@ -30,8 +30,8 @@ export function withPersist<GValue, GSelectedFeatureKeys extends TFeatureKeys<GV
 			}
 
 			// Setup listener
-			state.listen(async (value) => {
-				await storage.save(key, value);
+			state.listen((value) => {
+				storage.save(key, value);
 			});
 
 			return success;

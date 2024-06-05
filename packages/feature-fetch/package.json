@@ -1,6 +1,6 @@
 {
 	"name": "feature-fetch",
-	"description": "Straightforward and feature based fetch wrapper library",
+	"description": "Straightforward, typesafe, and feature-based fetch wrapper",
 	"version": "0.0.3",
 	"private": false,
 	"scripts": {
