@@ -3,11 +3,11 @@ import type { Result, TFetchClient, TOpenApiFetchResponse } from 'feature-fetch'
 import type { paths } from './gen/v1';
 
 export * from 'feature-fetch';
-export * from './create-google-client';
+export * from './create-google-webfonts-client';
 
 declare module 'feature-fetch' {
 	interface TThirdPartyFeatures {
-		google: {
+		'google-webfonts': {
 			rawFetchClient: TFetchClient<['base', 'api']>;
 			getWebFonts(
 				options?: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>

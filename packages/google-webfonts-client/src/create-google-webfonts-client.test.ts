@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { createGoogleClient } from './create-google-client';
+import { createGoogleWebfontsClient } from './create-google-webfonts-client';
 
 describe('createGoogleClient function tests', () => {
 	it('should have correct types', async () => {
-		const client = createGoogleClient({
+		const client = createGoogleWebfontsClient({
 			apiKey: '-'
 		});
 
@@ -14,6 +14,12 @@ describe('createGoogleClient function tests', () => {
 		const response = await client.downloadFontFile('Roboto Serif', {
 			fontWeight: 100,
 			fontStyle: 'italic'
+		});
+
+		await client.get('/webfonts', {
+			queryParams: {
+				key: 'test'
+			}
 		});
 
 		expect(response).not.toBeNull();

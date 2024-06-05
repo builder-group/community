@@ -16,13 +16,16 @@ const REGULAR_FONT_WEIGHT = 400;
 
 export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base', 'openapi']>>
-): TFetchClient<['google', ...GSelectedFeatureKeys], paths> {
+): TFetchClient<['google-webfonts', ...GSelectedFeatureKeys], paths> {
 	if (hasFeatures(fetchClient, ['openapi'])) {
-		fetchClient._features.push('google');
+		fetchClient._features.push('google-webfonts');
 
-		const googleFeature: TSelectFeatures<['google']> = {
+		const googleFeature: TSelectFeatures<['google-webfonts']> = {
 			rawFetchClient: createApiFetchClient(),
-			async getWebFonts(this: TFetchClient<['base', 'openapi', 'google'], paths>, options = {}) {
+			async getWebFonts(
+				this: TFetchClient<['base', 'openapi', 'google-webfonts'], paths>,
+				options = {}
+			) {
 				return this.get('/webfonts', {
 					queryParams: {
 						key: 'not-set', // Set by middleware,
@@ -31,7 +34,7 @@ export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 				});
 			},
 			async getFontFileUrl(
-				this: TFetchClient<['base', 'openapi', 'google'], paths>,
+				this: TFetchClient<['base', 'openapi', 'google-webfonts'], paths>,
 				family,
 				options = {}
 			) {
@@ -68,7 +71,7 @@ export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 				return Ok(null);
 			},
 			async downloadFontFile(
-				this: TFetchClient<['base', 'openapi', 'google'], paths>,
+				this: TFetchClient<['base', 'openapi', 'google-webfonts'], paths>,
 				family,
 				options = {}
 			) {
@@ -98,7 +101,7 @@ export function withGoogle<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		// Merge existing features from the state with the new api feature
 		const _fetchClient = Object.assign(fetchClient, googleFeature);
 
-		return _fetchClient as TFetchClient<['google', ...GSelectedFeatureKeys], paths>;
+		return _fetchClient as TFetchClient<['google-webfonts', ...GSelectedFeatureKeys], paths>;
 	}
 
 	throw Error('FetchClient must have "openapi" feature to use withGoogle');
@@ -111,13 +114,13 @@ function findClosestVariant(
 	fontWeight = REGULAR_FONT_WEIGHT,
 	fontStyle: 'italic' | 'regular' = 'regular'
 ): string | null {
-	let variant;
+	let variant: string;
 	if (fontWeight === REGULAR_FONT_WEIGHT) {
 		variant = fontStyle;
 	} else if (fontStyle === 'regular') {
-		variant = `${fontWeight}`;
+		variant = fontWeight.toString();
 	} else {
-		variant = `${fontWeight}${fontStyle}`;
+		variant = `${fontWeight.toString()}${fontStyle}`;
 	}
 
 	if (variants.includes(variant)) {
