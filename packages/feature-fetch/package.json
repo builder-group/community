@@ -29,8 +29,7 @@
 	"homepage": "https://inbeta.group/?source=package-json",
 	"dependencies": {
 		"@ibg/utils": "workspace:*",
-		"ts-results-es": "4.2.0",
-		"url-parse": "^1.5.10"
+		"ts-results-es": "4.2.0"
 	},
 	"devDependencies": {
 		"@ibg/config": "workspace:*",

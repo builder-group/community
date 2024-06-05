@@ -28,6 +28,7 @@ export type TFetchClient<
 
 export interface TBaseFetchClientConfig {
 	prefixUrl: string;
+	pathSerializer: TPathSerializer;
 	querySerializer: TQuerySerializer;
 	bodySerializer: TBodySerializer;
 	fetchProps: Omit<RequestInit, 'body' | 'method' | 'headers'>;
@@ -50,14 +51,17 @@ export type TFetchClientOptions = Partial<TBaseFetchClientConfig> & {
 // Serializer Methods
 // ============================================================================
 
+export type TPathSerializer<GPathParams extends Record<string, unknown> = Record<string, unknown>> =
+	(path: string, params: GPathParams) => string;
+
 export type TQuerySerializer<
 	GQueryParams extends Record<string, unknown> = Record<string, unknown>
-> = (query: GQueryParams) => string;
+> = (params: GQueryParams) => string;
 
-export type TBodySerializer<
-	GBody = unknown,
-	GResult extends RequestInit['body'] = RequestInit['body']
-> = (body: GBody, contentType?: string) => GResult;
+export type TBodySerializer<GBody = unknown, GResult extends TSerializedBody = TSerializedBody> = (
+	body: GBody,
+	contentType?: string
+) => GResult;
 
 // ============================================================================
 // Middleware
@@ -76,9 +80,12 @@ export interface TRequestMiddlewareData {
 }
 
 export interface TUrlParams {
-	query?: Record<string, unknown> | null;
-	path?: Record<string, unknown> | null;
+	query?: Record<string, unknown>;
+	path?: Record<string, unknown>;
 }
+
+export type TSerializedBody = RequestInit['body'];
+export type TUnserializedBody = TSerializedBody | Record<string, unknown>;
 
 // =============================================================================
 // Fetch Options
@@ -88,7 +95,7 @@ export interface TBaseFetchOptions<GParseAs extends TParseAs> {
 	parseAs?: GParseAs | TParseAs; // '| TParseAs' to fix VsCode autocomplete
 	headers?: RequestInit['headers'];
 	prefixUrl?: string;
-	fetchProps?: Omit<RequestInit, 'body' | 'method'>;
+	fetchProps?: Omit<RequestInit, 'body' | 'method' | 'headers'>;
 	middlewareProps?: unknown;
 }
 
@@ -100,7 +107,7 @@ export type TFetchOptions<GParseAs extends TParseAs> = {
 } & TBaseFetchOptions<GParseAs>;
 
 export type TFetchOptionsWithBody<GParseAs extends TParseAs> = {
-	body?: RequestInit['body']; // TODO: Only if POST or PUT
+	body?: TUnserializedBody; // TODO: Only if POST or PUT
 } & TFetchOptions<GParseAs>;
 
 // =============================================================================

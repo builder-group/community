@@ -1,4 +1,4 @@
-import { ServiceException } from '../../exceptions';
+import { ServiceException } from '../../../exceptions';
 
 export function serializeBodyToJson(body: unknown): string {
 	try {

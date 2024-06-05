@@ -8,12 +8,18 @@ import {
 	mapErrorToNetworkException,
 	mapErrorToServiceException,
 	mapResponseToRequestException,
-	parseAndValidateUrl,
 	processRequestMiddlewares,
 	serializeBody,
+	serializePathParams,
 	serializeQueryParams
 } from './helper';
-import type { TFetchClient, TFetchClientConfig, TFetchClientOptions, TUrlParams } from './types';
+import type {
+	TFetchClient,
+	TFetchClientConfig,
+	TFetchClientOptions,
+	TSerializedBody,
+	TUrlParams
+} from './types';
 
 export function createFetchClient<GPaths extends object = object>(
 	options: TFetchClientOptions = {}
@@ -23,7 +29,9 @@ export function createFetchClient<GPaths extends object = object>(
 		fetchProps: options.fetchProps ?? {},
 		headers: options.headers != null ? new FetchHeaders(options.headers) : new FetchHeaders(),
 		bodySerializer: options.bodySerializer ?? serializeBody,
-		querySerializer: options.querySerializer ?? serializeQueryParams,
+		pathSerializer: options.pathSerializer ?? serializePathParams,
+		querySerializer:
+			options.querySerializer ?? ((queryParams) => serializeQueryParams(queryParams)),
 		middleware: toArray(options.middleware ?? []),
 		fetch: options.fetch ?? typeof fetch === 'function' ? fetch : undefined
 	};
@@ -51,13 +59,6 @@ export function createFetchClient<GPaths extends object = object>(
 			} = baseFetchOptions;
 			const headers = new FetchHeaders(baseFetchOptions.headers);
 
-			// Parse and validate Url to ensure that even if path is a full URL and baseUrl is an empty string,
-			// the finalPath and origin can still be correctly extracted
-			const { path: parsedPath, origin } = parseAndValidateUrl(
-				`${prefixUrl}${path}`,
-				queryParams == null
-			);
-
 			const urlParams: TUrlParams = {
 				path: pathParams,
 				query: queryParams
@@ -66,7 +67,7 @@ export function createFetchClient<GPaths extends object = object>(
 			const mergedHeaders = FetchHeaders.merge(headers, this._config.headers);
 
 			// Serialize body
-			let serializedBody = body;
+			let serializedBody: TSerializedBody;
 			if (body != null) {
 				try {
 					serializedBody = bodySerializer(body, mergedHeaders.get('Content-Type') ?? undefined);
@@ -110,8 +111,8 @@ export function createFetchClient<GPaths extends object = object>(
 			}
 
 			// Build final URL
-			const finalUrl = buildUrl(origin, {
-				path: parsedPath,
+			const finalUrl = buildUrl(prefixUrl, {
+				path,
 				params: urlParams,
 				querySerializer
 			});

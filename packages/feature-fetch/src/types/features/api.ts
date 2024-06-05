@@ -1,5 +1,5 @@
 import type { TParseAs } from '../api';
-import type { TFetchOptions, TFetchResponse } from '../fetch-client';
+import type { TFetchOptions, TFetchResponse, TUnserializedBody } from '../fetch-client';
 
 export interface TApiFeature {
 	get: TApiGet;
@@ -20,7 +20,7 @@ export type TApiGet = <
 export type TApiPost = <
 	GSuccessResponseBody = unknown,
 	GErrorResponseBody = unknown,
-	GRequestBody extends RequestInit['body'] | Record<string, unknown> = Record<string, unknown>,
+	GRequestBody extends TUnserializedBody = Record<string, unknown>,
 	GParseAs extends TParseAs = 'json'
 >(
 	path: string,
@@ -31,7 +31,7 @@ export type TApiPost = <
 export type TApiPut = <
 	GSuccessResponseBody = unknown,
 	GErrorResponseBody = unknown,
-	GRequestBody extends RequestInit['body'] | Record<string, unknown> = Record<string, unknown>,
+	GRequestBody extends TUnserializedBody = Record<string, unknown>,
 	GParseAs extends TParseAs = 'json'
 >(
 	path: string,
