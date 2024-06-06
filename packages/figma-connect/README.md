@@ -1,1 +1,2 @@
-# `@ibg/figma-handler`
+# `figma-connect`
+> Status: Experimental

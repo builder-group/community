@@ -13,7 +13,7 @@ export class PluginCallback<
 	public readonly once: boolean;
 
 	constructor(registration: GPluginEventRegistration) {
-		this.key = registration.key != null ? registration.key : shortId();
+		this.key = registration.key ?? shortId();
 		this.type = registration.type;
 		this.callback = registration.callback;
 		this.once = registration.once ?? false;

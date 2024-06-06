@@ -28,22 +28,22 @@ const fetchClient = createApiFetchClient({
 });
 
 // Send request
-const result = await fetchClient.get<{ id: string }>('/blogposts/{postId}', {
+const response = await fetchClient.get<{ id: string }>('/blogposts/{postId}', {
     pathParams: {
        postId: '123'
    }
 });
 
 // Handle response
-if (result.isOk()) {
-    console.log(result.value.data); // Handle successful response
+if (response.isOk()) {
+    console.log(response.value.data); // Handle successful response
 } else {
-    console.error(result.error.message); // Handle error response or network exception
+    console.error(response.error.message); // Handle error response or network exception
 }
 
-// Or unwrap the result, throwing an exception on error
+// Or unwrap the response, throwing an exception on error
 try {
-    const data = result.unwrap().data;
+    const data = response.unwrap().data;
     console.log(data);
 } catch (error) {
   console.error(error.message);
@@ -72,7 +72,7 @@ Enhance `feature-fetch` to create a typesafe `fetch` wrapper. This feature provi
 
    ```ts
    // Send request
-   const result = await fetchClient.get<{ id: string }>('/blogposts/{postId}', {
+   const response = await fetchClient.get<{ id: string }>('/blogposts/{postId}', {
       pathParams: {
           postId: '123'
       }
@@ -108,7 +108,7 @@ Enhance `feature-fetch` with [OpenAPI](https://www.openapis.org/) support to cre
 
    ```ts
    // Send request
-   const result = await fetchClient.get('/blogposts/{postId}', {
+   const response = await fetchClient.get('/blogposts/{postId}', {
       pathParams: {
           postId: '123'
       }
@@ -117,15 +117,15 @@ Enhance `feature-fetch` with [OpenAPI](https://www.openapis.org/) support to cre
 
 ## Errors
 
-When handling API error responses (`result.isErr()`), `result` can be one of three [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) types, each representing a different kind of failure.
+When handling API error responses (`response.isErr()`), `response` can be one of three [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) types, each representing a different kind of failure.
 
 ### `NetworkException` (extends `ServiceException`)
 
-Indicates a failure in network communication, such as loss of connectivity or DNS issues.
+Indicates a failure in network communication, such as loss of connectivity.
 
 ```ts
-if (result.isErr() && result.error instanceof NetworkException) {
-  console.error('Network error:', result.error.message);
+if (response.isErr() && response.error instanceof NetworkException) {
+  console.error('Network error:', response.error.message);
 }
 ```
 
@@ -134,8 +134,8 @@ if (result.isErr() && result.error instanceof NetworkException) {
 Occurs when the server returns a response with a status code indicating an error (e.g., 4xx or 5xx).
 
 ```ts
-if (result.isErr() && result.error instanceof RequestException) {
-  console.error('Request error:', result.error.message, 'Status:', result.error.status);
+if (response.isErr() && response.error instanceof RequestException) {
+  console.error('Request error:', response.error.message, 'Status:', response.error.status);
 }
 ```
 
@@ -144,16 +144,16 @@ if (result.isErr() && result.error instanceof RequestException) {
 A general exception type that can encompass other error scenarios not covered by `NetworkException` or `RequestException`, for example when the response couldn't be parsed, ..
 
 ```ts
-if (result.isErr() && result.error instanceof ServiceException) {
-  console.error('Service error:', result.error.message);
+if (response.isErr() && response.error instanceof ServiceException) {
+  console.error('Service error:', response.error.message);
 }
 ```
 
 ### Example
 
 ```ts
-if (result.isErr()) {
-    const error = result.error;
+if (response.isErr()) {
+    const error = response.error;
 
     if (isStatusCode(error, 404)) {
         console.error('Not found:', error.data)

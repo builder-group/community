@@ -1,5 +1,4 @@
 # `feature-state-react`
-> Status: Beta
 
 The ReactJs extension for the `feature-state` library, providing hooks and features for easy state management in ReactJs.
 

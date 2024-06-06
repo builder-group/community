@@ -1,6 +1,6 @@
 {
 	"name": "google-webfonts-client",
-	"description": "Google Webfont fetch client",
+	"description": "Typesafe Google Webfont fetch client",
 	"version": "0.0.2",
 	"private": false,
 	"scripts": {

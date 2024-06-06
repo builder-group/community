@@ -57,7 +57,7 @@ export class FigmaPluginHandler<
 		const eventMethod = pluginCallback.once ? 'once' : 'on';
 
 		const eventListener = (...args: any[]) => {
-			this.onEvent(pluginCallback, args).catch((error) => {
+			this.onEvent(pluginCallback, args).catch((error: unknown) => {
 				console.error('An error occurred while handling plugin callback', error);
 			});
 		};

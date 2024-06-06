@@ -49,7 +49,7 @@ export class FigmaAppHandler<
 
 		const eventListener = (...args: any[]): void => {
 			if (appCallback.shouldCall()) {
-				this.onEvent(appCallback, args).catch((error) => {
+				this.onEvent(appCallback, args).catch((error: unknown) => {
 					console.error('An error occurred while handling app callback', error);
 				});
 			} else {

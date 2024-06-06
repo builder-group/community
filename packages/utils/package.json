@@ -1,6 +1,6 @@
 {
 	"name": "@ibg/utils",
-	"description": "Tree shakable utility functions for inbeta.group packages",
+	"description": "Straightforward, typesafe, and tree-shakable collection of utility functions",
 	"version": "0.0.3",
 	"private": false,
 	"scripts": {

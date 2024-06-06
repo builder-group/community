@@ -1,5 +1,4 @@
 # `feature-state`
-> Status: Beta
 
 A straightforward, typesafe, and feature-based state management library for ReactJs.
 

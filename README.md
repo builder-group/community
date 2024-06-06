@@ -1,3 +1,3 @@
-# inbeta.group (ibg)
+# inbeta.group (`ibg`)
 
-wip
+A collection of open source libraries maintained by [inbeta.group](https://inbeta.group).
