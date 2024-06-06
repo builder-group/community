@@ -10,21 +10,26 @@ import type {
 
 export function withRetry<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base']>>,
-	options: { maxRetries?: number; retryCount?: number }
+	options: TRetryMiddlewareOptions = {}
 ): TFetchClient<['retry', ...GSelectedFeatureKeys]> {
 	fetchClient._features.push('retry');
 
-	const { maxRetries = 3, retryCount = 0 } = options;
+	fetchClient._config.requestMiddlewares.push(createRetryMiddleware(options));
 
-	const retryMiddleware: TRequestMiddleware =
-		(next: TFetchLike) =>
+	return fetchClient as TFetchClient<['retry', ...GSelectedFeatureKeys]>;
+}
+
+export function createRetryMiddleware(options: TRetryMiddlewareOptions = {}): TRequestMiddleware {
+	const { maxRetries = 3, retryCount = 0 } = options;
+	return (next: TFetchLike) =>
 		async (url, requestInit): Promise<Response> => {
 			return fetchWithRetries(url, { requestInit, maxRetries, retryCount, fetchLike: next });
 		};
+}
 
-	fetchClient._config.requestMiddlewares.push(retryMiddleware);
-
-	return fetchClient as TFetchClient<['retry', ...GSelectedFeatureKeys]>;
+interface TRetryMiddlewareOptions {
+	maxRetries?: number;
+	retryCount?: number;
 }
 
 async function fetchWithRetries(

@@ -11,6 +11,7 @@ export type TFeatures<GPaths extends object = object> = {
 	api: TApiFeature;
 	openapi: TOpenApiFeature<GPaths>;
 	retry: { _: null };
+	delay: { _: null };
 } & TThirdPartyFeatures;
 
 // Global registry for third party features

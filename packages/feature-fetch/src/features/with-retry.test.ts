@@ -76,7 +76,7 @@ describe('withRetry', () => {
 		expect(retryCount).toBe(3);
 	}, 10000);
 
-	it('should not rety on server exception', async () => {
+	it('should not rety on request exception', async () => {
 		server.use(
 			http.get(new URL('/test', BASE_URL).toString(), () => {
 				return HttpResponse.json({ message: 'Internal Server Error' }, { status: 500 });
