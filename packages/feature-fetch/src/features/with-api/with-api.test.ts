@@ -8,7 +8,9 @@ describe('withApi function tests', () => {
 		const baseFetchClient = createFetchClient();
 		const fetchClient = withApi(baseFetchClient);
 
-		const response = await fetchClient.get('https://dummyjson.com/products/1');
+		const response = await fetchClient.get('https://dummyjson.com/products/{id}', {
+			pathParams: { id: '1' }
+		});
 
 		expect(response).not.toBeNull();
 	});

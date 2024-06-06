@@ -1,5 +1,4 @@
 import { Err, Ok } from 'ts-results-es';
-import { toArray } from '@ibg/utils';
 
 import { ServiceException } from './exceptions';
 import {
@@ -8,6 +7,7 @@ import {
 	mapErrorToNetworkException,
 	mapErrorToServiceException,
 	mapResponseToRequestException,
+	processBeforeRequestMiddlewares,
 	processRequestMiddlewares,
 	serializeBody,
 	serializePathParams,
@@ -17,8 +17,10 @@ import type {
 	TFetchClient,
 	TFetchClientConfig,
 	TFetchClientOptions,
-	TSerializedBody,
-	TUrlParams
+	TFetchLike,
+	TPathParams,
+	TQueryParams,
+	TSerializedBody
 } from './types';
 
 export function createFetchClient<GPaths extends object = object>(
@@ -32,9 +34,17 @@ export function createFetchClient<GPaths extends object = object>(
 		pathSerializer: options.pathSerializer ?? serializePathParams,
 		querySerializer:
 			options.querySerializer ?? ((queryParams) => serializeQueryParams(queryParams)),
-		middleware: toArray(options.middleware ?? []),
-		fetch: options.fetch ?? typeof fetch === 'function' ? fetch : undefined
+		beforeRequestMiddlewares: options.beforeRequestMiddlewares ?? [],
+		requestMiddlewares: options.requestMiddlewares ?? []
 	};
+	let fetchLike: TFetchLike;
+	if (typeof options.fetch === 'function') {
+		fetchLike = options.fetch;
+	} else if (typeof fetch === 'function') {
+		fetchLike = fetch;
+	} else {
+		throw Error('Missing fetch function');
+	}
 
 	// Apply default headers
 	if (!config.headers.has('Content-Type')) {
@@ -44,27 +54,23 @@ export function createFetchClient<GPaths extends object = object>(
 	return {
 		_: null,
 		_features: ['base'],
+		_fetchLike: fetchLike,
 		_config: config,
 		async _baseFetch(this: TFetchClient<['base']>, path, method, baseFetchOptions = {}) {
 			const {
 				parseAs = 'json',
-				bodySerializer = this._config.bodySerializer,
+				pathSerializer = this._config.pathSerializer,
 				querySerializer = this._config.querySerializer,
-				pathParams,
-				queryParams,
+				bodySerializer = this._config.bodySerializer,
 				body = undefined,
 				prefixUrl = this._config.prefixUrl,
 				fetchProps = {},
 				middlewareProps
 			} = baseFetchOptions;
 			const headers = new FetchHeaders(baseFetchOptions.headers);
-
-			const urlParams: TUrlParams = {
-				path: pathParams,
-				query: queryParams
-			};
-
 			const mergedHeaders = FetchHeaders.merge(headers, this._config.headers);
+			let pathParams: TPathParams | undefined = baseFetchOptions.pathParams;
+			let queryParams: TQueryParams | undefined = baseFetchOptions.queryParams;
 
 			// Serialize body
 			let serializedBody: TSerializedBody;
@@ -86,41 +92,41 @@ export function createFetchClient<GPaths extends object = object>(
 				body: serializedBody
 			};
 
-			// Remove `Content-Type` if serialized body is FormData.
+			// Remove `Content-Type` if body is FormData.
 			// Browser will correctly set Content-Type & boundary expression.
 			if (typeof FormData !== 'undefined' && requestInit.body instanceof FormData) {
 				mergedHeaders.delete('Content-Type');
 			}
 
-			// Call middlewares
+			// Process before request middlewares
 			try {
-				const middlewaresResponse = await processRequestMiddlewares(
-					this._config.middleware,
+				const middlewaresResponse = await processBeforeRequestMiddlewares(
+					this._config.beforeRequestMiddlewares,
 					{
 						requestInit,
-						queryParams: urlParams.query,
-						pathParams: urlParams.path
+						queryParams,
+						pathParams
 					},
 					middlewareProps
 				);
 				requestInit = middlewaresResponse.requestInit;
-				urlParams.path = middlewaresResponse.pathParams;
-				urlParams.query = middlewaresResponse.queryParams;
+				pathParams = middlewaresResponse.pathParams;
+				queryParams = middlewaresResponse.queryParams;
 			} catch (error) {
 				return Err(mapErrorToServiceException(error, '#ERR_MIDDLEWARE'));
 			}
 
-			// Build final URL
+			// Build final Url
 			const finalUrl = buildUrl(prefixUrl, {
 				path,
-				params: urlParams,
+				pathParams,
+				queryParams,
+				pathSerializer,
 				querySerializer
 			});
 
-			const baseFetch = this._config.fetch;
-			if (baseFetch == null) {
-				return Err(new ServiceException('#ERR_MISSING_FETCH'));
-			}
+			// Process request middlewares
+			const baseFetch = processRequestMiddlewares(this._config.requestMiddlewares, this._fetchLike);
 
 			// Send request
 			let response: Response;

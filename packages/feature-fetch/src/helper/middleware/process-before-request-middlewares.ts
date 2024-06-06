@@ -1,10 +1,10 @@
-import type { TRequestMiddleware, TRequestMiddlewareData } from '../types';
+import type { TBeforeRequestMiddleware, TBeforeRequestMiddlewareData } from '../../types';
 
-export async function processRequestMiddlewares(
-	middlewares: TRequestMiddleware[],
-	data: TRequestMiddlewareData,
+export async function processBeforeRequestMiddlewares(
+	middlewares: TBeforeRequestMiddleware[],
+	data: TBeforeRequestMiddlewareData,
 	middlewareProps: unknown
-): Promise<TRequestMiddlewareData> {
+): Promise<TBeforeRequestMiddlewareData> {
 	let result = data;
 
 	// Apply middleware and merge results with existing data

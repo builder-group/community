@@ -1,8 +1,9 @@
 import type { TParseAs } from '../api';
 import type {
-	TBaseFetchOptions,
 	TBodySerializer,
+	TFetchOptions,
 	TFetchResponse,
+	TPathSerializer,
 	TQuerySerializer
 } from '../fetch-client';
 import type {
@@ -100,6 +101,11 @@ export type TOpenApiPathParamsFetchOptions<GPathOperation> =
 
 // Combines base fetch options with query and path parameters
 export type TOpenApiFetchOptions<GPathOperation, GParseAs extends TParseAs> = {
+	pathSerializer?: TPathSerializer<
+		TRequestPathParams<GPathOperation> extends never
+			? Record<string, unknown>
+			: TRequestPathParams<GPathOperation>
+	>;
 	querySerializer?: TQuerySerializer<
 		TRequestQueryParams<GPathOperation> extends never
 			? Record<string, unknown>
@@ -108,6 +114,9 @@ export type TOpenApiFetchOptions<GPathOperation, GParseAs extends TParseAs> = {
 	bodySerializer?: TBodySerializer<
 		TRequestBody<GPathOperation> extends never ? unknown : TRequestBody<GPathOperation>
 	>;
-} & TBaseFetchOptions<GParseAs> &
+} & Omit<
+	TFetchOptions<GParseAs>,
+	'pathSerializer' | 'querySerializer' | 'bodySerializer' | 'pathParams' | 'queryParams'
+> &
 	TOpenApiQueryParamsFetchOptions<GPathOperation> &
 	TOpenApiPathParamsFetchOptions<GPathOperation>;

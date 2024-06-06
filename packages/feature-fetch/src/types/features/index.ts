@@ -10,7 +10,7 @@ export type TFeatures<GPaths extends object = object> = {
 	base: { _: null }; // TODO: Placeholder Feature: Figure out how to make the TS infer work with [] (empty array -> no feature)
 	api: TApiFeature;
 	openapi: TOpenApiFeature<GPaths>;
-	retries: { _: null };
+	retry: { _: null };
 } & TThirdPartyFeatures;
 
 // Global registry for third party features

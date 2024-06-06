@@ -1,38 +1,46 @@
 import { sleep } from '@ibg/utils';
 
-import type { TBaseFetch, TEnforceFeatures, TFeatureKeys, TFetchClient } from '../types';
+import type {
+	TEnforceFeatures,
+	TFeatureKeys,
+	TFetchClient,
+	TFetchLike,
+	TRequestMiddleware
+} from '../types';
 
-export function withRetries<GSelectedFeatureKeys extends TFeatureKeys[]>(
+export function withRetry<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base']>>,
 	options: { maxRetries?: number; retryCount?: number }
-): TFetchClient<['retries', ...GSelectedFeatureKeys]> {
-	fetchClient._features.push('retries');
+): TFetchClient<['retry', ...GSelectedFeatureKeys]> {
+	fetchClient._features.push('retry');
 
 	const { maxRetries = 3, retryCount = 0 } = options;
 
-	const baseFetch = fetchClient._config.fetch;
-	if (baseFetch != null) {
-		fetchClient._config.fetch = (url, requestInit) =>
-			fetchWithRetries(url, { requestInit, maxRetries, retryCount, fetch: baseFetch });
-	}
+	const retryMiddleware: TRequestMiddleware =
+		(next: TFetchLike) =>
+		async (url, requestInit): Promise<Response> => {
+			return fetchWithRetries(url, { requestInit, maxRetries, retryCount, fetchLike: next });
+		};
 
-	return fetchClient as TFetchClient<['retries', ...GSelectedFeatureKeys]>;
+	fetchClient._config.requestMiddlewares.push(retryMiddleware);
+
+	return fetchClient as TFetchClient<['retry', ...GSelectedFeatureKeys]>;
 }
 
-export async function fetchWithRetries(
+async function fetchWithRetries(
 	url: URL | string,
 	config: TFetchWithRetriesConfig
 ): Promise<Response> {
-	const { requestInit, maxRetries, retryCount, fetch: baseFetch } = config;
+	const { requestInit, maxRetries, retryCount, fetchLike } = config;
 	try {
 		// Send request
-		const response = await fetch(url, requestInit);
+		const response = await fetchLike(url, requestInit);
 
 		// If the rate limit error hits, retry
 		if (response.status === 429 && maxRetries > 0) {
 			await sleep(calculateRateLimitTimeout(response));
 			return fetchWithRetries(url, {
-				fetch: baseFetch,
+				fetchLike,
 				requestInit,
 				maxRetries: maxRetries - 1,
 				retryCount: retryCount + 1
@@ -45,7 +53,7 @@ export async function fetchWithRetries(
 		if (maxRetries > 0) {
 			await sleep(calculateNetworkErrorTimeout(retryCount));
 			return fetchWithRetries(url, {
-				fetch: baseFetch,
+				fetchLike,
 				requestInit,
 				maxRetries: maxRetries - 1,
 				retryCount: retryCount + 1
@@ -58,7 +66,7 @@ export async function fetchWithRetries(
 }
 
 interface TFetchWithRetriesConfig {
-	fetch: TBaseFetch;
+	fetchLike: TFetchLike;
 	requestInit?: RequestInit;
 	maxRetries: number;
 	retryCount: number;

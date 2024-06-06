@@ -26,6 +26,9 @@ describe('withOpenApi function tests', () => {
 				pathParams: {
 					shop_id: 1
 				},
+				pathSerializer: (path, params) => {
+					return path;
+				},
 				querySerializer: (query) => {
 					return query.test123.toString();
 				},

@@ -1,23 +1,18 @@
-import type { TPathSerializer, TQuerySerializer, TUrlParams } from '../types';
-import { serializePathParams, serializeQueryParams } from './serializer';
+import type { TPathParams, TPathSerializer, TQueryParams, TQuerySerializer } from '../types';
 
-export function buildUrl(baseUrl: string, options: TBuildUrlOptions): string {
-	const {
-		path = '',
-		params: { query: queryParams = {}, path: pathParams = {} } = {},
-		querySerializer = serializeQueryParams,
-		pathSerializer = serializePathParams
-	} = options;
-	const url = `${removeTrailingSlash(baseUrl)}${removeLeadingSlash(path)}`;
-	const urlWithPathParams = pathSerializer(url, pathParams);
+export function buildUrl(baseUrl: string, options: TBuildUrlConfig): string {
+	const { path = '', pathParams, queryParams, pathSerializer, querySerializer } = options;
+	const url = `${removeTrailingSlash(baseUrl)}/${removeLeadingSlash(path)}`;
+	const urlWithPathParams = pathSerializer(url, pathParams ?? {});
 	return appendQueryParams(urlWithPathParams, querySerializer, queryParams);
 }
 
-interface TBuildUrlOptions {
+interface TBuildUrlConfig {
 	path?: string;
-	params?: TUrlParams;
-	querySerializer?: TQuerySerializer;
-	pathSerializer?: TPathSerializer;
+	pathParams?: TPathParams;
+	queryParams?: TQueryParams;
+	querySerializer: TQuerySerializer;
+	pathSerializer: TPathSerializer;
 }
 
 function appendQueryParams(
@@ -25,7 +20,7 @@ function appendQueryParams(
 	querySerializer: TQuerySerializer,
 	queryParams?: Record<string, unknown>
 ): string {
-	if (queryParams != null) {
+	if (queryParams != null && Object.keys(queryParams).length > 0) {
 		const queryString = querySerializer(queryParams);
 		return `${path}?${removeLeadingQuestionmark(queryString)}`;
 	}
