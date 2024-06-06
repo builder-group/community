@@ -31,7 +31,14 @@ export function withPersist<GValue, GSelectedFeatureKeys extends TFeatureKeys<GV
 
 			// Setup listener
 			state.listen((value) => {
-				storage.save(key, value);
+				storage
+					.save(key, value)
+					.then(() => {
+						/* do nothing*/
+					})
+					.catch(() => {
+						/* do nothing*/
+					});
 			});
 
 			return success;

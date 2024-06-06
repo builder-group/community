@@ -8,7 +8,7 @@ const server = setupServer();
 
 const BASE_URL = 'https://api.example.com';
 
-describe('createFetchClient', () => {
+describe('createFetchClient function', () => {
 	beforeAll(() => {
 		server.listen();
 	});

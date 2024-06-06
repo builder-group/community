@@ -4,7 +4,7 @@
 A CLI tool for bundling TypeScript libraries with presets, powered by Rollup and Esbuild.
 
 ### Motivation
-Eliminate the hassle of manual configuring Rollup by providing a flexible Rollup wrapper with preset configurations for Figma Plugin, Rust (Wasm), and Typescript library bundling. 
+Eliminate the hassle of manually configuring Rollup over and over by providing a flexible wrapper with preset configurations for Figma plugins, Rust (Wasm), and TypeScript library bundling.
 
 ### Alternatives
 - [tsup](https://github.com/egoist/tsup)

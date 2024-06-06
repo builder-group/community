@@ -29,7 +29,7 @@ class MockStorage<GValue> implements StorageInterface<GValue> {
 	}
 }
 
-describe('withPersist function tests', () => {
+describe('withPersist function', () => {
 	let mockStorage: MockStorage<any>;
 
 	beforeEach(() => {

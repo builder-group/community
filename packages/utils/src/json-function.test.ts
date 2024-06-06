@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { toFunction } from './json-function';
 
-describe('toFunction', () => {
+describe('json-function function', () => {
 	it('should execute the function with provided arguments', () => {
 		const jsonFunction = {
 			args: ['a', 'b'],

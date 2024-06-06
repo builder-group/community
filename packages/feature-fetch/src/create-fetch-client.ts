@@ -43,7 +43,9 @@ export function createFetchClient<GPaths extends object = object>(
 	} else if (typeof fetch === 'function') {
 		fetchLike = fetch;
 	} else {
-		throw Error('Missing fetch function');
+		throw new ServiceException('#ERR_MISSING_FETCH', {
+			message: "Failed to find valid 'fetch' function to wrap around!"
+		});
 	}
 
 	// Apply default headers
@@ -141,14 +143,11 @@ export function createFetchClient<GPaths extends object = object>(
 				let data: any = response.body;
 				if (parseAs !== 'stream') {
 					try {
-						data =
-							typeof response[parseAs] === 'function'
-								? await response[parseAs]()
-								: await response.text();
+						data = await response[parseAs]();
 					} catch (error) {
 						return Err(
-							new ServiceException('#ERR_PARSE_RESPONSE', {
-								message: `Failed to parse response to '${parseAs}'`
+							new ServiceException('#ERR_PARSE_RESPONSE_DATA', {
+								message: `Failed to parse response as '${parseAs}'`
 							})
 						);
 					}

@@ -20,7 +20,7 @@ export function withApi<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		}
 	};
 
-	// Merge existing features from the state with the new api feature
+	// Merge existing features from the fetch client with the new api feature
 	const _fetchClient = Object.assign(fetchClient, apiFeature);
 
 	return _fetchClient as TFetchClient<['api', ...GSelectedFeatureKeys]>;

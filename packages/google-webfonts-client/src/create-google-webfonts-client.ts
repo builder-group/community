@@ -10,7 +10,7 @@ export function createGoogleWebfontsClient(
 	return withGoogle(
 		createOpenApiFetchClient<paths>({
 			prefixUrl,
-			middleware: [
+			beforeRequestMiddlewares: [
 				async (data) => {
 					const { queryParams } = data;
 					const newQueryParams = queryParams ?? {};

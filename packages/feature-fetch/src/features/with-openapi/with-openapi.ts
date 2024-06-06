@@ -29,7 +29,7 @@ export function withOpenApi<
 		}
 	};
 
-	// Merge existing features from the state with the new openapi feature
+	// Merge existing features from the fetch client with the new openapi feature
 	const _fetchClient = Object.assign(fetchClient, openApiFeature);
 
 	return _fetchClient as TFetchClient<['openapi', ...GSelectedFeatureKeys], GPaths>;

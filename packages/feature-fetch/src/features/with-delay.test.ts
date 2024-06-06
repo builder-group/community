@@ -9,7 +9,7 @@ const server = setupServer();
 
 const BASE_URL = 'https://api.example.com';
 
-describe('withDelay', () => {
+describe('withDelay function', () => {
 	beforeAll(() => {
 		server.listen();
 	});

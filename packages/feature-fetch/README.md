@@ -3,9 +3,15 @@
 
 A straightforward, typesafe, and feature-based fetch wrapper.
 
+- **Lightweight & Tree Shakable**: Function-based and modular design
+- **Fast**: Thin wrapper around the native fetch, maintaining near-native performance
+- **Modular & Expandable**: Easily extendable with features like `withRetry()`, ..
+- **Typesafe**: Built in TypeScript with support for `openapi-typescript` types
+- **Standalone**: Only dependent on `fetch`, making it usable in sandboxed environments like Figma plugin
+
 ### Motivation
 
-Provide a typesafe, straightforward, and lightweight fetch wrapper that can be configured to pull in an OpenAPI schema using `openapi-typescript`. This ensures API calls are correct and returns results using [`ts-results-es`](https://github.com/lune-climate/ts-results-es#readme), making error handling easy and predictable.
+Provide a typesafe, straightforward, and lightweight `fetch` wrapper that seamlessly integrates with OpenAPI schemas using `openapi-typescript`. It aims to simplify error handling by returning results in a predictable manner with [`ts-results-es`](https://github.com/lune-climate/ts-results-es#readme). Additionally, it is designed to be modular & expandable, enabling the creation of straightforward API wrappers, such as for the Google Web Fonts API (see `google-webfonts-client`), with simple and intuitive functions. `feature-fetch` only depends on `fetch`, making it usable in sandboxed environments like Figma plugins.
 
 ### Alternatives
 
@@ -82,16 +88,32 @@ await fetchClient.put('/blogposts/', { id: '123', message: 'hello' });
 
 ## Features
 
-### `withRetries()`
+### `withRetry()`
 
-Retries a request multiple times in case of an error.
+Retries a request using an exponential backoff strategy for network exceptions (`NetworkException`) or HTTP `429` (Too Many Requests) responses.
 
 ```ts
-import { createApiFetchClient, withRetries } from 'feature-fetch';
+import { createApiFetchClient, withRetry } from 'feature-fetch';
 
-const fetchClient = withRetries(createApiFetchClient({
+const fetchClient = withRetry(createApiFetchClient({
   prefixUrl: 'https://api.example.com/v1'
 }), {
-  maxRetries: 10
+  maxRetries: 3
 });
 ```
+
+- **`maxRetries`**: Maximum number of retry attempts
+
+### `withDelay()`
+
+Delays a request by a specified number of milliseconds before sending it.
+
+```ts
+import { createApiFetchClient, withDelay } from 'feature-fetch';
+
+const fetchClient = withDelay(createApiFetchClient({
+  prefixUrl: 'https://api.example.com/v1'
+}), 1000);
+```
+
+- **`delayInMs`**: Delay duration in milliseconds

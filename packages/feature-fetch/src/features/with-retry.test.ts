@@ -11,7 +11,7 @@ const server = setupServer();
 
 const BASE_URL = 'https://api.example.com';
 
-describe('withRetry', () => {
+describe('withRetry function', () => {
 	beforeAll(() => {
 		server.listen();
 	});

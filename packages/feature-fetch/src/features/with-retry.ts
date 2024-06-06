@@ -20,16 +20,15 @@ export function withRetry<GSelectedFeatureKeys extends TFeatureKeys[]>(
 }
 
 export function createRetryMiddleware(options: TRetryMiddlewareOptions = {}): TRequestMiddleware {
-	const { maxRetries = 3, retryCount = 0 } = options;
+	const { maxRetries = 3 } = options;
 	return (next: TFetchLike) =>
 		async (url, requestInit): Promise<Response> => {
-			return fetchWithRetries(url, { requestInit, maxRetries, retryCount, fetchLike: next });
+			return fetchWithRetries(url, { requestInit, maxRetries, retryCount: 0, fetchLike: next });
 		};
 }
 
 interface TRetryMiddlewareOptions {
 	maxRetries?: number;
-	retryCount?: number;
 }
 
 async function fetchWithRetries(
