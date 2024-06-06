@@ -5,13 +5,13 @@ A straightforward, typesafe, and feature-based state management library for Reac
 
 - **Lightweight & Tree Shakable**: Function-based and modular design (< 1KB minified)
 - **Fast**: Minimal code ensures high performance, and state changes can be deferred in "the bucket"
-- **Modular & Expandable**: Easily extendable with features like `withPersist()`, `withUndo()`, ..
-- **Typesafe**: Build in TypeScript
+- **Modular & Extendable**: Easily extendable with features like `withPersist()`, `withUndo()`, ..
+- **Typesafe**: Build with TypeScript for strong type safety
 - **Standalone**: Zero dependencies, ensuring ease of use in various environments
 
 ### Motivation
 
-Provide a typesafe, straightforward, and lightweight state management library designed to be modular and expandable with features like `withPersist()`, `withUndo()`, .. Having previously built [AgileTs](https://agile-ts.org/), I realized the importance of simplicity and modularity. AgileTs, while powerful, became bloated and complex. Learning from that experience, I followed the KISS (Keep It Simple, Stupid) principle for `feature-state`, aiming to provide a more streamlined and efficient solution. Because no code is the best code.
+Provide a typesafe, straightforward, and lightweight state management library designed to be modular and extendable with features like `withPersist()`, `withUndo()`, .. Having previously built [AgileTs](https://agile-ts.org/), I realized the importance of simplicity and modularity. AgileTs, while powerful, became bloated and complex. Learning from that experience, I followed the KISS (Keep It Simple, Stupid) principle for `feature-state`, aiming to provide a more streamlined and efficient solution. Because no code is the best code.
 
 ### Alternatives
 - [nanostores](https://github.com/nanostores/nanostores)
@@ -75,7 +75,7 @@ $temperature.set($temperature.get() + 5);
 
 ### Subscribing to State Changes
 
-You can subscribe to state changes using `$state.subscribe(callback)`, which works in vanilla JS. For React, special hooks like `useGlobalState($state)` are available to re-render components on state changes.
+You can subscribe to state changes using `$state.subscribe(callback)`, which works in vanilla JS. For React, special hooks like [`useGlobalState($state)`](https://github.com/inbeta-group/monorepo/tree/develop/packages/feature-state-react) are available to re-render components on state changes.
 
 Listener callbacks will receive the new value as the first argument.
 
@@ -91,6 +91,63 @@ Unlike `$state.listen(callback)`, `$state.subscribe(callback)` immediately invok
 
 ### `withPersist()`
 
+Adds persistence functionality to the state, allowing the state to be saved to and loaded from a storage medium.
+
+```ts
+import { createState, withPersist } from 'feature-state';
+
+const storage = {
+    async save(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+        return true;
+    },
+    async load(key) {
+        const value = localStorage.getItem(key);
+        return value ? JSON.parse(value) : undefined;
+    },
+    async delete(key) {
+        localStorage.removeItem(key);
+        return true;
+    }
+};
+
+const state = withPersist(createState([]), storage, 'tasks');
+
+await state.persist();
+
+state.addTask({ id: 1, title: 'Task 1' });
+```
+
+- **`storage`**: An object implementing the `StorageInterface` with methods `save`, `load`, and `delete` for handling the persistence
+- **`key`**: The key used to identify the state in the storage medium
+
 ### `withUndo()`
 
+Adds undo functionality to the state, allowing the state to revert to previous values.
+
+```ts
+import { createState, withUndo } from 'feature-state';
+
+const state = withUndo(createState([]), 50);
+
+state.addTask({ id: 1, title: 'Task 1' });
+state.undo();
+```
+
+- **`historyLimit`**: The maximum number of states to keep in history for undo functionality. The default is `50`
+
 ### `withMultiUndo()`
+
+Adds multi-undo functionality to the state, allowing the state to revert to multiple previous values at once.
+
+```ts
+import { createState, withUndo, withMultiUndo } from 'feature-state';
+
+const state = withMultiUndo(withUndo(createState([]), 50));
+
+state.addTask({ id: 1, title: 'Task 1' });
+state.addTask({ id: 2, title: 'Task 2' });
+state.multiUndo(2);
+```
+
+- **`count`**: The number of undo steps to perform, reverting the state back by the specified number of changes

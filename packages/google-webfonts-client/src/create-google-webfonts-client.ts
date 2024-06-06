@@ -12,10 +12,9 @@ export function createGoogleWebfontsClient(
 			prefixUrl,
 			beforeRequestMiddlewares: [
 				async (data) => {
-					const { queryParams } = data;
-					const newQueryParams = queryParams ?? {};
-					newQueryParams.key = apiKey;
-					return { queryParams: newQueryParams };
+					const { queryParams = {} } = data;
+					queryParams.key = apiKey;
+					return { queryParams };
 				}
 			]
 		})

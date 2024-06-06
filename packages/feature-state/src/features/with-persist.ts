@@ -8,7 +8,6 @@ export interface StorageInterface<GValue> {
 	delete: (key: string) => Promise<boolean>;
 }
 
-// TODO: Think about sync implementation of Persist
 export function withPersist<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]>(
 	state: TState<GValue, TEnforceFeatures<GSelectedFeatureKeys, ['base']>>,
 	storage: StorageInterface<GValue>,

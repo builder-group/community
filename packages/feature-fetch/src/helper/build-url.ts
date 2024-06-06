@@ -2,7 +2,10 @@ import type { TPathParams, TPathSerializer, TQueryParams, TQuerySerializer } fro
 
 export function buildUrl(baseUrl: string, options: TBuildUrlConfig): string {
 	const { path = '', pathParams, queryParams, pathSerializer, querySerializer } = options;
-	const url = `${removeTrailingSlash(baseUrl)}/${removeLeadingSlash(path)}`;
+	const baseUrlWithoutTrailingSlash = removeTrailingSlash(baseUrl);
+	const finalBaseUrl =
+		baseUrlWithoutTrailingSlash.length > 0 ? `${baseUrlWithoutTrailingSlash}/` : '';
+	const url = `${finalBaseUrl}${removeLeadingSlash(path)}`;
 	const urlWithPathParams = pathSerializer(url, pathParams ?? {});
 	return appendQueryParams(urlWithPathParams, querySerializer, queryParams);
 }

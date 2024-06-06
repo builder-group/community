@@ -8,20 +8,17 @@ describe('createGoogleClient function tests', () => {
 			apiKey: '-'
 		});
 
-		// const response = await client.getWebFonts();
-		// const data = response.unwrap();
-
-		const response = await client.downloadFontFile('Roboto Serif', {
+		const fileResponse = await client.downloadFontFile('Roboto Serif', {
 			fontWeight: 100,
 			fontStyle: 'italic'
 		});
 
-		await client.get('/webfonts', {
+		const webfontsResponse = await client.get('/webfonts', {
 			queryParams: {
 				key: 'test'
 			}
 		});
 
-		expect(response).not.toBeNull();
+		expect(fileResponse).not.toBeNull();
 	});
 });
