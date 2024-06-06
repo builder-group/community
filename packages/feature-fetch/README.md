@@ -1,17 +1,17 @@
 # `feature-fetch`
 > Status: Experimental
 
-A straightforward, typesafe, and feature-based fetch wrapper.
+A straightforward, typesafe, and feature-based [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) wrapper.
 
-- **Lightweight & Tree Shakable**: Function-based and modular design
+- **Lightweight & Tree Shakable**: Function-based and modular design (< 6KB minified)
 - **Fast**: Thin wrapper around the native fetch, maintaining near-native performance
-- **Modular & Expandable**: Easily extendable with features like `withRetry()`, ..
-- **Typesafe**: Built in TypeScript with support for `openapi-typescript` types
-- **Standalone**: Only dependent on `fetch`, making it usable in sandboxed environments like Figma plugin
+- **Modular & Expandable**: Easily extendable with features like `withRetry()`, `withOpenApi()`, ..
+- **Typesafe**: Build in TypeScript with support for `openapi-typescript` types
+- **Standalone**: Only dependent on `fetch`, ensuring ease of use in various environments
 
 ### Motivation
 
-Provide a typesafe, straightforward, and lightweight `fetch` wrapper that seamlessly integrates with OpenAPI schemas using `openapi-typescript`. It aims to simplify error handling by returning results in a predictable manner with [`ts-results-es`](https://github.com/lune-climate/ts-results-es#readme). Additionally, it is designed to be modular & expandable, enabling the creation of straightforward API wrappers, such as for the Google Web Fonts API (see `google-webfonts-client`), with simple and intuitive functions. `feature-fetch` only depends on `fetch`, making it usable in sandboxed environments like Figma plugins.
+Provide a typesafe, straightforward, and lightweight `fetch` wrapper that seamlessly integrates with OpenAPI schemas using `openapi-typescript`. It aims to simplify error handling by returning results in a predictable manner with [`ts-results-es`](https://github.com/lune-climate/ts-results-es#readme). Additionally, it is designed to be modular & expandable, enabling the creation of straightforward API wrappers, such as for the Google Web Fonts API (see [`google-webfonts-client`](https://github.com/inbeta-group/monorepo/tree/develop/packages/google-webfonts-client)), with simple and intuitive functions. `feature-fetch` only depends on `fetch`, making it usable in sandboxed environments like Figma plugins.
 
 ### Alternatives
 
@@ -22,7 +22,7 @@ Provide a typesafe, straightforward, and lightweight `fetch` wrapper that seamle
 
 ## `withApi()`
 
-A typesafe fetch wrapper.
+Use `feature-fetch` as a typesafe `fetch` wrapper with the common `get`, `post`, `put`, `del` methods.
 
 ```ts
 import { createApiFetchClient } from 'feature-fetch';
@@ -31,11 +31,14 @@ const fetchClient = createApiFetchClient({
   prefixUrl: 'https://api.example.com/v1'
 });
 
+// Send request
 const result = await fetchClient.get<{ id: string }>('/blogposts/{postId}', {
   pathParams: {
     postId: '123'
   }
 });
+
+// Handle response
 
 // 2XX Response Codes
 if (result.isOk()) {
@@ -43,18 +46,16 @@ if (result.isOk()) {
 }
 // Error response or Network exception
 else {
-  console.log(result.error);
+  console.log(result.error); // typeof NetworkException | RequestException | ServiceException
 }
 
-// Or get OK response and throw error
+// Or get OK response and throw 'result.error' as an exception
 result.unwrap();
-
-await fetchClient.put('/blogposts/', { id: '123', message: 'hello' });
 ```
 
 ## `withOpenApi()`
 
-A typesafe fetch wrapper that pulls in your OpenAPI schema using [`openapi-typescript`](https://github.com/drwpow/openapi-typescript/tree/main).
+Use `feature-fetch` as a typesafe `fetch` wrapper with the common `get`, `post`, `put`, `del` methods that pull in your OpenAPI schema using [`openapi-typescript`](https://github.com/drwpow/openapi-typescript/tree/main) and make it nearly impossible to send wrong requests.
 
 ```ts
 import { createOpenApiFetchClient } from 'feature-fetch';
@@ -65,11 +66,14 @@ const fetchClient = createOpenApiFetchClient<paths>({
   prefixUrl: 'https://api.example.com/v1'
 });
 
+// Send request
 const result = await fetchClient.get('/blogposts/{postId}', {
   pathParams: {
     postId: '123'
   }
 });
+
+// Handle response
 
 // 2XX Response Codes
 if (result.isOk()) {
@@ -77,20 +81,18 @@ if (result.isOk()) {
 }
 // Error response or Network exception
 else {
-  console.log(result.error);
+  console.log(result.error); // typeof NetworkException | RequestException | ServiceException
 }
 
-// Or get OK response and throw error
+// Or get OK response and throw 'result.error' as an exception
 result.unwrap();
-
-await fetchClient.put('/blogposts/', { id: '123', message: 'hello' });
 ```
 
 ## Features
 
 ### `withRetry()`
 
-Retries a request using an exponential backoff strategy for network exceptions (`NetworkException`) or HTTP `429` (Too Many Requests) responses.
+Retries each request using an exponential backoff strategy if a network exceptions (`NetworkException`) or HTTP `429` (Too Many Requests) response occur.
 
 ```ts
 import { createApiFetchClient, withRetry } from 'feature-fetch';
@@ -106,7 +108,7 @@ const fetchClient = withRetry(createApiFetchClient({
 
 ### `withDelay()`
 
-Delays a request by a specified number of milliseconds before sending it.
+Delays each request by a specified number of milliseconds before sending it.
 
 ```ts
 import { createApiFetchClient, withDelay } from 'feature-fetch';

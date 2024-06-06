@@ -9,9 +9,9 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	/**
 	 * Retrieves the current state value.
 	 *
-	 * Example usage:
+	 * @example
 	 * ```js
-	 * const currentState = MY_STATE.get();
+	 * const currentState = $state.get();
 	 * ```
 	 *
 	 * @returns The current state value of type `GValue`.
@@ -20,9 +20,9 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	/**
 	 * Updates the state value.
 	 *
-	 * Example usage:
+	 * @example
 	 * ```js
-	 * MY_STATE.set("Hello World");
+	 * $state.set("Hello World");
 	 * ```
 	 *
 	 * @param newValue - The new value to set for the state, of type `GValue`.
@@ -40,11 +40,11 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	/**
 	 * Subscribes to state changes and invokes the callback immediately with the current state value.
 	 *
-	 * Example usage:
+	 * @example
 	 * ```js
-	 * import { MY_STATE } from '../controller';
+	 * import { $state } from '../store';
 	 *
-	 * const unsubscribe = MY_STATE.subscribe(value => {
+	 * const unsubscribe = $state.subscribe(value => {
 	 *   console.log(value);
 	 * });
 	 * ```

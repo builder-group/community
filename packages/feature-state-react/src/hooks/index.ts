@@ -1,1 +1,1 @@
-export * from './use-feature-state';
+export * from './use-global-state';
