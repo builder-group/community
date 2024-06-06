@@ -10,7 +10,8 @@
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "vitest run",
-		"update:latest": "pnpm update --latest"
+		"update:latest": "pnpm update --latest",
+		"size": "size-limit --why"
 	},
 	"source": "./src/index.ts",
 	"main": "./dist/cjs/index.js",
@@ -34,5 +35,10 @@
 	"files": [
 		"dist",
 		"README.md"
+	],
+	"size-limit": [
+		{
+			"path": "dist/esm/index.js"
+		}
 	]
 }
