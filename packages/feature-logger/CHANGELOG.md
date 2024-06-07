@@ -1,5 +1,11 @@
 # @ibg/logger
 
+## 0.0.12
+
+### Patch Changes
+
+- [#29](https://github.com/inbeta-group/monorepo/pull/29) [`a7dc262`](https://github.com/inbeta-group/monorepo/commit/a7dc262c6841291a13b308c3b08ad3af8db5dc7a) Thanks [@github-actions](https://github.com/apps/github-actions)! - Fixed typos
+
 ## 0.0.11
 
 ### Patch Changes

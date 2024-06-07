@@ -1,7 +1,7 @@
 {
 	"name": "feature-state-react",
 	"description": "ReactJs extension features for feature-state",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
