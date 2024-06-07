@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="./.github/banner.svg" alt="google-webfonts-client banner">
+  <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/google-webfonts-client/.github/banner.svg" alt="google-webfonts-client banner">
 </h1>
 
 <p align="left">

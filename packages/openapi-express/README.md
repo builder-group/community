@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="./.github/banner.svg" alt="openapi-express banner">
+    <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/openapi-express/.github/banner.svg" alt="openapi-express banner">
 </h1>
 
 <p align="left">

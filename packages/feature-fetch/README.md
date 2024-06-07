@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="./.github/banner.svg" alt="feature-fetch banner">
+    <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/feature-fetch/.github/banner.svg" alt="feature-fetch banner">
 </h1>
 
 <p align="left">
