@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Target branch'
+        description: 'Head branch'
         required: true
         default: 'develop'
 
