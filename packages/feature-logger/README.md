@@ -20,3 +20,75 @@
 > Status: Experimental
 
 `feature-logger` is a straightforward, typesafe, and feature-based logging library.
+
+- **Lightweight & Tree Shakable**: Function-based and modular design (< 1KB minified)
+- **Fast**: Minimal code ensures high performance
+- **Modular & Extendable**: Easily extendable with features like `withTimestamp()`, `withPrefix()`, ..
+- **Typesafe**: Build with TypeScript for strong type safety
+- **Standalone**: Zero dependencies, ensuring ease of use in various environments
+
+### Motivation
+
+Provide a typesafe, straightforward, and lightweight logging library designed to be modular and extendable with features like `withTimestamp()`, `withPrefix()`, ..
+
+### Alternatives
+- [winston](https://github.com/winstonjs/winston)
+- [pino](https://github.com/pinojs/pino)
+
+## 📖 Usage
+
+```ts
+import { createLogger } from 'feature-logger';
+
+export const logger = createLogger();
+
+logger.trace("I'm a trace message!");
+logger.log("I'm a log message!");
+logger.info("I'm a info message!");
+logger.warn("I'm a warn message!");
+logger.error("I'm a error message!");
+```
+
+## 📙 Features
+
+### `withPrefix()`
+
+Adds a static prefix to all log messages, allowing for consistent and easily identifiable log entries.
+
+```ts
+import { createLogger, withPrefix } from 'feature-logger';
+
+const logger = withPrefix(createLogger(), 'PREFIX');
+
+logger.log('This is a log message.');
+// Output: "PREFIX This is a log message."
+```
+
+### `withTimestamp()`
+
+Adds a timestamp to all log messages, enabling you to track when each log entry was created.
+
+```ts
+import { createLogger, withTimestamp } from 'feature-logger';
+
+const logger = withTimestamp(createLogger());
+
+logger.log('This is a log message.');
+// Output: "[MM/DD/YYYY, HH:MM:SS AM/PM] This is a log message."
+```
+
+### `withMethodPrefix()`
+
+Adds the log method name as a prefix to all log messages, allowing you to easily identify the log level or method used.
+
+```ts
+import { createLogger, withMethodPrefix } from 'feature-logger';
+
+const logger = withMethodPrefix(createLogger());
+
+logger.log('This is a log message.');
+// Output: "Log: This is a log message."
+
+logger.error('This is an error message.');
+// Output: "Error: This is an error message."
+```

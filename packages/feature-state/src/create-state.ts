@@ -3,7 +3,7 @@ import type { TListener, TListenerQueueItem, TReadonlyIfObject, TState } from '.
 const LISTENER_QUEUE: TListenerQueueItem[] = [];
 
 export function createState<GValue>(value: GValue, deferred = true): TState<GValue, ['base']> {
-	const state: TState<GValue, ['base']> = {
+	return {
 		_: null,
 		_features: ['base'],
 		_listeners: [],
@@ -55,8 +55,6 @@ export function createState<GValue>(value: GValue, deferred = true): TState<GVal
 			}
 		}
 	};
-
-	return state;
 }
 
 function processQueue(): void {

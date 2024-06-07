@@ -5,7 +5,7 @@
 	"scripts": {
 		"build": "pnpm build:cli && turbo run build",
 		"build:cli": "turbo run build --filter=@ibg/cli && pnpm run cli:hello",
-		"packages:version": "changeset version && changeset publish",
+		"packages:version": "changeset version",
 		"packages:publish": "changeset publish",
 		"packages:change": "changeset",
 		"clean": "turbo run clean && shx rm -rf node_modules",
