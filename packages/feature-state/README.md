@@ -1,4 +1,25 @@
-# `feature-state`
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap');
+</style>
+<div style="background-color: #F0E81A; padding: 4px; border-radius: 12px; display: flex; align-items: center; overflow: hidden;">
+    <img src="../../.github/assets/logo.png" alt="inbeta.group logo" style="height: 64px">
+    <span style="font-size: 2em; font-family: 'Inter', sans-serif; color: #000000;">feature-state</span>
+</div>
+
+<p align="left" style="margin-top: 8px">
+    <a href="https://github.com/inbeta-group/monorepo/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
+    </a>
+    <a href="https://npm.im/@agile-ts/core">
+        <img src="https://img.shields.io/bundlephobia/min/feature-state.svg?label=bundle%20size&style=flat&colorA=293140&colorB=F0E81A" alt="NPM minified size"/>
+    </a>
+    <a href="https://npm.im/@agile-ts/core">
+        <img src="https://img.shields.io/npm/dt/featuer-state.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
+    </a>
+    <a href="https://discord.gg/T9GzreAwPH">
+        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=F0E81A" alt="Join Discord"/>
+    </a>
+</p>
 
 A straightforward, typesafe, and feature-based state management library for ReactJs.
 

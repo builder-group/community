@@ -3,7 +3,7 @@ import { describe, it } from 'vitest';
 import { z } from 'zod';
 
 import type { paths } from './__tests__/resources/mock-openapi-types';
-import { createOpenApiRouter } from './create-openapi-express';
+import { createOpenApiRouter } from './create-openapi-router';
 
 describe('createOpenApiRouter function tests', () => {
 	it('should have correct types', async () => {
