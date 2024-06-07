@@ -14,7 +14,7 @@ import {
 	type TPathsWith
 } from './types';
 
-export class OpenApiRouter<GPaths extends {} = {}> {
+export class OpenApiRouter<GPaths extends object = object> {
 	private readonly router: express.Router;
 
 	constructor(router: express.Router) {

@@ -30,9 +30,6 @@ Provide a typesafe and straightforward wrapper around the communication between 
 
 - [figma-messenger](https://github.com/okotoki/figma-messenger)
 
-### Used by
-- [dyn.art - Figma Plugin](https://github.com/dyn-art/monorepo/tree/develop/apps/figma-plugin)
-
 ## 📖 Usage
 
 ### Shared Types
@@ -180,3 +177,6 @@ export const MyComponent: React.FC = () => {
     );
 }
 ```
+
+## 👀 Used by
+- [dyn.art - Figma Plugin](https://github.com/dyn-art/monorepo/tree/develop/apps/figma-plugin)
