@@ -1,5 +1,11 @@
 # openapi-express
 
+## 0.0.4
+
+### Patch Changes
+
+- [`4b8fe68`](https://github.com/inbeta-group/monorepo/commit/4b8fe685450181f2f3eefca0a88597c591d6c3e4) Thanks [@bennoinbeta](https://github.com/bennoinbeta)! - Updated README
+
 ## 0.0.3
 
 ### Patch Changes
