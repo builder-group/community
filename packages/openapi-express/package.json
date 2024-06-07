@@ -1,7 +1,7 @@
 {
 	"name": "openapi-express",
 	"description": "Typesafe Express Router wrapper supporting OpenAPI types",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
