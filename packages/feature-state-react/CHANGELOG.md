@@ -1,5 +1,12 @@
 # feature-state-react
 
+## 0.0.7
+
+### Patch Changes
+
+- Updated dependencies [[`a7dc262`](https://github.com/inbeta-group/monorepo/commit/a7dc262c6841291a13b308c3b08ad3af8db5dc7a)]:
+  - feature-state@0.0.7
+
 ## 0.0.6
 
 ### Patch Changes
