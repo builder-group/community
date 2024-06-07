@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="./.github/banner.svg" alt="figma-connect banner">
+    <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/figma-connect/.github/banner.svg" alt="figma-connect banner">
 </h1>
 
 <p align="left">
@@ -18,7 +18,7 @@
 
 `figma-connect` is a straightforward and typesafe wrapper around the communication between the `app/ui` (iframe) and `plugin` (sandbox) part of a Figma Plugin.
 
-<img src="./.github/figma-connect-wrapper.png" alt="figma-connect-wrapper image">
+<img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/figma-connect/.github/figma-connect-wrapper.png" alt="figma-connect-wrapper image">
 
 [Source](https://www.figma.com/plugin-docs/how-plugins-run/)
 

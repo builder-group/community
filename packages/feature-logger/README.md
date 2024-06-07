@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="./.github/banner.svg" alt="feature-logger banner">
+    <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/feature-logger/.github/banner.svg" alt="feature-logger banner">
 </h1>
 
 <p align="left">

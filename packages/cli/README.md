@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="./.github/banner.svg" alt="@ibg/cli banner">
+    <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/cli/.github/banner.svg" alt="@ibg/cli banner">
 </h1>
 
 <p align="left">

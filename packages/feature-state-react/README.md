@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="./.github/banner.svg" alt="feature-state-react banner">
+    <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/feature-state-react/.github/banner.svg" alt="feature-state-react banner">
 </h1>
 
 <p align="left">
