@@ -5,7 +5,7 @@ Fetch client for interacting with the Google Web Fonts API using [`feature-fetch
 
 - [Google Fonts Developer API Docs](https://developers.google.com/fonts/docs/developer_api)
 
-## 📖 Usage
+# 📖 Usage
 
 ### Create a Google Web Fonts Client
 
@@ -69,7 +69,7 @@ if (fileResponse.isOk()) {
 }
 ```
 
-### Error Handling
+## Error Handling
 
 Errors can occur during API requests, and the client will return detailed error information. Possible error types include:
 

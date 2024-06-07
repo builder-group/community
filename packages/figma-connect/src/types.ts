@@ -6,27 +6,27 @@ import type { FigmaPluginHandler } from './plugin';
 // =============================================================================
 
 export type TPluginCallbackRegistration<
-	GAppMessageEvent extends TAppMessageEvent = TAppMessageEvent
-> = GAppMessageEvent extends TAppMessageEvent
+	GFromAppMessageEvent extends TFromAppMessageEvent = TFromAppMessageEvent
+> = GFromAppMessageEvent extends TFromAppMessageEvent
 	? {
-			[K in keyof TPluginEventTypes<TAppMessageEvent>]: TPluginCallbackRegistrationBase<
-				GAppMessageEvent,
+			[K in keyof TPluginEventTypes<TFromAppMessageEvent>]: TPluginCallbackRegistrationBase<
+				GFromAppMessageEvent,
 				K
 			>;
-	  }[keyof TPluginEventTypes<GAppMessageEvent>]
+		}[keyof TPluginEventTypes<GFromAppMessageEvent>]
 	: never;
 
 export interface TPluginCallbackRegistrationBase<
-	GAppMessageEvent extends TAppMessageEvent,
-	GEventType extends keyof TPluginEventTypes<GAppMessageEvent>,
+	GFromAppMessageEvent extends TFromAppMessageEvent,
+	GEventType extends keyof TPluginEventTypes<GFromAppMessageEvent>,
 	GPluginCallbackArgs extends
-		TPluginEventTypes<GAppMessageEvent>[GEventType][0] = TPluginEventTypes<GAppMessageEvent>[GEventType][0],
+		TPluginEventTypes<GFromAppMessageEvent>[GEventType][0] = TPluginEventTypes<GFromAppMessageEvent>[GEventType][0],
 	GPluginCallbackReturnValue extends
-		TPluginEventTypes<GAppMessageEvent>[GEventType][1] = TPluginEventTypes<GAppMessageEvent>[GEventType][1],
-	GPluginCallbackKey extends TPluginCallbackKey<GAppMessageEvent, GEventType> = TPluginCallbackKey<
-		GAppMessageEvent,
+		TPluginEventTypes<GFromAppMessageEvent>[GEventType][1] = TPluginEventTypes<GFromAppMessageEvent>[GEventType][1],
+	GPluginCallbackKey extends TPluginCallbackKey<
+		GFromAppMessageEvent,
 		GEventType
-	>
+	> = TPluginCallbackKey<GFromAppMessageEvent, GEventType>
 > {
 	key: GPluginCallbackKey;
 	type: GEventType;
@@ -43,17 +43,17 @@ export interface TPluginCallbackRegistrationBase<
 }
 
 export type TPluginCallbackKey<
-	GAppMessageEvent extends TAppMessageEvent,
-	GEventType extends keyof TPluginEventTypes<GAppMessageEvent>,
+	GFromAppMessageEvent extends TFromAppMessageEvent,
+	GEventType extends keyof TPluginEventTypes<GFromAppMessageEvent>,
 	GPluginCallbackArgs extends
-		TPluginEventTypes<GAppMessageEvent>[GEventType][0] = TPluginEventTypes<GAppMessageEvent>[GEventType][0]
+		TPluginEventTypes<GFromAppMessageEvent>[GEventType][0] = TPluginEventTypes<GFromAppMessageEvent>[GEventType][0]
 > = GPluginCallbackArgs[0] extends {
 	key: infer TKey;
 }
 	? TKey
 	: string | undefined;
 
-export interface TPluginEventTypes<GAppMessageEvent extends TAppMessageEvent> {
+export interface TPluginEventTypes<GFromAppMessageEvent extends TFromAppMessageEvent> {
 	// Events received from Figma
 	'run': [[event: RunEvent], Promise<void>];
 	'drop': [[event: DropEvent], Promise<void>];
@@ -70,84 +70,38 @@ export interface TPluginEventTypes<GAppMessageEvent extends TAppMessageEvent> {
 	'timerdone': [[], Promise<void>];
 
 	// Events received from app part
-	'app.message': [[event: GAppMessageEvent], Promise<void>];
+	'app.message': [[event: GFromAppMessageEvent], Promise<void>];
 }
 
-export interface TAppMessageEvent {
+export interface TFromAppMessageEvent {
 	key: string;
 	args: unknown;
 }
-
-// Testing
-
-// export interface TOnAppMessageEvent2 extends TAppMessageEvent {
-// 	key: 'on-event-2';
-// 	args: {
-// 		arg1: number;
-// 		arg2: string;
-// 	};
-// }
-
-// export interface TOnAppMessageEvent1 extends TAppMessageEvent {
-// 	key: 'on-event-1';
-// 	args: {
-// 		arg1: null;
-// 		arg2: number;
-// 		arg3: string;
-// 	};
-// }
-
-// export type TAppMessageEvents = TOnAppMessageEvent1 | TOnAppMessageEvent2;
-
-// const test: TPluginCallbackRegistration<TAppMessageEvents> = {
-// 	type: 'run',
-// 	key: undefined,
-// 	callback: async (instance, event) => {
-// 		// Event received by Figma
-// 	}
-// };
-
-// const test2: TPluginCallbackRegistration<TAppMessageEvents> = {
-// 	type: 'app.message',
-// 	key: 'on-event-1',
-// 	callback: async (instance, event) => {
-// 		// Event received by plugin part
-// 	}
-// };
-
-// const test3: TPluginCallbackRegistration<TAppMessageEvents> = {
-// 	type: 'textreview',
-// 	key: undefined,
-// 	callback: async (instance, event) => {
-// 		// Event received by Figma
-// 		return [];
-// 	}
-// };
 
 // =============================================================================
 // App
 // =============================================================================
 
 export type TAppCallbackRegistration<
-	GPluginMessageEvent extends TPluginMessageEvent = TPluginMessageEvent
-> = GPluginMessageEvent extends TPluginMessageEvent
+	GFromPluginMessageEvent extends TFromPluginMessageEvent = TFromPluginMessageEvent
+> = GFromPluginMessageEvent extends TFromPluginMessageEvent
 	? {
-			[K in keyof TAppEventTypes<TPluginMessageEvent>]: TAppCallbackRegistrationBase<
-				GPluginMessageEvent,
+			[K in keyof TAppEventTypes<TFromPluginMessageEvent>]: TAppCallbackRegistrationBase<
+				GFromPluginMessageEvent,
 				K
 			>;
-	  }[keyof TAppEventTypes<GPluginMessageEvent>]
+		}[keyof TAppEventTypes<GFromPluginMessageEvent>]
 	: never;
 
 export interface TAppCallbackRegistrationBase<
-	GPluginMessageEvent extends TPluginMessageEvent,
-	GEventType extends keyof TAppEventTypes<GPluginMessageEvent>,
+	GFromPluginMessageEvent extends TFromPluginMessageEvent,
+	GEventType extends keyof TAppEventTypes<GFromPluginMessageEvent>,
 	GAppCallbackArgs extends
-		TAppEventTypes<GPluginMessageEvent>[GEventType][0] = TAppEventTypes<GPluginMessageEvent>[GEventType][0],
+		TAppEventTypes<GFromPluginMessageEvent>[GEventType][0] = TAppEventTypes<GFromPluginMessageEvent>[GEventType][0],
 	GAppCallbackReturnValue extends
-		TAppEventTypes<GPluginMessageEvent>[GEventType][1] = TAppEventTypes<GPluginMessageEvent>[GEventType][1],
-	GAppCallbackKey extends TAppCallbackKey<GPluginMessageEvent, GEventType> = TAppCallbackKey<
-		GPluginMessageEvent,
+		TAppEventTypes<GFromPluginMessageEvent>[GEventType][1] = TAppEventTypes<GFromPluginMessageEvent>[GEventType][1],
+	GAppCallbackKey extends TAppCallbackKey<GFromPluginMessageEvent, GEventType> = TAppCallbackKey<
+		GFromPluginMessageEvent,
 		GEventType
 	>
 > {
@@ -164,16 +118,16 @@ export interface TAppCallbackRegistrationBase<
 					args: {
 						pluginId: string;
 					} & TArgs
-			  ]
+				]
 			: GAppCallbackArgs
 	) => GAppCallbackReturnValue;
 }
 
 export type TAppCallbackKey<
-	GPluginMessageEvent extends TPluginMessageEvent,
-	GEventType extends keyof TAppEventTypes<GPluginMessageEvent>,
+	GFromPluginMessageEvent extends TFromPluginMessageEvent,
+	GEventType extends keyof TAppEventTypes<GFromPluginMessageEvent>,
 	GAppCallbackArgs extends
-		TAppEventTypes<GPluginMessageEvent>[GEventType][0] = TAppEventTypes<GPluginMessageEvent>[GEventType][0]
+		TAppEventTypes<GFromPluginMessageEvent>[GEventType][0] = TAppEventTypes<GFromPluginMessageEvent>[GEventType][0]
 > = GAppCallbackArgs[0] extends {
 	key: infer TKey;
 }
@@ -181,54 +135,17 @@ export type TAppCallbackKey<
 	: string | undefined;
 
 export type TAppEventTypes<
-	GPluginMessageEvent extends TPluginMessageEvent,
+	GFromPluginMessageEvent extends TFromPluginMessageEvent,
 	GWindowCallbackKeys extends keyof WindowEventMap = keyof WindowEventMap
 > = {
 	// Events received from Window
 	[K in GWindowCallbackKeys]: [[event: WindowEventMap[K]], Promise<void>];
 } & {
 	// Events received from plugin part
-	'plugin.message': [[event: GPluginMessageEvent], Promise<void>];
+	'plugin.message': [[event: GFromPluginMessageEvent], Promise<void>];
 };
 
-export interface TPluginMessageEvent {
+export interface TFromPluginMessageEvent {
 	key: string;
 	args: unknown;
 }
-
-// Testing
-
-// export interface TOnPluginMessageEvent2 extends TPluginMessageEvent {
-// 	key: 'on-event-2';
-// 	args: {
-// 		arg1: number;
-// 		arg2: string;
-// 	};
-// }
-
-// export interface TOnPluginMessageEvent1 extends TPluginMessageEvent {
-// 	key: 'on-event-1';
-// 	args: {
-// 		arg1: null;
-// 		arg2: number;
-// 		arg3: string;
-// 	};
-// }
-
-// export type TPluginMessageEvents = TOnPluginMessageEvent1 | TOnPluginMessageEvent2;
-
-// const test: TAppCallbackRegistration<TPluginMessageEvents> = {
-// 	type: 'DOMContentLoaded',
-// 	key: undefined,
-// 	callback: async (instance, event) => {
-// 		// Event received by Window
-// 	}
-// };
-
-// const test2: TAppCallbackRegistration<TPluginMessageEvents> = {
-// 	type: 'plugin.message',
-// 	key: 'on-event-1',
-// 	callback: async (instance, event) => {
-// 		// Event received by plugin part
-// 	}
-// };

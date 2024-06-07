@@ -1,15 +1,19 @@
-import type { TAppMessageEvent, TPluginCallbackRegistration, TPluginMessageEvent } from '../types';
+import type {
+	TFromAppMessageEvent,
+	TFromPluginMessageEvent,
+	TPluginCallbackRegistration
+} from '../types';
 import { PluginCallback } from './PluginCallback';
 
 export class FigmaPluginHandler<
-	GAppMessageEvent extends TAppMessageEvent = TAppMessageEvent,
-	GPluginMessageEvent extends TPluginMessageEvent = TPluginMessageEvent
+	GFromAppMessageEvent extends TFromAppMessageEvent = TFromAppMessageEvent,
+	GFromPluginMessageEvent extends TFromPluginMessageEvent = TFromPluginMessageEvent
 > {
 	public readonly figma: typeof figma;
 
 	constructor(
 		figmaInstance: typeof figma,
-		options: TFigmaPluginHandlerOptions<GAppMessageEvent> = {}
+		options: TFigmaPluginHandlerOptions<GFromAppMessageEvent> = {}
 	) {
 		const { events = [] } = options;
 		this.figma = figmaInstance;
@@ -18,8 +22,8 @@ export class FigmaPluginHandler<
 
 	public register(
 		registrations:
-			| TPluginCallbackRegistration<GAppMessageEvent>
-			| TPluginCallbackRegistration<GAppMessageEvent>[]
+			| TPluginCallbackRegistration<GFromAppMessageEvent>
+			| TPluginCallbackRegistration<GFromAppMessageEvent>[]
 	): (() => void)[] {
 		const pluginCallbacks = Array.isArray(registrations)
 			? registrations.map((r) => new PluginCallback(r))
@@ -28,9 +32,9 @@ export class FigmaPluginHandler<
 		return this.registerCallbacks(pluginCallbacks);
 	}
 
-	public post<GKey extends GPluginMessageEvent['key']>(
+	public post<GKey extends GFromPluginMessageEvent['key']>(
 		key: GKey,
-		args: Extract<GPluginMessageEvent, { key: GKey }>['args']
+		args: Extract<GFromPluginMessageEvent, { key: GKey }>['args']
 	): void {
 		this.figma.ui.postMessage({ key, args });
 	}
@@ -39,11 +43,13 @@ export class FigmaPluginHandler<
 	// Helper
 	// =========================================================================
 
-	private registerCallbacks(pluginCallbacks: PluginCallback<GAppMessageEvent>[]): (() => void)[] {
+	private registerCallbacks(
+		pluginCallbacks: PluginCallback<GFromAppMessageEvent>[]
+	): (() => void)[] {
 		return pluginCallbacks.map((callback) => this.registerCallback(callback));
 	}
 
-	private registerCallback(pluginCallback: PluginCallback<GAppMessageEvent>): () => void {
+	private registerCallback(pluginCallback: PluginCallback<GFromAppMessageEvent>): () => void {
 		let type: string = pluginCallback.type;
 		let typeCategory: string | null = null;
 		const typeParts = type.split('.');
@@ -72,7 +78,7 @@ export class FigmaPluginHandler<
 	}
 
 	private async onEvent(
-		pluginCallback: PluginCallback<GAppMessageEvent>,
+		pluginCallback: PluginCallback<GFromAppMessageEvent>,
 		args: any[]
 	): Promise<void> {
 		if (pluginCallback.type === 'app.message') {
@@ -89,6 +95,6 @@ export class FigmaPluginHandler<
 	}
 }
 
-export interface TFigmaPluginHandlerOptions<GAppMessageEvent extends TAppMessageEvent> {
+export interface TFigmaPluginHandlerOptions<GAppMessageEvent extends TFromAppMessageEvent> {
 	events?: TPluginCallbackRegistration<GAppMessageEvent>[];
 }

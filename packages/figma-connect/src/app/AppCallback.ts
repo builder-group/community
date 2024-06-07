@@ -1,9 +1,9 @@
 import { shortId } from '@ibg/utils';
 
-import type { TAppCallbackRegistration, TPluginMessageEvent } from '../types';
+import type { TAppCallbackRegistration, TFromPluginMessageEvent } from '../types';
 
 export class AppCallback<
-	GPluginMessageEvent extends TPluginMessageEvent,
+	GPluginMessageEvent extends TFromPluginMessageEvent,
 	GAppEventRegistration extends
 		TAppCallbackRegistration<GPluginMessageEvent> = TAppCallbackRegistration<GPluginMessageEvent>
 > {

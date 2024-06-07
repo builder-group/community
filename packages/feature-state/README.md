@@ -46,7 +46,7 @@ export const Tasks = () => {
 }
 ```
 
-### Atom-based
+## Atom-based
 
 States in `feature-state` are atom-based, meaning each state should only represent a single piece of data. They can store various types of data such as strings, numbers, arrays, or even objects.
 
