@@ -1,7 +1,25 @@
-# `google-webfonts-client`
+<h1 align="center">
+  <img src="./.github/banner.svg" alt="google-webfonts-client banner">
+</h1>
+
+<p align="left">
+    <a href="https://github.com/inbeta-group/monorepo/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
+    </a>
+    <a href="https://www.npmjs.com/package/google-webfonts-client">
+        <img src="https://img.shields.io/bundlephobia/minzip/google-webfonts-client.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=F0E81A" alt="NPM bundle minzipped size"/>
+    </a>
+    <a href="https://www.npmjs.com/package/google-webfonts-client">
+        <img src="https://img.shields.io/npm/dt/google-webfonts-client.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
+    </a>
+    <a href="https://discord.gg/T9GzreAwPH">
+        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=F0E81A" alt="Join Discord"/>
+    </a>
+</p>
+
 > Status: Experimental
 
-A typesafe and straightforward fetch client for interacting with the Google Web Fonts API using [`feature-fetch`](https://github.com/inbeta-group/monorepo/tree/develop/packages/feature-fetch). This client provides typesafe methods for fetching and downloading Google Fonts.
+`google-webfonts-client` is a typesafe and straightforward fetch client for interacting with the Google Web Fonts API using [`feature-fetch`](https://github.com/inbeta-group/monorepo/tree/develop/packages/feature-fetch). This client provides typesafe methods for fetching and downloading Google Fonts.
 
 - [Google Fonts Developer API Docs](https://developers.google.com/fonts/docs/developer_api)
 

@@ -1,6 +1,20 @@
-# `@ibg/config`
+<h1 align="center">
+    <img src="./.github/banner.svg" alt="@ibg/config banner">
+</h1>
 
-A collection of ESLint, Vite and Typescript configurations.
+<p align="left">
+    <a href="https://github.com/inbeta-group/monorepo/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
+    </a>
+    <a href="https://www.npmjs.com/package/@ibg/config">
+        <img src="https://img.shields.io/npm/dt/@ibg/config.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
+    </a>
+    <a href="https://discord.gg/T9GzreAwPH">
+        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=F0E81A" alt="Join Discord"/>
+    </a>
+</p>
+
+`@ibg/config` is a collection of ESLint, Vite and Typescript configurations.
 
 ## 📖 Usage
 

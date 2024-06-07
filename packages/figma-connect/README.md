@@ -1,7 +1,22 @@
-# `figma-connect`
+<h1 align="center">
+    <img src="./.github/banner.svg" alt="figma-connect banner">
+</h1>
+
+<p align="left">
+    <a href="https://github.com/inbeta-group/monorepo/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
+    </a>
+    <a href="https://www.npmjs.com/package/figma-connect">
+        <img src="https://img.shields.io/npm/dt/figma-connect.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
+    </a>
+    <a href="https://discord.gg/T9GzreAwPH">
+        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=F0E81A" alt="Join Discord"/>
+    </a>
+</p>
+
 > Status: Experimental
 
-A straightforward and typesafe wrapper around the communication between the `app/ui` (iframe) and `plugin` (sandbox) part of a Figma Plugin.
+`figma-connect` is a straightforward and typesafe wrapper around the communication between the `app/ui` (iframe) and `plugin` (sandbox) part of a Figma Plugin.
 
 <img src="./.github/figma-connect-wrapper.png" alt="figma-connect-wrapper image">
 

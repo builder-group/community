@@ -1,6 +1,23 @@
-# `feature-state-react`
+<h1 align="center">
+    <img src="./.github/banner.svg" alt="feature-state-react banner">
+</h1>
 
-The ReactJs extension for the `feature-state` library, providing hooks and features for easy state management in ReactJs.
+<p align="left">
+    <a href="https://github.com/inbeta-group/monorepo/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
+    </a>
+    <a href="https://www.npmjs.com/package/feature-state-react">
+        <img src="https://img.shields.io/bundlephobia/minzip/feature-state-react.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=F0E81A" alt="NPM bundle minzipped size"/>
+    </a>
+    <a href="https://www.npmjs.com/package/feature-state-react">
+        <img src="https://img.shields.io/npm/dt/featuer-state-react.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
+    </a>
+    <a href="https://discord.gg/T9GzreAwPH">
+        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=F0E81A" alt="Join Discord"/>
+    </a>
+</p>
+
+`feature-state-react` is the ReactJs extension for the `feature-state` library, providing hooks and features for easy state management in ReactJs.
 
 - **Lightweight & Tree Shakable**: Function-based and modular design (< 1KB minified)
 - **Modular & Extendable**: Easily extendable with features like `withPersistLocalStorage()`, .. 

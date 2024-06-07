@@ -1,12 +1,8 @@
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap');
-</style>
-<div style="background-color: #F0E81A; padding: 4px; border-radius: 12px; display: flex; align-items: center; overflow: hidden;">
-    <img src="./.github/assets/logo.png" alt="inbeta.group logo" style="height: 64px">
-    <span style="font-size: 2em; font-family: 'Inter', sans-serif; color: #000000;">inbeta.group</span>
-</div>
+<h1 align="center">
+    <img src="./.github/assets/banner.svg" alt="inbeta.group (ibg) banner">
+</h1>
 
-<p align="left" style="margin-top: 8px">
+<p align="left">
     <a href="https://github.com/inbeta-group/monorepo/blob/develop/LICENSE">
         <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
     </a>

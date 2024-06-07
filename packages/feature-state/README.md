@@ -1,19 +1,15 @@
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap');
-</style>
-<div style="background-color: #F0E81A; padding: 4px; border-radius: 12px; display: flex; align-items: center; overflow: hidden;">
-    <img src="../../.github/assets/logo.png" alt="inbeta.group logo" style="height: 64px">
-    <span style="font-size: 2em; font-family: 'Inter', sans-serif; color: #000000;">feature-state</span>
-</div>
+<h1 align="center">
+    <img src="./.github/banner.svg" alt="feature-state banner">
+</h1>
 
-<p align="left" style="margin-top: 8px">
+<p align="left">
     <a href="https://github.com/inbeta-group/monorepo/blob/develop/LICENSE">
         <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
     </a>
-    <a href="https://npm.im/@agile-ts/core">
-        <img src="https://img.shields.io/bundlephobia/min/feature-state.svg?label=bundle%20size&style=flat&colorA=293140&colorB=F0E81A" alt="NPM minified size"/>
+    <a href="https://www.npmjs.com/package/feature-state">
+        <img src="https://img.shields.io/bundlephobia/minzip/feature-state.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=F0E81A" alt="NPM bundle minzipped size"/>
     </a>
-    <a href="https://npm.im/@agile-ts/core">
+    <a href="https://www.npmjs.com/package/feature-state">
         <img src="https://img.shields.io/npm/dt/featuer-state.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
     </a>
     <a href="https://discord.gg/T9GzreAwPH">
@@ -21,7 +17,7 @@
     </a>
 </p>
 
-A straightforward, typesafe, and feature-based state management library for ReactJs.
+`feature-state` is a straightforward, typesafe, and feature-based state management library for ReactJs.
 
 - **Lightweight & Tree Shakable**: Function-based and modular design (< 1KB minified)
 - **Fast**: Minimal code ensures high performance, and state changes can be deferred in "the bucket"
