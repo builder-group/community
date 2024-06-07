@@ -1,6 +1,6 @@
 {
 	"name": "openapi-express",
-	"description": "Express Router with OpenApi types",
+	"description": "Typesafe Express Router wrapper supporting OpenAPI types",
 	"version": "0.0.2",
 	"private": false,
 	"scripts": {

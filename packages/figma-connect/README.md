@@ -18,7 +18,7 @@ Provide a typesafe and straightforward wrapper around the communication between 
 ### Used by
 - [dyn.art - Figma Plugin](https://github.com/dyn-art/monorepo/tree/develop/apps/figma-plugin)
 
-# 📖 Usage
+## 📖 Usage
 
 ### Shared Types
 
@@ -127,7 +127,7 @@ pluginHandler.register({
 });
 ```
 
-## Use in ReactJs
+### Use in ReactJs
 
 To use `figma-connect` in a ReactJS application, you can utilize the `useAppCallback()` hook to handle events from the `plugin` part in a React component. 
 

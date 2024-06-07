@@ -17,7 +17,7 @@ Provide a typesafe, straightforward, and lightweight state management library de
 - [jotai](https://github.com/pmndrs/jotai)
 - [AgileTs](https://github.com/agile-ts/agile)
 
-# 📖 Usage
+## 📖 Usage
 
 `store/tasks.ts`
 ```ts
@@ -46,7 +46,7 @@ export const Tasks = () => {
 }
 ```
 
-## Atom-based
+### Atom-based
 
 States in `feature-state` are atom-based, meaning each state should only represent a single piece of data. They can store various types of data such as strings, numbers, arrays, or even objects.
 
@@ -86,7 +86,7 @@ const unsubscribe = $temperature.subscribe((newValue) => {
 
 Unlike `$state.listen(callback)`, `$state.subscribe(callback)` immediately invokes the listener during the subscription. 
 
-## Features
+## 📙 Features
 
 ### `withPersist()`
 

@@ -1,11 +1,11 @@
 # `google-webfonts-client`
 > Status: Experimental
 
-Fetch client for interacting with the Google Web Fonts API using [`feature-fetch`](https://github.com/inbeta-group/monorepo/tree/develop/packages/feature-fetch). This client provides typesafe methods for fetching and downloading Google Fonts.
+A typesafe and straightforward fetch client for interacting with the Google Web Fonts API using [`feature-fetch`](https://github.com/inbeta-group/monorepo/tree/develop/packages/feature-fetch). This client provides typesafe methods for fetching and downloading Google Fonts.
 
 - [Google Fonts Developer API Docs](https://developers.google.com/fonts/docs/developer_api)
 
-# 📖 Usage
+## 📖 Usage
 
 ### Create a Google Web Fonts Client
 
@@ -69,7 +69,7 @@ if (fileResponse.isOk()) {
 }
 ```
 
-## Error Handling
+### Error Handling
 
 Errors can occur during API requests, and the client will return detailed error information. Possible error types include:
 

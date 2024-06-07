@@ -1,7 +1,7 @@
 # `@ibg/cli`
 > Status: Experimental
 
-A CLI tool for bundling TypeScript libraries with presets, powered by Rollup and Esbuild.
+A straightforward CLI tool for bundling TypeScript libraries with presets, powered by Rollup and Esbuild.
 
 ### Motivation
 Eliminate the hassle of manually configuring Rollup over and over by providing a flexible wrapper with preset configurations for Figma plugins, Rust (Wasm), and TypeScript library bundling.
@@ -9,9 +9,9 @@ Eliminate the hassle of manually configuring Rollup over and over by providing a
 ### Alternatives
 - [tsup](https://github.com/egoist/tsup)
 
-# 📖 Usage
+## 📖 Usage
 
-## Bundle Files
+### Bundle Files
 
 To bundle your files, run:
 ```bash
@@ -32,7 +32,7 @@ Output:
 - `dist/cjs`: CommonJS bundle
 - `dist/types`: TypeScript types
 
-### Multiple Files
+### Bundle multiple Files
 
 To bundle multiple files, use the `exports` field:
 ```json

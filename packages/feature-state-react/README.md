@@ -7,7 +7,7 @@ The ReactJs extension for the `feature-state` library, providing hooks and featu
 - **Seamless Integration**: Designed to work effortlessly with `feature-state`
 - **Typesafe**: Build with TypeScript for strong type safety
 
-# 📖 Usage
+## 📖 Usage
 
 ### `useGlobalState()`
 
@@ -30,7 +30,7 @@ export const Tasks = () => {
 }
 ```
 
-## Features
+## 📙 Features
 
 ### `withPersistLocalStorage()`
 

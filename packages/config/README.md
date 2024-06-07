@@ -2,9 +2,9 @@
 
 A collection of ESLint, Vite and Typescript configurations.
 
-# 📖 Usage
+## 📖 Usage
 
-## Typescript
+### [Typescript](https://www.typescriptlang.org/)
 
 `tsconfig.json`
 ```json
@@ -19,7 +19,7 @@ A collection of ESLint, Vite and Typescript configurations.
 }
 ```
 
-## ESLint
+### [ESLint](https://eslint.org/)
 
 `.eslintrc.js`
 ```js
@@ -32,7 +32,7 @@ module.exports = {
 };
 ```
 
-## Vitest
+### [Vitest](https://vitest.dev/)
 
 `vitest.config.js`
 ```js
@@ -42,7 +42,7 @@ const { nodeConfig } = require('@ibg/config/vite/node.config');
 module.exports = mergeConfig(nodeConfig, defineConfig({}));
 ```
 
-# 🙏 Contribution
+## 🙏 Contribution
 
 ### Debugging ESLint Configuration
 
@@ -66,6 +66,6 @@ TypeScript configurations are placed at the root to allow easy referencing from 
 
 Node: Extending nested configuration didn't work.
 
-# 🌟 Credits
+## 🌟 Credits
 
 This configuration is based on the [`turbo-basic`](https://github.com/vercel/turbo/tree/main/examples/basic) starter template and will be kept in sync with it as the Vercel team knows better than me what configurations settings are best for NextJs apps and co. Also [`tsconfig/bases`](https://github.com/tsconfig/bases) was a source of inspiration.

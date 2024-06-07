@@ -1,7 +1,7 @@
 # `feature-fetch`
 > Status: Experimental
 
-A straightforward, typesafe, and feature-based [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) wrapper.
+A straightforward, typesafe, and feature-based [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) wrapper supporting [OpenAPI](https://www.openapis.org/) types.
 
 - **Lightweight & Tree Shakable**: Function-based and modular design (< 6KB minified)
 - **Fast**: Thin wrapper around the native [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API), maintaining near-native performance
@@ -18,7 +18,7 @@ Provide a typesafe, straightforward, and lightweight `fetch` wrapper that seamle
 - [wretch](https://github.com/elbywan/wretch)
 - [openapi-fetch](https://github.com/drwpow/openapi-typescript/tree/main/packages/openapi-fetch)
 
-# 📖 Usage
+## 📖 Usage
 
 ```ts
 import { createApiFetchClient } from 'feature-fetch';
@@ -50,11 +50,9 @@ try {
 }
 ```
 
-## `withApi()`
+### `withApi()`
 
 Enhance `feature-fetch` to create a typesafe `fetch` wrapper. This feature provides common HTTP methods (`get`, `post`, `put`, `del`) ensuring requests and responses are typed.
-
-### Usage
 
 1. **Create an API Fetch Client**:
    Use `createApiFetchClient` to create a fetch client with a specified base URL.
@@ -79,7 +77,7 @@ Enhance `feature-fetch` to create a typesafe `fetch` wrapper. This feature provi
    });
    ```
 
-## `withOpenApi()`
+### `withOpenApi()`
 
 Enhance `feature-fetch` with [OpenAPI](https://www.openapis.org/) support to create a typesafe `fetch` wrapper. This feature provides common HTTP methods (`get`, `post`, `put`, `del`) that are fully typed by leveraging your OpenAPI schema using [`openapi-typescript`](https://github.com/drwpow/openapi-typescript/).
 
@@ -115,7 +113,7 @@ Enhance `feature-fetch` with [OpenAPI](https://www.openapis.org/) support to cre
    });
    ```
 
-## Errors
+## 🚨 Errors
 
 When handling API error responses (`response.isErr()`), `response` can be one of three [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) types, each representing a different kind of failure.
 
@@ -171,7 +169,7 @@ if (response.isErr()) {
 } 
 ```
 
-## Features
+## 📙 Features
 
 ### `withRetry()`
 

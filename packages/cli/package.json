@@ -1,6 +1,6 @@
 {
 	"name": "@ibg/cli",
-	"description": "CLI to bundle Typescript libraries with presets, powered by Rollup and Esbuild",
+	"description": "Straightforward CLI to bundle Typescript libraries with presets, powered by Rollup and Esbuild",
 	"version": "0.0.8",
 	"private": false,
 	"bin": {
