@@ -1,5 +1,11 @@
 # @ibg/utils
 
+## 0.0.6
+
+### Patch Changes
+
+- [#26](https://github.com/inbeta-group/monorepo/pull/26) [`08b5aea`](https://github.com/inbeta-group/monorepo/commit/08b5aea3ff12687fec6d7a35a394d6945a5bc408) Thanks [@github-actions](https://github.com/apps/github-actions)! - Updated README
+
 ## 0.0.5
 
 ### Patch Changes
