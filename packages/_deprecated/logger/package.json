@@ -1,6 +1,6 @@
 {
 	"name": "feature-logger",
-	"description": "Straightforward, typesafe, and feature-based logging library",
+	"description": "Straightforward and typesafe logging library",
 	"version": "0.0.11",
 	"private": false,
 	"scripts": {
@@ -10,8 +10,7 @@
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "vitest run",
-		"update:latest": "pnpm update --latest",
-		"size": "size-limit --why"
+		"update:latest": "pnpm update --latest"
 	},
 	"source": "./src/index.ts",
 	"main": "./dist/cjs/index.js",
@@ -28,9 +27,6 @@
 		"url": "https://github.com/inbeta-group/monorepo/issues"
 	},
 	"homepage": "https://inbeta.group/?source=github",
-	"dependencies": {
-		"@ibg/utils": "workspace:*"
-	},
 	"devDependencies": {
 		"@ibg/config": "workspace:*",
 		"@types/node": "^20.14.1"
@@ -38,10 +34,5 @@
 	"files": [
 		"dist",
 		"README.md"
-	],
-	"size-limit": [
-		{
-			"path": "dist/esm/index.js"
-		}
 	]
 }

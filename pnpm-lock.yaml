@@ -166,6 +166,10 @@ importers:
         version: 2.3.1(typescript@5.4.5)
 
   packages/feature-logger:
+    dependencies:
+      '@ibg/utils':
+        specifier: workspace:^
+        version: link:../utils
     devDependencies:
       '@ibg/config':
         specifier: workspace:*
