@@ -8,7 +8,7 @@ export class RequestException<GData = unknown> extends ServiceException {
 	constructor(code: TErrorCode, status: number, options: TRequestExceptionOptions<GData> = {}) {
 		const { description, response, data } = options;
 		super(code, {
-			message: `Call to endpoint failed with status ${status}${
+			message: `Call to endpoint failed by exception with status code ${status.toString()}${
 				description != null ? `: ${description}` : '!'
 			}`
 		});

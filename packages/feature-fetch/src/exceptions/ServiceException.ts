@@ -4,7 +4,7 @@ export class ServiceException extends Error {
 
 	constructor(code: TErrorCode, options: TServiceExceptionOptions = {}) {
 		const { message } = options;
-		super(`[${code}] ${message}`);
+		super(message != null ? `[${code}] ${message}` : code);
 		this.code = code;
 	}
 }

@@ -39,7 +39,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	},
 	"keywords": [],
 	"author": "@bennoinbeta",
-	"license": "AGPL-3.0-or-later",
+	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/inbeta-group/monorepo/issues"
 	},

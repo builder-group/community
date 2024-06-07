@@ -1,10 +1,66 @@
-# `@ibg/config`
+<h1 align="center">
+    <img src="./.github/banner.svg" alt="@ibg/config banner">
+</h1>
+
+<p align="left">
+    <a href="https://github.com/inbeta-group/monorepo/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
+    </a>
+    <a href="https://www.npmjs.com/package/@ibg/config">
+        <img src="https://img.shields.io/npm/dt/@ibg/config.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
+    </a>
+    <a href="https://dyn.art/s/discord/?source=inbeta-group-readme">
+        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=F0E81A" alt="Join Discord"/>
+    </a>
+</p>
+
+`@ibg/config` is a collection of ESLint, Vite and Typescript configurations.
+
+## 📖 Usage
+
+### [Typescript](https://www.typescriptlang.org/)
+
+`tsconfig.json`
+```json
+{
+	"extends": "@ibg/config/react-library.tsconfig.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"declarationDir": "./dist/types",
+	},
+	"include": ["src"]
+}
+```
+
+### [ESLint](https://eslint.org/)
+
+`.eslintrc.js`
+```js
+/**
+ * @type {import('eslint').Linter.Config}
+ */
+module.exports = {
+	root: true,
+	extends: [require.resolve('@ibg/config/eslint/react-internal'), 'plugin:storybook/recommended']
+};
+```
+
+### [Vitest](https://vitest.dev/)
+
+`vitest.config.js`
+```js
+const { defineConfig, mergeConfig } = require('vitest/config');
+const { nodeConfig } = require('@ibg/config/vite/node.config');
+
+module.exports = mergeConfig(nodeConfig, defineConfig({}));
+```
 
 ## 🙏 Contribution
 
 ### Debugging ESLint Configuration
 
-If you are encountering issues or unexpected behavior with ESLint, you can use the following command to output the final configuration ESLint is using for a specific file. This can be helpful for debugging configuration issues.
+If you are encountering issues or unexpected behavior with ESLint, you can use the following command to output the final configuration. 
 
 ```bash
 npx eslint --print-config ./some/file/to/test/on.ts
@@ -22,7 +78,7 @@ TypeScript configurations are placed at the root to allow easy referencing from 
 }
 ```
 
-This setup bypasses limitations in TypeScript's module resolution mechanism when using the `extends` field.
+Node: Extending nested configuration didn't work.
 
 ## 🌟 Credits
 

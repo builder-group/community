@@ -232,7 +232,7 @@ export interface operations {
 	 */
 	postPingAPI: {
 		parameters: {
-			path?: {
+			path: {
 				/** @description The unique positive non-zero numeric ID for an Etsy Shop. */
 				shop_id: number;
 			};

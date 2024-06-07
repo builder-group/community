@@ -90,10 +90,10 @@ jobs:
         id: changesets
         uses: changesets/action@v1.4.7
         with:
-          title: "chore(publish): version packages 🦋"
+          title: "[ci] version packages 🦋"
           publish: pnpm packages:publish
           version: pnpm packages:version
-          commit: "chore(publish): version packages 🦋 [skip ci]"
+          commit: "[ci] version packages 🦋 [skip ci]"
           branch: "main"
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}

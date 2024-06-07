@@ -1,6 +1,6 @@
 import type { TListener, TListenerQueueItem, TReadonlyIfObject, TState } from './types';
 
-const listenerQueue: TListenerQueueItem[] = [];
+const LISTENER_QUEUE: TListenerQueueItem[] = [];
 
 export function createState<GValue>(value: GValue, deferred = true): TState<GValue, ['base']> {
 	const state: TState<GValue, ['base']> = {
@@ -45,7 +45,7 @@ export function createState<GValue>(value: GValue, deferred = true): TState<GVal
 					value: this._value,
 					...listener
 				};
-				listenerQueue.push(queueItem as TListenerQueueItem);
+				LISTENER_QUEUE.push(queueItem as TListenerQueueItem);
 			});
 
 			// Process queue
@@ -61,7 +61,7 @@ export function createState<GValue>(value: GValue, deferred = true): TState<GVal
 
 function processQueue(): void {
 	// Drain the queue
-	const queueToProcess = listenerQueue.splice(0, listenerQueue.length);
+	const queueToProcess = LISTENER_QUEUE.splice(0, LISTENER_QUEUE.length);
 
 	// Sort the drained listeners by level and execute the callbacks
 	queueToProcess

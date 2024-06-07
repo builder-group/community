@@ -1,9 +1,9 @@
 import { shortId } from '@ibg/utils';
 
-import type { TAppMessageEvent, TPluginCallbackRegistration } from '../types';
+import type { TFromAppMessageEvent, TPluginCallbackRegistration } from '../types';
 
 export class PluginCallback<
-	GAppMessageEvent extends TAppMessageEvent,
+	GAppMessageEvent extends TFromAppMessageEvent,
 	GPluginEventRegistration extends
 		TPluginCallbackRegistration<GAppMessageEvent> = TPluginCallbackRegistration<GAppMessageEvent>
 > {
@@ -13,7 +13,7 @@ export class PluginCallback<
 	public readonly once: boolean;
 
 	constructor(registration: GPluginEventRegistration) {
-		this.key = registration.key != null ? registration.key : shortId();
+		this.key = registration.key ?? shortId();
 		this.type = registration.type;
 		this.callback = registration.callback;
 		this.once = registration.once ?? false;

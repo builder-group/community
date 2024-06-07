@@ -8,7 +8,7 @@ export function withMultiUndo<GValue, GSelectedFeatureKeys extends TFeatureKeys<
 		state._features.push('multiundo');
 
 		const multiUndoFeature: TSelectFeatures<GValue, ['multiundo']> = {
-			multiundo(this: TState<GValue, ['multiundo', 'undo']>, count: number) {
+			multiUndo(this: TState<GValue, ['multiundo', 'undo']>, count: number) {
 				for (let i = 0; i < count; i++) {
 					this.undo();
 				}

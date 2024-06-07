@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { createState } from '../create-state';
 import { withUndo } from './with-undo';
 
-describe('withUndo function tests', () => {
+describe('withUndo function', () => {
 	it('should have correct types', () => {
 		const state = createState('Jeff');
 		const stateWithUndo = withUndo(state);

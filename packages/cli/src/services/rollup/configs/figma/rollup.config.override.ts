@@ -62,7 +62,7 @@ export async function createOverrideRollupConfig(
 							return dependencies
 								.map(
 									(dependency) =>
-										`${dependency.license} -- ${dependency.name}:${dependency.version}`
+										`${dependency.license ?? 'unkown'} -- ${dependency.name ?? 'unkown'}:${dependency.version ?? 'unkown'}`
 								)
 								.join('\n');
 						}

@@ -8,7 +8,6 @@ export interface StorageInterface<GValue> {
 	delete: (key: string) => Promise<boolean>;
 }
 
-// TODO: Think about sync implementation of Persist
 export function withPersist<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]>(
 	state: TState<GValue, TEnforceFeatures<GSelectedFeatureKeys, ['base']>>,
 	storage: StorageInterface<GValue>,
@@ -30,8 +29,15 @@ export function withPersist<GValue, GSelectedFeatureKeys extends TFeatureKeys<GV
 			}
 
 			// Setup listener
-			state.listen(async (value) => {
-				await storage.save(key, value);
+			state.listen((value) => {
+				storage
+					.save(key, value)
+					.then(() => {
+						/* do nothing*/
+					})
+					.catch(() => {
+						/* do nothing*/
+					});
 			});
 
 			return success;

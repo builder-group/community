@@ -27,7 +27,7 @@ export class AppError extends Error {
 
 	constructor(status: number, code: TErrorCode, options: TAppErrorOptions = {}) {
 		const { additionalErrors = [], description, uri } = options;
-		super(`Error [${code}]: ${description || 'An error occurred'}.`);
+		super(`Error [${code}]: ${description ?? 'An error occurred'}.`);
 
 		// Set the prototype explicity
 		Object.setPrototypeOf(this, new.target.prototype);

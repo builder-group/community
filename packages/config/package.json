@@ -1,6 +1,6 @@
 {
 	"name": "@ibg/config",
-	"description": "Shared configurations for inbeta.group packages",
+	"description": "Collection of ESLint, Vite and Typescript configurations",
 	"version": "0.0.8",
 	"private": false,
 	"scripts": {
@@ -15,7 +15,7 @@
 	},
 	"keywords": [],
 	"author": "@bennoinbeta",
-	"license": "AGPL-3.0-or-later",
+	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/inbeta-group/monorepo/issues"
 	},

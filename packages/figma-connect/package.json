@@ -1,6 +1,6 @@
 {
 	"name": "figma-connect",
-	"description": "Straightforward and typesafe communication between Figma app (iframe) and plugin (sandbox)",
+	"description": "Straightforward and typesafe wrapper around the communication between the app/ui (iframe) and plugin (sandbox) part of a Figma Plugin",
 	"version": "0.0.3",
 	"private": false,
 	"scripts": {
@@ -10,7 +10,8 @@
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"update:latest": "pnpm update --latest"
+		"update:latest": "pnpm update --latest",
+		"size": "size-limit --why"
 	},
 	"exports": {
 		"./app": {
@@ -42,7 +43,7 @@
 	},
 	"keywords": [],
 	"author": "@bennoinbeta",
-	"license": "AGPL-3.0-or-later",
+	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/inbeta-group/monorepo/issues"
 	},
@@ -51,12 +52,17 @@
 		"@ibg/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"@figma/plugin-typings": "^1.94.0",
+		"@figma/plugin-typings": "^1.95.0",
 		"@ibg/config": "workspace:*",
-		"@types/node": "^20.14.1"
+		"@types/node": "^20.14.2"
 	},
 	"files": [
 		"dist",
 		"README.md"
+	],
+	"size-limit": [
+		{
+			"path": "dist/app/esm/index.js"
+		}
 	]
 }

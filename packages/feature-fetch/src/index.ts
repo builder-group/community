@@ -1,5 +1,5 @@
+export * from './create-fetch-client';
 export * from './exceptions';
-export * from './factories';
 export * from './features';
 export * from './helper';
 export * from './types';
