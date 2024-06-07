@@ -168,7 +168,7 @@ importers:
   packages/feature-logger:
     dependencies:
       '@ibg/utils':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../utils
     devDependencies:
       '@ibg/config':
