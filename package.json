@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"build": "pnpm build:cli && turbo run build",
-		"build:cli": "turbo run build --filter=cli && pnpm run cli:hello",
+		"build:cli": "turbo run build --filter=@ibg/cli && pnpm run cli:hello",
 		"packages:version": "changeset version && changeset publish",
 		"packages:publish": "changeset publish",
 		"packages:change": "changeset",
