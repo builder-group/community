@@ -25,6 +25,9 @@
 - **Typesafe**: Build with TypeScript for strong type safety
 - **Standalone**: Zero dependencies, ensuring ease of use in various environments
 
+### 🏖️ Code Sandbox
+- [ReactJs Counter](https://codesandbox.io/p/sandbox/counter-k74k9k)
+
 ### Motivation
 
 Provide a typesafe, straightforward, and lightweight state management library designed to be modular and extendable with features like `withPersist()`, `withUndo()`, .. Having previously built [AgileTs](https://agile-ts.org/), I realized the importance of simplicity and modularity. AgileTs, while powerful, became bloated and complex. Learning from that experience, I followed the KISS (Keep It Simple, Stupid) principle for `feature-state`, aiming to provide a more streamlined and efficient solution. Because no code is the best code.
