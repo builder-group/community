@@ -6,7 +6,7 @@ export * from 'feature-fetch';
 export * from './create-google-webfonts-client';
 
 declare module 'feature-fetch' {
-	interface TThirdPartyFeatures {
+	interface TThirdPartyFeatures<GPaths> {
 		'google-webfonts': {
 			rawFetchClient: TFetchClient<['base', 'api']>;
 			getWebFonts(
