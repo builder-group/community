@@ -1,15 +1,16 @@
-import { TFeatureKeys, TSelectFeatures } from './features';
+import { TState } from 'feature-state';
+
 import { TFormField, TFormFieldValidator } from './form-field';
 
-export type TForm<GFormData extends TFormData, GSelectedFeatureKeys extends TFeatureKeys[]> = {
-	_features: string[];
+export type TForm<GFormData extends TFormData> = TState<TFormState<GFormData>, ['base', 'form']>;
+
+export interface TFormStateFeature<GFormData extends TFormData> {
 	_config: TFormConfig<GFormData>;
-	_data: TFormState<GFormData>;
 	key: string;
 	isValid: boolean;
 	isModified: boolean;
 	submitted: boolean;
-} & TSelectFeatures<GFormData, GSelectedFeatureKeys>;
+}
 
 export type TFormState<GFormData extends TFormData> = {
 	[Key in keyof GFormData]: TFormField<GFormData[Key]>;

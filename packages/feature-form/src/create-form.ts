@@ -1,12 +1,12 @@
+import { createState, TSelectFeatures } from 'feature-state';
 import { shortId } from '@ibg/utils';
 
 import { createFormField } from './create-form-field';
 import { TForm, TFormConfig, TFormData, TFormState, TFormValidators } from './types';
 
-// TODO: Should form also be a state?
 export function createForm<GFormData extends TFormData>(
 	config: TCreateFormConfig<GFormData>
-): TForm<GFormData, ['base']> {
+): TForm<GFormData> {
 	const {
 		initialValues,
 		validators,
@@ -30,9 +30,11 @@ export function createForm<GFormData extends TFormData>(
 		});
 	}
 
-	return {
-		_: null,
-		_features: ['base'],
+	const formState = createState(data);
+
+	formState._features.push('form');
+
+	const formFeature: TSelectFeatures<GFormData, ['form']> = {
 		_config: {
 			collectErrorMode,
 			disabled,
@@ -40,12 +42,16 @@ export function createForm<GFormData extends TFormData>(
 			reValidateMode,
 			onSubmit
 		},
-		_data: data,
 		key,
 		isModified: false,
 		isValid: false,
 		submitted: false
 	};
+
+	// Merge existing features from the state with the new undo feature
+	const _formState = Object.assign(formState, formFeature);
+
+	return _formState as TForm<GFormData>;
 }
 
 export interface TCreateFormConfig<GFormData extends TFormData>
