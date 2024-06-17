@@ -2,7 +2,7 @@ import { TState } from 'feature-state';
 
 import { TFormField, TFormFieldValidator } from './form-field';
 
-export type TForm<GFormData extends TFormData> = TState<TFormState<GFormData>, ['base', 'form']>;
+export type TForm<GFormData extends TFormData> = TState<TFormFields<GFormData>, ['base', 'form']>;
 
 export interface TFormStateFeature<GFormData extends TFormData> {
 	_config: TFormConfig<GFormData>;
@@ -10,11 +10,16 @@ export interface TFormStateFeature<GFormData extends TFormData> {
 	isValid: boolean;
 	isModified: boolean;
 	submitted: boolean;
+	getField: <GKey extends keyof TFormFields<GFormData>>(key: GKey) => TFormFields<GFormData>[GKey];
+	submit: () => void;
+	reset: () => void;
 }
 
-export type TFormState<GFormData extends TFormData> = {
+export type TFormFields<GFormData extends TFormData> = {
 	[Key in keyof GFormData]: TFormField<GFormData[Key]>;
 };
+
+export type TExtractGFormDataTFormFields<T> = T extends TFormFields<infer G> ? G : never;
 
 export type TFormValidators<GFormData extends TFormData> = {
 	[Key in keyof GFormData]: TFormFieldValidator<GFormData[Key]>;
@@ -47,6 +52,6 @@ export interface TFormConfig<GFormData extends TFormData> {
 
 export type TFormValidateMode = 'onBlur' | 'onChange' | 'onSubmit' | 'onTouched' | 'all';
 
-export type TFormReValidateMode = 'onBlur' | 'onChange' | 'onSubmit';
+export type TFormReValidateMode = 'onBlur' | 'onChange' | 'onSubmit' | 'afterFirstSubmit';
 
 export type TCollectErrorMode = 'firstError' | 'all';

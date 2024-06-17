@@ -1,15 +1,21 @@
-import { createState, TSelectFeatures } from 'feature-state';
+import { createState } from 'feature-state';
 import { shortId } from '@ibg/utils';
 
 import { createFormField } from './create-form-field';
-import { TForm, TFormConfig, TFormData, TFormState, TFormValidators } from './types';
+import {
+	TForm,
+	TFormConfig,
+	TFormData,
+	TFormFields,
+	TFormFieldValidator,
+	TFormStateFeature
+} from './types';
 
 export function createForm<GFormData extends TFormData>(
 	config: TCreateFormConfig<GFormData>
 ): TForm<GFormData> {
 	const {
-		initialValues,
-		validators,
+		fields,
 		collectErrorMode = 'firstError',
 		disabled = false,
 		key = shortId(),
@@ -18,23 +24,32 @@ export function createForm<GFormData extends TFormData>(
 		onSubmit = null
 	} = config;
 
-	const data: TFormState<GFormData> = {} as TFormState<GFormData>;
-	for (const key in initialValues) {
-		data[key] = createFormField({
+	const data: TFormFields<GFormData> = Object.fromEntries(
+		Object.entries(fields).map(([key, field]) => [
 			key,
-			initialValue: initialValues[key],
-			validator: validators[key],
-			collectErrorMode,
-			reValidateMode,
-			editable: true
-		});
-	}
+			createFormField({
+				key,
+				initialValue: field.initalValue,
+				validator: field.validator,
+				collectErrorMode,
+				reValidateMode,
+				editable: true
+			})
+		])
+	) as TFormFields<GFormData>;
 
 	const formState = createState(data);
 
 	formState._features.push('form');
 
-	const formFeature: TSelectFeatures<GFormData, ['form']> = {
+	// Notify form listeners if form field has changed
+	for (const formField of Object.values(formState._value)) {
+		formField.listen(() => {
+			formState._notify(true);
+		});
+	}
+
+	const formFeature: TFormStateFeature<GFormData> = {
 		_config: {
 			collectErrorMode,
 			disabled,
@@ -45,18 +60,53 @@ export function createForm<GFormData extends TFormData>(
 		key,
 		isModified: false,
 		isValid: false,
-		submitted: false
+		submitted: false,
+		getField(this: TForm<GFormData>, key) {
+			return this._value[key];
+		},
+		submit(this: TForm<GFormData>) {
+			this.submitted = true;
+
+			const preparedData: Record<string, unknown> = {};
+			for (const [key, formField] of Object.entries(this._value)) {
+				if (
+					this._config.reValidateMode === 'onSubmit' ||
+					(this._config.reValidateMode === 'afterFirstSubmit' && !this.submitted)
+				) {
+					formField.propagateStatus();
+				}
+
+				preparedData[key] = formField.get();
+			}
+
+			//this._config.onSubmit(preparedData as GFormData);
+		},
+		reset(this: TForm<GFormData>) {
+			for (const formField of Object.values(this._value)) {
+				formField.reset();
+			}
+			this.isModified = false;
+			this.submitted = false;
+		}
 	};
 
 	// Merge existing features from the state with the new undo feature
 	const _formState = Object.assign(formState, formFeature);
 
-	return _formState as TForm<GFormData>;
+	return _formState as unknown as TForm<GFormData>;
 }
 
 export interface TCreateFormConfig<GFormData extends TFormData>
 	extends Partial<TFormConfig<GFormData>> {
 	key?: string;
-	initialValues: GFormData;
-	validators: TFormValidators<GFormData>;
+	fields: TCreateFormConfigFormFields<GFormData>;
+}
+
+type TCreateFormConfigFormFields<GFormData extends TFormData> = {
+	[Key in keyof GFormData]: TCreateFormConfigFormField<GFormData[Key]>;
+};
+
+interface TCreateFormConfigFormField<GValue> {
+	initalValue: GValue;
+	validator: TFormFieldValidator<GValue>;
 }

@@ -6,6 +6,7 @@ export type TFormField<GValue> = TState<GValue, ['base', 'form-field']>;
 
 export interface TFormFieldStateFeature<GValue> {
 	_config: TFormFieldStateConfig;
+	_intialValue: GValue;
 	key: string;
 	isTouched: boolean;
 	status: TFormFieldStatus;
@@ -13,6 +14,7 @@ export interface TFormFieldStateFeature<GValue> {
 	validate: () => Promise<boolean>;
 	blur: () => void;
 	reset: () => void;
+	propagateStatus: () => void;
 }
 
 export interface TFormFieldStateConfig {

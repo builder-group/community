@@ -16,7 +16,7 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	 *
 	 * @returns The current state value of type `GValue`.
 	 */
-	get: () => GValue;
+	get: () => Readonly<GValue>;
 	/**
 	 * Updates the state value.
 	 *
