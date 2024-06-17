@@ -11,10 +11,10 @@ export function createState<GValue>(value: GValue, deferred = true): TState<GVal
 		get() {
 			return this._value;
 		},
-		set(newValue) {
+		set(newValue, process = true) {
 			if (this._value !== newValue) {
 				this._value = newValue;
-				this._notify(true);
+				this._notify(process);
 			}
 		},
 		listen(callback, level) {

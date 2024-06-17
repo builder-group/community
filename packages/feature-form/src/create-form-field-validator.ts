@@ -1,27 +1,32 @@
 import { deepCopy } from '@ibg/utils';
 
-import { TFormFieldValidator, TValidateFormField, TValidateFormFieldLink } from './types';
+import { TFormFieldValidationChain, TFormFieldValidator } from './types';
 
 export function createFormFieldValidator<GValue>(
-	chain: TValidateFormFieldLink<GValue>[]
+	validationChain: TFormFieldValidationChain<GValue>
 ): TFormFieldValidator<GValue> {
 	return {
-		_chain: chain,
+		_validationChain: validationChain,
 		isValidating: false,
 		append(validator) {
-			this._chain.push(...validator._chain);
+			this._validationChain.push(...validator._validationChain);
 		},
 		async validate(formField) {
 			this.isValidating = true;
-			await this._chain.reduceRight<TValidateFormField<GValue>>(
-				(acc, link) => link(acc),
-				async () => {}
-			)(formField);
+			for (const validateFunction of this._validationChain) {
+				await validateFunction(formField.get(), formField.status);
+				if (
+					formField._config.collectErrorMode === 'firstError' &&
+					formField.status.get().type === 'INVALID'
+				) {
+					break;
+				}
+			}
 			this.isValidating = false;
 			return formField.status.get().type === 'VALID';
 		},
 		clone() {
-			return createFormFieldValidator<GValue>(deepCopy(this._chain));
+			return createFormFieldValidator<GValue>(deepCopy(this._validationChain));
 		}
 	};
 }

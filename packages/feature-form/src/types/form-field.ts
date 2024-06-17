@@ -1,44 +1,55 @@
 import { TState } from 'feature-state';
 
+import { TCollectErrorMode, TFormReValidateMode } from './form';
+
 export type TFormField<GValue> = TState<GValue, ['base', 'form-field']>;
 
 export interface TFormFieldStateFeature<GValue> {
 	_config: TFormFieldStateConfig;
+	key: string;
 	isTouched: boolean;
 	status: TFormFieldStatus;
 	validator: TFormFieldValidator<GValue>;
+	validate: () => Promise<boolean>;
 	blur: () => void;
 	reset: () => void;
 }
 
 export interface TFormFieldStateConfig {
-	key: string;
 	editable: boolean;
+	reValidateMode: TFormReValidateMode;
+	collectErrorMode: TCollectErrorMode;
 }
 
 export type TFormFieldStatus = TState<TFormFieldStatusValue, ['base', 'form-field-status']>;
 
 export interface TFormFielStatusStateFeature {
 	display: boolean;
+	registerError: (error: TInvalidFormFieldError) => void;
 }
 
 export type TFormFieldStatusValue =
 	| TInvalidFormFieldStatus
 	| TValidFormFieldStatus
-	| TUnkownFormFieldStatus;
+	| TUnvalidatedFormFieldStatus;
 
-export type TInvalidFormFieldStatus = { type: 'INVALID'; message?: string };
-export type TValidFormFieldStatus = { type: 'VALID'; message?: string };
-export type TUnkownFormFieldStatus = { type: 'UNKOWN' };
+export type TInvalidFormFieldStatus = { type: 'INVALID'; errors: TInvalidFormFieldError[] };
+export type TValidFormFieldStatus = { type: 'VALID' };
+export type TUnvalidatedFormFieldStatus = { type: 'UNVALIDATED' };
 
-export type TValidateFormField<GValue> = (formField: TFormField<GValue>) => Promise<void>;
+export interface TInvalidFormFieldError {
+	type: string;
+	message?: string;
+}
 
-export type TValidateFormFieldLink<GValue> = (
-	next: TValidateFormField<GValue>
-) => TValidateFormField<GValue>;
+export type TValidateFormFieldFunction<GValue> = (
+	value: GValue,
+	formFieldStatus: TFormFieldStatus
+) => Promise<void>;
+export type TFormFieldValidationChain<GValue> = TValidateFormFieldFunction<GValue>[];
 
 export interface TFormFieldValidator<GValue> {
-	_chain: TValidateFormFieldLink<GValue>[];
+	_validationChain: TFormFieldValidationChain<GValue>;
 	isValidating: boolean;
 	validate: (formField: TFormField<GValue>) => Promise<boolean>;
 	append: (validator: TFormFieldValidator<GValue>) => void;

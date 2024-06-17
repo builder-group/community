@@ -1,5 +1,4 @@
-import { createState, TSelectFeatures, TState } from 'feature-state';
-import { WithOptional } from '@ibg/utils';
+import { createState, TSelectFeatures } from 'feature-state';
 
 import { createFormFieldStatus } from './create-form-field-status';
 import { TFormField, TFormFieldStateConfig, TFormFieldValidator } from './types';
@@ -7,24 +6,42 @@ import { TFormField, TFormFieldStateConfig, TFormFieldValidator } from './types'
 export function createFormField<GValue>(
 	config: TCreateFormFieldConfig<GValue>
 ): TFormField<GValue> {
-	const { initialValue, key, validator, editable = true } = config;
+	const {
+		initialValue,
+		key,
+		validator,
+		editable = true,
+		reValidateMode = 'onBlur',
+		collectErrorMode = 'firstError'
+	} = config;
 	const formFieldState = createState(initialValue);
 
 	formFieldState._features.push('form-field');
 
 	const formFieldFeature: TSelectFeatures<GValue, ['form-field']> = {
 		_config: {
-			key,
-			editable
+			editable,
+			reValidateMode,
+			collectErrorMode
 		},
+		key: key,
 		isTouched: false,
-		status: createFormFieldStatus({ type: 'UNKOWN' }),
+		status: createFormFieldStatus({ type: 'UNVALIDATED' }),
 		validator,
-		blur(this: TState<GValue, ['form-field']>) {
-			this.isTouched = true;
+		validate(this: TFormField<GValue>) {
+			return this.validator.validate(this);
 		},
-		reset(this: TState<GValue, ['form-field']>) {
+		blur(this: TFormField<GValue>) {
+			this.isTouched = true;
+
+			if (this._config.reValidateMode) {
+				this.status.display = true;
+				this.status._notify(true);
+			}
+		},
+		reset(this: TFormField<GValue>) {
 			this.set(initialValue);
+			this.status.display = false;
 			this.isTouched = false;
 		}
 	};
@@ -35,8 +52,8 @@ export function createFormField<GValue>(
 	return _formFieldState as TFormField<GValue>;
 }
 
-export interface TCreateFormFieldConfig<GValue>
-	extends WithOptional<TFormFieldStateConfig, 'editable'> {
+export interface TCreateFormFieldConfig<GValue> extends Partial<TFormFieldStateConfig> {
+	key: string;
 	initialValue: GValue;
 	validator: TFormFieldValidator<GValue>;
 }

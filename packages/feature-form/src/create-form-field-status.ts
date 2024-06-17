@@ -8,7 +8,14 @@ export function createFormFieldStatus(initialValue: TFormFieldStatusValue): TFor
 	formFieldStatusState._features.push('form-field-status');
 
 	const formFieldStatusFeature: TSelectFeatures<TFormFieldStatusValue, ['form-field-status']> = {
-		display: false
+		display: false,
+		registerError(this: TFormFieldStatus, error) {
+			if (this._value.type === 'INVALID') {
+				this._value.errors.push(error);
+			} else {
+				this._value = { type: 'INVALID', errors: [error] };
+			}
+		}
 	};
 
 	// Merge existing features from the state with the new undo feature
