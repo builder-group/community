@@ -11,5 +11,5 @@ export function withTimestamp<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		};
 	});
 
-	return logger as TLogger<['timestamp', ...GSelectedFeatureKeys]>;
+	return logger;
 }

@@ -3,6 +3,7 @@ import { shortId } from '@ibg/utils';
 
 import { createFormField } from './create-form-field';
 import {
+	TExtractGFormDataTFormFields,
 	TForm,
 	TFormConfig,
 	TFormData,
@@ -49,13 +50,15 @@ export function createForm<GFormData extends TFormData>(
 		});
 	}
 
-	const formFeature: TFormStateFeature<GFormData> = {
+	const formFeature: TFormStateFeature<TFormFields<GFormData>> = {
 		_config: {
 			collectErrorMode,
 			disabled,
 			mode,
 			reValidateMode,
-			onSubmit
+			onSubmit: onSubmit as NonNullable<
+				TCreateFormConfig<TExtractGFormDataTFormFields<TFormFields<GFormData>>>['onSubmit']
+			> // TODO: Fix type
 		},
 		key,
 		isModified: false,
@@ -79,7 +82,8 @@ export function createForm<GFormData extends TFormData>(
 				preparedData[key] = formField.get();
 			}
 
-			//this._config.onSubmit(preparedData as GFormData);
+			// TODO: Fix type
+			this._config.onSubmit?.(preparedData as TExtractGFormDataTFormFields<TFormFields<GFormData>>);
 		},
 		reset(this: TForm<GFormData>) {
 			for (const formField of Object.values(this._value)) {
@@ -93,7 +97,7 @@ export function createForm<GFormData extends TFormData>(
 	// Merge existing features from the state with the new undo feature
 	const _formState = Object.assign(formState, formFeature);
 
-	return _formState as unknown as TForm<GFormData>;
+	return _formState as TForm<GFormData>;
 }
 
 export interface TCreateFormConfig<GFormData extends TFormData>

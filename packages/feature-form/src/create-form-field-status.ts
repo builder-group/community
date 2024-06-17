@@ -21,5 +21,5 @@ export function createFormFieldStatus(initialValue: TFormFieldStatusValue): TFor
 	// Merge existing features from the state with the new undo feature
 	const _formFieldStatusState = Object.assign(formFieldStatusState, formFieldStatusFeature);
 
-	return _formFieldStatusState as TFormFieldStatus;
+	return _formFieldStatusState;
 }

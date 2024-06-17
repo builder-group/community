@@ -1,5 +1,4 @@
 import type {
-	TExtractGFormDataTFormFields,
 	TFormFieldStateFeature,
 	TFormFielStatusStateFeature,
 	TFormStateFeature
@@ -10,7 +9,7 @@ export * from './types';
 
 declare module 'feature-state' {
 	interface TThirdPartyFeatures<GValue> {
-		'form': TFormStateFeature<TExtractGFormDataTFormFields<GValue>>;
+		'form': TFormStateFeature<GValue>;
 		'form-field': TFormFieldStateFeature<GValue>;
 		'form-field-status': TFormFielStatusStateFeature;
 	}

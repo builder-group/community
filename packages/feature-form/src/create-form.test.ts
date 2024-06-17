@@ -13,11 +13,11 @@ describe('createForm function', () => {
 				item2: {
 					initalValue: 'hello',
 					validator: null as any
+				},
+				item3: {
+					initalValue: { nested: 'object' },
+					validator: null as any
 				}
-				// item3: {
-				// 	initalValue: { nested: 'object' },
-				// 	validator: null as any
-				// }
 			}
 		});
 		form._value;
@@ -25,7 +25,7 @@ describe('createForm function', () => {
 			console.log('Rerender');
 		});
 
-		const item2 = form.getField('item2');
+		const item3 = form.getField('item3');
 
 		expect(form).not.toBeNull();
 	});

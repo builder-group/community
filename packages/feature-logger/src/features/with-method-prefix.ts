@@ -18,5 +18,5 @@ export function withMethodPrefix<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		};
 	});
 
-	return logger as TLogger<['methodPrefix', ...GSelectedFeatureKeys]>;
+	return logger;
 }

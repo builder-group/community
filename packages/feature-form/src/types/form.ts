@@ -4,13 +4,13 @@ import { TFormField, TFormFieldValidator } from './form-field';
 
 export type TForm<GFormData extends TFormData> = TState<TFormFields<GFormData>, ['base', 'form']>;
 
-export interface TFormStateFeature<GFormData extends TFormData> {
-	_config: TFormConfig<GFormData>;
+export interface TFormStateFeature<GFormFields> {
+	_config: TFormConfig<TExtractGFormDataTFormFields<GFormFields>>;
 	key: string;
 	isValid: boolean;
 	isModified: boolean;
 	submitted: boolean;
-	getField: <GKey extends keyof TFormFields<GFormData>>(key: GKey) => TFormFields<GFormData>[GKey];
+	getField: <GKey extends keyof GFormFields>(key: GKey) => GFormFields[GKey];
 	submit: () => void;
 	reset: () => void;
 }
