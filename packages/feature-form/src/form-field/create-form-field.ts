@@ -1,13 +1,13 @@
 import { createState } from 'feature-state';
 import { deepCopy } from '@ibg/utils';
 
-import { createFormFieldStatus } from './create-form-field-status';
 import {
 	TFormField,
 	TFormFieldStateConfig,
 	TFormFieldStateFeature,
 	TFormFieldValidator
-} from './types';
+} from '../types';
+import { createFormFieldStatus } from './create-form-field-status';
 
 export function createFormField<GValue>(
 	config: TCreateFormFieldConfig<GValue>
@@ -38,28 +38,27 @@ export function createFormField<GValue>(
 			collectErrorMode
 		},
 		_intialValue: deepCopy(formFieldState._value),
+		_validator: validator,
 		key: key,
+		isValid: false,
 		isTouched: false,
 		status,
-		validator,
-		validate(this: TFormField<GValue>) {
-			return this.validator.validate(this);
+		async validate(this: TFormField<GValue>) {
+			this.isValid = await this._validator.validate(this);
+			return this.isValid;
 		},
 		blur(this: TFormField<GValue>) {
 			this.isTouched = true;
 
 			if (this._config.reValidateMode === 'onBlur') {
-				this.propagateStatus();
+				this.status.propagate();
 			}
 		},
 		reset(this: TFormField<GValue>) {
 			this.set(this._intialValue);
+			this.validate();
 			this.status.display = false;
 			this.isTouched = false;
-		},
-		propagateStatus(this: TFormField<GValue>) {
-			this.status.display = true;
-			this.status._notify(true);
 		}
 	};
 

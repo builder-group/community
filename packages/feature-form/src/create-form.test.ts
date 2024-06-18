@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import * as yup from 'yup';
+import * as zod from 'zod';
 
 import { createForm } from './create-form';
+import { createYupFormFieldValidator, createZodFormFieldValidator } from './form-field';
 
 describe('createForm function', () => {
 	it('shoudl work', () => {
@@ -8,15 +11,19 @@ describe('createForm function', () => {
 			fields: {
 				item1: {
 					initalValue: 10,
-					validator: null as any
+					validator: createYupFormFieldValidator(yup.number().required().positive().integer())
 				},
 				item2: {
-					initalValue: 'hello',
-					validator: null as any
+					initalValue: 'hello@gmail.com',
+					validator: createZodFormFieldValidator(zod.string().email())
 				},
 				item3: {
 					initalValue: { nested: 'object' },
-					validator: null as any
+					validator: createYupFormFieldValidator(
+						yup.object({
+							nested: yup.string().required()
+						})
+					)
 				}
 			}
 		});

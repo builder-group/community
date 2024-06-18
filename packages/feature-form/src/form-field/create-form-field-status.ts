@@ -1,6 +1,6 @@
 import { createState, TSelectFeatures } from 'feature-state';
 
-import { TFormFieldStatus, TFormFieldStatusValue } from './types';
+import { TFormFieldStatus, TFormFieldStatusValue } from '../types';
 
 export function createFormFieldStatus(initialValue: TFormFieldStatusValue): TFormFieldStatus {
 	const formFieldStatusState = createState(initialValue);
@@ -15,6 +15,10 @@ export function createFormFieldStatus(initialValue: TFormFieldStatusValue): TFor
 			} else {
 				this._value = { type: 'INVALID', errors: [error] };
 			}
+		},
+		propagate(this: TFormFieldStatus) {
+			this.display = true;
+			this._notify(true);
 		}
 	};
 

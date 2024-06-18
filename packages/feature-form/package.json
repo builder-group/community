@@ -34,7 +34,9 @@
 	},
 	"devDependencies": {
 		"@ibg/config": "workspace:*",
-		"@types/node": "^20.14.1"
+		"@types/node": "^20.14.1",
+		"yup": "^1.4.0",
+		"zod": "^3.23.8"
 	},
 	"files": [
 		"dist",

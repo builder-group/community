@@ -1,7 +1,7 @@
 import { createState } from 'feature-state';
 import { shortId } from '@ibg/utils';
 
-import { createFormField } from './create-form-field';
+import { createFormField } from './form-field';
 import {
 	TExtractGFormDataTFormFields,
 	TForm,
@@ -25,21 +25,21 @@ export function createForm<GFormData extends TFormData>(
 		onSubmit = null
 	} = config;
 
-	const data: TFormFields<GFormData> = Object.fromEntries(
-		Object.entries(fields).map(([key, field]) => [
-			key,
-			createFormField({
+	const formState = createState(
+		Object.fromEntries(
+			Object.entries(fields).map(([key, field]) => [
 				key,
-				initialValue: field.initalValue,
-				validator: field.validator,
-				collectErrorMode,
-				reValidateMode,
-				editable: true
-			})
-		])
-	) as TFormFields<GFormData>;
-
-	const formState = createState(data);
+				createFormField({
+					key,
+					initialValue: field.initalValue,
+					validator: field.validator,
+					collectErrorMode,
+					reValidateMode,
+					editable: true
+				})
+			])
+		) as TFormFields<GFormData>
+	);
 
 	formState._features.push('form');
 

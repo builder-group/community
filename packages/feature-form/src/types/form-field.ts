@@ -7,14 +7,14 @@ export type TFormField<GValue> = TState<GValue, ['base', 'form-field']>;
 export interface TFormFieldStateFeature<GValue> {
 	_config: TFormFieldStateConfig;
 	_intialValue: GValue;
+	_validator: TFormFieldValidator<GValue>;
 	key: string;
+	isValid: boolean;
 	isTouched: boolean;
 	status: TFormFieldStatus;
-	validator: TFormFieldValidator<GValue>;
 	validate: () => Promise<boolean>;
 	blur: () => void;
 	reset: () => void;
-	propagateStatus: () => void;
 }
 
 export interface TFormFieldStateConfig {
@@ -28,6 +28,7 @@ export type TFormFieldStatus = TState<TFormFieldStatusValue, ['base', 'form-fiel
 export interface TFormFielStatusStateFeature {
 	display: boolean;
 	registerError: (error: TInvalidFormFieldError) => void;
+	propagate: () => void;
 }
 
 export type TFormFieldStatusValue =
@@ -44,11 +45,12 @@ export interface TInvalidFormFieldError {
 	message?: string;
 }
 
-export type TValidateFormFieldFunction<GValue> = (
-	value: GValue,
-	formFieldStatus: TFormFieldStatus
-) => Promise<void>;
-export type TFormFieldValidationChain<GValue> = TValidateFormFieldFunction<GValue>[];
+export type TValidateFormFieldFunction<GValue> = (formField: TFormField<GValue>) => Promise<void>;
+export type TFormFieldValidationLink<GValue> = {
+	key: string;
+	validate: TValidateFormFieldFunction<GValue>;
+};
+export type TFormFieldValidationChain<GValue> = TFormFieldValidationLink<GValue>[];
 
 export interface TFormFieldValidator<GValue> {
 	_validationChain: TFormFieldValidationChain<GValue>;
@@ -56,4 +58,5 @@ export interface TFormFieldValidator<GValue> {
 	validate: (formField: TFormField<GValue>) => Promise<boolean>;
 	append: (validator: TFormFieldValidator<GValue>) => void;
 	clone: () => TFormFieldValidator<GValue>;
+	push: (...validateFunctions: TFormFieldValidationLink<GValue>[]) => void;
 }
