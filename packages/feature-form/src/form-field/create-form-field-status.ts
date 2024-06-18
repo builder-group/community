@@ -8,7 +8,6 @@ export function createFormFieldStatus(initialValue: TFormFieldStatusValue): TFor
 	formFieldStatusState._features.push('form-field-status');
 
 	const formFieldStatusFeature: TSelectFeatures<TFormFieldStatusValue, ['form-field-status']> = {
-		display: false,
 		registerError(this: TFormFieldStatus, error) {
 			if (this._value.type === 'INVALID') {
 				this._value.errors.push(error);

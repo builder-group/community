@@ -1,3 +1,4 @@
+import { object, string } from 'valibot';
 import { describe, expect, it } from 'vitest';
 import * as yup from 'yup';
 import * as zod from 'zod';
@@ -7,6 +8,11 @@ import { createYupFormFieldValidator, createZodFormFieldValidator } from './form
 
 describe('createForm function', () => {
 	it('shoudl work', () => {
+		const Schema = object({
+			name: string(),
+			url: string()
+		});
+
 		const form = createForm({
 			fields: {
 				item1: {
@@ -26,9 +32,6 @@ describe('createForm function', () => {
 					)
 				}
 			}
-		});
-		form.fields.listen(() => {
-			console.log('Rerender');
 		});
 
 		const item3 = form.getField('item3');

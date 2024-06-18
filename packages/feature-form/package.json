@@ -35,6 +35,7 @@
 	"devDependencies": {
 		"@ibg/config": "workspace:*",
 		"@types/node": "^20.14.1",
+		"valibot": "^0.32.0",
 		"yup": "^1.4.0",
 		"zod": "^3.23.8"
 	},

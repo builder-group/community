@@ -18,6 +18,7 @@ export function createFormField<GValue>(
 		validator,
 		editable = true,
 		reValidateMode = 'onBlur',
+		validateMode = 'onSubmit',
 		collectErrorMode = 'firstError',
 		notifyOnStatusChange = true
 	} = config;
@@ -37,6 +38,7 @@ export function createFormField<GValue>(
 	const formFieldFeature: TFormFieldStateFeature<GValue> = {
 		_config: {
 			editable,
+			validateMode,
 			reValidateMode,
 			collectErrorMode
 		},
@@ -50,44 +52,31 @@ export function createFormField<GValue>(
 		async validate(this: TFormField<GValue>) {
 			this.isValid = await this._validator.validate(this);
 			status._notify(true);
-			status.display = true;
 			return this.isValid;
 		},
 		blur(this: TFormField<GValue>) {
-			this.isTouched = true;
-
-			if (this._config.reValidateMode === 'onBlur') {
+			if (
+				(this.isSubmitted && this._config.reValidateMode === 'onBlur') ||
+				(!this.isSubmitted &&
+					(this._config.validateMode === 'onBlur' ||
+						(this._config.validateMode === 'onTouched' && !this.isTouched)))
+			) {
 				void this.validate();
 			}
+
+			this.isTouched = true;
 		},
 		reset(this: TFormField<GValue>) {
 			this.set(this._intialValue);
-			void this.validate();
-			this.status.display = false;
 			this.isTouched = false;
+			this.isSubmitted = false;
+			this.isValid = false;
+			this.status.set({ type: 'UNVALIDATED' });
 		}
 	};
 
 	// Merge existing features from the state with the new form field feature
-	const _formFieldState = Object.assign(
-		formFieldState,
-		formFieldFeature
-	) as unknown as TFormField<GValue>;
-
-	_formFieldState.listen(async (_, innerFormFieldState) => {
-		if (
-			innerFormFieldState._config.reValidateMode === 'onChange' ||
-			(innerFormFieldState._config.reValidateMode === 'afterFirstSubmit' &&
-				innerFormFieldState.isSubmitted)
-		) {
-			await innerFormFieldState.validate();
-		}
-
-		// TODO: recomputeValidatedState
-		// TODO: recomputeModifiedState
-	});
-
-	return _formFieldState;
+	return Object.assign(formFieldState, formFieldFeature) as unknown as TFormField<GValue>;
 }
 
 export interface TCreateFormFieldConfig<GValue> extends Partial<TFormFieldStateConfig> {

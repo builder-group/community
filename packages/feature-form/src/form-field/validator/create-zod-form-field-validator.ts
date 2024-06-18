@@ -9,7 +9,7 @@ export function createZodFormFieldValidator<GValue>(
 	return createFormFieldValidator([
 		{
 			key: 'zod',
-			validate: async (formField) => {
+			validate: (formField) => {
 				try {
 					schema.parse(formField.get());
 				} catch (err) {

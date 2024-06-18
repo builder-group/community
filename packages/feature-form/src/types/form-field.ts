@@ -1,6 +1,6 @@
 import { type TState } from 'feature-state';
 
-import { type TCollectErrorMode, type TFormReValidateMode } from './form';
+import { type TCollectErrorMode } from './form';
 
 export type TFormField<GValue> = TState<GValue, ['base', 'form-field']>;
 
@@ -20,14 +20,24 @@ export interface TFormFieldStateFeature<GValue> {
 
 export interface TFormFieldStateConfig {
 	editable: boolean;
-	reValidateMode: TFormReValidateMode;
+	/**
+	 * Validation strategy before submitting.
+	 */
+	validateMode?: TFormFieldValidateMode;
+	/**
+	 * Validation strategy after submitting.
+	 */
+	reValidateMode: TFormFieldReValidateMode;
 	collectErrorMode: TCollectErrorMode;
 }
+
+export type TFormFieldValidateMode = 'onBlur' | 'onChange' | 'onSubmit' | 'onTouched';
+
+export type TFormFieldReValidateMode = 'onBlur' | 'onChange' | 'onSubmit';
 
 export type TFormFieldStatus = TState<TFormFieldStatusValue, ['base', 'form-field-status']>;
 
 export interface TFormFielStatusStateFeature {
-	display: boolean;
 	registerError: (error: TInvalidFormFieldError) => void;
 }
 
@@ -52,7 +62,9 @@ export interface TInvalidFormFieldError {
 	message?: string;
 }
 
-export type TValidateFormFieldFunction<GValue> = (formField: TFormField<GValue>) => Promise<void>;
+export type TValidateFormFieldFunction<GValue> = (
+	formField: TFormField<GValue>
+) => Promise<void> | void;
 export interface TFormFieldValidationLink<GValue> {
 	key: string;
 	validate: TValidateFormFieldFunction<GValue>;
