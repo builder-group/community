@@ -27,8 +27,7 @@ describe('createForm function', () => {
 				}
 			}
 		});
-		form._value;
-		form.listen(() => {
+		form.fields.listen(() => {
 			console.log('Rerender');
 		});
 

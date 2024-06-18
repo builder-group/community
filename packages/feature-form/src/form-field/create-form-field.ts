@@ -45,6 +45,7 @@ export function createFormField<GValue>(
 		key,
 		isValid: false,
 		isTouched: false,
+		isSubmitted: false,
 		status,
 		async validate(this: TFormField<GValue>) {
 			this.isValid = await this._validator.validate(this);
@@ -77,7 +78,7 @@ export function createFormField<GValue>(
 		if (
 			innerFormFieldState._config.reValidateMode === 'onChange' ||
 			(innerFormFieldState._config.reValidateMode === 'afterFirstSubmit' &&
-				innerFormFieldState.submitted)
+				innerFormFieldState.isSubmitted)
 		) {
 			await innerFormFieldState.validate();
 		}

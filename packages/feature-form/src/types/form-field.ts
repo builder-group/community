@@ -11,6 +11,7 @@ export interface TFormFieldStateFeature<GValue> {
 	key: string;
 	isValid: boolean;
 	isTouched: boolean;
+	isSubmitted: boolean;
 	status: TFormFieldStatus;
 	validate: () => Promise<boolean>;
 	blur: () => void;

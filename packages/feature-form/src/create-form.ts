@@ -3,18 +3,16 @@ import { shortId } from '@ibg/utils';
 
 import { createFormField } from './form-field';
 import {
-	type TExtractGFormDataTFormFields,
 	type TForm,
 	type TFormConfig,
 	type TFormData,
 	type TFormFields,
-	type TFormFieldValidator,
-	type TFormStateFeature
+	type TFormFieldValidator
 } from './types';
 
 export function createForm<GFormData extends TFormData>(
 	config: TCreateFormConfig<GFormData>
-): TForm<GFormData> {
+): TForm<GFormData, ['base']> {
 	const {
 		fields,
 		collectErrorMode = 'firstError',
@@ -26,7 +24,7 @@ export function createForm<GFormData extends TFormData>(
 		notifyOnFromFieldChange = true
 	} = config;
 
-	const formState = createState(
+	const fieldsState = createState(
 		Object.fromEntries(
 			Object.entries(fields).map(([fieldKey, field]) => [
 				fieldKey,
@@ -42,60 +40,58 @@ export function createForm<GFormData extends TFormData>(
 		) as TFormFields<GFormData>
 	);
 
-	formState._features.push('form');
-
 	// Notify form listeners if form field has changed
 	if (notifyOnFromFieldChange) {
-		for (const formField of Object.values(formState._value)) {
+		for (const formField of Object.values(fieldsState._value)) {
 			formField.listen(() => {
-				formState._notify(true);
+				fieldsState._notify(true);
 			});
 		}
 	}
 
-	const formFeature: TFormStateFeature<TFormFields<GFormData>> = {
+	return {
+		_: null,
+		_features: ['base'],
 		_config: {
 			collectErrorMode,
 			disabled,
 			mode,
 			reValidateMode,
-			onSubmit: onSubmit as NonNullable<
-				TCreateFormConfig<TExtractGFormDataTFormFields<TFormFields<GFormData>>>['onSubmit']
-			> // TODO: Fix type
+			onSubmit
 		},
 		key,
+		fields: fieldsState,
 		isModified: false,
 		isValid: false,
-		submitted: false,
-		getField(this: TForm<GFormData>, fieldKey) {
-			return this._value[fieldKey];
+		isSubmitted: false,
+		getField(this: TForm<GFormData, ['base']>, fieldKey) {
+			return this.fields.get()[fieldKey];
 		},
-		submit(this: TForm<GFormData>) {
-			const preparedData: Record<string, unknown> = {};
-			for (const [fieldKey, formField] of Object.entries(this._value)) {
+		submit(this: TForm<GFormData, ['base']>) {
+			// @ts-expect-error - Filled in a second
+			const preparedData: GFormData = {};
+			for (const [fieldKey, formField] of Object.entries(this.fields._value)) {
 				if (this._config.reValidateMode === 'onSubmit') {
 					void formField.validate();
 				}
+				formField.isSubmitted = true;
 
+				// @ts-expect-error - GFormFields is based on GFormData and the keys should be identical
 				preparedData[fieldKey] = formField.get();
 			}
 
-			this.submitted = true;
+			this.isSubmitted = true;
 
-			// TODO: Fix type
-			this._config.onSubmit?.(preparedData as TExtractGFormDataTFormFields<TFormFields<GFormData>>);
+			this._config.onSubmit?.(preparedData);
 		},
-		reset(this: TForm<GFormData>) {
-			for (const formField of Object.values(this._value)) {
+		reset(this: TForm<GFormData, ['base']>) {
+			for (const formField of Object.values(this.fields._value)) {
 				formField.reset();
 			}
 			this.isModified = false;
-			this.submitted = false;
+			this.isSubmitted = false;
 		}
 	};
-
-	// Merge existing features from the state with the new form feature
-	return Object.assign(formState, formFeature) as unknown as TForm<GFormData>;
 }
 
 export interface TCreateFormConfig<GFormData extends TFormData>
