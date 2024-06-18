@@ -18,7 +18,8 @@ export function createFormField<GValue>(
 		validator,
 		editable = true,
 		reValidateMode = 'onBlur',
-		collectErrorMode = 'firstError'
+		collectErrorMode = 'firstError',
+		notifyOnStatusChange = true
 	} = config;
 	const formFieldState = createState(initialValue);
 
@@ -27,9 +28,13 @@ export function createFormField<GValue>(
 	const status = createFormFieldStatus({ type: 'UNVALIDATED' });
 
 	// Notify form field listeners if status has changed
-	status.listen(() => {
-		formFieldState._notify(true);
-	});
+	if (notifyOnStatusChange) {
+		status.listen(() => {
+			formFieldState._notify(true);
+		});
+	}
+
+	formFieldState.listen(() => {});
 
 	const formFieldFeature: TFormFieldStateFeature<GValue> = {
 		_config: {
@@ -62,8 +67,12 @@ export function createFormField<GValue>(
 		}
 	};
 
-	// Merge existing features from the state with the new undo feature
+	// Merge existing features from the state with the new form field feature
 	const _formFieldState = Object.assign(formFieldState, formFieldFeature);
+
+	_formFieldState.listen(() => {
+		// TODO
+	});
 
 	return _formFieldState as TFormField<GValue>;
 }
@@ -72,4 +81,5 @@ export interface TCreateFormFieldConfig<GValue> extends Partial<TFormFieldStateC
 	key: string;
 	initialValue: GValue;
 	validator: TFormFieldValidator<GValue>;
+	notifyOnStatusChange?: boolean;
 }

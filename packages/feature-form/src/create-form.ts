@@ -22,7 +22,8 @@ export function createForm<GFormData extends TFormData>(
 		key = shortId(),
 		mode = 'onBlur',
 		reValidateMode = 'onBlur',
-		onSubmit = null
+		onSubmit = null,
+		notifyOnFromFieldChange = true
 	} = config;
 
 	const formState = createState(
@@ -44,10 +45,12 @@ export function createForm<GFormData extends TFormData>(
 	formState._features.push('form');
 
 	// Notify form listeners if form field has changed
-	for (const formField of Object.values(formState._value)) {
-		formField.listen(() => {
-			formState._notify(true);
-		});
+	if (notifyOnFromFieldChange) {
+		for (const formField of Object.values(formState._value)) {
+			formField.listen(() => {
+				formState._notify(true);
+			});
+		}
 	}
 
 	const formFeature: TFormStateFeature<TFormFields<GFormData>> = {
@@ -94,16 +97,15 @@ export function createForm<GFormData extends TFormData>(
 		}
 	};
 
-	// Merge existing features from the state with the new undo feature
-	const _formState = Object.assign(formState, formFeature);
-
-	return _formState as TForm<GFormData>;
+	// Merge existing features from the state with the new form feature
+	return Object.assign(formState, formFeature) as TForm<GFormData>;
 }
 
 export interface TCreateFormConfig<GFormData extends TFormData>
 	extends Partial<TFormConfig<GFormData>> {
 	key?: string;
 	fields: TCreateFormConfigFormFields<GFormData>;
+	notifyOnFromFieldChange?: boolean;
 }
 
 type TCreateFormConfigFormFields<GFormData extends TFormData> = {

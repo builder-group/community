@@ -1,4 +1,4 @@
-import type { TListener, TListenerQueueItem, TReadonlyIfObject, TState } from './types';
+import type { TListener, TListenerQueueItem, TState } from './types';
 
 const LISTENER_QUEUE: TListenerQueueItem[] = [];
 
@@ -18,7 +18,7 @@ export function createState<GValue>(value: GValue, deferred = true): TState<GVal
 			}
 		},
 		listen(callback, level) {
-			const listener: TListener<GValue> = {
+			const listener: TListener<GValue, ['base']> = {
 				callback,
 				level: level ?? 0
 			};
@@ -35,7 +35,7 @@ export function createState<GValue>(value: GValue, deferred = true): TState<GVal
 		},
 		subscribe(callback, level) {
 			const unbind = this.listen(callback, level);
-			callback(this._value as TReadonlyIfObject<GValue>);
+			callback(this._value, this);
 			return unbind;
 		},
 		_notify(process) {
@@ -45,19 +45,23 @@ export function createState<GValue>(value: GValue, deferred = true): TState<GVal
 					value: this._value,
 					...listener
 				};
-				LISTENER_QUEUE.push(queueItem as TListenerQueueItem);
+				LISTENER_QUEUE.push(queueItem);
 			});
 
 			// Process queue
 			if (process) {
 				// Defer processing using setTimeout
-				deferred ? setTimeout(processQueue) : processQueue();
+				deferred
+					? setTimeout(() => {
+							processQueue(this);
+						})
+					: processQueue(this);
 			}
 		}
 	};
 }
 
-function processQueue(): void {
+function processQueue<GValue>(state: TState<GValue, ['base']>): void {
 	// Drain the queue
 	const queueToProcess = LISTENER_QUEUE.splice(0, LISTENER_QUEUE.length);
 
@@ -65,6 +69,6 @@ function processQueue(): void {
 	queueToProcess
 		.sort((a, b) => a.level - b.level)
 		.forEach((queueItem) => {
-			queueItem.callback(queueItem.value);
+			queueItem.callback(queueItem.value, state);
 		});
 }

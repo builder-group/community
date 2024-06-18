@@ -1,11 +1,9 @@
-import type { TPrimitive } from '@ibg/utils';
-
 import type { TFeatureKeys, TSelectFeatures } from './features';
 
 export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> = {
 	_features: string[];
 	_value: GValue;
-	_listeners: TListener<GValue>[];
+	_listeners: TListener<GValue, GSelectedFeatureKeys>[];
 	/**
 	 * Retrieves the current state value.
 	 *
@@ -36,7 +34,7 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	 * @param level - Optional parameter to specify the listener's priority level.
 	 * @returns A function that, when called, will unsubscribe the listener.
 	 */
-	listen: (callback: TListenerCallback<GValue>, level?: number) => () => void;
+	listen: (callback: TListenerCallback<GValue, GSelectedFeatureKeys>, level?: number) => () => void;
 	/**
 	 * Subscribes to state changes and invokes the callback immediately with the current state value.
 	 *
@@ -53,27 +51,26 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	 * @param level - Optional parameter to specify the listener's priority level.
 	 * @returns A function that, when called, will unsubscribe the listener.
 	 */
-	subscribe: (callback: TListenerCallback<GValue>, level?: number) => () => void;
+	subscribe: (
+		callback: TListenerCallback<GValue, GSelectedFeatureKeys>,
+		level?: number
+	) => () => void;
 	/**
 	 * Triggers all registered listeners to run with the current state value.
 	 */
 	_notify: (process: boolean) => void;
 } & TSelectFeatures<GValue, GSelectedFeatureKeys>;
 
-type TListenerCallback<GValue> = (value: TReadonlyIfObject<GValue>) => void;
-export interface TListener<GValue> {
-	callback: TListenerCallback<GValue>;
+export type TListenerCallback<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> = (
+	value: Readonly<GValue>,
+	state: TState<GValue, GSelectedFeatureKeys>
+) => void;
+export interface TListener<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> {
+	callback: TListenerCallback<GValue, GSelectedFeatureKeys>;
 	level: number;
 }
 
-export type TListenerQueueItem<GValue = unknown> = { value: GValue } & TListener<GValue>;
-
-export type TReadonlyIfObject<GValue> = GValue extends undefined
-	? GValue
-	: GValue extends (...args: any) => any
-		? GValue
-		: GValue extends TPrimitive
-			? GValue
-			: GValue extends object
-				? Readonly<GValue>
-				: GValue;
+export type TListenerQueueItem<GValue = any> = { value: Readonly<GValue> } & TListener<
+	GValue,
+	['base']
+>;

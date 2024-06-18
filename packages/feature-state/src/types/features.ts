@@ -32,6 +32,6 @@ export type TEnforceFeatures<
 	GFeatureKeys extends TFeatureKeys[],
 	GToEnforceFeatureKeys extends TFeatureKeys[]
 > =
-	Exclude<GToEnforceFeatureKeys, GFeatureKeys> extends never
+	Exclude<GToEnforceFeatureKeys[number], GFeatureKeys[number]> extends never
 		? GFeatureKeys
-		: GFeatureKeys | Exclude<GToEnforceFeatureKeys, GFeatureKeys>;
+		: GFeatureKeys | GToEnforceFeatureKeys;

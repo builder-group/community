@@ -16,9 +16,10 @@ export function withMultiUndo<GValue, GSelectedFeatureKeys extends TFeatureKeys<
 		};
 
 		// Merge existing features from the state with the new multiundo feature
-		const _state = Object.assign(state, multiUndoFeature);
-
-		return _state as TState<GValue, ['multiundo', ...GSelectedFeatureKeys]>;
+		return Object.assign(state, multiUndoFeature) as TState<
+			GValue,
+			['multiundo', ...GSelectedFeatureKeys]
+		>;
 	}
 
 	throw Error('State must have "undo" feature to use withMultiUndo');
