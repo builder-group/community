@@ -6,8 +6,8 @@ export function isExternal(
 ): TIsExternal {
 	const { fileTypesAsExternal = [], packageJsonDepsAsExternal = true } = options;
 	const allDepKeys = Object.keys({
-		...(packageJson.dependencies || {}),
-		...(packageJson.peerDependencies || {})
+		...(packageJson.dependencies ?? {}),
+		...(packageJson.peerDependencies ?? {})
 	});
 
 	return (source: string) => {

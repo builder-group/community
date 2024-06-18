@@ -64,7 +64,7 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 export type TListenerCallback<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> = (
 	value: Readonly<GValue>,
 	state: TState<GValue, GSelectedFeatureKeys>
-) => void;
+) => Promise<void> | void;
 export interface TListener<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> {
 	callback: TListenerCallback<GValue, GSelectedFeatureKeys>;
 	level: number;

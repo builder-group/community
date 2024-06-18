@@ -35,15 +35,8 @@ export function withPersist<
 			}
 
 			// Setup listener
-			state.listen((value) => {
-				storage
-					.save(key, value as GStorageValue)
-					.then(() => {
-						/* do nothing*/
-					})
-					.catch(() => {
-						/* do nothing*/
-					});
+			state.listen(async (value) => {
+				await storage.save(key, value as GStorageValue);
 			});
 
 			return success;

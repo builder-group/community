@@ -1,4 +1,4 @@
-import { TInvokeConsole, TLogger, TLoggerOptions, TLogMethod } from './types';
+import { type TInvokeConsole, type TLogger, type TLoggerOptions, type TLogMethod } from './types';
 
 export function createLogger(options: TLoggerOptions = {}): TLogger<['base']> {
 	const { active = true, level = 0, middlewares = [] } = options;

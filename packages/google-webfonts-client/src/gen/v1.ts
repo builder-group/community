@@ -46,9 +46,7 @@ export interface paths {
                    */
                   lastModified?: string;
                   /** @description The font family files (with all supported scripts) for each one of the available variants. */
-                  files?: {
-                    [key: string]: string;
-                  };
+                  files?: Record<string, string>;
                   /** @description Category of the font (ex: sans-serif, monospace). */
                   category?: string;
                   /** @description The kind of object, a webfont object. */

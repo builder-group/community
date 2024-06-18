@@ -1,6 +1,6 @@
-import { createState, TSelectFeatures } from 'feature-state';
+import { createState, type TSelectFeatures } from 'feature-state';
 
-import { TFormFieldStatus, TFormFieldStatusValue } from '../types';
+import { type TFormFieldStatus, type TFormFieldStatusValue } from '../types';
 
 export function createFormFieldStatus(initialValue: TFormFieldStatusValue): TFormFieldStatus {
 	const formFieldStatusState = createState(initialValue);
@@ -23,5 +23,5 @@ export function createFormFieldStatus(initialValue: TFormFieldStatusValue): TFor
 	};
 
 	// Merge existing features from the state with the new form field status feature
-	return Object.assign(formFieldStatusState, formFieldStatusFeature) as TFormFieldStatus;
+	return Object.assign(formFieldStatusState, formFieldStatusFeature) as unknown as TFormFieldStatus;
 }

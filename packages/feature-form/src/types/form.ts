@@ -1,6 +1,6 @@
-import { TState } from 'feature-state';
+import { type TState } from 'feature-state';
 
-import { TFormField, TFormFieldValidator } from './form-field';
+import { type TFormField, type TFormFieldValidator } from './form-field';
 
 export type TForm<GFormData extends TFormData> = TState<TFormFields<GFormData>, ['base', 'form']>;
 

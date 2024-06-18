@@ -135,7 +135,7 @@ export default class Bundle extends DynCommand {
 				await generateDts(this, { tsConfigPath });
 				break;
 			default:
-				this.error(`Unknown build strategy '${flags.buildStrategy}'!`, { exit: 1 });
+				this.error(`Unknown bundle strategy '${flags.bundleStrategy}'!`, { exit: 1 });
 		}
 
 		this.log(`\n`);

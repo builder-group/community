@@ -1,5 +1,5 @@
 import { hasFeatures } from '../has-features';
-import { TEnforceFeatures, TFeatureKeys, TLogger } from '../types';
+import { type TEnforceFeatures, type TFeatureKeys, type TLogger } from '../types';
 
 export function withMethodPrefix<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	logger: TLogger<TEnforceFeatures<GSelectedFeatureKeys, ['base']>>

@@ -53,22 +53,33 @@ export function createState<GValue>(value: GValue, deferred = true): TState<GVal
 				// Defer processing using setTimeout
 				deferred
 					? setTimeout(() => {
-							processQueue(this);
+							processQueue(this)
+								.then(() => {
+									// do nothing
+								})
+								.catch(() => {
+									// do nothing
+								});
 						})
-					: processQueue(this);
+					: processQueue(this)
+							.then(() => {
+								// do nothing
+							})
+							.catch(() => {
+								// do nothing
+							});
 			}
 		}
 	};
 }
 
-function processQueue<GValue>(state: TState<GValue, ['base']>): void {
+async function processQueue<GValue>(state: TState<GValue, ['base']>): Promise<void> {
 	// Drain the queue
 	const queueToProcess = LISTENER_QUEUE.splice(0, LISTENER_QUEUE.length);
+	queueToProcess.sort((a, b) => a.level - b.level);
 
-	// Sort the drained listeners by level and execute the callbacks
-	queueToProcess
-		.sort((a, b) => a.level - b.level)
-		.forEach((queueItem) => {
-			queueItem.callback(queueItem.value, state);
-		});
+	// Process each item in the queue sequentially
+	for (const queueItem of queueToProcess) {
+		await queueItem.callback(queueItem.value, state);
+	}
 }

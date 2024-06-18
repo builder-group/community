@@ -12,11 +12,11 @@ export async function execaVerbose(
 	const subprocess = execa(toExecuteCommand, args, { verbose, ...execaConfig });
 
 	if (verbose) {
-		subprocess.stdout?.on('data', (data) => {
+		subprocess.stdout?.on('data', (data: string) => {
 			command.log(chalk.gray(`\t${data}`));
 		});
 
-		subprocess.stderr?.on('data', (data) => {
+		subprocess.stderr?.on('data', (data: string) => {
 			command.log(chalk.gray(`\t${data}`));
 		});
 	}
@@ -27,7 +27,7 @@ export async function execaVerbose(
 		command.error(
 			`An error occured while executing command: ${chalk.yellow(
 				`${toExecuteCommand} ${args.join(' ')}`
-			)} \n\n ${chalk.gray(`\t${error as any}`)}`
+			)} \n\n ${chalk.gray(`\t${error as string}`)}`
 		);
 		process.exit(1);
 	}

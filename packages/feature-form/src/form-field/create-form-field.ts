@@ -2,10 +2,10 @@ import { createState } from 'feature-state';
 import { deepCopy } from '@ibg/utils';
 
 import {
-	TFormField,
-	TFormFieldStateConfig,
-	TFormFieldStateFeature,
-	TFormFieldValidator
+	type TFormField,
+	type TFormFieldStateConfig,
+	type TFormFieldStateFeature,
+	type TFormFieldValidator
 } from '../types';
 import { createFormFieldStatus } from './create-form-field-status';
 
@@ -34,8 +34,6 @@ export function createFormField<GValue>(
 		});
 	}
 
-	formFieldState.listen(() => {});
-
 	const formFieldFeature: TFormFieldStateFeature<GValue> = {
 		_config: {
 			editable,
@@ -44,7 +42,7 @@ export function createFormField<GValue>(
 		},
 		_intialValue: deepCopy(formFieldState._value),
 		_validator: validator,
-		key: key,
+		key,
 		isValid: false,
 		isTouched: false,
 		status,
@@ -68,13 +66,16 @@ export function createFormField<GValue>(
 	};
 
 	// Merge existing features from the state with the new form field feature
-	const _formFieldState = Object.assign(formFieldState, formFieldFeature);
+	const _formFieldState = Object.assign(
+		formFieldState,
+		formFieldFeature
+	) as unknown as TFormField<GValue>;
 
-	_formFieldState.listen(() => {
-		// TODO
+	_formFieldState.listen(async (_, innerFormFieldState) => {
+		await innerFormFieldState.validate();
 	});
 
-	return _formFieldState as TFormField<GValue>;
+	return _formFieldState;
 }
 
 export interface TCreateFormFieldConfig<GValue> extends Partial<TFormFieldStateConfig> {

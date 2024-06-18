@@ -1,6 +1,6 @@
 import { deepCopy } from '@ibg/utils';
 
-import { TFormFieldValidationChain, TFormFieldValidator } from '../../types';
+import { type TFormFieldValidationChain, type TFormFieldValidator } from '../../types';
 
 export function createFormFieldValidator<GValue>(
 	validationChain: TFormFieldValidationChain<GValue>

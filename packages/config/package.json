@@ -4,7 +4,6 @@
 	"version": "0.0.11",
 	"private": false,
 	"scripts": {
-		"lint": "eslint --ext .js,.ts,.jsx,.tsx src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"update:latest": "pnpm update --latest"
@@ -22,7 +21,7 @@
 	"homepage": "https://inbeta.group/?source=github",
 	"dependencies": {
 		"@vercel/style-guide": "^6.0.0",
-		"eslint-config-turbo": "^1.13.3",
+		"eslint-config-turbo": "^2.0.4",
 		"vite-tsconfig-paths": "^4.3.2"
 	},
 	"peerDependencies": {

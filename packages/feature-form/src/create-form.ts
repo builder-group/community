@@ -3,13 +3,13 @@ import { shortId } from '@ibg/utils';
 
 import { createFormField } from './form-field';
 import {
-	TExtractGFormDataTFormFields,
-	TForm,
-	TFormConfig,
-	TFormData,
-	TFormFields,
-	TFormFieldValidator,
-	TFormStateFeature
+	type TExtractGFormDataTFormFields,
+	type TForm,
+	type TFormConfig,
+	type TFormData,
+	type TFormFields,
+	type TFormFieldValidator,
+	type TFormStateFeature
 } from './types';
 
 export function createForm<GFormData extends TFormData>(
@@ -28,8 +28,8 @@ export function createForm<GFormData extends TFormData>(
 
 	const formState = createState(
 		Object.fromEntries(
-			Object.entries(fields).map(([key, field]) => [
-				key,
+			Object.entries(fields).map(([fieldKey, field]) => [
+				fieldKey,
 				createFormField({
 					key,
 					initialValue: field.initalValue,
@@ -67,14 +67,12 @@ export function createForm<GFormData extends TFormData>(
 		isModified: false,
 		isValid: false,
 		submitted: false,
-		getField(this: TForm<GFormData>, key) {
-			return this._value[key];
+		getField(this: TForm<GFormData>, fieldKey) {
+			return this._value[fieldKey];
 		},
 		submit(this: TForm<GFormData>) {
-			this.submitted = true;
-
 			const preparedData: Record<string, unknown> = {};
-			for (const [key, formField] of Object.entries(this._value)) {
+			for (const [fieldKey, formField] of Object.entries(this._value)) {
 				if (
 					this._config.reValidateMode === 'onSubmit' ||
 					(this._config.reValidateMode === 'afterFirstSubmit' && !this.submitted)
@@ -82,8 +80,10 @@ export function createForm<GFormData extends TFormData>(
 					formField.propagateStatus();
 				}
 
-				preparedData[key] = formField.get();
+				preparedData[fieldKey] = formField.get();
 			}
+
+			this.submitted = true;
 
 			// TODO: Fix type
 			this._config.onSubmit?.(preparedData as TExtractGFormDataTFormFields<TFormFields<GFormData>>);
@@ -98,7 +98,7 @@ export function createForm<GFormData extends TFormData>(
 	};
 
 	// Merge existing features from the state with the new form feature
-	return Object.assign(formState, formFeature) as TForm<GFormData>;
+	return Object.assign(formState, formFeature) as unknown as TForm<GFormData>;
 }
 
 export interface TCreateFormConfig<GFormData extends TFormData>
