@@ -35,7 +35,7 @@ export function createState<GValue>(value: GValue, deferred = true): TState<GVal
 		},
 		subscribe(callback, level) {
 			const unbind = this.listen(callback, level);
-			callback(this._value, this);
+			void callback(this._value, this);
 			return unbind;
 		},
 		_notify(process) {
@@ -53,21 +53,9 @@ export function createState<GValue>(value: GValue, deferred = true): TState<GVal
 				// Defer processing using setTimeout
 				deferred
 					? setTimeout(() => {
-							processQueue(this)
-								.then(() => {
-									// do nothing
-								})
-								.catch(() => {
-									// do nothing
-								});
+							void processQueue(this);
 						})
-					: processQueue(this)
-							.then(() => {
-								// do nothing
-							})
-							.catch(() => {
-								// do nothing
-							});
+					: void processQueue(this);
 			}
 		}
 	};

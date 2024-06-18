@@ -73,11 +73,8 @@ export function createForm<GFormData extends TFormData>(
 		submit(this: TForm<GFormData>) {
 			const preparedData: Record<string, unknown> = {};
 			for (const [fieldKey, formField] of Object.entries(this._value)) {
-				if (
-					this._config.reValidateMode === 'onSubmit' ||
-					(this._config.reValidateMode === 'afterFirstSubmit' && !this.submitted)
-				) {
-					formField.propagateStatus();
+				if (this._config.reValidateMode === 'onSubmit') {
+					void formField.validate();
 				}
 
 				preparedData[fieldKey] = formField.get();

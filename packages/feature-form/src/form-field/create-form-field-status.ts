@@ -15,10 +15,6 @@ export function createFormFieldStatus(initialValue: TFormFieldStatusValue): TFor
 			} else {
 				this._value = { type: 'INVALID', errors: [error] };
 			}
-		},
-		propagate(this: TFormFieldStatus) {
-			this.display = true;
-			this._notify(true);
 		}
 	};
 

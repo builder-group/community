@@ -48,18 +48,20 @@ export function createFormField<GValue>(
 		status,
 		async validate(this: TFormField<GValue>) {
 			this.isValid = await this._validator.validate(this);
+			status._notify(true);
+			status.display = true;
 			return this.isValid;
 		},
 		blur(this: TFormField<GValue>) {
 			this.isTouched = true;
 
 			if (this._config.reValidateMode === 'onBlur') {
-				this.status.propagate();
+				void this.validate();
 			}
 		},
 		reset(this: TFormField<GValue>) {
 			this.set(this._intialValue);
-			this.validate();
+			void this.validate();
 			this.status.display = false;
 			this.isTouched = false;
 		}
@@ -72,7 +74,16 @@ export function createFormField<GValue>(
 	) as unknown as TFormField<GValue>;
 
 	_formFieldState.listen(async (_, innerFormFieldState) => {
-		await innerFormFieldState.validate();
+		if (
+			innerFormFieldState._config.reValidateMode === 'onChange' ||
+			(innerFormFieldState._config.reValidateMode === 'afterFirstSubmit' &&
+				innerFormFieldState.submitted)
+		) {
+			await innerFormFieldState.validate();
+		}
+
+		// TODO: recomputeValidatedState
+		// TODO: recomputeModifiedState
 	});
 
 	return _formFieldState;

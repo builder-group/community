@@ -47,7 +47,7 @@ export interface TFormConfig<GFormData extends TFormData> {
 	/**
 	 * Called once form is submitted
 	 */
-	onSubmit: ((data: GFormData) => Promise<void>) | null;
+	onSubmit: ((data: GFormData) => void) | null;
 }
 
 export type TFormValidateMode = 'onBlur' | 'onChange' | 'onSubmit' | 'onTouched' | 'all';

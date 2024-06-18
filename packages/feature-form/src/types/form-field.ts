@@ -28,7 +28,6 @@ export type TFormFieldStatus = TState<TFormFieldStatusValue, ['base', 'form-fiel
 export interface TFormFielStatusStateFeature {
 	display: boolean;
 	registerError: (error: TInvalidFormFieldError) => void;
-	propagate: () => void;
 }
 
 export type TFormFieldStatusValue =
@@ -36,9 +35,16 @@ export type TFormFieldStatusValue =
 	| TValidFormFieldStatus
 	| TUnvalidatedFormFieldStatus;
 
-export interface TInvalidFormFieldStatus { type: 'INVALID'; errors: TInvalidFormFieldError[] }
-export interface TValidFormFieldStatus { type: 'VALID' }
-export interface TUnvalidatedFormFieldStatus { type: 'UNVALIDATED' }
+export interface TInvalidFormFieldStatus {
+	type: 'INVALID';
+	errors: TInvalidFormFieldError[];
+}
+export interface TValidFormFieldStatus {
+	type: 'VALID';
+}
+export interface TUnvalidatedFormFieldStatus {
+	type: 'UNVALIDATED';
+}
 
 export interface TInvalidFormFieldError {
 	type: string;

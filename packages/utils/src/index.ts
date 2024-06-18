@@ -1,6 +1,7 @@
 export * from './ContinuousId';
 export * from './apply-mat3-to-point';
 export * from './array-to-mat3';
+export * from './as-promise';
 export * from './calculate-bytes';
 export * from './deep-copy';
 export * from './deep-replace-var';

@@ -25,7 +25,7 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	 *
 	 * @param newValue - The new value to set for the state, of type `GValue`.
 	 */
-	set: (newValue: GValue) => void;
+	set: (newValue: GValue, process?: boolean) => void;
 	/**
 	 * Subscribes to state changes without immediately invoking the callback.
 	 * Use this to listen for changes that occur after the subscription.
