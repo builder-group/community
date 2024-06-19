@@ -3,45 +3,57 @@ import { describe, expect, it } from 'vitest';
 import * as yup from 'yup';
 import * as zod from 'zod';
 
-import { createForm } from './create-form';
-import {
-	createValibotFormFieldValidator,
-	createYupFormFieldValidator,
-	createZodFormFieldValidator
-} from './form-field';
+import { createForm, fromValidator } from './create-form';
+import { createValidator, valibotValidator, yupValidator, zodValidator } from './form-field';
 
 describe('createForm function', () => {
 	it('shoudl work', async () => {
 		const form = createForm({
 			fields: {
-				item1: {
-					initialValue: 10,
-					validator: createYupFormFieldValidator(yup.number().required().positive().integer())
-				},
-				item2: {
-					initialValue: 'test@gmail.com',
-					validator: createZodFormFieldValidator(zod.string().email())
-				},
-				item3: {
-					initialValue: { nested: 'object' },
-					validator: createYupFormFieldValidator(
+				item1: fromValidator(yupValidator(yup.number().required().positive().integer()), {
+					defaultValue: 10
+				}),
+				item2: fromValidator(zodValidator(zod.string().email()), {
+					defaultValue: 'test@gmail.com'
+				}),
+				item3: fromValidator(
+					yupValidator(
 						yup.object({
 							nested: yup.string().required()
 						})
-					)
-				},
-				item4: {
-					initialValue: {
-						name: 'Jeff',
-						url: 'jeff.com'
-					},
-					validator: createValibotFormFieldValidator(
+					),
+					{ defaultValue: { nested: 'object' } }
+				),
+				item4: fromValidator(
+					valibotValidator(
 						v.object({
 							name: v.string(),
-							url: v.string()
+							url: v.pipe(v.string(), v.url())
 						})
-					)
-				}
+					),
+
+					{
+						defaultValue: {
+							name: 'Jeff',
+							url: 'jeffcom'
+						}
+					}
+				),
+				item5: fromValidator<number>(
+					createValidator([
+						{
+							key: 'date',
+							validate: (formField) => {
+								if (formField._value != null) {
+									const date = new Date(formField._value);
+								}
+							}
+						}
+					]),
+					{
+						defaultValue: Date.now()
+					}
+				)
 			}
 		});
 

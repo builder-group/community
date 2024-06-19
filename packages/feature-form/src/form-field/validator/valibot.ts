@@ -1,12 +1,12 @@
 import { getDotPath, safeParseAsync, type BaseIssue, type BaseSchema } from 'valibot';
 
 import { type TFormFieldValidator } from '../../types';
-import { createFormFieldValidator } from './create-form-field-validator';
+import { createValidator } from './create-validator';
 
-export function createValibotFormFieldValidator<GValue>(
+export function valibotValidator<GValue>(
 	schema: BaseSchema<GValue, unknown, BaseIssue<unknown>>
 ): TFormFieldValidator<GValue> {
-	return createFormFieldValidator([
+	return createValidator([
 		{
 			key: 'valibot',
 			validate: async (formField) => {
@@ -18,7 +18,7 @@ export function createValibotFormFieldValidator<GValue>(
 					for (const issue of result.issues) {
 						formField.status.registerError({
 							code: issue.type,
-							message: issue.message.replace('this', formField.key),
+							message: issue.message,
 							path: getDotPath(issue) ?? undefined
 						});
 					}

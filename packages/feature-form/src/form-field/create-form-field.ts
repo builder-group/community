@@ -7,13 +7,13 @@ import {
 	type TFormFieldStateFeature,
 	type TFormFieldValidator
 } from '../types';
-import { createFormFieldStatus } from './create-form-field-status';
+import { createStatus } from './create-status';
 
 export function createFormField<GValue>(
+	initialValue: GValue | undefined,
 	config: TCreateFormFieldConfig<GValue>
 ): TFormField<GValue> {
 	const {
-		initialValue,
 		key,
 		validator,
 		editable = true,
@@ -26,7 +26,7 @@ export function createFormField<GValue>(
 
 	formFieldState._features.push('form-field');
 
-	const status = createFormFieldStatus({ type: 'UNVALIDATED' });
+	const status = createStatus({ type: 'UNVALIDATED' });
 
 	// Notify form field listeners if status has changed
 	if (notifyOnStatusChange) {
@@ -79,10 +79,8 @@ export function createFormField<GValue>(
 	return Object.assign(formFieldState, formFieldFeature) as unknown as TFormField<GValue>;
 }
 
-export interface TCreateFormFieldConfig<GValue, GInitalValue extends GValue = GValue>
-	extends Partial<TFormFieldStateConfig> {
+export interface TCreateFormFieldConfig<GValue> extends Partial<TFormFieldStateConfig> {
 	key: string;
-	initialValue: GInitalValue;
 	validator: TFormFieldValidator<GValue>;
 	notifyOnStatusChange?: boolean;
 }

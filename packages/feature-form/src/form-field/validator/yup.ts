@@ -1,12 +1,10 @@
 import { ValidationError, type Schema } from 'yup';
 
 import { type TFormFieldValidator } from '../../types';
-import { createFormFieldValidator } from './create-form-field-validator';
+import { createValidator } from './create-validator';
 
-export function createYupFormFieldValidator<GValue>(
-	schema: Schema<GValue>
-): TFormFieldValidator<GValue> {
-	return createFormFieldValidator([
+export function yupValidator<GValue>(schema: Schema<GValue>): TFormFieldValidator<GValue> {
+	return createValidator([
 		{
 			key: 'yup',
 			validate: async (formField) => {

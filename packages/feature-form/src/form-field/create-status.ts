@@ -2,7 +2,7 @@ import { createState, type TSelectFeatures } from 'feature-state';
 
 import { type TFormFieldStatus, type TFormFieldStatusValue } from '../types';
 
-export function createFormFieldStatus(initialValue: TFormFieldStatusValue): TFormFieldStatus {
+export function createStatus(initialValue: TFormFieldStatusValue): TFormFieldStatus {
 	const formFieldStatusState = createState(initialValue);
 
 	formFieldStatusState._features.push('form-field-status');

@@ -1,12 +1,10 @@
 import { ZodError, type Schema } from 'zod';
 
 import { type TFormFieldValidator } from '../../types';
-import { createFormFieldValidator } from './create-form-field-validator';
+import { createValidator } from './create-validator';
 
-export function createZodFormFieldValidator<GValue>(
-	schema: Schema<GValue>
-): TFormFieldValidator<GValue> {
-	return createFormFieldValidator([
+export function zodValidator<GValue>(schema: Schema<GValue>): TFormFieldValidator<GValue> {
+	return createValidator([
 		{
 			key: 'zod',
 			validate: (formField) => {
@@ -17,7 +15,7 @@ export function createZodFormFieldValidator<GValue>(
 						for (const issue of err.errors) {
 							formField.status.registerError({
 								code: issue.code,
-								message: issue.message.replace('this', formField.key),
+								message: issue.message,
 								path: issue.path.join('.')
 							});
 						}

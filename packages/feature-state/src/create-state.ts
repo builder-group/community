@@ -2,12 +2,15 @@ import type { TListener, TListenerQueueItem, TState } from './types';
 
 const LISTENER_QUEUE: TListenerQueueItem[] = [];
 
-export function createState<GValue>(value: GValue, deferred = true): TState<GValue, ['base']> {
+export function createState<GValue>(
+	initialValue: GValue,
+	deferred = true
+): TState<GValue, ['base']> {
 	return {
 		_: null,
 		_features: ['base'],
 		_listeners: [],
-		_value: value,
+		_value: initialValue,
 		get() {
 			return this._value;
 		},

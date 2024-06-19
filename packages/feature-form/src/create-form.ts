@@ -1,13 +1,13 @@
 import { type TEntries } from '@ibg/utils';
 
-import { createFormField, isFormField } from './form-field';
+import { createFormField } from './form-field';
 import {
 	type TForm,
 	type TFormConfig,
 	type TFormData,
-	type TFormField,
 	type TFormFieldReValidateMode,
 	type TFormFields,
+	type TFormFieldStateConfig,
 	type TFormFieldValidateMode,
 	type TFormFieldValidator
 } from './types';
@@ -33,20 +33,19 @@ export function createForm<GFormData extends TFormData>(
 			onSubmit
 		},
 		fields: Object.fromEntries(
-			Object.entries(fields).map(([fieldKey, field]: [string, TCreateFormConfigFormField]) => [
-				fieldKey,
-				isFormField(field)
-					? field
-					: createFormField({
-							key: fieldKey,
-							initialValue: field.initialValue,
-							validator: field.validator,
-							collectErrorMode,
-							validateMode,
-							reValidateMode,
-							editable: true
-						})
-			])
+			Object.entries(fields).map(
+				([fieldKey, field]: [string, TCreateFormConfigFormField<unknown>]) => [
+					fieldKey,
+					createFormField(field.defaultValue, {
+						key: fieldKey,
+						validator: field.validator,
+						collectErrorMode: field.collectErrorMode ?? collectErrorMode,
+						validateMode: field.validateMode ?? validateMode,
+						reValidateMode: field.reValidateMode ?? reValidateMode,
+						editable: field.editable ?? true
+					})
+				]
+			)
 		) as TFormFields<GFormData>,
 		isValid: false,
 		isSubmitted: false,
@@ -144,13 +143,20 @@ export interface TCreateFormConfig<GFormData extends TFormData>
 	reValidateMode?: TFormFieldReValidateMode;
 }
 
-type TCreateFormConfigFormFields<GFormData extends TFormData> = {
+export type TCreateFormConfigFormFields<GFormData extends TFormData> = {
 	[Key in keyof GFormData]: TCreateFormConfigFormField<GFormData[Key]>;
 };
 
-type TCreateFormConfigFormField<GValue = unknown> =
-	| {
-			initialValue: GValue;
-			validator: TFormFieldValidator<GValue>;
-	  }
-	| TFormField<GValue>;
+export interface TCreateFormConfigFormField<GValue> extends Partial<TFormFieldStateConfig> {
+	defaultValue?: GValue;
+	validator: TFormFieldValidator<GValue>;
+}
+
+// Helper function to make type inference work
+// https://github.com/microsoft/TypeScript/issues/26242
+export function fromValidator<GValue>(
+	validator: TFormFieldValidator<GValue>,
+	config: Omit<TCreateFormConfigFormField<GValue>, 'validator'>
+): TCreateFormConfigFormField<GValue> {
+	return { validator, ...config };
+}

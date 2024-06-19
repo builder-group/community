@@ -2,11 +2,11 @@ import { type TState } from 'feature-state';
 
 import { type TCollectErrorMode } from './form';
 
-export type TFormField<GValue> = TState<GValue, ['base', 'form-field']>;
+export type TFormField<GValue> = TState<GValue | undefined, ['base', 'form-field']>;
 
 export interface TFormFieldStateFeature<GValue> {
 	_config: TFormFieldStateConfig;
-	_intialValue: GValue;
+	_intialValue: GValue | undefined;
 	_validator: TFormFieldValidator<GValue>;
 	key: string;
 	isValid: boolean;
@@ -23,7 +23,7 @@ export interface TFormFieldStateConfig {
 	/**
 	 * Validation strategy before submitting.
 	 */
-	validateMode?: TFormFieldValidateMode;
+	validateMode: TFormFieldValidateMode;
 	/**
 	 * Validation strategy after submitting.
 	 */
