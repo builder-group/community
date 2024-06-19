@@ -75,9 +75,9 @@ export function createForm<GFormData extends TFormData>(
 			}
 		},
 		async validate(this: TForm<GFormData, ['base']>) {
-			return this.revalidate(false);
+			return this._revalidate(false);
 		},
-		async revalidate(this: TForm<GFormData, ['base']>, cached = false) {
+		async _revalidate(this: TForm<GFormData, ['base']>, cached = false) {
 			let isValid = true;
 
 			for (const formField of Object.values(
@@ -120,7 +120,7 @@ export function createForm<GFormData extends TFormData>(
 			}
 		});
 		field.status.listen(async () => {
-			await form.revalidate(true);
+			await form._revalidate(true);
 		});
 	}
 

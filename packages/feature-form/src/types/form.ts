@@ -10,8 +10,8 @@ export type TForm<GFormData extends TFormData, GSelectedFeatureKeys extends TFea
 	fields: TFormFields<GFormData>;
 	isValid: boolean;
 	isSubmitted: boolean;
+	_revalidate: (cached?: boolean) => Promise<boolean>;
 	submit: () => Promise<void>;
-	revalidate: (cached?: boolean) => Promise<boolean>;
 	validate: () => Promise<boolean>;
 	getField: <GKey extends keyof TFormFields<GFormData>>(key: GKey) => TFormFields<GFormData>[GKey];
 	reset: () => void;

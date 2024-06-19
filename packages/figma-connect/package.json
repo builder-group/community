@@ -63,6 +63,9 @@
 	"size-limit": [
 		{
 			"path": "dist/app/esm/index.js"
+		},
+		{
+			"path": "dist/plugin/esm/index.js"
 		}
 	]
 }

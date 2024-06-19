@@ -9,6 +9,9 @@ import { createValidator, valibotValidator, yupValidator, zodValidator } from '.
 describe('createForm function', () => {
 	it('shoudl work', async () => {
 		const form = createForm({
+			onSubmit: (data) => {
+				console.log(data);
+			},
 			fields: {
 				item1: fromValidator(yupValidator(yup.number().required().positive().integer()), {
 					defaultValue: 10
@@ -35,7 +38,7 @@ describe('createForm function', () => {
 					{
 						defaultValue: {
 							name: 'Jeff',
-							url: 'jeffcom'
+							url: 'https://jeff.com'
 						}
 					}
 				),
@@ -57,7 +60,8 @@ describe('createForm function', () => {
 			}
 		});
 
-		await form.validate();
+		const isValid = await form.validate();
+		await form.submit();
 
 		expect(form).not.toBeNull();
 	});
