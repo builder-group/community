@@ -206,6 +206,31 @@ importers:
         specifier: ^20.14.1
         version: 20.14.1
 
+  packages/feature-react:
+    dependencies:
+      '@ibg/utils':
+        specifier: workspace:*
+        version: link:../utils
+      feature-form:
+        specifier: workspace:*
+        version: link:../feature-form
+      feature-state:
+        specifier: workspace:*
+        version: link:../feature-state
+    devDependencies:
+      '@ibg/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^20.14.1
+        version: 20.14.2
+      '@types/react':
+        specifier: ^18.3.3
+        version: 18.3.3
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+
   packages/feature-state:
     dependencies:
       '@ibg/utils':
@@ -218,25 +243,6 @@ importers:
       '@types/node':
         specifier: ^20.14.1
         version: 20.14.1
-
-  packages/feature-state-react:
-    dependencies:
-      feature-state:
-        specifier: workspace:*
-        version: link:../feature-state
-    devDependencies:
-      '@ibg/config':
-        specifier: workspace:*
-        version: link:../config
-      '@types/node':
-        specifier: ^20.14.1
-        version: 20.14.1
-      '@types/react':
-        specifier: ^18.3.3
-        version: 18.3.3
-      react:
-        specifier: ^18.3.1
-        version: 18.3.1
 
   packages/figma-connect:
     dependencies:

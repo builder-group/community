@@ -1,7 +1,7 @@
 import { type TFeatureKeys, type TSelectFeatures } from './features';
 import { type TFormField, type TFormFieldValidator } from './form-field';
 
-// Note: TForm is not a state because of type issues mainly because GFormData is the main generic,
+// Note: TForm is not itself a state because of type issues mainly because GFormData is the main generic,
 // but the State value was TFormFields<GFormData>. Thus We had to check if GValue extends TFormFields<infer GFormData>,
 // which was unreliable in TypeScript if deeply nested.
 export type TForm<GFormData extends TFormData, GSelectedFeatureKeys extends TFeatureKeys[]> = {
@@ -11,7 +11,7 @@ export type TForm<GFormData extends TFormData, GSelectedFeatureKeys extends TFea
 	isValid: boolean;
 	isSubmitted: boolean;
 	_revalidate: (cached?: boolean) => Promise<boolean>;
-	submit: () => Promise<void>;
+	submit: () => Promise<boolean>;
 	validate: () => Promise<boolean>;
 	getField: <GKey extends keyof TFormFields<GFormData>>(key: GKey) => TFormFields<GFormData>[GKey];
 	reset: () => void;

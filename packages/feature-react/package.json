@@ -49,6 +49,7 @@
 	},
 	"homepage": "https://inbeta.group/?source=package-json",
 	"dependencies": {
+		"@ibg/utils": "workspace:*",
 		"feature-form": "workspace:*",
 		"feature-state": "workspace:*"
 	},

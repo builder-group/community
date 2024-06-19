@@ -49,6 +49,22 @@ export function createForm<GFormData extends TFormData>(
 		) as TFormFields<GFormData>,
 		isValid: false,
 		isSubmitted: false,
+		async _revalidate(this: TForm<GFormData, ['base']>, cached = false) {
+			let isValid = true;
+
+			for (const formField of Object.values(
+				this.fields
+			) as TFormFields<GFormData>[keyof GFormData][]) {
+				if (cached) {
+					isValid = formField.isValid && isValid;
+				} else {
+					isValid = (await formField.validate()) && isValid;
+				}
+			}
+
+			this.isValid = isValid;
+			return isValid;
+		},
 		async submit(this: TForm<GFormData, ['base']>) {
 			// @ts-expect-error - Filled below
 			const preparedData: GFormData = {};
@@ -73,25 +89,10 @@ export function createForm<GFormData extends TFormData>(
 			if (this.isValid) {
 				this._config.onSubmit?.(preparedData);
 			}
+			return this.isValid;
 		},
 		async validate(this: TForm<GFormData, ['base']>) {
 			return this._revalidate(false);
-		},
-		async _revalidate(this: TForm<GFormData, ['base']>, cached = false) {
-			let isValid = true;
-
-			for (const formField of Object.values(
-				this.fields
-			) as TFormFields<GFormData>[keyof GFormData][]) {
-				if (cached) {
-					isValid = formField.isValid && isValid;
-				} else {
-					isValid = (await formField.validate()) && isValid;
-				}
-			}
-
-			this.isValid = isValid;
-			return isValid;
 		},
 		getField(this: TForm<GFormData, ['base']>, fieldKey) {
 			return this.fields[fieldKey];
@@ -108,7 +109,7 @@ export function createForm<GFormData extends TFormData>(
 	};
 
 	for (const field of Object.values(form.fields) as TFormFields<GFormData>[keyof GFormData][]) {
-		field.listen(async (_, innerFormFieldState) => {
+		field.listen(async ({ state: innerFormFieldState }) => {
 			if (
 				(innerFormFieldState.isSubmitted &&
 					innerFormFieldState._config.reValidateMode === 'onChange') ||

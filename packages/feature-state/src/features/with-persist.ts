@@ -3,9 +3,14 @@ import type { TEnforceFeatures, TFeatureKeys, TSelectFeatures, TState } from '..
 export const FAILED_TO_LOAD_IDENTIFIER = undefined;
 
 export interface StorageInterface<GStorageValue> {
-	save: (key: string, value: GStorageValue) => Promise<boolean>;
-	load: (key: string) => Promise<GStorageValue | typeof FAILED_TO_LOAD_IDENTIFIER>;
-	delete: (key: string) => Promise<boolean>;
+	save: (key: string, value: GStorageValue) => Promise<boolean> | boolean;
+	load: (
+		key: string
+	) =>
+		| Promise<GStorageValue | typeof FAILED_TO_LOAD_IDENTIFIER>
+		| GStorageValue
+		| typeof FAILED_TO_LOAD_IDENTIFIER;
+	delete: (key: string) => Promise<boolean> | boolean;
 }
 
 export function withPersist<
