@@ -1,40 +1,51 @@
-import { object, string } from 'valibot';
+import * as v from 'valibot';
 import { describe, expect, it } from 'vitest';
 import * as yup from 'yup';
 import * as zod from 'zod';
 
 import { createForm } from './create-form';
-import { createYupFormFieldValidator, createZodFormFieldValidator } from './form-field';
+import {
+	createValibotFormFieldValidator,
+	createYupFormFieldValidator,
+	createZodFormFieldValidator
+} from './form-field';
 
 describe('createForm function', () => {
-	it('shoudl work', () => {
-		const Schema = object({
-			name: string(),
-			url: string()
-		});
-
+	it('shoudl work', async () => {
 		const form = createForm({
 			fields: {
 				item1: {
-					initalValue: 10,
+					initialValue: 10,
 					validator: createYupFormFieldValidator(yup.number().required().positive().integer())
 				},
 				item2: {
-					initalValue: 'hello@gmail.com',
+					initialValue: 'test@gmail.com',
 					validator: createZodFormFieldValidator(zod.string().email())
 				},
 				item3: {
-					initalValue: { nested: 'object' },
+					initialValue: { nested: 'object' },
 					validator: createYupFormFieldValidator(
 						yup.object({
 							nested: yup.string().required()
+						})
+					)
+				},
+				item4: {
+					initialValue: {
+						name: 'Jeff',
+						url: 'jeff.com'
+					},
+					validator: createValibotFormFieldValidator(
+						v.object({
+							name: v.string(),
+							url: v.string()
 						})
 					)
 				}
 			}
 		});
 
-		const item3 = form.getField('item3');
+		await form.validate();
 
 		expect(form).not.toBeNull();
 	});

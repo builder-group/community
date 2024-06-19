@@ -16,6 +16,7 @@ export function createFormFieldValidator<GValue>(
 		},
 		async validate(formField) {
 			this.isValidating = true;
+
 			for (const validationLink of this._validationChain) {
 				await validationLink.validate(formField);
 				if (
@@ -25,6 +26,12 @@ export function createFormFieldValidator<GValue>(
 					break;
 				}
 			}
+
+			// If no error was registered we assume its valid
+			if (formField.status.get().type === 'UNVALIDATED') {
+				formField.status._value = { type: 'VALID' };
+			}
+
 			this.isValidating = false;
 			return formField.status.get().type === 'VALID';
 		},

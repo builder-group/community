@@ -1,4 +1,4 @@
-import type { Schema } from 'zod';
+import { ZodError, type Schema } from 'zod';
 
 import { type TFormFieldValidator } from '../../types';
 import { createFormFieldValidator } from './create-form-field-validator';
@@ -13,22 +13,12 @@ export function createZodFormFieldValidator<GValue>(
 				try {
 					schema.parse(formField.get());
 				} catch (err) {
-					if (
-						err instanceof Error &&
-						err.name === 'ZodError' &&
-						'errors' in err &&
-						Array.isArray(err.errors)
-					) {
-						if (err.errors.length === 0) {
+					if (err instanceof ZodError) {
+						for (const issue of err.errors) {
 							formField.status.registerError({
-								type: 'zod',
-								message: err.message.replace('this', formField.key)
-							});
-						}
-						for (const innerErr of err.errors) {
-							formField.status.registerError({
-								type: 'zod',
-								message: innerErr.message.replace('this', formField.key)
+								code: issue.code,
+								message: issue.message.replace('this', formField.key),
+								path: issue.path.join('.')
 							});
 						}
 					}

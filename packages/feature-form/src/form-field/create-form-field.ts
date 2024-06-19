@@ -51,7 +51,7 @@ export function createFormField<GValue>(
 		status,
 		async validate(this: TFormField<GValue>) {
 			this.isValid = await this._validator.validate(this);
-			status._notify(true);
+			this.status._notify(true);
 			return this.isValid;
 		},
 		blur(this: TFormField<GValue>) {
@@ -79,9 +79,10 @@ export function createFormField<GValue>(
 	return Object.assign(formFieldState, formFieldFeature) as unknown as TFormField<GValue>;
 }
 
-export interface TCreateFormFieldConfig<GValue> extends Partial<TFormFieldStateConfig> {
+export interface TCreateFormFieldConfig<GValue, GInitalValue extends GValue = GValue>
+	extends Partial<TFormFieldStateConfig> {
 	key: string;
-	initialValue: GValue;
+	initialValue: GInitalValue;
 	validator: TFormFieldValidator<GValue>;
 	notifyOnStatusChange?: boolean;
 }

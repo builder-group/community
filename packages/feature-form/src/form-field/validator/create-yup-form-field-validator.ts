@@ -1,4 +1,4 @@
-import type { Schema } from 'yup';
+import { ValidationError, type Schema } from 'yup';
 
 import { type TFormFieldValidator } from '../../types';
 import { createFormFieldValidator } from './create-form-field-validator';
@@ -11,24 +11,23 @@ export function createYupFormFieldValidator<GValue>(
 			key: 'yup',
 			validate: async (formField) => {
 				try {
-					await schema.validate(formField.get());
+					await schema.validate(formField.get(), {
+						abortEarly: formField._config.collectErrorMode === 'firstError'
+					});
 				} catch (err) {
-					if (
-						err instanceof Error &&
-						err.name === 'ValidationError' &&
-						'inner' in err &&
-						Array.isArray(err.inner)
-					) {
+					if (err instanceof ValidationError) {
 						if (err.inner.length === 0) {
 							formField.status.registerError({
-								type: 'yup',
-								message: err.message.replace('this', formField.key)
+								code: err.type ?? 'unknown',
+								message: err.message.replace('this', formField.key),
+								path: err.path
 							});
 						}
 						for (const innerErr of err.inner) {
 							formField.status.registerError({
-								type: 'yup',
-								message: innerErr.message.replace('this', formField.key)
+								code: innerErr.type ?? 'unknown',
+								message: innerErr.message.replace('this', formField.key),
+								path: innerErr.path
 							});
 						}
 					}

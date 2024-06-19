@@ -1,10 +1,11 @@
 import { type TEntries } from '@ibg/utils';
 
-import { createFormField } from './form-field';
+import { createFormField, isFormField } from './form-field';
 import {
 	type TForm,
 	type TFormConfig,
 	type TFormData,
+	type TFormField,
 	type TFormFieldReValidateMode,
 	type TFormFields,
 	type TFormFieldValidateMode,
@@ -32,17 +33,19 @@ export function createForm<GFormData extends TFormData>(
 			onSubmit
 		},
 		fields: Object.fromEntries(
-			Object.entries(fields).map(([fieldKey, field]) => [
+			Object.entries(fields).map(([fieldKey, field]: [string, TCreateFormConfigFormField]) => [
 				fieldKey,
-				createFormField({
-					key: fieldKey,
-					initialValue: field.initalValue,
-					validator: field.validator,
-					collectErrorMode,
-					validateMode,
-					reValidateMode,
-					editable: true
-				})
+				isFormField(field)
+					? field
+					: createFormField({
+							key: fieldKey,
+							initialValue: field.initialValue,
+							validator: field.validator,
+							collectErrorMode,
+							validateMode,
+							reValidateMode,
+							editable: true
+						})
 			])
 		) as TFormFields<GFormData>,
 		isValid: false,
@@ -145,7 +148,9 @@ type TCreateFormConfigFormFields<GFormData extends TFormData> = {
 	[Key in keyof GFormData]: TCreateFormConfigFormField<GFormData[Key]>;
 };
 
-interface TCreateFormConfigFormField<GValue> {
-	initalValue: GValue;
-	validator: TFormFieldValidator<GValue>;
-}
+type TCreateFormConfigFormField<GValue = unknown> =
+	| {
+			initialValue: GValue;
+			validator: TFormFieldValidator<GValue>;
+	  }
+	| TFormField<GValue>;

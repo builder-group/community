@@ -58,8 +58,9 @@ export interface TUnvalidatedFormFieldStatus {
 }
 
 export interface TInvalidFormFieldError {
-	type: string;
+	code: string;
 	message?: string;
+	path?: string;
 }
 
 export type TValidateFormFieldFunction<GValue> = (
