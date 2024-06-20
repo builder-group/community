@@ -36,3 +36,4 @@ yarn-error.log*
 .DS_Store
 *.pem
 *-why.html
+*-why-*.html

@@ -5,6 +5,10 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	_value: GValue;
 	_listeners: TListener<GValue, GSelectedFeatureKeys>[];
 	/**
+	 * Triggers all registered listeners to run with the current state value.
+	 */
+	_notify: (options?: TStateNotifyOptions) => void;
+	/**
 	 * Retrieves the current state value.
 	 *
 	 * @example
@@ -25,7 +29,7 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	 *
 	 * @param newValue - The new value to set for the state, of type `GValue`.
 	 */
-	set: (newValue: GValue) => void;
+	set: (newValue: GValue, options?: TStateSetOptions) => void;
 	/**
 	 * Subscribes to state changes without immediately invoking the callback.
 	 * Use this to listen for changes that occur after the subscription.
@@ -55,22 +59,39 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 		callback: TListenerCallback<GValue, GSelectedFeatureKeys>,
 		level?: number
 	) => () => void;
-	/**
-	 * Triggers all registered listeners to run with the current state value.
-	 */
-	_notify: (process: boolean) => void;
 } & TSelectFeatures<GValue, GSelectedFeatureKeys>;
 
 export type TListenerCallback<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> = (
-	value: Readonly<GValue>,
-	state: TState<GValue, GSelectedFeatureKeys>
+	props: TListenerCallbackProps<GValue, GSelectedFeatureKeys>
 ) => Promise<void> | void;
+
+export interface TListenerCallbackProps<
+	GValue,
+	GSelectedFeatureKeys extends TFeatureKeys<GValue>[]
+> {
+	state: TState<GValue, GSelectedFeatureKeys>;
+	data?: unknown;
+}
+
 export interface TListener<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> {
 	callback: TListenerCallback<GValue, GSelectedFeatureKeys>;
 	level: number;
 }
 
-export type TListenerQueueItem<GValue = any> = { value: Readonly<GValue> } & TListener<
-	GValue,
-	['base']
->;
+// TODO: Should we pass no reference to the state and/or value
+// and instead just directly access the state in the listener callback?
+// https://stackoverflow.com/questions/78645591/best-practices-for-managing-object-references-in-callbacks-javascript
+export type TListenerQueueItem<
+	GValue = any,
+	GSelectedFeatureKeys extends TFeatureKeys<GValue>[] = ['base']
+> = {
+	stateRef: WeakRef<TState<GValue, GSelectedFeatureKeys>>;
+	data?: unknown;
+} & TListener<GValue, GSelectedFeatureKeys>;
+
+export type TStateSetOptions = TStateNotifyOptions;
+
+export interface TStateNotifyOptions {
+	processListenerQueue?: boolean;
+	listenerData?: unknown;
+}

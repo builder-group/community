@@ -6,6 +6,6 @@ export function hasFeatures<
 >(
 	fetchClient: TFetchClient<GFeatureKeys>,
 	features: GHasFeatureKeys
-): fetchClient is TFetchClient<GHasFeatureKeys> {
+): fetchClient is TFetchClient<(GFeatureKeys[number] | GHasFeatureKeys[number])[]> {
 	return features.every((feature) => fetchClient._features.includes(feature));
 }

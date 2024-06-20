@@ -1,25 +1,25 @@
-import { type TState } from 'feature-state';
-
+import { type TFeatureKeys, type TSelectFeatures } from './features';
 import { type TFormField, type TFormFieldValidator } from './form-field';
 
-export type TForm<GFormData extends TFormData> = TState<TFormFields<GFormData>, ['base', 'form']>;
-
-export interface TFormStateFeature<GFormFields> {
-	_config: TFormConfig<TExtractGFormDataTFormFields<GFormFields>>;
-	key: string;
+// Note: TForm is not itself a state because of type issues mainly because GFormData is the main generic,
+// but the State value was TFormFields<GFormData>. Thus We had to check if GValue extends TFormFields<infer GFormData>,
+// which was unreliable in TypeScript if deeply nested.
+export type TForm<GFormData extends TFormData, GSelectedFeatureKeys extends TFeatureKeys[]> = {
+	_features: string[];
+	_config: TFormConfig<GFormData>;
+	fields: TFormFields<GFormData>;
 	isValid: boolean;
-	isModified: boolean;
-	submitted: boolean;
-	getField: <GKey extends keyof GFormFields>(key: GKey) => GFormFields[GKey];
-	submit: () => void;
+	isSubmitted: boolean;
+	_revalidate: (cached?: boolean) => Promise<boolean>;
+	submit: () => Promise<boolean>;
+	validate: () => Promise<boolean>;
+	getField: <GKey extends keyof TFormFields<GFormData>>(key: GKey) => TFormFields<GFormData>[GKey];
 	reset: () => void;
-}
+} & TSelectFeatures<GFormData, GSelectedFeatureKeys>;
 
 export type TFormFields<GFormData extends TFormData> = {
 	[Key in keyof GFormData]: TFormField<GFormData[Key]>;
 };
-
-export type TExtractGFormDataTFormFields<T> = T extends TFormFields<infer G> ? G : never;
 
 export type TFormValidators<GFormData extends TFormData> = {
 	[Key in keyof GFormData]: TFormFieldValidator<GFormData[Key]>;
@@ -28,14 +28,6 @@ export type TFormValidators<GFormData extends TFormData> = {
 export type TFormData = Record<string, unknown>;
 
 export interface TFormConfig<GFormData extends TFormData> {
-	/**
-	 * Validation strategy after submitting.
-	 */
-	mode: TFormValidateMode;
-	/**
-	 * Validation strategy before submitting.
-	 */
-	reValidateMode: TFormReValidateMode;
 	/**
 	 * Indicates if the form is disabled.
 	 */
@@ -47,11 +39,7 @@ export interface TFormConfig<GFormData extends TFormData> {
 	/**
 	 * Called once form is submitted
 	 */
-	onSubmit: ((data: GFormData) => Promise<void>) | null;
+	onSubmit: ((data: GFormData) => void) | null;
 }
-
-export type TFormValidateMode = 'onBlur' | 'onChange' | 'onSubmit' | 'onTouched' | 'all';
-
-export type TFormReValidateMode = 'onBlur' | 'onChange' | 'onSubmit' | 'afterFirstSubmit';
 
 export type TCollectErrorMode = 'firstError' | 'all';

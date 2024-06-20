@@ -7,6 +7,6 @@ export function hasFeatures<
 >(
 	state: TState<GValue, GFeatureKeys>,
 	features: GHasFeatureKeys
-): state is TState<GValue, GHasFeatureKeys> {
-	return features.every((feature) => state._features.includes(feature));
+): state is TState<GValue, (GFeatureKeys[number] | GHasFeatureKeys[number])[]> {
+	return features.every((feature) => state._features.includes(feature as GFeatureKeys[number]));
 }

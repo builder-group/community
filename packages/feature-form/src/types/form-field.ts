@@ -1,16 +1,17 @@
 import { type TState } from 'feature-state';
 
-import { type TCollectErrorMode, type TFormReValidateMode } from './form';
+import { type TCollectErrorMode } from './form';
 
-export type TFormField<GValue> = TState<GValue, ['base', 'form-field']>;
+export type TFormField<GValue> = TState<GValue | undefined, ['base', 'form-field']>;
 
 export interface TFormFieldStateFeature<GValue> {
 	_config: TFormFieldStateConfig;
-	_intialValue: GValue;
+	_intialValue: GValue | undefined;
 	_validator: TFormFieldValidator<GValue>;
 	key: string;
 	isValid: boolean;
 	isTouched: boolean;
+	isSubmitted: boolean;
 	status: TFormFieldStatus;
 	validate: () => Promise<boolean>;
 	blur: () => void;
@@ -19,16 +20,25 @@ export interface TFormFieldStateFeature<GValue> {
 
 export interface TFormFieldStateConfig {
 	editable: boolean;
-	reValidateMode: TFormReValidateMode;
+	/**
+	 * Validation strategy before submitting.
+	 */
+	validateMode: TFormFieldValidateMode;
+	/**
+	 * Validation strategy after submitting.
+	 */
+	reValidateMode: TFormFieldReValidateMode;
 	collectErrorMode: TCollectErrorMode;
 }
+
+export type TFormFieldValidateMode = 'onBlur' | 'onChange' | 'onSubmit' | 'onTouched';
+
+export type TFormFieldReValidateMode = 'onBlur' | 'onChange' | 'onSubmit';
 
 export type TFormFieldStatus = TState<TFormFieldStatusValue, ['base', 'form-field-status']>;
 
 export interface TFormFielStatusStateFeature {
-	display: boolean;
 	registerError: (error: TInvalidFormFieldError) => void;
-	propagate: () => void;
 }
 
 export type TFormFieldStatusValue =
@@ -36,16 +46,26 @@ export type TFormFieldStatusValue =
 	| TValidFormFieldStatus
 	| TUnvalidatedFormFieldStatus;
 
-export interface TInvalidFormFieldStatus { type: 'INVALID'; errors: TInvalidFormFieldError[] }
-export interface TValidFormFieldStatus { type: 'VALID' }
-export interface TUnvalidatedFormFieldStatus { type: 'UNVALIDATED' }
-
-export interface TInvalidFormFieldError {
-	type: string;
-	message?: string;
+export interface TInvalidFormFieldStatus {
+	type: 'INVALID';
+	errors: TInvalidFormFieldError[];
+}
+export interface TValidFormFieldStatus {
+	type: 'VALID';
+}
+export interface TUnvalidatedFormFieldStatus {
+	type: 'UNVALIDATED';
 }
 
-export type TValidateFormFieldFunction<GValue> = (formField: TFormField<GValue>) => Promise<void>;
+export interface TInvalidFormFieldError {
+	code: string;
+	message?: string;
+	path?: string;
+}
+
+export type TValidateFormFieldFunction<GValue> = (
+	formField: TFormField<GValue>
+) => Promise<void> | void;
 export interface TFormFieldValidationLink<GValue> {
 	key: string;
 	validate: TValidateFormFieldFunction<GValue>;

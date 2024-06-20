@@ -2,7 +2,7 @@ import { deepCopy } from '@ibg/utils';
 
 import { type TFormFieldValidationChain, type TFormFieldValidator } from '../../types';
 
-export function createFormFieldValidator<GValue>(
+export function createValidator<GValue>(
 	validationChain: TFormFieldValidationChain<GValue>
 ): TFormFieldValidator<GValue> {
 	return {
@@ -16,6 +16,7 @@ export function createFormFieldValidator<GValue>(
 		},
 		async validate(formField) {
 			this.isValidating = true;
+
 			for (const validationLink of this._validationChain) {
 				await validationLink.validate(formField);
 				if (
@@ -25,11 +26,17 @@ export function createFormFieldValidator<GValue>(
 					break;
 				}
 			}
+
+			// If no error was registered we assume its valid
+			if (formField.status.get().type === 'UNVALIDATED') {
+				formField.status._value = { type: 'VALID' };
+			}
+
 			this.isValidating = false;
 			return formField.status.get().type === 'VALID';
 		},
 		clone() {
-			return createFormFieldValidator<GValue>(deepCopy(this._validationChain));
+			return createValidator<GValue>(deepCopy(this._validationChain));
 		}
 	};
 }

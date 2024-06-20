@@ -1,20 +1,48 @@
 import type { TListener, TListenerQueueItem, TState } from './types';
 
-const LISTENER_QUEUE: TListenerQueueItem[] = [];
+const GLOBAL_LISTENER_QUEUE: TListenerQueueItem[] = [];
 
-export function createState<GValue>(value: GValue, deferred = true): TState<GValue, ['base']> {
+export function createState<GValue>(
+	initialValue: GValue,
+	options: TCreateStateOptions = {}
+): TState<GValue, ['base']> {
+	const { deferred = true } = options;
+
 	return {
 		_: null,
 		_features: ['base'],
 		_listeners: [],
-		_value: value,
+		_value: initialValue,
+		_notify(notifyOptions = {}) {
+			const { processListenerQueue = true, listenerData } = notifyOptions;
+
+			// Add current state's listeners to the queue
+			this._listeners.forEach((listener) => {
+				GLOBAL_LISTENER_QUEUE.push({
+					stateRef: new WeakRef(this),
+					data: listenerData,
+					callback: listener.callback,
+					level: listener.level
+				});
+			});
+
+			// Process queue
+			if (processListenerQueue) {
+				// Defer processing using setTimeout
+				deferred
+					? setTimeout(() => {
+							void processQueue();
+						})
+					: void processQueue();
+			}
+		},
 		get() {
 			return this._value;
 		},
-		set(newValue, process = true) {
+		set(newValue, setOptions = {}) {
 			if (this._value !== newValue) {
 				this._value = newValue;
-				this._notify(process);
+				this._notify(setOptions);
 			}
 		},
 		listen(callback, level) {
@@ -35,51 +63,31 @@ export function createState<GValue>(value: GValue, deferred = true): TState<GVal
 		},
 		subscribe(callback, level) {
 			const unbind = this.listen(callback, level);
-			callback(this._value, this);
+			void callback({ state: this });
 			return unbind;
-		},
-		_notify(process) {
-			// Add current state's listeners to the queue
-			this._listeners.forEach((listener) => {
-				const queueItem: TListenerQueueItem<GValue> = {
-					value: this._value,
-					...listener
-				};
-				LISTENER_QUEUE.push(queueItem);
-			});
-
-			// Process queue
-			if (process) {
-				// Defer processing using setTimeout
-				deferred
-					? setTimeout(() => {
-							processQueue(this)
-								.then(() => {
-									// do nothing
-								})
-								.catch(() => {
-									// do nothing
-								});
-						})
-					: processQueue(this)
-							.then(() => {
-								// do nothing
-							})
-							.catch(() => {
-								// do nothing
-							});
-			}
 		}
 	};
 }
 
-async function processQueue<GValue>(state: TState<GValue, ['base']>): Promise<void> {
+export interface TCreateStateOptions {
+	deferred?: boolean;
+}
+
+async function processQueue(): Promise<void> {
 	// Drain the queue
-	const queueToProcess = LISTENER_QUEUE.splice(0, LISTENER_QUEUE.length);
+	const queueToProcess = GLOBAL_LISTENER_QUEUE.splice(0, GLOBAL_LISTENER_QUEUE.length);
 	queueToProcess.sort((a, b) => a.level - b.level);
 
 	// Process each item in the queue sequentially
 	for (const queueItem of queueToProcess) {
-		await queueItem.callback(queueItem.value, state);
+		const state = queueItem.stateRef.deref();
+		if (state != null) {
+			await queueItem.callback({
+				state,
+				data: queueItem.data
+			});
+		} else {
+			console.warn('Reference to State was dropped before listener could be called!');
+		}
 	}
 }
