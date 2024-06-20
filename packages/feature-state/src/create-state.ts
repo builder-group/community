@@ -19,7 +19,7 @@ export function createState<GValue>(
 			// Add current state's listeners to the queue
 			this._listeners.forEach((listener) => {
 				GLOBAL_LISTENER_QUEUE.push({
-					state: this,
+					stateRef: new WeakRef(this),
 					data: listenerData,
 					callback: listener.callback,
 					level: listener.level
@@ -80,9 +80,14 @@ async function processQueue(): Promise<void> {
 
 	// Process each item in the queue sequentially
 	for (const queueItem of queueToProcess) {
-		await queueItem.callback({
-			state: queueItem.state,
-			data: queueItem.data
-		});
+		const state = queueItem.stateRef.deref();
+		if (state != null) {
+			await queueItem.callback({
+				state,
+				data: queueItem.data
+			});
+		} else {
+			console.warn('Reference to State was dropped before listener could be called!');
+		}
 	}
 }

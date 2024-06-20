@@ -78,11 +78,14 @@ export interface TListener<GValue, GSelectedFeatureKeys extends TFeatureKeys<GVa
 	level: number;
 }
 
+// TODO: Should we pass no reference to the state and/or value
+// and instead just directly access the state in the listener callback?
+// https://stackoverflow.com/questions/78645591/best-practices-for-managing-object-references-in-callbacks-javascript
 export type TListenerQueueItem<
 	GValue = any,
 	GSelectedFeatureKeys extends TFeatureKeys<GValue>[] = ['base']
 > = {
-	state: TState<GValue, GSelectedFeatureKeys>;
+	stateRef: WeakRef<TState<GValue, GSelectedFeatureKeys>>;
 	data?: unknown;
 } & TListener<GValue, GSelectedFeatureKeys>;
 
