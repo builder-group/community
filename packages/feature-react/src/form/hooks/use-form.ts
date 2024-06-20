@@ -34,7 +34,7 @@ export function useForm<GFormData extends TFormData>(
 				onChange(event) {
 					if (hasProperty(event.target, 'value')) {
 						formField.set(event.target.value as any, {
-							data: {
+							listenerData: {
 								background: !controlled
 							}
 						});

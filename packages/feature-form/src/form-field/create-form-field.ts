@@ -31,7 +31,7 @@ export function createFormField<GValue>(
 	// Notify form field listeners if status has changed
 	if (notifyOnStatusChange) {
 		status.listen(() => {
-			formFieldState._notify(true);
+			formFieldState._notify();
 		});
 	}
 
@@ -51,7 +51,7 @@ export function createFormField<GValue>(
 		status,
 		async validate(this: TFormField<GValue>) {
 			this.isValid = await this._validator.validate(this);
-			this.status._notify(true);
+			this.status._notify();
 			return this.isValid;
 		},
 		blur(this: TFormField<GValue>) {
