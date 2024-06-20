@@ -1,4 +1,4 @@
-import { type TForm, type TFormData, type TFormField } from 'feature-form';
+import { type TForm, type TFormData, type TFormField, type TFormFieldStatus } from 'feature-form';
 import React, { type ChangeEventHandler, type FocusEventHandler } from 'react';
 import { hasProperty } from '@ibg/utils';
 
@@ -42,7 +42,13 @@ export function useForm<GFormData extends TFormData>(
 				}
 			};
 		},
-		submit: form.submit
+		submit: form.submit,
+		field(formFieldKey) {
+			return form.getField(formFieldKey);
+		},
+		status(formFieldKey) {
+			return form.getField(formFieldKey).status;
+		}
 	};
 }
 
@@ -52,6 +58,8 @@ export interface TUseFormResponse<GFormData> {
 		formFieldKey: GKey,
 		controlled?: boolean
 	) => TRegisterFormFieldResponse<GKey, GFormData[GKey]>;
+	field: <GKey extends keyof GFormData>(formFieldKey: GKey) => TFormField<GFormData[GKey]>;
+	status: <GKey extends keyof GFormData>(formFieldKey: GKey) => TFormFieldStatus;
 }
 
 export interface TRegisterFormFieldResponse<GKey, GValue> {
