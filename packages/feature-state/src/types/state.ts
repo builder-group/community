@@ -70,7 +70,7 @@ export type TListenerCallback<GValue> = (
 
 export interface TListenerCallbackProps<GValue> {
 	value: Readonly<GValue>;
-	data?: unknown;
+	data?: TListenerData;
 }
 
 export interface TListener<GValue> {
@@ -79,17 +79,22 @@ export interface TListener<GValue> {
 	callback: TListenerCallback<GValue>;
 }
 
-// TODO: Should we pass no reference to the state and/or value
-// and instead just directly access the state in the listener callback?
+interface TListenerData {
+	[key: string]: unknown;
+	source?: string;
+	background?: boolean;
+}
+
+// TODO: Reference state or just value?
 // https://stackoverflow.com/questions/78645591/best-practices-for-managing-object-references-in-callbacks-javascript
 export type TListenerQueueItem<GValue = any> = {
 	value: Readonly<GValue>;
-	data?: unknown;
+	data?: TListenerData;
 } & TListener<GValue>;
 
 export type TStateSetOptions = TStateNotifyOptions;
 
 export interface TStateNotifyOptions {
 	processListenerQueue?: boolean;
-	listenerData?: unknown;
+	listenerData?: TListenerData;
 }

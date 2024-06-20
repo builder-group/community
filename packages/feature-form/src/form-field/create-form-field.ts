@@ -30,7 +30,7 @@ export function createFormField<GValue>(
 	if (notifyOnStatusChange) {
 		status.listen(
 			() => {
-				formFieldState._notify();
+				formFieldState._notify({ listenerData: { source: 'status' } });
 			},
 			{ key: 'form-field' }
 		);

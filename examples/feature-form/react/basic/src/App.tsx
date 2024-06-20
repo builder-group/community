@@ -7,11 +7,13 @@ import './App.css';
 
 import { StatusMessage } from './components';
 
+type TGender = 'Male' | 'Female';
+
 type TFormData = {
 	// [key: string]: string; // https://stackoverflow.com/questions/65799316/why-cant-an-interface-be-assigned-to-recordstring-unknown
 	firstName: string;
 	lastName: string;
-	gender: 'Male' | 'Female';
+	gender: TGender;
 	// userName: string;
 	// email: string;
 	// aboutYou: string;
@@ -67,10 +69,6 @@ const $form = withGlobalBind(
 	})
 );
 
-$form.getField('firstName').status.listen((props) => {
-	console.log('Change Field', props);
-});
-
 function App() {
 	const { submit, status, field, register } = useForm($form);
 
@@ -92,7 +90,7 @@ function App() {
 			<select
 				defaultValue={''}
 				onChange={(e) =>
-					field('gender').set(e.target.value as any, { listenerData: { background: true } })
+					field('gender').set(e.target.value as TGender, { listenerData: { background: true } })
 				}
 			>
 				<option value={''}>Select...</option>

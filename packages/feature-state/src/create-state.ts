@@ -41,8 +41,12 @@ export function createState<GValue>(
 		},
 		set(newValue, setOptions = {}) {
 			if (this._value !== newValue) {
+				const { listenerData = {}, processListenerQueue = true } = setOptions;
 				this._value = newValue;
-				this._notify(setOptions);
+				this._notify({
+					listenerData: { source: 'set', ...listenerData },
+					processListenerQueue
+				});
 			}
 		},
 		listen(callback, listenOptions = {}) {

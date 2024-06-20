@@ -10,11 +10,14 @@ export function useForm<GFormData extends TFormData>(
 	React.useEffect(() => {
 		const unbindCallbacks: (() => void)[] = [];
 		for (const formField of Object.values(form.fields) as TFormField<unknown>[]) {
-			const unbind = formField.listen(({ data }) => {
-				if (!(hasProperty(data, 'background') && data.background)) {
-					forceRender();
-				}
-			});
+			const unbind = formField.listen(
+				({ data }) => {
+					if (!data?.background) {
+						forceRender();
+					}
+				},
+				{ key: 'use-form' }
+			);
 			unbindCallbacks.push(unbind);
 		}
 		return () => {
