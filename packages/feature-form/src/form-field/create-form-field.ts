@@ -52,7 +52,6 @@ export function createFormField<GValue>(
 		status,
 		async validate(this: TFormField<GValue>) {
 			this.isValid = await this._validator.validate(this);
-			this.status._notify();
 			return this.isValid;
 		},
 		blur(this: TFormField<GValue>) {

@@ -38,7 +38,8 @@ export type TFormFieldReValidateMode = 'onBlur' | 'onChange' | 'onSubmit';
 export type TFormFieldStatus = TState<TFormFieldStatusValue, ['base', 'form-field-status']>;
 
 export interface TFormFielStatusStateFeature {
-	registerError: (error: TInvalidFormFieldError) => void;
+	_nextValue?: TFormFieldStatusValue;
+	registerNextError: (error: TInvalidFormFieldError) => void;
 }
 
 export type TFormFieldStatusValue =
@@ -76,7 +77,7 @@ export interface TFormFieldValidator<GValue> {
 	_validationChain: TFormFieldValidationChain<GValue>;
 	isValidating: boolean;
 	validate: (formField: TFormField<GValue>) => Promise<boolean>;
-	append: (validator: TFormFieldValidator<GValue>) => void;
+	append: (validator: TFormFieldValidator<GValue>) => TFormFieldValidator<GValue>;
 	clone: () => TFormFieldValidator<GValue>;
 	push: (...validateFunctions: TFormFieldValidationLink<GValue>[]) => void;
 }

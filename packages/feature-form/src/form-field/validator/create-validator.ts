@@ -13,6 +13,7 @@ export function createValidator<GValue>(
 		},
 		append(validator) {
 			this._validationChain.push(...validator._validationChain);
+			return this;
 		},
 		async validate(formField) {
 			this.isValidating = true;
@@ -21,18 +22,22 @@ export function createValidator<GValue>(
 				await validationLink.validate(formField);
 				if (
 					formField._config.collectErrorMode === 'firstError' &&
-					formField.status.get().type === 'INVALID'
+					formField.status._nextValue?.type === 'INVALID'
 				) {
 					break;
 				}
 			}
 
 			// If no error was registered we assume its valid
-			if (formField.status.get().type === 'UNVALIDATED') {
-				formField.status._value = { type: 'VALID' };
+			if (formField.status._nextValue == null) {
+				formField.status.set({ type: 'VALID' });
+			} else {
+				formField.status.set(formField.status._nextValue);
 			}
 
+			formField.status._nextValue = undefined;
 			this.isValidating = false;
+
 			return formField.status.get().type === 'VALID';
 		},
 		clone() {

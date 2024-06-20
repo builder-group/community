@@ -6,11 +6,12 @@ export function createStatus(initialValue: TFormFieldStatusValue): TFormFieldSta
 	const formFieldStatusState = createState(initialValue);
 
 	const formFieldStatusFeature: TSelectFeatures<TFormFieldStatusValue, ['form-field-status']> = {
-		registerError(this: TFormFieldStatus, error) {
-			if (this._value.type === 'INVALID') {
-				this._value.errors.push(error);
+		_nextValue: undefined,
+		registerNextError(this: TFormFieldStatus, error) {
+			if (this._nextValue?.type === 'INVALID') {
+				this._nextValue.errors.push(error);
 			} else {
-				this._value = { type: 'INVALID', errors: [error] };
+				this._nextValue = { type: 'INVALID', errors: [error] };
 			}
 		}
 	};

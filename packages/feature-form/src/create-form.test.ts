@@ -59,6 +59,8 @@ describe('createForm function', () => {
 			}
 		});
 
+		const test = form.getField('item3');
+
 		const isValid = await form.validate();
 		await form.submit();
 

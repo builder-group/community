@@ -15,14 +15,14 @@ export function yupValidator<GValue>(schema: Schema<GValue>): TFormFieldValidato
 				} catch (err) {
 					if (err instanceof ValidationError) {
 						if (err.inner.length === 0) {
-							formField.status.registerError({
+							formField.status.registerNextError({
 								code: err.type ?? 'unknown',
 								message: err.message.replace('this', formField.key),
 								path: err.path
 							});
 						}
 						for (const innerErr of err.inner) {
-							formField.status.registerError({
+							formField.status.registerNextError({
 								code: innerErr.type ?? 'unknown',
 								message: innerErr.message.replace('this', formField.key),
 								path: innerErr.path

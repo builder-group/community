@@ -13,7 +13,7 @@ export function zodValidator<GValue>(schema: Schema<GValue>): TFormFieldValidato
 				} catch (err) {
 					if (err instanceof ZodError) {
 						for (const issue of err.errors) {
-							formField.status.registerError({
+							formField.status.registerNextError({
 								code: issue.code,
 								message: issue.message,
 								path: issue.path.join('.')

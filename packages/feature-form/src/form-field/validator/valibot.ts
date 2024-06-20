@@ -16,7 +16,7 @@ export function valibotValidator<GValue>(
 
 				if (result.issues != null) {
 					for (const issue of result.issues) {
-						formField.status.registerError({
+						formField.status.registerNextError({
 							code: issue.type,
 							message: issue.message,
 							path: getDotPath(issue) ?? undefined
