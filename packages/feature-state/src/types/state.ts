@@ -69,7 +69,6 @@ export interface TListenerCallbackProps<
 	GValue,
 	GSelectedFeatureKeys extends TFeatureKeys<GValue>[]
 > {
-	value: Readonly<GValue>;
 	state: TState<GValue, GSelectedFeatureKeys>;
 	data?: unknown;
 }
@@ -79,14 +78,17 @@ export interface TListener<GValue, GSelectedFeatureKeys extends TFeatureKeys<GVa
 	level: number;
 }
 
-export type TListenerQueueItem<GValue = any> = {
-	value: Readonly<GValue>;
+export type TListenerQueueItem<
+	GValue = any,
+	GSelectedFeatureKeys extends TFeatureKeys<GValue>[] = ['base']
+> = {
+	state: TState<GValue, GSelectedFeatureKeys>;
 	data?: unknown;
-} & TListener<GValue, ['base']>;
+} & TListener<GValue, GSelectedFeatureKeys>;
 
 export type TStateSetOptions = TStateNotifyOptions;
 
 export interface TStateNotifyOptions {
-	process?: boolean;
-	data?: unknown;
+	processListenerQueue?: boolean;
+	listenerData?: unknown;
 }

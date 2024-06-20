@@ -5,8 +5,8 @@ export function hasFeatures<
 	GFeatureKeys extends TFeatureKeys[],
 	GHasFeatureKeys extends TFeatureKeys[]
 >(
-	state: TForm<GFormData, GFeatureKeys>,
+	form: TForm<GFormData, GFeatureKeys>,
 	features: GHasFeatureKeys
-): state is TForm<GFormData, GHasFeatureKeys> {
-	return features.every((feature) => state._features.includes(feature));
+): form is TForm<GFormData, (GFeatureKeys[number] | GHasFeatureKeys[number])[]> {
+	return features.every((feature) => form._features.includes(feature));
 }

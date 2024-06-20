@@ -34,7 +34,6 @@ describe('createForm function', () => {
 							url: v.pipe(v.string(), v.url())
 						})
 					),
-
 					{
 						defaultValue: {
 							name: 'Jeff',

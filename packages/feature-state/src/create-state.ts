@@ -1,6 +1,6 @@
 import type { TListener, TListenerQueueItem, TState } from './types';
 
-const LISTENER_QUEUE: TListenerQueueItem[] = [];
+const GLOBAL_LISTENER_QUEUE: TListenerQueueItem[] = [];
 
 export function createState<GValue>(
 	initialValue: GValue,
@@ -14,26 +14,26 @@ export function createState<GValue>(
 		_listeners: [],
 		_value: initialValue,
 		_notify(notifyOptions = {}) {
-			const { process = true, data } = notifyOptions;
+			const { processListenerQueue = true, listenerData } = notifyOptions;
 
 			// Add current state's listeners to the queue
 			this._listeners.forEach((listener) => {
-				const queueItem: TListenerQueueItem<GValue> = {
-					value: this._value,
-					data,
-					...listener
-				};
-				LISTENER_QUEUE.push(queueItem);
+				GLOBAL_LISTENER_QUEUE.push({
+					state: this,
+					data: listenerData,
+					callback: listener.callback,
+					level: listener.level
+				});
 			});
 
 			// Process queue
-			if (process) {
+			if (processListenerQueue) {
 				// Defer processing using setTimeout
 				deferred
 					? setTimeout(() => {
-							void processQueue(this);
+							void processQueue();
 						})
-					: void processQueue(this);
+					: void processQueue();
 			}
 		},
 		get() {
@@ -63,7 +63,7 @@ export function createState<GValue>(
 		},
 		subscribe(callback, level) {
 			const unbind = this.listen(callback, level);
-			void callback({ value: this._value, state: this });
+			void callback({ state: this });
 			return unbind;
 		}
 	};
@@ -73,13 +73,16 @@ export interface TCreateStateOptions {
 	deferred?: boolean;
 }
 
-async function processQueue<GValue>(state: TState<GValue, ['base']>): Promise<void> {
+async function processQueue(): Promise<void> {
 	// Drain the queue
-	const queueToProcess = LISTENER_QUEUE.splice(0, LISTENER_QUEUE.length);
+	const queueToProcess = GLOBAL_LISTENER_QUEUE.splice(0, GLOBAL_LISTENER_QUEUE.length);
 	queueToProcess.sort((a, b) => a.level - b.level);
 
 	// Process each item in the queue sequentially
 	for (const queueItem of queueToProcess) {
-		await queueItem.callback({ value: queueItem.value, state, data: queueItem.data });
+		await queueItem.callback({
+			state: queueItem.state,
+			data: queueItem.data
+		});
 	}
 }
