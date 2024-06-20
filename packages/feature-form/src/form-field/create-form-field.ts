@@ -24,15 +24,16 @@ export function createFormField<GValue>(
 	} = config;
 	const formFieldState = createState(initialValue);
 
-	formFieldState._features.push('form-field');
-
 	const status = createStatus({ type: 'UNVALIDATED' });
 
 	// Notify form field listeners if status has changed
 	if (notifyOnStatusChange) {
-		status.listen(() => {
-			formFieldState._notify();
-		});
+		status.listen(
+			() => {
+				formFieldState._notify();
+			},
+			{ key: 'form-field' }
+		);
 	}
 
 	const formFieldFeature: TFormFieldStateFeature<GValue> = {
@@ -76,7 +77,13 @@ export function createFormField<GValue>(
 	};
 
 	// Merge existing features from the state with the new form field feature
-	return Object.assign(formFieldState, formFieldFeature) as unknown as TFormField<GValue>;
+	const _formField = Object.assign(
+		formFieldState,
+		formFieldFeature
+	) as unknown as TFormField<GValue>;
+	_formField._features.push('form-field');
+
+	return _formField;
 }
 
 export interface TCreateFormFieldConfig<GValue> extends Partial<TFormFieldStateConfig> {

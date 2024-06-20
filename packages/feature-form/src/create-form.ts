@@ -109,18 +109,24 @@ export function createForm<GFormData extends TFormData>(
 	};
 
 	for (const field of Object.values(form.fields) as TFormFields<GFormData>[keyof GFormData][]) {
-		field.listen(async () => {
-			if (
-				(field.isSubmitted && field._config.reValidateMode === 'onChange') ||
-				(!field.isSubmitted && field._config.validateMode === 'onChange') ||
-				(field._config.validateMode === 'onTouched' && field.isTouched)
-			) {
-				await field.validate();
-			}
-		});
-		field.status.listen(async () => {
-			await form._revalidate(true);
-		});
+		field.listen(
+			async () => {
+				if (
+					(field.isSubmitted && field._config.reValidateMode === 'onChange') ||
+					(!field.isSubmitted && field._config.validateMode === 'onChange') ||
+					(field._config.validateMode === 'onTouched' && field.isTouched)
+				) {
+					await field.validate();
+				}
+			},
+			{ key: 'form' }
+		);
+		field.status.listen(
+			async () => {
+				await form._revalidate(true);
+			},
+			{ key: 'form' }
+		);
 	}
 
 	return form;

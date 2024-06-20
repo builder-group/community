@@ -6,11 +6,15 @@ export function useGlobalState<GValue>(state: TState<GValue, ['base']>): Readonl
 	const [, forceRender] = React.useReducer((s: number) => s + 1, 0);
 
 	React.useEffect(() => {
-		const unbind = state.listen(({ data }) => {
-			if (!(hasProperty(data, 'background') && data.background)) {
-				forceRender();
-			}
-		});
+		const unbind = state.listen(
+			({ data }) => {
+				if (!(hasProperty(data, 'background') && data.background)) {
+					forceRender();
+				}
+			},
+			{ key: 'use-global-state' }
+		);
+
 		return () => {
 			unbind();
 		};

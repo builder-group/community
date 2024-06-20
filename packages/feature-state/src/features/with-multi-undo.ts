@@ -5,8 +5,6 @@ export function withMultiUndo<GValue, GSelectedFeatureKeys extends TFeatureKeys<
 	state: TState<GValue, TEnforceFeatures<GSelectedFeatureKeys, ['base', 'undo']>>
 ): TState<GValue, ['multiundo', ...GSelectedFeatureKeys]> {
 	if (hasFeatures(state, ['undo'])) {
-		state._features.push('multiundo');
-
 		const multiUndoFeature: TSelectFeatures<GValue, ['multiundo']> = {
 			multiUndo(this: TState<GValue, ['multiundo', 'undo']>, count: number) {
 				for (let i = 0; i < count; i++) {
@@ -16,10 +14,13 @@ export function withMultiUndo<GValue, GSelectedFeatureKeys extends TFeatureKeys<
 		};
 
 		// Merge existing features from the state with the new multiundo feature
-		return Object.assign(state, multiUndoFeature) as TState<
+		const _state = Object.assign(state, multiUndoFeature) as TState<
 			GValue,
 			['multiundo', ...GSelectedFeatureKeys]
 		>;
+		_state._features.push('multiundo');
+
+		return _state;
 	}
 
 	throw Error('State must have "undo" feature to use withMultiUndo');

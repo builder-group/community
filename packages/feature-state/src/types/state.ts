@@ -38,7 +38,10 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	 * @param level - Optional parameter to specify the listener's priority level.
 	 * @returns A function that, when called, will unsubscribe the listener.
 	 */
-	listen: (callback: TListenerCallback<GValue>, level?: number) => () => void;
+	listen: (
+		callback: TListenerCallback<GValue>,
+		options?: Partial<Omit<TListener<GValue>, 'callback'>>
+	) => () => void;
 	/**
 	 * Subscribes to state changes and invokes the callback immediately with the current state value.
 	 *
@@ -55,7 +58,10 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	 * @param level - Optional parameter to specify the listener's priority level.
 	 * @returns A function that, when called, will unsubscribe the listener.
 	 */
-	subscribe: (callback: TListenerCallback<GValue>, level?: number) => () => void;
+	subscribe: (
+		callback: TListenerCallback<GValue>,
+		options?: Partial<Omit<TListener<GValue>, 'callback'>>
+	) => () => void;
 } & TSelectFeatures<GValue, GSelectedFeatureKeys>;
 
 export type TListenerCallback<GValue> = (
@@ -68,8 +74,9 @@ export interface TListenerCallbackProps<GValue> {
 }
 
 export interface TListener<GValue> {
-	callback: TListenerCallback<GValue>;
+	key?: string;
 	level: number;
+	callback: TListenerCallback<GValue>;
 }
 
 // TODO: Should we pass no reference to the state and/or value

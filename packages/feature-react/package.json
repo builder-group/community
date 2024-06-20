@@ -1,7 +1,7 @@
 {
 	"name": "feature-react",
 	"description": "ReactJs extension features for feature-state",
-	"version": "0.0.11",
+	"version": "0.0.13",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
@@ -11,7 +11,7 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest",
-		"publish:patch": "pnpm version patch && pnpm publish --no-git-checks",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks",
 		"size": "size-limit --why"
 	},
 	"exports": {

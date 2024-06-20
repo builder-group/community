@@ -16,7 +16,7 @@ export function createState<GValue>(
 		_notify(notifyOptions = {}) {
 			const { processListenerQueue = true, listenerData } = notifyOptions;
 
-			// Add current state's listeners to the queue
+			// Push current state's listeners to the queue
 			this._listeners.forEach((listener) => {
 				GLOBAL_LISTENER_QUEUE.push({
 					value: this._value as Readonly<GValue>,
@@ -45,24 +45,25 @@ export function createState<GValue>(
 				this._notify(setOptions);
 			}
 		},
-		listen(callback, level) {
+		listen(callback, listenOptions = {}) {
+			const { level = 0, key } = listenOptions;
 			const listener: TListener<GValue> = {
-				callback,
-				level: level ?? 0
+				key,
+				level,
+				callback
 			};
 			this._listeners.push(listener);
 
 			// Undbind
 			return () => {
 				const index = this._listeners.indexOf(listener);
-				// eslint-disable-next-line no-bitwise -- .
-				if (~index) {
+				if (index !== -1) {
 					this._listeners.splice(index, 1);
 				}
 			};
 		},
-		subscribe(callback, level) {
-			const unbind = this.listen(callback, level);
+		subscribe(callback, subscribeOptions) {
+			const unbind = this.listen(callback, subscribeOptions);
 			void callback({ value: this._value });
 			return unbind;
 		}
