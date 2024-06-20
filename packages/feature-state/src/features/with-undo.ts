@@ -1,10 +1,4 @@
-import type {
-	TEnforceFeatures,
-	TFeatureKeys,
-	TListenerCallback,
-	TSelectFeatures,
-	TState
-} from '../types';
+import type { TEnforceFeatures, TFeatureKeys, TSelectFeatures, TState } from '../types';
 
 export function withUndo<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]>(
 	state: TState<GValue, TEnforceFeatures<GSelectedFeatureKeys, ['base']>>,
@@ -24,20 +18,16 @@ export function withUndo<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValu
 	};
 
 	// Merge existing features from the state with the new undo feature
-	const _state = Object.assign(state, undoFeature) as TState<
-		GValue,
-		['undo', ...GSelectedFeatureKeys]
-	>;
+	const _state = Object.assign(state, undoFeature) as unknown as TState<GValue, ['undo', 'base']>;
 
-	_state.listen(((value: GValue, innerState: TState<GValue, ['base', 'undo']>) => {
+	_state.listen(({ value }) => {
 		// Maintaining the history stack size
-		if (innerState._history.length >= historyLimit) {
-			innerState._history.shift(); // Remove oldest state
+		if (_state._history.length >= historyLimit) {
+			_state._history.shift(); // Remove oldest state
 		}
 
-		innerState._history.push(value);
-		// TODO: Improve types so that the below type balancing act is not necessary
-	}) as unknown as TListenerCallback<GValue, ['undo', ...GSelectedFeatureKeys]>);
+		_state._history.push(value);
+	});
 
-	return _state;
+	return _state as unknown as TState<GValue, ['undo', ...GSelectedFeatureKeys]>;
 }

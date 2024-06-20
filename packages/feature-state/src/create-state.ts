@@ -19,7 +19,7 @@ export function createState<GValue>(
 			// Add current state's listeners to the queue
 			this._listeners.forEach((listener) => {
 				GLOBAL_LISTENER_QUEUE.push({
-					stateRef: new WeakRef(this),
+					value: this._value as Readonly<GValue>,
 					data: listenerData,
 					callback: listener.callback,
 					level: listener.level
@@ -46,7 +46,7 @@ export function createState<GValue>(
 			}
 		},
 		listen(callback, level) {
-			const listener: TListener<GValue, ['base']> = {
+			const listener: TListener<GValue> = {
 				callback,
 				level: level ?? 0
 			};
@@ -63,7 +63,7 @@ export function createState<GValue>(
 		},
 		subscribe(callback, level) {
 			const unbind = this.listen(callback, level);
-			void callback({ state: this });
+			void callback({ value: this._value });
 			return unbind;
 		}
 	};
@@ -80,14 +80,9 @@ async function processQueue(): Promise<void> {
 
 	// Process each item in the queue sequentially
 	for (const queueItem of queueToProcess) {
-		const state = queueItem.stateRef.deref();
-		if (state != null) {
-			await queueItem.callback({
-				state,
-				data: queueItem.data
-			});
-		} else {
-			console.warn('Reference to State was dropped before listener could be called!');
-		}
+		await queueItem.callback({
+			value: queueItem.value,
+			data: queueItem.data
+		});
 	}
 }

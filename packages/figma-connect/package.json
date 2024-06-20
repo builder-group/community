@@ -11,6 +11,7 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"update:latest": "pnpm update --latest",
+		"publish:patch": "pnpm version patch && pnpm publish --no-git-checks",
 		"size": "size-limit --why"
 	},
 	"exports": {
