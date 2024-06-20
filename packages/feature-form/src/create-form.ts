@@ -21,7 +21,8 @@ export function createForm<GFormData extends TFormData>(
 		disabled = false,
 		validateMode = 'onSubmit',
 		reValidateMode = 'onBlur',
-		onSubmit = null
+		onSubmit = null,
+		notifyOnStatusChange = true
 	} = config;
 
 	const form: TForm<GFormData, ['base']> = {
@@ -42,7 +43,8 @@ export function createForm<GFormData extends TFormData>(
 						collectErrorMode: field.collectErrorMode ?? collectErrorMode,
 						validateMode: field.validateMode ?? validateMode,
 						reValidateMode: field.reValidateMode ?? reValidateMode,
-						editable: field.editable ?? true
+						editable: field.editable ?? true,
+						notifyOnStatusChange
 					})
 				]
 			)
@@ -146,6 +148,10 @@ export interface TCreateFormConfig<GFormData extends TFormData>
 	 * Validation strategy before submitting.
 	 */
 	reValidateMode?: TFormFieldReValidateMode;
+	/**
+	 * Whether to notify the form field if its status has changed
+	 */
+	notifyOnStatusChange?: boolean;
 }
 
 export type TCreateFormConfigFormFields<GFormData extends TFormData> = {

@@ -10,8 +10,10 @@ export function useForm<GFormData extends TFormData>(
 	React.useEffect(() => {
 		const unbindCallbacks: (() => void)[] = [];
 		for (const formField of Object.values(form.fields) as TFormField<unknown>[]) {
-			const unbind = formField.listen(() => {
-				forceRender();
+			const unbind = formField.listen(({ data }) => {
+				if (!(hasProperty(data, 'background') && data.background)) {
+					forceRender();
+				}
 			});
 			unbindCallbacks.push(unbind);
 		}
@@ -30,7 +32,9 @@ export function useForm<GFormData extends TFormData>(
 				name: formField.key,
 				defaultValue: formField._intialValue,
 				value: controlled ? formField._value : undefined,
-				onBlur: formField.blur,
+				onBlur: () => {
+					formField.blur();
+				},
 				onChange(event) {
 					if (hasProperty(event.target, 'value')) {
 						formField.set(event.target.value as any, {
@@ -42,7 +46,9 @@ export function useForm<GFormData extends TFormData>(
 				}
 			};
 		},
-		submit: form.submit,
+		submit: () => {
+			return form.submit();
+		},
 		field(formFieldKey) {
 			return form.getField(formFieldKey);
 		},
