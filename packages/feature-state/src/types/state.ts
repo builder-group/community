@@ -65,12 +65,19 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 } & TSelectFeatures<GValue, GSelectedFeatureKeys>;
 
 export type TListenerCallback<GValue> = (
-	props: TListenerCallbackProps<GValue>
+	data: TListenerCallbackData<GValue>
 ) => Promise<void> | void;
 
-export interface TListenerCallbackProps<GValue> {
+// TODO: Reference state or just value?
+// https://stackoverflow.com/questions/78645591/best-practices-for-managing-object-references-in-callbacks-javascript
+export interface TListenerCallbackData<GValue> extends TAdditionalListenerCallbackData {
 	value: Readonly<GValue>;
-	data?: TListenerData;
+}
+
+export interface TAdditionalListenerCallbackData {
+	[key: string]: unknown;
+	source?: string;
+	background?: boolean;
 }
 
 export interface TListener<GValue> {
@@ -79,22 +86,13 @@ export interface TListener<GValue> {
 	callback: TListenerCallback<GValue>;
 }
 
-interface TListenerData {
-	[key: string]: unknown;
-	source?: string;
-	background?: boolean;
-}
-
-// TODO: Reference state or just value?
-// https://stackoverflow.com/questions/78645591/best-practices-for-managing-object-references-in-callbacks-javascript
 export type TListenerQueueItem<GValue = any> = {
-	value: Readonly<GValue>;
-	data?: TListenerData;
+	data: TListenerCallbackData<GValue>;
 } & TListener<GValue>;
 
 export type TStateSetOptions = TStateNotifyOptions;
 
 export interface TStateNotifyOptions {
 	processListenerQueue?: boolean;
-	listenerData?: TListenerData;
+	additionalData?: TAdditionalListenerCallbackData;
 }

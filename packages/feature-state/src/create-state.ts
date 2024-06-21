@@ -14,13 +14,12 @@ export function createState<GValue>(
 		_listeners: [],
 		_value: initialValue,
 		_notify(notifyOptions = {}) {
-			const { processListenerQueue = true, listenerData } = notifyOptions;
+			const { processListenerQueue = true, additionalData = {} } = notifyOptions;
 
 			// Push current state's listeners to the queue
 			this._listeners.forEach((listener) => {
 				GLOBAL_LISTENER_QUEUE.push({
-					value: this._value as Readonly<GValue>,
-					data: listenerData,
+					data: { ...additionalData, value: this._value as Readonly<GValue> },
 					callback: listener.callback,
 					level: listener.level
 				});
@@ -41,10 +40,11 @@ export function createState<GValue>(
 		},
 		set(newValue, setOptions = {}) {
 			if (this._value !== newValue) {
-				const { listenerData = {}, processListenerQueue = true } = setOptions;
+				const { additionalData = {}, processListenerQueue = true } = setOptions;
+				additionalData.source = additionalData.source ?? 'set';
 				this._value = newValue;
 				this._notify({
-					listenerData: { source: 'set', ...listenerData },
+					additionalData,
 					processListenerQueue
 				});
 			}
@@ -85,9 +85,6 @@ async function processQueue(): Promise<void> {
 
 	// Process each item in the queue sequentially
 	for (const queueItem of queueToProcess) {
-		await queueItem.callback({
-			value: queueItem.value,
-			data: queueItem.data
-		});
+		await queueItem.callback(queueItem.data);
 	}
 }

@@ -6,8 +6,8 @@ export function useGlobalState<GValue>(state: TState<GValue, ['base']>): Readonl
 
 	React.useEffect(() => {
 		const unbind = state.listen(
-			({ data }) => {
-				if (!data?.background) {
+			({ background }) => {
+				if (!background) {
 					forceRender();
 				}
 			},

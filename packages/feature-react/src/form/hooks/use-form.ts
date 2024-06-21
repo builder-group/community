@@ -1,4 +1,10 @@
-import { type TForm, type TFormData, type TFormField, type TFormFieldStatus } from 'feature-form';
+import {
+	type TForm,
+	type TFormData,
+	type TFormField,
+	type TFormFieldStatus,
+	type TSubmitOptions
+} from 'feature-form';
 import React, { type ChangeEventHandler, type FocusEventHandler } from 'react';
 import { hasProperty } from '@ibg/utils';
 
@@ -11,8 +17,8 @@ export function useForm<GFormData extends TFormData>(
 		const unbindCallbacks: (() => void)[] = [];
 		for (const formField of Object.values(form.fields) as TFormField<unknown>[]) {
 			const unbind = formField.listen(
-				({ data }) => {
-					if (!data?.background) {
+				({ background }) => {
+					if (!background) {
 						forceRender();
 					}
 				},
@@ -41,7 +47,7 @@ export function useForm<GFormData extends TFormData>(
 				onChange(event) {
 					if (hasProperty(event.target, 'value')) {
 						formField.set(event.target.value as any, {
-							listenerData: {
+							additionalData: {
 								background: !controlled
 							}
 						});
@@ -49,8 +55,21 @@ export function useForm<GFormData extends TFormData>(
 				}
 			};
 		},
-		submit: () => {
-			return form.submit();
+		handleSubmit: (options = {}) => {
+			const { preventDefault = true, ...submitOptions } = options;
+			return (event?: React.BaseSyntheticEvent) => {
+				if (preventDefault) {
+					event?.preventDefault();
+				}
+
+				if (submitOptions.additionalData != null) {
+					submitOptions.additionalData.event = event;
+				} else {
+					submitOptions.additionalData = { event };
+				}
+
+				return form.submit(submitOptions);
+			};
 		},
 		field(formFieldKey) {
 			return form.getField(formFieldKey);
@@ -61,14 +80,18 @@ export function useForm<GFormData extends TFormData>(
 	};
 }
 
-export interface TUseFormResponse<GFormData> {
-	submit: () => Promise<boolean>;
+export interface TUseFormResponse<GFormData extends TFormData> {
+	handleSubmit: (options?: THandleSubmitOptions<GFormData>) => () => Promise<boolean>;
 	register: <GKey extends keyof GFormData>(
 		formFieldKey: GKey,
 		controlled?: boolean
 	) => TRegisterFormFieldResponse<GKey, GFormData[GKey]>;
 	field: <GKey extends keyof GFormData>(formFieldKey: GKey) => TFormField<GFormData[GKey]>;
 	status: <GKey extends keyof GFormData>(formFieldKey: GKey) => TFormFieldStatus;
+}
+
+interface THandleSubmitOptions<GFormData extends TFormData> extends TSubmitOptions<GFormData> {
+	preventDefault?: boolean;
 }
 
 export interface TRegisterFormFieldResponse<GKey, GValue> {

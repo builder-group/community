@@ -1,6 +1,7 @@
 import { createForm, createValidator, TFormFieldValidator, valibotValidator } from 'feature-form';
 import { useForm } from 'feature-react/form';
 import { withGlobalBind } from 'feature-react/state';
+import React from 'react';
 import { maxLength, minLength, pipe, regex, string } from 'valibot';
 
 import './App.css';
@@ -60,8 +61,11 @@ const $form = withGlobalBind(
 				defaultValue: 'Female'
 			}
 		},
-		onSubmit: (data) => {
-			console.log('Submit', data);
+		onValidSubmit: (data, additionalData) => {
+			console.log('ValidSubmit', { data, additionalData });
+		},
+		onInvalidSubmit: (errors, additionalData) => {
+			console.log('Invalid Submit', { errors, additionalData });
 		},
 		notifyOnStatusChange: false,
 		validateMode: 'onChange',
@@ -70,12 +74,18 @@ const $form = withGlobalBind(
 );
 
 function App() {
-	const { submit, status, field, register } = useForm($form);
+	const { handleSubmit, status, field, register } = useForm($form);
+	const [data, setData] = React.useState('');
 
 	renderCount++;
 
 	return (
-		<form>
+		<form
+			onSubmit={handleSubmit({
+				onValidSubmit: (data) => setData(JSON.stringify(data)),
+				preventDefault: true
+			})}
+		>
 			<h1>Sign Up</h1>
 
 			<label>First Name:</label>
@@ -90,7 +100,9 @@ function App() {
 			<select
 				defaultValue={''}
 				onChange={(e) =>
-					field('gender').set(e.target.value as TGender, { listenerData: { background: true } })
+					field('gender').set(e.target.value as TGender, {
+						additionalData: { background: true }
+					})
 				}
 			>
 				<option value={''}>Select...</option>
@@ -99,16 +111,10 @@ function App() {
 			</select>
 			<StatusMessage $status={status('gender')} />
 
-			<button
-				onClick={async (event) => {
-					event.preventDefault();
-					await submit();
-				}}
-			>
-				Submit
-			</button>
+			<button type="submit">Submit</button>
 			<p>Is Valid: {$form.isValid.toString()}</p>
 			<p>Render Count: {renderCount}</p>
+			<p>Data {data}</p>
 		</form>
 	);
 }

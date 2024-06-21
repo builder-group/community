@@ -30,7 +30,7 @@ export function createFormField<GValue>(
 	if (notifyOnStatusChange) {
 		status.listen(
 			() => {
-				formFieldState._notify({ listenerData: { source: 'status' } });
+				formFieldState._notify({ additionalData: { source: 'status' } });
 			},
 			{ key: 'form-field' }
 		);
@@ -44,15 +44,17 @@ export function createFormField<GValue>(
 			collectErrorMode
 		},
 		_intialValue: deepCopy(formFieldState._value),
-		_validator: validator,
 		key,
-		isValid: false,
 		isTouched: false,
 		isSubmitted: false,
+		isSubmitting: false,
+		validator,
 		status,
 		async validate(this: TFormField<GValue>) {
-			this.isValid = await this._validator.validate(this);
-			return this.isValid;
+			return this.validator.validate(this);
+		},
+		isValid(this: TFormField<GValue>) {
+			return this.status.get().type === 'VALID';
 		},
 		blur(this: TFormField<GValue>) {
 			if (
@@ -70,7 +72,7 @@ export function createFormField<GValue>(
 			this.set(this._intialValue);
 			this.isTouched = false;
 			this.isSubmitted = false;
-			this.isValid = false;
+			this.isSubmitting = false;
 			this.status.set({ type: 'UNVALIDATED' });
 		}
 	};

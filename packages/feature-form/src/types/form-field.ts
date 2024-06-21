@@ -7,13 +7,14 @@ export type TFormField<GValue> = TState<GValue | undefined, ['base', 'form-field
 export interface TFormFieldStateFeature<GValue> {
 	_config: TFormFieldStateConfig;
 	_intialValue: GValue | undefined;
-	_validator: TFormFieldValidator<GValue>;
 	key: string;
-	isValid: boolean;
 	isTouched: boolean;
 	isSubmitted: boolean;
+	isSubmitting: boolean;
+	validator: TFormFieldValidator<GValue>;
 	status: TFormFieldStatus;
 	validate: () => Promise<boolean>;
+	isValid: () => boolean;
 	blur: () => void;
 	reset: () => void;
 }
@@ -51,9 +52,11 @@ export interface TInvalidFormFieldStatus {
 	type: 'INVALID';
 	errors: TInvalidFormFieldError[];
 }
+
 export interface TValidFormFieldStatus {
 	type: 'VALID';
 }
+
 export interface TUnvalidatedFormFieldStatus {
 	type: 'UNVALIDATED';
 }
