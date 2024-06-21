@@ -5,8 +5,9 @@ import {
 	type TFormFieldStatus,
 	type TSubmitOptions
 } from 'feature-form';
-import React, { type ChangeEventHandler, type FocusEventHandler } from 'react';
-import { hasProperty } from '@ibg/utils';
+import React from 'react';
+
+import { registerFormField, type TRegisterFormFieldResponse } from '../register-form-field';
 
 export function useForm<GFormData extends TFormData>(
 	form: TForm<GFormData, ['base']>
@@ -34,26 +35,8 @@ export function useForm<GFormData extends TFormData>(
 	}, [form.fields]);
 
 	return {
-		register(formFieldKey, controlled = false) {
-			const formField = form.getField(formFieldKey);
-
-			return {
-				name: formField.key,
-				defaultValue: formField._intialValue,
-				value: controlled ? formField._value : undefined,
-				onBlur: () => {
-					formField.blur();
-				},
-				onChange(event) {
-					if (hasProperty(event.target, 'value')) {
-						formField.set(event.target.value as any, {
-							additionalData: {
-								background: !controlled
-							}
-						});
-					}
-				}
-			};
+		register<GKey extends keyof GFormData>(formFieldKey: GKey, controlled = false) {
+			return registerFormField<GFormData[GKey], GKey>(form.getField(formFieldKey), controlled);
 		},
 		handleSubmit: (options = {}) => {
 			const { preventDefault = true, ...submitOptions } = options;
@@ -92,12 +75,4 @@ export interface TUseFormResponse<GFormData extends TFormData> {
 
 interface THandleSubmitOptions<GFormData extends TFormData> extends TSubmitOptions<GFormData> {
 	preventDefault?: boolean;
-}
-
-export interface TRegisterFormFieldResponse<GKey, GValue> {
-	defaultValue?: GValue;
-	value?: GValue;
-	name?: GKey | string;
-	onChange?: ChangeEventHandler;
-	onBlur?: FocusEventHandler;
 }
