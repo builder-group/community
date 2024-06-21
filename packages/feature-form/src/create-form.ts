@@ -1,14 +1,14 @@
-import { deepCopy, type TEntries } from '@ibg/utils';
+import { bitwiseFlag, deepCopy, type BitwiseFlag, type TEntries } from '@ibg/utils';
 
 import { createFormField } from './form-field';
 import {
+	FormFieldReValidateMode,
+	FormFieldValidateMode,
 	type TForm,
 	type TFormConfig,
 	type TFormData,
-	type TFormFieldReValidateMode,
 	type TFormFields,
 	type TFormFieldStateConfig,
-	type TFormFieldValidateMode,
 	type TFormFieldValidator,
 	type TInvalidFormFieldError,
 	type TInvalidFormFieldErrors,
@@ -23,8 +23,8 @@ export function createForm<GFormData extends TFormData>(
 		fields,
 		collectErrorMode = 'firstError',
 		disabled = false,
-		validateMode = 'onSubmit',
-		reValidateMode = 'onBlur',
+		validateMode = bitwiseFlag(FormFieldValidateMode.OnSubmit),
+		reValidateMode = bitwiseFlag(FormFieldReValidateMode.OnBlur),
 		onValidSubmit,
 		onInvalidSubmit,
 		notifyOnStatusChange = true
@@ -86,8 +86,10 @@ export function createForm<GFormData extends TFormData>(
 				this.fields
 			) as TFormFields<GFormData>[keyof GFormData][]) {
 				if (
-					(formField.isSubmitted && formField._config.reValidateMode === 'onSubmit') ||
-					(!formField.isSubmitted && formField._config.validateMode === 'onSubmit')
+					(formField.isSubmitted &&
+						formField._config.reValidateMode.has(FormFieldReValidateMode.OnSubmit)) ||
+					(!formField.isSubmitted &&
+						formField._config.validateMode.has(FormFieldValidateMode.OnSubmit))
 				) {
 					validationPromises.push(formField.validate());
 				}
@@ -196,9 +198,11 @@ export function createForm<GFormData extends TFormData>(
 			async ({ source }) => {
 				if (source === 'set') {
 					if (
-						(field.isSubmitted && field._config.reValidateMode === 'onChange') ||
-						(!field.isSubmitted && field._config.validateMode === 'onChange') ||
-						(field._config.validateMode === 'onTouched' && field.isTouched)
+						(field.isSubmitted &&
+							field._config.reValidateMode.has(FormFieldReValidateMode.OnChange)) ||
+						(!field.isSubmitted &&
+							field._config.validateMode.has(FormFieldValidateMode.OnChange)) ||
+						(field._config.validateMode.has(FormFieldValidateMode.OnTouched) && field.isTouched)
 					) {
 						await field.validate();
 					}
@@ -225,11 +229,11 @@ export interface TCreateFormConfig<GFormData extends TFormData> extends Partial<
 	/**
 	 * Validation strategy after submitting.
 	 */
-	validateMode?: TFormFieldValidateMode;
+	validateMode?: BitwiseFlag<FormFieldValidateMode>;
 	/**
 	 * Validation strategy before submitting.
 	 */
-	reValidateMode?: TFormFieldReValidateMode;
+	reValidateMode?: BitwiseFlag<FormFieldReValidateMode>;
 	/**
 	 * Whether to notify the form field if its status has changed
 	 */

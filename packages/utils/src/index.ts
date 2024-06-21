@@ -1,3 +1,4 @@
+export * from './BitwiseFlag';
 export * from './ContinuousId';
 export * from './apply-mat3-to-point';
 export * from './array-to-mat3';

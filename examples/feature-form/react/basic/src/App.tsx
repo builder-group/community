@@ -1,4 +1,12 @@
-import { createForm, createValidator, TFormFieldValidator, valibotValidator } from 'feature-form';
+import {
+	bitwiseFlag,
+	createForm,
+	createValidator,
+	FormFieldReValidateMode,
+	FormFieldValidateMode,
+	TFormFieldValidator,
+	valibotValidator
+} from 'feature-form';
 import { useForm } from 'feature-react/form';
 import { withGlobalBind } from 'feature-react/state';
 import React from 'react';
@@ -68,8 +76,8 @@ const $form = withGlobalBind(
 			console.log('Invalid Submit', { errors, additionalData });
 		},
 		notifyOnStatusChange: false,
-		validateMode: 'onChange',
-		reValidateMode: 'onChange'
+		validateMode: bitwiseFlag(FormFieldValidateMode.OnChange, FormFieldValidateMode.OnSubmit),
+		reValidateMode: bitwiseFlag(FormFieldReValidateMode.OnChange)
 	})
 );
 

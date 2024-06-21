@@ -1,5 +1,6 @@
 import type { TFormFieldStateFeature, TFormFielStatusStateFeature } from './types';
 
+export { BitwiseFlag, bitwiseFlag } from '@ibg/utils';
 export * from './create-form';
 export * from './form-field';
 export * from './types';

@@ -46,7 +46,12 @@
 	],
 	"size-limit": [
 		{
-			"path": "dist/esm/index.js"
+			"path": "dist/esm/index.js",
+			"ignore": [
+				"zod",
+				"yup",
+				"valibot"
+			]
 		}
 	]
 }

@@ -1,7 +1,9 @@
 import { createState } from 'feature-state';
-import { deepCopy } from '@ibg/utils';
+import { bitwiseFlag, deepCopy } from '@ibg/utils';
 
 import {
+	FormFieldReValidateMode,
+	FormFieldValidateMode,
 	type TFormField,
 	type TFormFieldStateConfig,
 	type TFormFieldStateFeature,
@@ -17,8 +19,8 @@ export function createFormField<GValue>(
 		key,
 		validator,
 		editable = true,
-		reValidateMode = 'onBlur',
-		validateMode = 'onSubmit',
+		reValidateMode = bitwiseFlag(FormFieldReValidateMode.OnBlur),
+		validateMode = bitwiseFlag(FormFieldValidateMode.OnSubmit),
 		collectErrorMode = 'firstError',
 		notifyOnStatusChange = true
 	} = config;
@@ -58,10 +60,10 @@ export function createFormField<GValue>(
 		},
 		blur(this: TFormField<GValue>) {
 			if (
-				(this.isSubmitted && this._config.reValidateMode === 'onBlur') ||
+				(this.isSubmitted && this._config.reValidateMode.has(FormFieldReValidateMode.OnBlur)) ||
 				(!this.isSubmitted &&
-					(this._config.validateMode === 'onBlur' ||
-						(this._config.validateMode === 'onTouched' && !this.isTouched)))
+					(this._config.validateMode.has(FormFieldValidateMode.OnBlur) ||
+						(this._config.validateMode.has(FormFieldValidateMode.OnTouched) && !this.isTouched)))
 			) {
 				void this.validate();
 			}
