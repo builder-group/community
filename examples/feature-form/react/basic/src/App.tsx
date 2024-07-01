@@ -54,8 +54,8 @@ const $form = withGlobalBind(
 							validate: (formField) => {
 								if (formField.get()?.includes('Jeff')) {
 									formField.status.registerNextError({
-										code: 'jeff-not-allowed',
-										message: 'Jeff is not allowed!'
+										code: 'jeff-not-last-name',
+										message: 'Jeff is not a last name!'
 									});
 								}
 							}
