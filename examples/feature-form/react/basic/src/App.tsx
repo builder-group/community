@@ -5,12 +5,14 @@ import {
 	FormFieldReValidateMode,
 	FormFieldValidateMode,
 	TFormFieldValidator,
-	valibotValidator
+	valibotValidator,
+	zodValidator
 } from 'feature-form';
 import { useForm } from 'feature-react/form';
 import { withGlobalBind } from 'feature-react/state';
 import React from 'react';
-import { maxLength, minLength, pipe, regex, string } from 'valibot';
+import * as v from 'valibot';
+import * as z from 'zod';
 
 import './App.css';
 
@@ -24,7 +26,7 @@ type TFormData = {
 	lastName: string;
 	gender: TGender;
 	// userName: string;
-	// email: string;
+	email: string;
 	// aboutYou: string;
 	// image: {
 	// 	id: string;
@@ -32,9 +34,19 @@ type TFormData = {
 	// };
 };
 
-const nameValidator = valibotValidator(
-	pipe(string(), minLength(2), maxLength(10), regex(/^([^0-9]*)$/))
+const valibotNameValidator = valibotValidator(
+	v.pipe(v.string(), v.minLength(2), v.maxLength(10), v.regex(/^([^0-9]*)$/))
 );
+
+const zodNameValidator = zodValidator(
+	z
+		.string()
+		.min(2)
+		.max(10)
+		.regex(/^([^0-9]*)$/)
+);
+
+const zodEmailValidator = zodValidator(z.string().email().max(30).min(1));
 
 let renderCount = 0;
 
@@ -43,11 +55,11 @@ const $form = withGlobalBind(
 	createForm<TFormData>({
 		fields: {
 			firstName: {
-				validator: nameValidator,
+				validator: zodNameValidator,
 				defaultValue: ''
 			},
 			lastName: {
-				validator: nameValidator.clone().append(
+				validator: valibotNameValidator.clone().append(
 					createValidator([
 						{
 							key: 'jeff',
@@ -65,8 +77,12 @@ const $form = withGlobalBind(
 				defaultValue: ''
 			},
 			gender: {
-				validator: valibotValidator(string()) as TFormFieldValidator<'Male' | 'Female'>,
+				validator: valibotValidator(v.string()) as TFormFieldValidator<'Male' | 'Female'>,
 				defaultValue: 'Female'
+			},
+			email: {
+				validator: zodEmailValidator,
+				defaultValue: ''
 			}
 		},
 		onValidSubmit: (data, additionalData) => {
@@ -76,8 +92,8 @@ const $form = withGlobalBind(
 			console.log('Invalid Submit', { errors, additionalData });
 		},
 		notifyOnStatusChange: false,
-		validateMode: bitwiseFlag(FormFieldValidateMode.OnChange, FormFieldValidateMode.OnSubmit),
-		reValidateMode: bitwiseFlag(FormFieldReValidateMode.OnChange)
+		validateMode: bitwiseFlag(FormFieldValidateMode.OnSubmit, FormFieldValidateMode.OnChange),
+		reValidateMode: bitwiseFlag(FormFieldReValidateMode.OnBlur, FormFieldReValidateMode.OnChange)
 	})
 );
 
@@ -118,6 +134,10 @@ function App() {
 				<option value="female">Female</option>
 			</select>
 			<StatusMessage $status={status('gender')} />
+
+			<label>Email:</label>
+			<input {...register('email')} />
+			<StatusMessage $status={status('email')} />
 
 			<button type="submit">Submit</button>
 			<p>Is Valid: {$form.isValid.toString()}</p>

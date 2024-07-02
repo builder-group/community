@@ -74,6 +74,9 @@ importers:
       valibot:
         specifier: ^0.35.0
         version: 0.35.0
+      zod:
+        specifier: ^3.23.8
+        version: 3.23.8
     devDependencies:
       '@types/react':
         specifier: ^18.2.66
