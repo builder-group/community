@@ -28,9 +28,15 @@ async function bundleSize(command: DynCommand): Promise<Plugin> {
 							chalk.underline(options.name)
 						)} (${chalk.blue(options.format)}):`
 					);
-					command.log(`  - Original Size: ${chalk.green(chalk.underline(`${originalSize}`))}`);
-					command.log(`  - Minified Size: ${chalk.green(chalk.underline(`${minifiedSize}`))}`);
-					command.log(`  - Gzipped Size: ${chalk.green(chalk.underline(`${compressedSize}`))}`);
+					command.log(
+						`  - Original Size: ${chalk.green(chalk.underline(originalSize?.toString()))}`
+					);
+					command.log(
+						`  - Minified Size: ${chalk.green(chalk.underline(minifiedSize?.toString()))}`
+					);
+					command.log(
+						`  - Gzipped Size: ${chalk.green(chalk.underline(compressedSize?.toString()))}`
+					);
 				}
 			}
 		},
@@ -42,7 +48,7 @@ async function bundleSize(command: DynCommand): Promise<Plugin> {
 				command.log(
 					`Created directory for ${chalk.magenta(chalk.underline(options.name))} (${chalk.blue(
 						options.format
-					)}): ${chalk.green(chalk.underline(`${dirSize} bytes`))}`
+					)}): ${chalk.green(chalk.underline(`${dirSize.toString()} bytes`))}`
 				);
 			}
 		}

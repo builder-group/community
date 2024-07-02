@@ -1,3 +1,5 @@
+# https://pnpm.io/pnpm-workspace_yaml
 packages:
   - "apps/*"
   - "packages/*"
+  - "examples/**"

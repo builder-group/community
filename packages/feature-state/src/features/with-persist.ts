@@ -2,19 +2,28 @@ import type { TEnforceFeatures, TFeatureKeys, TSelectFeatures, TState } from '..
 
 export const FAILED_TO_LOAD_IDENTIFIER = undefined;
 
-export interface StorageInterface<GValue> {
-	save: (key: string, value: GValue) => Promise<boolean>;
-	load: (key: string) => Promise<GValue | typeof FAILED_TO_LOAD_IDENTIFIER>;
-	delete: (key: string) => Promise<boolean>;
+export interface StorageInterface<GStorageValue> {
+	save: (key: string, value: GStorageValue) => Promise<boolean> | boolean;
+	load: (
+		key: string
+	) =>
+		| Promise<GStorageValue | typeof FAILED_TO_LOAD_IDENTIFIER>
+		| GStorageValue
+		| typeof FAILED_TO_LOAD_IDENTIFIER;
+	delete: (key: string) => Promise<boolean> | boolean;
 }
 
-export function withPersist<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]>(
+export function withPersist<
+	GValue,
+	GSelectedFeatureKeys extends TFeatureKeys<GValue>[],
+	// TODO: For whatever reason Typescript infers type from storage and not state argument
+	// thus I need this extra GStorageValue
+	GStorageValue extends GValue = GValue
+>(
 	state: TState<GValue, TEnforceFeatures<GSelectedFeatureKeys, ['base']>>,
-	storage: StorageInterface<GValue>,
+	storage: StorageInterface<GStorageValue>,
 	key: string
 ): TState<GValue, [...GSelectedFeatureKeys, 'persist']> {
-	state._features.push('persist');
-
 	const persistFeature: TSelectFeatures<GValue, ['persist']> = {
 		async persist() {
 			let success = false;
@@ -25,20 +34,16 @@ export function withPersist<GValue, GSelectedFeatureKeys extends TFeatureKeys<GV
 				state.set(persistedValue);
 				success = true;
 			} else {
-				success = await storage.save(key, state._value);
+				success = await storage.save(key, state._value as GStorageValue);
 			}
 
 			// Setup listener
-			state.listen((value) => {
-				storage
-					.save(key, value)
-					.then(() => {
-						/* do nothing*/
-					})
-					.catch(() => {
-						/* do nothing*/
-					});
-			});
+			state.listen(
+				async ({ value }) => {
+					await storage.save(key, value as GStorageValue);
+				},
+				{ key: 'with-persist' }
+			);
 
 			return success;
 		},
@@ -48,7 +53,11 @@ export function withPersist<GValue, GSelectedFeatureKeys extends TFeatureKeys<GV
 	};
 
 	// Merge existing features from the state with the new persist feature
-	const _state = Object.assign(state, persistFeature);
+	const _state = Object.assign(state, persistFeature) as TState<
+		GValue,
+		[...GSelectedFeatureKeys, 'persist']
+	>;
+	_state._features.push('persist');
 
-	return _state as TState<GValue, [...GSelectedFeatureKeys, 'persist']>;
+	return _state;
 }

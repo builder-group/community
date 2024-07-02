@@ -1,11 +1,13 @@
-import type { TPrimitive } from '@ibg/utils';
-
 import type { TFeatureKeys, TSelectFeatures } from './features';
 
 export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> = {
 	_features: string[];
 	_value: GValue;
 	_listeners: TListener<GValue>[];
+	/**
+	 * Triggers all registered listeners to run with the current state value.
+	 */
+	_notify: (options?: TStateNotifyOptions) => void;
 	/**
 	 * Retrieves the current state value.
 	 *
@@ -16,7 +18,7 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	 *
 	 * @returns The current state value of type `GValue`.
 	 */
-	get: () => GValue;
+	get: () => Readonly<GValue>;
 	/**
 	 * Updates the state value.
 	 *
@@ -27,7 +29,7 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	 *
 	 * @param newValue - The new value to set for the state, of type `GValue`.
 	 */
-	set: (newValue: GValue) => void;
+	set: (newValue: GValue, options?: TStateSetOptions) => void;
 	/**
 	 * Subscribes to state changes without immediately invoking the callback.
 	 * Use this to listen for changes that occur after the subscription.
@@ -36,7 +38,10 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	 * @param level - Optional parameter to specify the listener's priority level.
 	 * @returns A function that, when called, will unsubscribe the listener.
 	 */
-	listen: (callback: TListenerCallback<GValue>, level?: number) => () => void;
+	listen: (
+		callback: TListenerCallback<GValue>,
+		options?: Partial<Omit<TListener<GValue>, 'callback'>>
+	) => () => void;
 	/**
 	 * Subscribes to state changes and invokes the callback immediately with the current state value.
 	 *
@@ -53,27 +58,41 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	 * @param level - Optional parameter to specify the listener's priority level.
 	 * @returns A function that, when called, will unsubscribe the listener.
 	 */
-	subscribe: (callback: TListenerCallback<GValue>, level?: number) => () => void;
-	/**
-	 * Triggers all registered listeners to run with the current state value.
-	 */
-	_notify: (process: boolean) => void;
+	subscribe: (
+		callback: TListenerCallback<GValue>,
+		options?: Partial<Omit<TListener<GValue>, 'callback'>>
+	) => () => void;
 } & TSelectFeatures<GValue, GSelectedFeatureKeys>;
 
-type TListenerCallback<GValue> = (value: TReadonlyIfObject<GValue>) => void;
-export interface TListener<GValue> {
-	callback: TListenerCallback<GValue>;
-	level: number;
+export type TListenerCallback<GValue> = (
+	data: TListenerCallbackData<GValue>
+) => Promise<void> | void;
+
+// TODO: Reference state or just value?
+// https://stackoverflow.com/questions/78645591/best-practices-for-managing-object-references-in-callbacks-javascript
+export interface TListenerCallbackData<GValue> extends TAdditionalListenerCallbackData {
+	value: Readonly<GValue>;
 }
 
-export type TListenerQueueItem<GValue = unknown> = { value: GValue } & TListener<GValue>;
+export interface TAdditionalListenerCallbackData {
+	[key: string]: unknown;
+	source?: string;
+	background?: boolean;
+}
 
-export type TReadonlyIfObject<GValue> = GValue extends undefined
-	? GValue
-	: GValue extends (...args: any) => any
-		? GValue
-		: GValue extends TPrimitive
-			? GValue
-			: GValue extends object
-				? Readonly<GValue>
-				: GValue;
+export interface TListener<GValue> {
+	key?: string;
+	level: number;
+	callback: TListenerCallback<GValue>;
+}
+
+export type TListenerQueueItem<GValue = any> = {
+	data: TListenerCallbackData<GValue>;
+} & TListener<GValue>;
+
+export type TStateSetOptions = TStateNotifyOptions;
+
+export interface TStateNotifyOptions {
+	processListenerQueue?: boolean;
+	additionalData?: TAdditionalListenerCallbackData;
+}

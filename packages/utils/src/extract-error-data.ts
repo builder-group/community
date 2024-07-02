@@ -4,7 +4,7 @@
  * @param error - The error to extract data from.
  * @returns An object containing the error (if applicable) and its message.
  */
-export function extractErrorData(error: unknown) {
+export function extractErrorData(error: unknown): { error: Error | null; message: string } {
 	if (error instanceof Error) {
 		return { error, message: error.message };
 	}

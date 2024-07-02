@@ -1,4 +1,4 @@
-import { TEnforceFeatures, TFeatureKeys, TLogger } from '../types';
+import { type TEnforceFeatures, type TFeatureKeys, type TLogger } from '../types';
 
 export function withPrefix<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	logger: TLogger<TEnforceFeatures<GSelectedFeatureKeys, ['base']>>,
@@ -12,5 +12,5 @@ export function withPrefix<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		};
 	});
 
-	return logger as TLogger<['prefix', ...GSelectedFeatureKeys]>;
+	return logger;
 }

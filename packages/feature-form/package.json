@@ -1,7 +1,7 @@
 {
-	"name": "feature-state-react",
-	"description": "ReactJs extension features for feature-state",
-	"version": "0.0.7",
+	"name": "feature-form",
+	"description": "Straightforward, typesafe, and feature-based form library for ReactJs",
+	"version": "0.0.6",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
@@ -11,6 +11,7 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks",
 		"size": "size-limit --why"
 	},
 	"source": "./src/index.ts",
@@ -27,18 +28,17 @@
 	"bugs": {
 		"url": "https://github.com/inbeta-group/monorepo/issues"
 	},
-	"homepage": "https://inbeta.group/?source=package-json",
+	"homepage": "https://inbeta.group/?source=github",
 	"dependencies": {
+		"@ibg/utils": "workspace:*",
 		"feature-state": "workspace:*"
-	},
-	"peerDependencies": {
-		"react": "^18.2.0"
 	},
 	"devDependencies": {
 		"@ibg/config": "workspace:*",
 		"@types/node": "^20.14.1",
-		"@types/react": "^18.3.3",
-		"react": "^18.3.1"
+		"valibot": "^0.35.0",
+		"yup": "^1.4.0",
+		"zod": "^3.23.8"
 	},
 	"files": [
 		"dist",
@@ -46,7 +46,12 @@
 	],
 	"size-limit": [
 		{
-			"path": "dist/esm/index.js"
+			"path": "dist/esm/index.js",
+			"ignore": [
+				"zod",
+				"yup",
+				"valibot"
+			]
 		}
 	]
 }

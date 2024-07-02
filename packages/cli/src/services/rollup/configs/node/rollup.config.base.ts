@@ -64,7 +64,7 @@ export async function createBaseRollupConfig(
 								return dependencies
 									.map(
 										(dependency) =>
-											`${dependency.license} -- ${dependency.name}:${dependency.version}`
+											`${dependency.license?.toString() ?? '_'} -- ${dependency.name?.toString() ?? '_'}:${dependency.version?.toString() ?? '_'}`
 									)
 									.join('\n');
 							}

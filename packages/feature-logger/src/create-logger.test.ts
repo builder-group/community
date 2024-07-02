@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { mockConsole, restoreConsoleMock, TConsoleSpies } from './__tests__/mock-console';
+import { mockConsole, restoreConsoleMock, type TConsoleSpies } from './__tests__/mock-console';
 import { createLogger, LOG_LEVEL } from './create-logger';
-import { TLoggerMiddleware } from './types';
+import { type TLoggerMiddleware } from './types';
 
 describe('createLogger function', () => {
 	const consoleSpies: TConsoleSpies = {};

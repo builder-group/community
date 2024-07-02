@@ -47,7 +47,7 @@ export function getJsonFunctionExecutionEnv(jsonFunction: TJsonFunction): TJsonF
 
 	// Extract all identifiers from the body
 	const identifierRegex = /\b[a-zA-Z_$][a-zA-Z0-9_$]*\b/g;
-	const identifiers = body.match(identifierRegex) || [];
+	const identifiers = body.match(identifierRegex) ?? [];
 
 	for (const identifier of identifiers) {
 		if (!KEYWORDS_AND_BUILTINS_WHITELIST.has(identifier) && !args.includes(identifier)) {

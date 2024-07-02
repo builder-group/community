@@ -8,17 +8,15 @@ import {
 } from 'feature-state';
 
 class LocalStorageInterface<GValue> implements StorageInterface<GValue> {
-	async save(key: string, value: GValue): Promise<boolean> {
+	save(key: string, value: GValue): boolean {
 		localStorage.setItem(key, JSON.stringify(value));
 		return true;
 	}
-
-	async load(key: string): Promise<GValue | typeof FAILED_TO_LOAD_IDENTIFIER> {
+	load(key: string): GValue | typeof FAILED_TO_LOAD_IDENTIFIER {
 		const item = localStorage.getItem(key);
 		return item ? (JSON.parse(item) as GValue) : FAILED_TO_LOAD_IDENTIFIER;
 	}
-
-	async delete(key: string): Promise<boolean> {
+	delete(key: string): boolean {
 		localStorage.removeItem(key);
 		return true;
 	}

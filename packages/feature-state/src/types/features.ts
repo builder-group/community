@@ -1,17 +1,19 @@
 import type { TUnionToIntersection } from '@ibg/utils';
 
+import { type TStateSetOptions } from './state';
+
 export type TFeatures<GValue = unknown> = {
 	base: { _: null }; // TODO: Placeholder Feature: Figure out how to make the TS infer work with [] (empty array -> no feature)
-	undo: { undo: () => void; _history: GValue[] };
+	undo: { undo: (options?: TStateSetOptions) => void; _history: GValue[] };
 	multiundo: {
 		multiUndo: (count: number) => void;
 	};
 	persist: { persist: () => Promise<boolean>; deletePersisted: () => Promise<boolean> };
-} & TThirdPartyFeatures;
+} & TThirdPartyFeatures<GValue>;
 
 // Global registry for third party features
 // eslint-disable-next-line @typescript-eslint/no-empty-interface -- Overwritten by third party libraries
-export interface TThirdPartyFeatures {}
+export interface TThirdPartyFeatures<GValue> {}
 
 export type TFeatureKeys<GValue = unknown> = keyof TFeatures<GValue>;
 
@@ -32,6 +34,6 @@ export type TEnforceFeatures<
 	GFeatureKeys extends TFeatureKeys[],
 	GToEnforceFeatureKeys extends TFeatureKeys[]
 > =
-	Exclude<GToEnforceFeatureKeys, GFeatureKeys> extends never
+	Exclude<GToEnforceFeatureKeys[number], GFeatureKeys[number]> extends never
 		? GFeatureKeys
-		: GFeatureKeys | Exclude<GToEnforceFeatureKeys, GFeatureKeys>;
+		: GFeatureKeys | GToEnforceFeatureKeys;

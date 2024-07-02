@@ -1,3 +1,4 @@
+export * from './BitwiseFlag';
 export * from './ContinuousId';
 export * from './apply-mat3-to-point';
 export * from './array-to-mat3';
@@ -7,6 +8,7 @@ export * from './deep-replace-var';
 export * from './define-config';
 export * from './extract-error-data';
 export * from './extract-start-end-point-from-mat3';
+export * from './has-property';
 export * from './hex-to-rgb';
 export * from './inverse-mat3';
 export * from './is-hex-color';

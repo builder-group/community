@@ -1,4 +1,4 @@
-import { MockInstance, vi } from 'vitest';
+import { type MockInstance, vi } from 'vitest';
 
 export function mockConsole(spyOnMethods: TConsoleMethod[], consoleSpies: TConsoleSpies) {
 	spyOnMethods.forEach((type) => {

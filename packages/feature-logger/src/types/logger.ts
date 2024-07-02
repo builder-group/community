@@ -1,10 +1,10 @@
-import { TFeatureKeys, TSelectFeatures } from './features';
+import { type TFeatureKeys, type TSelectFeatures } from './features';
 
 export type TLogger<GSelectedFeatureKeys extends TFeatureKeys[]> = {
 	_features: string[];
 	_config: TLoggerConfig;
 	_invokeConsole: TInvokeConsole;
-	_baseLog(category: TLoggerCategory, data: unknown[]): void;
+	_baseLog: (category: TLoggerCategory, data: unknown[]) => void;
 	trace: (message?: unknown, ...optionalParams: unknown[]) => void;
 	log: (message?: unknown, ...optionalParams: unknown[]) => void;
 	info: (message?: unknown, ...optionalParams: unknown[]) => void;

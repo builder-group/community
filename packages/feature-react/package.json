@@ -1,0 +1,78 @@
+{
+	"name": "feature-react",
+	"description": "ReactJs extension features for feature-state",
+	"version": "0.0.13",
+	"private": false,
+	"scripts": {
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"start:dev": "tsc -w",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks",
+		"size": "size-limit --why"
+	},
+	"exports": {
+		"./state": {
+			"source": "./src/state/index.ts",
+			"require": "./dist/state/cjs/index.js",
+			"import": "./dist/state/esm/index.js",
+			"types": "./dist/types/state/index.d.ts"
+		},
+		"./form": {
+			"source": "./src/form/index.ts",
+			"require": "./dist/form/cjs/index.js",
+			"import": "./dist/form/esm/index.js",
+			"types": "./dist/types/form/index.d.ts"
+		}
+	},
+	"typesVersions": {
+		"*": {
+			"state": [
+				"./dist/types/state/index.d.ts"
+			],
+			"form": [
+				"./dist/types/form/index.d.ts"
+			]
+		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/inbeta-group/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/inbeta-group/monorepo/issues"
+	},
+	"homepage": "https://inbeta.group/?source=package-json",
+	"dependencies": {
+		"@ibg/utils": "workspace:*",
+		"feature-form": "workspace:*",
+		"feature-state": "workspace:*"
+	},
+	"peerDependencies": {
+		"react": "^18.2.0"
+	},
+	"devDependencies": {
+		"@ibg/config": "workspace:*",
+		"@types/node": "^20.14.1",
+		"@types/react": "^18.3.3",
+		"react": "^18.3.1"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"size-limit": [
+		{
+			"path": "dist/state/esm/index.js"
+		},
+		{
+			"path": "dist/form/esm/index.js"
+		}
+	]
+}

@@ -1,11 +1,7 @@
-import { TInvokeConsole, TLogger, TLoggerConfig, TLoggerOptions, TLogMethod } from './types';
+import { type TInvokeConsole, type TLogger, type TLoggerOptions, type TLogMethod } from './types';
 
 export function createLogger(options: TLoggerOptions = {}): TLogger<['base']> {
-	const config: TLoggerConfig = {
-		active: options.active ?? true,
-		level: options.level ?? 0,
-		middlewares: options.middlewares ?? []
-	};
+	const { active = true, level = 0, middlewares = [] } = options;
 
 	let invokeConsole: TInvokeConsole;
 	if (typeof options.invokeConsole === 'function') {
@@ -19,7 +15,11 @@ export function createLogger(options: TLoggerOptions = {}): TLogger<['base']> {
 	return {
 		_: null,
 		_features: ['base'],
-		_config: config,
+		_config: {
+			active,
+			level,
+			middlewares
+		},
 		_invokeConsole: invokeConsole,
 		_baseLog(category, data) {
 			if (this._config.active && category.level >= this._config.level) {
