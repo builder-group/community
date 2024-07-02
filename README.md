@@ -7,7 +7,7 @@
         <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
     </a>
     <a href="https://dyn.art/s/discord/?source=inbeta-group-readme">
-        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=F0E81A" alt="Join Discord"/>
+        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=F0E81A" alt="Join Discord"/>
     </a>
 </p>
 
@@ -20,6 +20,7 @@ A collection of open source libraries maintained by [inbeta.group](https://inbet
 | [cli](https://github.com/inbeta-group/monorepo/blob/develop/packages/cli) | Straightforward CLI to bundle Typescript libraries with presets, powered by Rollup and Esbuild | [`@ibg/cli`](https://www.npmjs.com/package/@ibg/cli) |
 | [config](https://github.com/inbeta-group/monorepo/blob/develop/packages/cli) | Collection of ESLint, Vite, and Typescript configurations | [`@ibg/config`](https://www.npmjs.com/package/@ibg/config) |
 | [feature-fetch](https://github.com/inbeta-group/monorepo/blob/develop/packages/feature-fetch) | Straightforward, typesafe, and feature-based fetch wrapper supporting OpenAPI types | [`feature-fetch`](https://www.npmjs.com/package/feature-fetch) |
+| [feature-form](https://github.com/inbeta-group/monorepo/blob/develop/packages/feature-form) | Straightforward, typesafe, and feature-based form library | [`feature-form`](https://www.npmjs.com/package/feature-form) |
 | [feature-logger](https://github.com/inbeta-group/monorepo/blob/develop/packages/feature-logger) | Straightforward, typesafe, and feature-based logging library | [`feature-logger`](https://www.npmjs.com/package/feature-logger) |
 | [feature-state](https://github.com/inbeta-group/monorepo/blob/develop/packages/feature-state) | Straightforward, typesafe, and feature-based state management library for ReactJs | [`feature-state`](https://www.npmjs.com/package/feature-state) |
 | [feature-state-react](https://github.com/inbeta-group/monorepo/blob/develop/packages/feature-state-react) | ReactJs extension for the feature-state library, providing hooks and features for easy state management in ReactJs | [`feature-state-react`](https://www.npmjs.com/package/feature-state-react) |
