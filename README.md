@@ -28,3 +28,14 @@ A collection of open source libraries maintained by [inbeta.group](https://inbet
 | [google-webfonts-client](https://github.com/inbeta-group/monorepo/blob/develop/packages/google-webfonts-client) | Typesafe and straightforward fetch client for interacting with the Google Web Fonts API using feature-fetch | [`google-webfonts-client`](https://www.npmjs.com/package/google-webfonts-client) |
 | [openapi-express](https://github.com/inbeta-group/monorepo/blob/develop/packages/openapi-express) | Typesafe Express Router wrapper supporting OpenAPI types | [`openapi-express`](https://www.npmjs.com/package/openapi-express) |
 | [utils](https://github.com/inbeta-group/monorepo/blob/develop/packages/utils) | Straightforward, typesafe, and tree-shakable collection of utility functions | [`@ibg/utils`](https://www.npmjs.com/package/@ibg/utils) |
+
+## 👀 Examples
+
+> See [`/examples`](https://github.com/inbeta-group/monorepo/tree/develop/examples)
+
+### `feature-state`
+- [`feature-state/react/counter`](https://github.com/inbeta-group/monorepo/tree/develop/examples/feature-state/react/counter)
+
+### `feature-form`
+- [`feature-form/react/basic`](https://github.com/inbeta-group/monorepo/tree/develop/examples/feature-form/react/basic)
+

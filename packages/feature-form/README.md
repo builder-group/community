@@ -28,7 +28,7 @@
 - **Standalone**: Zero external dependencies, ensuring ease of use in various environments
 
 ### 🏖️ Code Sandbox
-- [ReactJs Counter](https://codesandbox.io/p/sandbox/counter-k74k9k)
+- [ReactJs Basic](https://codesandbox.io/p/sandbox/basic-c4gd3t)
 
 ### Motivation
 
@@ -56,11 +56,12 @@ const $form = createForm({
 });
 
 export const Component: React.FC = () => {
-    const { handleSubmit, register } = useForm($form);
+    const { handleSubmit, register, status } = useForm($form);
 
     return (
         <form onSubmit={handleSubmit()}>
             <input {...register('firstName')} />
+            <ErrorMessage status={status('firstName')} />
             <button type="submit">Submit</button>
         </form>
     );

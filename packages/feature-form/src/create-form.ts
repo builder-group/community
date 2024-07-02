@@ -124,8 +124,8 @@ export function createForm<GFormData extends TFormData>(
 					if (assignToInitial) {
 						formField._intialValue = deepCopy(data[fieldKey]);
 					}
-					formField.isSubmitted = true;
 				}
+				formField.isSubmitted = true;
 				formField.isSubmitting = false;
 			}
 
@@ -227,11 +227,11 @@ export interface TCreateFormConfig<GFormData extends TFormData> extends Partial<
 	 */
 	fields: TCreateFormConfigFormFields<GFormData>;
 	/**
-	 * Validation strategy after submitting.
+	 * Validation strategy **before** submitting.
 	 */
 	validateMode?: BitwiseFlag<FormFieldValidateMode>;
 	/**
-	 * Validation strategy before submitting.
+	 * Validation strategy **after** submitting.
 	 */
 	reValidateMode?: BitwiseFlag<FormFieldReValidateMode>;
 	/**
