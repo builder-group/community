@@ -73,7 +73,8 @@ export const Component: React.FC = () => {
 Supports various validators such as [Zod](https://github.com/colinhacks/zod), [Yup](https://github.com/jquense/yup), [Valibot](https://github.com/fabian-hiller/valibot) and more.
 
 ```ts
-import { zodValidator, valibotValidator } from 'feature-form';
+import { zodValidator, valibotValidator } from 'feature-form-validators/zod';
+import { valibotValidator } from 'feature-form-validators/valibot';
 import * as z from 'zod';
 import * as v from 'valibot';
 

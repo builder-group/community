@@ -62,6 +62,9 @@ importers:
       feature-form:
         specifier: workspace:*
         version: link:../../../../packages/feature-form
+      feature-form-validators:
+        specifier: workspace:*
+        version: link:../../../../packages/feature-form-validators
       feature-react:
         specifier: workspace:*
         version: link:../../../../packages/feature-react
@@ -281,6 +284,12 @@ importers:
       '@types/node':
         specifier: ^20.14.1
         version: 20.14.9
+
+  packages/feature-form-validators:
+    dependencies:
+      feature-form:
+        specifier: workspace:*
+        version: link:../feature-form
       valibot:
         specifier: ^0.35.0
         version: 0.35.0
@@ -290,6 +299,13 @@ importers:
       zod:
         specifier: ^3.23.8
         version: 3.23.8
+    devDependencies:
+      '@ibg/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^20.14.1
+        version: 20.14.9
 
   packages/feature-logger:
     dependencies:

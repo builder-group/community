@@ -1,7 +1,7 @@
 {
-	"name": "feature-form",
-	"description": "Straightforward, typesafe, and feature-based form library for ReactJs",
-	"version": "0.0.8",
+	"name": "feature-form-validators",
+	"description": "Validators for feature-form",
+	"version": "0.0.2",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
@@ -14,10 +14,39 @@
 		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks",
 		"size": "size-limit --why"
 	},
-	"source": "./src/index.ts",
-	"main": "./dist/cjs/index.js",
-	"module": "./dist/esm/index.js",
-	"types": "./dist/types/index.d.ts",
+	"exports": {
+		"./zod": {
+			"source": "./src/zod/index.ts",
+			"require": "./dist/zod/cjs/index.js",
+			"import": "./dist/zod/esm/index.js",
+			"types": "./dist/types/zod/index.d.ts"
+		},
+		"./yup": {
+			"source": "./src/yup/index.ts",
+			"require": "./dist/yup/cjs/index.js",
+			"import": "./dist/yup/esm/index.js",
+			"types": "./dist/types/yup/index.d.ts"
+		},
+		"./valibot": {
+			"source": "./src/valibot/index.ts",
+			"require": "./dist/valibot/cjs/index.js",
+			"import": "./dist/valibot/esm/index.js",
+			"types": "./dist/types/valibot/index.d.ts"
+		}
+	},
+	"typesVersions": {
+		"*": {
+			"zod": [
+				"./dist/types/zod/index.d.ts"
+			],
+			"yup": [
+				"./dist/types/yup/index.d.ts"
+			],
+			"valibot": [
+				"./dist/types/valibot/index.d.ts"
+			]
+		}
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/inbeta-group/monorepo.git"
@@ -30,8 +59,10 @@
 	},
 	"homepage": "https://inbeta.group/?source=github",
 	"dependencies": {
-		"@ibg/utils": "workspace:*",
-		"feature-state": "workspace:*"
+		"feature-form": "workspace:*",
+		"valibot": "^0.35.0",
+		"yup": "^1.4.0",
+		"zod": "^3.23.8"
 	},
 	"devDependencies": {
 		"@ibg/config": "workspace:*",

@@ -4,10 +4,10 @@ import {
 	createValidator,
 	FormFieldReValidateMode,
 	FormFieldValidateMode,
-	TFormFieldValidator,
-	valibotValidator,
-	zodValidator
+	TFormFieldValidator
 } from 'feature-form';
+import { valibotValidator } from 'feature-form-validators/valibot';
+import { zodValidator } from 'feature-form-validators/zod';
 import { useForm } from 'feature-react/form';
 import { withGlobalBind } from 'feature-react/state';
 import React from 'react';

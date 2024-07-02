@@ -1,7 +1,5 @@
+import { createValidator, type TFormFieldValidator } from 'feature-form';
 import { ZodError, type Schema } from 'zod';
-
-import { type TFormFieldValidator } from '../../types';
-import { createValidator } from './create-validator';
 
 export function zodValidator<GValue>(schema: Schema<GValue>): TFormFieldValidator<GValue> {
 	return createValidator([

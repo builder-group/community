@@ -17,7 +17,7 @@
     </a>
 </p>
 
-`feature-state-react` is the ReactJs extension for the `feature-state` library, providing hooks and features for easy state management in ReactJs.
+`feature-state-react` is the ReactJs extension for the `feature-state` and `feature-form` library, providing hooks and features for easy state management in ReactJs.
 
 - **Lightweight & Tree Shakable**: Function-based and modular design (< 1KB minified)
 - **Modular & Extendable**: Easily extendable with features like `withPersistLocalStorage()`, .. 

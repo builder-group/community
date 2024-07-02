@@ -1,7 +1,5 @@
+import { createValidator, type TFormFieldValidator } from 'feature-form';
 import { getDotPath, safeParseAsync, type BaseIssue, type BaseSchema } from 'valibot';
-
-import { type TFormFieldValidator } from '../../types';
-import { createValidator } from './create-validator';
 
 export function valibotValidator<GValue>(
 	schema: BaseSchema<GValue, unknown, BaseIssue<unknown>>

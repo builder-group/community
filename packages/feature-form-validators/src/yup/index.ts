@@ -1,7 +1,5 @@
+import { createValidator, type TFormFieldValidator } from 'feature-form';
 import { ValidationError, type Schema } from 'yup';
-
-import { type TFormFieldValidator } from '../../types';
-import { createValidator } from './create-validator';
 
 export function yupValidator<GValue>(schema: Schema<GValue>): TFormFieldValidator<GValue> {
 	return createValidator([
