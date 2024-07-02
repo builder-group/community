@@ -5,18 +5,23 @@ import { type TFormFieldStatus, type TFormFieldStatusValue } from '../types';
 export function createStatus(initialValue: TFormFieldStatusValue): TFormFieldStatus {
 	const formFieldStatusState = createState(initialValue);
 
-	formFieldStatusState._features.push('form-field-status');
-
 	const formFieldStatusFeature: TSelectFeatures<TFormFieldStatusValue, ['form-field-status']> = {
-		registerError(this: TFormFieldStatus, error) {
-			if (this._value.type === 'INVALID') {
-				this._value.errors.push(error);
+		_nextValue: undefined,
+		registerNextError(this: TFormFieldStatus, error) {
+			if (this._nextValue?.type === 'INVALID') {
+				this._nextValue.errors.push(error);
 			} else {
-				this._value = { type: 'INVALID', errors: [error] };
+				this._nextValue = { type: 'INVALID', errors: [error] };
 			}
 		}
 	};
 
 	// Merge existing features from the state with the new form field status feature
-	return Object.assign(formFieldStatusState, formFieldStatusFeature) as unknown as TFormFieldStatus;
+	const _formFieldStatus = Object.assign(
+		formFieldStatusState,
+		formFieldStatusFeature
+	) as unknown as TFormFieldStatus;
+	_formFieldStatus._features.push('form-field-status');
+
+	return _formFieldStatus;
 }

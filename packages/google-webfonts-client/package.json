@@ -12,6 +12,7 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks",
 		"size": "size-limit --why"
 	},
 	"source": "./src/index.ts",

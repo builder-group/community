@@ -3,7 +3,7 @@ import type { TFeatureKeys, TSelectFeatures } from './features';
 export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> = {
 	_features: string[];
 	_value: GValue;
-	_listeners: TListener<GValue, GSelectedFeatureKeys>[];
+	_listeners: TListener<GValue>[];
 	/**
 	 * Triggers all registered listeners to run with the current state value.
 	 */
@@ -38,7 +38,10 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	 * @param level - Optional parameter to specify the listener's priority level.
 	 * @returns A function that, when called, will unsubscribe the listener.
 	 */
-	listen: (callback: TListenerCallback<GValue, GSelectedFeatureKeys>, level?: number) => () => void;
+	listen: (
+		callback: TListenerCallback<GValue>,
+		options?: Partial<Omit<TListener<GValue>, 'callback'>>
+	) => () => void;
 	/**
 	 * Subscribes to state changes and invokes the callback immediately with the current state value.
 	 *
@@ -56,42 +59,40 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	 * @returns A function that, when called, will unsubscribe the listener.
 	 */
 	subscribe: (
-		callback: TListenerCallback<GValue, GSelectedFeatureKeys>,
-		level?: number
+		callback: TListenerCallback<GValue>,
+		options?: Partial<Omit<TListener<GValue>, 'callback'>>
 	) => () => void;
 } & TSelectFeatures<GValue, GSelectedFeatureKeys>;
 
-export type TListenerCallback<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> = (
-	props: TListenerCallbackProps<GValue, GSelectedFeatureKeys>
+export type TListenerCallback<GValue> = (
+	data: TListenerCallbackData<GValue>
 ) => Promise<void> | void;
 
-export interface TListenerCallbackProps<
-	GValue,
-	GSelectedFeatureKeys extends TFeatureKeys<GValue>[]
-> {
-	state: TState<GValue, GSelectedFeatureKeys>;
-	data?: unknown;
-}
-
-export interface TListener<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> {
-	callback: TListenerCallback<GValue, GSelectedFeatureKeys>;
-	level: number;
-}
-
-// TODO: Should we pass no reference to the state and/or value
-// and instead just directly access the state in the listener callback?
+// TODO: Reference state or just value?
 // https://stackoverflow.com/questions/78645591/best-practices-for-managing-object-references-in-callbacks-javascript
-export type TListenerQueueItem<
-	GValue = any,
-	GSelectedFeatureKeys extends TFeatureKeys<GValue>[] = ['base']
-> = {
-	stateRef: WeakRef<TState<GValue, GSelectedFeatureKeys>>;
-	data?: unknown;
-} & TListener<GValue, GSelectedFeatureKeys>;
+export interface TListenerCallbackData<GValue> extends TAdditionalListenerCallbackData {
+	value: Readonly<GValue>;
+}
+
+export interface TAdditionalListenerCallbackData {
+	[key: string]: unknown;
+	source?: string;
+	background?: boolean;
+}
+
+export interface TListener<GValue> {
+	key?: string;
+	level: number;
+	callback: TListenerCallback<GValue>;
+}
+
+export type TListenerQueueItem<GValue = any> = {
+	data: TListenerCallbackData<GValue>;
+} & TListener<GValue>;
 
 export type TStateSetOptions = TStateNotifyOptions;
 
 export interface TStateNotifyOptions {
 	processListenerQueue?: boolean;
-	listenerData?: unknown;
+	additionalData?: TAdditionalListenerCallbackData;
 }

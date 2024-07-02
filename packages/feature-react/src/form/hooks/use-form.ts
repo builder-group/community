@@ -1,6 +1,13 @@
-import { type TForm, type TFormData, type TFormField, type TFormFieldStatus } from 'feature-form';
-import React, { type ChangeEventHandler, type FocusEventHandler } from 'react';
-import { hasProperty } from '@ibg/utils';
+import {
+	type TForm,
+	type TFormData,
+	type TFormField,
+	type TFormFieldStatus,
+	type TSubmitOptions
+} from 'feature-form';
+import React from 'react';
+
+import { registerFormField, type TRegisterFormFieldResponse } from '../register-form-field';
 
 export function useForm<GFormData extends TFormData>(
 	form: TForm<GFormData, ['base']>
@@ -10,9 +17,14 @@ export function useForm<GFormData extends TFormData>(
 	React.useEffect(() => {
 		const unbindCallbacks: (() => void)[] = [];
 		for (const formField of Object.values(form.fields) as TFormField<unknown>[]) {
-			const unbind = formField.listen(() => {
-				forceRender();
-			});
+			const unbind = formField.listen(
+				({ background }) => {
+					if (!background) {
+						forceRender();
+					}
+				},
+				{ key: 'use-form' }
+			);
 			unbindCallbacks.push(unbind);
 		}
 		return () => {
@@ -23,26 +35,25 @@ export function useForm<GFormData extends TFormData>(
 	}, [form.fields]);
 
 	return {
-		register(formFieldKey, controlled = false) {
-			const formField = form.getField(formFieldKey);
-
-			return {
-				name: formField.key,
-				defaultValue: formField._intialValue,
-				value: controlled ? formField._value : undefined,
-				onBlur: formField.blur,
-				onChange(event) {
-					if (hasProperty(event.target, 'value')) {
-						formField.set(event.target.value as any, {
-							listenerData: {
-								background: !controlled
-							}
-						});
-					}
+		register<GKey extends keyof GFormData>(formFieldKey: GKey, controlled = false) {
+			return registerFormField<GFormData[GKey], GKey>(form.getField(formFieldKey), controlled);
+		},
+		handleSubmit: (options = {}) => {
+			const { preventDefault = true, ...submitOptions } = options;
+			return (event?: React.BaseSyntheticEvent) => {
+				if (preventDefault) {
+					event?.preventDefault();
 				}
+
+				if (submitOptions.additionalData != null) {
+					submitOptions.additionalData.event = event;
+				} else {
+					submitOptions.additionalData = { event };
+				}
+
+				return form.submit(submitOptions);
 			};
 		},
-		submit: form.submit,
 		field(formFieldKey) {
 			return form.getField(formFieldKey);
 		},
@@ -52,8 +63,8 @@ export function useForm<GFormData extends TFormData>(
 	};
 }
 
-export interface TUseFormResponse<GFormData> {
-	submit: () => Promise<boolean>;
+export interface TUseFormResponse<GFormData extends TFormData> {
+	handleSubmit: (options?: THandleSubmitOptions<GFormData>) => () => Promise<boolean>;
 	register: <GKey extends keyof GFormData>(
 		formFieldKey: GKey,
 		controlled?: boolean
@@ -62,10 +73,6 @@ export interface TUseFormResponse<GFormData> {
 	status: <GKey extends keyof GFormData>(formFieldKey: GKey) => TFormFieldStatus;
 }
 
-export interface TRegisterFormFieldResponse<GKey, GValue> {
-	defaultValue?: GValue;
-	value?: GValue;
-	name?: GKey | string;
-	onChange?: ChangeEventHandler;
-	onBlur?: FocusEventHandler;
+interface THandleSubmitOptions<GFormData extends TFormData> extends TSubmitOptions<GFormData> {
+	preventDefault?: boolean;
 }

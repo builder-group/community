@@ -13,7 +13,7 @@
         <img src="https://img.shields.io/npm/dt/featuer-state-react.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
     </a>
     <a href="https://dyn.art/s/discord/?source=inbeta-group-readme">
-        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=F0E81A" alt="Join Discord"/>
+        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=F0E81A" alt="Join Discord"/>
     </a>
 </p>
 
@@ -65,3 +65,8 @@ state.addTask({ id: 1, title: 'Task 1' });
 ```
 
 - **`key`**: The key used to identify the state in `localStorage`.
+
+### `withGlobalBind()`
+
+todo
+ 

@@ -14,13 +14,12 @@ export function createState<GValue>(
 		_listeners: [],
 		_value: initialValue,
 		_notify(notifyOptions = {}) {
-			const { processListenerQueue = true, listenerData } = notifyOptions;
+			const { processListenerQueue = true, additionalData = {} } = notifyOptions;
 
-			// Add current state's listeners to the queue
+			// Push current state's listeners to the queue
 			this._listeners.forEach((listener) => {
 				GLOBAL_LISTENER_QUEUE.push({
-					stateRef: new WeakRef(this),
-					data: listenerData,
+					data: { ...additionalData, value: this._value as Readonly<GValue> },
 					callback: listener.callback,
 					level: listener.level
 				});
@@ -41,29 +40,35 @@ export function createState<GValue>(
 		},
 		set(newValue, setOptions = {}) {
 			if (this._value !== newValue) {
+				const { additionalData = {}, processListenerQueue = true } = setOptions;
+				additionalData.source = additionalData.source ?? 'set';
 				this._value = newValue;
-				this._notify(setOptions);
+				this._notify({
+					additionalData,
+					processListenerQueue
+				});
 			}
 		},
-		listen(callback, level) {
-			const listener: TListener<GValue, ['base']> = {
-				callback,
-				level: level ?? 0
+		listen(callback, listenOptions = {}) {
+			const { level = 0, key } = listenOptions;
+			const listener: TListener<GValue> = {
+				key,
+				level,
+				callback
 			};
 			this._listeners.push(listener);
 
 			// Undbind
 			return () => {
 				const index = this._listeners.indexOf(listener);
-				// eslint-disable-next-line no-bitwise -- .
-				if (~index) {
+				if (index !== -1) {
 					this._listeners.splice(index, 1);
 				}
 			};
 		},
-		subscribe(callback, level) {
-			const unbind = this.listen(callback, level);
-			void callback({ state: this });
+		subscribe(callback, subscribeOptions) {
+			const unbind = this.listen(callback, subscribeOptions);
+			void callback({ value: this._value });
 			return unbind;
 		}
 	};
@@ -80,14 +85,6 @@ async function processQueue(): Promise<void> {
 
 	// Process each item in the queue sequentially
 	for (const queueItem of queueToProcess) {
-		const state = queueItem.stateRef.deref();
-		if (state != null) {
-			await queueItem.callback({
-				state,
-				data: queueItem.data
-			});
-		} else {
-			console.warn('Reference to State was dropped before listener could be called!');
-		}
+		await queueItem.callback(queueItem.data);
 	}
 }

@@ -6,8 +6,6 @@ export function withOpenApi<
 >(
 	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base']>, GPaths>
 ): TFetchClient<['openapi', ...GSelectedFeatureKeys], GPaths> {
-	fetchClient._features.push('openapi');
-
 	const openApiFeature: TSelectFeatures<['openapi'], GPaths> = {
 		get(this: TFetchClient<['base'], GPaths>, path, options) {
 			return this._baseFetch(path as string, 'GET', options as any);
@@ -30,7 +28,11 @@ export function withOpenApi<
 	};
 
 	// Merge existing features from the fetch client with the new openapi feature
-	const _fetchClient = Object.assign(fetchClient, openApiFeature);
+	const _fetchClient = Object.assign(fetchClient, openApiFeature) as TFetchClient<
+		['openapi', ...GSelectedFeatureKeys],
+		GPaths
+	>;
+	_fetchClient._features.push('openapi');
 
-	return _fetchClient as TFetchClient<['openapi', ...GSelectedFeatureKeys], GPaths>;
+	return _fetchClient;
 }

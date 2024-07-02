@@ -24,8 +24,6 @@ export function withPersist<
 	storage: StorageInterface<GStorageValue>,
 	key: string
 ): TState<GValue, [...GSelectedFeatureKeys, 'persist']> {
-	state._features.push('persist');
-
 	const persistFeature: TSelectFeatures<GValue, ['persist']> = {
 		async persist() {
 			let success = false;
@@ -40,9 +38,12 @@ export function withPersist<
 			}
 
 			// Setup listener
-			state.listen(async (value) => {
-				await storage.save(key, value as GStorageValue);
-			});
+			state.listen(
+				async ({ value }) => {
+					await storage.save(key, value as GStorageValue);
+				},
+				{ key: 'with-persist' }
+			);
 
 			return success;
 		},
@@ -52,8 +53,11 @@ export function withPersist<
 	};
 
 	// Merge existing features from the state with the new persist feature
-	return Object.assign(state, persistFeature) as TState<
+	const _state = Object.assign(state, persistFeature) as TState<
 		GValue,
 		[...GSelectedFeatureKeys, 'persist']
 	>;
+	_state._features.push('persist');
+
+	return _state;
 }

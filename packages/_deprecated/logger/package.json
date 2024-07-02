@@ -10,7 +10,8 @@
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "vitest run",
-		"update:latest": "pnpm update --latest"
+		"update:latest": "pnpm update --latest",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks"
 	},
 	"source": "./src/index.ts",
 	"main": "./dist/cjs/index.js",

@@ -11,17 +11,29 @@ export function zodValidator<GValue>(schema: Schema<GValue>): TFormFieldValidato
 				try {
 					schema.parse(formField.get());
 				} catch (err) {
-					if (err instanceof ZodError) {
+					if (isZodError(err)) {
 						for (const issue of err.errors) {
-							formField.status.registerError({
+							formField.status.registerNextError({
 								code: issue.code,
 								message: issue.message,
 								path: issue.path.join('.')
 							});
 						}
+					} else {
+						console.warn(
+							'Parse error is not an instance of a ZodError. Ensure Zod is correctly installed.',
+							err
+						);
 					}
 				}
 			}
 		}
 	]);
+}
+
+export function isZodError(err: unknown): err is ZodError {
+	return (
+		err instanceof ZodError ||
+		(err instanceof Error && 'errors' in err && Array.isArray(err.errors))
+	);
 }

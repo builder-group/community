@@ -1,7 +1,9 @@
 import { createState } from 'feature-state';
-import { deepCopy } from '@ibg/utils';
+import { bitwiseFlag, deepCopy } from '@ibg/utils';
 
 import {
+	FormFieldReValidateMode,
+	FormFieldValidateMode,
 	type TFormField,
 	type TFormFieldStateConfig,
 	type TFormFieldStateFeature,
@@ -17,22 +19,23 @@ export function createFormField<GValue>(
 		key,
 		validator,
 		editable = true,
-		reValidateMode = 'onBlur',
-		validateMode = 'onSubmit',
+		reValidateMode = bitwiseFlag(FormFieldReValidateMode.OnBlur),
+		validateMode = bitwiseFlag(FormFieldValidateMode.OnSubmit),
 		collectErrorMode = 'firstError',
 		notifyOnStatusChange = true
 	} = config;
 	const formFieldState = createState(initialValue);
 
-	formFieldState._features.push('form-field');
-
 	const status = createStatus({ type: 'UNVALIDATED' });
 
 	// Notify form field listeners if status has changed
 	if (notifyOnStatusChange) {
-		status.listen(() => {
-			formFieldState._notify();
-		});
+		status.listen(
+			() => {
+				formFieldState._notify({ additionalData: { source: 'status' } });
+			},
+			{ key: 'form-field' }
+		);
 	}
 
 	const formFieldFeature: TFormFieldStateFeature<GValue> = {
@@ -43,23 +46,24 @@ export function createFormField<GValue>(
 			collectErrorMode
 		},
 		_intialValue: deepCopy(formFieldState._value),
-		_validator: validator,
 		key,
-		isValid: false,
 		isTouched: false,
 		isSubmitted: false,
+		isSubmitting: false,
+		validator,
 		status,
 		async validate(this: TFormField<GValue>) {
-			this.isValid = await this._validator.validate(this);
-			this.status._notify();
-			return this.isValid;
+			return this.validator.validate(this);
+		},
+		isValid(this: TFormField<GValue>) {
+			return this.status.get().type === 'VALID';
 		},
 		blur(this: TFormField<GValue>) {
 			if (
-				(this.isSubmitted && this._config.reValidateMode === 'onBlur') ||
+				(this.isSubmitted && this._config.reValidateMode.has(FormFieldReValidateMode.OnBlur)) ||
 				(!this.isSubmitted &&
-					(this._config.validateMode === 'onBlur' ||
-						(this._config.validateMode === 'onTouched' && !this.isTouched)))
+					(this._config.validateMode.has(FormFieldValidateMode.OnBlur) ||
+						(this._config.validateMode.has(FormFieldValidateMode.OnTouched) && !this.isTouched)))
 			) {
 				void this.validate();
 			}
@@ -70,13 +74,19 @@ export function createFormField<GValue>(
 			this.set(this._intialValue);
 			this.isTouched = false;
 			this.isSubmitted = false;
-			this.isValid = false;
+			this.isSubmitting = false;
 			this.status.set({ type: 'UNVALIDATED' });
 		}
 	};
 
 	// Merge existing features from the state with the new form field feature
-	return Object.assign(formFieldState, formFieldFeature) as unknown as TFormField<GValue>;
+	const _formField = Object.assign(
+		formFieldState,
+		formFieldFeature
+	) as unknown as TFormField<GValue>;
+	_formField._features.push('form-field');
+
+	return _formField;
 }
 
 export interface TCreateFormFieldConfig<GValue> extends Partial<TFormFieldStateConfig> {
