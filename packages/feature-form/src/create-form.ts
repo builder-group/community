@@ -248,7 +248,7 @@ export type TCreateFormConfigFormFields<GFormData extends TFormData> = {
 
 export interface TCreateFormConfigFormField<GValue> extends Partial<TFormFieldStateConfig> {
 	defaultValue?: GValue;
-	validator: TFormFieldValidator<GValue>;
+	validator?: TFormFieldValidator<GValue>;
 }
 
 // Helper function to make type inference work

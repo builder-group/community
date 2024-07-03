@@ -10,6 +10,7 @@ import {
 	type TFormFieldValidator
 } from '../types';
 import { createStatus } from './create-status';
+import { createValidator } from './create-validator';
 
 export function createFormField<GValue>(
 	initialValue: GValue | undefined,
@@ -17,7 +18,7 @@ export function createFormField<GValue>(
 ): TFormField<GValue> {
 	const {
 		key,
-		validator,
+		validator = createValidator([]),
 		editable = true,
 		reValidateMode = bitwiseFlag(FormFieldReValidateMode.OnBlur),
 		validateMode = bitwiseFlag(FormFieldValidateMode.OnSubmit),
@@ -91,6 +92,6 @@ export function createFormField<GValue>(
 
 export interface TCreateFormFieldConfig<GValue> extends Partial<TFormFieldStateConfig> {
 	key: string;
-	validator: TFormFieldValidator<GValue>;
+	validator?: TFormFieldValidator<GValue>;
 	notifyOnStatusChange?: boolean;
 }
