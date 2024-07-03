@@ -1,7 +1,3 @@
-export function randomColor(): string {
-	return '#' + ((Math.random() * 0xffffff) << 0).toString(16).padStart(6, '0');
-}
-
 export function isLightColor(color: string): boolean {
 	const hex = color.replace('#', '');
 	const c_r = parseInt(hex.substr(0, 2), 16);

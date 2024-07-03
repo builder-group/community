@@ -95,4 +95,5 @@ export type TStateSetOptions = TStateNotifyOptions;
 export interface TStateNotifyOptions {
 	processListenerQueue?: boolean;
 	additionalData?: TAdditionalListenerCallbackData;
+	deferred?: boolean;
 }

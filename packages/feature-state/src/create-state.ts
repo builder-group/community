@@ -6,7 +6,7 @@ export function createState<GValue>(
 	initialValue: GValue,
 	options: TCreateStateOptions = {}
 ): TState<GValue, ['base']> {
-	const { deferred = true } = options;
+	const { deferred = false } = options;
 
 	return {
 		_: null,
@@ -14,7 +14,11 @@ export function createState<GValue>(
 		_listeners: [],
 		_value: initialValue,
 		_notify(notifyOptions = {}) {
-			const { processListenerQueue = true, additionalData = {} } = notifyOptions;
+			const {
+				processListenerQueue = true,
+				additionalData = {},
+				deferred: innerDeferred = deferred
+			} = notifyOptions;
 
 			// Push current state's listeners to the queue
 			this._listeners.forEach((listener) => {
@@ -28,7 +32,7 @@ export function createState<GValue>(
 			// Process queue
 			if (processListenerQueue) {
 				// Defer processing using setTimeout
-				deferred
+				innerDeferred
 					? setTimeout(() => {
 							void processQueue();
 						})

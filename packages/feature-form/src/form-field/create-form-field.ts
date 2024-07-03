@@ -24,7 +24,7 @@ export function createFormField<GValue>(
 		collectErrorMode = 'firstError',
 		notifyOnStatusChange = true
 	} = config;
-	const formFieldState = createState(initialValue);
+	const formFieldState = createState(initialValue, { deferred: false });
 
 	const status = createStatus({ type: 'UNVALIDATED' });
 

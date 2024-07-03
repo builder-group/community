@@ -71,7 +71,6 @@ export function createForm<GFormData extends TFormData>(
 			this.isValid = formFields.every((formField) => formField.isValid());
 			return this.isValid;
 		},
-
 		async submit(this: TForm<GFormData, ['base']>, options = {}) {
 			const {
 				additionalData,

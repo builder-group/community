@@ -13,11 +13,12 @@ import { withGlobalBind } from 'feature-react/state';
 import React from 'react';
 import * as v from 'valibot';
 import * as z from 'zod';
+import { randomHex, shortId } from '@ibg/utils';
 
 import './App.css';
 
 import { StatusMessage } from './components';
-import { isLightColor, randomColor } from './utils';
+import { isLightColor } from './utils';
 
 type TGender = 'male' | 'female' | 'diverse';
 
@@ -103,8 +104,8 @@ const $form = withGlobalBind(
 					}
 				]),
 				defaultValue: {
-					id: '',
-					color: randomColor()
+					id: shortId(),
+					color: randomHex()
 				}
 			}
 		},
@@ -181,8 +182,8 @@ function App() {
 						event.preventDefault();
 						field('image').set(
 							{
-								id: '',
-								color: randomColor()
+								id: shortId(),
+								color: randomHex()
 							},
 							{ additionalData: { background: false } }
 						);

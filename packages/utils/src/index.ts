@@ -21,6 +21,7 @@ export * from './mat3-to-array';
 export * from './multiply-vec2';
 export * from './not-empty';
 export * from './pick-properties';
+export * from './random-hex';
 export * from './rgb-to-hex';
 export * from './rgb-to-rgba';
 export * from './rgba-to-rgb';

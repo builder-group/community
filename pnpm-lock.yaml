@@ -59,6 +59,9 @@ importers:
 
   examples/feature-form/react/basic:
     dependencies:
+      '@ibg/utils':
+        specifier: workspace:*
+        version: link:../../../../packages/utils
       feature-form:
         specifier: workspace:*
         version: link:../../../../packages/feature-form
