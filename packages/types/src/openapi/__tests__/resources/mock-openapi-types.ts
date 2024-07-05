@@ -426,9 +426,7 @@ export interface operations {
 		responses: {
 			/** @description Successful operation */
 			200: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content: {
 					'application/json': components['schemas']['Pet'];
 					'application/xml': components['schemas']['Pet'];
@@ -436,23 +434,17 @@ export interface operations {
 			};
 			/** @description Invalid ID supplied */
 			400: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 			/** @description Pet not found */
 			404: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 			/** @description Validation exception */
 			422: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};
@@ -475,9 +467,7 @@ export interface operations {
 		responses: {
 			/** @description Successful operation */
 			200: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content: {
 					'application/json': components['schemas']['Pet'];
 					'application/xml': components['schemas']['Pet'];
@@ -485,16 +475,12 @@ export interface operations {
 			};
 			/** @description Invalid input */
 			400: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 			/** @description Validation exception */
 			422: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};
@@ -513,9 +499,7 @@ export interface operations {
 		responses: {
 			/** @description successful operation */
 			200: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content: {
 					'application/json': components['schemas']['Pet'][];
 					'application/xml': components['schemas']['Pet'][];
@@ -523,9 +507,7 @@ export interface operations {
 			};
 			/** @description Invalid status value */
 			400: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};
@@ -544,9 +526,7 @@ export interface operations {
 		responses: {
 			/** @description successful operation */
 			200: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content: {
 					'application/json': components['schemas']['Pet'][];
 					'application/xml': components['schemas']['Pet'][];
@@ -554,9 +534,7 @@ export interface operations {
 			};
 			/** @description Invalid tag value */
 			400: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};
@@ -575,9 +553,7 @@ export interface operations {
 		responses: {
 			/** @description successful operation */
 			200: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content: {
 					'application/json': components['schemas']['Pet'];
 					'application/xml': components['schemas']['Pet'];
@@ -585,16 +561,12 @@ export interface operations {
 			};
 			/** @description Invalid ID supplied */
 			400: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 			/** @description Pet not found */
 			404: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};
@@ -618,9 +590,7 @@ export interface operations {
 		responses: {
 			/** @description Invalid input */
 			400: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};
@@ -641,9 +611,7 @@ export interface operations {
 		responses: {
 			/** @description Invalid pet value */
 			400: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};
@@ -669,9 +637,7 @@ export interface operations {
 		responses: {
 			/** @description successful operation */
 			200: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content: {
 					'application/json': components['schemas']['ApiResponse'];
 				};
@@ -689,13 +655,9 @@ export interface operations {
 		responses: {
 			/** @description successful operation */
 			200: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content: {
-					'application/json': {
-						[key: string]: number | undefined;
-					};
+					'application/json': Record<string, number | undefined>;
 				};
 			};
 		};
@@ -717,25 +679,19 @@ export interface operations {
 		responses: {
 			/** @description successful operation */
 			200: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content: {
 					'application/json': components['schemas']['Order'];
 				};
 			};
 			/** @description Invalid input */
 			400: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 			/** @description Validation exception */
 			422: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};
@@ -754,9 +710,7 @@ export interface operations {
 		responses: {
 			/** @description successful operation */
 			200: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content: {
 					'application/json': components['schemas']['Order'];
 					'application/xml': components['schemas']['Order'];
@@ -764,16 +718,12 @@ export interface operations {
 			};
 			/** @description Invalid ID supplied */
 			400: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 			/** @description Order not found */
 			404: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};
@@ -792,16 +742,12 @@ export interface operations {
 		responses: {
 			/** @description Invalid ID supplied */
 			400: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 			/** @description Order not found */
 			404: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};
@@ -824,9 +770,7 @@ export interface operations {
 		responses: {
 			/** @description successful operation */
 			default: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content: {
 					'application/json': components['schemas']['User'];
 					'application/xml': components['schemas']['User'];
@@ -849,9 +793,7 @@ export interface operations {
 		responses: {
 			/** @description Successful operation */
 			200: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content: {
 					'application/json': components['schemas']['User'];
 					'application/xml': components['schemas']['User'];
@@ -859,9 +801,7 @@ export interface operations {
 			};
 			/** @description successful operation */
 			default: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};
@@ -896,9 +836,7 @@ export interface operations {
 			};
 			/** @description Invalid username/password supplied */
 			400: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};
@@ -914,9 +852,7 @@ export interface operations {
 		responses: {
 			/** @description successful operation */
 			default: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};
@@ -935,9 +871,7 @@ export interface operations {
 		responses: {
 			/** @description successful operation */
 			200: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content: {
 					'application/json': components['schemas']['User'];
 					'application/xml': components['schemas']['User'];
@@ -945,16 +879,12 @@ export interface operations {
 			};
 			/** @description Invalid username supplied */
 			400: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 			/** @description User not found */
 			404: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};
@@ -980,9 +910,7 @@ export interface operations {
 		responses: {
 			/** @description successful operation */
 			default: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};
@@ -1001,16 +929,12 @@ export interface operations {
 		responses: {
 			/** @description Invalid username supplied */
 			400: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 			/** @description User not found */
 			404: {
-				headers: {
-					[name: string]: unknown;
-				};
+				headers: Record<string, unknown>;
 				content?: never;
 			};
 		};

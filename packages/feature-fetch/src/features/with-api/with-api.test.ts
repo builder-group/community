@@ -20,17 +20,6 @@ describe('withApi function', () => {
 		server.close();
 	});
 
-	it('should have correct types', async () => {
-		const baseFetchClient = createFetchClient();
-		const fetchClient = withApi(baseFetchClient);
-
-		const response = await fetchClient.get('https://dummyjson.com/products/{id}', {
-			pathParams: { id: '1' }
-		});
-
-		expect(response).not.toBeNull();
-	});
-
 	it('should make a GET request successfully', async () => {
 		server.use(
 			http.get(new URL('/test', BASE_URL).toString(), () => {

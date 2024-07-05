@@ -1,0 +1,9 @@
+{
+	"extends": "@ibg/config/shared-library.tsconfig.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"declarationDir": "./dist"
+	},
+	"include": ["src"]
+}

@@ -2,8 +2,8 @@ import type { Result } from 'ts-results-es';
 
 import type { NetworkException, RequestException, ServiceException } from '../exceptions';
 import type { FetchHeaders } from '../helper';
-import type { TParseAs, TRequestMethod } from './api';
 import type { TFeatureKeys, TSelectFeatures } from './features';
+import { type TParseAs, type TParseAsResponse, type TRequestMethod } from './fetch';
 
 export type TFetchClient<
 	GSelectedFeatureKeys extends TFeatureKeys[],
@@ -110,23 +110,8 @@ export type TFetchOptionsWithBody<GParseAs extends TParseAs> = {
 // Fetch Response
 // =============================================================================
 
-export type TResponseBodyWithParseAs<
-	GResponseBody,
-	GParseAs extends TParseAs
-> = GParseAs extends 'json'
-	? GResponseBody
-	: GParseAs extends 'text'
-		? Awaited<ReturnType<Response['text']>>
-		: GParseAs extends 'blob'
-			? Awaited<ReturnType<Response['blob']>>
-			: GParseAs extends 'arrayBuffer'
-				? Awaited<ReturnType<Response['arrayBuffer']>>
-				: GParseAs extends 'stream'
-					? Response['body']
-					: never;
-
 export interface TFetchResponseSuccess<GSuccessResponseBody, GParseAs extends TParseAs> {
-	data: TResponseBodyWithParseAs<GSuccessResponseBody, GParseAs>;
+	data: TParseAsResponse<GParseAs, GSuccessResponseBody>;
 	response: Response;
 }
 
