@@ -287,6 +287,9 @@ importers:
       '@ibg/config':
         specifier: workspace:*
         version: link:../config
+      '@ibg/types':
+        specifier: workspace:*
+        version: link:../types
       '@types/node':
         specifier: ^20.14.1
         version: 20.14.9
@@ -322,6 +325,9 @@ importers:
       '@ibg/config':
         specifier: workspace:*
         version: link:../config
+      '@ibg/types':
+        specifier: workspace:*
+        version: link:../types
       '@types/node':
         specifier: ^20.14.1
         version: 20.14.1
@@ -360,6 +366,9 @@ importers:
       '@ibg/config':
         specifier: workspace:*
         version: link:../config
+      '@ibg/types':
+        specifier: workspace:*
+        version: link:../types
       '@types/node':
         specifier: ^20.14.1
         version: 20.14.1
