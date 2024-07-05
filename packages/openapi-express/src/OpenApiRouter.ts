@@ -1,4 +1,6 @@
 import type express from 'express';
+import { type TPathsWithMethod } from '@ibg/types/openapi';
+import { type TFilterKeys } from '@ibg/types/utils';
 
 import { ValidationError, type TValidationErrorDetails } from './exceptions';
 import { parseRequestQuery } from './helper';
@@ -9,9 +11,7 @@ import {
 	type TBaseValidationSchema,
 	type TBaseValidationSchemaEntry,
 	type TExpressRequestHandler,
-	type TFilterKeys,
-	type TOpenApiValidationSchema,
-	type TPathsWithMethod
+	type TOpenApiValidationSchema
 } from './types';
 
 export class OpenApiRouter<GPaths extends object = object> {

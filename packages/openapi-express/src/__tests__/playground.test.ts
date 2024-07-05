@@ -8,6 +8,8 @@ describe('playground', () => {
 	it('types should work', async () => {
 		const apiRouter = createOpenApiRouter<paths>(Router());
 
+		apiRouter.get('/pet/{petId}');
+
 		// TODO
 	});
 });

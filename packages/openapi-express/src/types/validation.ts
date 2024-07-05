@@ -1,4 +1,5 @@
-import type { TOperationPathParams, TOperationQueryParams, TRequestBody } from './openapi';
+import type { TOperationPathParams, TOperationQueryParams, TRequestBody } from '@ibg/types/openapi';
+
 import type { TParserSchema } from './parser';
 
 // =============================================================================
