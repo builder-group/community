@@ -1,17 +1,18 @@
-import { createValidator, type TFormFieldValidator } from 'feature-form';
 import { ZodError, type Schema } from 'zod';
 
-export function zodValidator<GValue>(schema: Schema<GValue>): TFormFieldValidator<GValue> {
-	return createValidator([
+import { createValidationAdapter, type TValidationAdapter } from '../_adapter';
+
+export function zodValidator<GValue>(schema: Schema<GValue>): TValidationAdapter<GValue> {
+	return createValidationAdapter([
 		{
 			key: 'zod',
-			validate: (formField) => {
+			validate: (cx) => {
 				try {
-					schema.parse(formField.get());
+					schema.parse(cx.value);
 				} catch (err) {
 					if (isZodError(err)) {
 						for (const issue of err.errors) {
-							formField.status.registerNextError({
+							cx.registerError({
 								code: issue.code,
 								message: issue.message,
 								path: issue.path.join('.')

@@ -67,7 +67,7 @@ importers:
         version: link:../../../../packages/feature-form
       feature-form-validators:
         specifier: workspace:*
-        version: link:../../../../packages/feature-form-validators
+        version: link:../../../../packages/feature-validator
       feature-react:
         specifier: workspace:*
         version: link:../../../../packages/feature-react
@@ -294,28 +294,6 @@ importers:
         specifier: ^20.14.1
         version: 20.14.9
 
-  packages/feature-form-validators:
-    dependencies:
-      feature-form:
-        specifier: workspace:*
-        version: link:../feature-form
-      valibot:
-        specifier: ^0.35.0
-        version: 0.35.0
-      yup:
-        specifier: ^1.4.0
-        version: 1.4.0
-      zod:
-        specifier: ^3.23.8
-        version: 3.23.8
-    devDependencies:
-      '@ibg/config':
-        specifier: workspace:*
-        version: link:../config
-      '@types/node':
-        specifier: ^20.14.1
-        version: 20.14.9
-
   packages/feature-logger:
     dependencies:
       '@ibg/utils':
@@ -372,6 +350,28 @@ importers:
       '@types/node':
         specifier: ^20.14.1
         version: 20.14.1
+
+  packages/feature-validator:
+    dependencies:
+      '@ibg/utils':
+        specifier: workspace:*
+        version: link:../utils
+      valibot:
+        specifier: ^0.35.0
+        version: 0.35.0
+      yup:
+        specifier: ^1.4.0
+        version: 1.4.0
+      zod:
+        specifier: ^3.23.8
+        version: 3.23.8
+    devDependencies:
+      '@ibg/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^20.14.1
+        version: 20.14.9
 
   packages/figma-connect:
     dependencies:

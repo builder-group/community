@@ -1,7 +1,7 @@
 {
-	"name": "feature-form-validators",
-	"description": "Validators for feature-form",
-	"version": "0.0.3",
+	"name": "validation-adapter",
+	"description": "Universal validation adapter",
+	"version": "0.0.1",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
@@ -15,6 +15,12 @@
 		"size": "size-limit --why"
 	},
 	"exports": {
+		".": {
+			"source": "./src/_validator/index.ts",
+			"require": "./dist/_validator/cjs/index.js",
+			"import": "./dist/_validator/esm/index.js",
+			"types": "./dist/_validator/types/index.d.ts"
+		},
 		"./zod": {
 			"source": "./src/zod/index.ts",
 			"require": "./dist/zod/cjs/index.js",
@@ -59,7 +65,7 @@
 	},
 	"homepage": "https://inbeta.group/?source=github",
 	"dependencies": {
-		"feature-form": "workspace:*",
+		"@ibg/utils": "workspace:*",
 		"valibot": "^0.35.0",
 		"yup": "^1.4.0",
 		"zod": "^3.23.8"

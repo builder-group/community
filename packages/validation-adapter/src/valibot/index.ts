@@ -1,20 +1,21 @@
-import { createValidator, type TFormFieldValidator } from 'feature-form';
 import { getDotPath, safeParseAsync, type BaseIssue, type BaseSchema } from 'valibot';
+
+import { createValidationAdapter, type TValidationAdapter } from '../_adapter';
 
 export function valibotValidator<GValue>(
 	schema: BaseSchema<GValue, unknown, BaseIssue<unknown>>
-): TFormFieldValidator<GValue> {
-	return createValidator([
+): TValidationAdapter<GValue> {
+	return createValidationAdapter([
 		{
 			key: 'valibot',
-			validate: async (formField) => {
-				const result = await safeParseAsync(schema, formField.get(), {
-					abortPipeEarly: formField._config.collectErrorMode === 'firstError'
+			validate: async (cx) => {
+				const result = await safeParseAsync(schema, cx.value, {
+					abortPipeEarly: cx.config.collectErrorMode === 'firstError'
 				});
 
 				if (result.issues != null) {
 					for (const issue of result.issues) {
-						formField.status.registerNextError({
+						cx.registerError({
 							code: issue.type,
 							message: issue.message,
 							path: getDotPath(issue) ?? undefined
