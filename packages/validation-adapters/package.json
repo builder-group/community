@@ -1,7 +1,7 @@
 {
-	"name": "feature-form-validators",
-	"description": "Validators for feature-form",
-	"version": "0.0.3",
+	"name": "validation-adapters",
+	"description": "Pre-made validation adapters for the validation-adapter library, including adapters for Zod and Valibot",
+	"version": "0.0.2",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
@@ -15,11 +15,11 @@
 		"size": "size-limit --why"
 	},
 	"exports": {
-		"./zod": {
-			"source": "./src/zod/index.ts",
-			"require": "./dist/zod/cjs/index.js",
-			"import": "./dist/zod/esm/index.js",
-			"types": "./dist/types/zod/index.d.ts"
+		"./valibot": {
+			"source": "./src/valibot/index.ts",
+			"require": "./dist/valibot/cjs/index.js",
+			"import": "./dist/valibot/esm/index.js",
+			"types": "./dist/types/valibot/index.d.ts"
 		},
 		"./yup": {
 			"source": "./src/yup/index.ts",
@@ -27,23 +27,25 @@
 			"import": "./dist/yup/esm/index.js",
 			"types": "./dist/types/yup/index.d.ts"
 		},
-		"./valibot": {
-			"source": "./src/valibot/index.ts",
-			"require": "./dist/valibot/cjs/index.js",
-			"import": "./dist/valibot/esm/index.js",
-			"types": "./dist/types/valibot/index.d.ts"
-		}
+		"./zod": {
+			"source": "./src/zod/index.ts",
+			"require": "./dist/zod/cjs/index.js",
+			"import": "./dist/zod/esm/index.js",
+			"types": "./dist/types/zod/index.d.ts"
+		},
+		"./package.json": "./package.json",
+		"./*": "./*"
 	},
 	"typesVersions": {
 		"*": {
-			"zod": [
-				"./dist/types/zod/index.d.ts"
+			"valibot": [
+				"./dist/valibot/types/index.d.ts"
 			],
 			"yup": [
-				"./dist/types/yup/index.d.ts"
+				"./dist/yup/types/index.d.ts"
 			],
-			"valibot": [
-				"./dist/types/valibot/index.d.ts"
+			"zod": [
+				"./dist/zod/types/index.d.ts"
 			]
 		}
 	},
@@ -58,15 +60,13 @@
 		"url": "https://github.com/inbeta-group/monorepo/issues"
 	},
 	"homepage": "https://inbeta.group/?source=github",
-	"dependencies": {
-		"feature-form": "workspace:*",
-		"valibot": "^0.35.0",
-		"yup": "^1.4.0",
-		"zod": "^3.23.8"
-	},
 	"devDependencies": {
 		"@ibg/config": "workspace:*",
-		"@types/node": "^20.14.1"
+		"@types/node": "^20.14.1",
+		"valibot": "^0.35.0",
+		"validation-adapter": "workspace:*",
+		"yup": "^1.4.0",
+		"zod": "^3.23.8"
 	},
 	"files": [
 		"dist",
@@ -74,12 +74,13 @@
 	],
 	"size-limit": [
 		{
-			"path": "dist/esm/index.js",
-			"ignore": [
-				"zod",
-				"yup",
-				"valibot"
-			]
+			"path": "dist/valibot/esm/index.js"
+		},
+		{
+			"path": "dist/yup/esm/index.js"
+		},
+		{
+			"path": "dist/zod/esm/index.js"
 		}
 	]
 }

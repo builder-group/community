@@ -1,28 +1,34 @@
-import { createValidator, type TFormFieldValidator } from 'feature-form';
+import { createValidationAdapter, type TValidationAdapter } from 'validation-adapter';
 import { ValidationError, type Schema } from 'yup';
 
-export function yupValidator<GValue>(schema: Schema<GValue>): TFormFieldValidator<GValue> {
-	return createValidator([
+export function yupAdapter<GValue>(schema: Schema<GValue>): TValidationAdapter<GValue> {
+	return createValidationAdapter([
 		{
 			key: 'yup',
-			validate: async (formField) => {
+			validate: async (cx) => {
 				try {
-					await schema.validate(formField.get(), {
-						abortEarly: formField._config.collectErrorMode === 'firstError'
+					await schema.validate(cx.value, {
+						abortEarly: cx.config.collectErrorMode === 'firstError'
 					});
 				} catch (err) {
 					if (isYupError(err)) {
 						if (err.inner.length === 0) {
-							formField.status.registerNextError({
+							cx.registerError({
 								code: err.type ?? 'unknown',
-								message: err.message.replace('this', formField.key),
+								message:
+									cx.config.name != null
+										? err.message.replace('this', cx.config.name)
+										: err.message,
 								path: err.path
 							});
 						}
 						for (const innerErr of err.inner) {
-							formField.status.registerNextError({
+							cx.registerError({
 								code: innerErr.type ?? 'unknown',
-								message: innerErr.message.replace('this', formField.key),
+								message:
+									cx.config.name != null
+										? innerErr.message.replace('this', cx.config.name)
+										: innerErr.message,
 								path: innerErr.path
 							});
 						}

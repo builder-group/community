@@ -1,4 +1,5 @@
 import { createState } from 'feature-state';
+import { createValidationAdapter } from 'validation-adapter';
 import { bitwiseFlag, deepCopy } from '@ibg/utils';
 
 import {
@@ -7,7 +8,7 @@ import {
 	type TFormField,
 	type TFormFieldStateConfig,
 	type TFormFieldStateFeature,
-	type TFormFieldValidator
+	type TFormFieldValidationAdapter
 } from '../types';
 import { createStatus } from './create-status';
 import { createValidator } from './create-validator';
@@ -18,7 +19,7 @@ export function createFormField<GValue>(
 ): TFormField<GValue> {
 	const {
 		key,
-		validator = createValidator([]),
+		validationAdapter = createValidationAdapter([]),
 		editable = true,
 		reValidateMode = bitwiseFlag(FormFieldReValidateMode.OnBlur),
 		validateMode = bitwiseFlag(FormFieldValidateMode.OnSubmit),
@@ -51,7 +52,7 @@ export function createFormField<GValue>(
 		isTouched: false,
 		isSubmitted: false,
 		isSubmitting: false,
-		validator,
+		validator: createValidator(validationAdapter),
 		status,
 		async validate(this: TFormField<GValue>) {
 			return this.validator.validate(this);
@@ -92,6 +93,6 @@ export function createFormField<GValue>(
 
 export interface TCreateFormFieldConfig<GValue> extends Partial<TFormFieldStateConfig> {
 	key: string;
-	validator?: TFormFieldValidator<GValue>;
+	validationAdapter?: TFormFieldValidationAdapter<GValue>;
 	notifyOnStatusChange?: boolean;
 }
