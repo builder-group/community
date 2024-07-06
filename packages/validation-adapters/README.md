@@ -19,7 +19,7 @@
 
 > Status: Experimental
 
-`validation-adapters` contains pre-made adapters for popular validation libraries like Zod and Valibot, allowing for easy integration with the [`validation-adapter`](https://github.com/inbeta-group/monorepo/tree/develop/packages/validation-adapter) library.
+`validation-adapters` is a collection of pre-made adapters for popular validation libraries like Zod and Valibot, allowing for easy integration with the [`validation-adapter`](https://github.com/inbeta-group/monorepo/tree/develop/packages/validation-adapter) library.
 
 ## 📖 Usage
 
