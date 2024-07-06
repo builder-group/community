@@ -12,7 +12,7 @@
 	"dependencies": {
 		"@ibg/utils": "workspace:*",
 		"feature-form": "workspace:*",
-		"feature-form-validators": "workspace:*",
+		"validation-adapters": "workspace:*",
 		"feature-react": "workspace:*",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",

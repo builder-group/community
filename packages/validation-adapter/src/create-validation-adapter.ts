@@ -1,13 +1,21 @@
 import { deepCopy } from '@ibg/utils';
 
-import { type TFormFieldValidationChain, type TValidationAdapter } from './types';
+import { type TValidationAdapter, type TValidationChain } from './types';
 
 export function createValidationAdapter<GValue>(
-	validationChain: TFormFieldValidationChain<GValue>
+	validationChain: TValidationChain<GValue>
 ): TValidationAdapter<GValue> {
 	return {
 		_validationChain: validationChain,
-		isValidating: false,
+		async validate(this, cx) {
+			for (const validationLink of this._validationChain) {
+				await validationLink.validate(cx);
+				if (cx.config.collectErrorMode === 'firstError' && cx.hasError()) {
+					break;
+				}
+			}
+			return cx;
+		},
 		push(validateFunctions) {
 			this._validationChain.push(validateFunctions);
 		},

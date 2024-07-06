@@ -14,45 +14,10 @@
 		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks",
 		"size": "size-limit --why"
 	},
-	"exports": {
-		".": {
-			"source": "./src/_validator/index.ts",
-			"require": "./dist/_validator/cjs/index.js",
-			"import": "./dist/_validator/esm/index.js",
-			"types": "./dist/_validator/types/index.d.ts"
-		},
-		"./zod": {
-			"source": "./src/zod/index.ts",
-			"require": "./dist/zod/cjs/index.js",
-			"import": "./dist/zod/esm/index.js",
-			"types": "./dist/types/zod/index.d.ts"
-		},
-		"./yup": {
-			"source": "./src/yup/index.ts",
-			"require": "./dist/yup/cjs/index.js",
-			"import": "./dist/yup/esm/index.js",
-			"types": "./dist/types/yup/index.d.ts"
-		},
-		"./valibot": {
-			"source": "./src/valibot/index.ts",
-			"require": "./dist/valibot/cjs/index.js",
-			"import": "./dist/valibot/esm/index.js",
-			"types": "./dist/types/valibot/index.d.ts"
-		}
-	},
-	"typesVersions": {
-		"*": {
-			"zod": [
-				"./dist/types/zod/index.d.ts"
-			],
-			"yup": [
-				"./dist/types/yup/index.d.ts"
-			],
-			"valibot": [
-				"./dist/types/valibot/index.d.ts"
-			]
-		}
-	},
+	"source": "./src/index.ts",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/inbeta-group/monorepo.git"
@@ -65,10 +30,7 @@
 	},
 	"homepage": "https://inbeta.group/?source=github",
 	"dependencies": {
-		"@ibg/utils": "workspace:*",
-		"valibot": "^0.35.0",
-		"yup": "^1.4.0",
-		"zod": "^3.23.8"
+		"@ibg/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@ibg/config": "workspace:*",
@@ -80,12 +42,7 @@
 	],
 	"size-limit": [
 		{
-			"path": "dist/esm/index.js",
-			"ignore": [
-				"zod",
-				"yup",
-				"valibot"
-			]
+			"path": "dist/esm/index.js"
 		}
 	]
 }

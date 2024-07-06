@@ -31,7 +31,8 @@
 	"homepage": "https://inbeta.group/?source=github",
 	"dependencies": {
 		"@ibg/utils": "workspace:*",
-		"feature-state": "workspace:*"
+		"feature-state": "workspace:*",
+		"validation-adapter": "workspace:*"
 	},
 	"devDependencies": {
 		"@ibg/config": "workspace:*",

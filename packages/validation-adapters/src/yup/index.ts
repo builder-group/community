@@ -1,8 +1,7 @@
+import { createValidationAdapter, type TValidationAdapter } from 'validation-adapter';
 import { ValidationError, type Schema } from 'yup';
 
-import { createValidationAdapter, type TValidationAdapter } from '../_adapter';
-
-export function yupValidator<GValue>(schema: Schema<GValue>): TValidationAdapter<GValue> {
+export function yupAdapter<GValue>(schema: Schema<GValue>): TValidationAdapter<GValue> {
 	return createValidationAdapter([
 		{
 			key: 'yup',
@@ -16,14 +15,20 @@ export function yupValidator<GValue>(schema: Schema<GValue>): TValidationAdapter
 						if (err.inner.length === 0) {
 							cx.registerError({
 								code: err.type ?? 'unknown',
-								message: err.message.replace('this', cx.config.key),
+								message:
+									cx.config.name != null
+										? err.message.replace('this', cx.config.name)
+										: err.message,
 								path: err.path
 							});
 						}
 						for (const innerErr of err.inner) {
 							cx.registerError({
 								code: innerErr.type ?? 'unknown',
-								message: innerErr.message.replace('this', cx.config.key),
+								message:
+									cx.config.name != null
+										? innerErr.message.replace('this', cx.config.name)
+										: innerErr.message,
 								path: innerErr.path
 							});
 						}

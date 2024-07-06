@@ -1,8 +1,7 @@
 import { getDotPath, safeParseAsync, type BaseIssue, type BaseSchema } from 'valibot';
+import { createValidationAdapter, type TValidationAdapter } from 'validation-adapter';
 
-import { createValidationAdapter, type TValidationAdapter } from '../_adapter';
-
-export function valibotValidator<GValue>(
+export function valibotAdapter<GValue>(
 	schema: BaseSchema<GValue, unknown, BaseIssue<unknown>>
 ): TValidationAdapter<GValue> {
 	return createValidationAdapter([

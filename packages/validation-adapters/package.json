@@ -1,0 +1,86 @@
+{
+	"name": "validation-adapters",
+	"description": "Validation adapters / resolvers for validation-adapter",
+	"version": "0.0.1",
+	"private": false,
+	"scripts": {
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"start:dev": "tsc -w",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks",
+		"size": "size-limit --why"
+	},
+	"exports": {
+		"./valibot": {
+			"source": "./src/valibot/index.ts",
+			"require": "./dist/valibot/cjs/index.js",
+			"import": "./dist/valibot/esm/index.js",
+			"types": "./dist/types/valibot/index.d.ts"
+		},
+		"./yup": {
+			"source": "./src/yup/index.ts",
+			"require": "./dist/yup/cjs/index.js",
+			"import": "./dist/yup/esm/index.js",
+			"types": "./dist/types/yup/index.d.ts"
+		},
+		"./zod": {
+			"source": "./src/zod/index.ts",
+			"require": "./dist/zod/cjs/index.js",
+			"import": "./dist/zod/esm/index.js",
+			"types": "./dist/types/zod/index.d.ts"
+		},
+		"./package.json": "./package.json",
+		"./*": "./*"
+	},
+	"typesVersions": {
+		"*": {
+			"valibot": [
+				"./dist/valibot/types/index.d.ts"
+			],
+			"yup": [
+				"./dist/yup/types/index.d.ts"
+			],
+			"zod": [
+				"./dist/zod/types/index.d.ts"
+			]
+		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/inbeta-group/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/inbeta-group/monorepo/issues"
+	},
+	"homepage": "https://inbeta.group/?source=github",
+	"devDependencies": {
+		"@ibg/config": "workspace:*",
+		"@types/node": "^20.14.1",
+		"valibot": "^0.35.0",
+		"validation-adapter": "workspace:*",
+		"yup": "^1.4.0",
+		"zod": "^3.23.8"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"size-limit": [
+		{
+			"path": "dist/valibot/esm/index.js"
+		},
+		{
+			"path": "dist/yup/esm/index.js"
+		},
+		{
+			"path": "dist/zod/esm/index.js"
+		}
+	]
+}
