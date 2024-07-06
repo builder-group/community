@@ -3,7 +3,7 @@ import { createState, type TSelectFeatures } from 'feature-state';
 import { type TFormFieldStatus, type TFormFieldStatusValue } from '../types';
 
 export function createStatus(initialValue: TFormFieldStatusValue): TFormFieldStatus {
-	const formFieldStatusState = createState(initialValue);
+	const formFieldStatusState = createState(initialValue, { deferred: false });
 
 	const formFieldStatusFeature: TSelectFeatures<TFormFieldStatusValue, ['form-field-status']> = {
 		_nextValue: undefined,

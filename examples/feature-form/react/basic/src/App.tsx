@@ -1,23 +1,25 @@
 import {
 	bitwiseFlag,
 	createForm,
-	createValidator,
+	createValidationAdapter,
 	FormFieldReValidateMode,
 	FormFieldValidateMode,
-	TFormFieldValidator,
-	valibotValidator,
-	zodValidator
+	TFormFieldValidationAdapter
 } from 'feature-form';
 import { useForm } from 'feature-react/form';
 import { withGlobalBind } from 'feature-react/state';
 import React from 'react';
 import * as v from 'valibot';
 import * as z from 'zod';
+import { randomHex, shortId } from '@ibg/utils';
 
 import './App.css';
 
+import { valibotAdapter } from 'validation-adapters/valibot';
+import { zodAdapter } from 'validation-adapters/zod';
+
 import { StatusMessage } from './components';
-import { isLightColor, randomColor } from './utils';
+import { isLightColor } from './utils';
 
 type TGender = 'male' | 'female' | 'diverse';
 
@@ -33,7 +35,7 @@ type TFormData = {
 	};
 };
 
-const valibotNameValidator = valibotValidator(
+const valibotNameValidator = valibotAdapter(
 	v.pipe(v.string(), v.minLength(2), v.maxLength(10), v.regex(/^([^0-9]*)$/))
 );
 
@@ -42,13 +44,13 @@ const $form = withGlobalBind(
 	createForm<TFormData>({
 		fields: {
 			firstName: {
-				validator: valibotNameValidator.clone().append(
-					createValidator([
+				validationAdapter: valibotNameValidator.clone().append(
+					createValidationAdapter([
 						{
 							key: 'jeff',
-							validate: (formField) => {
-								if (formField.get() !== 'Jeff') {
-									formField.status.registerNextError({
+							validate: (cx) => {
+								if (cx.value !== 'Jeff') {
+									cx.registerError({
 										code: 'jeff',
 										message: 'Only the name Jeff is allowed.'
 									});
@@ -60,41 +62,38 @@ const $form = withGlobalBind(
 				defaultValue: ''
 			},
 			lastName: {
-				validator: valibotNameValidator,
+				validationAdapter: valibotNameValidator,
 				defaultValue: ''
 			},
 			gender: {
-				validator: createValidator([
+				validationAdapter: createValidationAdapter([
 					{
 						key: 'gender',
-						validate: (formField) => {
-							if (
-								formField.get() !== 'female' &&
-								formField.get() !== 'male' &&
-								formField.get() !== 'diverse'
-							) {
-								formField.status.registerNextError({
+						validate: (cx) => {
+							if (cx.value !== 'female' && cx.value !== 'male' && cx.value !== 'diverse') {
+								cx.registerError({
 									code: 'invalid-gender',
 									message: 'Unknown gender.'
 								});
 							}
 						}
 					}
-				]) as TFormFieldValidator<TGender>,
+				]) as TFormFieldValidationAdapter<TGender>,
 				defaultValue: 'female'
 			},
 			email: {
-				validator: zodValidator(z.string().email().max(30).min(1)),
+				validationAdapter: zodAdapter(z.string().email().max(30).min(1)),
 				defaultValue: ''
 			},
 			image: {
-				validator: createValidator([
+				validationAdapter: createValidationAdapter([
 					{
 						key: 'color',
-						validate: (formField) => {
-							const color = formField.get()?.color;
+						validate: (cx) => {
+							const value = cx.value as TFormData['image'] | undefined;
+							const color = value?.color;
 							if (color != null && !isLightColor(color)) {
-								formField.status.registerNextError({
+								cx.registerError({
 									code: 'too-dark',
 									message: 'The image is too dark.'
 								});
@@ -103,8 +102,8 @@ const $form = withGlobalBind(
 					}
 				]),
 				defaultValue: {
-					id: '',
-					color: randomColor()
+					id: shortId(),
+					color: randomHex()
 				}
 			}
 		},
@@ -116,7 +115,8 @@ const $form = withGlobalBind(
 		},
 		notifyOnStatusChange: false,
 		validateMode: bitwiseFlag(FormFieldValidateMode.OnSubmit),
-		reValidateMode: bitwiseFlag(FormFieldReValidateMode.OnBlur, FormFieldReValidateMode.OnChange)
+		reValidateMode: bitwiseFlag(FormFieldReValidateMode.OnBlur, FormFieldReValidateMode.OnChange),
+		collectErrorMode: 'firstError'
 	})
 );
 
@@ -181,8 +181,8 @@ function App() {
 						event.preventDefault();
 						field('image').set(
 							{
-								id: '',
-								color: randomColor()
+								id: shortId(),
+								color: randomHex()
 							},
 							{ additionalData: { background: false } }
 						);

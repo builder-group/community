@@ -40,14 +40,26 @@ Provide a typesafe, straightforward, and lightweight form library designed to be
 ## 📖 Usage
 
 ```tsx
-import { createForm, zodValidator } from 'feature-form';
+import { createForm } from 'feature-form';
+import { zodValidator } from 'feature-form-validators/zod';
+import { valibotValidator } from 'feature-form-validators/valibot';
 import { useForm } from 'feature-react/form';
 import * as z from 'zod';
+import * as v from 'valibot';
 
-const $form = createForm({
+interface TFormData {
+    name: string;
+    email: string;
+}
+
+const $form = createForm<TFormData>({
     fields: {
-        firstName: {
+        name: {
             validator: zodValidator(z.string().min(2).max(10)),
+            defaultValue: ''
+        },
+        email: {
+            validator: valibotValidator(v.pipe(v.string(), v.email())),
             defaultValue: ''
         }
     },
@@ -55,25 +67,34 @@ const $form = createForm({
     onInvalidSubmit: (errors) => console.log('InvalidSubmit', errors)
 });
 
-export const Component: React.FC = () => {
+export const MyFormComponent: React.FC = () => {
     const { handleSubmit, register, status } = useForm($form);
 
     return (
         <form onSubmit={handleSubmit()}>
-            <input {...register('firstName')} />
-            <ErrorMessage status={status('firstName')} />
+            <div>
+                <label>Name</label>
+                <input {...register('name')} />
+                {status('name').error && <span>{status('name').error}</span>}
+            </div>
+            <div>
+                <label>Email</label>
+                <input {...register('email')} />
+                {status('email').error && <span>{status('email').error}</span>}
+            </div>
             <button type="submit">Submit</button>
         </form>
     );
 }
 ```
 
-### Validators
+### Validators ([`feature-form-validators`](https://github.com/inbeta-group/monorepo/tree/develop/packages/feature-form-validators))
 
-Supports various validators such as [Zod](https://github.com/colinhacks/zod), [Yup](https://github.com/jquense/yup), [Valibot](https://github.com/fabian-hiller/valibot) and more.
+`feature-form` supports various validators such as [Zod](https://github.com/colinhacks/zod), [Yup](https://github.com/jquense/yup), [Valibot](https://github.com/fabian-hiller/valibot) and more.
 
 ```ts
-import { zodValidator, valibotValidator } from 'feature-form';
+import { zodValidator } from 'feature-form-validators/zod';
+import { valibotValidator } from 'feature-form-validators/valibot';
 import * as z from 'zod';
 import * as v from 'valibot';
 

@@ -1,7 +1,7 @@
 {
 	"name": "feature-form",
 	"description": "Straightforward, typesafe, and feature-based form library for ReactJs",
-	"version": "0.0.7",
+	"version": "0.0.9",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
@@ -31,14 +31,13 @@
 	"homepage": "https://inbeta.group/?source=github",
 	"dependencies": {
 		"@ibg/utils": "workspace:*",
-		"feature-state": "workspace:*"
+		"feature-state": "workspace:*",
+		"validation-adapter": "workspace:*"
 	},
 	"devDependencies": {
 		"@ibg/config": "workspace:*",
-		"@types/node": "^20.14.1",
-		"valibot": "^0.35.0",
-		"yup": "^1.4.0",
-		"zod": "^3.23.8"
+		"@ibg/types": "workspace:*",
+		"@types/node": "^20.14.1"
 	},
 	"files": [
 		"dist",
@@ -46,12 +45,7 @@
 	],
 	"size-limit": [
 		{
-			"path": "dist/esm/index.js",
-			"ignore": [
-				"zod",
-				"yup",
-				"valibot"
-			]
+			"path": "dist/esm/index.js"
 		}
 	]
 }

@@ -1,7 +1,7 @@
 {
 	"name": "feature-react",
 	"description": "ReactJs extension features for feature-state",
-	"version": "0.0.14",
+	"version": "0.0.15",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
@@ -49,18 +49,16 @@
 		"url": "https://github.com/inbeta-group/monorepo/issues"
 	},
 	"homepage": "https://inbeta.group/?source=package-json",
-	"dependencies": {
-		"@ibg/utils": "workspace:*",
-		"feature-form": "workspace:*",
-		"feature-state": "workspace:*"
-	},
 	"peerDependencies": {
-		"react": "^18.2.0"
+		"react": "^18.3.1"
 	},
 	"devDependencies": {
 		"@ibg/config": "workspace:*",
+		"@ibg/utils": "workspace:*",
 		"@types/node": "^20.14.1",
 		"@types/react": "^18.3.3",
+		"feature-form": "workspace:*",
+		"feature-state": "workspace:*",
 		"react": "^18.3.1"
 	},
 	"files": [

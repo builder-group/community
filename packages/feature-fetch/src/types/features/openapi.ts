@@ -1,4 +1,14 @@
-import type { TParseAs } from '../api';
+import type {
+	TOperationErrorResponseContent,
+	TOperationPathParams,
+	TOperationQueryParams,
+	TOperationSuccessResponseContent,
+	TPathsWithMethod,
+	TRequestBody
+} from '@ibg/types/openapi';
+import { type TFilterKeys } from '@ibg/types/utils';
+
+import { type TParseAs } from '../fetch';
 import type {
 	TBodySerializer,
 	TFetchOptions,
@@ -6,15 +16,6 @@ import type {
 	TPathSerializer,
 	TQuerySerializer
 } from '../fetch-client';
-import type {
-	TErrorResponseBody,
-	TFilterKeys,
-	TPathsWith,
-	TRequestBody,
-	TRequestPathParams,
-	TRequestQueryParams,
-	TSuccessResponseBody
-} from '../openapi';
 
 export interface TOpenApiFeature<GPaths extends object> {
 	get: TOpenApiGet<GPaths>;
@@ -24,7 +25,7 @@ export interface TOpenApiFeature<GPaths extends object> {
 }
 
 export type TOpenApiGet<GPaths extends object> = <
-	GGetPaths extends TPathsWith<GPaths, 'get'>,
+	GGetPaths extends TPathsWithMethod<GPaths, 'get'>,
 	GPathOperation extends TFilterKeys<GPaths[GGetPaths], 'get'>,
 	GParseAs extends TParseAs = 'json'
 >(
@@ -33,7 +34,7 @@ export type TOpenApiGet<GPaths extends object> = <
 ) => Promise<TOpenApiFetchResponse<GPathOperation, GParseAs>>;
 
 export type TOpenApiPost<GPaths extends object> = <
-	GPostPaths extends TPathsWith<GPaths, 'post'>,
+	GPostPaths extends TPathsWithMethod<GPaths, 'post'>,
 	GPathOperation extends TFilterKeys<GPaths[GPostPaths], 'post'>,
 	GParseAs extends TParseAs = 'json'
 >(
@@ -47,7 +48,7 @@ export type TOpenApiPost<GPaths extends object> = <
 ) => Promise<TOpenApiFetchResponse<GPathOperation, GParseAs>>;
 
 export type TOpenApiPut<GPaths extends object> = <
-	GPutPaths extends TPathsWith<GPaths, 'put'>,
+	GPutPaths extends TPathsWithMethod<GPaths, 'put'>,
 	GPathOperation extends TFilterKeys<GPaths[GPutPaths], 'put'>,
 	GParseAs extends TParseAs = 'json'
 >(
@@ -61,7 +62,7 @@ export type TOpenApiPut<GPaths extends object> = <
 ) => Promise<TOpenApiFetchResponse<GPathOperation, GParseAs>>;
 
 export type TOpenApiDelete<GPaths extends object> = <
-	GDeletePaths extends TPathsWith<GPaths, 'delete'>,
+	GDeletePaths extends TPathsWithMethod<GPaths, 'delete'>,
 	GPathOperation extends TFilterKeys<GPaths[GDeletePaths], 'delete'>,
 	GParseAs extends TParseAs = 'json'
 >(
@@ -74,8 +75,8 @@ export type TOpenApiDelete<GPaths extends object> = <
 // =============================================================================
 
 export type TOpenApiFetchResponse<GPathOperation, GParseAs extends TParseAs> = TFetchResponse<
-	TSuccessResponseBody<GPathOperation>,
-	TErrorResponseBody<GPathOperation>,
+	TOperationSuccessResponseContent<GPathOperation>,
+	TOperationErrorResponseContent<GPathOperation>,
 	GParseAs
 >;
 
@@ -85,31 +86,30 @@ export type TOpenApiFetchResponse<GPathOperation, GParseAs extends TParseAs> = T
 
 // Fetch options for query parameters
 export type TOpenApiQueryParamsFetchOptions<GPathOperation> =
-	undefined extends TRequestQueryParams<GPathOperation> // If the queryParams can be undefined/optional
-		? { queryParams?: TRequestQueryParams<GPathOperation> }
-		: TRequestQueryParams<GPathOperation> extends never
+	undefined extends TOperationQueryParams<GPathOperation> // If the queryParams can be undefined/optional
+		? { queryParams?: TOperationQueryParams<GPathOperation> }
+		: TOperationQueryParams<GPathOperation> extends never
 			? { queryParams?: Record<string, unknown> }
-			: { queryParams: TRequestQueryParams<GPathOperation> };
+			: { queryParams: TOperationQueryParams<GPathOperation> };
 
 // Fetch options for path parameters
 export type TOpenApiPathParamsFetchOptions<GPathOperation> =
-	undefined extends TRequestPathParams<GPathOperation> // If the pathParams can be undefined/optional
-		? { pathParams?: TRequestPathParams<GPathOperation> }
-		: TRequestPathParams<GPathOperation> extends never
+	undefined extends TOperationPathParams<GPathOperation> // If the pathParams can be undefined/optional
+		? { pathParams?: TOperationPathParams<GPathOperation> }
+		: TOperationPathParams<GPathOperation> extends never
 			? { pathParams?: Record<string, unknown> }
-			: { pathParams: TRequestPathParams<GPathOperation> };
+			: { pathParams: TOperationPathParams<GPathOperation> };
 
-// Combines base fetch options with query and path parameters
 export type TOpenApiFetchOptions<GPathOperation, GParseAs extends TParseAs> = {
 	pathSerializer?: TPathSerializer<
-		TRequestPathParams<GPathOperation> extends never
+		TOperationPathParams<GPathOperation> extends never
 			? Record<string, unknown>
-			: TRequestPathParams<GPathOperation>
+			: TOperationPathParams<GPathOperation>
 	>;
 	querySerializer?: TQuerySerializer<
-		TRequestQueryParams<GPathOperation> extends never
+		TOperationQueryParams<GPathOperation> extends never
 			? Record<string, unknown>
-			: TRequestQueryParams<GPathOperation>
+			: TOperationQueryParams<GPathOperation>
 	>;
 	bodySerializer?: TBodySerializer<
 		TRequestBody<GPathOperation> extends never ? unknown : TRequestBody<GPathOperation>

@@ -64,7 +64,9 @@ export function useForm<GFormData extends TFormData>(
 }
 
 export interface TUseFormResponse<GFormData extends TFormData> {
-	handleSubmit: (options?: THandleSubmitOptions<GFormData>) => () => Promise<boolean>;
+	handleSubmit: (
+		options?: THandleSubmitOptions<GFormData>
+	) => (event?: React.BaseSyntheticEvent) => Promise<boolean>;
 	register: <GKey extends keyof GFormData>(
 		formFieldKey: GKey,
 		controlled?: boolean

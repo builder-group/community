@@ -1,4 +1,4 @@
-import type { TParseAs } from '../api';
+import { type TParseAs } from '../fetch';
 import type { TFetchOptions, TFetchResponse, TUnserializedBody } from '../fetch-client';
 
 export interface TApiFeature {

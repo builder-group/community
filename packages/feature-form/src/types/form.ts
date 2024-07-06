@@ -1,3 +1,5 @@
+import { type TCollectErrorMode } from 'validation-adapter';
+
 import { type TFeatureKeys, type TSelectFeatures } from './features';
 import {
 	type TFormField,
@@ -73,5 +75,3 @@ export interface TFormConfig {
 	 */
 	collectErrorMode: TCollectErrorMode;
 }
-
-export type TCollectErrorMode = 'firstError' | 'all';

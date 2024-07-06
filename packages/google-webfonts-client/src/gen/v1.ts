@@ -3,83 +3,105 @@
  * Do not make direct changes to the file.
  */
 
-
 export interface paths {
-  "/webfonts": {
-    /** Retrieve the list of fonts */
-    get: {
-      parameters: {
-        query: {
-          /** @description Your developer API Key. */
-          key: string;
-          /** @description Name of a font family. */
-          family?: string;
-          /** @description Name of a font subset. */
-          subset?: string;
-          /** @description Type of font source file. */
-          capability?: "VF" | "WOFF2";
-          /** @description alpha | date | popularity | style | trending. */
-          sort?: "alpha" | "date" | "popularity" | "style" | "trending";
+    "/webfonts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
         };
-      };
-      responses: {
-        /** @description A list of fonts */
-        200: {
-          content: {
-            "application/json": {
-              /** @description The kind of object, a webfont object. */
-              kind?: string;
-              items?: {
-                  /** @description The name of the family. */
-                  family?: string;
-                  /** @description A list of scripts supported by the family. */
-                  subsets?: string[];
-                  /** @description A url to the family subset covering only the name of the family. */
-                  menu?: string;
-                  /** @description The different styles available for the family. */
-                  variants?: string[];
-                  /** @description The font family version. */
-                  version?: string;
-                  /**
-                   * Format: date
-                   * @description The date (format "yyyy-MM-dd") the font family was modified for the last time.
-                   */
-                  lastModified?: string;
-                  /** @description The font family files (with all supported scripts) for each one of the available variants. */
-                  files?: Record<string, string>;
-                  /** @description Category of the font (ex: sans-serif, monospace). */
-                  category?: string;
-                  /** @description The kind of object, a webfont object. */
-                  kind?: string;
-                  axes?: {
-                      /** @description Tag of the variable font axis. */
-                      tag?: string;
-                      /**
-                       * Format: float
-                       * @description Start of the range of the variable font axis.
-                       */
-                      start?: number;
-                      /**
-                       * Format: float
-                       * @description End of the range of the variable font axis.
-                       */
-                      end?: number;
-                    }[];
-                }[];
+        /** Retrieve the list of fonts */
+        get: {
+            parameters: {
+                query: {
+                    /** @description Your developer API Key. */
+                    key: string;
+                    /** @description Name of a font family. */
+                    family?: string;
+                    /** @description Name of a font subset. */
+                    subset?: string;
+                    /** @description Type of font source file. */
+                    capability?: "VF" | "WOFF2";
+                    /** @description alpha | date | popularity | style | trending. */
+                    sort?: "alpha" | "date" | "popularity" | "style" | "trending";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
             };
-          };
+            requestBody?: never;
+            responses: {
+                /** @description A list of fonts */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description The kind of object, a webfont object. */
+                            kind?: string;
+                            items?: {
+                                /** @description The name of the family. */
+                                family?: string;
+                                /** @description A list of scripts supported by the family. */
+                                subsets?: string[];
+                                /** @description A url to the family subset covering only the name of the family. */
+                                menu?: string;
+                                /** @description The different styles available for the family. */
+                                variants?: string[];
+                                /** @description The font family version. */
+                                version?: string;
+                                /**
+                                 * Format: date
+                                 * @description The date (format "yyyy-MM-dd") the font family was modified for the last time.
+                                 */
+                                lastModified?: string;
+                                /** @description The font family files (with all supported scripts) for each one of the available variants. */
+                                files?: {
+                                    [key: string]: string | undefined;
+                                };
+                                /** @description Category of the font (ex: sans-serif, monospace). */
+                                category?: string;
+                                /** @description The kind of object, a webfont object. */
+                                kind?: string;
+                                axes?: {
+                                    /** @description Tag of the variable font axis. */
+                                    tag?: string;
+                                    /**
+                                     * Format: float
+                                     * @description Start of the range of the variable font axis.
+                                     */
+                                    start?: number;
+                                    /**
+                                     * Format: float
+                                     * @description End of the range of the variable font axis.
+                                     */
+                                    end?: number;
+                                }[];
+                            }[];
+                        };
+                    };
+                };
+            };
         };
-      };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-  };
 }
-
 export type webhooks = Record<string, never>;
-
-export type components = Record<string, never>;
-
+export interface components {
+    schemas: never;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
+}
 export type $defs = Record<string, never>;
-
-export type external = Record<string, never>;
-
 export type operations = Record<string, never>;

@@ -1,4 +1,6 @@
 import type express from 'express';
+import { type TPathsWithMethod } from '@ibg/types/openapi';
+import { type TFilterKeys } from '@ibg/types/utils';
 
 import { ValidationError, type TValidationErrorDetails } from './exceptions';
 import { parseRequestQuery } from './helper';
@@ -9,9 +11,7 @@ import {
 	type TBaseValidationSchema,
 	type TBaseValidationSchemaEntry,
 	type TExpressRequestHandler,
-	type TFilterKeys,
-	type TOpenApiValidationSchema,
-	type TPathsWith
+	type TOpenApiValidationSchema
 } from './types';
 
 export class OpenApiRouter<GPaths extends object = object> {
@@ -22,7 +22,7 @@ export class OpenApiRouter<GPaths extends object = object> {
 	}
 
 	public get<
-		GGetPaths extends TPathsWith<GPaths, 'get'>,
+		GGetPaths extends TPathsWithMethod<GPaths, 'get'>,
 		GPathOperation extends TFilterKeys<GPaths[GGetPaths], 'get'>
 	>(
 		path: GGetPaths | (string & Record<never, never>),
@@ -37,7 +37,7 @@ export class OpenApiRouter<GPaths extends object = object> {
 	}
 
 	public post<
-		GPostPaths extends TPathsWith<GPaths, 'post'>,
+		GPostPaths extends TPathsWithMethod<GPaths, 'post'>,
 		GPathOperation extends TFilterKeys<GPaths[GPostPaths], 'post'>
 	>(
 		path: GPostPaths | (string & Record<never, never>),
@@ -52,7 +52,7 @@ export class OpenApiRouter<GPaths extends object = object> {
 	}
 
 	public put<
-		GPutPaths extends TPathsWith<GPaths, 'put'>,
+		GPutPaths extends TPathsWithMethod<GPaths, 'put'>,
 		GPathOperation extends TFilterKeys<GPaths[GPutPaths], 'put'>
 	>(
 		path: GPutPaths | (string & Record<never, never>),
@@ -67,7 +67,7 @@ export class OpenApiRouter<GPaths extends object = object> {
 	}
 
 	public del<
-		GDeletePaths extends TPathsWith<GPaths, 'delete'>,
+		GDeletePaths extends TPathsWithMethod<GPaths, 'delete'>,
 		GPathOperation extends TFilterKeys<GPaths[GDeletePaths], 'delete'>
 	>(
 		path: GDeletePaths | (string & Record<never, never>),

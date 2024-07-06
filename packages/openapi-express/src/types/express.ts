@@ -1,12 +1,11 @@
 import type express from 'express';
 import type * as core from 'express-serve-static-core';
-
 import type {
-	TRequestBody,
-	TRequestPathParams,
-	TRequestQueryParams,
-	TSuccessResponseBody
-} from './openapi';
+	TOperationPathParams,
+	TOperationQueryParams,
+	TOperationSuccessResponseContent,
+	TRequestBody
+} from '@ibg/types/openapi';
 
 // =============================================================================
 // Request Options
@@ -14,15 +13,15 @@ import type {
 
 // Request options for query parameters
 export type TOpenApiQueryParamsRequestOptions<GPathOperation> =
-	TRequestQueryParams<GPathOperation> extends never
+	TOperationQueryParams<GPathOperation> extends never
 		? core.Query
-		: TRequestQueryParams<GPathOperation>;
+		: TOperationQueryParams<GPathOperation>;
 
 // Request options for path parameters
 export type TOpenApiPathParamsRequestOptions<GPathOperation> =
-	TRequestPathParams<GPathOperation> extends never
+	TOperationPathParams<GPathOperation> extends never
 		? core.ParamsDictionary
-		: TRequestPathParams<GPathOperation>;
+		: TOperationPathParams<GPathOperation>;
 
 // =============================================================================
 // Request
@@ -30,7 +29,7 @@ export type TOpenApiPathParamsRequestOptions<GPathOperation> =
 
 export type TOpenApiExpressRequest<GPathOperation> = express.Request<
 	TOpenApiPathParamsRequestOptions<GPathOperation>, // Params
-	TSuccessResponseBody<GPathOperation>, // ResBody
+	TOperationSuccessResponseContent<GPathOperation>, // ResBody
 	TRequestBody<GPathOperation>, // ReqBody
 	TOpenApiQueryParamsRequestOptions<GPathOperation> // ReqQuery
 >;
@@ -40,7 +39,7 @@ export type TOpenApiExpressRequest<GPathOperation> = express.Request<
 // =============================================================================
 
 export type TOpenApiExpressResponse<GPathOperation> = express.Response<
-	TSuccessResponseBody<GPathOperation> // ResBody
+	TOperationSuccessResponseContent<GPathOperation> // ResBody
 >;
 
 // =============================================================================
