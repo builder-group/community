@@ -1,5 +1,16 @@
 # feature-form
 
+## 0.0.10
+
+### Patch Changes
+
+- [#39](https://github.com/inbeta-group/monorepo/pull/39) [`4dd985a`](https://github.com/inbeta-group/monorepo/commit/4dd985a432a4197324792cb25d7df3c0f9ccc912) Thanks [@bennoinbeta](https://github.com/bennoinbeta)! - updated dependencies
+
+- Updated dependencies [[`4dd985a`](https://github.com/inbeta-group/monorepo/commit/4dd985a432a4197324792cb25d7df3c0f9ccc912)]:
+  - validation-adapter@0.0.3
+  - feature-state@0.0.15
+  - @ibg/utils@0.0.10
+
 ## 0.0.7
 
 ### Patch Changes

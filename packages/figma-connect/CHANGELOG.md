@@ -1,5 +1,12 @@
 # figma-connect
 
+## 0.0.8
+
+### Patch Changes
+
+- Updated dependencies [[`4dd985a`](https://github.com/inbeta-group/monorepo/commit/4dd985a432a4197324792cb25d7df3c0f9ccc912)]:
+  - @ibg/utils@0.0.10
+
 ## 0.0.7
 
 ### Patch Changes
