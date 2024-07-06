@@ -1,4 +1,4 @@
-import type { TUnionToIntersection } from '@ibg/utils';
+import type { TUnionToIntersection } from '@ibg/types/utils';
 
 import type { TApiFeature } from './api';
 import type { TOpenApiFeature } from './openapi';

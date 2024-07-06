@@ -1,0 +1,48 @@
+{
+	"name": "validation-adapter",
+	"description": "Universal validation adapter that integrates various validation libraries like Zod, Valibot, and Yup",
+	"version": "0.0.2",
+	"private": false,
+	"scripts": {
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"start:dev": "tsc -w",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks",
+		"size": "size-limit --why"
+	},
+	"source": "./src/index.ts",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/inbeta-group/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/inbeta-group/monorepo/issues"
+	},
+	"homepage": "https://inbeta.group/?source=github",
+	"dependencies": {
+		"@ibg/utils": "workspace:*"
+	},
+	"devDependencies": {
+		"@ibg/config": "workspace:*",
+		"@types/node": "^20.14.1"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"size-limit": [
+		{
+			"path": "dist/esm/index.js"
+		}
+	]
+}

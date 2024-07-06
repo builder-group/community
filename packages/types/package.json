@@ -1,0 +1,59 @@
+{
+	"name": "@ibg/types",
+	"description": "A collection of utility types",
+	"version": "0.0.1",
+	"private": false,
+	"scripts": {
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle -b typesonly",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"update:latest": "pnpm update --latest",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks"
+	},
+	"exports": {
+		"./api": {
+			"source": "./src/api/index.ts",
+			"types": "./dist/api/index.d.ts"
+		},
+		"./openapi": {
+			"source": "./src/openapi/index.ts",
+			"types": "./dist/openapi/index.d.ts"
+		},
+		"./utils": {
+			"source": "./src/utils/index.ts",
+			"types": "./dist/utils/index.d.ts"
+		}
+	},
+	"typesVersions": {
+		"*": {
+			"api": [
+				"./dist/api/index.d.ts"
+			],
+			"openapi": [
+				"./dist/openapi/index.d.ts"
+			],
+			"utils": [
+				"./dist/utils/index.d.ts"
+			]
+		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/inbeta-group/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennoinbeta",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/inbeta-group/monorepo/issues"
+	},
+	"homepage": "https://inbeta.group/?source=package-json",
+	"devDependencies": {
+		"@ibg/config": "workspace:*"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	]
+}

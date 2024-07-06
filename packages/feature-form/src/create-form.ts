@@ -1,4 +1,5 @@
-import { bitwiseFlag, deepCopy, type BitwiseFlag, type TEntries } from '@ibg/utils';
+import { type TEntries } from '@ibg/types/utils';
+import { bitwiseFlag, deepCopy, type BitwiseFlag } from '@ibg/utils';
 
 import { createFormField } from './form-field';
 import {
@@ -9,7 +10,7 @@ import {
 	type TFormData,
 	type TFormFields,
 	type TFormFieldStateConfig,
-	type TFormFieldValidator,
+	type TFormFieldValidationAdapter,
 	type TInvalidFormFieldError,
 	type TInvalidFormFieldErrors,
 	type TInvalidSubmitCallback,
@@ -45,7 +46,7 @@ export function createForm<GFormData extends TFormData>(
 					fieldKey,
 					createFormField(field.defaultValue, {
 						key: fieldKey,
-						validator: field.validator,
+						validationAdapter: field.validationAdapter,
 						collectErrorMode: field.collectErrorMode ?? collectErrorMode,
 						validateMode: field.validateMode ?? validateMode,
 						reValidateMode: field.reValidateMode ?? reValidateMode,
@@ -248,14 +249,14 @@ export type TCreateFormConfigFormFields<GFormData extends TFormData> = {
 
 export interface TCreateFormConfigFormField<GValue> extends Partial<TFormFieldStateConfig> {
 	defaultValue?: GValue;
-	validator?: TFormFieldValidator<GValue>;
+	validationAdapter?: TFormFieldValidationAdapter<GValue>;
 }
 
 // Helper function to make type inference work
 // https://github.com/microsoft/TypeScript/issues/26242
-export function fromValidator<GValue>(
-	validator: TFormFieldValidator<GValue>,
+export function fromValidationAdapter<GValue>(
+	validationAdapter: TFormFieldValidationAdapter<GValue>,
 	config: Omit<TCreateFormConfigFormField<GValue>, 'validator'>
 ): TCreateFormConfigFormField<GValue> {
-	return { validator, ...config };
+	return { validationAdapter, ...config };
 }

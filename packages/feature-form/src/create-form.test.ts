@@ -1,19 +1,19 @@
+import { createValidationAdapter } from 'validation-adapter';
 import { describe, expect, it } from 'vitest';
 
-import { createForm, fromValidator } from './create-form';
-import { createValidator } from './form-field';
+import { createForm, fromValidationAdapter } from './create-form';
 
 describe('createForm function', () => {
 	it('shoudl work', async () => {
 		const form = createForm({
 			fields: {
-				item5: fromValidator<number>(
-					createValidator([
+				item5: fromValidationAdapter<number>(
+					createValidationAdapter([
 						{
 							key: 'date',
-							validate: (formField) => {
-								if (formField._value != null) {
-									const date = new Date(formField._value);
+							validate: (cx) => {
+								if (cx.value != null) {
+									const date = new Date(cx.value);
 								}
 							}
 						}

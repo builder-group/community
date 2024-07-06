@@ -1,32 +1,18 @@
-import { deepCopy } from '@ibg/utils';
-
-import { type TFormFieldValidationChain, type TFormFieldValidator } from '../types';
+import { type TFormFieldValidationAdapter, type TFormFieldValidator } from '../types';
+import { createValidateContext } from './create-validate-context';
 
 export function createValidator<GValue>(
-	validationChain: TFormFieldValidationChain<GValue>
+	validationAdapter: TFormFieldValidationAdapter<GValue>
 ): TFormFieldValidator<GValue> {
 	return {
-		_validationChain: validationChain,
+		_validationAdapter: validationAdapter,
 		isValidating: false,
-		push(validateFunctions) {
-			this._validationChain.push(validateFunctions);
-		},
-		append(validator) {
-			this._validationChain.push(...validator._validationChain);
-			return this;
-		},
-		async validate(formField) {
-			this.isValidating = true;
+		async validate(this, formField) {
+			const validationContext = createValidateContext(formField);
 
-			for (const validationLink of this._validationChain) {
-				await validationLink.validate(formField);
-				if (
-					formField._config.collectErrorMode === 'firstError' &&
-					formField.status._nextValue?.type === 'INVALID'
-				) {
-					break;
-				}
-			}
+			this.isValidating = true;
+			await this._validationAdapter.validate(validationContext);
+			this.isValidating = false;
 
 			// If no error was registered we assume its valid
 			if (formField.status._nextValue == null) {
@@ -36,12 +22,8 @@ export function createValidator<GValue>(
 			}
 
 			formField.status._nextValue = undefined;
-			this.isValidating = false;
 
 			return formField.status.get().type === 'VALID';
-		},
-		clone() {
-			return createValidator<GValue>(deepCopy(this._validationChain));
 		}
 	};
 }

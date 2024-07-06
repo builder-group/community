@@ -35,9 +35,9 @@
 	},
 	"devDependencies": {
 		"@ibg/config": "workspace:*",
-		"@types/node": "^20.14.1",
+		"@types/node": "^20.14.10",
 		"dotenv": "^16.4.5",
-		"openapi-typescript": "^6.7.6"
+		"openapi-typescript": "^7.0.2"
 	},
 	"files": [
 		"dist",
