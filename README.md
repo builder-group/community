@@ -11,7 +11,7 @@
     </a>
 </p>
 
-A collection of open source libraries maintained by [inbeta.group](https://inbeta.group).
+A collection of open source libraries maintained by [@bennoinbeta](https://github.com/bennoinbeta) and [inbeta.group](https://inbeta.group).
 
 ## 📦 Packages
 
@@ -23,7 +23,7 @@ A collection of open source libraries maintained by [inbeta.group](https://inbet
 | [feature-form](https://github.com/inbeta-group/monorepo/blob/develop/packages/feature-form) | Straightforward, typesafe, and feature-based form library | [`feature-form`](https://www.npmjs.com/package/feature-form) |
 | [feature-logger](https://github.com/inbeta-group/monorepo/blob/develop/packages/feature-logger) | Straightforward, typesafe, and feature-based logging library | [`feature-logger`](https://www.npmjs.com/package/feature-logger) |
 | [feature-state](https://github.com/inbeta-group/monorepo/blob/develop/packages/feature-state) | Straightforward, typesafe, and feature-based state management library for ReactJs | [`feature-state`](https://www.npmjs.com/package/feature-state) |
-| [feature-state-react](https://github.com/inbeta-group/monorepo/blob/develop/packages/feature-state-react) | ReactJs extension for the feature-state library, providing hooks and features for easy state management in ReactJs | [`feature-state-react`](https://www.npmjs.com/package/feature-state-react) |
+| [feature-react](https://github.com/inbeta-group/monorepo/blob/develop/packages/feature-react) | ReactJs extension for the feature-state and feature-form library, providing hooks and features for ReactJs | [`feature-state-react`](https://www.npmjs.com/package/feature-state-react) |
 | [figma-connect](https://github.com/inbeta-group/monorepo/blob/develop/packages/figma-connect) | Straightforward and typesafe wrapper around the communication between the app/ui (iframe) and plugin (sandbox) part of a Figma Plugin | [`figma-connect`](https://www.npmjs.com/package/figma-connect) |
 | [google-webfonts-client](https://github.com/inbeta-group/monorepo/blob/develop/packages/google-webfonts-client) | Typesafe and straightforward fetch client for interacting with the Google Web Fonts API using feature-fetch | [`google-webfonts-client`](https://www.npmjs.com/package/google-webfonts-client) |
 | [openapi-express](https://github.com/inbeta-group/monorepo/blob/develop/packages/openapi-express) | Typesafe Express Router wrapper supporting OpenAPI types | [`openapi-express`](https://www.npmjs.com/package/openapi-express) |
