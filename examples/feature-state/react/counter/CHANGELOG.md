@@ -1,5 +1,13 @@
 # counter
 
+## 0.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`4dd985a`](https://github.com/inbeta-group/monorepo/commit/4dd985a432a4197324792cb25d7df3c0f9ccc912)]:
+  - feature-react@0.0.16
+  - feature-state@0.0.15
+
 ## 0.0.1
 
 ### Patch Changes
