@@ -436,6 +436,12 @@ importers:
       express:
         specifier: ^4.19.2
         version: 4.19.2
+      valibot:
+        specifier: ^0.35.0
+        version: 0.35.0
+      validation-adapters:
+        specifier: workspace:*
+        version: link:../validation-adapters
 
   packages/types:
     devDependencies:

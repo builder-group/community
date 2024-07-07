@@ -39,13 +39,13 @@
 	"typesVersions": {
 		"*": {
 			"valibot": [
-				"./dist/valibot/types/index.d.ts"
+				"./dist/types/valibot/index.d.ts"
 			],
 			"yup": [
-				"./dist/yup/types/index.d.ts"
+				"./dist/types/yup/index.d.ts"
 			],
 			"zod": [
-				"./dist/zod/types/index.d.ts"
+				"./dist/types/zod/index.d.ts"
 			]
 		}
 	},

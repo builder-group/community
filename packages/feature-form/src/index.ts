@@ -4,6 +4,7 @@ export { BitwiseFlag, bitwiseFlag } from '@ibg/utils';
 export { createValidationAdapter } from 'validation-adapter';
 export * from './create-form';
 export * from './form-field';
+export * from './helper';
 export * from './types';
 
 declare module 'feature-state' {
