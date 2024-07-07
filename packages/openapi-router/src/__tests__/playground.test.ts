@@ -10,19 +10,15 @@ describe('playground', () => {
 	it('types should work', async () => {
 		const openapiRouter = createExpressOpenApiRouter<paths>(Router());
 
-		const pathValibotAdapter = valibotAdapter(v.object({}));
+		const pathValibotAdapter = valibotAdapter(
+			v.object({
+				petId: v.number()
+			})
+		);
 
 		openapiRouter.get(
 			'/pet/{petId}',
 			{
-				// pathAdapter: createValidationAdapter([
-				// 	{
-				// 		key: 'pet',
-				// 		validate: (cx) => {
-				// 			// TODO
-				// 		}
-				// 	}
-				// ])
 				pathAdapter: pathValibotAdapter
 			},
 			async (req, res, next) => {

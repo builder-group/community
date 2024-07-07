@@ -3,6 +3,7 @@ export interface TValidationAdapter<
 	GValidateContext extends TBaseValidateContext<GValue> = TBaseValidateContext<GValue>
 > {
 	_validationChain: TValidationChain<GValue, GValidateContext>;
+	_typeEnforcer?: GValue; // TODO: This field ensures that TypeScript enforces the generic type GValue consistently across different instances of TValidationAdapter
 	validate: <GInnerValidateContext extends GValidateContext = GValidateContext>(
 		cx: GInnerValidateContext
 	) => Promise<GInnerValidateContext>;
