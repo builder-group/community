@@ -1,12 +1,12 @@
 import { Err, Ok } from 'ts-results-es';
 
-import { ServiceException } from './exceptions';
+import { ServiceError } from './exceptions';
 import {
 	buildUrl,
 	FetchHeaders,
-	mapErrorToNetworkException,
-	mapErrorToServiceException,
-	mapResponseToRequestException,
+	mapErrorToNetworkError,
+	mapErrorToServiceError,
+	mapResponseToRequestError,
 	processBeforeRequestMiddlewares,
 	processRequestMiddlewares,
 	serializeBody,
@@ -43,8 +43,8 @@ export function createFetchClient<GPaths extends object = object>(
 	} else if (typeof fetch === 'function') {
 		fetchLike = fetch;
 	} else {
-		throw new ServiceException('#ERR_MISSING_FETCH', {
-			message: "Failed to find valid 'fetch' function to wrap around!"
+		throw new ServiceError('#ERR_MISSING_FETCH', {
+			description: "Failed to find valid 'fetch' function to wrap around!"
 		});
 	}
 
@@ -80,7 +80,7 @@ export function createFetchClient<GPaths extends object = object>(
 				try {
 					serializedBody = bodySerializer(body, mergedHeaders.get('Content-Type') ?? undefined);
 				} catch (error) {
-					return Err(mapErrorToServiceException(error, '#ERR_SERIALIZE_BODY'));
+					return Err(mapErrorToServiceError(error, '#ERR_SERIALIZE_BODY'));
 				}
 			}
 
@@ -115,7 +115,7 @@ export function createFetchClient<GPaths extends object = object>(
 				pathParams = middlewaresResponse.pathParams;
 				queryParams = middlewaresResponse.queryParams;
 			} catch (error) {
-				return Err(mapErrorToServiceException(error, '#ERR_MIDDLEWARE'));
+				return Err(mapErrorToServiceError(error, '#ERR_MIDDLEWARE'));
 			}
 
 			// Build final Url
@@ -135,7 +135,7 @@ export function createFetchClient<GPaths extends object = object>(
 			try {
 				response = await baseFetch(finalUrl, requestInit);
 			} catch (error) {
-				return Err(mapErrorToNetworkException(error));
+				return Err(mapErrorToNetworkError(error));
 			}
 
 			// Handle ok response (parse as "parseAs" and falling back to .text() when necessary)
@@ -146,8 +146,8 @@ export function createFetchClient<GPaths extends object = object>(
 						data = await response[parseAs]();
 					} catch (error) {
 						return Err(
-							new ServiceException('#ERR_PARSE_RESPONSE_DATA', {
-								message: `Failed to parse response as '${parseAs}'`
+							new ServiceError('#ERR_PARSE_RESPONSE_DATA', {
+								description: `Failed to parse response as '${parseAs}'`
 							})
 						);
 					}
@@ -156,7 +156,7 @@ export function createFetchClient<GPaths extends object = object>(
 			}
 
 			// Handle errors (always parse as .json() or .text())
-			return Err(await mapResponseToRequestException(response));
+			return Err(await mapResponseToRequestError(response));
 		}
 	};
 }

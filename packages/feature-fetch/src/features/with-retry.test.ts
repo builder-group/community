@@ -3,7 +3,7 @@ import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { createFetchClient } from '../create-fetch-client';
-import { RequestException } from '../exceptions';
+import { RequestError } from '../exceptions';
 import { type TFetchLike } from '../types';
 import { withRetry } from './with-retry';
 
@@ -88,7 +88,7 @@ describe('withRetry function', () => {
 
 		expect(result.isErr()).toBe(true);
 		const error = result.unwrapErr();
-		expect(error instanceof RequestException).toBe(true);
-		expect((error as RequestException).data).toEqual({ message: 'Internal Server Error' });
+		expect(error instanceof RequestError).toBe(true);
+		expect((error as RequestError).data).toEqual({ message: 'Internal Server Error' });
 	});
 });
