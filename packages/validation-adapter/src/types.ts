@@ -3,7 +3,7 @@ export interface TValidationAdapter<
 	GValidateContext extends TBaseValidateContext<GValue> = TBaseValidateContext<GValue>
 > {
 	_validationChain: TValidationChain<GValue, GValidateContext>;
-	validate: (cx: GValidateContext) => Promise<GValidateContext>;
+	validate: (cx: GValidateContext) => Promise<void>;
 	append: (
 		validator: TValidationAdapter<GValue, GValidateContext>
 	) => TValidationAdapter<GValue, GValidateContext>;

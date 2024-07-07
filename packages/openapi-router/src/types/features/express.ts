@@ -89,32 +89,34 @@ export type TOpenApiExpressResponse<GPathOperation> = express.Response<
 // Router Options
 // =============================================================================
 
-export type TOpenApiRouteOptions<GPathOperation> =
-	TOpenApiQueryParamsValidationAdapter<GPathOperation> &
-		TOpenApiPathParamsValidationAdapter<GPathOperation> &
-		TOpenApiBodyValidationAdapter<GPathOperation>;
+export type TOpenApiRouteOptions<GPathOperation> = TOpenApiValidationAdapters<GPathOperation>;
 
 // =============================================================================
 // Validation
 // =============================================================================
 
+export type TOpenApiValidationAdapters<GPathOperation> =
+	TOpenApiQueryParamsValidationAdapter<GPathOperation> &
+		TOpenApiPathParamsValidationAdapter<GPathOperation> &
+		TOpenApiBodyValidationAdapter<GPathOperation>;
+
 export type TOpenApiQueryParamsValidationAdapter<GPathOperation> =
 	undefined extends TOperationQueryParams<GPathOperation> // If the queryAdapter can be undefined/optional
-		? { queryAdapter?: TOperationQueryParams<GPathOperation> }
+		? { queryAdapter?: TValidationAdapter<TOperationQueryParams<GPathOperation>> }
 		: TOperationQueryParams<GPathOperation> extends never
 			? { queryAdapter?: TDefaultValidationAdapter }
 			: { queryAdapter: TValidationAdapter<TOperationQueryParams<GPathOperation>> };
 
 export type TOpenApiPathParamsValidationAdapter<GPathOperation> =
 	undefined extends TOperationPathParams<GPathOperation> // If the pathAdapter can be undefined/optional
-		? { pathAdapter?: TOperationPathParams<GPathOperation> }
+		? { pathAdapter?: TValidationAdapter<TOperationPathParams<GPathOperation>> }
 		: TOperationPathParams<GPathOperation> extends never
 			? { pathAdapter?: TDefaultValidationAdapter }
 			: { pathAdapter: TValidationAdapter<TOperationPathParams<GPathOperation>> };
 
 export type TOpenApiBodyValidationAdapter<GPathOperation> =
 	undefined extends TRequestBody<GPathOperation> // If the bodyAdapter can be undefined/optional
-		? { bodyAdapter?: TRequestBody<GPathOperation> }
+		? { bodyAdapter?: TValidationAdapter<TRequestBody<GPathOperation>> }
 		: TRequestBody<GPathOperation> extends never
 			? { bodyAdapter?: TDefaultValidationAdapter }
 			: { bodyAdapter: TValidationAdapter<TRequestBody<GPathOperation>> };

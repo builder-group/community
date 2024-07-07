@@ -14,7 +14,6 @@ export function createValidationAdapter<GValue>(
 					break;
 				}
 			}
-			return cx;
 		},
 		push(validateFunctions) {
 			this._validationChain.push(validateFunctions);
