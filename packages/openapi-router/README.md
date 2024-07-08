@@ -19,4 +19,50 @@
 
 > Status: Experimental
 
-todo
+`@ibg/openapi-router` is a thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod.
+
+- **Typesafe**: Build with TypeScript for strong type safety and support for [`openapi-typescript`](https://github.com/drwpow/openapi-typescript) types
+- **Framework Agnostic**: Compatible with Express, Hono, and other popular web frameworks
+- **Validation-First**: Integrates with Valibot, Zod, and other validators to ensure requests adhere to expected types
+- **Modular & Extendable**: Easily extendable with features like `withExpress()`, ..
+
+### Motivation
+
+The goal is to provide a typesafe and straightforward wrapper around web framework routers, seamlessly integrating with OpenAPI schemas using `openapi-typescript` and ensuring type validation with libraries like Zod and Valibot.
+
+## 📖 Usage
+
+```ts
+import { Router } from 'express';
+import * as v from 'valibot';
+import { valibotAdapter } from 'validation-adapters/valibot';
+import { createExpressOpenApiRouter } from '@ibg/openapi-router';
+
+export const app: Express = express();
+
+// Add middleware to parse JSON request bodies
+app.use(express.json());
+
+const openapiRouter = createExpressOpenApiRouter<paths>(Router());
+
+openapiRouter.get('/pet/{petId}', {
+    pathAdapter: valibotAdapter(
+        v.object({
+            petId: v.number()
+        })
+    ),
+    handler: async (req, res, next) => {}
+});
+
+openapiRouter.get('/pet/findByTags', {
+    queryAdapter: valibotAdapter(
+        v.object({
+            tags: v.optional(v.array(v.string()))
+        })
+    ),
+    handler: (req, res, next) => {}
+});
+
+// Application endpoint
+app.use('/*', openapiRouter);
+```

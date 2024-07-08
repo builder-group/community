@@ -1,6 +1,6 @@
 {
 	"name": "@ibg/openapi-router",
-	"description": "Typesafe router for web frameworks like ExpressJs and Hono",
+	"description": "Thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod",
 	"version": "0.0.1",
 	"private": false,
 	"scripts": {
