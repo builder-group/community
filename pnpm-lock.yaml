@@ -286,6 +286,9 @@ importers:
 
   packages/feature-fetch:
     dependencies:
+      '@ibg/types':
+        specifier: workspace:*
+        version: link:../types
       '@ibg/utils':
         specifier: workspace:*
         version: link:../utils
@@ -296,9 +299,6 @@ importers:
       '@ibg/config':
         specifier: workspace:*
         version: link:../config
-      '@ibg/types':
-        specifier: workspace:*
-        version: link:../types
       '@types/node':
         specifier: ^20.14.1
         version: 20.14.1
@@ -311,6 +311,9 @@ importers:
 
   packages/feature-form:
     dependencies:
+      '@ibg/types':
+        specifier: workspace:*
+        version: link:../types
       '@ibg/utils':
         specifier: workspace:*
         version: link:../utils
@@ -324,15 +327,15 @@ importers:
       '@ibg/config':
         specifier: workspace:*
         version: link:../config
-      '@ibg/types':
-        specifier: workspace:*
-        version: link:../types
       '@types/node':
         specifier: ^20.14.1
         version: 20.14.9
 
   packages/feature-logger:
     dependencies:
+      '@ibg/types':
+        specifier: workspace:*
+        version: link:../types
       '@ibg/utils':
         specifier: workspace:*
         version: link:../utils
@@ -340,9 +343,6 @@ importers:
       '@ibg/config':
         specifier: workspace:*
         version: link:../config
-      '@ibg/types':
-        specifier: workspace:*
-        version: link:../types
       '@types/node':
         specifier: ^20.14.1
         version: 20.14.1
@@ -373,6 +373,9 @@ importers:
 
   packages/feature-state:
     dependencies:
+      '@ibg/types':
+        specifier: workspace:*
+        version: link:../types
       '@ibg/utils':
         specifier: workspace:*
         version: link:../utils
@@ -380,9 +383,6 @@ importers:
       '@ibg/config':
         specifier: workspace:*
         version: link:../config
-      '@ibg/types':
-        specifier: workspace:*
-        version: link:../types
       '@types/node':
         specifier: ^20.14.1
         version: 20.14.1
@@ -424,6 +424,9 @@ importers:
 
   packages/openapi-router:
     dependencies:
+      '@ibg/types':
+        specifier: workspace:*
+        version: link:../types
       validation-adapter:
         specifier: workspace:*
         version: link:../validation-adapter
@@ -431,9 +434,6 @@ importers:
       '@ibg/config':
         specifier: workspace:*
         version: link:../config
-      '@ibg/types':
-        specifier: workspace:*
-        version: link:../types
       '@types/express':
         specifier: ^4.17.21
         version: 4.17.21
