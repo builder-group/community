@@ -23,8 +23,7 @@ export type TOpenApiExpressGet<GPaths extends object> = <
 	GPathOperation extends TFilterKeys<GPaths[GGetPaths], 'get'>
 >(
 	path: GGetPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
-	options: TOpenApiRouteOptions<GPathOperation>,
-	handler: TOpenApiExpressRequestHandler<GPathOperation>
+	config: TOpenApiRouteConfig<GPathOperation>
 ) => void;
 
 export type TOpenApiExpressPost<GPaths extends object> = <
@@ -32,8 +31,7 @@ export type TOpenApiExpressPost<GPaths extends object> = <
 	GPathOperation extends TFilterKeys<GPaths[GGetPaths], 'post'>
 >(
 	path: GGetPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
-	options: TOpenApiRouteOptions<GPathOperation>,
-	handler: TOpenApiExpressRequestHandler<GPathOperation>
+	config: TOpenApiRouteConfig<GPathOperation>
 ) => void;
 
 export type TOpenApiExpressPut<GPaths extends object> = <
@@ -41,8 +39,7 @@ export type TOpenApiExpressPut<GPaths extends object> = <
 	GPathOperation extends TFilterKeys<GPaths[GGetPaths], 'put'>
 >(
 	path: GGetPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
-	options: TOpenApiRouteOptions<GPathOperation>,
-	handler: TOpenApiExpressRequestHandler<GPathOperation>
+	config: TOpenApiRouteConfig<GPathOperation>
 ) => void;
 
 export type TOpenApiExpressDelete<GPaths extends object> = <
@@ -50,8 +47,7 @@ export type TOpenApiExpressDelete<GPaths extends object> = <
 	GPathOperation extends TFilterKeys<GPaths[GGetPaths], 'delete'>
 >(
 	path: GGetPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
-	options: TOpenApiRouteOptions<GPathOperation>,
-	handler: TOpenApiExpressRequestHandler<GPathOperation>
+	config: TOpenApiRouteConfig<GPathOperation>
 ) => void;
 
 // =============================================================================
@@ -89,7 +85,9 @@ export type TOpenApiExpressResponse<GPathOperation> = express.Response<
 // Router Options
 // =============================================================================
 
-export type TOpenApiRouteOptions<GPathOperation> = TOpenApiValidationAdapters<GPathOperation>;
+export type TOpenApiRouteConfig<GPathOperation> = {
+	handler: TOpenApiExpressRequestHandler<GPathOperation>;
+} & TOpenApiValidationAdapters<GPathOperation>;
 
 // =============================================================================
 // Validation

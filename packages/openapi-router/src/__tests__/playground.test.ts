@@ -10,20 +10,24 @@ describe('playground', () => {
 	it('types should work', async () => {
 		const openapiRouter = createExpressOpenApiRouter<paths>(Router());
 
-		const pathValibotAdapter = valibotAdapter(
-			v.object({
-				petId: v.number()
-			})
-		);
-
-		openapiRouter.get(
-			'/pet/{petId}',
-			{
-				pathAdapter: pathValibotAdapter
-			},
-			async (req, res, next) => {
+		openapiRouter.get('/pet/{petId}', {
+			pathAdapter: valibotAdapter(
+				v.object({
+					petId: v.number()
+				})
+			),
+			handler: async (req, res, next) => {
 				// TODO
 			}
-		);
+		});
+
+		openapiRouter.get('/pet/findByTags', {
+			queryAdapter: valibotAdapter(
+				v.object({
+					tags: v.optional(v.array(v.string()))
+				})
+			),
+			handler: (req, res, next) => {}
+		});
 	});
 });

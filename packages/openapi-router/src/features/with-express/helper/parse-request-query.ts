@@ -3,8 +3,7 @@ import type { Query } from 'express-serve-static-core';
 export function parseRequestQuery(query: Query): TExpandedQuery {
 	const parsedQuery: TExpandedQuery = {};
 
-	for (const key in query) {
-		const value = query[key];
+	for (const [key, value] of Object.entries(query)) {
 		parsedQuery[key] = parseValue(value);
 	}
 
@@ -13,17 +12,17 @@ export function parseRequestQuery(query: Query): TExpandedQuery {
 
 function parseValue(value: Query[keyof Query]): TQueryValue {
 	if (typeof value === 'string') {
-		return parseString(value);
+		return parseStringValue(value);
 	} else if (Array.isArray(value)) {
-		return value.map((v) => (typeof v === 'string' ? parseString(v) : parseRequestQuery(v)));
+		return value.map((v) => (typeof v === 'string' ? parseStringValue(v) : parseRequestQuery(v)));
 	} else if (typeof value === 'object') {
-		return parseObject(value);
+		return parseObjectValue(value);
 	}
 
 	return value;
 }
 
-function parseString(value: string): string | number | boolean | null | undefined {
+function parseStringValue(value: string): string | number | boolean | null | undefined {
 	if (value === '') return '';
 	if (value === 'null') return null;
 	if (value === 'undefined') return undefined;
@@ -36,17 +35,18 @@ function parseString(value: string): string | number | boolean | null | undefine
 	return value;
 }
 
-function parseObject(object: Query): TExpandedQuery {
+function parseObjectValue(object: Query): TExpandedQuery {
 	const parsedObject: TExpandedQuery = {};
 
-	for (const key in object) {
-		parsedObject[key] = parseValue(object[key]);
+	for (const [key, value] of Object.entries(object)) {
+		parsedObject[key] = parseValue(value);
 	}
 
 	return parsedObject;
 }
 
 type TBaseQueryValue = string | number | boolean | null | undefined;
+
 type TQueryValue =
 	| TBaseQueryValue
 	| (TBaseQueryValue | TExpandedQuery)[]
