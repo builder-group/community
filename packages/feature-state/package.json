@@ -30,11 +30,11 @@
 	},
 	"homepage": "https://inbeta.group/?source=github",
 	"dependencies": {
+		"@ibg/types": "workspace:*",
 		"@ibg/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@ibg/config": "workspace:*",
-		"@ibg/types": "workspace:*",
 		"@types/node": "^20.14.1"
 	},
 	"files": [

@@ -74,6 +74,18 @@ For specific packages, additional fields should be included as shown below. Note
 }
 ```
 
+## Q and A
+
+### Why is `@ibg/types` listed as a dependency in some packages?
+
+`@ibg/types` is listed as a dependency to ensure it's automatically installed for consumers, preventing issues like `any` types for `feature-x` packages due to missing `TUnionToIntersection`.
+
+For more details: [Microsoft/types-publisher/issues/81](https://github.com/Microsoft/types-publisher/issues/81).
+
+Alternatives:
+- Move `TUnionToIntersection` into each package
+- Enforce `@ibg/types` as a `peerDependency`
+
 ## 📄 License
 
 By contributing to inbeta.group, you agree that your contributions will be licensed under the license defined in [`LICENSE.md`](./LICENSE.md).

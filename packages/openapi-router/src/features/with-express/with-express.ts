@@ -1,5 +1,4 @@
 import type * as express from 'express';
-import { type Query } from 'express-serve-static-core';
 import { createValidateContext, type TValidationError } from 'validation-adapter';
 import { type TOperationPathParams, type TOperationQueryParams } from '@ibg/types/openapi';
 
@@ -11,7 +10,7 @@ import {
 	type TOpenApiValidationAdapters,
 	type TSelectFeatures
 } from '../../types';
-import { formatPath, parseRequestQuery } from './helper';
+import { formatPath, parseParams } from './helper';
 
 export function withExpress<
 	GPaths extends object,
@@ -26,6 +25,7 @@ export function withExpress<
 			const { handler } = config;
 			this._router.get(
 				typeof path === 'string' ? formatPath(path) : path.toString(),
+				parseParamsMiddleware(),
 				validationMiddleware(config),
 				requestHandler(handler as express.RequestHandler)
 			);
@@ -34,6 +34,7 @@ export function withExpress<
 			const { handler } = config;
 			this._router.post(
 				typeof path === 'string' ? formatPath(path) : path.toString(),
+				parseParamsMiddleware(),
 				validationMiddleware(config),
 				requestHandler(handler as express.RequestHandler)
 			);
@@ -42,6 +43,7 @@ export function withExpress<
 			const { handler } = config;
 			this._router.put(
 				typeof path === 'string' ? formatPath(path) : path.toString(),
+				parseParamsMiddleware(),
 				validationMiddleware(config),
 				requestHandler(handler as express.RequestHandler)
 			);
@@ -50,6 +52,7 @@ export function withExpress<
 			const { handler } = config;
 			this._router.delete(
 				typeof path === 'string' ? formatPath(path) : path.toString(),
+				parseParamsMiddleware(),
 				validationMiddleware(config),
 				requestHandler(handler as express.RequestHandler)
 			);
@@ -66,13 +69,26 @@ export function withExpress<
 	return _router;
 }
 
+function parseParamsMiddleware(): express.RequestHandler {
+	return (req, _res, next) => {
+		// Extend Express query params & path params parsing to handle numbers and booleans
+		// as primitive type instead of string.
+		// See: https://expressjs.com/en/5x/api.html#req.query
+		//      https://github.com/ljharb/qs/issues/91
+		req.query = parseParams(req.query);
+		req.params = parseParams(req.params);
+
+		next();
+	};
+}
+
 function validationMiddleware<GPathOperation>(
 	validationAdapters: TOpenApiValidationAdapters<GPathOperation>
 ): express.RequestHandler {
 	const { bodyAdapter, pathAdapter, queryAdapter } = validationAdapters;
 
 	// eslint-disable-next-line @typescript-eslint/no-misused-promises -- async callback
-	return async (req, _, next) => {
+	return async (req, _res, next) => {
 		try {
 			const validationErrors: TValidationError[] = [];
 
@@ -120,13 +136,8 @@ function validationMiddleware<GPathOperation>(
 
 function requestHandler(handler: express.RequestHandler): express.RequestHandler {
 	// eslint-disable-next-line @typescript-eslint/no-misused-promises -- async callback
-	return async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+	return async (req, res, next) => {
 		try {
-			// Extend Express query parsing to handle numbers and booleans.
-			// See: https://expressjs.com/en/5x/api.html#req.query
-			//      https://github.com/ljharb/qs/issues/91
-			req.query = parseRequestQuery(req.query) as Query;
-
 			// eslint-disable-next-line @typescript-eslint/await-thenable, @typescript-eslint/no-confusing-void-expression -- RequestHandler can be async
 			await handler(req, res, next);
 		} catch (error) {

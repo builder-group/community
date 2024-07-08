@@ -1,0 +1,1 @@
+https://github.com/swagger-api/swagger-petstore
