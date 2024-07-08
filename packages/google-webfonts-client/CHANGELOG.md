@@ -1,5 +1,12 @@
 # google-webfonts-client
 
+## 0.0.9
+
+### Patch Changes
+
+- Updated dependencies [[`35d0ca2`](https://github.com/inbeta-group/monorepo/commit/35d0ca2baaf734a63499f668d2e278f501cf9a71)]:
+  - feature-fetch@0.0.10
+
 ## 0.0.8
 
 ### Patch Changes
