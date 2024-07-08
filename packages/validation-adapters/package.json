@@ -1,7 +1,7 @@
 {
 	"name": "validation-adapters",
 	"description": "Pre-made validation adapters for the validation-adapter library, including adapters for Zod and Valibot",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
@@ -11,7 +11,7 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest",
-		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
 		"size": "size-limit --why"
 	},
 	"exports": {
@@ -39,13 +39,13 @@
 	"typesVersions": {
 		"*": {
 			"valibot": [
-				"./dist/valibot/types/index.d.ts"
+				"./dist/types/valibot/index.d.ts"
 			],
 			"yup": [
-				"./dist/yup/types/index.d.ts"
+				"./dist/types/yup/index.d.ts"
 			],
 			"zod": [
-				"./dist/zod/types/index.d.ts"
+				"./dist/types/zod/index.d.ts"
 			]
 		}
 	},

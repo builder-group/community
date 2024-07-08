@@ -41,8 +41,8 @@ Provide a typesafe, straightforward, and lightweight form library designed to be
 
 ```tsx
 import { createForm } from 'feature-form';
-import { zodValidator } from 'feature-form-validators/zod';
-import { valibotValidator } from 'feature-form-validators/valibot';
+import { zodAdapter } from 'validation-adapters/zod';
+import { valibotAdapter } from 'validation-adapters/valibot';
 import { useForm } from 'feature-react/form';
 import * as z from 'zod';
 import * as v from 'valibot';
@@ -55,11 +55,11 @@ interface TFormData {
 const $form = createForm<TFormData>({
     fields: {
         name: {
-            validator: zodValidator(z.string().min(2).max(10)),
+            validator: zodAdapter(z.string().min(2).max(10)),
             defaultValue: ''
         },
         email: {
-            validator: valibotValidator(v.pipe(v.string(), v.email())),
+            validator: valibotAdapter(v.pipe(v.string(), v.email())),
             defaultValue: ''
         }
     },
@@ -88,21 +88,21 @@ export const MyFormComponent: React.FC = () => {
 }
 ```
 
-### Validators ([`feature-form-validators`](https://github.com/inbeta-group/monorepo/tree/develop/packages/feature-form-validators))
+### Validators ([`validation-adapters`](https://github.com/inbeta-group/monorepo/tree/develop/packages/validation-adapters))
 
 `feature-form` supports various validators such as [Zod](https://github.com/colinhacks/zod), [Yup](https://github.com/jquense/yup), [Valibot](https://github.com/fabian-hiller/valibot) and more.
 
 ```ts
-import { zodValidator } from 'feature-form-validators/zod';
-import { valibotValidator } from 'feature-form-validators/valibot';
+import { zodAdapter } from 'validation-adapters/zod';
+import { valibotAdapter } from 'validation-adapters/valibot';
 import * as z from 'zod';
 import * as v from 'valibot';
 
-const zodNameValidator = zodValidator(
+const zodNameValidator = zodAdapter(
     z.string().min(2).max(10).regex(/^([^0-9]*)$/)
 );
 
-const valibotNameValidator = valibotValidator(
+const valibotNameValidator = valibotAdapter(
     v.pipe(v.string(), v.minLength(2), v.maxLength(10), v.regex(/^([^0-9]*)$/))
 );
 ```

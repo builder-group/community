@@ -1,7 +1,8 @@
 import { createValidationAdapter } from 'validation-adapter';
 import { describe, expect, it } from 'vitest';
 
-import { createForm, fromValidationAdapter } from './create-form';
+import { createForm } from './create-form';
+import { fromValidationAdapter } from './helper';
 
 describe('createForm function', () => {
 	it('shoudl work', async () => {
@@ -12,7 +13,7 @@ describe('createForm function', () => {
 						{
 							key: 'date',
 							validate: (cx) => {
-								if (cx.value != null) {
+								if (typeof cx.value === 'number') {
 									const date = new Date(cx.value);
 								}
 							}

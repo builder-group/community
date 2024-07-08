@@ -3,12 +3,12 @@ export interface TValidationAdapter<
 	GValidateContext extends TBaseValidateContext<GValue> = TBaseValidateContext<GValue>
 > {
 	_validationChain: TValidationChain<GValue, GValidateContext>;
-	validate: <GInnerValidateContext extends GValidateContext = GValidateContext>(
-		cx: GInnerValidateContext
-	) => Promise<GInnerValidateContext>;
-	append: (validator: TValidationAdapter<GValue>) => TValidationAdapter<GValue>;
-	clone: () => TValidationAdapter<GValue>;
-	push: (...validateFunctions: TValidationLink<GValue>[]) => void;
+	validate: (cx: GValidateContext) => Promise<void>;
+	append: (
+		validator: TValidationAdapter<GValue, GValidateContext>
+	) => TValidationAdapter<GValue, GValidateContext>;
+	clone: () => TValidationAdapter<GValue, GValidateContext>;
+	push: (...validateFunctions: TValidationLink<GValue, GValidateContext>[]) => void;
 }
 
 export type TValidationChain<
@@ -32,8 +32,9 @@ export type TValidateCallback<
 export interface TBaseValidateContext<GValue> {
 	config: TValidateContextConfig;
 	// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents -- ok here
-	value: Readonly<GValue> | unknown;
+	value: Readonly<GValue | unknown>;
 	hasError: () => boolean;
+	isValue: (value: unknown) => value is GValue; // NOTE: We have to define a property using explicitly GValue to enforce generic. See: https://stackoverflow.com/questions/78716973/enforcing-same-generic-types-in-typescript/78717389
 	registerError: (error: TValidationError) => void;
 }
 
