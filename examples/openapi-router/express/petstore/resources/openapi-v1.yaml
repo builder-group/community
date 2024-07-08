@@ -773,6 +773,30 @@ components:
           type: string
       xml:
         name: '##default'
+    ServiceError:
+      type: object
+      description: Error Response
+      properties:
+        error_code:
+          type: string
+          description: Error code
+        error_description:
+          type: string
+          description: Error description
+          nullable: true
+        error_uri:
+          type: string
+          description: Error URI
+          nullable: true
+        additional_errors:
+          type: array
+          items:
+            type: object
+      example:
+        error_code: "400"
+        error_description: "Bad Request"
+        error_uri: null
+        additional_errors: []
   requestBodies:
     Pet:
       description: Pet object that needs to be added to the store

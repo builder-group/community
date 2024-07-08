@@ -385,6 +385,24 @@ export interface components {
             type?: string;
             message?: string;
         };
+        /**
+         * @description Error Response
+         * @example {
+         *       "error_code": "400",
+         *       "error_description": "Bad Request",
+         *       "error_uri": null,
+         *       "additional_errors": []
+         *     }
+         */
+        ServiceError: {
+            /** @description Error code */
+            error_code?: string;
+            /** @description Error description */
+            error_description?: string | null;
+            /** @description Error URI */
+            error_uri?: string | null;
+            additional_errors?: Record<string, never>[];
+        };
     };
     responses: never;
     parameters: never;

@@ -1,7 +1,8 @@
-export class AppError extends Error {
+export class ServiceError extends Error {
 	public readonly code: TErrorCode;
 	public readonly throwable?: Error;
 	public readonly status: number;
+	public readonly description?: string;
 	public readonly uri?: string;
 	public readonly additionalErrors: Record<string, unknown>[] = [];
 
@@ -16,6 +17,7 @@ export class AppError extends Error {
 		this.code = code;
 		this.throwable = throwable;
 		this.status = status;
+		this.description = description;
 		this.uri = uri;
 		this.additionalErrors = additionalErrors;
 

@@ -1,8 +1,8 @@
 import { type TValidationError } from 'validation-adapter';
 
-import { AppError } from './AppError';
+import { ServiceError } from './ServiceError';
 
-export class ValidationError extends AppError {
+export class ValidationError extends ServiceError {
 	constructor(errors: TValidationError[]) {
 		super('#ERR_BAD_REQUEST', 400, {
 			description: 'One or more validation errors occurred!',
