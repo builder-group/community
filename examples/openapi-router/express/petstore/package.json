@@ -1,0 +1,26 @@
+{
+	"name": "petstore",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle node",
+		"start:dev": "nodemon --config ./nodemon.json",
+		"gen:openapi": "npx openapi-typescript ./resources/openapi-v1.yaml -o ./src/gen/v1.ts"
+	},
+	"source": "./src/index.ts",
+	"main": "./dist/index.js",
+	"dependencies": {
+		"@ibg/openapi-router": "workspace:*",
+		"express": "^4.19.2",
+		"valibot": "^0.35.0",
+		"validation-adapters": "workspace:*"
+	},
+	"devDependencies": {
+		"@ibg/config": "workspace:*",
+		"@types/express": "^4.17.21",
+		"@types/node": "^20.14.10",
+		"nodemon": "^3.1.4",
+		"openapi-typescript": "^7.0.2",
+		"ts-node": "^10.9.2"
+	}
+}
