@@ -1,7 +1,7 @@
 {
 	"name": "google-webfonts-client",
 	"description": "Typesafe and straightforward fetch client for interacting with the Google Web Fonts API using feature-fetch",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
