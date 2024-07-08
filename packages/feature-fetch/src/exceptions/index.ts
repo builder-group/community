@@ -1,3 +1,3 @@
-export * from './NetworkException';
-export * from './RequestException';
-export * from './ServiceException';
+export * from './NetworkError';
+export * from './RequestError';
+export * from './ServiceError';

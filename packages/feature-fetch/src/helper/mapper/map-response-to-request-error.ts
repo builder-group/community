@@ -1,11 +1,11 @@
 import { isObject } from '@ibg/utils';
 
-import { RequestException, type TErrorCode } from '../../exceptions';
+import { RequestError, type TErrorCode } from '../../exceptions';
 
-export async function mapResponseToRequestException(
+export async function mapResponseToRequestError(
 	response: Response,
 	defaultErrorCode: TErrorCode = '#ERR_UNKOWN'
-): Promise<RequestException> {
+): Promise<RequestError> {
 	try {
 		const contentType = response.headers.get('Content-Type');
 
@@ -22,13 +22,13 @@ export async function mapResponseToRequestException(
 			errorDescription = errorData as string;
 		}
 
-		return new RequestException(errorCode, response.status, {
+		return new RequestError(errorCode, response.status, {
 			description: errorDescription,
 			data: errorData,
 			response
 		});
 	} catch (error) {
-		return new RequestException(defaultErrorCode, response.status, {
+		return new RequestError(defaultErrorCode, response.status, {
 			description: 'Error processing response',
 			data: error,
 			response

@@ -14,8 +14,11 @@ export function createValidateContext<GValue>(
 			collectErrorMode,
 			name
 		},
-		value,
+		value: value as Readonly<GValue>,
 		errors: [],
+		isValue: (v): v is GValue => {
+			return true;
+		},
 		hasError(this) {
 			return this.errors.length > 0;
 		},

@@ -251,12 +251,3 @@ export interface TCreateFormConfigFormField<GValue> extends Partial<TFormFieldSt
 	defaultValue?: GValue;
 	validationAdapter?: TFormFieldValidationAdapter<GValue>;
 }
-
-// Helper function to make type inference work
-// https://github.com/microsoft/TypeScript/issues/26242
-export function fromValidationAdapter<GValue>(
-	validationAdapter: TFormFieldValidationAdapter<GValue>,
-	config: Omit<TCreateFormConfigFormField<GValue>, 'validator'>
-): TCreateFormConfigFormField<GValue> {
-	return { validationAdapter, ...config };
-}

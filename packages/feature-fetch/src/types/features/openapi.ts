@@ -84,22 +84,6 @@ export type TOpenApiFetchResponse<GPathOperation, GParseAs extends TParseAs> = T
 // Fetch Options
 // =============================================================================
 
-// Fetch options for query parameters
-export type TOpenApiQueryParamsFetchOptions<GPathOperation> =
-	undefined extends TOperationQueryParams<GPathOperation> // If the queryParams can be undefined/optional
-		? { queryParams?: TOperationQueryParams<GPathOperation> }
-		: TOperationQueryParams<GPathOperation> extends never
-			? { queryParams?: Record<string, unknown> }
-			: { queryParams: TOperationQueryParams<GPathOperation> };
-
-// Fetch options for path parameters
-export type TOpenApiPathParamsFetchOptions<GPathOperation> =
-	undefined extends TOperationPathParams<GPathOperation> // If the pathParams can be undefined/optional
-		? { pathParams?: TOperationPathParams<GPathOperation> }
-		: TOperationPathParams<GPathOperation> extends never
-			? { pathParams?: Record<string, unknown> }
-			: { pathParams: TOperationPathParams<GPathOperation> };
-
 export type TOpenApiFetchOptions<GPathOperation, GParseAs extends TParseAs> = {
 	pathSerializer?: TPathSerializer<
 		TOperationPathParams<GPathOperation> extends never
@@ -120,3 +104,17 @@ export type TOpenApiFetchOptions<GPathOperation, GParseAs extends TParseAs> = {
 > &
 	TOpenApiQueryParamsFetchOptions<GPathOperation> &
 	TOpenApiPathParamsFetchOptions<GPathOperation>;
+
+export type TOpenApiQueryParamsFetchOptions<GPathOperation> =
+	undefined extends TOperationQueryParams<GPathOperation> // If the queryParams can be undefined/optional
+		? { queryParams?: TOperationQueryParams<GPathOperation> }
+		: TOperationQueryParams<GPathOperation> extends never
+			? { queryParams?: Record<string, unknown> }
+			: { queryParams: TOperationQueryParams<GPathOperation> };
+
+export type TOpenApiPathParamsFetchOptions<GPathOperation> =
+	undefined extends TOperationPathParams<GPathOperation> // If the pathParams can be undefined/optional
+		? { pathParams?: TOperationPathParams<GPathOperation> }
+		: TOperationPathParams<GPathOperation> extends never
+			? { pathParams?: Record<string, unknown> }
+			: { pathParams: TOperationPathParams<GPathOperation> };

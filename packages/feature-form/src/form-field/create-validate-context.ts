@@ -8,7 +8,10 @@ export function createValidateContext<GValue>(
 			collectErrorMode: formField._config.collectErrorMode,
 			name: formField.key
 		},
-		value: formField.get(),
+		value: formField.get() as Readonly<GValue>,
+		isValue: (v): v is GValue => {
+			return true;
+		},
 		hasError: () => {
 			return formField.status._nextValue?.type === 'INVALID';
 		},
