@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/@igb/openapi-router/.github/banner.svg" alt="@igb/openapi-router banner">
+    <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/openapi-router/.github/banner.svg" alt="@igb/openapi-router banner">
 </h1>
 
 <p align="left">
