@@ -1,5 +1,14 @@
 # @ibg/openapi-router
 
+## 0.0.9
+
+### Patch Changes
+
+- Renamde ValidationAdapter to Validator for more clarity
+
+- Updated dependencies []:
+  - validation-adapter@0.0.5
+
 ## 0.0.8
 
 ### Patch Changes

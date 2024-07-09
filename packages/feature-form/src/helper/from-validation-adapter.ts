@@ -1,11 +1,11 @@
 import { type TCreateFormConfigFormField } from '../create-form';
-import { type TFormFieldValidationAdapter } from '../types';
+import { type TFormFieldValidator } from '../types';
 
 // Helper function to make type inference work
 // https://github.com/microsoft/TypeScript/issues/26242
 export function fromValidationAdapter<GValue>(
-	validationAdapter: TFormFieldValidationAdapter<GValue>,
-	config: Omit<TCreateFormConfigFormField<GValue>, 'validationAdapter'>
+	validator: TFormFieldValidator<GValue>,
+	config: Omit<TCreateFormConfigFormField<GValue>, 'validator'>
 ): TCreateFormConfigFormField<GValue> {
-	return { validationAdapter, ...config };
+	return { validator, ...config };
 }

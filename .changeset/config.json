@@ -7,5 +7,10 @@
 	"access": "public",
 	"baseBranch": "origin/main",
 	"updateInternalDependencies": "patch",
-	"ignore": ["basic", "counter", "petstore"]
+	"ignore": [
+		"feature-form-react-basic",
+		"feature-state-react-counter",
+		"openapi-router-express-petstore",
+		"openapi-router-hono-petstore"
+	]
 }

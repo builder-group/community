@@ -195,6 +195,22 @@ importers:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@20.14.10)(typescript@5.5.3)
 
+  examples/openapi-router/hono/petstore:
+    dependencies:
+      '@hono/node-server':
+        specifier: ^1.12.0
+        version: 1.12.0
+      hono:
+        specifier: ^4.4.12
+        version: 4.4.12
+    devDependencies:
+      '@types/node':
+        specifier: ^20.11.17
+        version: 20.14.10
+      tsx:
+        specifier: ^4.7.1
+        version: 4.16.2
+
   packages/cli:
     dependencies:
       '@oclif/core':
@@ -1347,6 +1363,10 @@ packages:
 
   '@figma/plugin-typings@1.95.0':
     resolution: {integrity: sha512-lx/ZkaiiQ4qoZb7bJI5zXfYqDDVm6ESowTknVTQu62uuiT51PAWSbPsUQVkjXiD6gXqmD//FqL9mPIUF+vNXYQ==}
+
+  '@hono/node-server@1.12.0':
+    resolution: {integrity: sha512-e6oHjNiErRxsZRZBmc2KucuvY3btlO/XPncIpP2X75bRdTilF9GLjm3NHvKKunpJbbJJj31/FoPTksTf8djAVw==}
+    engines: {node: '>=18.14.1'}
 
   '@humanwhocodes/config-array@0.11.14':
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
@@ -3310,6 +3330,10 @@ packages:
   headers-polyfill@4.0.3:
     resolution: {integrity: sha512-IScLbePpkvO846sIwOtOTDjutRMWdXdJmXdMvk6gCBHxFO8d+QKOQedyZSxFTTFYRSmlgSTDtXqqq4pcenBXLQ==}
 
+  hono@4.4.12:
+    resolution: {integrity: sha512-Lx4Vwbws0IqFfXIVYychxUW0A4EE+7dn/jsjVeM34OXSA2Xs45MkDDP14Mzznp7LlDemUNHQG2uv2N5jQld0hA==}
+    engines: {node: '>=16.0.0'}
+
   hosted-git-info@2.8.9:
     resolution: {integrity: sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==}
 
@@ -5098,6 +5122,11 @@ packages:
     peerDependencies:
       typescript: '>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta'
 
+  tsx@4.16.2:
+    resolution: {integrity: sha512-C1uWweJDgdtX2x600HjaFaucXTilT7tgUZHbOE4+ypskZ1OP8CRCSDkCxG6Vya9EwaFIVagWwpaVAn5wzypaqQ==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+
   tty-table@4.2.3:
     resolution: {integrity: sha512-Fs15mu0vGzCrj8fmJNP7Ynxt5J7praPXqFN0leZeZBXJwkMxv9cb2D454k1ltrtUSJbZ4yH4e0CynsHLxmUfFA==}
     engines: {node: '>=8.0.0'}
@@ -6246,6 +6275,8 @@ snapshots:
   '@eslint/object-schema@2.1.4': {}
 
   '@figma/plugin-typings@1.95.0': {}
+
+  '@hono/node-server@1.12.0': {}
 
   '@humanwhocodes/config-array@0.11.14':
     dependencies:
@@ -8920,6 +8951,8 @@ snapshots:
 
   headers-polyfill@4.0.3: {}
 
+  hono@4.4.12: {}
+
   hosted-git-info@2.8.9: {}
 
   http-errors@2.0.0:
@@ -10652,6 +10685,13 @@ snapshots:
     dependencies:
       tslib: 1.14.1
       typescript: 5.5.3
+
+  tsx@4.16.2:
+    dependencies:
+      esbuild: 0.21.5
+      get-tsconfig: 4.7.5
+    optionalDependencies:
+      fsevents: 2.3.3
 
   tty-table@4.2.3:
     dependencies:

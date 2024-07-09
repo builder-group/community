@@ -1,36 +1,36 @@
-export interface TValidationAdapter<
+export interface TValidator<
 	GValue,
-	GValidateContext extends TBaseValidateContext<GValue> = TBaseValidateContext<GValue>
+	GValidationContext extends TBaseValidationContext<GValue> = TBaseValidationContext<GValue>
 > {
-	_validationChain: TValidationChain<GValue, GValidateContext>;
-	validate: (cx: GValidateContext) => Promise<void>;
+	_validationChain: TValidationChain<GValue, GValidationContext>;
+	validate: (cx: GValidationContext) => Promise<void>;
 	append: (
-		validator: TValidationAdapter<GValue, GValidateContext>
-	) => TValidationAdapter<GValue, GValidateContext>;
-	clone: () => TValidationAdapter<GValue, GValidateContext>;
-	push: (...validateFunctions: TValidationLink<GValue, GValidateContext>[]) => void;
+		validator: TValidator<GValue, GValidationContext>
+	) => TValidator<GValue, GValidationContext>;
+	clone: () => TValidator<GValue, GValidationContext>;
+	push: (...validateFunctions: TValidationLink<GValue, GValidationContext>[]) => void;
 }
 
 export type TValidationChain<
 	GValue,
-	GValidateContext extends TBaseValidateContext<GValue> = TBaseValidateContext<GValue>
-> = TValidationLink<GValue, GValidateContext>[];
+	GValidationContext extends TBaseValidationContext<GValue> = TBaseValidationContext<GValue>
+> = TValidationLink<GValue, GValidationContext>[];
 
 export interface TValidationLink<
 	GValue,
-	GValidateContext extends TBaseValidateContext<GValue> = TBaseValidateContext<GValue>
+	GValidationContext extends TBaseValidationContext<GValue> = TBaseValidationContext<GValue>
 > {
 	key: string;
-	validate: TValidateCallback<GValue, GValidateContext>;
+	validate: TValidateCallback<GValue, GValidationContext>;
 }
 
 export type TValidateCallback<
 	GValue,
-	GValidateContext extends TBaseValidateContext<GValue> = TBaseValidateContext<GValue>
-> = (context: GValidateContext) => Promise<void> | void;
+	GValidationContext extends TBaseValidationContext<GValue> = TBaseValidationContext<GValue>
+> = (context: GValidationContext) => Promise<void> | void;
 
-export interface TBaseValidateContext<GValue> {
-	config: TValidateContextConfig;
+export interface TBaseValidationContext<GValue> {
+	config: TValidationContextConfig;
 	// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents -- ok here
 	value: Readonly<GValue | unknown>;
 	hasError: () => boolean;
@@ -45,7 +45,7 @@ export interface TValidationError {
 	path?: string;
 }
 
-export interface TValidateContextConfig {
+export interface TValidationContextConfig {
 	name?: string;
 	collectErrorMode: TCollectErrorMode;
 }

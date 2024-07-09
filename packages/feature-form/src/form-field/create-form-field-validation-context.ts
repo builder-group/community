@@ -1,8 +1,8 @@
-import { type TFormField, type TFormFieldValidateContext } from '../types';
+import { type TFormField, type TFormFieldValidationContext } from '../types';
 
-export function createValidateContext<GValue>(
+export function createFormFieldValidationContext<GValue>(
 	formField: TFormField<GValue>
-): TFormFieldValidateContext<GValue> {
+): TFormFieldValidationContext<GValue> {
 	return {
 		config: {
 			collectErrorMode: formField._config.collectErrorMode,

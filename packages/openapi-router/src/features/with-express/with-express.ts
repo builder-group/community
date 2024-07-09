@@ -1,13 +1,13 @@
 import type * as express from 'express';
-import { createValidateContext, type TValidationError } from 'validation-adapter';
+import { createValidationContext, type TValidationError } from 'validation-adapter';
 import { type TOperationPathParams, type TOperationQueryParams } from '@ibg/types/openapi';
 
 import { ValidationError } from '../../exceptions';
 import {
 	type TEnforceFeatures,
 	type TFeatureKeys,
+	type TOpenApiExpressValidators,
 	type TOpenApiRouter,
-	type TOpenApiValidationAdapters,
 	type TSelectFeatures
 } from '../../types';
 import { formatPath, parseParams } from './helper';
@@ -83,40 +83,40 @@ function parseParamsMiddleware(): express.RequestHandler {
 }
 
 function validationMiddleware<GPathOperation>(
-	validationAdapters: TOpenApiValidationAdapters<GPathOperation>
+	validators: TOpenApiExpressValidators<GPathOperation>
 ): express.RequestHandler {
-	const { bodyAdapter, pathAdapter, queryAdapter } = validationAdapters;
+	const { bodyValidator, pathValidator, queryValidator } = validators;
 
 	// eslint-disable-next-line @typescript-eslint/no-misused-promises -- async callback
 	return async (req, _res, next) => {
 		try {
 			const validationErrors: TValidationError[] = [];
 
-			if (bodyAdapter != null) {
-				const bodyValidationContext = createValidateContext(req.body);
-				await bodyAdapter.validate(bodyValidationContext);
+			if (bodyValidator != null) {
+				const bodyValidationContext = createValidationContext(req.body);
+				await bodyValidator.validate(bodyValidationContext);
 				for (const error of bodyValidationContext.errors) {
 					error.source = 'body';
 					validationErrors.push(error);
 				}
 			}
 
-			if (pathAdapter != null) {
-				const pathValidationContext = createValidateContext<TOperationPathParams<GPathOperation>>(
+			if (pathValidator != null) {
+				const pathValidationContext = createValidationContext<TOperationPathParams<GPathOperation>>(
 					req.params as TOperationPathParams<GPathOperation>
 				);
-				await pathAdapter.validate(pathValidationContext);
+				await pathValidator.validate(pathValidationContext);
 				for (const error of pathValidationContext.errors) {
 					error.source = 'path';
 					validationErrors.push(error);
 				}
 			}
 
-			if (queryAdapter != null) {
-				const queryValidationContext = createValidateContext<TOperationQueryParams<GPathOperation>>(
-					req.query as TOperationQueryParams<GPathOperation>
-				);
-				await queryAdapter.validate(queryValidationContext);
+			if (queryValidator != null) {
+				const queryValidationContext = createValidationContext<
+					TOperationQueryParams<GPathOperation>
+				>(req.query as TOperationQueryParams<GPathOperation>);
+				await queryValidator.validate(queryValidationContext);
 				for (const error of queryValidationContext.errors) {
 					error.source = 'query';
 					validationErrors.push(error);

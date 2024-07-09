@@ -1,5 +1,5 @@
 import { createState } from 'feature-state';
-import { createValidationAdapter } from 'validation-adapter';
+import { createValidator } from 'validation-adapter';
 import { bitwiseFlag, deepCopy } from '@ibg/utils';
 
 import {
@@ -8,10 +8,10 @@ import {
 	type TFormField,
 	type TFormFieldStateConfig,
 	type TFormFieldStateFeature,
-	type TFormFieldValidationAdapter
+	type TFormFieldValidator
 } from '../types';
+import { createFormFieldValidationContext } from './create-form-field-validation-context';
 import { createStatus } from './create-status';
-import { createValidator } from './create-validator';
 
 export function createFormField<GValue>(
 	initialValue: GValue | undefined,
@@ -19,7 +19,7 @@ export function createFormField<GValue>(
 ): TFormField<GValue> {
 	const {
 		key,
-		validationAdapter = createValidationAdapter([]),
+		validator = createValidator([]),
 		editable = true,
 		reValidateMode = bitwiseFlag(FormFieldReValidateMode.OnBlur),
 		validateMode = bitwiseFlag(FormFieldValidateMode.OnSubmit),
@@ -48,14 +48,30 @@ export function createFormField<GValue>(
 			collectErrorMode
 		},
 		_intialValue: deepCopy(formFieldState._value),
+		_validator: validator,
 		key,
 		isTouched: false,
 		isSubmitted: false,
 		isSubmitting: false,
-		validator: createValidator(validationAdapter),
+		isValidating: false,
 		status,
 		async validate(this: TFormField<GValue>) {
-			return this.validator.validate(this);
+			const validationContext = createFormFieldValidationContext(this);
+
+			this.isValidating = true;
+			await this._validator.validate(validationContext);
+			this.isValidating = false;
+
+			// If no error was registered we assume its valid
+			if (this.status._nextValue == null) {
+				this.status.set({ type: 'VALID' });
+			} else {
+				this.status.set(this.status._nextValue);
+			}
+
+			this.status._nextValue = undefined;
+
+			return this.status.get().type === 'VALID';
 		},
 		isValid(this: TFormField<GValue>) {
 			return this.status.get().type === 'VALID';
@@ -93,6 +109,6 @@ export function createFormField<GValue>(
 
 export interface TCreateFormFieldConfig<GValue> extends Partial<TFormFieldStateConfig> {
 	key: string;
-	validationAdapter?: TFormFieldValidationAdapter<GValue>;
+	validator?: TFormFieldValidator<GValue>;
 	notifyOnStatusChange?: boolean;
 }
