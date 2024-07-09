@@ -1,1 +1,1 @@
-export * from './from-validation-adapter';
+export * from './from-validator';

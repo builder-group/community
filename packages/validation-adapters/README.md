@@ -24,21 +24,21 @@
 ## 📖 Usage
 
 ```ts
-import { zodAdapter } from 'validation-adapters/zod';
-import { valibotAdapter } from 'validation-adapters/valibot';
-import { createValidationAdapter } from 'validation-adapter';
+import { zValidator } from 'validation-adapters/zod';
+import { vValidator } from 'validation-adapters/valibot';
+import { createValidator } from 'validation-adapter';
 import * as z from 'zod';
 import * as v from 'valibot';
 
-const zodNameValidator = zodAdapter(
+const zodNameValidator = zValidator(
     z.string().min(2).max(10).regex(/^([^0-9]*)$/)
 );
 
-const valibotNameValidator = valibotAdapter(
+const valibotNameValidator = vValidator(
     v.pipe(v.string(), v.minLength(2), v.maxLength(10), v.regex(/^([^0-9]*)$/))
 );
 
-const customValidator = createValidationAdapter([
+const customValidator = createValidator([
     {
         key: 'custom',
         validate: (cx) => {
@@ -58,10 +58,10 @@ const combinedValidator = valibotNameValidator.clone().append(customValidator);
 ### Zod Adapter
 
 ```ts
-import { zodAdapter } from 'validation-adapters/zod';
+import { zValidator } from 'validation-adapters/zod';
 import * as z from 'zod';
 
-const zodNameValidator = zodAdapter(
+const zodNameValidator = zValidator(
     z.string().min(2).max(10).regex(/^([^0-9]*)$/)
 );
 ```
@@ -69,10 +69,10 @@ const zodNameValidator = zodAdapter(
 ### Valibot Adapter
 
 ```ts
-import { valibotAdapter } from 'validation-adapters/valibot';
+import { vValidator } from 'validation-adapters/valibot';
 import * as v from 'valibot';
 
-const valibotNameValidator = valibotAdapter(
+const valibotNameValidator = vValidator(
     v.pipe(v.string(), v.minLength(2), v.maxLength(10), v.regex(/^([^0-9]*)$/))
 );
 ```

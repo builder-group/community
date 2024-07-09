@@ -35,7 +35,7 @@ The goal is to provide a typesafe and straightforward wrapper around web framewo
 ```ts
 import { Router } from 'express';
 import * as v from 'valibot';
-import { valibotAdapter } from 'validation-adapters/valibot';
+import { vValidator } from 'validation-adapters/valibot';
 import { createExpressOpenApiRouter } from '@ibg/openapi-router';
 
 export const app: Express = express();
@@ -46,7 +46,7 @@ app.use(express.json());
 const openapiRouter = createExpressOpenApiRouter<paths>(Router());
 
 openapiRouter.get('/pet/{petId}', {
-    pathAdapter: valibotAdapter(
+    pathValidator: vValidator(
         v.object({
             petId: v.number()
         })
@@ -55,7 +55,7 @@ openapiRouter.get('/pet/{petId}', {
 });
 
 openapiRouter.get('/pet/findByTags', {
-    queryAdapter: valibotAdapter(
+    queryValidator: vValidator(
         v.object({
             tags: v.optional(v.array(v.string()))
         })

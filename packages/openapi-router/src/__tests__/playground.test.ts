@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import * as v from 'valibot';
-import { valibotAdapter } from 'validation-adapters/valibot';
+import { vValidator } from 'validation-adapters/valibot';
 import { describe, it } from 'vitest';
 
 import { createExpressOpenApiRouter } from '../features';
@@ -11,7 +11,7 @@ describe('playground', () => {
 		const openapiRouter = createExpressOpenApiRouter<paths>(Router());
 
 		openapiRouter.get('/pet/{petId}', {
-			pathAdapter: valibotAdapter(
+			pathValidator: vValidator(
 				v.object({
 					petId: v.number()
 				})
@@ -22,7 +22,7 @@ describe('playground', () => {
 		});
 
 		openapiRouter.get('/pet/findByTags', {
-			queryAdapter: valibotAdapter(
+			queryValidator: vValidator(
 				v.object({
 					tags: v.optional(v.array(v.string()))
 				})
