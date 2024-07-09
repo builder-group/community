@@ -1,11 +1,11 @@
 import { Err, Ok } from 'ts-results-es';
 
-import { ServiceError } from './exceptions';
+import { FetchError } from './exceptions';
 import {
 	buildUrl,
 	FetchHeaders,
+	mapErrorToFetchError,
 	mapErrorToNetworkError,
-	mapErrorToServiceError,
 	mapResponseToRequestError,
 	processBeforeRequestMiddlewares,
 	processRequestMiddlewares,
@@ -43,7 +43,7 @@ export function createFetchClient<GPaths extends object = object>(
 	} else if (typeof fetch === 'function') {
 		fetchLike = fetch;
 	} else {
-		throw new ServiceError('#ERR_MISSING_FETCH', {
+		throw new FetchError('#ERR_MISSING_FETCH', {
 			description: "Failed to find valid 'fetch' function to wrap around!"
 		});
 	}
@@ -80,7 +80,7 @@ export function createFetchClient<GPaths extends object = object>(
 				try {
 					serializedBody = bodySerializer(body, mergedHeaders.get('Content-Type') ?? undefined);
 				} catch (error) {
-					return Err(mapErrorToServiceError(error, '#ERR_SERIALIZE_BODY'));
+					return Err(mapErrorToFetchError(error, '#ERR_SERIALIZE_BODY'));
 				}
 			}
 
@@ -115,7 +115,7 @@ export function createFetchClient<GPaths extends object = object>(
 				pathParams = middlewaresResponse.pathParams;
 				queryParams = middlewaresResponse.queryParams;
 			} catch (error) {
-				return Err(mapErrorToServiceError(error, '#ERR_MIDDLEWARE'));
+				return Err(mapErrorToFetchError(error, '#ERR_MIDDLEWARE'));
 			}
 
 			// Build final Url
@@ -146,7 +146,7 @@ export function createFetchClient<GPaths extends object = object>(
 						data = await response[parseAs]();
 					} catch (error) {
 						return Err(
-							new ServiceError('#ERR_PARSE_RESPONSE_DATA', {
+							new FetchError('#ERR_PARSE_RESPONSE_DATA', {
 								description: `Failed to parse response as '${parseAs}'`
 							})
 						);

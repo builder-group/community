@@ -1,2 +1,2 @@
-export * from './ServiceError';
+export * from './AppError';
 export * from './ValidationError';

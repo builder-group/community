@@ -1,6 +1,6 @@
-import { ServiceError, type TErrorCode } from './ServiceError';
+import { FetchError, type TErrorCode } from './FetchError';
 
-export class RequestError<GData = unknown> extends ServiceError {
+export class RequestError<GData = unknown> extends FetchError {
 	public readonly status: number;
 	public readonly response?: Response;
 	public readonly data?: GData;

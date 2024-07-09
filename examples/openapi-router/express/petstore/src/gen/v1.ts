@@ -394,7 +394,7 @@ export interface components {
          *       "additional_errors": []
          *     }
          */
-        ServiceError: {
+        AppError: {
             /** @description Error code */
             error_code?: string;
             /** @description Error description */

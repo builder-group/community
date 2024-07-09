@@ -1,5 +1,11 @@
 # @ibg/openapi-router
 
+## 0.0.8
+
+### Patch Changes
+
+- Improved Error class naming
+
 ## 0.0.7
 
 ### Patch Changes

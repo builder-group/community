@@ -1,5 +1,11 @@
 # feature-fetch
 
+## 0.0.11
+
+### Patch Changes
+
+- Improved Error class naming
+
 ## 0.0.10
 
 ### Patch Changes

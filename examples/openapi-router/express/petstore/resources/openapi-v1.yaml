@@ -773,7 +773,7 @@ components:
           type: string
       xml:
         name: '##default'
-    ServiceError:
+    AppError:
       type: object
       description: Error Response
       properties:
