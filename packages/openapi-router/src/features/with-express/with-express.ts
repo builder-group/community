@@ -3,6 +3,7 @@ import { createValidationContext, type TValidationError } from 'validation-adapt
 import { type TOperationPathParams, type TOperationQueryParams } from '@ibg/types/openapi';
 
 import { ValidationError } from '../../exceptions';
+import { formatPath, parseParams } from '../../helper';
 import {
 	type TEnforceFeatures,
 	type TFeatureKeys,
@@ -10,7 +11,6 @@ import {
 	type TOpenApiRouter,
 	type TSelectFeatures
 } from '../../types';
-import { formatPath, parseParams } from './helper';
 
 export function withExpress<
 	GPaths extends object,
@@ -22,39 +22,35 @@ export function withExpress<
 	const expressFeatures: TSelectFeatures<['express'], GPaths> = {
 		_router: expressRouter,
 		get(this: TOpenApiRouter<['base', 'express'], GPaths>, path, config) {
-			const { handler } = config;
 			this._router.get(
-				typeof formatPath(path),
+				formatPath(path),
 				parseParamsMiddleware(),
 				validationMiddleware(config),
-				requestHandler(handler as express.RequestHandler)
+				requestHandler(config.handler as express.RequestHandler)
 			);
 		},
 		post(this: TOpenApiRouter<['base', 'express'], GPaths>, path, config) {
-			const { handler } = config;
 			this._router.post(
 				formatPath(path),
 				parseParamsMiddleware(),
 				validationMiddleware(config),
-				requestHandler(handler as express.RequestHandler)
+				requestHandler(config.handler as express.RequestHandler)
 			);
 		},
 		put(this: TOpenApiRouter<['base', 'express'], GPaths>, path, config) {
-			const { handler } = config;
 			this._router.put(
 				formatPath(path),
 				parseParamsMiddleware(),
 				validationMiddleware(config),
-				requestHandler(handler as express.RequestHandler)
+				requestHandler(config.handler as express.RequestHandler)
 			);
 		},
 		del(this: TOpenApiRouter<['base', 'express'], GPaths>, path, config) {
-			const { handler } = config;
 			this._router.delete(
 				formatPath(path),
 				parseParamsMiddleware(),
 				validationMiddleware(config),
-				requestHandler(handler as express.RequestHandler)
+				requestHandler(config.handler as express.RequestHandler)
 			);
 		}
 	};
