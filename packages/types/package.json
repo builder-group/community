@@ -1,7 +1,7 @@
 {
 	"name": "@ibg/types",
 	"description": "A collection of utility types",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle -b typesonly",

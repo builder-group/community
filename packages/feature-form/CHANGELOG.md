@@ -1,5 +1,16 @@
 # feature-form
 
+## 0.0.14
+
+### Patch Changes
+
+- [#49](https://github.com/inbeta-group/monorepo/pull/49) [`df1fdfa`](https://github.com/inbeta-group/monorepo/commit/df1fdfa0971048452041354681b73f10b2908aa1) Thanks [@bennoinbeta](https://github.com/bennoinbeta)! - Updated README.md
+
+- Updated dependencies [[`df1fdfa`](https://github.com/inbeta-group/monorepo/commit/df1fdfa0971048452041354681b73f10b2908aa1)]:
+  - validation-adapter@0.0.6
+  - feature-state@0.0.18
+  - @ibg/types@0.0.4
+
 ## 0.0.13
 
 ### Patch Changes
