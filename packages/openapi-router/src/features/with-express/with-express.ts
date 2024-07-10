@@ -24,7 +24,7 @@ export function withExpress<
 		get(this: TOpenApiRouter<['base', 'express'], GPaths>, path, config) {
 			const { handler } = config;
 			this._router.get(
-				typeof path === 'string' ? formatPath(path) : path.toString(),
+				typeof formatPath(path),
 				parseParamsMiddleware(),
 				validationMiddleware(config),
 				requestHandler(handler as express.RequestHandler)
@@ -33,7 +33,7 @@ export function withExpress<
 		post(this: TOpenApiRouter<['base', 'express'], GPaths>, path, config) {
 			const { handler } = config;
 			this._router.post(
-				typeof path === 'string' ? formatPath(path) : path.toString(),
+				formatPath(path),
 				parseParamsMiddleware(),
 				validationMiddleware(config),
 				requestHandler(handler as express.RequestHandler)
@@ -42,7 +42,7 @@ export function withExpress<
 		put(this: TOpenApiRouter<['base', 'express'], GPaths>, path, config) {
 			const { handler } = config;
 			this._router.put(
-				typeof path === 'string' ? formatPath(path) : path.toString(),
+				formatPath(path),
 				parseParamsMiddleware(),
 				validationMiddleware(config),
 				requestHandler(handler as express.RequestHandler)
@@ -51,7 +51,7 @@ export function withExpress<
 		del(this: TOpenApiRouter<['base', 'express'], GPaths>, path, config) {
 			const { handler } = config;
 			this._router.delete(
-				typeof path === 'string' ? formatPath(path) : path.toString(),
+				formatPath(path),
 				parseParamsMiddleware(),
 				validationMiddleware(config),
 				requestHandler(handler as express.RequestHandler)

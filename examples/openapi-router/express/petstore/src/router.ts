@@ -15,28 +15,11 @@ openApiRouter.get('/pet/{petId}', {
 		})
 	),
 	handler: (req, res) => {
+		const { petId } = req.params;
+
 		res.send({
 			name: 'Falko',
 			photoUrls: []
 		});
-	}
-});
-
-openApiRouter.post('/pet/{petId}/uploadImage', {
-	pathValidator: vValidator(
-		v.object({
-			petId: v.number()
-		})
-	),
-	queryValidator: vValidator(
-		v.object({
-			additionalMetadata: v.optional(v.string())
-		})
-	),
-	handler: (req, res) => {
-		const { petId } = req.params;
-		req.query;
-
-		res.send({});
 	}
 });
