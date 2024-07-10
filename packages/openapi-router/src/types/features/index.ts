@@ -1,12 +1,14 @@
 import { type TUnionToIntersection } from '@ibg/types/utils';
 
 import { type TOpenApiExpressFeature } from './express';
+import { type TOpenApiHonoFeature } from './hono';
 
 export * from './express';
 
 export type TFeatures<GPaths extends object = object> = {
 	base: { _: null }; // TODO: Placeholder Feature: Figure out how to make the TS infer work with [] (empty array -> no feature)
 	express: TOpenApiExpressFeature<GPaths>;
+	hono: TOpenApiHonoFeature<GPaths>;
 } & TThirdPartyFeatures<GPaths>;
 
 // Global registry for third party features
