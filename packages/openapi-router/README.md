@@ -26,24 +26,32 @@
 - **Validation-First**: Integrates with Valibot, Zod, and other validators to ensure requests adhere to expected types
 - **Modular & Extendable**: Easily extendable with features like `withExpress()`, ..
 
-### Motivation
+### 📚 Examples
+
+- [Express Petstore](https://github.com/inbeta-group/monorepo/tree/develop/examples/openapi-router/express/petstore)
+- [Hono Petstore](https://github.com/inbeta-group/monorepo/tree/develop/examples/openapi-router/hono/petstore)
+
+### 🌟 Motivation
 
 The goal is to provide a typesafe and straightforward wrapper around web framework routers, seamlessly integrating with OpenAPI schemas using `openapi-typescript` and ensuring type validation with libraries like Zod and Valibot.
 
 ## 📖 Usage
 
+### ExpressJs
+
 ```ts
-import { Router } from 'express';
+import express, { Router } from 'express';
 import * as v from 'valibot';
 import { vValidator } from 'validation-adapters/valibot';
 import { createExpressOpenApiRouter } from '@ibg/openapi-router';
+import { paths } from './path/to/openapi/types';
 
-export const app: Express = express();
+const app = express();
 
-// Add middleware to parse JSON request bodies
 app.use(express.json());
 
-const openapiRouter = createExpressOpenApiRouter<paths>(Router());
+const router = Router();
+const openapiRouter = createExpressOpenApiRouter<paths>(router);
 
 openapiRouter.get('/pet/{petId}', {
     pathValidator: vValidator(
@@ -63,6 +71,41 @@ openapiRouter.get('/pet/findByTags', {
     handler: (req, res, next) => {}
 });
 
+app.use('/*', router);
+```
+
+### Hono
+
+```ts
+import { Hono } from 'hono';
+import * as v from 'valibot';
+import { vValidator } from 'validation-adapters/valibot';
+import { createHonoOpenApiRouter } from '@ibg/openapi-router';
+import { paths } from './path/to/openapi/types';
+
+export const app = new Hono();
+
+const router = new Hono();
+const openapiRouter = createHonoOpenApiRouter<paths>(router);
+
+openapiRouter.get('/pet/{petId}', {
+    pathValidator: vValidator(
+        v.object({
+            petId: v.number()
+        })
+    ),
+    handler: async (c) => {}
+});
+
+openapiRouter.get('/pet/findByTags', {
+    queryValidator: vValidator(
+        v.object({
+            tags: v.optional(v.array(v.string()))
+        })
+    ),
+    handler: (c) => {}
+});
+
 // Application endpoint
-app.use('/*', openapiRouter);
+app.route('/', router);
 ```

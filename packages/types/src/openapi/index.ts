@@ -12,11 +12,13 @@
  */
 
 import type { TErrorStatus, THttpMethod, TMediaType, TOkStatus } from '../api';
-import { type TFilterKeys } from '../utils';
+import { type TExtractString, type TFilterKeys } from '../utils';
 
 /** Given an OpenAPI **Paths Object**, find all paths that have the given method */
 export type TPathsWithMethod<GPaths, GHttpMethod extends THttpMethod> = {
-	[GPath in keyof GPaths]: GPaths[GPath] extends { [GMethod in GHttpMethod]: any } ? GPath : never;
+	[GPath in keyof GPaths]: GPaths[GPath] extends { [GMethod in GHttpMethod]: any }
+		? TExtractString<GPath>
+		: never;
 }[keyof GPaths];
 
 /** Return first `parameters/path` from an operation object */

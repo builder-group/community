@@ -200,9 +200,21 @@ importers:
       '@hono/node-server':
         specifier: ^1.12.0
         version: 1.12.0
+      '@hono/zod-validator':
+        specifier: ^0.2.2
+        version: 0.2.2(hono@4.4.12)(zod@3.23.8)
+      '@ibg/openapi-router':
+        specifier: workspace:*
+        version: link:../../../../packages/openapi-router
       hono:
         specifier: ^4.4.12
         version: 4.4.12
+      validation-adapters:
+        specifier: workspace:*
+        version: link:../../../../packages/validation-adapters
+      zod:
+        specifier: ^3.23.8
+        version: 3.23.8
     devDependencies:
       '@types/node':
         specifier: ^20.11.17
@@ -462,6 +474,9 @@ importers:
       express:
         specifier: ^4.19.2
         version: 4.19.2
+      hono:
+        specifier: ^4.4.12
+        version: 4.4.12
       valibot:
         specifier: ^0.35.0
         version: 0.35.0
@@ -1367,6 +1382,12 @@ packages:
   '@hono/node-server@1.12.0':
     resolution: {integrity: sha512-e6oHjNiErRxsZRZBmc2KucuvY3btlO/XPncIpP2X75bRdTilF9GLjm3NHvKKunpJbbJJj31/FoPTksTf8djAVw==}
     engines: {node: '>=18.14.1'}
+
+  '@hono/zod-validator@0.2.2':
+    resolution: {integrity: sha512-dSDxaPV70Py8wuIU2QNpoVEIOSzSXZ/6/B/h4xA7eOMz7+AarKTSGV8E6QwrdcCbBLkpqfJ4Q2TmBO0eP1tCBQ==}
+    peerDependencies:
+      hono: '>=3.9.0'
+      zod: ^3.19.1
 
   '@humanwhocodes/config-array@0.11.14':
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
@@ -6277,6 +6298,11 @@ snapshots:
   '@figma/plugin-typings@1.95.0': {}
 
   '@hono/node-server@1.12.0': {}
+
+  '@hono/zod-validator@0.2.2(hono@4.4.12)(zod@3.23.8)':
+    dependencies:
+      hono: 4.4.12
+      zod: 3.23.8
 
   '@humanwhocodes/config-array@0.11.14':
     dependencies:

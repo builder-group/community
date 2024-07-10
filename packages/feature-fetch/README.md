@@ -27,11 +27,11 @@
 - **Typesafe**: Build with TypeScript for strong type safety and support for [`openapi-typescript`](https://github.com/drwpow/openapi-typescript) types
 - **Standalone**: Only dependent on `fetch`, ensuring ease of use in various environments
 
-### Motivation
+### 🌟 Motivation
 
 Provide a typesafe, straightforward, and lightweight `fetch` wrapper that seamlessly integrates with OpenAPI schemas using `openapi-typescript`. It aims to simplify error handling by returning results in a predictable manner with [`ts-results-es`](https://github.com/lune-climate/ts-results-es#readme). Additionally, it is designed to be modular & extendable, enabling the creation of straightforward API wrappers, such as for the Google Web Fonts API (see [`google-webfonts-client`](https://github.com/inbeta-group/monorepo/tree/develop/packages/google-webfonts-client)). `feature-fetch` only depends on `fetch`, making it usable in most sandboxed environments like Figma plugins.
 
-### Alternatives
+### ⚖️ Alternatives
 
 - [wretch](https://github.com/elbywan/wretch)
 - [openapi-fetch](https://github.com/drwpow/openapi-typescript/tree/main/packages/openapi-fetch)
@@ -135,32 +135,32 @@ Enhance `feature-fetch` with [OpenAPI](https://www.openapis.org/) support to cre
 
 When handling API error responses (`response.isErr()`), `response` can be one of three [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) types, each representing a different kind of failure.
 
-### `NetworkException` (extends `ServiceException`)
+### `NetworkError` (extends `FetchError`)
 
 Indicates a failure in network communication, such as loss of connectivity.
 
 ```ts
-if (response.isErr() && response.error instanceof NetworkException) {
+if (response.isErr() && response.error instanceof NetworkError) {
   console.error('Network error:', response.error.message);
 }
 ```
 
-### `RequestException` (extends `ServiceException`)
+### `RequestError` (extends `FetchError`)
 
 Occurs when the server returns a response with a status code indicating an error (e.g., 4xx or 5xx).
 
 ```ts
-if (response.isErr() && response.error instanceof RequestException) {
+if (response.isErr() && response.error instanceof RequestError) {
   console.error('Request error:', response.error.message, 'Status:', response.error.status);
 }
 ```
 
-### `ServiceException`
+### `FetchError`
 
-A general exception type that can encompass other error scenarios not covered by `NetworkException` or `RequestException`, for example when the response couldn't be parsed, ..
+A general exception type that can encompass other error scenarios not covered by `NetworkError` or `RequestError`, for example when the response couldn't be parsed, ..
 
 ```ts
-if (response.isErr() && response.error instanceof ServiceException) {
+if (response.isErr() && response.error instanceof FetchError) {
   console.error('Service error:', response.error.message);
 }
 ```
@@ -175,11 +175,11 @@ if (response.isErr()) {
         console.error('Not found:', error.data)
     }
 
-    if (error instanceof NetworkException) {
+    if (error instanceof NetworkError) {
         console.error('Network error:', error.message);
-    } else if (error instanceof RequestException) {
+    } else if (error instanceof RequestError) {
         console.error('Request error:', error.message, 'Status:', error.status);
-    } else if (error instanceof ServiceException) {
+    } else if (error instanceof FetchError) {
         console.error('Service error:', error.message);
     } else {
         console.error('Unexpected error:', error);
@@ -191,7 +191,7 @@ if (response.isErr()) {
 
 ### `withRetry()`
 
-Retries each request using an exponential backoff strategy if a network exceptions (`NetworkException`) or HTTP `429` (Too Many Requests) response occur.
+Retries each request using an exponential backoff strategy if a network exceptions (`NetworkError`) or HTTP `429` (Too Many Requests) response occur.
 
 ```ts
 import { createApiFetchClient, withRetry } from 'feature-fetch';

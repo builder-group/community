@@ -1,19 +1,17 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 
-const app = new Hono();
-
-app.get('/', (c) => {
-	return c.text('Hello Hono!');
-});
-
-app.post('/:jeff', (c) => {
-	c.req.param('jeff');
-
-	return c.json({});
-});
+import { errorHandler, invalidPathHandler } from './handlers';
+import { router } from './router';
 
 const port = 3000;
+
+const app = new Hono();
+
+app.onError(errorHandler);
+app.notFound(invalidPathHandler);
+app.route('/', router);
+
 console.log(`Server is running on port ${port}`);
 
 serve({

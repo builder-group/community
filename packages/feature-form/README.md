@@ -27,14 +27,15 @@
 - **Typesafe**: Build with TypeScript for strong type safety
 - **Standalone**: Zero external dependencies, ensuring ease of use in various environments
 
-### 🏖️ Code Sandbox
-- [ReactJs Basic](https://codesandbox.io/p/sandbox/basic-c4gd3t)
+### 📚 Examples
 
-### Motivation
+- [ReactJs Basic](https://github.com/inbeta-group/monorepo/tree/develop/examples/feature-form/react/basic) ([Code Sandbox](https://codesandbox.io/p/sandbox/basic-c4gd3t))
+
+### 🌟 Motivation
 
 Provide a typesafe, straightforward, and lightweight form library designed to be modular and extendable with features.
 
-### Alternatives
+### ⚖️ Alternatives
 - [react-hook-form](https://github.com/react-hook-form/react-hook-form)
 
 ## 📖 Usage
