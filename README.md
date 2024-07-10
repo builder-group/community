@@ -33,7 +33,7 @@ Brought to you by [dyn.art](https://github.com/dyn-art/monorepo). An open-source
 | [validation-adapter](https://github.com/inbeta-group/monorepo/blob/develop/packages/validation-adapter) | Universal validation adapter that integrates various validation libraries like Zod, Valibot, and Yup | [`validation-adapter`](https://www.npmjs.com/package/validation-adapter) |
 | [validation-adapters](https://github.com/inbeta-group/monorepo/blob/develop/packages/validation-adapters) | Pre-made validation adapters for the validation-adapter library, including adapters for Zod and Valibot | [`validation-adapters`](https://www.npmjs.com/package/validation-adapters) |
 
-## 👀 Examples
+### 📚 Examples
 
 > See [`/examples`](https://github.com/inbeta-group/monorepo/tree/develop/examples)
 
@@ -42,4 +42,8 @@ Brought to you by [dyn.art](https://github.com/dyn-art/monorepo). An open-source
 
 ### `feature-form`
 - [`feature-form/react/basic`](https://github.com/inbeta-group/monorepo/tree/develop/examples/feature-form/react/basic)
+
+### `openapi-router`
+- [`openapi-router/hono/petstore`](https://github.com/inbeta-group/monorepo/tree/develop/examples/openapi-router/hono/petstore)
+- [`openapi-router/express/petstore`](https://github.com/inbeta-group/monorepo/tree/develop/examples/openapi-router/express/petstore)
 

@@ -25,7 +25,7 @@
 - **Flexible**: Easily append and extend validation rules
 - **Typesafe**: Build with TypeScript for strong type safety
 
-### Motivation
+### 🌟 Motivation
 
 Provide a universal validation adapter that generalizes different validation libraries like Zod, Valibot, etc. for use in libraries & applications requiring diverse validation strategies like [`feature-form`](https://github.com/inbeta-group/monorepo/tree/develop/packages/feature-form).
 

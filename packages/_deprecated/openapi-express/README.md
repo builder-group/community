@@ -24,7 +24,7 @@
 - **Typesafe**: Build with TypeScript for strong type safety and support for [`openapi-typescript`](https://github.com/drwpow/openapi-typescript) types
 - **Validation**: Ensures request validation against defined schemas using [`zod`](https://zod.dev/)
 
-### Motivation
+### 🌟 Motivation
 
 Provide a typesafe, straightforward, and lightweight wrapper for the [Express](https://expressjs.com/) Router that seamlessly integrates with OpenAPI schemas using `openapi-typescript`. It aims to simplify error handling and request validation.
 

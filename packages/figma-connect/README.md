@@ -22,11 +22,11 @@
 
 [Source](https://www.figma.com/plugin-docs/how-plugins-run/)
 
-### Motivation
+### 🌟 Motivation
 
 Provide a typesafe and straightforward wrapper around the communication between the `app/ui` and `plugin` part of a Figma Plugin.
 
-### Alternatives
+### ⚖️ Alternatives
 
 - [figma-messenger](https://github.com/okotoki/figma-messenger)
 
