@@ -4,6 +4,7 @@ import * as z from 'zod';
 import { createHonoOpenApiRouter } from '@ibg/openapi-router';
 
 import { paths } from './gen/v1';
+import { PetSchema } from './schemas';
 
 export const router = new Hono();
 export const openApiRouter = createHonoOpenApiRouter<paths>(router);
@@ -21,5 +22,14 @@ openApiRouter.get('/pet/{petId}', {
 			name: 'Falko',
 			photoUrls: []
 		});
+	}
+});
+
+openApiRouter.post('/pet', {
+	bodyValidator: zValidator(PetSchema),
+	handler: (c) => {
+		const { name, photoUrls } = c.req.valid('json');
+
+		return c.json({ name, photoUrls });
 	}
 });
