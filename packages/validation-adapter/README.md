@@ -25,28 +25,28 @@
 - **Flexible**: Easily append and extend validation rules
 - **Typesafe**: Build with TypeScript for strong type safety
 
-### Motivation
+### 🌟 Motivation
 
 Provide a universal validation adapter that generalizes different validation libraries like Zod, Valibot, etc. for use in libraries & applications requiring diverse validation strategies like [`feature-form`](https://github.com/inbeta-group/monorepo/tree/develop/packages/feature-form).
 
 ## 📖 Usage
 
 ```ts
-import { zodAdapter } from 'validation-adapters/zod';
-import { valibotAdapter } from 'validation-adapters/valibot';
-import { createValidationAdapter } from 'validation-adapter';
+import { zValidator } from 'validation-adapters/zod';
+import { vValidator } from 'validation-adapters/valibot';
+import { createValidator } from 'validation-adapter';
 import * as z from 'zod';
 import * as v from 'valibot';
 
-const zodNameValidator = zodAdapter(
+const zodNameValidator = zValidator(
     z.string().min(2).max(10).regex(/^([^0-9]*)$/)
 );
 
-const valibotNameValidator = valibotAdapter(
+const valibotNameValidator = vValidator(
     v.pipe(v.string(), v.minLength(2), v.maxLength(10), v.regex(/^([^0-9]*)$/))
 );
 
-const customValidator = createValidationAdapter([
+const customValidator = createValidator([
     {
         key: 'custom',
         validate: (cx) => {

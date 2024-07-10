@@ -1,6 +1,6 @@
 import type express from 'express';
 import type * as core from 'express-serve-static-core';
-import { type TValidationAdapter } from 'validation-adapter';
+import { type TValidator } from 'validation-adapter';
 import {
 	type TOperationPathParams,
 	type TOperationQueryParams,
@@ -19,35 +19,35 @@ export interface TOpenApiExpressFeature<GPaths extends object> {
 }
 
 export type TOpenApiExpressGet<GPaths extends object> = <
-	GGetPaths extends TPathsWithMethod<GPaths, 'get'>,
-	GPathOperation extends TFilterKeys<GPaths[GGetPaths], 'get'>
+	GGetPath extends TPathsWithMethod<GPaths, 'get'>,
+	GPathOperation extends TFilterKeys<GPaths[GGetPath], 'get'>
 >(
-	path: GGetPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
-	config: TOpenApiRouteConfig<GPathOperation>
+	path: GGetPath | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
+	config: TOpenApiExpressRouteConfig<GPathOperation>
 ) => void;
 
 export type TOpenApiExpressPost<GPaths extends object> = <
-	GGetPaths extends TPathsWithMethod<GPaths, 'post'>,
-	GPathOperation extends TFilterKeys<GPaths[GGetPaths], 'post'>
+	GPostPath extends TPathsWithMethod<GPaths, 'post'>,
+	GPathOperation extends TFilterKeys<GPaths[GPostPath], 'post'>
 >(
-	path: GGetPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
-	config: TOpenApiRouteConfig<GPathOperation>
+	path: GPostPath | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
+	config: TOpenApiExpressRouteConfig<GPathOperation>
 ) => void;
 
 export type TOpenApiExpressPut<GPaths extends object> = <
-	GGetPaths extends TPathsWithMethod<GPaths, 'put'>,
-	GPathOperation extends TFilterKeys<GPaths[GGetPaths], 'put'>
+	GPutPath extends TPathsWithMethod<GPaths, 'put'>,
+	GPathOperation extends TFilterKeys<GPaths[GPutPath], 'put'>
 >(
-	path: GGetPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
-	config: TOpenApiRouteConfig<GPathOperation>
+	path: GPutPath | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
+	config: TOpenApiExpressRouteConfig<GPathOperation>
 ) => void;
 
 export type TOpenApiExpressDelete<GPaths extends object> = <
-	GGetPaths extends TPathsWithMethod<GPaths, 'delete'>,
-	GPathOperation extends TFilterKeys<GPaths[GGetPaths], 'delete'>
+	GDeletePath extends TPathsWithMethod<GPaths, 'delete'>,
+	GPathOperation extends TFilterKeys<GPaths[GDeletePath], 'delete'>
 >(
-	path: GGetPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
-	config: TOpenApiRouteConfig<GPathOperation>
+	path: GDeletePath | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
+	config: TOpenApiExpressRouteConfig<GPathOperation>
 ) => void;
 
 // =============================================================================
@@ -61,62 +61,64 @@ export type TOpenApiExpressRequestHandler<GPathOperation> = (
 ) => Promise<void> | void;
 
 export type TOpenApiExpressRequest<GPathOperation> = express.Request<
-	TOpenApiExpressPathParamsRequestOptions<GPathOperation>, // Params
+	TOpenApiExpressPathParams<GPathOperation>, // Params
 	TOperationSuccessResponseContent<GPathOperation>, // ResBody
-	TRequestBody<GPathOperation>, // ReqBody
-	TOpenApiExpressQueryParamsRequestOptions<GPathOperation> // ReqQuery
+	TOpenApiExpressRequestBody<GPathOperation>, // ReqBody
+	TOpenApiExpressQueryParams<GPathOperation> // ReqQuery
 >;
 
-export type TOpenApiExpressQueryParamsRequestOptions<GPathOperation> =
+export type TOpenApiExpressQueryParams<GPathOperation> =
 	TOperationQueryParams<GPathOperation> extends never
 		? core.Query
 		: TOperationQueryParams<GPathOperation>;
 
-export type TOpenApiExpressPathParamsRequestOptions<GPathOperation> =
+export type TOpenApiExpressPathParams<GPathOperation> =
 	TOperationPathParams<GPathOperation> extends never
 		? core.ParamsDictionary
 		: TOperationPathParams<GPathOperation>;
 
+export type TOpenApiExpressRequestBody<GPathOperation> = TRequestBody<GPathOperation>;
+
 export type TOpenApiExpressResponse<GPathOperation> = express.Response<
-	TOperationSuccessResponseContent<GPathOperation> // ResBody
+	TOperationSuccessResponseContent<GPathOperation>
 >;
 
 // =============================================================================
 // Router Options
 // =============================================================================
 
-export type TOpenApiRouteConfig<GPathOperation> = {
+export type TOpenApiExpressRouteConfig<GPathOperation> = {
 	handler: TOpenApiExpressRequestHandler<GPathOperation>;
-} & TOpenApiValidationAdapters<GPathOperation>;
+} & TOpenApiExpressValidators<GPathOperation>;
 
 // =============================================================================
 // Validation
 // =============================================================================
 
-export type TOpenApiValidationAdapters<GPathOperation> =
-	TOpenApiQueryParamsValidationAdapter<GPathOperation> &
-		TOpenApiPathParamsValidationAdapter<GPathOperation> &
-		TOpenApiBodyValidationAdapter<GPathOperation>;
+export type TOpenApiExpressValidators<GPathOperation> =
+	TOpenApiExpressQueryParamsValidator<GPathOperation> &
+		TOpenApiExpressPathParamsValidator<GPathOperation> &
+		TOpenApiExpressBodyValidator<GPathOperation>;
 
-export type TOpenApiQueryParamsValidationAdapter<GPathOperation> =
-	undefined extends TOperationQueryParams<GPathOperation> // If the queryAdapter can be undefined/optional
-		? { queryAdapter?: TValidationAdapter<TOperationQueryParams<GPathOperation>> }
+export type TOpenApiExpressQueryParamsValidator<GPathOperation> =
+	undefined extends TOperationQueryParams<GPathOperation> // If the queryValidator can be undefined/optional
+		? { queryValidator?: TValidator<TOperationQueryParams<GPathOperation>> }
 		: TOperationQueryParams<GPathOperation> extends never
-			? { queryAdapter?: TDefaultValidationAdapter }
-			: { queryAdapter: TValidationAdapter<TOperationQueryParams<GPathOperation>> };
+			? { queryValidator?: TDefaultExpressValidator }
+			: { queryValidator: TValidator<TOperationQueryParams<GPathOperation>> };
 
-export type TOpenApiPathParamsValidationAdapter<GPathOperation> =
-	undefined extends TOperationPathParams<GPathOperation> // If the pathAdapter can be undefined/optional
-		? { pathAdapter?: TValidationAdapter<TOperationPathParams<GPathOperation>> }
+export type TOpenApiExpressPathParamsValidator<GPathOperation> =
+	undefined extends TOperationPathParams<GPathOperation> // If the pathValidator can be undefined/optional
+		? { pathValidator?: TValidator<TOperationPathParams<GPathOperation>> }
 		: TOperationPathParams<GPathOperation> extends never
-			? { pathAdapter?: TDefaultValidationAdapter }
-			: { pathAdapter: TValidationAdapter<TOperationPathParams<GPathOperation>> };
+			? { pathValidator?: TDefaultExpressValidator }
+			: { pathValidator: TValidator<TOperationPathParams<GPathOperation>> };
 
-export type TOpenApiBodyValidationAdapter<GPathOperation> =
-	undefined extends TRequestBody<GPathOperation> // If the bodyAdapter can be undefined/optional
-		? { bodyAdapter?: TValidationAdapter<TRequestBody<GPathOperation>> }
+export type TOpenApiExpressBodyValidator<GPathOperation> =
+	undefined extends TRequestBody<GPathOperation> // If the bodyValidator can be undefined/optional
+		? { bodyValidator?: TValidator<TRequestBody<GPathOperation>> }
 		: TRequestBody<GPathOperation> extends never
-			? { bodyAdapter?: TDefaultValidationAdapter }
-			: { bodyAdapter: TValidationAdapter<TRequestBody<GPathOperation>> };
+			? { bodyValidator?: TDefaultExpressValidator }
+			: { bodyValidator: TValidator<TRequestBody<GPathOperation>> };
 
-export type TDefaultValidationAdapter = TValidationAdapter<Record<string, unknown>>;
+export type TDefaultExpressValidator = TValidator<Record<string, unknown>>;

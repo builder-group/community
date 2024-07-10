@@ -1,3 +1,3 @@
-export * from './create-validate-context';
-export * from './create-validation-adapter';
+export * from './create-validation-context';
+export * from './create-validator';
 export * from './types';

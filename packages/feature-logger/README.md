@@ -27,11 +27,11 @@
 - **Typesafe**: Build with TypeScript for strong type safety
 - **Standalone**: Zero dependencies, ensuring ease of use in various environments
 
-### Motivation
+### 🌟 Motivation
 
 Provide a typesafe, straightforward, and lightweight logging library designed to be modular and extendable with features like `withTimestamp()`, `withPrefix()`, ..
 
-### Alternatives
+### ⚖️ Alternatives
 - [winston](https://github.com/winstonjs/winston)
 - [pino](https://github.com/pinojs/pino)
 

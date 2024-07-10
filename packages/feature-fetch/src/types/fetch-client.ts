@@ -1,6 +1,6 @@
 import type { Result } from 'ts-results-es';
 
-import type { NetworkError, RequestError, ServiceError } from '../exceptions';
+import type { FetchError, NetworkError, RequestError } from '../exceptions';
 import type { FetchHeaders } from '../helper';
 import type { TFeatureKeys, TSelectFeatures } from './features';
 import { type TParseAs, type TParseAsResponse, type TRequestMethod } from './fetch';
@@ -118,7 +118,7 @@ export interface TFetchResponseSuccess<GSuccessResponseBody, GParseAs extends TP
 export type TFetchResponseError<GErrorResponseBody = unknown> =
 	| NetworkError
 	| RequestError<GErrorResponseBody>
-	| ServiceError;
+	| FetchError;
 
 export type TFetchResponse<
 	GSuccessResponseBody,

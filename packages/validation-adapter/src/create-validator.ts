@@ -1,10 +1,10 @@
 import { deepCopy } from '@ibg/utils';
 
-import { type TValidationAdapter, type TValidationChain } from './types';
+import { type TValidationChain, type TValidator } from './types';
 
-export function createValidationAdapter<GValue>(
+export function createValidator<GValue>(
 	validationChain: TValidationChain<GValue>
-): TValidationAdapter<GValue> {
+): TValidator<GValue> {
 	return {
 		_validationChain: validationChain,
 		async validate(this, cx) {
@@ -23,7 +23,7 @@ export function createValidationAdapter<GValue>(
 			return this;
 		},
 		clone() {
-			return createValidationAdapter<GValue>(deepCopy(this._validationChain));
+			return createValidator<GValue>(deepCopy(this._validationChain));
 		}
 	};
 }

@@ -1,7 +1,7 @@
 {
 	"name": "@ibg/openapi-router",
 	"description": "Thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod",
-	"version": "0.0.7",
+	"version": "0.0.9",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
@@ -39,6 +39,7 @@
 		"@types/express-serve-static-core": "^4.19.5",
 		"@types/node": "^20.14.10",
 		"express": "^4.19.2",
+		"hono": "^4.4.12",
 		"valibot": "^0.35.0",
 		"validation-adapters": "workspace:*"
 	},

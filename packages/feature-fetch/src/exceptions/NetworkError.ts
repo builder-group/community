@@ -1,6 +1,6 @@
-import { ServiceError, type TErrorCode } from './ServiceError';
+import { FetchError, type TErrorCode } from './FetchError';
 
-export class NetworkError extends ServiceError {
+export class NetworkError extends FetchError {
 	constructor(code: TErrorCode, options: TNetworkErrorOptions = {}) {
 		const { throwable, description } = options;
 		super(code, {

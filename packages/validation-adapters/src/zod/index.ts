@@ -1,8 +1,10 @@
-import { createValidationAdapter, type TValidationAdapter } from 'validation-adapter';
+import { createValidator, type TValidator } from 'validation-adapter';
 import { ZodError, type Schema } from 'zod';
 
-export function zodAdapter<GValue>(schema: Schema<GValue>): TValidationAdapter<GValue> {
-	return createValidationAdapter([
+export { zodValidator as zValidator };
+
+export function zodValidator<GValue>(schema: Schema<GValue>): TValidator<GValue> {
+	return createValidator([
 		{
 			key: 'zod',
 			validate: (cx) => {

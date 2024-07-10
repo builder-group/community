@@ -1,5 +1,21 @@
 # google-webfonts-client
 
+## 0.0.11
+
+### Patch Changes
+
+- Renamde ValidationAdapter to Validator for more clarity
+
+- Updated dependencies []:
+  - feature-fetch@0.0.12
+
+## 0.0.10
+
+### Patch Changes
+
+- Updated dependencies []:
+  - feature-fetch@0.0.11
+
 ## 0.0.9
 
 ### Patch Changes

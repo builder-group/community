@@ -18,10 +18,10 @@
 
 `@ibg/cli` is a straightforward CLI tool for bundling TypeScript libraries with presets, powered by Rollup and Esbuild.
 
-### Motivation
+### 🌟 Motivation
 Eliminate the hassle of manually configuring Rollup over and over by providing a flexible wrapper with preset configurations for Figma plugins, Rust (Wasm), and TypeScript library bundling.
 
-### Alternatives
+### ⚖️ Alternatives
 - [tsup](https://github.com/egoist/tsup)
 
 ## 📖 Usage

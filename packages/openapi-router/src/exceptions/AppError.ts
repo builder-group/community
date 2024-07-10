@@ -1,4 +1,4 @@
-export class ServiceError extends Error {
+export class AppError extends Error {
 	public readonly code: TErrorCode;
 	public readonly throwable?: Error;
 	public readonly status: number;

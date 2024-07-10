@@ -1,8 +1,10 @@
-import { createValidationAdapter, type TValidationAdapter } from 'validation-adapter';
+import { createValidator, type TValidator } from 'validation-adapter';
 import { ValidationError, type Schema } from 'yup';
 
-export function yupAdapter<GValue>(schema: Schema<GValue>): TValidationAdapter<GValue> {
-	return createValidationAdapter([
+export { yupValidator as yValidator };
+
+export function yupValidator<GValue>(schema: Schema<GValue>): TValidator<GValue> {
+	return createValidator([
 		{
 			key: 'yup',
 			validate: async (cx) => {

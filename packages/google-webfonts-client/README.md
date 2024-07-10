@@ -91,20 +91,20 @@ if (fileResponse.isOk()) {
 
 Errors can occur during API requests, and the client will return detailed error information. Possible error types include:
 
-- **`NetworkException`**: Indicates a failure in network communication, such as loss of connectivity
-- **`RequestException`**: Occurs when the server returns a response with a status code indicating an error (e.g., 4xx or 5xx)
-- **`ServiceException`**: A general exception type that can encompass other error scenarios not covered by `NetworkException` or `RequestException`, for example when the response couldn't be parsed, ..
+- **`NetworkError`**: Indicates a failure in network communication, such as loss of connectivity
+- **`RequestError`**: Occurs when the server returns a response with a status code indicating an error (e.g., 4xx or 5xx)
+- **`FetchError`**: A general exception type that can encompass other error scenarios not covered by `NetworkError` or `RequestError`, for example when the response couldn't be parsed, ..
 
 ```ts
 try {
   const data = urlResponse.unwrap();
   console.log(data);
 } catch (error) {
-  if (error instanceof NetworkException) {
+  if (error instanceof NetworkError) {
     console.error('Network error:', error.message);
-  } else if (error instanceof RequestException) {
+  } else if (error instanceof RequestError) {
     console.error('Request error:', error.message, 'Status:', error.status);
-  } else if (error instanceof ServiceException) {
+  } else if (error instanceof FetchError) {
     console.error('Service error:', error.message, 'Code:', error.code);
   } else {
     console.error('Unexpected error:', error);

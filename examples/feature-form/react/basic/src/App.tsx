@@ -1,10 +1,10 @@
 import {
 	bitwiseFlag,
 	createForm,
-	createValidationAdapter,
+	createValidator,
 	FormFieldReValidateMode,
 	FormFieldValidateMode,
-	TFormFieldValidationAdapter
+	TFormFieldValidator
 } from 'feature-form';
 import { useForm } from 'feature-react/form';
 import { withGlobalBind } from 'feature-react/state';
@@ -15,8 +15,8 @@ import { randomHex, shortId } from '@ibg/utils';
 
 import './App.css';
 
-import { valibotAdapter } from 'validation-adapters/valibot';
-import { zodAdapter } from 'validation-adapters/zod';
+import { vValidator } from 'validation-adapters/valibot';
+import { zValidator } from 'validation-adapters/zod';
 
 import { StatusMessage } from './components';
 import { isLightColor } from './utils';
@@ -35,7 +35,7 @@ type TFormData = {
 	};
 };
 
-const valibotNameValidator = valibotAdapter(
+const valibotNameValidator = vValidator(
 	v.pipe(v.string(), v.minLength(2), v.maxLength(10), v.regex(/^([^0-9]*)$/))
 );
 
@@ -44,8 +44,8 @@ const $form = withGlobalBind(
 	createForm<TFormData>({
 		fields: {
 			firstName: {
-				validationAdapter: valibotNameValidator.clone().append(
-					createValidationAdapter([
+				validator: valibotNameValidator.clone().append(
+					createValidator([
 						{
 							key: 'jeff',
 							validate: (cx) => {
@@ -62,11 +62,11 @@ const $form = withGlobalBind(
 				defaultValue: ''
 			},
 			lastName: {
-				validationAdapter: valibotNameValidator,
+				validator: valibotNameValidator,
 				defaultValue: ''
 			},
 			gender: {
-				validationAdapter: createValidationAdapter([
+				validator: createValidator([
 					{
 						key: 'gender',
 						validate: (cx) => {
@@ -78,15 +78,15 @@ const $form = withGlobalBind(
 							}
 						}
 					}
-				]) as TFormFieldValidationAdapter<TGender>,
+				]) as TFormFieldValidator<TGender>,
 				defaultValue: 'female'
 			},
 			email: {
-				validationAdapter: zodAdapter(z.string().email().max(30).min(1)),
+				validator: zValidator(z.string().email().max(30).min(1)),
 				defaultValue: ''
 			},
 			image: {
-				validationAdapter: createValidationAdapter([
+				validator: createValidator([
 					{
 						key: 'color',
 						validate: (cx) => {

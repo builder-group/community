@@ -1,5 +1,14 @@
 # feature-form
 
+## 0.0.13
+
+### Patch Changes
+
+- Renamde ValidationAdapter to Validator for more clarity
+
+- Updated dependencies []:
+  - validation-adapter@0.0.5
+
 ## 0.0.12
 
 ### Patch Changes

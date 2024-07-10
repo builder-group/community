@@ -1,8 +1,8 @@
 import { type TState } from 'feature-state';
 import {
-	type TBaseValidateContext,
+	type TBaseValidationContext,
 	type TCollectErrorMode,
-	type TValidationAdapter
+	type TValidator
 } from 'validation-adapter';
 import { type BitwiseFlag } from '@ibg/utils';
 
@@ -11,11 +11,12 @@ export type TFormField<GValue> = TState<GValue | undefined, ['base', 'form-field
 export interface TFormFieldStateFeature<GValue> {
 	_config: TFormFieldStateConfig;
 	_intialValue: GValue | undefined;
+	_validator: TFormFieldValidator<GValue>;
 	key: string;
 	isTouched: boolean;
 	isSubmitted: boolean;
 	isSubmitting: boolean;
-	validator: TFormFieldValidator<GValue>;
+	isValidating: boolean;
 	status: TFormFieldStatus;
 	validate: () => Promise<boolean>;
 	isValid: () => boolean;
@@ -89,15 +90,6 @@ export interface TInvalidFormFieldError {
 	path?: string;
 }
 
-export interface TFormFieldValidator<GValue> {
-	_validationAdapter: TFormFieldValidationAdapter<GValue>;
-	isValidating: boolean;
-	validate: (formField: TFormField<GValue>) => Promise<boolean>;
-}
+export type TFormFieldValidator<GValue> = TValidator<GValue, TFormFieldValidationContext<GValue>>;
 
-export type TFormFieldValidationAdapter<GValue> = TValidationAdapter<
-	GValue,
-	TFormFieldValidateContext<GValue>
->;
-
-export type TFormFieldValidateContext<GValue> = TBaseValidateContext<GValue>;
+export type TFormFieldValidationContext<GValue> = TBaseValidationContext<GValue>;

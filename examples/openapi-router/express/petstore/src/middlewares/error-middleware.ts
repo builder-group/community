@@ -1,5 +1,5 @@
 import type express from 'express';
-import { ServiceError } from '@ibg/openapi-router';
+import { AppError } from '@ibg/openapi-router';
 
 import { type components } from '../gen/v1';
 
@@ -10,7 +10,7 @@ export function errorMiddleware(
 	_next: express.NextFunction
 ): void {
 	let statusCode = 500;
-	const jsonResponse: components['schemas']['ServiceError'] = {
+	const jsonResponse: components['schemas']['AppError'] = {
 		error_code: '#ERR_UNKNOWN',
 		error_description: null,
 		error_uri: null,
@@ -18,7 +18,7 @@ export function errorMiddleware(
 	};
 
 	// Handle application-specific errors (instances of AppError)
-	if (err instanceof ServiceError) {
+	if (err instanceof AppError) {
 		statusCode = err.status;
 		jsonResponse.error_code = err.code;
 		jsonResponse.error_description = err.description;

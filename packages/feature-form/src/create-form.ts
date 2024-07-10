@@ -10,7 +10,7 @@ import {
 	type TFormData,
 	type TFormFields,
 	type TFormFieldStateConfig,
-	type TFormFieldValidationAdapter,
+	type TFormFieldValidator,
 	type TInvalidFormFieldError,
 	type TInvalidFormFieldErrors,
 	type TInvalidSubmitCallback,
@@ -46,7 +46,7 @@ export function createForm<GFormData extends TFormData>(
 					fieldKey,
 					createFormField(field.defaultValue, {
 						key: fieldKey,
-						validationAdapter: field.validationAdapter,
+						validator: field.validator,
 						collectErrorMode: field.collectErrorMode ?? collectErrorMode,
 						validateMode: field.validateMode ?? validateMode,
 						reValidateMode: field.reValidateMode ?? reValidateMode,
@@ -249,5 +249,5 @@ export type TCreateFormConfigFormFields<GFormData extends TFormData> = {
 
 export interface TCreateFormConfigFormField<GValue> extends Partial<TFormFieldStateConfig> {
 	defaultValue?: GValue;
-	validationAdapter?: TFormFieldValidationAdapter<GValue>;
+	validator?: TFormFieldValidator<GValue>;
 }

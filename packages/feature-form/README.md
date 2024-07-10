@@ -27,22 +27,23 @@
 - **Typesafe**: Build with TypeScript for strong type safety
 - **Standalone**: Zero external dependencies, ensuring ease of use in various environments
 
-### 🏖️ Code Sandbox
-- [ReactJs Basic](https://codesandbox.io/p/sandbox/basic-c4gd3t)
+### 📚 Examples
 
-### Motivation
+- [ReactJs Basic](https://github.com/inbeta-group/monorepo/tree/develop/examples/feature-form/react/basic) ([Code Sandbox](https://codesandbox.io/p/sandbox/basic-c4gd3t))
+
+### 🌟 Motivation
 
 Provide a typesafe, straightforward, and lightweight form library designed to be modular and extendable with features.
 
-### Alternatives
+### ⚖️ Alternatives
 - [react-hook-form](https://github.com/react-hook-form/react-hook-form)
 
 ## 📖 Usage
 
 ```tsx
 import { createForm } from 'feature-form';
-import { zodAdapter } from 'validation-adapters/zod';
-import { valibotAdapter } from 'validation-adapters/valibot';
+import { zValidator } from 'validation-adapters/zod';
+import { vValidator } from 'validation-adapters/valibot';
 import { useForm } from 'feature-react/form';
 import * as z from 'zod';
 import * as v from 'valibot';
@@ -55,11 +56,11 @@ interface TFormData {
 const $form = createForm<TFormData>({
     fields: {
         name: {
-            validator: zodAdapter(z.string().min(2).max(10)),
+            validator: zValidator(z.string().min(2).max(10)),
             defaultValue: ''
         },
         email: {
-            validator: valibotAdapter(v.pipe(v.string(), v.email())),
+            validator: vValidator(v.pipe(v.string(), v.email())),
             defaultValue: ''
         }
     },
@@ -93,16 +94,16 @@ export const MyFormComponent: React.FC = () => {
 `feature-form` supports various validators such as [Zod](https://github.com/colinhacks/zod), [Yup](https://github.com/jquense/yup), [Valibot](https://github.com/fabian-hiller/valibot) and more.
 
 ```ts
-import { zodAdapter } from 'validation-adapters/zod';
-import { valibotAdapter } from 'validation-adapters/valibot';
+import { zValidator } from 'validation-adapters/zod';
+import { vValidator } from 'validation-adapters/valibot';
 import * as z from 'zod';
 import * as v from 'valibot';
 
-const zodNameValidator = zodAdapter(
+const zodNameValidator = zValidator(
     z.string().min(2).max(10).regex(/^([^0-9]*)$/)
 );
 
-const valibotNameValidator = valibotAdapter(
+const valibotNameValidator = vValidator(
     v.pipe(v.string(), v.minLength(2), v.maxLength(10), v.regex(/^([^0-9]*)$/))
 );
 ```

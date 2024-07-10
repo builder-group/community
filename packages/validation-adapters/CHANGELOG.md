@@ -1,5 +1,11 @@
 # validation-adapters
 
+## 0.0.6
+
+### Patch Changes
+
+- Renamde ValidationAdapter to Validator for more clarity
+
 ## 0.0.5
 
 ### Patch Changes

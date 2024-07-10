@@ -1,8 +1,8 @@
-export class ServiceError extends Error {
+export class FetchError extends Error {
 	public readonly code: TErrorCode;
 	public readonly throwable?: Error;
 
-	constructor(code: TErrorCode, options: TServiceErrorOptions = {}) {
+	constructor(code: TErrorCode, options: TFetchErrorOptions = {}) {
 		const { description = options.throwable?.message, throwable } = options;
 		super(description != null ? `[${code}] ${description}` : code);
 		this.code = code;
@@ -13,7 +13,7 @@ export class ServiceError extends Error {
 	}
 }
 
-interface TServiceErrorOptions {
+interface TFetchErrorOptions {
 	description?: string;
 	throwable?: Error;
 }

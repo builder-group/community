@@ -1,13 +1,13 @@
 import {
-	type TBaseValidateContext,
-	type TValidateContextConfig,
+	type TBaseValidationContext,
+	type TValidationContextConfig,
 	type TValidationError
 } from './types';
 
-export function createValidateContext<GValue>(
+export function createValidationContext<GValue>(
 	value: GValue,
-	options: TCreateValidationAdapterOptions = {}
-): TDefaultValidateContext<GValue> {
+	options: TCreateValidationContextOptions = {}
+): TDefaultValidationContext<GValue> {
 	const { collectErrorMode = 'firstError', name } = options;
 	return {
 		config: {
@@ -28,8 +28,8 @@ export function createValidateContext<GValue>(
 	};
 }
 
-interface TDefaultValidateContext<GValue> extends TBaseValidateContext<GValue> {
+interface TDefaultValidationContext<GValue> extends TBaseValidationContext<GValue> {
 	errors: TValidationError[];
 }
 
-export type TCreateValidationAdapterOptions = Partial<TValidateContextConfig>;
+export type TCreateValidationContextOptions = Partial<TValidationContextConfig>;
