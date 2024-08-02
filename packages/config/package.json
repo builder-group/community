@@ -1,13 +1,13 @@
 {
 	"name": "@blgc/config",
 	"description": "Collection of ESLint, Vite and Typescript configurations",
-	"version": "0.0.14",
+	"version": "0.0.15",
 	"private": false,
 	"scripts": {
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"update:latest": "pnpm update --latest",
-		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public"
+		"publish:patch": "pnpm version patch && pnpm publish --no-git-checks --access=public"
 	},
 	"repository": {
 		"type": "git",

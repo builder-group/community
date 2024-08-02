@@ -1,7 +1,7 @@
 {
 	"name": "@blgc/types",
 	"description": "A collection of utility types",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle -b typesonly",
