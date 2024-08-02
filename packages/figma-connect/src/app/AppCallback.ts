@@ -1,4 +1,4 @@
-import { shortId } from '@ibg/utils';
+import { shortId } from '@blgc/utils';
 
 import type { TAppCallbackRegistration, TFromPluginMessageEvent } from '../types';
 

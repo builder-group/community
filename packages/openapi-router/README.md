@@ -1,25 +1,25 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/openapi-router/.github/banner.svg" alt="@igb/openapi-router banner">
+    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/openapi-router/.github/banner.svg" alt="@igb/openapi-router banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/inbeta-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/@igb/openapi-router">
-        <img src="https://img.shields.io/bundlephobia/minzip/@igb/openapi-router.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=F0E81A" alt="NPM bundle minzipped size"/>
+        <img src="https://img.shields.io/bundlephobia/minzip/@igb/openapi-router.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
     </a>
     <a href="https://www.npmjs.com/package/@igb/openapi-router">
-        <img src="https://img.shields.io/npm/dt/@igb/openapi-router.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
+        <img src="https://img.shields.io/npm/dt/@igb/openapi-router.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>
     </a>
-    <a href="https://dyn.art/s/discord/?source=inbeta-group-readme">
-        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=F0E81A" alt="Join Discord"/>
+    <a href="https://discord.gg/w4xE3bSjhQ">
+        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=FDE200" alt="Join Discord"/>
     </a>
 </p>
 
 > Status: Experimental
 
-`@ibg/openapi-router` is a thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod.
+`@blgc/openapi-router` is a thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod.
 
 - **Typesafe**: Build with TypeScript for strong type safety and support for [`openapi-typescript`](https://github.com/drwpow/openapi-typescript) types
 - **Framework Agnostic**: Compatible with Express, Hono, and other popular web frameworks
@@ -28,8 +28,8 @@
 
 ### 📚 Examples
 
-- [Express Petstore](https://github.com/inbeta-group/monorepo/tree/develop/examples/openapi-router/express/petstore)
-- [Hono Petstore](https://github.com/inbeta-group/monorepo/tree/develop/examples/openapi-router/hono/petstore)
+- [Express Petstore](https://github.com/builder-group/monorepo/tree/develop/examples/openapi-router/express/petstore)
+- [Hono Petstore](https://github.com/builder-group/monorepo/tree/develop/examples/openapi-router/hono/petstore)
 
 ### 🌟 Motivation
 
@@ -43,7 +43,7 @@ The goal is to provide a typesafe and straightforward wrapper around web framewo
 import express, { Router } from 'express';
 import * as v from 'valibot';
 import { vValidator } from 'validation-adapters/valibot';
-import { createExpressOpenApiRouter } from '@ibg/openapi-router';
+import { createExpressOpenApiRouter } from '@blgc/openapi-router';
 import { paths } from './path/to/openapi/types';
 
 const app = express();
@@ -80,7 +80,7 @@ app.use('/*', router);
 import { Hono } from 'hono';
 import * as v from 'valibot';
 import { vValidator } from 'validation-adapters/valibot';
-import { createHonoOpenApiRouter } from '@ibg/openapi-router';
+import { createHonoOpenApiRouter } from '@blgc/openapi-router';
 import { paths } from './path/to/openapi/types';
 
 export const app = new Hono();

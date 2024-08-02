@@ -1,5 +1,5 @@
-import { type TEntries } from '@ibg/types/utils';
-import { bitwiseFlag, deepCopy, type BitwiseFlag } from '@ibg/utils';
+import { type TEntries } from '@blgc/types/utils';
+import { bitwiseFlag, deepCopy, type BitwiseFlag } from '@blgc/utils';
 
 import { createFormField } from './form-field';
 import {

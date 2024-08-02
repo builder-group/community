@@ -1,5 +1,5 @@
 {
-	"extends": "@ibg/config/node.tsconfig.json",
+	"extends": "@blgc/config/node.tsconfig.json",
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./src"

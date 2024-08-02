@@ -1,7 +1,7 @@
 {
-	"name": "@ibg/openapi-router",
+	"name": "@blgc/openapi-router",
 	"description": "Thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod",
-	"version": "0.0.10",
+	"version": "0.0.11",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
@@ -20,21 +20,21 @@
 	"types": "./dist/types/index.d.ts",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/inbeta-group/monorepo.git"
+		"url": "https://github.com/builder-group/monorepo.git"
 	},
 	"keywords": [],
-	"author": "@bennoinbeta",
+	"author": "@bennobuilder",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/inbeta-group/monorepo/issues"
+		"url": "https://github.com/builder-group/monorepo/issues"
 	},
-	"homepage": "https://inbeta.group/?source=package-json",
+	"homepage": "https://builder.group/?source=package-json",
 	"dependencies": {
-		"@ibg/types": "workspace:*",
+		"@blgc/types": "workspace:*",
 		"validation-adapter": "workspace:*"
 	},
 	"devDependencies": {
-		"@ibg/config": "workspace:*",
+		"@blgc/config": "workspace:*",
 		"@types/express": "^4.17.21",
 		"@types/express-serve-static-core": "^4.19.5",
 		"@types/node": "^20.14.10",

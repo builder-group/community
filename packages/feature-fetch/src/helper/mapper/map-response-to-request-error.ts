@@ -1,4 +1,4 @@
-import { isObject } from '@ibg/utils';
+import { isObject } from '@blgc/utils';
 
 import { RequestError, type TErrorCode } from '../../exceptions';
 

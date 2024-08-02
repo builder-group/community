@@ -1,4 +1,4 @@
-import type { TUnionToIntersection } from '@ibg/types/utils';
+import type { TUnionToIntersection } from '@blgc/types/utils';
 
 export type TFeatures = {
 	base: { _: null }; // TODO: Placeholder Feature: Figure out how to make the TS infer work with [] (empty array -> no feature)

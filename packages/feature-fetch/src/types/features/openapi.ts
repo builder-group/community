@@ -5,8 +5,8 @@ import type {
 	TOperationSuccessResponseContent,
 	TPathsWithMethod,
 	TRequestBody
-} from '@ibg/types/openapi';
-import { type TFilterKeys } from '@ibg/types/utils';
+} from '@blgc/types/openapi';
+import { type TFilterKeys } from '@blgc/types/utils';
 
 import { type TParseAs } from '../fetch';
 import type {

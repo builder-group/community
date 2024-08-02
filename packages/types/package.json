@@ -1,7 +1,7 @@
 {
-	"name": "@ibg/types",
+	"name": "@blgc/types",
 	"description": "A collection of utility types",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle -b typesonly",
@@ -40,17 +40,17 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/inbeta-group/monorepo.git"
+		"url": "https://github.com/builder-group/monorepo.git"
 	},
 	"keywords": [],
-	"author": "@bennoinbeta",
+	"author": "@bennobuilder",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/inbeta-group/monorepo/issues"
+		"url": "https://github.com/builder-group/monorepo/issues"
 	},
-	"homepage": "https://inbeta.group/?source=package-json",
+	"homepage": "https://builder.group/?source=package-json",
 	"devDependencies": {
-		"@ibg/config": "workspace:*"
+		"@blgc/config": "workspace:*"
 	},
 	"files": [
 		"dist",

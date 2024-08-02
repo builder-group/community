@@ -1,7 +1,7 @@
+import { type TOperationPathParams, type TOperationQueryParams } from '@blgc/types/openapi';
 import { type Hono } from 'hono';
 import type * as hono from 'hono/types';
 import { createValidationContext, type TValidationError } from 'validation-adapter';
-import { type TOperationPathParams, type TOperationQueryParams } from '@ibg/types/openapi';
 
 import { ValidationError } from '../../exceptions';
 import { formatPath, parseParams } from '../../helper';

@@ -1,4 +1,4 @@
-import type { TUnionToIntersection } from '@ibg/types/utils';
+import type { TUnionToIntersection } from '@blgc/types/utils';
 
 import { type TFormData } from './form';
 
