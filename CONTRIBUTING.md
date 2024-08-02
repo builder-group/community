@@ -1,4 +1,4 @@
-# Contributing to builder.group (ibg)
+# Contributing to builder.group (blgc)
 
 We are open and grateful for any contribution made by the community. If you're interested in contributing to builder.group, this document might make the process for you easier.
 
@@ -21,7 +21,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 
 ```json
 {
-	"name": "@ibg/template",
+	"name": "@blgc/template",
 	"description": "Description of the package",
 	"version": "0.0.1",
 	"private": true, // Or false if package should be published to NPM
@@ -76,15 +76,15 @@ For specific packages, additional fields should be included as shown below. Note
 
 ## Q and A
 
-### Why is `@ibg/types` listed as a dependency in some packages?
+### Why is `@blgc/types` listed as a dependency in some packages?
 
-`@ibg/types` is listed as a dependency to ensure it's automatically installed for consumers, preventing issues like `any` types for `feature-x` packages due to missing `TUnionToIntersection`.
+`@blgc/types` is listed as a dependency to ensure it's automatically installed for consumers, preventing issues like `any` types for `feature-x` packages due to missing `TUnionToIntersection`.
 
 For more details: [Microsoft/types-publisher/issues/81](https://github.com/Microsoft/types-publisher/issues/81).
 
 Alternatives:
 - Move `TUnionToIntersection` into each package
-- Enforce `@ibg/types` as a `peerDependency`
+- Enforce `@blgc/types` as a `peerDependency`
 
 ## 📄 License
 

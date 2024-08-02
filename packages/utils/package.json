@@ -1,5 +1,5 @@
 {
-	"name": "@ibg/utils",
+	"name": "@blgc/utils",
 	"description": "Straightforward, typesafe, and tree-shakable collection of utility functions",
 	"version": "0.0.13",
 	"private": false,
@@ -30,7 +30,7 @@
 	},
 	"homepage": "https://builder.group/?source=package-json",
 	"devDependencies": {
-		"@ibg/config": "workspace:*",
+		"@blgc/config": "workspace:*",
 		"@types/node": "^20.14.1"
 	},
 	"files": [

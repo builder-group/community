@@ -16,7 +16,7 @@ import {
 } from '../../utils';
 
 export default class Rust extends DynCommand {
-	static description = 'Bundle Rust part of dyn.art packages';
+	static description = 'Bundle Rust packages';
 
 	static examples = [];
 

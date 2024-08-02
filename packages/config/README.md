@@ -1,20 +1,20 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/config/.github/banner.svg" alt="@ibg/config banner">
+    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/config/.github/banner.svg" alt="@blgc/config banner">
 </h1>
 
 <p align="left">
     <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
+        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
-    <a href="https://www.npmjs.com/package/@ibg/config">
-        <img src="https://img.shields.io/npm/dt/@ibg/config.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
+    <a href="https://www.npmjs.com/package/@blgc/config">
+        <img src="https://img.shields.io/npm/dt/@blgc/config.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>
     </a>
-    <a href="https://dyn.art/s/discord/?source=builder-group-readme">
-        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=F0E81A" alt="Join Discord"/>
+    <a href="https://discord.gg/w4xE3bSjhQ">
+        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=FDE200" alt="Join Discord"/>
     </a>
 </p>
 
-`@ibg/config` is a collection of ESLint, Vite and Typescript configurations.
+`@blgc/config` is a collection of ESLint, Vite and Typescript configurations.
 
 ## 📖 Usage
 
@@ -23,7 +23,7 @@
 `tsconfig.json`
 ```json
 {
-	"extends": "@ibg/config/react-library.tsconfig.json",
+	"extends": "@blgc/config/react-library.tsconfig.json",
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./src",
@@ -42,7 +42,7 @@
  */
 module.exports = {
 	root: true,
-	extends: [require.resolve('@ibg/config/eslint/react-internal'), 'plugin:storybook/recommended']
+	extends: [require.resolve('@blgc/config/eslint/react-internal'), 'plugin:storybook/recommended']
 };
 ```
 
@@ -51,7 +51,7 @@ module.exports = {
 `vitest.config.js`
 ```js
 const { defineConfig, mergeConfig } = require('vitest/config');
-const { nodeConfig } = require('@ibg/config/vite/node.config');
+const { nodeConfig } = require('@blgc/config/vite/node.config');
 
 module.exports = mergeConfig(nodeConfig, defineConfig({}));
 ```
@@ -74,7 +74,7 @@ TypeScript configurations are placed at the root to allow easy referencing from 
 
 ```json
 {
-	"extends": "@ibg/config/base.json"
+	"extends": "@blgc/config/base.json"
 }
 ```
 

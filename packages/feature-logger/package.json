@@ -30,11 +30,11 @@
 	},
 	"homepage": "https://builder.group/?source=github",
 	"dependencies": {
-		"@ibg/types": "workspace:*",
-		"@ibg/utils": "workspace:*"
+		"@blgc/types": "workspace:*",
+		"@blgc/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"@ibg/config": "workspace:*",
+		"@blgc/config": "workspace:*",
 		"@types/node": "^20.14.1"
 	},
 	"files": [

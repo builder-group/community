@@ -1,10 +1,10 @@
 {
-	"name": "@ibg/cli",
+	"name": "@blgc/cli",
 	"description": "Straightforward CLI to bundle Typescript libraries with presets, powered by Rollup and Esbuild",
 	"version": "0.0.14",
 	"private": false,
 	"bin": {
-		"ibg": "./bin/run"
+		"blgc": "./bin/run"
 	},
 	"scripts": {
 		"build": "shx rm -rf dist && tsc",
@@ -62,8 +62,8 @@
 		"README.md"
 	],
 	"oclif": {
-		"bin": "ibg",
-		"dirname": "ibg",
+		"bin": "blgc",
+		"dirname": "blgc",
 		"commands": "./dist/commands",
 		"topicSeparator": " ",
 		"topics": {

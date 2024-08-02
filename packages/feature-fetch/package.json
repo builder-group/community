@@ -30,12 +30,12 @@
 	},
 	"homepage": "https://builder.group/?source=package-json",
 	"dependencies": {
-		"@ibg/types": "workspace:*",
-		"@ibg/utils": "workspace:*",
+		"@blgc/types": "workspace:*",
+		"@blgc/utils": "workspace:*",
 		"ts-results-es": "4.2.0"
 	},
 	"devDependencies": {
-		"@ibg/config": "workspace:*",
+		"@blgc/config": "workspace:*",
 		"@types/node": "^20.14.1",
 		"@types/url-parse": "^1.4.11",
 		"msw": "^2.3.1"

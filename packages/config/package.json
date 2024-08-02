@@ -1,5 +1,5 @@
 {
-	"name": "@ibg/config",
+	"name": "@blgc/config",
 	"description": "Collection of ESLint, Vite and Typescript configurations",
 	"version": "0.0.14",
 	"private": false,

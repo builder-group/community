@@ -1,5 +1,5 @@
 {
-	"name": "@ibg/types",
+	"name": "@blgc/types",
 	"description": "A collection of utility types",
 	"version": "0.0.4",
 	"private": false,
@@ -50,7 +50,7 @@
 	},
 	"homepage": "https://builder.group/?source=package-json",
 	"devDependencies": {
-		"@ibg/config": "workspace:*"
+		"@blgc/config": "workspace:*"
 	},
 	"files": [
 		"dist",

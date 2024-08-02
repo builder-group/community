@@ -8,7 +8,7 @@ import { bundleAllWithRollup, createNodeRollupConfig, getDynConfig } from '../..
 import { doesFileExist, promisifyFiglet, readJsonFile } from '../../utils';
 
 export default class Node extends DynCommand {
-	static description = 'Bundle Figma Plugin of dyn.art';
+	static description = 'Bundle Figma Plugin';
 
 	static examples = [];
 

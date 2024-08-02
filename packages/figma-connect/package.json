@@ -50,11 +50,11 @@
 	},
 	"homepage": "https://builder.group/?source=package-json",
 	"dependencies": {
-		"@ibg/utils": "workspace:*"
+		"@blgc/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@figma/plugin-typings": "^1.95.0",
-		"@ibg/config": "workspace:*",
+		"@blgc/config": "workspace:*",
 		"@types/node": "^20.14.2"
 	},
 	"files": [
