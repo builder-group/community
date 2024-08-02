@@ -11,7 +11,7 @@
     </a>
 </p>
 
-A collection of open source libraries maintained by [@bennobuilder](https://github.com/bennobuilder) and [builder.group](https://builder.group).
+A collection of open source libraries maintained by [builder.group](https://builder.group). Let's build together.
 
 ## 📦 Packages
 
@@ -52,4 +52,4 @@ A collection of open source libraries maintained by [@bennobuilder](https://gith
 
 ### What does `blgc` stand for?
 
-`blgc` stands for **B**ui**l**der.**G**roup **C**ommunity, chosen because similar names like `blg`, `bldr` and `bgc` were already taken.
+`blgc` stands for **B**ui**L**der.**G**roup **C**ommunity, chosen because similar names like `blg`, `bldr` and `bgc` were already taken.
