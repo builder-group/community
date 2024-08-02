@@ -1,5 +1,5 @@
+import { AppError } from '@blgc/openapi-router';
 import type * as hono from 'hono/types';
-import { AppError } from '@ibg/openapi-router';
 
 export const invalidPathHandler: hono.NotFoundHandler = (c) => {
 	throw new AppError('#ERR_PATH_NOT_FOUND', 404, {

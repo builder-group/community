@@ -1,6 +1,6 @@
 import type { TFormFieldStateFeature, TFormFielStatusStateFeature } from './types';
 
-export { BitwiseFlag, bitwiseFlag } from '@ibg/utils';
+export { BitwiseFlag, bitwiseFlag } from '@blgc/utils';
 export { createValidator } from 'validation-adapter';
 export * from './create-form';
 export * from './form-field';

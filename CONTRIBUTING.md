@@ -1,6 +1,6 @@
-# Contributing to inbeta.group (ibg)
+# Contributing to builder.group (blgc)
 
-We are open and grateful for any contribution made by the community. If you're interested in contributing to inbeta.group, this document might make the process for you easier.
+We are open and grateful for any contribution made by the community. If you're interested in contributing to builder.group, this document might make the process for you easier.
 
 The [Open Source Guides](https://opensource.guide/) website has a collection of resources for individuals,
 communities, and companies who want to learn how to run and contribute to an open-source project.
@@ -21,7 +21,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 
 ```json
 {
-	"name": "@ibg/template",
+	"name": "@blgc/template",
 	"description": "Description of the package",
 	"version": "0.0.1",
 	"private": true, // Or false if package should be published to NPM
@@ -35,15 +35,15 @@ The structure of the `package.json` file in this project should adhere to a spec
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/inbeta-group/monorepo.git"
+		"url": "https://github.com/builder-group/monorepo.git"
 	},
 	"keywords": [],
-	"author": "@bennoinbeta",
+	"author": "@bennobuilder",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/inbeta-group/monorepo/issues"
+		"url": "https://github.com/builder-group/monorepo/issues"
 	},
-	"homepage": "https://inbeta.group/?source=github",
+	"homepage": "https://builder.group/?source=github",
 	"dependencies": {
 		// Project dependencies here
 	},
@@ -76,19 +76,19 @@ For specific packages, additional fields should be included as shown below. Note
 
 ## Q and A
 
-### Why is `@ibg/types` listed as a dependency in some packages?
+### Why is `@blgc/types` listed as a dependency in some packages?
 
-`@ibg/types` is listed as a dependency to ensure it's automatically installed for consumers, preventing issues like `any` types for `feature-x` packages due to missing `TUnionToIntersection`.
+`@blgc/types` is listed as a dependency to ensure it's automatically installed for consumers, preventing issues like `any` types for `feature-x` packages due to missing `TUnionToIntersection`.
 
 For more details: [Microsoft/types-publisher/issues/81](https://github.com/Microsoft/types-publisher/issues/81).
 
 Alternatives:
 - Move `TUnionToIntersection` into each package
-- Enforce `@ibg/types` as a `peerDependency`
+- Enforce `@blgc/types` as a `peerDependency`
 
 ## 📄 License
 
-By contributing to inbeta.group, you agree that your contributions will be licensed under the license defined in [`LICENSE.md`](./LICENSE.md).
+By contributing to builder.group, you agree that your contributions will be licensed under the license defined in [`LICENSE.md`](./LICENSE.md).
 
 ## 🎉 Credits
 

@@ -1,6 +1,6 @@
+import { type TPathsWithMethod } from '@blgc/types/openapi';
+import { type TFilterKeys } from '@blgc/types/utils';
 import type express from 'express';
-import { type TPathsWithMethod } from '@ibg/types/openapi';
-import { type TFilterKeys } from '@ibg/types/utils';
 
 import { ValidationError, type TValidationErrorDetails } from './exceptions';
 import { parseRequestQuery } from './helper';

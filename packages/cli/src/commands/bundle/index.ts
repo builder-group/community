@@ -14,7 +14,7 @@ import {
 import { doesFileExist, promisifyFiglet, readJsonFile } from '../../utils';
 
 export default class Bundle extends DynCommand {
-	static description = 'Bundle dyn.art packages';
+	static description = 'Bundle packages';
 
 	static examples = [];
 

@@ -1,4 +1,4 @@
-import { sleep } from '@ibg/utils';
+import { sleep } from '@blgc/utils';
 
 import type {
 	TEnforceFeatures,

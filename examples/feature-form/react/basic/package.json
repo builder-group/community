@@ -10,7 +10,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"@ibg/utils": "workspace:*",
+		"@blgc/utils": "workspace:*",
 		"feature-form": "workspace:*",
 		"validation-adapters": "workspace:*",
 		"feature-react": "workspace:*",

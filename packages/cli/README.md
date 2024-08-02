@@ -1,22 +1,22 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/cli/.github/banner.svg" alt="@ibg/cli banner">
+    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/cli/.github/banner.svg" alt="@blgc/cli banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/inbeta-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
-    <a href="https://www.npmjs.com/package/@ibg/cli">
-        <img src="https://img.shields.io/npm/dt/@ibg/cli.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
+    <a href="https://www.npmjs.com/package/@blgc/cli">
+        <img src="https://img.shields.io/npm/dt/@blgc/cli.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>
     </a>
-    <a href="https://dyn.art/s/discord/?source=inbeta-group-readme">
-        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=F0E81A" alt="Join Discord"/>
+    <a href="https://discord.gg/w4xE3bSjhQ">
+        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=FDE200" alt="Join Discord"/>
     </a>
 </p>
 
 > Status: Experimental
 
-`@ibg/cli` is a straightforward CLI tool for bundling TypeScript libraries with presets, powered by Rollup and Esbuild.
+`@blgc/cli` is a straightforward CLI tool for bundling TypeScript libraries with presets, powered by Rollup and Esbuild.
 
 ### 🌟 Motivation
 Eliminate the hassle of manually configuring Rollup over and over by providing a flexible wrapper with preset configurations for Figma plugins, Rust (Wasm), and TypeScript library bundling.
@@ -30,7 +30,7 @@ Eliminate the hassle of manually configuring Rollup over and over by providing a
 
 To bundle your files, run:
 ```bash
-ibg bundle
+blgc bundle
 ```
 
 Define the source file and output locations in `package.json`:
@@ -73,7 +73,7 @@ Expand the preset configuration via a `dyn.config.js` file.
 
 #### Add Rollup plugins
 
-The `@ibg/cli` allows combining two Rollup configurations using plugin placeholders.
+The `@blgc/cli` allows combining two Rollup configurations using plugin placeholders.
 
 - **`override`** (`isBase = false`): Fill placeholders in `overrideConfig` with plugins from `baseConfig`.
   ```javascript
@@ -111,7 +111,7 @@ In the below example we expand the preset library Rollup config with the `rollup
 
 ```js
 /**
- * @type {import('@ibg/cli').TDynConfig}
+ * @type {import('@blgc/cli').TDynConfig}
  */
 module.exports = {
 	library: {

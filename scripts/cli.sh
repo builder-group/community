@@ -1,8 +1,8 @@
 #!/bin/sh
 
-# This script serves as a local execution wrapper for the @ibg/cli tool.
+# This script serves as a local execution wrapper for the @blgc/cli tool.
 # We are using this approach because we couldn't figure out how to
-# reliable bind the "ibg" command in the local development environment
+# reliable bind the "blgc" command in the local development environment
 # and within the constraints of a PaaS build step.
 # It ensures the run.sh script within the CLI's bin directory is directly invoked
 # with the necessary arguments and environment variables setup.

@@ -1,5 +1,5 @@
+import { AppError } from '@blgc/openapi-router';
 import type express from 'express';
-import { AppError } from '@ibg/openapi-router';
 
 import { type components } from '../gen/v1';
 

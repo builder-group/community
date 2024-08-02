@@ -14,7 +14,7 @@ import {
 import { doesFileExist, promisifyFiglet, readJsonFile } from '../../utils';
 
 export default class Figma extends DynCommand {
-	static description = 'Bundle Figma Plugin of dyn.art';
+	static description = 'Bundle Figma Plugin';
 
 	static examples = [];
 

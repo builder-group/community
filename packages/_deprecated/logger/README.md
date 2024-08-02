@@ -1,4 +1,4 @@
-# `@ibg/logger`
+# `@blgc/logger`
 > Status: Experimental
 
-`@ibg/logger` is a straightforward and typesafe logging library.
+`@blgc/logger` is a straightforward and typesafe logging library.
