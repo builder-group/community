@@ -1,6 +1,6 @@
-# Contributing to inbeta.group (ibg)
+# Contributing to builder.group (ibg)
 
-We are open and grateful for any contribution made by the community. If you're interested in contributing to inbeta.group, this document might make the process for you easier.
+We are open and grateful for any contribution made by the community. If you're interested in contributing to builder.group, this document might make the process for you easier.
 
 The [Open Source Guides](https://opensource.guide/) website has a collection of resources for individuals,
 communities, and companies who want to learn how to run and contribute to an open-source project.
@@ -35,15 +35,15 @@ The structure of the `package.json` file in this project should adhere to a spec
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/inbeta-group/monorepo.git"
+		"url": "https://github.com/builder-group/monorepo.git"
 	},
 	"keywords": [],
-	"author": "@bennoinbeta",
+	"author": "@bennobuilder",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/inbeta-group/monorepo/issues"
+		"url": "https://github.com/builder-group/monorepo/issues"
 	},
-	"homepage": "https://inbeta.group/?source=github",
+	"homepage": "https://builder.group/?source=github",
 	"dependencies": {
 		// Project dependencies here
 	},
@@ -88,7 +88,7 @@ Alternatives:
 
 ## 📄 License
 
-By contributing to inbeta.group, you agree that your contributions will be licensed under the license defined in [`LICENSE.md`](./LICENSE.md).
+By contributing to builder.group, you agree that your contributions will be licensed under the license defined in [`LICENSE.md`](./LICENSE.md).
 
 ## 🎉 Credits
 

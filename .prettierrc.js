@@ -17,7 +17,7 @@ module.exports = {
 	importOrder: [
 		// External packages
 		'<THIRD_PARTY_MODULES>',
-		// inbeta.group packages
+		// builder.group packages
 		'^@ibg/',
 		// Internal packages
 		'^@/',

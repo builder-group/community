@@ -40,15 +40,15 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/inbeta-group/monorepo.git"
+		"url": "https://github.com/builder-group/monorepo.git"
 	},
 	"keywords": [],
-	"author": "@bennoinbeta",
+	"author": "@bennobuilder",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/inbeta-group/monorepo/issues"
+		"url": "https://github.com/builder-group/monorepo/issues"
 	},
-	"homepage": "https://inbeta.group/?source=package-json",
+	"homepage": "https://builder.group/?source=package-json",
 	"devDependencies": {
 		"@ibg/config": "workspace:*"
 	},

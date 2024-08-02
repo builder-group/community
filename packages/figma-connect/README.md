@@ -1,15 +1,15 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/figma-connect/.github/banner.svg" alt="figma-connect banner">
+    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/figma-connect/.github/banner.svg" alt="figma-connect banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/inbeta-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/figma-connect">
         <img src="https://img.shields.io/npm/dt/figma-connect.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
     </a>
-    <a href="https://dyn.art/s/discord/?source=inbeta-group-readme">
+    <a href="https://dyn.art/s/discord/?source=builder-group-readme">
         <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=F0E81A" alt="Join Discord"/>
     </a>
 </p>
@@ -18,7 +18,7 @@
 
 `figma-connect` is a straightforward and typesafe wrapper around the communication between the `app/ui` (iframe) and `plugin` (sandbox) part of a Figma Plugin.
 
-<img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/figma-connect/.github/figma-connect-wrapper.png" alt="figma-connect-wrapper image">
+<img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/figma-connect/.github/figma-connect-wrapper.png" alt="figma-connect-wrapper image">
 
 [Source](https://www.figma.com/plugin-docs/how-plugins-run/)
 

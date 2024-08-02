@@ -20,15 +20,15 @@
 	"types": "./dist/types/index.d.ts",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/inbeta-group/monorepo.git"
+		"url": "https://github.com/builder-group/monorepo.git"
 	},
 	"keywords": [],
-	"author": "@bennoinbeta",
+	"author": "@bennobuilder",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/inbeta-group/monorepo/issues"
+		"url": "https://github.com/builder-group/monorepo/issues"
 	},
-	"homepage": "https://inbeta.group/?source=github",
+	"homepage": "https://builder.group/?source=github",
 	"dependencies": {
 		"@ibg/types": "workspace:*",
 		"@ibg/utils": "workspace:*"

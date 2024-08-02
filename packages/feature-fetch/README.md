@@ -1,10 +1,10 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/feature-fetch/.github/banner.svg" alt="feature-fetch banner">
+    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/feature-fetch/.github/banner.svg" alt="feature-fetch banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/inbeta-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/feature-fetch">
         <img src="https://img.shields.io/bundlephobia/minzip/feature-fetch.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=F0E81A" alt="NPM bundle minzipped size"/>
@@ -12,7 +12,7 @@
     <a href="https://www.npmjs.com/package/feature-fetch">
         <img src="https://img.shields.io/npm/dt/feature-fetch.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
     </a>
-    <a href="https://dyn.art/s/discord/?source=inbeta-group-readme">
+    <a href="https://dyn.art/s/discord/?source=builder-group-readme">
         <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=F0E81A" alt="Join Discord"/>
     </a>
 </p>
@@ -29,7 +29,7 @@
 
 ### 🌟 Motivation
 
-Provide a typesafe, straightforward, and lightweight `fetch` wrapper that seamlessly integrates with OpenAPI schemas using `openapi-typescript`. It aims to simplify error handling by returning results in a predictable manner with [`ts-results-es`](https://github.com/lune-climate/ts-results-es#readme). Additionally, it is designed to be modular & extendable, enabling the creation of straightforward API wrappers, such as for the Google Web Fonts API (see [`google-webfonts-client`](https://github.com/inbeta-group/monorepo/tree/develop/packages/google-webfonts-client)). `feature-fetch` only depends on `fetch`, making it usable in most sandboxed environments like Figma plugins.
+Provide a typesafe, straightforward, and lightweight `fetch` wrapper that seamlessly integrates with OpenAPI schemas using `openapi-typescript`. It aims to simplify error handling by returning results in a predictable manner with [`ts-results-es`](https://github.com/lune-climate/ts-results-es#readme). Additionally, it is designed to be modular & extendable, enabling the creation of straightforward API wrappers, such as for the Google Web Fonts API (see [`google-webfonts-client`](https://github.com/builder-group/monorepo/tree/develop/packages/google-webfonts-client)). `feature-fetch` only depends on `fetch`, making it usable in most sandboxed environments like Figma plugins.
 
 ### ⚖️ Alternatives
 

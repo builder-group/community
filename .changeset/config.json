@@ -1,6 +1,6 @@
 {
 	"$schema": "https://unpkg.com/@changesets/config@3.0.1/schema.json",
-	"changelog": ["@changesets/changelog-github", { "repo": "inbeta-group/monorepo" }],
+	"changelog": ["@changesets/changelog-github", { "repo": "builder-group/monorepo" }],
 	"commit": false,
 	"fixed": [],
 	"linked": [],

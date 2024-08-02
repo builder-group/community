@@ -1,10 +1,10 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/feature-react/.github/banner.svg" alt="feature-react banner">
+    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/feature-react/.github/banner.svg" alt="feature-react banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/inbeta-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/feature-react">
         <img src="https://img.shields.io/bundlephobia/minzip/feature-react.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=F0E81A" alt="NPM bundle minzipped size"/>
@@ -12,7 +12,7 @@
     <a href="https://www.npmjs.com/package/feature-react">
         <img src="https://img.shields.io/npm/dt/featuer-state-react.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
     </a>
-    <a href="https://dyn.art/s/discord/?source=inbeta-group-readme">
+    <a href="https://dyn.art/s/discord/?source=builder-group-readme">
         <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=F0E81A" alt="Join Discord"/>
     </a>
 </p>
@@ -24,7 +24,7 @@
 - **Seamless Integration**: Designed to work effortlessly with `feature-state`
 - **Typesafe**: Build with TypeScript for strong type safety
 
-# [`feature-state`](https://github.com/inbeta-group/monorepo/tree/develop/packages/feature-state)
+# [`feature-state`](https://github.com/builder-group/monorepo/tree/develop/packages/feature-state)
 
 ## 📖 Usage
 
@@ -88,7 +88,7 @@ console.log(globalThis._state); // { /* $state */ }
 - **`key`**: The key used to identify the value in the global scope.
 - **`value`**: The value to be bound to the global scope.
 
-# [`feature-form`](https://github.com/inbeta-group/monorepo/tree/develop/packages/feature-form)
+# [`feature-form`](https://github.com/builder-group/monorepo/tree/develop/packages/feature-form)
 
 ## 📖 Usage
 

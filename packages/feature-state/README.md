@@ -1,10 +1,10 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/feature-state/.github/banner.svg" alt="feature-state banner">
+    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/feature-state/.github/banner.svg" alt="feature-state banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/inbeta-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/feature-state">
         <img src="https://img.shields.io/bundlephobia/minzip/feature-state.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=F0E81A" alt="NPM bundle minzipped size"/>
@@ -12,7 +12,7 @@
     <a href="https://www.npmjs.com/package/feature-state">
         <img src="https://img.shields.io/npm/dt/featuer-state.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
     </a>
-    <a href="https://dyn.art/s/discord/?source=inbeta-group-readme">
+    <a href="https://dyn.art/s/discord/?source=builder-group-readme">
         <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=F0E81A" alt="Join Discord"/>
     </a>
 </p>
@@ -27,7 +27,7 @@
 
 ### 📚 Examples
 
-- [ReactJs Counter](https://github.com/inbeta-group/monorepo/tree/develop/examples/feature-state/react/counter) ([Code Sandbox](https://codesandbox.io/p/sandbox/counter-k74k9k))
+- [ReactJs Counter](https://github.com/builder-group/monorepo/tree/develop/examples/feature-state/react/counter) ([Code Sandbox](https://codesandbox.io/p/sandbox/counter-k74k9k))
 
 ### 🌟 Motivation
 
@@ -95,7 +95,7 @@ $temperature.set($temperature.get() + 5);
 
 ### Subscribing to State Changes
 
-You can subscribe to state changes using `$state.subscribe(callback)`, which works in vanilla JS. For React, special hooks like [`useGlobalState($state)`](https://github.com/inbeta-group/monorepo/tree/develop/packages/feature-state-react) are available to re-render components on state changes.
+You can subscribe to state changes using `$state.subscribe(callback)`, which works in vanilla JS. For React, special hooks like [`useGlobalState($state)`](https://github.com/builder-group/monorepo/tree/develop/packages/feature-state-react) are available to re-render components on state changes.
 
 Listener callbacks will receive the new value as the first argument.
 
