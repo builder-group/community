@@ -22,15 +22,15 @@
 	"homepage": "https://builder.group/?source=github",
 	"dependencies": {
 		"@vercel/style-guide": "^6.0.0",
-		"eslint-config-turbo": "^2.0.4",
+		"eslint-config-turbo": "^2.0.11",
 		"vite-tsconfig-paths": "^4.3.2"
 	},
 	"peerDependencies": {
-		"@next/eslint-plugin-next": "^14.0.1",
-		"@remix-run/eslint-config": "^2.2.0"
+		"@next/eslint-plugin-next": "^14.2.5",
+		"@remix-run/eslint-config": "^2.11.0"
 	},
 	"devDependencies": {
 		"@next/eslint-plugin-next": "^14.2.3",
-		"@remix-run/eslint-config": "^2.9.2"
+		"@remix-run/eslint-config": "^2.11.0"
 	}
 }
