@@ -1,14 +1,14 @@
-import type express from 'express';
-import type * as core from 'express-serve-static-core';
-import { type TValidator } from 'validation-adapter';
 import {
 	type TOperationPathParams,
 	type TOperationQueryParams,
 	type TOperationSuccessResponseContent,
 	type TPathsWithMethod,
 	type TRequestBody
-} from '@ibg/types/openapi';
-import { type TFilterKeys } from '@ibg/types/utils';
+} from '@blgc/types/openapi';
+import { type TFilterKeys } from '@blgc/types/utils';
+import type express from 'express';
+import type * as core from 'express-serve-static-core';
+import { type TValidator } from 'validation-adapter';
 
 export interface TOpenApiExpressFeature<GPaths extends object> {
 	_router: express.Router;

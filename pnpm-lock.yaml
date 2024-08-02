@@ -17,10 +17,10 @@ importers:
       '@ianvs/prettier-plugin-sort-imports':
         specifier: ^4.2.1
         version: 4.2.1(prettier@3.3.1)
-      '@ibg/cli':
+      '@blgc/cli':
         specifier: workspace:*
         version: link:packages/cli
-      '@ibg/config':
+      '@blgc/config':
         specifier: workspace:*
         version: link:packages/config
       '@size-limit/esbuild':
@@ -59,7 +59,7 @@ importers:
 
   examples/feature-form/react/basic:
     dependencies:
-      '@ibg/utils':
+      '@blgc/utils':
         specifier: workspace:*
         version: link:../../../../packages/utils
       feature-form:
@@ -163,7 +163,7 @@ importers:
 
   examples/openapi-router/express/petstore:
     dependencies:
-      '@ibg/openapi-router':
+      '@blgc/openapi-router':
         specifier: workspace:*
         version: link:../../../../packages/openapi-router
       express:
@@ -176,7 +176,7 @@ importers:
         specifier: workspace:*
         version: link:../../../../packages/validation-adapters
     devDependencies:
-      '@ibg/config':
+      '@blgc/config':
         specifier: workspace:*
         version: link:../../../../packages/config
       '@types/express':
@@ -203,7 +203,7 @@ importers:
       '@hono/zod-validator':
         specifier: ^0.2.2
         version: 0.2.2(hono@4.4.12)(zod@3.23.8)
-      '@ibg/openapi-router':
+      '@blgc/openapi-router':
         specifier: workspace:*
         version: link:../../../../packages/openapi-router
       hono:
@@ -314,17 +314,17 @@ importers:
 
   packages/feature-fetch:
     dependencies:
-      '@ibg/types':
+      '@blgc/types':
         specifier: workspace:*
         version: link:../types
-      '@ibg/utils':
+      '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
       ts-results-es:
         specifier: 4.2.0
         version: 4.2.0
     devDependencies:
-      '@ibg/config':
+      '@blgc/config':
         specifier: workspace:*
         version: link:../config
       '@types/node':
@@ -339,10 +339,10 @@ importers:
 
   packages/feature-form:
     dependencies:
-      '@ibg/types':
+      '@blgc/types':
         specifier: workspace:*
         version: link:../types
-      '@ibg/utils':
+      '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
       feature-state:
@@ -352,7 +352,7 @@ importers:
         specifier: workspace:*
         version: link:../validation-adapter
     devDependencies:
-      '@ibg/config':
+      '@blgc/config':
         specifier: workspace:*
         version: link:../config
       '@types/node':
@@ -361,14 +361,14 @@ importers:
 
   packages/feature-logger:
     dependencies:
-      '@ibg/types':
+      '@blgc/types':
         specifier: workspace:*
         version: link:../types
-      '@ibg/utils':
+      '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
     devDependencies:
-      '@ibg/config':
+      '@blgc/config':
         specifier: workspace:*
         version: link:../config
       '@types/node':
@@ -377,10 +377,10 @@ importers:
 
   packages/feature-react:
     devDependencies:
-      '@ibg/config':
+      '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@ibg/utils':
+      '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
       '@types/node':
@@ -401,14 +401,14 @@ importers:
 
   packages/feature-state:
     dependencies:
-      '@ibg/types':
+      '@blgc/types':
         specifier: workspace:*
         version: link:../types
-      '@ibg/utils':
+      '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
     devDependencies:
-      '@ibg/config':
+      '@blgc/config':
         specifier: workspace:*
         version: link:../config
       '@types/node':
@@ -417,14 +417,14 @@ importers:
 
   packages/figma-connect:
     dependencies:
-      '@ibg/utils':
+      '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
     devDependencies:
       '@figma/plugin-typings':
         specifier: ^1.95.0
         version: 1.95.0
-      '@ibg/config':
+      '@blgc/config':
         specifier: workspace:*
         version: link:../config
       '@types/node':
@@ -437,7 +437,7 @@ importers:
         specifier: workspace:*
         version: link:../feature-fetch
     devDependencies:
-      '@ibg/config':
+      '@blgc/config':
         specifier: workspace:*
         version: link:../config
       '@types/node':
@@ -452,14 +452,14 @@ importers:
 
   packages/openapi-router:
     dependencies:
-      '@ibg/types':
+      '@blgc/types':
         specifier: workspace:*
         version: link:../types
       validation-adapter:
         specifier: workspace:*
         version: link:../validation-adapter
     devDependencies:
-      '@ibg/config':
+      '@blgc/config':
         specifier: workspace:*
         version: link:../config
       '@types/express':
@@ -486,13 +486,13 @@ importers:
 
   packages/types:
     devDependencies:
-      '@ibg/config':
+      '@blgc/config':
         specifier: workspace:*
         version: link:../config
 
   packages/utils:
     devDependencies:
-      '@ibg/config':
+      '@blgc/config':
         specifier: workspace:*
         version: link:../config
       '@types/node':
@@ -501,11 +501,11 @@ importers:
 
   packages/validation-adapter:
     dependencies:
-      '@ibg/utils':
+      '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
     devDependencies:
-      '@ibg/config':
+      '@blgc/config':
         specifier: workspace:*
         version: link:../config
       '@types/node':
@@ -514,7 +514,7 @@ importers:
 
   packages/validation-adapters:
     devDependencies:
-      '@ibg/config':
+      '@blgc/config':
         specifier: workspace:*
         version: link:../config
       '@types/node':
@@ -1057,7 +1057,7 @@ packages:
     os: [linux]
 
   '@esbuild/linux-loong64@0.21.5':
-    resolution: {integrity: sha512-uHf1BmMG8qEvzdrzAqg2SIG/02+4/DHB6a9Kbya0XDvwDEKCoC8ZRWI5JJvNdUjtciBGFQ5PuBlpEOXQj+JQSg==}
+    resolution: {integrity: sha512-uHf1BmMG8qEvzdrzAqg2SIG/02+4/DHB6a9Kbya0XDvwDEKCoC8ZRWI5JJvNdUjtcblgcFQ5PuBlpEOXQj+JQSg==}
     engines: {node: '>=12'}
     cpu: [loong64]
     os: [linux]
@@ -1530,7 +1530,7 @@ packages:
     engines: {node: '>=14.19.0', npm: '>=7.0.0'}
 
   '@remix-run/eslint-config@2.9.2':
-    resolution: {integrity: sha512-tZV98Fz1QHAwIA9MOo48Es0ltAzvOIj/uCjCDsKOEndhEX+qwH1qC7eLIBGJiRDgEO3hIQUtzUuw5S6J8B2B+w==}
+    resolution: {integrity: sha512-tZV98Fz1QHAwIA9MOo48Es0ltAzvOIj/uCjCDsKOEndhEX+qwH1qC7eLblgcJiRDgEO3hIQUtzUuw5S6J8B2B+w==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       eslint: ^8.0.0

@@ -1,4 +1,4 @@
-import { deepCopy } from '@ibg/utils';
+import { deepCopy } from '@blgc/utils';
 
 import { type TValidationChain, type TValidator } from './types';
 

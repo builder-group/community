@@ -1,4 +1,4 @@
-import { isObject } from '@ibg/utils';
+import { isObject } from '@blgc/utils';
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis
 export function withGlobalBind<T>(key: string, value: T): T {

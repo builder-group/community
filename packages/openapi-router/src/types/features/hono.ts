@@ -1,14 +1,14 @@
-import type { Hono } from 'hono';
-import type hono from 'hono/types';
-import { type TValidator } from 'validation-adapter';
 import {
 	type TOperationPathParams,
 	type TOperationQueryParams,
 	type TOperationSuccessResponseContent,
 	type TPathsWithMethod,
 	type TRequestBody
-} from '@ibg/types/openapi';
-import { type TFilterKeys } from '@ibg/types/utils';
+} from '@blgc/types/openapi';
+import { type TFilterKeys } from '@blgc/types/utils';
+import type { Hono } from 'hono';
+import type hono from 'hono/types';
+import { type TValidator } from 'validation-adapter';
 
 export interface TOpenApiHonoFeature<GPaths extends object> {
 	_hono: Hono;

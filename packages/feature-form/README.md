@@ -1,19 +1,19 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/inbeta-group/monorepo/develop/packages/feature-form/.github/banner.svg" alt="feature-form banner">
+    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/feature-form/.github/banner.svg" alt="feature-form banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/inbeta-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/inbeta-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=F0E81A" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/feature-form">
-        <img src="https://img.shields.io/bundlephobia/minzip/feature-form.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=F0E81A" alt="NPM bundle minzipped size"/>
+        <img src="https://img.shields.io/bundlephobia/minzip/feature-form.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
     </a>
     <a href="https://www.npmjs.com/package/feature-form">
-        <img src="https://img.shields.io/npm/dt/feature-form.svg?label=downloads&style=flat&colorA=293140&colorB=F0E81A" alt="NPM total downloads"/>
+        <img src="https://img.shields.io/npm/dt/feature-form.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>
     </a>
-    <a href="https://dyn.art/s/discord/?source=inbeta-group-readme">
-        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=F0E81A" alt="Join Discord"/>
+    <a href="https://discord.gg/w4xE3bSjhQ">
+        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=FDE200" alt="Join Discord"/>
     </a>
 </p>
 
@@ -29,7 +29,7 @@
 
 ### 📚 Examples
 
-- [ReactJs Basic](https://github.com/inbeta-group/monorepo/tree/develop/examples/feature-form/react/basic) ([Code Sandbox](https://codesandbox.io/p/sandbox/basic-c4gd3t))
+- [ReactJs Basic](https://github.com/builder-group/monorepo/tree/develop/examples/feature-form/react/basic) ([Code Sandbox](https://codesandbox.io/p/sandbox/basic-c4gd3t))
 
 ### 🌟 Motivation
 
@@ -89,7 +89,7 @@ export const MyFormComponent: React.FC = () => {
 }
 ```
 
-### Validators ([`validation-adapters`](https://github.com/inbeta-group/monorepo/tree/develop/packages/validation-adapters))
+### Validators ([`validation-adapters`](https://github.com/builder-group/monorepo/tree/develop/packages/validation-adapters))
 
 `feature-form` supports various validators such as [Zod](https://github.com/colinhacks/zod), [Yup](https://github.com/jquense/yup), [Valibot](https://github.com/fabian-hiller/valibot) and more.
 
