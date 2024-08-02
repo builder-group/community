@@ -1,7 +1,7 @@
 {
 	"name": "feature-fetch",
 	"description": "Straightforward, typesafe, and feature-based fetch wrapper supporting OpenAPI types",
-	"version": "0.0.13",
+	"version": "0.0.14",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",

@@ -1,7 +1,7 @@
 {
 	"name": "@blgc/config",
 	"description": "Collection of ESLint, Vite and Typescript configurations",
-	"version": "0.0.15",
+	"version": "0.0.16",
 	"private": false,
 	"scripts": {
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
