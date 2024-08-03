@@ -57,6 +57,22 @@ importers:
         specifier: ^1.6.0
         version: 1.6.0(@types/node@22.1.0)
 
+  examples/feature-fetch/vanilla/open-meteo:
+    dependencies:
+      feature-fetch:
+        specifier: workspace:*
+        version: link:../../../../packages/feature-fetch
+    devDependencies:
+      openapi-typescript:
+        specifier: ^7.0.2
+        version: 7.3.0(typescript@5.5.4)
+      typescript:
+        specifier: ^5.2.2
+        version: 5.5.4
+      vite:
+        specifier: ^5.3.4
+        version: 5.3.5(@types/node@22.1.0)
+
   examples/feature-form/react/basic:
     dependencies:
       '@blgc/utils':
