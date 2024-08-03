@@ -29,7 +29,7 @@
 
 ### 📚 Examples
 
-- [Vanialla Open-Meteo](https://github.com/builder-group/monorepo/tree/develop/examples/feature-fetch/vanilla/open-meteo)
+- [Vanilla Open-Meteo](https://github.com/builder-group/monorepo/tree/develop/examples/feature-fetch/vanilla/open-meteo)
 
 ### 🌟 Motivation
 
