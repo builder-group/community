@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/openapi-router/.github/banner.svg" alt="roxmltree banner">
+    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/roxmltree/.github/banner.svg" alt="roxmltree banner">
 </h1>
 
 <p align="left">
