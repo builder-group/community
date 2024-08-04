@@ -9,7 +9,10 @@
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
-		"test": "vitest run"
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"size": "size-limit --why"
 	},
 	"source": "./src/index.ts",
 	"main": "./dist/cjs/index.js",
@@ -17,15 +20,15 @@
 	"types": "./dist/types/index.d.ts",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/builder-group/project-shopify.git"
+		"url": "https://github.com/builder-group/monorepo.git"
 	},
 	"keywords": [],
-	"author": "@bennoinbeta",
-	"license": "AGPL-3.0-or-later",
+	"author": "@bennobuilder",
+	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/builder-group/project-shopify/issues"
+		"url": "https://github.com/builder-group/monorepo/issues"
 	},
-	"homepage": "",
+	"homepage": "https://builder.group/?source=package-json",
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@types/node": "^20.14.10"
@@ -33,5 +36,10 @@
 	"files": [
 		"dist",
 		"README.md"
+	],
+	"size-limit": [
+		{
+			"path": "dist/esm/index.js"
+		}
 	]
 }
