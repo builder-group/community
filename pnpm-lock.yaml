@@ -500,6 +500,15 @@ importers:
         specifier: workspace:*
         version: link:../validation-adapters
 
+  packages/roxmltree:
+    devDependencies:
+      '@blgc/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^20.14.10
+        version: 20.14.14
+
   packages/types:
     devDependencies:
       '@blgc/config':
