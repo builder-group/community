@@ -77,12 +77,12 @@ export class XmlError extends Error {
 }
 
 function formatPos(pos: TTextPos): string {
-	return `${pos.row}:${pos.col}`;
+	return `${pos.row.toString()}:${pos.col.toString()}`;
 }
 
 function toUnicodeEscape(codePoint: number | string): string {
 	const code = typeof codePoint === 'string' ? codePoint.charCodeAt(0) : codePoint;
-	if (code == null || code < 0 || code > 0x10ffff) {
+	if (code < 0 || code > 0x10ffff) {
 		throw new Error('Code point out of range');
 	}
 
@@ -130,21 +130,21 @@ type TXMLErrorVariant =
 	| TUnexpectedEndOfStream;
 
 /**
- * The `xmlns:xml` attribute must have an <http://www.w3.org/XML/1998/namespace> URI.
+ * The `xmlns:xml` attribute must have an \<http://www.w3.org/XML/1998/namespace\> URI.
  */
 interface TInvalidXmlPrefixUri {
 	type: 'InvalidXmlPrefixUri';
 }
 
 /**
- * Only the `xmlns:xml` attribute can have the <http://www.w3.org/XML/1998/namespace> URI.
+ * Only the `xmlns:xml` attribute can have the \<http://www.w3.org/XML/1998/namespace\> URI.
  */
 interface TUnexpectedXmlUri {
 	type: 'UnexpectedXmlUri';
 }
 
 /**
- * The <http://www.w3.org/2000/xmlns/> URI must not be declared.
+ * The \<http://www.w3.org/2000/xmlns/\> URI must not be declared.
  */
 interface TUnexpectedXmlnsUri {
 	type: 'UnexpectedXmlnsUri';
@@ -311,7 +311,7 @@ interface TInvalidName {
 /**
  * A non-XML character has occurred.
  *
- * Valid characters are: <https://www.w3.org/TR/xml/#char32>
+ * Valid characters are: \<https://www.w3.org/TR/xml/#char32\>
  */
 interface TNonXmlChar {
 	type: 'NonXmlChar';
