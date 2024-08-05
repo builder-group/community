@@ -57,7 +57,7 @@ export class XmlError extends Error {
 			case 'NonXmlChar':
 				return `a non-XML character '${toUnicodeEscape(variant.char)}' found at ${formatPos(pos)}`;
 			case 'InvalidChar':
-				return `expected '${typeof variant.expected === 'string' ? variant.expected : toUnicodeEscape(variant.expected)}' not '${toUnicodeEscape(variant.actual)}' at ${formatPos(pos)}`;
+				return `expected ${typeof variant.expected === 'string' ? variant.expected : `'${toUnicodeEscape(variant.expected)}'`} not '${toUnicodeEscape(variant.actual)}' at ${formatPos(pos)}`;
 			case 'InvalidString':
 				return `expected '${variant.expected}' at ${formatPos(pos)}`;
 			case 'InvalidExternalID':

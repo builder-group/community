@@ -1,7 +1,6 @@
 import { XmlError } from '../XMLError';
 import { type StrSpan } from './StrSpan';
 import { type TXmlEvents } from './types';
-import { b } from './utils';
 import { XmlStream } from './XmlStream';
 
 export * from './StrSpan';
@@ -17,7 +16,7 @@ export * from './XmlStream';
  * https://www.w3.org/TR/xml/#NT-document
  */
 export function parse(text: string, allowDtd: boolean, events: TXmlEvents): void {
-	const s = new XmlStream(text);
+	const s = XmlStream.fromString(text);
 
 	// Skip UTF-8 BOM
 	if (s.startsWith('\uFEFF')) {
@@ -41,7 +40,7 @@ export function parse(text: string, allowDtd: boolean, events: TXmlEvents): void
 	}
 
 	s.skipSpaces();
-	if (!s.atEnd() && s.currByte() === b('<')) {
+	if (!s.atEnd() && s.currByte() === 60 /* < */) {
 		parseElement(s, events);
 	}
 
@@ -131,7 +130,7 @@ function parseComment(s: XmlStream, events: TXmlEvents): void {
 		throw new XmlError({ type: 'InvalidComment' }, s.genTextPosFrom(start));
 	}
 
-	events.token({ type: 'Comment', text, range: s.rangeFrom(start) });
+	events.token({ type: 'Comment', content: text, range: s.rangeFrom(start) });
 }
 
 /**
@@ -151,16 +150,16 @@ function parsePi(s: XmlStream, events: TXmlEvents): void {
 	s.advance(2);
 	const target = s.consumeName();
 	s.skipSpaces();
-	let content: string | undefined;
-	try {
-		content = s.consumeChars((_s, c) => !(c === '?' && _s.startsWith('?>')));
-	} catch (e) {
-		// Do nothing
-	}
+	const content = s.consumeChars((_s, c) => !(c === '?' && _s.startsWith('?>')));
 
 	s.skipString('?>');
 
-	events.token({ type: 'ProcessingInstruction', target, content, range: s.rangeFrom(start) });
+	events.token({
+		type: 'ProcessingInstruction',
+		name: target,
+		content: content.length === 0 ? undefined : content,
+		range: s.rangeFrom(start)
+	});
 }
 
 /**
@@ -171,7 +170,7 @@ function parseDoctype(s: XmlStream, events: TXmlEvents): void {
 	parseDoctypeStart(s);
 	s.skipSpaces();
 
-	if (s.currByte() === b('>')) {
+	if (s.currByte() === 62 /* > */) {
 		s.advance(1);
 		return;
 	}
@@ -189,12 +188,12 @@ function parseDoctype(s: XmlStream, events: TXmlEvents): void {
 			// DTD ends with ']' S? '>', therefore we have to skip possible spaces
 			s.advance(1);
 			s.skipSpaces();
-			if (s.currByte() === b('>')) {
+			if (s.currByte() === 62 /* > */) {
 				s.advance(1);
 				break;
 			} else {
 				throw new XmlError(
-					{ type: 'InvalidChar', expected: '>', actual: s.currByteUnchecked() },
+					{ type: 'InvalidChar', expected: "'>'", actual: s.currByteUnchecked() },
 					s.genTextPos()
 				);
 			}
@@ -232,7 +231,7 @@ function parseDoctypeStart(s: XmlStream): void {
 	s.skipSpaces();
 
 	const c = s.currByte();
-	if (c !== b('[') && c !== b('>')) {
+	if (c !== 91 /* [ */ && c !== 62 /* > */) {
 		throw new XmlError({ type: 'InvalidChar', expected: "'[' or '>'", actual: c }, s.genTextPos());
 	}
 }
@@ -281,7 +280,7 @@ function parseEntityDecl(s: XmlStream, events: TXmlEvents): void {
 	s.advance(8);
 	s.consumeSpaces();
 
-	const isGe = !s.tryConsumeByte(b('%'));
+	const isGe = !s.tryConsumeByte(37 /* % */);
 	if (!isGe) {
 		s.consumeSpaces();
 	}
@@ -293,7 +292,7 @@ function parseEntityDecl(s: XmlStream, events: TXmlEvents): void {
 		events.token({ type: 'EntityDeclaration', name, definition });
 	}
 	s.skipSpaces();
-	s.consumeByte(b('>'));
+	s.consumeByte(62 /* > */);
 }
 
 /**
@@ -310,14 +309,14 @@ function parseEntityDecl(s: XmlStream, events: TXmlEvents): void {
  */
 function parseEntityDef(s: XmlStream, isGe: boolean): StrSpan | null {
 	const c = s.currByte();
-	if (c === b('"') || c === b("'")) {
+	if (c === 34 /* " */ || c === 39 /* ' */) {
 		const quote = s.consumeQuote();
 		const start = s.getPos();
 		s.skipBytes((_c) => _c !== quote);
 		const value = s.sliceBackSpan(start);
 		s.consumeByte(quote);
 		return value;
-	} else if (c === b('S') || c === b('P')) {
+	} else if (c === 83 /* S */ || c === 80 /* P */) {
 		if (parseExternalId(s)) {
 			if (isGe) {
 				s.skipSpaces();
@@ -345,8 +344,8 @@ function parseEntityDef(s: XmlStream, isGe: boolean): StrSpan | null {
  * Consumes a declaration.
  */
 function consumeDecl(s: XmlStream): void {
-	s.skipBytes((c) => c !== b('>'));
-	s.consumeByte(b('>'));
+	s.skipBytes((c) => c !== 62 /* > */);
+	s.consumeByte(62 /* > */);
 }
 
 /**
@@ -370,13 +369,13 @@ function parseElement(s: XmlStream, events: TXmlEvents): void {
 		const _start = s.getPos();
 		const currByte = s.currByte();
 
-		if (currByte === b('/')) {
+		if (currByte === 47 /* / */) {
 			s.advance(1);
-			s.consumeByte(b('>'));
+			s.consumeByte(62 /* > */);
 			const range = s.rangeFrom(_start);
 			events.token({ type: 'ElementEnd', variant: { type: 'Empty' }, range });
 			break;
-		} else if (currByte === b('>')) {
+		} else if (currByte === 62 /* > */) {
 			s.advance(1);
 			const range = s.rangeFrom(_start);
 			events.token({ type: 'ElementEnd', variant: { type: 'Open' }, range });
@@ -437,9 +436,9 @@ function parseAttribute(s: XmlStream): [string, string, StrSpan] {
 function parseContent(s: XmlStream, events: TXmlEvents): void {
 	while (!s.atEnd()) {
 		const currByte = s.currByte();
-		if (currByte === b('<')) {
+		if (currByte === 60 /* < */) {
 			const nextByte = s.nextByte();
-			if (nextByte === b('!')) {
+			if (nextByte === 33 /* ! */) {
 				if (s.startsWith('<!--')) {
 					parseComment(s, events);
 				} else if (s.startsWith('<![CDATA[')) {
@@ -447,9 +446,9 @@ function parseContent(s: XmlStream, events: TXmlEvents): void {
 				} else {
 					throw new XmlError({ type: 'UnknownToken' }, s.genTextPos());
 				}
-			} else if (nextByte === b('?')) {
+			} else if (nextByte === 63 /* ? */) {
 				parsePi(s, events);
-			} else if (nextByte === b('/')) {
+			} else if (nextByte === 47 /* / */) {
 				parseCloseElement(s, events);
 				break;
 			} else {
@@ -493,7 +492,7 @@ function parseCloseElement(s: XmlStream, events: TXmlEvents): void {
 
 	const [prefix, tagName] = s.consumeQName();
 	s.skipSpaces();
-	s.consumeByte(b('>'));
+	s.consumeByte(62 /* > */);
 
 	const range = s.rangeFrom(start);
 	events.token({ type: 'ElementEnd', variant: { type: 'Close', prefix, name: tagName }, range });

@@ -1,14 +1,5 @@
-// ASCII byte literal
-export function b(c: string): number {
-	if (c.length !== 1) {
-		throw new Error('Input must be a single character');
-	}
-	return c.charCodeAt(0);
-}
-
-export function isAsciiDigit(c: string | number): boolean {
-	const code = typeof c === 'string' ? b(c) : c;
-	return code >= 48 && code <= 57; // '0' (48) to '9' (57)
+export function isAsciiDigit(byte: number): boolean {
+	return byte >= 48 /* 0 */ && byte <= 57 /* 9 */;
 }
 
 /**
@@ -25,10 +16,10 @@ export function isXmlNameStart(c: string): boolean {
 	// Check for ASCII first
 	if (code <= 128) {
 		return (
-			(code >= b('A') && code <= b('Z')) ||
-			(code >= b('a') && code <= b('z')) ||
-			code === b(':') ||
-			code === b('_')
+			(code >= 65 /* A */ && code <= 90) /* Z */ ||
+			(code >= 97 /* a */ && code <= 122) /* z */ ||
+			code === 58 /* : */ ||
+			code === 95 /* _ */
 		);
 	}
 
@@ -107,7 +98,9 @@ export function isXmlChar(c: string): boolean {
  * @returns True if the byte is a valid XML space, false otherwise.
  */
 export function isXmlSpaceByte(byte: number): boolean {
-	return byte === b(' ') || byte === b('\t') || byte === b('\n') || byte === b('\r');
+	return (
+		byte === 32 /* ' ' */ || byte === 9 /* \t */ || byte === 10 /* \n */ || byte === 13 /* \r */
+	);
 }
 
 /**
@@ -117,12 +110,12 @@ export function isXmlSpaceByte(byte: number): boolean {
  */
 export function isXmlNameByte(byte: number): boolean {
 	return (
-		(byte >= b('0') && byte <= b('9')) ||
-		(byte >= b('A') && byte <= b('Z')) ||
-		(byte >= b('a') && byte <= b('z')) ||
-		byte === b(':') ||
-		byte === b('_') ||
-		byte === b('-') ||
-		byte === b('.')
+		(byte >= 48 /* 0 */ && byte <= 57) /* 9 */ ||
+		(byte >= 65 /* A */ && byte <= 90) /* Z */ ||
+		(byte >= 97 /* a */ && byte <= 122) /* z */ ||
+		byte === 58 /* : */ ||
+		byte === 95 /* _ */ ||
+		byte === 45 /* - */ ||
+		byte === 46 /* . */
 	);
 }
