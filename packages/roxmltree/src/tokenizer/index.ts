@@ -8,6 +8,10 @@ export * from './types';
 export * from './utils';
 export * from './XmlStream';
 
+export function parseString(text: string, allowDtd: boolean, events: TXmlEvents): void {
+	parse(XmlStream.fromString(text), allowDtd, events);
+}
+
 /**
  * Parses an XML document.
  *
@@ -15,9 +19,7 @@ export * from './XmlStream';
  *
  * https://www.w3.org/TR/xml/#NT-document
  */
-export function parse(text: string, allowDtd: boolean, events: TXmlEvents): void {
-	const s = XmlStream.fromString(text);
-
+export function parse(s: XmlStream, allowDtd: boolean, events: TXmlEvents): void {
 	// Skip UTF-8 BOM
 	if (s.startsWith('\uFEFF')) {
 		s.advance(3);

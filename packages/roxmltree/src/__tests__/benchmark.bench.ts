@@ -15,8 +15,7 @@ void describe('xmlToObject function', () => {
 	});
 
 	bench('xmlToObject', () => {
-		const result = xmlToObject(xml);
-		console.log(result);
+		xmlToObject(xml);
 	});
 
 	bench('fast-xml-parser', () => {

@@ -1,15 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import { XmlError } from '../XMLError';
-import { parse } from './index';
+import { parseString } from './index';
 import { type TXmlEvents, type TXMLToken } from './types';
 
 describe('tokenizer tests', () => {
-	// TODO: Benchmark
-	// bench(() => {
-	// 	parse('<p><![CDATA[content]]></p>', true, new EventsCollector());
-	// });
-
 	describe('CDATA', () => {
 		it('cdata_01', () => {
 			assertTokens('<p><![CDATA[content]]></p>', [
@@ -2267,7 +2262,7 @@ class EventsCollector implements TXmlEvents {
 function collectTokens(text: string): TToken[] {
 	const collector = new EventsCollector();
 	try {
-		parse(text, true, collector);
+		parseString(text, true, collector);
 	} catch (error) {
 		if (error instanceof XmlError) {
 			collector.tokens.push({ type: 'Error', message: error.message });

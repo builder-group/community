@@ -1,5 +1,5 @@
 import {
-	parse,
+	parseString,
 	type TAttributeToken,
 	type TCdataToken,
 	type TElementEndToken,
@@ -81,7 +81,7 @@ export function xmlToObject(xmlString: string): XMLNode {
 		}
 	}
 
-	parse(xmlString, false, xmlEvents);
+	parseString(xmlString, false, xmlEvents);
 	return root.children[0] as unknown as XMLNode;
 }
 
