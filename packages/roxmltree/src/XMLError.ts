@@ -55,9 +55,9 @@ export class XmlError extends Error {
 			case 'InvalidName':
 				return `invalid name token at ${formatPos(pos)}`;
 			case 'NonXmlChar':
-				return `a non-XML character '${variant.char}' found at ${formatPos(pos)}`;
+				return `a non-XML character '${toUnicodeEscape(variant.char)}' found at ${formatPos(pos)}`;
 			case 'InvalidChar':
-				return `expected '${typeof variant.expected === 'string' ? variant.expected : String.fromCharCode(variant.expected)}' not '${String.fromCharCode(variant.actual)}' at ${formatPos(pos)}`;
+				return `expected '${typeof variant.expected === 'string' ? variant.expected : toUnicodeEscape(variant.expected)}' not '${toUnicodeEscape(variant.actual)}' at ${formatPos(pos)}`;
 			case 'InvalidString':
 				return `expected '${variant.expected}' at ${formatPos(pos)}`;
 			case 'InvalidExternalID':
@@ -77,7 +77,25 @@ export class XmlError extends Error {
 }
 
 function formatPos(pos: TTextPos): string {
-	return `${pos.row}: ${pos.col}`;
+	return `${pos.row}:${pos.col}`;
+}
+
+function toUnicodeEscape(codePoint: number | string): string {
+	const code = typeof codePoint === 'string' ? codePoint.charCodeAt(0) : codePoint;
+	if (code == null || code < 0 || code > 0x10ffff) {
+		throw new Error('Code point out of range');
+	}
+
+	// Convert to hexadecimal string with leading zeros
+	let hexString = code.toString(16).toUpperCase();
+	if (code <= 0xffff) {
+		hexString = hexString.padStart(4, '0');
+	} else {
+		hexString = hexString.padStart(6, '0');
+	}
+
+	// Format with Unicode escape sequence
+	return `\\u{${hexString}}`;
 }
 
 type TXMLErrorVariant =

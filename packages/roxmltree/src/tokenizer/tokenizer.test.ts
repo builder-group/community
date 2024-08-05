@@ -330,7 +330,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'Error',
-					message: "a non-XML character '\\u{1}' found at 1:13"
+					message: "a non-XML character '\\u{0001}' found at 1:13"
 				}
 			]);
 		});
