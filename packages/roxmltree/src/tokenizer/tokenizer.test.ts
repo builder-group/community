@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { XmlError } from '../XMLError';
 import { parse } from './index';
-import { TXmlEvents, TXMLToken } from './types';
+import { type TXmlEvents, type TXMLToken } from './types';
 
 describe('tokenizer tests', () => {
 	// TODO: Benchmark
@@ -36,7 +36,7 @@ describe('tokenizer tests', () => {
 					variant: {
 						type: 'Close',
 						prefix: '',
-						name: 'p'
+						local: 'p'
 					},
 					range: [22, 26]
 				}
@@ -68,7 +68,7 @@ describe('tokenizer tests', () => {
 					variant: {
 						type: 'Close',
 						prefix: '',
-						name: 'p'
+						local: 'p'
 					},
 					range: [22, 26]
 				}
@@ -100,7 +100,7 @@ describe('tokenizer tests', () => {
 					variant: {
 						type: 'Close',
 						prefix: '',
-						name: 'p'
+						local: 'p'
 					},
 					range: [24, 28]
 				}
@@ -132,7 +132,7 @@ describe('tokenizer tests', () => {
 					variant: {
 						type: 'Close',
 						prefix: '',
-						name: 'p'
+						local: 'p'
 					},
 					range: [25, 29]
 				}
@@ -164,7 +164,7 @@ describe('tokenizer tests', () => {
 					variant: {
 						type: 'Close',
 						prefix: '',
-						name: 'p'
+						local: 'p'
 					},
 					range: [38, 42]
 				}
@@ -196,7 +196,7 @@ describe('tokenizer tests', () => {
 					variant: {
 						type: 'Close',
 						prefix: '',
-						name: 'p'
+						local: 'p'
 					},
 					range: [66, 70]
 				}
@@ -233,7 +233,7 @@ describe('tokenizer tests', () => {
 					variant: {
 						type: 'Close',
 						prefix: '',
-						name: 'p'
+						local: 'p'
 					},
 					range: [29, 33]
 				}
@@ -275,7 +275,7 @@ describe('tokenizer tests', () => {
 					variant: {
 						type: 'Close',
 						prefix: '',
-						name: 'p'
+						local: 'p'
 					},
 					range: [25, 29]
 				}
@@ -307,7 +307,7 @@ describe('tokenizer tests', () => {
 					variant: {
 						type: 'Close',
 						prefix: '',
-						name: 'p'
+						local: 'p'
 					},
 					range: [29, 33]
 				}
@@ -337,7 +337,7 @@ describe('tokenizer tests', () => {
 		});
 	});
 
-	describe('Comments', () => {
+	describe('Comment', () => {
 		it('comment_01', () => {
 			assertTokens('<!--comment-->', [
 				{
@@ -1022,6 +1022,7 @@ describe('tokenizer tests', () => {
 			);
 		});
 
+		// TODO: better error
 		it('document_err_01', () => {
 			assertTokens('<![CDATA[text]]>', [
 				{
@@ -1058,6 +1059,7 @@ describe('tokenizer tests', () => {
 			]);
 		});
 
+		// TODO: better error
 		it('document_err_05', () => {
 			assertTokens('<!DOCTYPE greeting1><!DOCTYPE greeting2>', [
 				{
@@ -1076,9 +1078,1147 @@ describe('tokenizer tests', () => {
 			]);
 		});
 	});
+
+	describe('Element', () => {
+		it('element_01', () => {
+			assertTokens('<a/>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'a',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Empty' },
+					range: [2, 4]
+				}
+			]);
+		});
+
+		it('element_02', () => {
+			assertTokens('<a></a>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'a',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Open' },
+					range: [2, 3]
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Close', prefix: '', local: 'a' },
+					range: [3, 7]
+				}
+			]);
+		});
+
+		it('element_03', () => {
+			assertTokens('  \t  <a/>   \n ', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'a',
+					startPos: 5
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Empty' },
+					range: [7, 9]
+				}
+			]);
+		});
+
+		it('element_04', () => {
+			assertTokens('  \t  <b><a/></b>   \n ', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'b',
+					startPos: 5
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Open' },
+					range: [7, 8]
+				},
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'a',
+					startPos: 8
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Empty' },
+					range: [10, 12]
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Close', prefix: '', local: 'b' },
+					range: [12, 16]
+				}
+			]);
+		});
+
+		// TODO
+		// it('element_06', () => {
+		// 	assertTokens('<俄语 լեզու="ռուսերեն">данные</俄语>', [
+		// 		{
+		// 			type: 'ElementStart',
+		// 			prefix: '',
+		// 			local: '俄语',
+		// 			startPos: 0
+		// 		},
+		// 		{
+		// 			type: 'Attr',
+		// 			prefix: '',
+		// 			local: 'լեզու',
+		// 			value: 'ռուսերեն'
+		// 		},
+		// 		{
+		// 			type: 'ElementEnd',
+		// 			variant: { type: 'Open' },
+		// 			range: [37, 38]
+		// 		},
+		// 		{
+		// 			type: 'Text',
+		// 			text: 'данные',
+		// 			range: [38, 50]
+		// 		},
+		// 		{
+		// 			type: 'ElementEnd',
+		// 			variant: { type: 'Close', prefix: '', local: '俄语' },
+		// 			range: [50, 59]
+		// 		}
+		// 	]);
+		// });
+
+		it('element_07', () => {
+			assertTokens('<svg:circle></svg:circle>', [
+				{
+					type: 'ElementStart',
+					prefix: 'svg',
+					local: 'circle',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Open' },
+					range: [11, 12]
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Close', prefix: 'svg', local: 'circle' },
+					range: [12, 25]
+				}
+			]);
+		});
+
+		it('element_08', () => {
+			assertTokens('<:circle/>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'circle',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Empty' },
+					range: [8, 10]
+				}
+			]);
+		});
+
+		it('element_err_01', () => {
+			assertTokens('<>', [
+				{
+					type: 'Error',
+					message: 'invalid name token at 1:2'
+				}
+			]);
+		});
+
+		it('element_err_02', () => {
+			assertTokens('</', [
+				{
+					type: 'Error',
+					message: 'invalid name token at 1:2'
+				}
+			]);
+		});
+
+		it('element_err_03', () => {
+			assertTokens('</a', [
+				{
+					type: 'Error',
+					message: 'invalid name token at 1:2'
+				}
+			]);
+		});
+
+		it('element_err_04', () => {
+			assertTokens("<a x='test' /", [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'a',
+					startPos: 0
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'x',
+					value: 'test'
+				},
+				{
+					type: 'Error',
+					message: 'unexpected end of stream'
+				}
+			]);
+		});
+
+		it('element_err_05', () => {
+			assertTokens('<<', [
+				{
+					type: 'Error',
+					message: 'invalid name token at 1:2'
+				}
+			]);
+		});
+
+		it('element_err_06', () => {
+			assertTokens('< a', [
+				{
+					type: 'Error',
+					message: 'invalid name token at 1:2'
+				}
+			]);
+		});
+
+		it('element_err_07', () => {
+			assertTokens('< ', [
+				{
+					type: 'Error',
+					message: 'invalid name token at 1:2'
+				}
+			]);
+		});
+
+		it('element_err_08', () => {
+			assertTokens('<&#x9;', [
+				{
+					type: 'Error',
+					message: 'invalid name token at 1:2'
+				}
+			]);
+		});
+
+		it('element_err_09', () => {
+			assertTokens('<a></a></a>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'a',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Open' },
+					range: [2, 3]
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Close', prefix: '', local: 'a' },
+					range: [3, 7]
+				},
+				{
+					type: 'Error',
+					message: 'unknown token at 1:8'
+				}
+			]);
+		});
+
+		it('element_err_10', () => {
+			assertTokens('<a/><a/>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'a',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Empty' },
+					range: [2, 4]
+				},
+				{
+					type: 'Error',
+					message: 'unknown token at 1:5'
+				}
+			]);
+		});
+
+		it('element_err_11', () => {
+			assertTokens('<a></br/></a>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'a',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Open' },
+					range: [2, 3]
+				},
+				{
+					type: 'Error',
+					message: "expected '\\u{003E}' not '\\u{002F}' at 1:8"
+				}
+			]);
+		});
+
+		it('element_err_12', () => {
+			assertTokens('<svg:/>', [
+				{
+					type: 'Error',
+					message: 'invalid name token at 1:2'
+				}
+			]);
+		});
+
+		it('element_err_13', () => {
+			assertTokens(`<root>\n</root>\n</root>`, [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'root',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Open' },
+					range: [5, 6]
+				},
+				{
+					type: 'Text',
+					text: '\n',
+					range: [6, 7]
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Close', prefix: '', local: 'root' },
+					range: [7, 14]
+				},
+				{
+					type: 'Error',
+					message: 'unknown token at 3:1'
+				}
+			]);
+		});
+
+		it('element_err_14', () => {
+			assertTokens('<-svg/>', [
+				{
+					type: 'Error',
+					message: 'invalid name token at 1:2'
+				}
+			]);
+		});
+
+		it('element_err_15', () => {
+			assertTokens('<svg:-svg/>', [
+				{
+					type: 'Error',
+					message: 'invalid name token at 1:2'
+				}
+			]);
+		});
+
+		it('element_err_16', () => {
+			assertTokens('<svg::svg/>', [
+				{
+					type: 'Error',
+					message: 'invalid name token at 1:2'
+				}
+			]);
+		});
+
+		it('element_err_17', () => {
+			assertTokens('<svg:s:vg/>', [
+				{
+					type: 'Error',
+					message: 'invalid name token at 1:2'
+				}
+			]);
+		});
+
+		it('element_err_18', () => {
+			assertTokens('<::svg/>', [
+				{
+					type: 'Error',
+					message: 'invalid name token at 1:2'
+				}
+			]);
+		});
+	});
+
+	describe('Attribute', () => {
+		it('attribute_01', () => {
+			assertTokens('<a ax="test"/>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'a',
+					startPos: 0
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'ax',
+					value: 'test'
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Empty' },
+					range: [12, 14]
+				}
+			]);
+		});
+
+		it('attribute_02', () => {
+			assertTokens("<a ax='test'/>", [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'a',
+					startPos: 0
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'ax',
+					value: 'test'
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Empty' },
+					range: [12, 14]
+				}
+			]);
+		});
+
+		it('attribute_03', () => {
+			assertTokens('<a b=\'test1\' c="test2"/>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'a',
+					startPos: 0
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'b',
+					value: 'test1'
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'c',
+					value: 'test2'
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Empty' },
+					range: [22, 24]
+				}
+			]);
+		});
+
+		it('attribute_04', () => {
+			assertTokens('<a b=\'"test1"\' c="\'test2\'"/>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'a',
+					startPos: 0
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'b',
+					value: '"test1"'
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'c',
+					value: "'test2'"
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Empty' },
+					range: [26, 28]
+				}
+			]);
+		});
+
+		it('attribute_05', () => {
+			assertTokens('<c a="test1\' c=\'test2" b=\'test1" c="test2\'/>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					startPos: 0
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'a',
+					value: "test1' c='test2"
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'b',
+					value: 'test1" c="test2'
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Empty' },
+					range: [42, 44]
+				}
+			]);
+		});
+
+		it('attribute_06', () => {
+			assertTokens("<c   a   =    'test1'     />", [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					startPos: 0
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'a',
+					value: 'test1'
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Empty' },
+					range: [26, 28]
+				}
+			]);
+		});
+
+		it('attribute_07', () => {
+			assertTokens("<c q:a='b'/>", [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					startPos: 0
+				},
+				{
+					type: 'Attr',
+					prefix: 'q',
+					local: 'a',
+					value: 'b'
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Empty' },
+					range: [10, 12]
+				}
+			]);
+		});
+
+		it('attribute_err_01', () => {
+			assertTokens('<c az=test>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					startPos: 0
+				},
+				{
+					type: 'Error',
+					message: "expected a quote not '\\u{0074}' at 1:7"
+				}
+			]);
+		});
+
+		it('attribute_err_02', () => {
+			assertTokens('<c a>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					startPos: 0
+				},
+				{
+					type: 'Error',
+					message: "expected '\\u{003D}' not '\\u{003E}' at 1:5"
+				}
+			]);
+		});
+
+		it('attribute_err_03', () => {
+			assertTokens('<c a/>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					startPos: 0
+				},
+				{
+					type: 'Error',
+					message: "expected '\\u{003D}' not '\\u{002F}' at 1:5"
+				}
+			]);
+		});
+
+		it('attribute_err_04', () => {
+			assertTokens("<c a='b' q/>", [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					startPos: 0
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'a',
+					value: 'b'
+				},
+				{
+					type: 'Error',
+					message: "expected '\\u{003D}' not '\\u{002F}' at 1:11"
+				}
+			]);
+		});
+
+		it('attribute_err_05', () => {
+			assertTokens("<c a='<'/>", [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					startPos: 0
+				},
+				{
+					type: 'Error',
+					message: "expected '\\u{0027}' not '\\u{003C}' at 1:7"
+				}
+			]);
+		});
+
+		it('attribute_err_06', () => {
+			assertTokens("<c a='\u{1}'/>", [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					startPos: 0
+				},
+				{
+					type: 'Error',
+					message: "a non-XML character '\\u{0001}' found at 1:7"
+				}
+			]);
+		});
+
+		it('attribute_err_07', () => {
+			assertTokens("<c a='v'b='v'/>", [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					startPos: 0
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'a',
+					value: 'v'
+				},
+				{
+					type: 'Error',
+					message: "expected a whitespace not '\\u{0062}' at 1:9"
+				}
+			]);
+		});
+	});
+
+	describe('PI', () => {
+		it('pi_01', () => {
+			assertTokens('<?xslt ma?>', [
+				{
+					type: 'ProcessingInstruction',
+					name: 'xslt',
+					content: 'ma',
+					range: [0, 11]
+				}
+			]);
+		});
+
+		it('pi_02', () => {
+			assertTokens('<?xslt \t\n m?>', [
+				{
+					type: 'ProcessingInstruction',
+					name: 'xslt',
+					content: 'm',
+					range: [0, 13]
+				}
+			]);
+		});
+
+		it('pi_03', () => {
+			assertTokens('<?xslt?>', [
+				{
+					type: 'ProcessingInstruction',
+					name: 'xslt',
+					content: undefined,
+					range: [0, 8]
+				}
+			]);
+		});
+
+		it('pi_04', () => {
+			assertTokens('<?xslt ?>', [
+				{
+					type: 'ProcessingInstruction',
+					name: 'xslt',
+					content: undefined,
+					range: [0, 9]
+				}
+			]);
+		});
+
+		it('pi_05', () => {
+			assertTokens('<?xml-stylesheet?>', [
+				{
+					type: 'ProcessingInstruction',
+					name: 'xml-stylesheet',
+					content: undefined,
+					range: [0, 18]
+				}
+			]);
+		});
+
+		it('pi_err_01', () => {
+			assertTokens('<??xml \t\n m?>', [
+				{
+					type: 'Error',
+					message: 'invalid name token at 1:3'
+				}
+			]);
+		});
+	});
+
+	describe('Declaration', () => {
+		it('declaration_01', () => {
+			assertTokens('<?xml version="1.0"?>', []);
+		});
+
+		it('declaration_02', () => {
+			assertTokens("<?xml version='1.0'?>", []);
+		});
+
+		it('declaration_03', () => {
+			assertTokens('<?xml version=\'1.0\' encoding="UTF-8"?>', []);
+		});
+
+		it('declaration_04', () => {
+			assertTokens("<?xml version='1.0' encoding='UTF-8'?>", []);
+		});
+
+		it('declaration_05', () => {
+			assertTokens("<?xml version='1.0' encoding='utf-8'?>", []);
+		});
+
+		it('declaration_06', () => {
+			assertTokens("<?xml version='1.0' encoding='EUC-JP'?>", []);
+		});
+
+		it('declaration_07', () => {
+			assertTokens("<?xml version='1.0' encoding='UTF-8' standalone='yes'?>", []);
+		});
+
+		it('declaration_08', () => {
+			assertTokens("<?xml version='1.0' encoding='UTF-8' standalone='no'?>", []);
+		});
+
+		it('declaration_09', () => {
+			assertTokens("<?xml version='1.0' standalone='no'?>", []);
+		});
+
+		it('declaration_10', () => {
+			assertTokens("<?xml version='1.0' standalone='no' ?>", []);
+		});
+
+		// Declaration with an invalid order
+		it('declaration_err_01', () => {
+			assertTokens("<?xml encoding='UTF-8' version='1.0'?>", [
+				{
+					type: 'Error',
+					message: "expected 'version' at 1:7"
+				}
+			]);
+		});
+
+		it('declaration_err_05', () => {
+			assertTokens("<?xml version='1.0' yes='true'?>", [
+				{
+					type: 'Error',
+					message: "expected '?>' at 1:21"
+				}
+			]);
+		});
+
+		it('declaration_err_06', () => {
+			assertTokens("<?xml version='1.0' encoding='UTF-8' standalone='yes' yes='true'?>", [
+				{
+					type: 'Error',
+					message: "expected '?>' at 1:55"
+				}
+			]);
+		});
+
+		it('declaration_err_07', () => {
+			assertTokens("\u{000a}<?xml\u{000a}&jg'];", [
+				{
+					type: 'Error',
+					message: "expected '?>' at 3:7"
+				}
+			]);
+		});
+
+		it('declaration_err_08', () => {
+			assertTokens('<?xml \t\n ?m?>', [
+				{
+					type: 'Error',
+					message: "expected 'version' at 2:2"
+				}
+			]);
+		});
+
+		it('declaration_err_09', () => {
+			assertTokens('<?xml \t\n m?>', [
+				{
+					type: 'Error',
+					message: "expected 'version' at 2:2"
+				}
+			]);
+		});
+
+		// XML declaration allowed only at the start of the document
+		it('declaration_err_10', () => {
+			assertTokens(" <?xml version='1.0'?>", [
+				{
+					type: 'Error',
+					message: 'unexpected XML declaration at 1:2'
+				}
+			]);
+		});
+
+		it('declaration_err_11', () => {
+			assertTokens("<!-- comment --><?xml version='1.0'?>", [
+				{
+					type: 'Comment',
+					content: ' comment ',
+					range: [0, 16]
+				},
+				{
+					type: 'Error',
+					message: 'unexpected XML declaration at 1:17'
+				}
+			]);
+		});
+
+		it('declaration_err_12', () => {
+			assertTokens("<?xml version='1.0'?><?xml version='1.0'?>", [
+				{
+					type: 'Error',
+					message: 'unexpected XML declaration at 1:22'
+				}
+			]);
+		});
+
+		it('declaration_err_13', () => {
+			assertTokens('<?target \u{1}content>', [
+				{
+					type: 'Error',
+					message: "a non-XML character '\\u{0001}' found at 1:10"
+				}
+			]);
+		});
+
+		it('declaration_err_14', () => {
+			assertTokens("<?xml version='1.0'encoding='UTF-8'?>", [
+				{
+					type: 'Error',
+					message: "expected a whitespace not '\\u{0065}' at 1:20"
+				}
+			]);
+		});
+
+		it('declaration_err_15', () => {
+			assertTokens("<?xml version='1.0' encoding='UTF-8'standalone='yes'?>", [
+				{
+					type: 'Error',
+					message: "expected a whitespace not '\\u{0073}' at 1:37"
+				}
+			]);
+		});
+
+		it('declaration_err_16', () => {
+			assertTokens("<?xml version='1.0'", [
+				{
+					type: 'Error',
+					message: "expected '?>' at 1:20"
+				}
+			]);
+		});
+	});
+
+	describe('Text', () => {
+		it('text_01', () => {
+			assertTokens('<p>text</p>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'p',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Open' },
+					range: [2, 3]
+				},
+				{
+					type: 'Text',
+					text: 'text',
+					range: [3, 7]
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Close', prefix: '', local: 'p' },
+					range: [7, 11]
+				}
+			]);
+		});
+
+		it('text_02', () => {
+			assertTokens('<p> text </p>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'p',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Open' },
+					range: [2, 3]
+				},
+				{
+					type: 'Text',
+					text: ' text ',
+					range: [3, 9]
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Close', prefix: '', local: 'p' },
+					range: [9, 13]
+				}
+			]);
+		});
+
+		// 欄 is EF A4 9D. And EF can be mistreated for UTF-8 BOM
+		it('text_03', () => {
+			assertTokens('<p>欄</p>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'p',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Open' },
+					range: [2, 3]
+				},
+				{
+					type: 'Text',
+					text: '欄',
+					range: [3, 6]
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Close', prefix: '', local: 'p' },
+					range: [6, 10]
+				}
+			]);
+		});
+
+		it('text_04', () => {
+			assertTokens('<p> </p>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'p',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Open' },
+					range: [2, 3]
+				},
+				{
+					type: 'Text',
+					text: ' ',
+					range: [3, 4]
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Close', prefix: '', local: 'p' },
+					range: [4, 8]
+				}
+			]);
+		});
+
+		it('text_05', () => {
+			assertTokens('<p> \r\n\t </p>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'p',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Open' },
+					range: [2, 3]
+				},
+				{
+					type: 'Text',
+					text: ' \r\n\t ',
+					range: [3, 8]
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Close', prefix: '', local: 'p' },
+					range: [8, 12]
+				}
+			]);
+		});
+
+		it('text_06', () => {
+			assertTokens('<p>&#x20;</p>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'p',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Open' },
+					range: [2, 3]
+				},
+				{
+					type: 'Text',
+					text: '&#x20;',
+					range: [3, 9]
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Close', prefix: '', local: 'p' },
+					range: [9, 13]
+				}
+			]);
+		});
+
+		it('text_07', () => {
+			assertTokens('<p>]></p>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'p',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Open' },
+					range: [2, 3]
+				},
+				{
+					type: 'Text',
+					text: ']>',
+					range: [3, 5]
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Close', prefix: '', local: 'p' },
+					range: [5, 9]
+				}
+			]);
+		});
+
+		it('text_err_01', () => {
+			assertTokens('<p>]]></p>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'p',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Open' },
+					range: [2, 3]
+				},
+				{
+					type: 'Error',
+					message: "']]>' at 1:7 is not allowed inside a character data"
+				}
+			]);
+		});
+
+		it('text_err_02', () => {
+			assertTokens('<p>\u{0c}</p>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'p',
+					startPos: 0
+				},
+				{
+					type: 'ElementEnd',
+					variant: { type: 'Open' },
+					range: [2, 3]
+				},
+				{
+					type: 'Error',
+					message: "a non-XML character '\\u{000C}' found at 1:4"
+				}
+			]);
+		});
+	});
 });
 
-type TToken = TXMLToken | TErrorToken | TEntityDeclToken;
+type TToken = TXMLToken | TErrorToken | TEntityDeclToken | TAttrToken;
 
 interface TErrorToken {
 	type: 'Error';
@@ -1091,6 +2231,13 @@ interface TEntityDeclToken {
 	definition: string;
 }
 
+interface TAttrToken {
+	type: 'Attr';
+	prefix: string;
+	local: string;
+	value: string;
+}
+
 class EventsCollector implements TXmlEvents {
 	public tokens: TToken[] = [];
 
@@ -1101,6 +2248,14 @@ class EventsCollector implements TXmlEvents {
 					type: 'EntityDecl',
 					name: token.name,
 					definition: token.definition.toString()
+				});
+				break;
+			case 'Attribute':
+				this.tokens.push({
+					type: 'Attr',
+					prefix: token.prefix,
+					local: token.local,
+					value: token.value.toString()
 				});
 				break;
 			default:
@@ -1123,6 +2278,6 @@ function collectTokens(text: string): TToken[] {
 	return collector.tokens;
 }
 
-function assertTokens(text: string, tokens: TToken[]) {
+function assertTokens(text: string, tokens: TToken[]): void {
 	expect(collectTokens(text)).toStrictEqual(tokens);
 }

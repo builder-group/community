@@ -495,7 +495,7 @@ function parseCloseElement(s: XmlStream, events: TXmlEvents): void {
 	s.consumeByte(62 /* > */);
 
 	const range = s.rangeFrom(start);
-	events.token({ type: 'ElementEnd', variant: { type: 'Close', prefix, name: tagName }, range });
+	events.token({ type: 'ElementEnd', variant: { type: 'Close', prefix, local: tagName }, range });
 }
 
 /**

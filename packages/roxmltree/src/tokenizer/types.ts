@@ -7,7 +7,7 @@ export interface TXmlEvents {
 /**
  * A Processing Instruction token.
  *
- * <?target content?>
+ * \<?target content?\>
  */
 export interface TProcessingInstructionToken {
 	type: 'ProcessingInstruction';
@@ -19,7 +19,7 @@ export interface TProcessingInstructionToken {
 /**
  * A Comment token.
  *
- * <!-- text -->
+ * \<!-- text --\>
  */
 export interface TCommentToken {
 	type: 'Comment';
@@ -30,7 +30,7 @@ export interface TCommentToken {
 /**
  * An Entity Declaration token.
  *
- * <!ENTITY ns_extend "http://test.com">
+ * \<!ENTITY ns_extend "http://test.com"\>
  */
 export interface TEntityDeclarationToken {
 	type: 'EntityDeclaration';
@@ -41,7 +41,7 @@ export interface TEntityDeclarationToken {
 /**
  * An Element Start token.
  *
- * <ns:elem
+ * \<ns:elem
  */
 export interface TElementStartToken {
 	type: 'ElementStart';
@@ -76,7 +76,7 @@ export type TElementEndVariant =
 	// Indicates `>`
 	| { type: 'Open' }
 	// Indicates `</ns:name>`
-	| { type: 'Close'; prefix: string; name: string }
+	| { type: 'Close'; prefix: string; local: string }
 	// Indicates `/>`
 	| { type: 'Empty' };
 
@@ -96,7 +96,7 @@ export interface TTextToken {
 /**
  * A CDATA Section token.
  *
- * <![CDATA[text]]>
+ * \<![CDATA[text]]\>
  */
 export interface TCdataToken {
 	type: 'Cdata';
