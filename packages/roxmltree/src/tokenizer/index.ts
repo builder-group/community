@@ -41,7 +41,7 @@ export function parse(text: string, allowDtd: boolean, events: TXmlEvents): void
 	}
 
 	s.skipSpaces();
-	if (s.currByte() === b('<')) {
+	if (!s.atEnd() && s.currByte() === b('<')) {
 		parseElement(s, events);
 	}
 
@@ -360,7 +360,7 @@ function parseElement(s: XmlStream, events: TXmlEvents): void {
 	const start = s.getPos();
 	s.advance(1); // '<'
 	const [prefix, local] = s.consumeQName();
-	events.token({ type: 'ElementStart', prefix, local, start });
+	events.token({ type: 'ElementStart', prefix, local, startPos: start });
 
 	let open = false;
 	while (!s.atEnd()) {
@@ -373,12 +373,12 @@ function parseElement(s: XmlStream, events: TXmlEvents): void {
 			s.advance(1);
 			s.consumeByte(b('>'));
 			const range = s.rangeFrom(_start);
-			events.token({ type: 'ElementEnd', end: { type: 'Empty' }, range });
+			events.token({ type: 'ElementEnd', variant: { type: 'Empty' }, range });
 			break;
 		} else if (currByte === b('>')) {
 			s.advance(1);
 			const range = s.rangeFrom(_start);
-			events.token({ type: 'ElementEnd', end: { type: 'Open' }, range });
+			events.token({ type: 'ElementEnd', variant: { type: 'Open' }, range });
 			open = true;
 			break;
 		} else {
@@ -496,7 +496,7 @@ function parseCloseElement(s: XmlStream, events: TXmlEvents): void {
 	s.consumeByte(b('>'));
 
 	const range = s.rangeFrom(start);
-	events.token({ type: 'ElementEnd', end: { type: 'Close', prefix, name: tagName }, range });
+	events.token({ type: 'ElementEnd', variant: { type: 'Close', prefix, name: tagName }, range });
 }
 
 /**

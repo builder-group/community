@@ -1,41 +1,118 @@
 import { type StrSpan } from './StrSpan';
 
 export interface TXmlEvents {
-	token: (token: TToken) => void;
+	token: (token: TXMLToken) => void;
 }
 
-export type TToken =
-	// <?target content?>
-	| { type: 'ProcessingInstruction'; target: string; content?: string; range: TRange }
-	// <!-- text -->
-	| { type: 'Comment'; text: string; range: TRange }
-	// <!ENTITY ns_extend "http://test.com">
-	| { type: 'EntityDeclaration'; name: string; definition: StrSpan }
-	// <ns:elem
-	| { type: 'ElementStart'; prefix: string; local: string; start: number }
-	// ns:attr="value"
-	| {
-			type: 'Attribute';
-			range: TRange;
-			prefix: string;
-			local: string;
-			value: StrSpan;
-	  }
-	| { type: 'ElementEnd'; end: TElementEnd; range: TRange }
-	// Contains text between elements including whitespaces.
-	// Basically everything between `>` and `<`.
-	// Except `]]>`, which is not allowed and will lead to an error.
-	| { type: 'Text'; text: string; range: TRange }
-	// <![CDATA[text]]>
-	| { type: 'Cdata'; text: string; range: TRange };
+/**
+ * A Processing Instruction token.
+ *
+ * <?target content?>
+ */
+export interface TProcessingInstructionToken {
+	type: 'ProcessingInstruction';
+	target: string;
+	content?: string;
+	range: TRange;
+}
 
-export type TElementEnd =
+/**
+ * A Comment token.
+ *
+ * <!-- text -->
+ */
+export interface TCommentToken {
+	type: 'Comment';
+	text: string;
+	range: TRange;
+}
+
+/**
+ * An Entity Declaration token.
+ *
+ * <!ENTITY ns_extend "http://test.com">
+ */
+export interface TEntityDeclarationToken {
+	type: 'EntityDeclaration';
+	name: string;
+	definition: StrSpan;
+}
+
+/**
+ * An Element Start token.
+ *
+ * <ns:elem
+ */
+export interface TElementStartToken {
+	type: 'ElementStart';
+	prefix: string;
+	local: string;
+	startPos: number;
+}
+
+/**
+ * An Attribute token.
+ *
+ * ns:attr="value"
+ */
+export interface TAttributeToken {
+	type: 'Attribute';
+	range: TRange;
+	prefix: string;
+	local: string;
+	value: StrSpan;
+}
+
+/**
+ * An Element End token.
+ */
+export interface TElementEndToken {
+	type: 'ElementEnd';
+	variant: TElementEndVariant;
+	range: TRange;
+}
+
+export type TElementEndVariant =
 	// Indicates `>`
 	| { type: 'Open' }
 	// Indicates `</ns:name>`
 	| { type: 'Close'; prefix: string; name: string }
 	// Indicates `/>`
 	| { type: 'Empty' };
+
+/**
+ * A Text token.
+ *
+ * Contains text between elements including whitespaces.
+ * Basically everything between `>` and `<`.
+ * Except `]]>`, which is not allowed and will lead to an error.
+ */
+export interface TTextToken {
+	type: 'Text';
+	text: string;
+	range: TRange;
+}
+
+/**
+ * A CDATA Section token.
+ *
+ * <![CDATA[text]]>
+ */
+export interface TCdataToken {
+	type: 'Cdata';
+	text: string;
+	range: TRange;
+}
+
+export type TXMLToken =
+	| TProcessingInstructionToken
+	| TCommentToken
+	| TEntityDeclarationToken
+	| TElementStartToken
+	| TAttributeToken
+	| TElementEndToken
+	| TTextToken
+	| TCdataToken;
 
 export type TRange = [number, number];
 
