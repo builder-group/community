@@ -1,4 +1,4 @@
-import { XmlError, XMLErrorVariant } from '../XMLError';
+import { XmlError } from '../XMLError';
 import { type StrSpan } from './StrSpan';
 import { type TXmlEvents } from './types';
 import { b } from './utils';
@@ -33,7 +33,7 @@ export function parse(text: string, allowDtd: boolean, events: TXmlEvents): void
 	s.skipSpaces();
 	if (s.startsWith('<!DOCTYPE')) {
 		if (!allowDtd) {
-			throw new XmlError(XMLErrorVariant.DtdDetected, 'Dtd detected');
+			throw new XmlError({ type: 'DtdDetected' });
 		}
 
 		parseDoctype(s, events);
@@ -48,7 +48,7 @@ export function parse(text: string, allowDtd: boolean, events: TXmlEvents): void
 	parseMisc(s, events);
 
 	if (!s.atEnd()) {
-		throw new XmlError(XMLErrorVariant.UnknownToken, 'Unknown token', s.genTextPos());
+		throw new XmlError({ type: 'UnknownToken' }, s.genTextPos());
 	}
 }
 
@@ -85,7 +85,7 @@ function parseDeclaration(s: XmlStream): void {
 
 	// The `version` "attribute" is mandatory
 	if (!s.startsWith('version')) {
-		throw new XmlError(XMLErrorVariant.InvalidString, 'Expected version', s.genTextPos());
+		throw new XmlError({ type: 'InvalidString', expected: 'version' }, s.genTextPos());
 	}
 	parseAttribute(s);
 	consumeSpaces(s);
@@ -107,7 +107,10 @@ function consumeSpaces(s: XmlStream): void {
 	if (s.startsWithSpace()) {
 		s.skipSpaces();
 	} else if (!s.startsWith('?>') && !s.atEnd()) {
-		throw new XmlError(XMLErrorVariant.InvalidChar, 'A whitespace', s.genTextPos());
+		throw new XmlError(
+			{ type: 'InvalidChar', expected: 'a whitespace', actual: s.currByteUnchecked() },
+			s.genTextPos()
+		);
 	}
 }
 
@@ -125,7 +128,7 @@ function parseComment(s: XmlStream, events: TXmlEvents): void {
 	s.skipString('-->');
 
 	if (text.includes('--') || text.endsWith('-')) {
-		throw new XmlError(XMLErrorVariant.InvalidComment, 'Invalid comment', s.genTextPosFrom(start));
+		throw new XmlError({ type: 'InvalidComment' }, s.genTextPosFrom(start));
 	}
 
 	events.token({ type: 'Comment', text, range: s.rangeFrom(start) });
@@ -141,11 +144,7 @@ function parseComment(s: XmlStream, events: TXmlEvents): void {
  */
 function parsePi(s: XmlStream, events: TXmlEvents): void {
 	if (s.startsWith('<?xml ')) {
-		throw new XmlError(
-			XMLErrorVariant.UnexpectedDeclaration,
-			'Unexpected XML declaration',
-			s.genTextPos()
-		);
+		throw new XmlError({ type: 'UnexpectedDeclaration' }, s.genTextPos());
 	}
 
 	const start = s.getPos();
@@ -194,7 +193,10 @@ function parseDoctype(s: XmlStream, events: TXmlEvents): void {
 				s.advance(1);
 				break;
 			} else {
-				throw new XmlError(XMLErrorVariant.InvalidChar, `Expected '>'`, s.genTextPos());
+				throw new XmlError(
+					{ type: 'InvalidChar', expected: '>', actual: s.currByteUnchecked() },
+					s.genTextPos()
+				);
 			}
 		} else if (
 			s.startsWith('<!ELEMENT') ||
@@ -204,10 +206,10 @@ function parseDoctype(s: XmlStream, events: TXmlEvents): void {
 			try {
 				consumeDecl(s);
 			} catch (e) {
-				throw new XmlError(XMLErrorVariant.UnknownToken, 'Unknown token', s.genTextPosFrom(start));
+				throw new XmlError({ type: 'UnknownToken' }, s.genTextPosFrom(start));
 			}
 		} else {
-			throw new XmlError(XMLErrorVariant.UnknownToken, 'Unknown token', s.genTextPos());
+			throw new XmlError({ type: 'UnknownToken' }, s.genTextPos());
 		}
 	}
 }
@@ -231,7 +233,7 @@ function parseDoctypeStart(s: XmlStream): void {
 
 	const c = s.currByte();
 	if (c !== b('[') && c !== b('>')) {
-		throw new XmlError(XMLErrorVariant.InvalidChar, `Expected '[' or '>'`, s.genTextPos());
+		throw new XmlError({ type: 'InvalidChar', expected: "'[' or '>'", actual: c }, s.genTextPos());
 	}
 }
 
@@ -330,11 +332,10 @@ function parseEntityDef(s: XmlStream, isGe: boolean): StrSpan | null {
 			return null;
 		}
 
-		throw new XmlError(XMLErrorVariant.InvalidExternalID, 'Invalid external ID', s.genTextPos());
+		throw new XmlError({ type: 'InvalidExternalID' }, s.genTextPos());
 	} else {
 		throw new XmlError(
-			XMLErrorVariant.InvalidChar,
-			'Expected a quote, SYSTEM or PUBLIC',
+			{ type: 'InvalidChar', expected: 'a quote, SYSTEM or PUBLIC', actual: c },
 			s.genTextPos()
 		);
 	}
@@ -385,8 +386,7 @@ function parseElement(s: XmlStream, events: TXmlEvents): void {
 			// An attribute must be preceded with a whitespace
 			if (!hasSpace) {
 				throw new XmlError(
-					XMLErrorVariant.InvalidChar,
-					'An attribute must be preceded with a whitespace!',
+					{ type: 'InvalidChar', expected: 'a whitespace', actual: s.currByteUnchecked() },
 					s.genTextPos()
 				);
 			}
@@ -445,7 +445,7 @@ function parseContent(s: XmlStream, events: TXmlEvents): void {
 				} else if (s.startsWith('<![CDATA[')) {
 					parseCdata(s, events);
 				} else {
-					throw new XmlError(XMLErrorVariant.UnknownToken, 'Unknown token!', s.genTextPos());
+					throw new XmlError({ type: 'UnknownToken' }, s.genTextPos());
 				}
 			} else if (nextByte === b('?')) {
 				parsePi(s, events);
@@ -511,11 +511,7 @@ function parseText(s: XmlStream, events: TXmlEvents): void {
 	//
 	// Search for `>` first, since it's a bit faster than looking for `]]>`.
 	if (text.includes('>') && text.includes(']]>')) {
-		throw new XmlError(
-			XMLErrorVariant.InvalidCharacterData,
-			'Invalid character data',
-			s.genTextPos()
-		);
+		throw new XmlError({ type: 'InvalidCharacterData' }, s.genTextPos());
 	}
 
 	events.token({ type: 'Text', text, range: s.rangeFrom(start) });

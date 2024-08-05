@@ -469,7 +469,7 @@ function collectTokens(text: string): TToken[] {
 	try {
 		parse(text, true, collector);
 	} catch (error) {
-		collector.tokens.push({ type: 'Error', message: '' });
+		collector.tokens.push({ type: 'Error', message: error instanceof Error ? error.message : '' });
 	}
 	return collector.tokens;
 }

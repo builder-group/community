@@ -1,4 +1,4 @@
-import { XmlError, XMLErrorVariant } from '../XMLError';
+import { XmlError } from '../XMLError';
 import { StrSpan } from './StrSpan';
 import { type TRange, type TReference, type TTextPos } from './types';
 import { b, isAsciiDigit, isXmlChar, isXmlName, isXmlNameStart, isXmlSpaceByte } from './utils';
@@ -47,7 +47,7 @@ export class XmlStream {
 	 */
 	public currByte(): number {
 		if (this.atEnd()) {
-			throw new XmlError(XMLErrorVariant.UnexpectedEndOfStream, 'Unexpected end of stream!');
+			throw new XmlError({ type: 'UnexpectedEndOfStream' });
 		}
 		return this.currByteUnchecked();
 	}
@@ -66,7 +66,7 @@ export class XmlStream {
 	 */
 	public nextByte(): number {
 		if (this._pos + 1 >= this._end) {
-			throw new XmlError(XMLErrorVariant.UnexpectedEndOfStream, 'Unexpected end of stream!');
+			throw new XmlError({ type: 'UnexpectedEndOfStream' });
 		}
 		return this._span.text.charCodeAt(this._pos + 1);
 	}
@@ -96,11 +96,7 @@ export class XmlStream {
 	public consumeByte(c: number): void {
 		const curr = this.currByte();
 		if (curr !== c) {
-			throw new XmlError(
-				XMLErrorVariant.InvalidChar,
-				`Invalid char: Expected ${String.fromCharCode(c)}, found ${String.fromCharCode(curr)}`,
-				this.genTextPos()
-			);
+			throw new XmlError({ type: 'InvalidChar', expected: c, actual: curr }, this.genTextPos());
 		}
 		this.advance(1);
 	}
@@ -127,11 +123,7 @@ export class XmlStream {
 	 */
 	public skipString(text: string): void {
 		if (!this.startsWith(text)) {
-			throw new XmlError(
-				XMLErrorVariant.InvalidString,
-				`Invalid string, Expected "${text}"`,
-				this.genTextPos()
-			);
+			throw new XmlError({ type: 'InvalidString', expected: text }, this.genTextPos());
 		}
 		this.advance(text.length);
 	}
@@ -177,7 +169,7 @@ export class XmlStream {
 	public skipChars(predicate: (stream: XmlStream, char: string) => boolean): void {
 		for (const char of this.chars()) {
 			if (!isXmlChar(char)) {
-				throw new XmlError(XMLErrorVariant.NonXmlChar, `Non xml char: ${char}`, this.genTextPos());
+				throw new XmlError({ type: 'NonXmlChar', char }, this.genTextPos());
 			} else if (predicate(this, char)) {
 				this.advance(char.length);
 			} else {
@@ -237,15 +229,14 @@ export class XmlStream {
 	 */
 	public consumeSpaces(): void {
 		if (this.atEnd()) {
-			throw new XmlError(
-				XMLErrorVariant.UnexpectedEndOfStream,
-				'Unexpected end of stream!',
-				this.genTextPos()
-			);
+			throw new XmlError({ type: 'UnexpectedEndOfStream' }, this.genTextPos());
 		}
 
 		if (!this.startsWithSpace()) {
-			throw new XmlError(XMLErrorVariant.InvalidChar, 'A white space', this.genTextPos());
+			throw new XmlError(
+				{ type: 'InvalidChar', expected: 'a whitespace', actual: this.currByteUnchecked() },
+				this.genTextPos()
+			);
 		}
 
 		this.skipSpaces();
@@ -349,11 +340,7 @@ export class XmlStream {
 
 		const name = this.sliceBack(start);
 		if (name.length === 0) {
-			throw new XmlError(
-				XMLErrorVariant.InvalidName,
-				`Invalid name: ${name}`,
-				this.genTextPosFrom(start)
-			);
+			throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 		}
 
 		return name;
@@ -370,11 +357,7 @@ export class XmlStream {
 		for (const c of this.chars()) {
 			if (this._pos === start) {
 				if (!isXmlNameStart(c)) {
-					throw new XmlError(
-						XMLErrorVariant.InvalidName,
-						`Invalid name prefix at position ${c}`,
-						this.genTextPosFrom(start)
-					);
+					throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 				}
 			} else if (!isXmlName(c)) {
 				break;
@@ -401,11 +384,8 @@ export class XmlStream {
 						splitter = this._pos;
 						this.advance(1);
 					} else {
-						throw new XmlError(
-							XMLErrorVariant.InvalidName,
-							`Multiple ':' found in name at position ${start.toString()}`,
-							this.genTextPosFrom(start)
-						);
+						// Multiple `:` is an error
+						throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 					}
 				} else if (isXmlName(String.fromCharCode(currByte))) {
 					this.advance(1);
@@ -430,24 +410,16 @@ export class XmlStream {
 
 		// Prefix must start with a `NameStartChar`
 		if (prefix.length > 0 && !isXmlNameStart(prefix[0] as unknown as string)) {
-			throw new XmlError(
-				XMLErrorVariant.InvalidName,
-				`Invalid name prefix at position ${start.toString()}`,
-				this.genTextPosFrom(start)
-			);
+			throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 		}
 
 		// Local name must start with a `NameStartChar`
 		if (local.length > 0) {
 			if (!isXmlNameStart(local[0] as unknown as string)) {
-				throw new XmlError(
-					XMLErrorVariant.InvalidName,
-					`Invalid name local at position ${start.toString()}`,
-					this.genTextPosFrom(start)
-				);
+				throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 			}
 		} else {
-			throw new XmlError(XMLErrorVariant.InvalidName, 'Local is empty', this.genTextPosFrom(start));
+			throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 		}
 
 		return [prefix, local];
@@ -472,7 +444,7 @@ export class XmlStream {
 			this.advance(1);
 			return c;
 		}
-		throw new XmlError(XMLErrorVariant.InvalidChar, 'Invalid quote', this.genTextPos());
+		throw new XmlError({ type: 'InvalidChar', expected: 'a quote', actual: c }, this.genTextPos());
 	}
 
 	/**
