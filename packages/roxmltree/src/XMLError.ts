@@ -67,7 +67,7 @@ export class XmlError extends Error {
 			case 'InvalidCharacterData':
 				return `']]>' at ${formatPos(pos)} is not allowed inside a character data`;
 			case 'UnknownToken':
-				return `unknown token at ${formatPos(pos)}`;
+				return `unknown token at ${formatPos(pos)}${variant.message != null ? ` | ${variant.message}` : ''}`;
 			case 'UnexpectedEndOfStream':
 				return `unexpected end of stream`;
 			default:
@@ -367,6 +367,7 @@ interface TInvalidCharacterData {
  */
 interface TUnknownToken {
 	type: 'UnknownToken';
+	message?: string;
 }
 
 /**

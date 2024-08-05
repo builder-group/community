@@ -47,7 +47,7 @@ export function parse(text: string, allowDtd: boolean, events: TXmlEvents): void
 	parseMisc(s, events);
 
 	if (!s.atEnd()) {
-		throw new XmlError({ type: 'UnknownToken' }, s.genTextPos());
+		throw new XmlError({ type: 'UnknownToken', message: 'Not at end' }, s.genTextPos());
 	}
 }
 
@@ -205,10 +205,16 @@ function parseDoctype(s: XmlStream, events: TXmlEvents): void {
 			try {
 				consumeDecl(s);
 			} catch (e) {
-				throw new XmlError({ type: 'UnknownToken' }, s.genTextPosFrom(start));
+				throw new XmlError(
+					{ type: 'UnknownToken', message: 'Failed to consume declaration' },
+					s.genTextPosFrom(start)
+				);
 			}
 		} else {
-			throw new XmlError({ type: 'UnknownToken' }, s.genTextPos());
+			throw new XmlError(
+				{ type: 'UnknownToken', message: 'Failed to parse doctype' },
+				s.genTextPos()
+			);
 		}
 	}
 }
@@ -444,7 +450,10 @@ function parseContent(s: XmlStream, events: TXmlEvents): void {
 				} else if (s.startsWith('<![CDATA[')) {
 					parseCdata(s, events);
 				} else {
-					throw new XmlError({ type: 'UnknownToken' }, s.genTextPos());
+					throw new XmlError(
+						{ type: 'UnknownToken', message: 'Failed to parse content' },
+						s.genTextPos()
+					);
 				}
 			} else if (nextByte === 63 /* ? */) {
 				parsePi(s, events);
