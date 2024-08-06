@@ -18,12 +18,12 @@ void describe('xml to object', () => {
 		await initWasm();
 	});
 
-	bench('[roxmltree:wasm]', () => {
-		xmlToObjectWasm(xml);
-	});
-
 	bench('[roxmltree]', () => {
 		xmlToObject(xml);
+	});
+
+	bench('[roxmltree:wasm]', () => {
+		xmlToObjectWasm(xml);
 	});
 
 	bench('[fast-xml-parser]', () => {
