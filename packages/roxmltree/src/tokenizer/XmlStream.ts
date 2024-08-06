@@ -1,28 +1,26 @@
-import { StrSpan } from './StrSpan';
 import { type TRange, type TReference, type TTextPos } from './types';
 import { isAsciiDigit, isXmlChar, isXmlName, isXmlNameStart, isXmlSpaceByte } from './utils';
 import { XmlError } from './XMLError';
 
 /**
  * Represents a stream of characters for parsing XML-like content.
+ *
+ * Unlike the Rust implementation, which is based on bytes, this implementation
+ * is based on code units for simplicity.
  */
 export class XmlStream {
-	private _span: StrSpan;
+	private _text: string;
 	private _pos: number;
 	private _end: number;
 
-	public constructor(span: StrSpan, pos = 0) {
-		this._span = span;
+	public constructor(text: string, pos = 0) {
+		this._text = text;
 		this._pos = pos;
-		this._end = this._span.length;
-	}
-
-	public static fromString(text: string, pos = 0): XmlStream {
-		return new XmlStream(StrSpan.fromString(text), pos);
+		this._end = this._text.length;
 	}
 
 	public clone(): XmlStream {
-		return new XmlStream(this._span.clone(), this._pos);
+		return new XmlStream(this._text, this._pos);
 	}
 
 	/**
@@ -57,7 +55,7 @@ export class XmlStream {
 	 * @returns The current byte.
 	 */
 	public currByteUnchecked(): number {
-		return this._span.getByte(this._pos);
+		return this._text.charCodeAt(this._pos);
 	}
 
 	/**
@@ -68,7 +66,7 @@ export class XmlStream {
 		if (this._pos + 1 >= this._end) {
 			throw new XmlError({ type: 'UnexpectedEndOfStream' });
 		}
-		return this._span.getByte(this._pos + 1);
+		return this._text.charCodeAt(this._pos + 1);
 	}
 
 	/**
@@ -85,7 +83,7 @@ export class XmlStream {
 	 * @returns True if the stream starts with the text, false otherwise.
 	 */
 	public startsWith(text: string): boolean {
-		return this._span.startsWith(text, this._pos);
+		return this._text.startsWith(text, this._pos);
 	}
 
 	/**
@@ -167,8 +165,9 @@ export class XmlStream {
 	 * @throws Error if a non-XML character is encountered.
 	 */
 	public skipChars(predicate: (stream: XmlStream, char: string) => boolean): void {
-		for (const charByte of this.charBytes()) {
-			const char = String.fromCharCode(charByte);
+		const end = Math.min(this._end, this._text.length);
+		for (let i = this._pos; i < end; i++) {
+			const char = this._text[i] as unknown as string;
 			if (!isXmlChar(char)) {
 				throw new XmlError({ type: 'NonXmlChar', char }, this.genTextPos());
 			} else if (predicate(this, char)) {
@@ -180,26 +179,16 @@ export class XmlStream {
 	}
 
 	/**
-	 * Returns an iterator over the remaining characters in the stream.
-	 * @returns An iterator of characters.
-	 */
-	public *charBytes(): IterableIterator<number> {
-		for (let i = this._pos; i < Math.min(this._end, this._span.length); i++) {
-			yield this._span.getByte(i);
-		}
-	}
-
-	/**
 	 * Slices the text from the given position to the current position.
 	 * @param pos - The start position.
 	 * @returns The sliced string.
 	 */
 	public sliceBack(pos: number): string {
-		return this._span.sliceRegion(pos, this._pos);
+		return this._text.slice(pos, this._pos);
 	}
 
-	public sliceBackSpan(pos: number): StrSpan {
-		return StrSpan.fromSubBytes(this._span.bytes, pos, this._pos);
+	public sliceBackSpan(pos: number): string {
+		return this._text.slice(pos, this._pos);
 	}
 
 	public rangeFrom(start: number): TRange {
@@ -355,8 +344,9 @@ export class XmlStream {
 	public skipName(): void {
 		const start = this._pos;
 
-		for (const charByte of this.charBytes()) {
-			const char = String.fromCharCode(charByte);
+		const end = Math.min(this._end, this._text.length);
+		for (let i = this._pos; i < end; i++) {
+			const char = this._text[i] as unknown as string;
 			if (this._pos === start) {
 				if (!isXmlNameStart(char)) {
 					throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
@@ -389,25 +379,20 @@ export class XmlStream {
 						// Multiple `:` is an error
 						throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 					}
-				} else if (isXmlName(String.fromCharCode(currByte))) {
+				} else if (isXmlName(currByte)) {
 					this.advance(1);
 				} else {
 					break;
 				}
+			} else if (isXmlName(currByte)) {
+				this.advance(1);
 			} else {
-				const char = String.fromCodePoint(currByte);
-				if (isXmlName(char)) {
-					this.advance(char.length);
-				} else {
-					break;
-				}
+				break;
 			}
 		}
 
 		const prefix =
-			splitter != null
-				? this._span.sliceRegion(start, splitter)
-				: this._span.sliceRegion(start, start);
+			splitter != null ? this._text.slice(start, splitter) : this._text.slice(start, start);
 		const local = splitter != null ? this.sliceBack(splitter + 1) : this.sliceBack(start);
 
 		// Prefix must start with a `NameStartChar`
@@ -456,8 +441,8 @@ export class XmlStream {
 	 * @returns Text position.
 	 */
 	public genTextPos(): TTextPos {
-		const row = XmlStream.calcCurrRow(this._span.bytes, this._pos);
-		const col = XmlStream.calcCurrCol(this._span.bytes, this._pos);
+		const row = XmlStream.calcCurrRow(this._text, this._pos);
+		const col = XmlStream.calcCurrCol(this._text, this._pos);
 
 		return { row, col };
 	}
@@ -470,18 +455,18 @@ export class XmlStream {
 	 * @returns Text position.
 	 */
 	public genTextPosFrom(pos: number): TTextPos {
-		const clampedPos = Math.min(pos, this._span.length);
-		const bytes = this._span.bytes.subarray(0, clampedPos);
-		const row = XmlStream.calcCurrRow(bytes, clampedPos);
-		const col = XmlStream.calcCurrCol(bytes, clampedPos);
+		const clampedPos = Math.min(pos, this._text.length);
+		const text = this._text.slice(0, clampedPos);
+		const row = XmlStream.calcCurrRow(text, clampedPos);
+		const col = XmlStream.calcCurrCol(text, clampedPos);
 		return { row, col };
 	}
 
 	// Calculates the current row in the text.
-	private static calcCurrRow(bytes: Uint8Array, end: number): number {
+	private static calcCurrRow(text: string, end: number): number {
 		let row = 1;
-		for (let i = 0; i < Math.min(end, bytes.length); i++) {
-			if (bytes[i] === 10 /* \n */) {
+		for (let i = 0; i < Math.min(end, text.length); i++) {
+			if (text.charCodeAt(i) === 10 /* \n */) {
 				row++;
 			}
 		}
@@ -489,10 +474,10 @@ export class XmlStream {
 	}
 
 	// Calculates the current column in the text.
-	private static calcCurrCol(bytes: Uint8Array, end: number): number {
+	private static calcCurrCol(text: string, end: number): number {
 		let col = 1;
 		for (let i = end - 1; i >= 0; i--) {
-			if (bytes[i] === 10 /* \n */) {
+			if (text.charCodeAt(i) === 10 /* \n */) {
 				break;
 			} else {
 				col++;

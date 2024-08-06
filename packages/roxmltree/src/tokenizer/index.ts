@@ -1,16 +1,14 @@
-import { type StrSpan } from './StrSpan';
 import { type TXmlEvents } from './types';
 import { XmlError } from './XMLError';
 import { XmlStream } from './XmlStream';
 
-export * from './StrSpan';
 export * from './types';
 export * from './utils';
 export * from './XMLError';
 export * from './XmlStream';
 
 export function parseString(text: string, allowDtd: boolean, events: TXmlEvents): void {
-	parse(XmlStream.fromString(text), allowDtd, events);
+	parse(new XmlStream(text), allowDtd, events);
 }
 
 /**
@@ -23,7 +21,7 @@ export function parseString(text: string, allowDtd: boolean, events: TXmlEvents)
 export function parse(s: XmlStream, allowDtd: boolean, events: TXmlEvents): void {
 	// Skip UTF-8 BOM
 	if (s.startsWith('\uFEFF')) {
-		s.advance(3);
+		s.advance(1);
 	}
 
 	if (s.startsWith('<?xml ')) {
@@ -316,7 +314,7 @@ function parseEntityDecl(s: XmlStream, events: TXmlEvents): void {
  *
  * https://www.w3.org/TR/xml/#sec-entity-decl
  */
-function parseEntityDef(s: XmlStream, isGe: boolean): StrSpan | null {
+function parseEntityDef(s: XmlStream, isGe: boolean): string | null {
 	const c = s.currByte();
 	if (c === 34 /* " */ || c === 39 /* ' */) {
 		const quote = s.consumeQuote();
@@ -423,7 +421,7 @@ function parseElement(s: XmlStream, events: TXmlEvents): void {
  *
  * https://www.w3.org/TR/xml/#NT-Attribute
  */
-function parseAttribute(s: XmlStream): [string, string, StrSpan] {
+function parseAttribute(s: XmlStream): [string, string, string] {
 	const [prefix, local] = s.consumeQName();
 	s.consumeEq();
 	const quote = s.consumeQuote();

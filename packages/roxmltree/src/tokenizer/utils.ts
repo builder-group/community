@@ -44,8 +44,8 @@ export function isXmlNameStart(c: string): boolean {
  * @param c - The character to check.
  * @returns True if the character is a valid XML name character, false otherwise.
  */
-export function isXmlName(c: string): boolean {
-	const code = c.codePointAt(0);
+export function isXmlName(c: string | number): boolean {
+	const code = typeof c === 'string' ? c.codePointAt(0) : c;
 	if (code == null) {
 		return false;
 	}

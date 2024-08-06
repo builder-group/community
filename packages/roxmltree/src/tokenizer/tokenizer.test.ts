@@ -961,12 +961,14 @@ describe('tokenizer tests', () => {
 						type: 'ElementStart',
 						prefix: '',
 						local: 'a',
-						start: 3
+						start: 1
+						// start: 3 // When based on bytes
 					},
 					{
 						type: 'ElementEnd',
 						end: { type: 'Empty' },
-						range: { start: 5, end: 7 }
+						range: { start: 3, end: 5 }
+						// range: { start: 5, end: 7 } // When based on bytes
 					}
 				]
 			);
@@ -2057,12 +2059,14 @@ describe('tokenizer tests', () => {
 				{
 					type: 'Text',
 					text: '欄',
-					range: { start: 3, end: 6 }
+					range: { start: 3, end: 4 }
+					// range: { start: 3, end: 6 } // When based on bytes
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Close', prefix: '', local: 'p' },
-					range: { start: 6, end: 10 }
+					range: { start: 4, end: 8 }
+					// range: { start: 6, end: 10 } // When based on bytes
 				}
 			]);
 		});

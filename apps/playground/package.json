@@ -9,7 +9,8 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"roxmltree": "workspace:*"
+		"roxmltree": "workspace:*",
+		"txml": "^5.1.1"
 	},
 	"devDependencies": {
 		"typescript": "^5.2.2",

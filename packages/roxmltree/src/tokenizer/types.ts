@@ -1,5 +1,3 @@
-import { type StrSpan } from './StrSpan';
-
 export interface TXmlEvents {
 	token: (token: TXMLToken) => void;
 }
@@ -35,7 +33,7 @@ export interface TCommentToken {
 export interface TEntityDeclarationToken {
 	type: 'EntityDeclaration';
 	name: string;
-	definition: StrSpan;
+	definition: string;
 }
 
 /**
@@ -60,7 +58,7 @@ export interface TAttributeToken {
 	range: TRange;
 	prefix: string;
 	local: string;
-	value: StrSpan;
+	value: string;
 }
 
 /**

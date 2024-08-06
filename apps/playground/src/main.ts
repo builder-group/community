@@ -1,4 +1,5 @@
 import { wasm, xmlToObject } from 'roxmltree';
+import * as txml from 'txml';
 
 const response = await fetch('http://localhost:5173/midsize.xml');
 const sample = await response.text();
@@ -9,7 +10,7 @@ await wasm.initWasm();
 
 console.log(xmlToObject(sample));
 
-console.log(wasm.xmlToObject(sample, false));
+console.log(txml.parse(sample));
 
 // wasm.parseXml(
 // 	`
