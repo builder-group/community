@@ -20,3 +20,7 @@
 > Status: Experimental
 
 `roxmltree` is a Typescript implementation of the [`roxmltree`](https://github.com/RazrFalcon/roxmltree) Rust crate.
+
+
+// TODO: Create WASM connection for roxmltree XmlEvents.. the other parts continue to live at js
+// TODO: Figure out why my tokenizer is so slow

@@ -6,11 +6,8 @@
 		"declarationDir": "./dist/types",
 		"baseUrl": ".",
 		"paths": {
-			"@/utils": ["./src/utils/index.ts"],
-			"@/hooks": ["./src/hooks/index.ts"],
-			"@/components/*": ["./src/components/*"],
-			"@/components": ["./src/components/index.ts"]
-		}
+			"@/rust/*": ["./src/rust_modules/*"]
+		},
 	},
 	"include": ["src"]
 }

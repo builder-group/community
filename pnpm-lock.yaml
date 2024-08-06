@@ -57,6 +57,19 @@ importers:
         specifier: ^1.6.0
         version: 1.6.0(@types/node@22.1.0)
 
+  apps/playground:
+    dependencies:
+      roxmltree:
+        specifier: workspace:*
+        version: link:../../packages/roxmltree
+    devDependencies:
+      typescript:
+        specifier: ^5.2.2
+        version: 5.5.4
+      vite:
+        specifier: ^5.3.4
+        version: 5.3.5(@types/node@22.1.0)
+
   examples/feature-fetch/vanilla/open-meteo:
     dependencies:
       feature-fetch:
@@ -501,16 +514,26 @@ importers:
         version: link:../validation-adapters
 
   packages/roxmltree:
+    dependencies:
+      roxmltree:
+        specifier: ^0.0.3
+        version: 0.0.3
     devDependencies:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
+      '@rollup/plugin-wasm':
+        specifier: ^6.2.2
+        version: 6.2.2(rollup@4.19.2)
       '@types/node':
         specifier: ^20.14.10
         version: 20.14.14
       fast-xml-parser:
         specifier: ^4.4.1
         version: 4.4.1
+      txml:
+        specifier: ^5.1.1
+        version: 5.1.1
 
   packages/types:
     devDependencies:
@@ -1129,6 +1152,15 @@ packages:
 
   '@rollup/plugin-replace@5.0.7':
     resolution: {integrity: sha512-PqxSfuorkHz/SPpyngLyg5GCEkOcee9M1bkxiVDr41Pd61mqP1PLOoDPbpl44SB2mQGKwV/In74gqQmGITOhEQ==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+
+  '@rollup/plugin-wasm@6.2.2':
+    resolution: {integrity: sha512-gpC4R1G9Ni92ZIRTexqbhX7U+9estZrbhP+9SRb0DW9xpB9g7j34r+J2hqrcW/lRI7dJaU84MxZM0Rt82tqYPQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
@@ -3953,6 +3985,10 @@ packages:
     resolution: {integrity: sha512-VIMnQi/Z4HT2Fxuwg5KrY174U1VdUIASQVWXXyqtNRtxSr9IYkn1rsI6Tb6HsrHCmB7gVpNwX6JxPTHcH6IoTA==}
     engines: {node: '>=6'}
 
+  readable-stream@3.6.2:
+    resolution: {integrity: sha512-9u/sniCrY3D5WdsERHzHE4G2YCXqoG5FTHUiCC4SIbr6XcLZBY05ya9EKjYek9O5xOAwjGq+1JdGBAS7Q9ScoA==}
+    engines: {node: '>= 6'}
+
   readdirp@3.6.0:
     resolution: {integrity: sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==}
     engines: {node: '>=8.10.0'}
@@ -4068,6 +4104,9 @@ packages:
     resolution: {integrity: sha512-6/jgnN1svF9PjNYJ4ya3l+cqutg49vOZ4rVgsDKxdl+5gpGPnByFXWGyfH9YGx9i3nfBwSu1Iyu6vGwFFA0BdQ==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
+
+  roxmltree@0.0.3:
+    resolution: {integrity: sha512-BIqoErkd7CovabT+umJswi34b7g/D51Tsjq/GwsxE79Jdzm+GeTiMX8dd8qKd4Zd44J/rDVUYOV7/7yv4Zu1mw==}
 
   run-applescript@7.0.0:
     resolution: {integrity: sha512-9by4Ij99JUr/MCFBUkDKLWK3G9HVXmabKz9U5MlIAIuvuzkiOicRYs8XJLxX+xahD+mLiiCYDqF9dKAgtzKP1A==}
@@ -4294,6 +4333,9 @@ packages:
     resolution: {integrity: sha512-UXSH262CSZY1tfu3G3Secr6uGLCFVPMhIqHjlgCUtCCcgihYc/xKs9djMTMUOb2j1mVSeU8EU6NWc/iQKU6Gfg==}
     engines: {node: '>= 0.4'}
 
+  string_decoder@1.3.0:
+    resolution: {integrity: sha512-hkRX8U1WjJFd8LsDJ2yQ/wWWxaopEsABU1XfkM8A+j0+85JAGppt16cr1Whg6KIbb4okU6Mql6BOj+uup/wKeA==}
+
   strip-ansi@3.0.1:
     resolution: {integrity: sha512-VhumSSbBqDTP8p2ZLKj40UjBCV4+v8bUSEpUb4KjRgWk9pbqGF4REFj6KEagidb2f/M6AzC0EmFyDNGaw9OCzg==}
     engines: {node: '>=0.10.0'}
@@ -4384,6 +4426,9 @@ packages:
 
   text-table@0.2.0:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}
+
+  through2@3.0.2:
+    resolution: {integrity: sha512-enaDQ4MUyP2W6ZyT6EsMzqBPZaM/avg8iuo+l2d3QCs0J+6RaqkHV/2/lOwDTueBHeJ/2LG9lrLW3d5rWPucuQ==}
 
   tiny-case@1.0.3:
     resolution: {integrity: sha512-Eet/eeMhkO6TX8mnUteS9zgPbUMQa4I6Kkp5ORiBD5476/m+PIRiumP5tmh5ioJpH7k51Kehawy2UDfsnxxY8Q==}
@@ -4515,6 +4560,9 @@ packages:
   turbo@2.0.11:
     resolution: {integrity: sha512-imDlFFAvitbCm1JtDFJ6eG882qwxHUmVT2noPb3p2jq5o5DuXOchMbkVS9kUeC3/4WpY5N0GBZ3RvqNyjHZw1Q==}
     hasBin: true
+
+  txml@5.1.1:
+    resolution: {integrity: sha512-TwMDLnXQ09enNaxybLVvKZU7rqog8LgnuAs4ZYXM0nV0eu10iLsSFwlX3AEknAXXtH1wT3CYfoiXAjyBexcmuw==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -5570,6 +5618,12 @@ snapshots:
     dependencies:
       '@rollup/pluginutils': 5.1.0(rollup@4.19.2)
       magic-string: 0.30.11
+    optionalDependencies:
+      rollup: 4.19.2
+
+  '@rollup/plugin-wasm@6.2.2(rollup@4.19.2)':
+    dependencies:
+      '@rollup/pluginutils': 5.1.0(rollup@4.19.2)
     optionalDependencies:
       rollup: 4.19.2
 
@@ -8662,6 +8716,12 @@ snapshots:
       pify: 4.0.1
       strip-bom: 3.0.0
 
+  readable-stream@3.6.2:
+    dependencies:
+      inherits: 2.0.4
+      string_decoder: 1.3.0
+      util-deprecate: 1.0.2
+
   readdirp@3.6.0:
     dependencies:
       picomatch: 2.3.1
@@ -8816,6 +8876,8 @@ snapshots:
       '@rollup/rollup-win32-ia32-msvc': 4.19.2
       '@rollup/rollup-win32-x64-msvc': 4.19.2
       fsevents: 2.3.3
+
+  roxmltree@0.0.3: {}
 
   run-applescript@7.0.0: {}
 
@@ -9091,6 +9153,10 @@ snapshots:
       define-properties: 1.2.1
       es-object-atoms: 1.0.0
 
+  string_decoder@1.3.0:
+    dependencies:
+      safe-buffer: 5.2.1
+
   strip-ansi@3.0.1:
     dependencies:
       ansi-regex: 2.1.1
@@ -9170,6 +9236,11 @@ snapshots:
   term-size@2.2.1: {}
 
   text-table@0.2.0: {}
+
+  through2@3.0.2:
+    dependencies:
+      inherits: 2.0.4
+      readable-stream: 3.6.2
 
   tiny-case@1.0.3: {}
 
@@ -9281,6 +9352,10 @@ snapshots:
       turbo-linux-arm64: 2.0.11
       turbo-windows-64: 2.0.11
       turbo-windows-arm64: 2.0.11
+
+  txml@5.1.1:
+    dependencies:
+      through2: 3.0.2
 
   type-check@0.4.0:
     dependencies:

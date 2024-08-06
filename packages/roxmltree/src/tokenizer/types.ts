@@ -11,7 +11,7 @@ export interface TXmlEvents {
  */
 export interface TProcessingInstructionToken {
 	type: 'ProcessingInstruction';
-	name: string;
+	target: string;
 	content?: string;
 	range: TRange;
 }
@@ -23,7 +23,7 @@ export interface TProcessingInstructionToken {
  */
 export interface TCommentToken {
 	type: 'Comment';
-	content: string;
+	text: string;
 	range: TRange;
 }
 
@@ -68,7 +68,7 @@ export interface TAttributeToken {
  */
 export interface TElementEndToken {
 	type: 'ElementEnd';
-	variant: TElementEndVariant;
+	end: TElementEndVariant;
 	range: TRange;
 }
 

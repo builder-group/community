@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { XmlError } from '../XMLError';
 import { parseString } from './index';
 import { type TXmlEvents, type TXMLToken } from './types';
+import { XmlError } from './XMLError';
 
 describe('tokenizer tests', () => {
 	describe('CDATA', () => {
@@ -16,7 +16,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Open'
 					},
 					range: [2, 3]
@@ -28,7 +28,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Close',
 						prefix: '',
 						local: 'p'
@@ -48,7 +48,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Open'
 					},
 					range: [2, 3]
@@ -60,7 +60,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Close',
 						prefix: '',
 						local: 'p'
@@ -80,7 +80,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Open'
 					},
 					range: [2, 3]
@@ -92,7 +92,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Close',
 						prefix: '',
 						local: 'p'
@@ -112,7 +112,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Open'
 					},
 					range: [2, 3]
@@ -124,7 +124,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Close',
 						prefix: '',
 						local: 'p'
@@ -144,7 +144,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Open'
 					},
 					range: [2, 3]
@@ -156,7 +156,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Close',
 						prefix: '',
 						local: 'p'
@@ -176,7 +176,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Open'
 					},
 					range: [2, 3]
@@ -188,7 +188,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Close',
 						prefix: '',
 						local: 'p'
@@ -208,7 +208,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Open'
 					},
 					range: [2, 3]
@@ -225,7 +225,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Close',
 						prefix: '',
 						local: 'p'
@@ -245,7 +245,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Open'
 					},
 					range: [2, 3]
@@ -267,7 +267,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Close',
 						prefix: '',
 						local: 'p'
@@ -287,7 +287,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Open'
 					},
 					range: [2, 3]
@@ -299,7 +299,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Close',
 						prefix: '',
 						local: 'p'
@@ -319,7 +319,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Open'
 					},
 					range: [2, 3]
@@ -337,7 +337,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<!--comment-->', [
 				{
 					type: 'Comment',
-					content: 'comment',
+					text: 'comment',
 					range: [0, 14]
 				}
 			]);
@@ -347,7 +347,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<!--<head>-->', [
 				{
 					type: 'Comment',
-					content: '<head>',
+					text: '<head>',
 					range: [0, 13]
 				}
 			]);
@@ -357,7 +357,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<!--<!-x-->', [
 				{
 					type: 'Comment',
-					content: '<!-x',
+					text: '<!-x',
 					range: [0, 11]
 				}
 			]);
@@ -367,7 +367,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<!--<!x-->', [
 				{
 					type: 'Comment',
-					content: '<!x',
+					text: '<!x',
 					range: [0, 10]
 				}
 			]);
@@ -377,7 +377,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<!--<<!x-->', [
 				{
 					type: 'Comment',
-					content: '<<!x',
+					text: '<<!x',
 					range: [0, 11]
 				}
 			]);
@@ -387,7 +387,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<!--<<!-x-->', [
 				{
 					type: 'Comment',
-					content: '<<!-x',
+					text: '<<!-x',
 					range: [0, 12]
 				}
 			]);
@@ -397,7 +397,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<!--<x-->', [
 				{
 					type: 'Comment',
-					content: '<x',
+					text: '<x',
 					range: [0, 9]
 				}
 			]);
@@ -407,7 +407,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<!--<>-->', [
 				{
 					type: 'Comment',
-					content: '<>',
+					text: '<>',
 					range: [0, 9]
 				}
 			]);
@@ -417,7 +417,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<!--<-->', [
 				{
 					type: 'Comment',
-					content: '<',
+					text: '<',
 					range: [0, 8]
 				}
 			]);
@@ -427,7 +427,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<!--<!-->', [
 				{
 					type: 'Comment',
-					content: '<!',
+					text: '<!',
 					range: [0, 9]
 				}
 			]);
@@ -437,7 +437,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<!---->', [
 				{
 					type: 'Comment',
-					content: '',
+					text: '',
 					range: [0, 7]
 				}
 			]);
@@ -800,7 +800,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: {
+					end: {
 						type: 'Empty'
 					},
 					range: [21, 23]
@@ -965,7 +965,7 @@ describe('tokenizer tests', () => {
 					},
 					{
 						type: 'ElementEnd',
-						variant: { type: 'Empty' },
+						end: { type: 'Empty' },
 						range: [5, 7]
 					}
 				]
@@ -982,7 +982,7 @@ describe('tokenizer tests', () => {
 				[
 					{
 						type: 'Comment',
-						content: ' comment ',
+						text: ' comment ',
 						range: [39, 55]
 					}
 				]
@@ -995,7 +995,7 @@ describe('tokenizer tests', () => {
 				[
 					{
 						type: 'ProcessingInstruction',
-						name: 'xml-stylesheet',
+						target: 'xml-stylesheet',
 						content: undefined,
 						range: [0, 18]
 					}
@@ -1009,7 +1009,7 @@ describe('tokenizer tests', () => {
 				[
 					{
 						type: 'ProcessingInstruction',
-						name: 'xml-stylesheet',
+						target: 'xml-stylesheet',
 						content: undefined,
 						range: [39, 57]
 					}
@@ -1085,7 +1085,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Empty' },
+					end: { type: 'Empty' },
 					range: [2, 4]
 				}
 			]);
@@ -1101,12 +1101,12 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Open' },
+					end: { type: 'Open' },
 					range: [2, 3]
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Close', prefix: '', local: 'a' },
+					end: { type: 'Close', prefix: '', local: 'a' },
 					range: [3, 7]
 				}
 			]);
@@ -1122,7 +1122,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Empty' },
+					end: { type: 'Empty' },
 					range: [7, 9]
 				}
 			]);
@@ -1138,7 +1138,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Open' },
+					end: { type: 'Open' },
 					range: [7, 8]
 				},
 				{
@@ -1149,12 +1149,12 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Empty' },
+					end: { type: 'Empty' },
 					range: [10, 12]
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Close', prefix: '', local: 'b' },
+					end: { type: 'Close', prefix: '', local: 'b' },
 					range: [12, 16]
 				}
 			]);
@@ -1203,12 +1203,12 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Open' },
+					end: { type: 'Open' },
 					range: [11, 12]
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Close', prefix: 'svg', local: 'circle' },
+					end: { type: 'Close', prefix: 'svg', local: 'circle' },
 					range: [12, 25]
 				}
 			]);
@@ -1224,7 +1224,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Empty' },
+					end: { type: 'Empty' },
 					range: [8, 10]
 				}
 			]);
@@ -1324,12 +1324,12 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Open' },
+					end: { type: 'Open' },
 					range: [2, 3]
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Close', prefix: '', local: 'a' },
+					end: { type: 'Close', prefix: '', local: 'a' },
 					range: [3, 7]
 				},
 				{
@@ -1349,7 +1349,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Empty' },
+					end: { type: 'Empty' },
 					range: [2, 4]
 				},
 				{
@@ -1369,7 +1369,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Open' },
+					end: { type: 'Open' },
 					range: [2, 3]
 				},
 				{
@@ -1398,7 +1398,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Open' },
+					end: { type: 'Open' },
 					range: [5, 6]
 				},
 				{
@@ -1408,7 +1408,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Close', prefix: '', local: 'root' },
+					end: { type: 'Close', prefix: '', local: 'root' },
 					range: [7, 14]
 				},
 				{
@@ -1481,7 +1481,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Empty' },
+					end: { type: 'Empty' },
 					range: [12, 14]
 				}
 			]);
@@ -1503,7 +1503,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Empty' },
+					end: { type: 'Empty' },
 					range: [12, 14]
 				}
 			]);
@@ -1531,7 +1531,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Empty' },
+					end: { type: 'Empty' },
 					range: [22, 24]
 				}
 			]);
@@ -1559,7 +1559,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Empty' },
+					end: { type: 'Empty' },
 					range: [26, 28]
 				}
 			]);
@@ -1587,7 +1587,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Empty' },
+					end: { type: 'Empty' },
 					range: [42, 44]
 				}
 			]);
@@ -1609,7 +1609,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Empty' },
+					end: { type: 'Empty' },
 					range: [26, 28]
 				}
 			]);
@@ -1631,7 +1631,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Empty' },
+					end: { type: 'Empty' },
 					range: [10, 12]
 				}
 			]);
@@ -1760,7 +1760,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<?xslt ma?>', [
 				{
 					type: 'ProcessingInstruction',
-					name: 'xslt',
+					target: 'xslt',
 					content: 'ma',
 					range: [0, 11]
 				}
@@ -1771,7 +1771,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<?xslt \t\n m?>', [
 				{
 					type: 'ProcessingInstruction',
-					name: 'xslt',
+					target: 'xslt',
 					content: 'm',
 					range: [0, 13]
 				}
@@ -1782,7 +1782,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<?xslt?>', [
 				{
 					type: 'ProcessingInstruction',
-					name: 'xslt',
+					target: 'xslt',
 					content: undefined,
 					range: [0, 8]
 				}
@@ -1793,7 +1793,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<?xslt ?>', [
 				{
 					type: 'ProcessingInstruction',
-					name: 'xslt',
+					target: 'xslt',
 					content: undefined,
 					range: [0, 9]
 				}
@@ -1804,7 +1804,7 @@ describe('tokenizer tests', () => {
 			assertTokens('<?xml-stylesheet?>', [
 				{
 					type: 'ProcessingInstruction',
-					name: 'xml-stylesheet',
+					target: 'xml-stylesheet',
 					content: undefined,
 					range: [0, 18]
 				}
@@ -1931,7 +1931,7 @@ describe('tokenizer tests', () => {
 			assertTokens("<!-- comment --><?xml version='1.0'?>", [
 				{
 					type: 'Comment',
-					content: ' comment ',
+					text: ' comment ',
 					range: [0, 16]
 				},
 				{
@@ -1998,7 +1998,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Open' },
+					end: { type: 'Open' },
 					range: [2, 3]
 				},
 				{
@@ -2008,7 +2008,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Close', prefix: '', local: 'p' },
+					end: { type: 'Close', prefix: '', local: 'p' },
 					range: [7, 11]
 				}
 			]);
@@ -2024,7 +2024,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Open' },
+					end: { type: 'Open' },
 					range: [2, 3]
 				},
 				{
@@ -2034,7 +2034,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Close', prefix: '', local: 'p' },
+					end: { type: 'Close', prefix: '', local: 'p' },
 					range: [9, 13]
 				}
 			]);
@@ -2051,7 +2051,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Open' },
+					end: { type: 'Open' },
 					range: [2, 3]
 				},
 				{
@@ -2061,7 +2061,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Close', prefix: '', local: 'p' },
+					end: { type: 'Close', prefix: '', local: 'p' },
 					range: [6, 10]
 				}
 			]);
@@ -2077,7 +2077,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Open' },
+					end: { type: 'Open' },
 					range: [2, 3]
 				},
 				{
@@ -2087,7 +2087,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Close', prefix: '', local: 'p' },
+					end: { type: 'Close', prefix: '', local: 'p' },
 					range: [4, 8]
 				}
 			]);
@@ -2103,7 +2103,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Open' },
+					end: { type: 'Open' },
 					range: [2, 3]
 				},
 				{
@@ -2113,7 +2113,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Close', prefix: '', local: 'p' },
+					end: { type: 'Close', prefix: '', local: 'p' },
 					range: [8, 12]
 				}
 			]);
@@ -2129,7 +2129,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Open' },
+					end: { type: 'Open' },
 					range: [2, 3]
 				},
 				{
@@ -2139,7 +2139,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Close', prefix: '', local: 'p' },
+					end: { type: 'Close', prefix: '', local: 'p' },
 					range: [9, 13]
 				}
 			]);
@@ -2155,7 +2155,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Open' },
+					end: { type: 'Open' },
 					range: [2, 3]
 				},
 				{
@@ -2165,7 +2165,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Close', prefix: '', local: 'p' },
+					end: { type: 'Close', prefix: '', local: 'p' },
 					range: [5, 9]
 				}
 			]);
@@ -2181,7 +2181,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Open' },
+					end: { type: 'Open' },
 					range: [2, 3]
 				},
 				{
@@ -2201,7 +2201,7 @@ describe('tokenizer tests', () => {
 				},
 				{
 					type: 'ElementEnd',
-					variant: { type: 'Open' },
+					end: { type: 'Open' },
 					range: [2, 3]
 				},
 				{

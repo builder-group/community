@@ -60,7 +60,7 @@ export function xmlToObject(xmlString: string): XMLNode {
 	}
 
 	function handleElementEnd(token: TElementEndToken): void {
-		if (token.variant.type === 'Close' || token.variant.type === 'Empty') {
+		if (token.end.type === 'Close' || token.end.type === 'Empty') {
 			stack.pop();
 			const newCurrentNode = stack[stack.length - 1];
 			if (newCurrentNode != null) {

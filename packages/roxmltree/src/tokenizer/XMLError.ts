@@ -1,4 +1,4 @@
-import { type TTextPos } from './tokenizer/types';
+import { type TTextPos } from './types';
 
 export class XmlError extends Error {
 	public readonly variant: TXMLErrorVariant;
@@ -21,9 +21,9 @@ export class XmlError extends Error {
 			case 'InvalidElementNamePrefix':
 				return `the 'xmlns' prefix is used at ${formatPos(pos)}, but it must not be`;
 			case 'DuplicatedNamespace':
-				return `namespace '${variant.namespace}' at ${formatPos(pos)} is already defined`;
+				return `namespace '${variant.name}' at ${formatPos(pos)} is already defined`;
 			case 'UnknownNamespace':
-				return `an unknown namespace prefix '${variant.prefix}' at ${formatPos(pos)}`;
+				return `an unknown namespace prefix '${variant.name}' at ${formatPos(pos)}`;
 			case 'UnexpectedCloseTag':
 				return `expected '${variant.expected}' tag, not '${variant.actual}' at ${formatPos(pos)}`;
 			case 'UnexpectedEntityCloseTag':
@@ -31,7 +31,7 @@ export class XmlError extends Error {
 			case 'MalformedEntityReference':
 				return `malformed entity reference at ${formatPos(pos)}`;
 			case 'UnknownEntityReference':
-				return `unknown entity reference '${variant.reference}' at ${formatPos(pos)}`;
+				return `unknown entity reference '${variant.name}' at ${formatPos(pos)}`;
 			case 'EntityReferenceLoop':
 				return `a possible entity reference loop is detected at ${formatPos(pos)}`;
 			case 'InvalidAttributeValue':
@@ -67,7 +67,7 @@ export class XmlError extends Error {
 			case 'InvalidCharacterData':
 				return `']]>' at ${formatPos(pos)} is not allowed inside a character data`;
 			case 'UnknownToken':
-				return `unknown token at ${formatPos(pos)}${variant.message != null ? ` | ${variant.message}` : ''}`;
+				return `unknown token at ${formatPos(pos)}`;
 			case 'UnexpectedEndOfStream':
 				return `unexpected end of stream`;
 			default:
@@ -162,7 +162,7 @@ interface TInvalidElementNamePrefix {
  */
 interface TDuplicatedNamespace {
 	type: 'DuplicatedNamespace';
-	namespace: string;
+	name: string;
 }
 
 /**
@@ -174,7 +174,7 @@ interface TDuplicatedNamespace {
  */
 interface TUnknownNamespace {
 	type: 'UnknownNamespace';
-	prefix: string;
+	name: string;
 }
 
 /**
@@ -206,7 +206,7 @@ interface TUnexpectedEntityCloseTag {
  */
 interface TUnknownEntityReference {
 	type: 'UnknownEntityReference';
-	reference: string;
+	name: string;
 }
 
 /**

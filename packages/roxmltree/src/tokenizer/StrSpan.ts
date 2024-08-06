@@ -1,4 +1,4 @@
-import { XmlError } from '../XMLError';
+import { XmlError } from './XMLError';
 
 /**
  * A string slice that also contains the position in the input XML

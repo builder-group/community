@@ -1,7 +1,7 @@
-import { XmlError } from '../XMLError';
 import { StrSpan } from './StrSpan';
 import { type TRange, type TReference, type TTextPos } from './types';
 import { isAsciiDigit, isXmlChar, isXmlName, isXmlNameStart, isXmlSpaceByte } from './utils';
+import { XmlError } from './XMLError';
 
 /**
  * Represents a stream of characters for parsing XML-like content.

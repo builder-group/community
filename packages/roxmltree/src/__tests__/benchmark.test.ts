@@ -1,17 +1,19 @@
 import { readFile } from 'node:fs/promises';
 import { beforeAll, describe, test } from 'vitest';
 
-import { xmlToObject } from '../xml-to-object';
+import { initWasm, parseXml, type WT } from '../wasm';
 
-void describe('xmlToObject function', () => {
+describe('xmlToObject function', () => {
 	let xml = '';
 
 	beforeAll(async () => {
 		xml = await readFile(`${__dirname}/resources/midsize.xml`, 'utf-8');
+		await initWasm();
 	});
 
 	test('xmlToObject', () => {
-		const result = xmlToObject(xml);
-		console.log(result);
+		parseXml(xml, true, (token: WT.Token) => {
+			console.log({ token });
+		});
 	});
 });

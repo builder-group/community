@@ -1,13 +1,20 @@
 {
 	"name": "roxmltree",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "Read Only XML Tree",
 	"private": false,
 	"scripts": {
-		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
+		"build": "pnpm run build:rust && pnpm run build:ts",
+		"build:ts": "pnpm run clean:ts && shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
+		"build:rust": "pnpm run clean:rust && shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle rust",
+		"build:dev": "pnpm run build:dev:rust && pnpm run build:dev:ts",
+		"build:dev:rust": "pnpm run clean:rust && shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle rust --target=dev",
+		"build:dev:ts": "pnpm run clean:ts && shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle --target=dev",
 		"start:dev": "tsc -w",
 		"lint": "eslint --ext .js,.ts src/",
-		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"clean": "pnpm run clean:ts && shx rm -rf node_modules && pnpm run clean:rust && shx rm -rf rust/target && shx rm -rf .turbo",
+		"clean:rust": "shx rm -rf src/rust_modules",
+		"clean:ts": "shx rm -rf dist",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "vitest run",
 		"bench": "vitest bench",
@@ -32,8 +39,10 @@
 	"homepage": "https://builder.group/?source=package-json",
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
+		"@rollup/plugin-wasm": "^6.2.2",
 		"@types/node": "^20.14.10",
-		"fast-xml-parser": "^4.4.1"
+		"fast-xml-parser": "^4.4.1",
+		"txml": "^5.1.1"
 	},
 	"files": [
 		"dist",
@@ -43,5 +52,8 @@
 		{
 			"path": "dist/esm/index.js"
 		}
-	]
+	],
+	"dependencies": {
+		"roxmltree": "^0.0.3"
+	}
 }

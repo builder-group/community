@@ -1,0 +1,1 @@
+To Typescript ported [`tokenizer.rs`](https://github.com/RazrFalcon/roxmltree/blob/master/src/tokenizer.rs).

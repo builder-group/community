@@ -1,11 +1,12 @@
-import { XmlError } from '../XMLError';
 import { type StrSpan } from './StrSpan';
 import { type TXmlEvents } from './types';
+import { XmlError } from './XMLError';
 import { XmlStream } from './XmlStream';
 
 export * from './StrSpan';
 export * from './types';
 export * from './utils';
+export * from './XMLError';
 export * from './XmlStream';
 
 export function parseString(text: string, allowDtd: boolean, events: TXmlEvents): void {
@@ -132,7 +133,7 @@ function parseComment(s: XmlStream, events: TXmlEvents): void {
 		throw new XmlError({ type: 'InvalidComment' }, s.genTextPosFrom(start));
 	}
 
-	events.token({ type: 'Comment', content: text, range: s.rangeFrom(start) });
+	events.token({ type: 'Comment', text, range: s.rangeFrom(start) });
 }
 
 /**
@@ -158,7 +159,7 @@ function parsePi(s: XmlStream, events: TXmlEvents): void {
 
 	events.token({
 		type: 'ProcessingInstruction',
-		name: target,
+		target,
 		content: content.length === 0 ? undefined : content,
 		range: s.rangeFrom(start)
 	});
@@ -381,12 +382,12 @@ function parseElement(s: XmlStream, events: TXmlEvents): void {
 			s.advance(1);
 			s.consumeByte(62 /* > */);
 			const range = s.rangeFrom(_start);
-			events.token({ type: 'ElementEnd', variant: { type: 'Empty' }, range });
+			events.token({ type: 'ElementEnd', end: { type: 'Empty' }, range });
 			break;
 		} else if (currByte === 62 /* > */) {
 			s.advance(1);
 			const range = s.rangeFrom(_start);
-			events.token({ type: 'ElementEnd', variant: { type: 'Open' }, range });
+			events.token({ type: 'ElementEnd', end: { type: 'Open' }, range });
 			open = true;
 			break;
 		} else {
@@ -506,7 +507,7 @@ function parseCloseElement(s: XmlStream, events: TXmlEvents): void {
 	s.consumeByte(62 /* > */);
 
 	const range = s.rangeFrom(start);
-	events.token({ type: 'ElementEnd', variant: { type: 'Close', prefix, local: tagName }, range });
+	events.token({ type: 'ElementEnd', end: { type: 'Close', prefix, local: tagName }, range });
 }
 
 /**
