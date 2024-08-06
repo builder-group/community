@@ -1,20 +1,27 @@
-import { initWasm, parseXml } from 'roxmltree';
+import { wasm, xmlToObject } from 'roxmltree';
 
-console.log('Hello World');
+const response = await fetch('http://localhost:5173/midsize.xml');
+const sample = await response.text();
 
-await initWasm();
+console.log('Sample', { sample });
 
-parseXml(
-	`
-  <note>
-<to>Tove</to>
-<from>Jani</from>
-<heading>Reminder</heading>
-<body>Don't forget me this weekend!</body>
-</note>
-  `,
-	true,
-	(token: any) => {
-		console.log({ token });
-	}
-);
+await wasm.initWasm();
+
+console.log(xmlToObject(sample));
+
+console.log(wasm.xmlToObject(sample, false));
+
+// wasm.parseXml(
+// 	`
+//   <note>
+// <to>Tove</to>
+// <from>Jani</from>
+// <heading>Reminder</heading>
+// <body>Don't forget me this weekend!</body>
+// </note>
+//   `,
+// 	true,
+// 	(token: any) => {
+// 		console.log({ token });
+// 	}
+// );

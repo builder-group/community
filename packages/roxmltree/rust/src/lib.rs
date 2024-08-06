@@ -42,8 +42,9 @@ pub fn xml_to_object(text: &str, allow_dtd: bool) -> Result<JsValue, JsValue> {
     };
 
     match parse(text, allow_dtd, &mut context) {
-        Ok(_) => serde_wasm_bindgen::to_value(&context.root)
-            .map_err(|e| JsValue::from_str(&format!("Serialization error: {:?}", e))),
+        // Ok(_) => serde_wasm_bindgen::to_value(&context.root)
+        //     .map_err(|e| JsValue::from_str(&format!("Serialization error: {:?}", e))),
+        Ok(_) => Ok(JsValue::NULL),
         Err(err) => Err(JsValue::from_str(&format!("XML parsing error: {:?}", err))),
     }
 }
