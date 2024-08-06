@@ -1,4 +1,4 @@
-import { parseXml, type WT } from './wasm';
+import { parseXml, type Token } from './wasm';
 import { type TXMLNode } from './xml-to-object';
 
 export function xmlToObjectWasm(xmlString: string): TXMLNode {
@@ -10,7 +10,7 @@ export function xmlToObjectWasm(xmlString: string): TXMLNode {
 	const stack: TXMLNode[] = [root];
 	let currentNode: TXMLNode = root;
 
-	parseXml(xmlString, false, (token: WT.Token) => {
+	parseXml(xmlString, false, (token: Token) => {
 		switch (token.type) {
 			case 'ElementStart': {
 				const newNode: TXMLNode = {

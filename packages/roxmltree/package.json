@@ -1,6 +1,6 @@
 {
 	"name": "roxmltree",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "Read Only XML Tree",
 	"private": false,
 	"scripts": {

@@ -6,7 +6,7 @@ import { beforeAll, bench } from 'vitest';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Ok
 // @ts-ignore -- Ok
-import { initWasm, xmlToObject, xmlToObjectWasm } from '../../dist/esm';
+import { wasm, xmlToObject, xmlToObjectWasm } from '../../dist/esm';
 
 const parser = new XMLParser();
 
@@ -15,15 +15,19 @@ void describe('xml to object', () => {
 
 	beforeAll(async () => {
 		xml = await readFile(`${__dirname}/resources/midsize.xml`, 'utf-8');
-		await initWasm();
+		await wasm.initWasm();
 	});
 
 	bench('[roxmltree]', () => {
 		xmlToObject(xml);
 	});
 
-	bench('[roxmltree:wasm]', () => {
+	bench('[roxmltree:wasmMix]', () => {
 		xmlToObjectWasm(xml);
+	});
+
+	bench('[roxmltree:wasm]', () => {
+		wasm.xmlToObject(xml);
 	});
 
 	bench('[fast-xml-parser]', () => {
