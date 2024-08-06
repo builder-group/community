@@ -1,7 +1,9 @@
 import { readFile } from 'node:fs/promises';
 import { beforeAll, describe, test } from 'vitest';
 
-import { initWasm, parseXml, type WT } from '../wasm';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Ok
+// @ts-ignore -- Ok
+import { initWasm, xmlToObjectWasm } from '../../dist/esm';
 
 describe('xmlToObject function', () => {
 	let xml = '';
@@ -12,8 +14,7 @@ describe('xmlToObject function', () => {
 	});
 
 	test('xmlToObject', () => {
-		parseXml(xml, true, (token: WT.Token) => {
-			console.log({ token });
-		});
+		const result = xmlToObjectWasm(xml);
+		console.log(result);
 	});
 });

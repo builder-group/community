@@ -1,18 +1,65 @@
-import {
-	parseString,
-	type TAttributeToken,
-	type TCdataToken,
-	type TElementEndToken,
-	type TElementStartToken,
-	type TTextToken,
-	type TXmlEvents,
-	type TXMLToken
-} from './tokenizer';
+import { parseString, type TXmlEvents, type TXMLToken } from './tokenizer';
+import { parseXml, type WT } from './wasm';
 
 interface XMLNode {
 	tagName: string;
 	attributes: Record<string, string>;
 	children: (XMLNode | string)[];
+}
+
+export function xmlToObjectWasm(xmlString: string): XMLNode {
+	const root: XMLNode = {
+		tagName: 'root',
+		attributes: {},
+		children: []
+	};
+	const stack: XMLNode[] = [root];
+	let currentNode: XMLNode = root;
+
+	parseXml(xmlString, false, (token: WT.Token) => {
+		switch (token.type) {
+			case 'ElementStart': {
+				const newNode: XMLNode = {
+					tagName: getFullName(token.prefix, token.local),
+					attributes: {},
+					children: []
+				};
+				currentNode.children.push(newNode);
+				stack.push(newNode);
+				currentNode = newNode;
+				break;
+			}
+			case 'ElementEnd': {
+				if (token.end.type === 'Close' || token.end.type === 'Empty') {
+					stack.pop();
+					const newCurrentNode = stack[stack.length - 1];
+					if (newCurrentNode != null) {
+						currentNode = newCurrentNode;
+					}
+				}
+				break;
+			}
+			case 'Attribute': {
+				const attrName = getFullName(token.prefix, token.local);
+				currentNode.attributes[attrName] = token.value.text;
+				break;
+			}
+			case 'Text':
+			case 'Cdata': {
+				const trimmedText = token.text.trim();
+				if (trimmedText.length > 0) {
+					currentNode.children.push(token.text);
+				}
+				break;
+			}
+			case 'Comment':
+			case 'ProcessingInstruction':
+			case 'EntityDeclaration':
+				break;
+		}
+	});
+
+	return root.children[0] as unknown as XMLNode;
 }
 
 export function xmlToObject(xmlString: string): XMLNode {
@@ -27,19 +74,40 @@ export function xmlToObject(xmlString: string): XMLNode {
 	const xmlEvents: TXmlEvents = {
 		token: (token: TXMLToken) => {
 			switch (token.type) {
-				case 'ElementStart':
-					handleElementStart(token);
+				case 'ElementStart': {
+					const newNode: XMLNode = {
+						tagName: getFullName(token.prefix, token.local),
+						attributes: {},
+						children: []
+					};
+					currentNode.children.push(newNode);
+					stack.push(newNode);
+					currentNode = newNode;
 					break;
-				case 'ElementEnd':
-					handleElementEnd(token);
+				}
+				case 'ElementEnd': {
+					if (token.end.type === 'Close' || token.end.type === 'Empty') {
+						stack.pop();
+						const newCurrentNode = stack[stack.length - 1];
+						if (newCurrentNode != null) {
+							currentNode = newCurrentNode;
+						}
+					}
 					break;
-				case 'Attribute':
-					handleAttribute(token);
+				}
+				case 'Attribute': {
+					const attrName = getFullName(token.prefix, token.local);
+					currentNode.attributes[attrName] = token.value.toString();
 					break;
+				}
 				case 'Text':
-				case 'Cdata':
-					handleTextOrCdata(token);
+				case 'Cdata': {
+					const trimmedText = token.text.trim();
+					if (trimmedText.length > 0) {
+						currentNode.children.push(token.text);
+					}
 					break;
+				}
 				case 'Comment':
 				case 'ProcessingInstruction':
 				case 'EntityDeclaration':
@@ -47,39 +115,6 @@ export function xmlToObject(xmlString: string): XMLNode {
 			}
 		}
 	};
-
-	function handleElementStart(token: TElementStartToken): void {
-		const newNode: XMLNode = {
-			tagName: getFullName(token.prefix, token.local),
-			attributes: {},
-			children: []
-		};
-		currentNode.children.push(newNode);
-		stack.push(newNode);
-		currentNode = newNode;
-	}
-
-	function handleElementEnd(token: TElementEndToken): void {
-		if (token.end.type === 'Close' || token.end.type === 'Empty') {
-			stack.pop();
-			const newCurrentNode = stack[stack.length - 1];
-			if (newCurrentNode != null) {
-				currentNode = newCurrentNode;
-			}
-		}
-	}
-
-	function handleAttribute(token: TAttributeToken): void {
-		const attrName = getFullName(token.prefix, token.local);
-		currentNode.attributes[attrName] = token.value.toString();
-	}
-
-	function handleTextOrCdata(token: TTextToken | TCdataToken): void {
-		const trimmedText = token.text.trim();
-		if (trimmedText.length > 0) {
-			currentNode.children.push(token.text);
-		}
-	}
 
 	parseString(xmlString, false, xmlEvents);
 	return root.children[0] as unknown as XMLNode;

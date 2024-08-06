@@ -369,7 +369,7 @@ function parseElement(s: XmlStream, events: TXmlEvents): void {
 	const start = s.getPos();
 	s.advance(1); // '<'
 	const [prefix, local] = s.consumeQName();
-	events.token({ type: 'ElementStart', prefix, local, startPos: start });
+	events.token({ type: 'ElementStart', prefix, local, start });
 
 	let open = false;
 	while (!s.atEnd()) {
@@ -403,7 +403,7 @@ function parseElement(s: XmlStream, events: TXmlEvents): void {
 			const end = s.getPos();
 			events.token({
 				type: 'Attribute',
-				range: [_start, end],
+				range: { start: _start, end },
 				prefix: _prefix,
 				local: _local,
 				value

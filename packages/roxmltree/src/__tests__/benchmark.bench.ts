@@ -1,11 +1,12 @@
 import { readFile } from 'node:fs/promises';
 import { describe } from 'node:test';
 import { XMLParser } from 'fast-xml-parser';
-import * as rox from 'roxmltree';
 import * as txml from 'txml';
 import { beforeAll, bench } from 'vitest';
 
-import { xmlToObject } from '../xml-to-object';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Ok
+// @ts-ignore -- Ok
+import { initWasm, xmlToObject, xmlToObjectWasm } from '../../dist/esm';
 
 const parser = new XMLParser();
 
@@ -14,15 +15,14 @@ void describe('xml to object', () => {
 
 	beforeAll(async () => {
 		xml = await readFile(`${__dirname}/resources/midsize.xml`, 'utf-8');
-		await rox.initWasm();
+		await initWasm();
+	});
+
+	bench('[roxmltree:wasm]', () => {
+		xmlToObjectWasm(xml);
 	});
 
 	bench('[roxmltree]', () => {
-		const document = new rox.Document();
-		document.parse(xml);
-	});
-
-	bench('[roxmltree:local]', () => {
 		xmlToObject(xml);
 	});
 

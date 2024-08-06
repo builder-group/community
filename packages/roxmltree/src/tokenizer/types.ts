@@ -47,7 +47,7 @@ export interface TElementStartToken {
 	type: 'ElementStart';
 	prefix: string;
 	local: string;
-	startPos: number;
+	start: number;
 }
 
 /**
@@ -114,7 +114,10 @@ export type TXMLToken =
 	| TTextToken
 	| TCdataToken;
 
-export type TRange = [number, number];
+export interface TRange {
+	start: number;
+	end: number;
+}
 
 export interface TTextPos {
 	row: number;

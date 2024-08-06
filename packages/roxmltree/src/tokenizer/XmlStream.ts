@@ -203,7 +203,7 @@ export class XmlStream {
 	}
 
 	public rangeFrom(start: number): TRange {
-		return [start, this._pos];
+		return { start, end: this._pos };
 	}
 
 	/**

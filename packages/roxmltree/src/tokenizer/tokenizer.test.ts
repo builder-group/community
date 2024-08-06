@@ -12,19 +12,19 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: {
 						type: 'Open'
 					},
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Cdata',
 					text: 'content',
-					range: [3, 22]
+					range: { start: 3, end: 22 }
 				},
 				{
 					type: 'ElementEnd',
@@ -33,7 +33,7 @@ describe('tokenizer tests', () => {
 						prefix: '',
 						local: 'p'
 					},
-					range: [22, 26]
+					range: { start: 22, end: 26 }
 				}
 			]);
 		});
@@ -44,19 +44,19 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: {
 						type: 'Open'
 					},
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Cdata',
 					text: '&amping',
-					range: [3, 22]
+					range: { start: 3, end: 22 }
 				},
 				{
 					type: 'ElementEnd',
@@ -65,7 +65,7 @@ describe('tokenizer tests', () => {
 						prefix: '',
 						local: 'p'
 					},
-					range: [22, 26]
+					range: { start: 22, end: 26 }
 				}
 			]);
 		});
@@ -76,19 +76,19 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: {
 						type: 'Open'
 					},
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Cdata',
 					text: '&amping ]',
-					range: [3, 24]
+					range: { start: 3, end: 24 }
 				},
 				{
 					type: 'ElementEnd',
@@ -97,7 +97,7 @@ describe('tokenizer tests', () => {
 						prefix: '',
 						local: 'p'
 					},
-					range: [24, 28]
+					range: { start: 24, end: 28 }
 				}
 			]);
 		});
@@ -108,19 +108,19 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: {
 						type: 'Open'
 					},
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Cdata',
 					text: '&amping]] ',
-					range: [3, 25]
+					range: { start: 3, end: 25 }
 				},
 				{
 					type: 'ElementEnd',
@@ -129,7 +129,7 @@ describe('tokenizer tests', () => {
 						prefix: '',
 						local: 'p'
 					},
-					range: [25, 29]
+					range: { start: 25, end: 29 }
 				}
 			]);
 		});
@@ -140,19 +140,19 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: {
 						type: 'Open'
 					},
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Cdata',
 					text: '<message>text</message>',
-					range: [3, 38]
+					range: { start: 3, end: 38 }
 				},
 				{
 					type: 'ElementEnd',
@@ -161,7 +161,7 @@ describe('tokenizer tests', () => {
 						prefix: '',
 						local: 'p'
 					},
-					range: [38, 42]
+					range: { start: 38, end: 42 }
 				}
 			]);
 		});
@@ -172,19 +172,19 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: {
 						type: 'Open'
 					},
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Cdata',
 					text: '</this is malformed!</malformed</malformed & worse>',
-					range: [3, 66]
+					range: { start: 3, end: 66 }
 				},
 				{
 					type: 'ElementEnd',
@@ -193,7 +193,7 @@ describe('tokenizer tests', () => {
 						prefix: '',
 						local: 'p'
 					},
-					range: [66, 70]
+					range: { start: 66, end: 70 }
 				}
 			]);
 		});
@@ -204,24 +204,24 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: {
 						type: 'Open'
 					},
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Cdata',
 					text: '1',
-					range: [3, 16]
+					range: { start: 3, end: 16 }
 				},
 				{
 					type: 'Cdata',
 					text: '2',
-					range: [16, 29]
+					range: { start: 16, end: 29 }
 				},
 				{
 					type: 'ElementEnd',
@@ -230,7 +230,7 @@ describe('tokenizer tests', () => {
 						prefix: '',
 						local: 'p'
 					},
-					range: [29, 33]
+					range: { start: 29, end: 33 }
 				}
 			]);
 		});
@@ -241,29 +241,29 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: {
 						type: 'Open'
 					},
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Text',
 					text: ' \n ',
-					range: [3, 6]
+					range: { start: 3, end: 6 }
 				},
 				{
 					type: 'Cdata',
 					text: 'data',
-					range: [6, 22]
+					range: { start: 6, end: 22 }
 				},
 				{
 					type: 'Text',
 					text: ' \t ',
-					range: [22, 25]
+					range: { start: 22, end: 25 }
 				},
 				{
 					type: 'ElementEnd',
@@ -272,7 +272,7 @@ describe('tokenizer tests', () => {
 						prefix: '',
 						local: 'p'
 					},
-					range: [25, 29]
+					range: { start: 25, end: 29 }
 				}
 			]);
 		});
@@ -283,19 +283,19 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: {
 						type: 'Open'
 					},
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Cdata',
 					text: 'bracket ]after',
-					range: [3, 29]
+					range: { start: 3, end: 29 }
 				},
 				{
 					type: 'ElementEnd',
@@ -304,7 +304,7 @@ describe('tokenizer tests', () => {
 						prefix: '',
 						local: 'p'
 					},
-					range: [29, 33]
+					range: { start: 29, end: 33 }
 				}
 			]);
 		});
@@ -315,14 +315,14 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: {
 						type: 'Open'
 					},
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Error',
@@ -338,7 +338,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'Comment',
 					text: 'comment',
-					range: [0, 14]
+					range: { start: 0, end: 14 }
 				}
 			]);
 		});
@@ -348,7 +348,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'Comment',
 					text: '<head>',
-					range: [0, 13]
+					range: { start: 0, end: 13 }
 				}
 			]);
 		});
@@ -358,7 +358,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'Comment',
 					text: '<!-x',
-					range: [0, 11]
+					range: { start: 0, end: 11 }
 				}
 			]);
 		});
@@ -368,7 +368,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'Comment',
 					text: '<!x',
-					range: [0, 10]
+					range: { start: 0, end: 10 }
 				}
 			]);
 		});
@@ -378,7 +378,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'Comment',
 					text: '<<!x',
-					range: [0, 11]
+					range: { start: 0, end: 11 }
 				}
 			]);
 		});
@@ -388,7 +388,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'Comment',
 					text: '<<!-x',
-					range: [0, 12]
+					range: { start: 0, end: 12 }
 				}
 			]);
 		});
@@ -398,7 +398,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'Comment',
 					text: '<x',
-					range: [0, 9]
+					range: { start: 0, end: 9 }
 				}
 			]);
 		});
@@ -408,7 +408,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'Comment',
 					text: '<>',
-					range: [0, 9]
+					range: { start: 0, end: 9 }
 				}
 			]);
 		});
@@ -418,7 +418,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'Comment',
 					text: '<',
-					range: [0, 8]
+					range: { start: 0, end: 8 }
 				}
 			]);
 		});
@@ -428,7 +428,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'Comment',
 					text: '<!',
-					range: [0, 9]
+					range: { start: 0, end: 9 }
 				}
 			]);
 		});
@@ -438,7 +438,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'Comment',
 					text: '',
-					range: [0, 7]
+					range: { start: 0, end: 7 }
 				}
 			]);
 		});
@@ -796,14 +796,14 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'a',
-					startPos: 19
+					start: 19
 				},
 				{
 					type: 'ElementEnd',
 					end: {
 						type: 'Empty'
 					},
-					range: [21, 23]
+					range: { start: 21, end: 23 }
 				}
 			]);
 		});
@@ -961,12 +961,12 @@ describe('tokenizer tests', () => {
 						type: 'ElementStart',
 						prefix: '',
 						local: 'a',
-						startPos: 3
+						start: 3
 					},
 					{
 						type: 'ElementEnd',
 						end: { type: 'Empty' },
-						range: [5, 7]
+						range: { start: 5, end: 7 }
 					}
 				]
 			);
@@ -983,7 +983,7 @@ describe('tokenizer tests', () => {
 					{
 						type: 'Comment',
 						text: ' comment ',
-						range: [39, 55]
+						range: { start: 39, end: 55 }
 					}
 				]
 			);
@@ -997,7 +997,7 @@ describe('tokenizer tests', () => {
 						type: 'ProcessingInstruction',
 						target: 'xml-stylesheet',
 						content: undefined,
-						range: [0, 18]
+						range: { start: 0, end: 18 }
 					}
 				]
 			);
@@ -1011,7 +1011,7 @@ describe('tokenizer tests', () => {
 						type: 'ProcessingInstruction',
 						target: 'xml-stylesheet',
 						content: undefined,
-						range: [39, 57]
+						range: { start: 39, end: 57 }
 					}
 				]
 			);
@@ -1081,12 +1081,12 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'a',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Empty' },
-					range: [2, 4]
+					range: { start: 2, end: 4 }
 				}
 			]);
 		});
@@ -1097,17 +1097,17 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'a',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Open' },
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Close', prefix: '', local: 'a' },
-					range: [3, 7]
+					range: { start: 3, end: 7 }
 				}
 			]);
 		});
@@ -1118,12 +1118,12 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'a',
-					startPos: 5
+					start: 5
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Empty' },
-					range: [7, 9]
+					range: { start: 7, end: 9 }
 				}
 			]);
 		});
@@ -1134,28 +1134,28 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'b',
-					startPos: 5
+					start: 5
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Open' },
-					range: [7, 8]
+					range: { start: 7, end: 8 }
 				},
 				{
 					type: 'ElementStart',
 					prefix: '',
 					local: 'a',
-					startPos: 8
+					start: 8
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Empty' },
-					range: [10, 12]
+					range: { start: 10, end: 12 }
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Close', prefix: '', local: 'b' },
-					range: [12, 16]
+					range: { start: 12, end: 16 }
 				}
 			]);
 		});
@@ -1178,17 +1178,17 @@ describe('tokenizer tests', () => {
 		// 		{
 		// 			type: 'ElementEnd',
 		// 			variant: { type: 'Open' },
-		// 			range: [37, 38]
+		// 			range: {start: 37, end: 38}
 		// 		},
 		// 		{
 		// 			type: 'Text',
 		// 			text: 'данные',
-		// 			range: [38, 50]
+		// 			range: {start: 38, end: 50}
 		// 		},
 		// 		{
 		// 			type: 'ElementEnd',
 		// 			variant: { type: 'Close', prefix: '', local: '俄语' },
-		// 			range: [50, 59]
+		// 			range: {start: 50, end: 59}
 		// 		}
 		// 	]);
 		// });
@@ -1199,17 +1199,17 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: 'svg',
 					local: 'circle',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Open' },
-					range: [11, 12]
+					range: { start: 11, end: 12 }
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Close', prefix: 'svg', local: 'circle' },
-					range: [12, 25]
+					range: { start: 12, end: 25 }
 				}
 			]);
 		});
@@ -1220,12 +1220,12 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'circle',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Empty' },
-					range: [8, 10]
+					range: { start: 8, end: 10 }
 				}
 			]);
 		});
@@ -1263,7 +1263,7 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'a',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'Attr',
@@ -1320,17 +1320,17 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'a',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Open' },
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Close', prefix: '', local: 'a' },
-					range: [3, 7]
+					range: { start: 3, end: 7 }
 				},
 				{
 					type: 'Error',
@@ -1345,12 +1345,12 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'a',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Empty' },
-					range: [2, 4]
+					range: { start: 2, end: 4 }
 				},
 				{
 					type: 'Error',
@@ -1365,12 +1365,12 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'a',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Open' },
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Error',
@@ -1394,22 +1394,22 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'root',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Open' },
-					range: [5, 6]
+					range: { start: 5, end: 6 }
 				},
 				{
 					type: 'Text',
 					text: '\n',
-					range: [6, 7]
+					range: { start: 6, end: 7 }
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Close', prefix: '', local: 'root' },
-					range: [7, 14]
+					range: { start: 7, end: 14 }
 				},
 				{
 					type: 'Error',
@@ -1471,7 +1471,7 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'a',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'Attr',
@@ -1482,7 +1482,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'ElementEnd',
 					end: { type: 'Empty' },
-					range: [12, 14]
+					range: { start: 12, end: 14 }
 				}
 			]);
 		});
@@ -1493,7 +1493,7 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'a',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'Attr',
@@ -1504,7 +1504,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'ElementEnd',
 					end: { type: 'Empty' },
-					range: [12, 14]
+					range: { start: 12, end: 14 }
 				}
 			]);
 		});
@@ -1515,7 +1515,7 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'a',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'Attr',
@@ -1532,7 +1532,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'ElementEnd',
 					end: { type: 'Empty' },
-					range: [22, 24]
+					range: { start: 22, end: 24 }
 				}
 			]);
 		});
@@ -1543,7 +1543,7 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'a',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'Attr',
@@ -1560,7 +1560,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'ElementEnd',
 					end: { type: 'Empty' },
-					range: [26, 28]
+					range: { start: 26, end: 28 }
 				}
 			]);
 		});
@@ -1571,7 +1571,7 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'c',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'Attr',
@@ -1588,7 +1588,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'ElementEnd',
 					end: { type: 'Empty' },
-					range: [42, 44]
+					range: { start: 42, end: 44 }
 				}
 			]);
 		});
@@ -1599,7 +1599,7 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'c',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'Attr',
@@ -1610,7 +1610,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'ElementEnd',
 					end: { type: 'Empty' },
-					range: [26, 28]
+					range: { start: 26, end: 28 }
 				}
 			]);
 		});
@@ -1621,7 +1621,7 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'c',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'Attr',
@@ -1632,7 +1632,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'ElementEnd',
 					end: { type: 'Empty' },
-					range: [10, 12]
+					range: { start: 10, end: 12 }
 				}
 			]);
 		});
@@ -1643,7 +1643,7 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'c',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'Error',
@@ -1658,7 +1658,7 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'c',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'Error',
@@ -1673,7 +1673,7 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'c',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'Error',
@@ -1688,7 +1688,7 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'c',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'Attr',
@@ -1709,7 +1709,7 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'c',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'Error',
@@ -1724,7 +1724,7 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'c',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'Error',
@@ -1739,7 +1739,7 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'c',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'Attr',
@@ -1762,7 +1762,7 @@ describe('tokenizer tests', () => {
 					type: 'ProcessingInstruction',
 					target: 'xslt',
 					content: 'ma',
-					range: [0, 11]
+					range: { start: 0, end: 11 }
 				}
 			]);
 		});
@@ -1773,7 +1773,7 @@ describe('tokenizer tests', () => {
 					type: 'ProcessingInstruction',
 					target: 'xslt',
 					content: 'm',
-					range: [0, 13]
+					range: { start: 0, end: 13 }
 				}
 			]);
 		});
@@ -1784,7 +1784,7 @@ describe('tokenizer tests', () => {
 					type: 'ProcessingInstruction',
 					target: 'xslt',
 					content: undefined,
-					range: [0, 8]
+					range: { start: 0, end: 8 }
 				}
 			]);
 		});
@@ -1795,7 +1795,7 @@ describe('tokenizer tests', () => {
 					type: 'ProcessingInstruction',
 					target: 'xslt',
 					content: undefined,
-					range: [0, 9]
+					range: { start: 0, end: 9 }
 				}
 			]);
 		});
@@ -1806,7 +1806,7 @@ describe('tokenizer tests', () => {
 					type: 'ProcessingInstruction',
 					target: 'xml-stylesheet',
 					content: undefined,
-					range: [0, 18]
+					range: { start: 0, end: 18 }
 				}
 			]);
 		});
@@ -1932,7 +1932,7 @@ describe('tokenizer tests', () => {
 				{
 					type: 'Comment',
 					text: ' comment ',
-					range: [0, 16]
+					range: { start: 0, end: 16 }
 				},
 				{
 					type: 'Error',
@@ -1994,22 +1994,22 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Open' },
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Text',
 					text: 'text',
-					range: [3, 7]
+					range: { start: 3, end: 7 }
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Close', prefix: '', local: 'p' },
-					range: [7, 11]
+					range: { start: 7, end: 11 }
 				}
 			]);
 		});
@@ -2020,22 +2020,22 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Open' },
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Text',
 					text: ' text ',
-					range: [3, 9]
+					range: { start: 3, end: 9 }
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Close', prefix: '', local: 'p' },
-					range: [9, 13]
+					range: { start: 9, end: 13 }
 				}
 			]);
 		});
@@ -2047,22 +2047,22 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Open' },
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Text',
 					text: '欄',
-					range: [3, 6]
+					range: { start: 3, end: 6 }
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Close', prefix: '', local: 'p' },
-					range: [6, 10]
+					range: { start: 6, end: 10 }
 				}
 			]);
 		});
@@ -2073,22 +2073,22 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Open' },
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Text',
 					text: ' ',
-					range: [3, 4]
+					range: { start: 3, end: 4 }
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Close', prefix: '', local: 'p' },
-					range: [4, 8]
+					range: { start: 4, end: 8 }
 				}
 			]);
 		});
@@ -2099,22 +2099,22 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Open' },
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Text',
 					text: ' \r\n\t ',
-					range: [3, 8]
+					range: { start: 3, end: 8 }
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Close', prefix: '', local: 'p' },
-					range: [8, 12]
+					range: { start: 8, end: 12 }
 				}
 			]);
 		});
@@ -2125,22 +2125,22 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Open' },
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Text',
 					text: '&#x20;',
-					range: [3, 9]
+					range: { start: 3, end: 9 }
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Close', prefix: '', local: 'p' },
-					range: [9, 13]
+					range: { start: 9, end: 13 }
 				}
 			]);
 		});
@@ -2151,22 +2151,22 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Open' },
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Text',
 					text: ']>',
-					range: [3, 5]
+					range: { start: 3, end: 5 }
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Close', prefix: '', local: 'p' },
-					range: [5, 9]
+					range: { start: 5, end: 9 }
 				}
 			]);
 		});
@@ -2177,12 +2177,12 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Open' },
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Error',
@@ -2197,12 +2197,12 @@ describe('tokenizer tests', () => {
 					type: 'ElementStart',
 					prefix: '',
 					local: 'p',
-					startPos: 0
+					start: 0
 				},
 				{
 					type: 'ElementEnd',
 					end: { type: 'Open' },
-					range: [2, 3]
+					range: { start: 2, end: 3 }
 				},
 				{
 					type: 'Error',
