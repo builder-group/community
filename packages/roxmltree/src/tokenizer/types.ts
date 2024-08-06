@@ -1,6 +1,4 @@
-export interface TXmlEvents {
-	token: (token: TXMLToken) => void;
-}
+export type TTokenCallback = (token: TXMLToken) => void;
 
 /**
  * A Processing Instruction token.

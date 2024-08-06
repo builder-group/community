@@ -1,14 +1,13 @@
 import { readFile } from 'node:fs/promises';
 import { describe } from 'node:test';
-import { XMLParser } from 'fast-xml-parser';
+import * as fastXmlParser from 'fast-xml-parser';
 import * as txml from 'txml';
-import { beforeAll, bench } from 'vitest';
+import { beforeAll, bench, expect } from 'vitest';
+import * as xml2js from 'xml2js';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Ok
 // @ts-ignore -- Ok
 import { wasm, xmlToObject, xmlToObjectWasm } from '../../dist/esm';
-
-const parser = new XMLParser();
 
 void describe('xml to object', () => {
 	let xml = '';
@@ -19,22 +18,36 @@ void describe('xml to object', () => {
 	});
 
 	bench('[roxmltree]', () => {
-		xmlToObject(xml);
+		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -- Not void
+		const result = xmlToObject(xml);
+		expect(result).not.toBeNull();
 	});
 
 	bench('[roxmltree:wasmMix]', () => {
-		xmlToObjectWasm(xml);
+		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -- Not void
+		const result = xmlToObjectWasm(xml);
+		expect(result).not.toBeNull();
 	});
 
 	bench('[roxmltree:wasm]', () => {
-		wasm.xmlToObject(xml);
+		const result = wasm.xmlToObject(xml);
+		expect(result).not.toBeNull();
 	});
 
 	bench('[fast-xml-parser]', () => {
-		parser.parse(xml);
+		const parser = new fastXmlParser.XMLParser();
+		const result = parser.parse(xml);
+		expect(result).not.toBeNull();
 	});
 
 	bench('[txml]', () => {
-		txml.parse(xml);
+		const result = txml.parse(xml);
+		expect(result).not.toBeNull();
+	});
+
+	bench('[xml2js]', () => {
+		xml2js.parseString(xml, (err, result) => {
+			expect(result).not.toBeNull();
+		});
 	});
 });

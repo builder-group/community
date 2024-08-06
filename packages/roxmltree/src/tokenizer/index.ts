@@ -1,4 +1,4 @@
-import { type TXmlEvents } from './types';
+import { type TTokenCallback } from './types';
 import { XmlError } from './XMLError';
 import { XmlStream } from './XmlStream';
 
@@ -7,8 +7,8 @@ export * from './utils';
 export * from './XMLError';
 export * from './XmlStream';
 
-export function parseString(text: string, allowDtd: boolean, events: TXmlEvents): void {
-	parse(new XmlStream(text), allowDtd, events);
+export function parseString(text: string, allowDtd: boolean, tokenCallback: TTokenCallback): void {
+	parseXmlStream(new XmlStream(text), allowDtd, tokenCallback);
 }
 
 /**
@@ -18,7 +18,11 @@ export function parseString(text: string, allowDtd: boolean, events: TXmlEvents)
  *
  * https://www.w3.org/TR/xml/#NT-document
  */
-export function parse(s: XmlStream, allowDtd: boolean, events: TXmlEvents): void {
+export function parseXmlStream(
+	s: XmlStream,
+	allowDtd: boolean,
+	tokenCallback: TTokenCallback
+): void {
 	// Skip UTF-8 BOM
 	if (s.startsWith('\uFEFF')) {
 		s.advance(1);
@@ -28,7 +32,7 @@ export function parse(s: XmlStream, allowDtd: boolean, events: TXmlEvents): void
 		parseDeclaration(s);
 	}
 
-	parseMisc(s, events);
+	parseMisc(s, tokenCallback);
 
 	s.skipSpaces();
 	if (s.startsWith('<!DOCTYPE')) {
@@ -36,16 +40,16 @@ export function parse(s: XmlStream, allowDtd: boolean, events: TXmlEvents): void
 			throw new XmlError({ type: 'DtdDetected' });
 		}
 
-		parseDoctype(s, events);
-		parseMisc(s, events);
+		parseDoctype(s, tokenCallback);
+		parseMisc(s, tokenCallback);
 	}
 
 	s.skipSpaces();
 	if (!s.atEnd() && s.currByte() === 60 /* < */) {
-		parseElement(s, events);
+		parseElement(s, tokenCallback);
 	}
 
-	parseMisc(s, events);
+	parseMisc(s, tokenCallback);
 
 	if (!s.atEnd()) {
 		throw new XmlError({ type: 'UnknownToken', message: 'Not at end' }, s.genTextPos());
@@ -59,13 +63,13 @@ export function parse(s: XmlStream, allowDtd: boolean, events: TXmlEvents): void
  *
  * https://www.w3.org/TR/xml/#NT-Misc
  */
-function parseMisc(s: XmlStream, events: TXmlEvents): void {
+function parseMisc(s: XmlStream, tokenCallback: TTokenCallback): void {
 	while (!s.atEnd()) {
 		s.skipSpaces();
 		if (s.startsWith('<!--')) {
-			parseComment(s, events);
+			parseComment(s, tokenCallback);
 		} else if (s.startsWith('<?')) {
-			parsePi(s, events);
+			parsePi(s, tokenCallback);
 		} else {
 			break;
 		}
@@ -121,7 +125,7 @@ function consumeSpaces(s: XmlStream): void {
  *
  * https://www.w3.org/TR/xml/#sec-comments
  */
-function parseComment(s: XmlStream, events: TXmlEvents): void {
+function parseComment(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(4);
 	const text = s.consumeChars((_s, c) => !(c === '-' && _s.startsWith('-->')));
@@ -131,7 +135,7 @@ function parseComment(s: XmlStream, events: TXmlEvents): void {
 		throw new XmlError({ type: 'InvalidComment' }, s.genTextPosFrom(start));
 	}
 
-	events.token({ type: 'Comment', text, range: s.rangeFrom(start) });
+	tokenCallback({ type: 'Comment', text, range: s.rangeFrom(start) });
 }
 
 /**
@@ -142,7 +146,7 @@ function parseComment(s: XmlStream, events: TXmlEvents): void {
  *
  * https://www.w3.org/TR/xml/#sec-pi
  */
-function parsePi(s: XmlStream, events: TXmlEvents): void {
+function parsePi(s: XmlStream, tokenCallback: TTokenCallback): void {
 	if (s.startsWith('<?xml ')) {
 		throw new XmlError({ type: 'UnexpectedDeclaration' }, s.genTextPos());
 	}
@@ -155,7 +159,7 @@ function parsePi(s: XmlStream, events: TXmlEvents): void {
 
 	s.skipString('?>');
 
-	events.token({
+	tokenCallback({
 		type: 'ProcessingInstruction',
 		target,
 		content: content.length === 0 ? undefined : content,
@@ -166,7 +170,7 @@ function parsePi(s: XmlStream, events: TXmlEvents): void {
 /**
  * Parses the DOCTYPE declaration.
  */
-function parseDoctype(s: XmlStream, events: TXmlEvents): void {
+function parseDoctype(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	parseDoctypeStart(s);
 	s.skipSpaces();
@@ -180,11 +184,11 @@ function parseDoctype(s: XmlStream, events: TXmlEvents): void {
 	while (!s.atEnd()) {
 		s.skipSpaces();
 		if (s.startsWith('<!ENTITY')) {
-			parseEntityDecl(s, events);
+			parseEntityDecl(s, tokenCallback);
 		} else if (s.startsWith('<!--')) {
-			parseComment(s, events);
+			parseComment(s, tokenCallback);
 		} else if (s.startsWith('<?')) {
-			parsePi(s, events);
+			parsePi(s, tokenCallback);
 		} else if (s.startsWith(']')) {
 			// DTD ends with ']' S? '>', therefore we have to skip possible spaces
 			s.advance(1);
@@ -283,7 +287,7 @@ function parseExternalId(s: XmlStream): boolean {
  *
  * https://www.w3.org/TR/xml/#sec-entity-decl
  */
-function parseEntityDecl(s: XmlStream, events: TXmlEvents): void {
+function parseEntityDecl(s: XmlStream, tokenCallback: TTokenCallback): void {
 	s.advance(8);
 	s.consumeSpaces();
 
@@ -296,7 +300,7 @@ function parseEntityDecl(s: XmlStream, events: TXmlEvents): void {
 	s.consumeSpaces();
 	const definition = parseEntityDef(s, isGe);
 	if (definition !== null) {
-		events.token({ type: 'EntityDeclaration', name, definition });
+		tokenCallback({ type: 'EntityDeclaration', name, definition });
 	}
 	s.skipSpaces();
 	s.consumeByte(62 /* > */);
@@ -363,11 +367,11 @@ function consumeDecl(s: XmlStream): void {
  *
  * https://www.w3.org/TR/xml/#NT-element
  */
-function parseElement(s: XmlStream, events: TXmlEvents): void {
+function parseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(1); // '<'
 	const [prefix, local] = s.consumeQName();
-	events.token({ type: 'ElementStart', prefix, local, start });
+	tokenCallback({ type: 'ElementStart', prefix, local, start });
 
 	let open = false;
 	while (!s.atEnd()) {
@@ -380,12 +384,12 @@ function parseElement(s: XmlStream, events: TXmlEvents): void {
 			s.advance(1);
 			s.consumeByte(62 /* > */);
 			const range = s.rangeFrom(_start);
-			events.token({ type: 'ElementEnd', end: { type: 'Empty' }, range });
+			tokenCallback({ type: 'ElementEnd', end: { type: 'Empty' }, range });
 			break;
 		} else if (currByte === 62 /* > */) {
 			s.advance(1);
 			const range = s.rangeFrom(_start);
-			events.token({ type: 'ElementEnd', end: { type: 'Open' }, range });
+			tokenCallback({ type: 'ElementEnd', end: { type: 'Open' }, range });
 			open = true;
 			break;
 		} else {
@@ -399,7 +403,7 @@ function parseElement(s: XmlStream, events: TXmlEvents): void {
 
 			const [_prefix, _local, value] = parseAttribute(s);
 			const end = s.getPos();
-			events.token({
+			tokenCallback({
 				type: 'Attribute',
 				range: { start: _start, end },
 				prefix: _prefix,
@@ -410,7 +414,7 @@ function parseElement(s: XmlStream, events: TXmlEvents): void {
 	}
 
 	if (open) {
-		parseContent(s, events);
+		parseContent(s, tokenCallback);
 	}
 }
 
@@ -440,16 +444,16 @@ function parseAttribute(s: XmlStream): [string, string, string] {
  *
  * https://www.w3.org/TR/xml/#NT-content
  */
-function parseContent(s: XmlStream, events: TXmlEvents): void {
+function parseContent(s: XmlStream, tokenCallback: TTokenCallback): void {
 	while (!s.atEnd()) {
 		const currByte = s.currByte();
 		if (currByte === 60 /* < */) {
 			const nextByte = s.nextByte();
 			if (nextByte === 33 /* ! */) {
 				if (s.startsWith('<!--')) {
-					parseComment(s, events);
+					parseComment(s, tokenCallback);
 				} else if (s.startsWith('<![CDATA[')) {
-					parseCdata(s, events);
+					parseCdata(s, tokenCallback);
 				} else {
 					throw new XmlError(
 						{ type: 'UnknownToken', message: 'Failed to parse content' },
@@ -457,15 +461,15 @@ function parseContent(s: XmlStream, events: TXmlEvents): void {
 					);
 				}
 			} else if (nextByte === 63 /* ? */) {
-				parsePi(s, events);
+				parsePi(s, tokenCallback);
 			} else if (nextByte === 47 /* / */) {
-				parseCloseElement(s, events);
+				parseCloseElement(s, tokenCallback);
 				break;
 			} else {
-				parseElement(s, events);
+				parseElement(s, tokenCallback);
 			}
 		} else {
-			parseText(s, events);
+			parseText(s, tokenCallback);
 		}
 	}
 }
@@ -480,13 +484,13 @@ function parseContent(s: XmlStream, events: TXmlEvents): void {
  *
  * https://www.w3.org/TR/xml/#sec-cdata-sect
  */
-function parseCdata(s: XmlStream, events: TXmlEvents): void {
+function parseCdata(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(9); // <![CDATA[
 	const text = s.consumeChars((_s, c) => !(c === ']' && _s.startsWith(']]>')));
 	s.skipString(']]>');
 	const range = s.rangeFrom(start);
-	events.token({ type: 'Cdata', text, range });
+	tokenCallback({ type: 'Cdata', text, range });
 }
 
 /**
@@ -496,7 +500,7 @@ function parseCdata(s: XmlStream, events: TXmlEvents): void {
  *
  * https://www.w3.org/TR/xml/#NT-ETag
  */
-function parseCloseElement(s: XmlStream, events: TXmlEvents): void {
+function parseCloseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(2); // </
 
@@ -505,13 +509,13 @@ function parseCloseElement(s: XmlStream, events: TXmlEvents): void {
 	s.consumeByte(62 /* > */);
 
 	const range = s.rangeFrom(start);
-	events.token({ type: 'ElementEnd', end: { type: 'Close', prefix, local: tagName }, range });
+	tokenCallback({ type: 'ElementEnd', end: { type: 'Close', prefix, local: tagName }, range });
 }
 
 /**
  * Parses text content.
  */
-function parseText(s: XmlStream, events: TXmlEvents): void {
+function parseText(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	const text = s.consumeChars((_, c) => c !== '<');
 
@@ -523,5 +527,5 @@ function parseText(s: XmlStream, events: TXmlEvents): void {
 		throw new XmlError({ type: 'InvalidCharacterData' }, s.genTextPos());
 	}
 
-	events.token({ type: 'Text', text, range: s.rangeFrom(start) });
+	tokenCallback({ type: 'Text', text, range: s.rangeFrom(start) });
 }

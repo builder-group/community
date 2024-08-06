@@ -1,5 +1,15 @@
-// https://github.com/RazrFalcon/roxmltree/blob/master/src/tokenizer.rs
-
+/**
+ * -----------------------------------------------------------------------------
+ * This file includes code derived from the project RazrFalcon/roxmltree by \@RazrFalcon.
+ * Project Repository: https://github.com/RazrFalcon/roxmltree/blob/master/src/tokenizer.rs
+ *
+ * Date of Import: 06 August 2024
+ * -----------------------------------------------------------------------------
+ * The code included in this file is licensed under the MIT License,
+ * as per the original project by \@RazrFalcon.
+ * For the license text, see: https://github.com/RazrFalcon/roxmltree/blob/master/LICENSE-MIT
+ * -----------------------------------------------------------------------------
+ */
 use core::ops::Range;
 use core::str;
 

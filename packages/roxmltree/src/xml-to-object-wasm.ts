@@ -1,7 +1,8 @@
 import { parseXml, type Token } from './wasm';
-import { type TXMLNode } from './xml-to-object';
+import { getTagName, type TXMLNode } from './xml-to-object';
 
-export function xmlToObjectWasm(xmlString: string): TXMLNode {
+// TODO: Very slow because of constant communication between wasm and Javascript layer
+export function xmlToObjectWasm(xmlString: string, allowDtd = false): TXMLNode {
 	const root: TXMLNode = {
 		tagName: 'root',
 		attributes: {},
@@ -10,11 +11,11 @@ export function xmlToObjectWasm(xmlString: string): TXMLNode {
 	const stack: TXMLNode[] = [root];
 	let currentNode: TXMLNode = root;
 
-	parseXml(xmlString, false, (token: Token) => {
+	parseXml(xmlString, allowDtd, (token: Token) => {
 		switch (token.type) {
 			case 'ElementStart': {
 				const newNode: TXMLNode = {
-					tagName: `${token.prefix}:${token.local}`,
+					tagName: getTagName(token.local, token.prefix),
 					attributes: {},
 					children: []
 				};
@@ -34,7 +35,7 @@ export function xmlToObjectWasm(xmlString: string): TXMLNode {
 				break;
 			}
 			case 'Attribute': {
-				currentNode.attributes[`${token.prefix}:${token.local}`] = token.value.text;
+				currentNode.attributes[getTagName(token.local, token.prefix)] = token.value.text;
 				break;
 			}
 			case 'Text':
