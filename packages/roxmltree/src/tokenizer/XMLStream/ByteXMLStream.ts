@@ -32,6 +32,7 @@ export class ByteXmlStream implements TXmlStream {
 	private _buffer: Uint8Array;
 	private _pos: number;
 	private _end: number;
+	private _textDecoder = new TextDecoder();
 
 	public constructor(buffer: Uint8Array, pos = 0) {
 		this._buffer = buffer;
@@ -380,6 +381,6 @@ export class ByteXmlStream implements TXmlStream {
 	}
 
 	private decodeSlice(start: number, end: number): string {
-		return new TextDecoder().decode(this._buffer.subarray(start, end));
+		return this._textDecoder.decode(this._buffer.subarray(start, end));
 	}
 }

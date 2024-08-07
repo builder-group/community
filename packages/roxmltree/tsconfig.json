@@ -3,11 +3,7 @@
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./src",
-		"declarationDir": "./dist/types",
-		"baseUrl": ".",
-		"paths": {
-			"@/rust/*": ["./src/rust_modules/*"]
-		},
+		"declarationDir": "./dist/types"
 	},
 	"include": ["src"]
 }

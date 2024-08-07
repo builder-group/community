@@ -5,7 +5,7 @@ import * as txml from 'txml';
 import { beforeAll, bench, expect } from 'vitest';
 import * as xml2js from 'xml2js';
 
-import { xmlToObject } from '../xml-to-object';
+import { xmlToObject } from '../index';
 
 void describe('xml to object', () => {
 	let xml = '';

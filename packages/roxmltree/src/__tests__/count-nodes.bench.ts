@@ -4,18 +4,31 @@ import * as sax from 'sax';
 import * as saxen from 'saxen';
 import { beforeAll, bench, expect } from 'vitest';
 
-import { parseXmlStream, TextXmlStream } from '../tokenizer';
+import { ByteXmlStream, parseXmlStream, TextXmlStream } from '../index';
 
 void describe('count nodes', () => {
 	let xml = '';
+	let xmlBytes: Uint8Array;
 
 	beforeAll(async () => {
 		xml = await readFile(`${__dirname}/resources/midsize.xml`, 'utf-8');
+		xmlBytes = new TextEncoder().encode(xml);
 	});
 
 	bench('[roxmltree:text]', () => {
 		let nodeCount = 0;
 		parseXmlStream(new TextXmlStream(xml), false, (token) => {
+			if (token.type === 'ElementStart') {
+				nodeCount++;
+			}
+		});
+
+		expect(nodeCount).toBe(10045);
+	});
+
+	bench('[roxmltree:byte]', () => {
+		let nodeCount = 0;
+		parseXmlStream(new ByteXmlStream(xmlBytes), false, (token) => {
 			if (token.type === 'ElementStart') {
 				nodeCount++;
 			}
