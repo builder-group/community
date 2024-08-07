@@ -1,6 +1,8 @@
-import { parseXmlStream, TextXmlStream } from './tokenizer';
+import { parseXml, type Token } from './wasm';
+import { getTagName, type TXMLNode } from './xml-to-object';
 
-export function xmlToObject(xmlString: string, allowDtd = false): TXMLNode {
+// TODO: Very slow because of constant communication between wasm and Javascript layer
+export function xmlToObjectWasm(xmlString: string, allowDtd = false): TXMLNode {
 	const root: TXMLNode = {
 		tagName: 'root',
 		attributes: {},
@@ -9,7 +11,7 @@ export function xmlToObject(xmlString: string, allowDtd = false): TXMLNode {
 	const stack: TXMLNode[] = [root];
 	let currentNode: TXMLNode = root;
 
-	parseXmlStream(new TextXmlStream(xmlString), allowDtd, (token) => {
+	parseXml(xmlString, allowDtd, (token: Token) => {
 		switch (token.type) {
 			case 'ElementStart': {
 				const newNode: TXMLNode = {
@@ -33,7 +35,7 @@ export function xmlToObject(xmlString: string, allowDtd = false): TXMLNode {
 				break;
 			}
 			case 'Attribute': {
-				currentNode.attributes[getTagName(token.local, token.prefix)] = token.value.toString();
+				currentNode.attributes[getTagName(token.local, token.prefix)] = token.value.text;
 				break;
 			}
 			case 'Text':
@@ -50,15 +52,6 @@ export function xmlToObject(xmlString: string, allowDtd = false): TXMLNode {
 				break;
 		}
 	});
+
 	return root.children[0] as unknown as TXMLNode;
-}
-
-export interface TXMLNode {
-	tagName: string;
-	attributes: Record<string, string>;
-	children: (TXMLNode | string)[];
-}
-
-export function getTagName(local: string, prefix: string): string {
-	return prefix.length > 0 ? `${prefix}:${local}` : local;
 }
