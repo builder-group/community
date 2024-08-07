@@ -1,4 +1,17 @@
 import { type TTokenCallback } from './types';
+import {
+	DOUBLE_QUOTE,
+	EXCLAMATION_MARK,
+	GREATER_THAN,
+	LESS_THAN,
+	OPEN_BRACKET,
+	PERCENT,
+	QUESTION_MARK,
+	SINGLE_QUOTE,
+	SLASH,
+	UPPERCASE_P,
+	UPPERCASE_S
+} from './utils';
 import { XmlError } from './XmlError';
 import { type TXmlStream } from './XmlStream';
 
@@ -36,7 +49,7 @@ export function parseXmlStream(
 	}
 
 	s.skipSpaces();
-	if (!s.atEnd() && s.currByte() === 60 /* < */) {
+	if (!s.atEnd() && s.currByte() === LESS_THAN) {
 		parseElement(s, tokenCallback);
 	}
 
@@ -166,7 +179,7 @@ function parseDoctype(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	parseDoctypeStart(s);
 	s.skipSpaces();
 
-	if (s.currByte() === 62 /* > */) {
+	if (s.currByte() === GREATER_THAN) {
 		s.advance(1);
 		return;
 	}
@@ -184,7 +197,7 @@ function parseDoctype(s: TXmlStream, tokenCallback: TTokenCallback): void {
 			// DTD ends with ']' S? '>', therefore we have to skip possible spaces
 			s.advance(1);
 			s.skipSpaces();
-			if (s.currByte() === 62 /* > */) {
+			if (s.currByte() === GREATER_THAN) {
 				s.advance(1);
 				break;
 			} else {
@@ -233,7 +246,7 @@ function parseDoctypeStart(s: TXmlStream): void {
 	s.skipSpaces();
 
 	const c = s.currByte();
-	if (c !== 91 /* [ */ && c !== 62 /* > */) {
+	if (c !== OPEN_BRACKET && c !== GREATER_THAN) {
 		throw new XmlError({ type: 'InvalidChar', expected: "'[' or '>'", actual: c }, s.genTextPos());
 	}
 }
@@ -282,7 +295,7 @@ function parseEntityDecl(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	s.advance(8);
 	s.consumeSpaces();
 
-	const isGe = !s.tryConsumeByte(37 /* % */);
+	const isGe = !s.tryConsumeByte(PERCENT);
 	if (!isGe) {
 		s.consumeSpaces();
 	}
@@ -294,7 +307,7 @@ function parseEntityDecl(s: TXmlStream, tokenCallback: TTokenCallback): void {
 		tokenCallback({ type: 'EntityDeclaration', name, definition });
 	}
 	s.skipSpaces();
-	s.consumeByte(62 /* > */);
+	s.consumeByte(GREATER_THAN);
 }
 
 /**
@@ -311,14 +324,14 @@ function parseEntityDecl(s: TXmlStream, tokenCallback: TTokenCallback): void {
  */
 function parseEntityDef(s: TXmlStream, isGe: boolean): string | null {
 	const c = s.currByte();
-	if (c === 34 /* " */ || c === 39 /* ' */) {
+	if (c === DOUBLE_QUOTE || c === SINGLE_QUOTE) {
 		const quote = s.consumeQuote();
 		const start = s.getPos();
 		s.skipBytes((_c) => _c !== quote);
 		const value = s.sliceBackSpan(start);
 		s.consumeByte(quote);
 		return value;
-	} else if (c === 83 /* S */ || c === 80 /* P */) {
+	} else if (c === UPPERCASE_S || c === UPPERCASE_P) {
 		if (parseExternalId(s)) {
 			if (isGe) {
 				s.skipSpaces();
@@ -346,8 +359,8 @@ function parseEntityDef(s: TXmlStream, isGe: boolean): string | null {
  * Consumes a declaration.
  */
 function consumeDecl(s: TXmlStream): void {
-	s.skipBytes((c) => c !== 62 /* > */);
-	s.consumeByte(62 /* > */);
+	s.skipBytes((c) => c !== GREATER_THAN);
+	s.consumeByte(GREATER_THAN);
 }
 
 /**
@@ -371,13 +384,13 @@ function parseElement(s: TXmlStream, tokenCallback: TTokenCallback): void {
 		const _start = s.getPos();
 		const currByte = s.currByte();
 
-		if (currByte === 47 /* / */) {
+		if (currByte === SLASH) {
 			s.advance(1);
-			s.consumeByte(62 /* > */);
+			s.consumeByte(GREATER_THAN);
 			const range = s.rangeFrom(_start);
 			tokenCallback({ type: 'ElementEnd', end: { type: 'Empty' }, range });
 			break;
-		} else if (currByte === 62 /* > */) {
+		} else if (currByte === GREATER_THAN) {
 			s.advance(1);
 			const range = s.rangeFrom(_start);
 			tokenCallback({ type: 'ElementEnd', end: { type: 'Open' }, range });
@@ -438,9 +451,9 @@ function parseAttribute(s: TXmlStream): [string, string, string] {
 function parseContent(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	while (!s.atEnd()) {
 		const currByte = s.currByte();
-		if (currByte === 60 /* < */) {
+		if (currByte === LESS_THAN) {
 			const nextByte = s.nextByte();
-			if (nextByte === 33 /* ! */) {
+			if (nextByte === EXCLAMATION_MARK) {
 				if (s.startsWith('<!--')) {
 					parseComment(s, tokenCallback);
 				} else if (s.startsWith('<![CDATA[')) {
@@ -451,9 +464,9 @@ function parseContent(s: TXmlStream, tokenCallback: TTokenCallback): void {
 						s.genTextPos()
 					);
 				}
-			} else if (nextByte === 63 /* ? */) {
+			} else if (nextByte === QUESTION_MARK) {
 				parsePi(s, tokenCallback);
-			} else if (nextByte === 47 /* / */) {
+			} else if (nextByte === SLASH) {
 				parseCloseElement(s, tokenCallback);
 				break;
 			} else {
@@ -497,7 +510,7 @@ function parseCloseElement(s: TXmlStream, tokenCallback: TTokenCallback): void {
 
 	const [prefix, tagName] = s.consumeQName();
 	s.skipSpaces();
-	s.consumeByte(62 /* > */);
+	s.consumeByte(GREATER_THAN);
 
 	const range = s.rangeFrom(start);
 	tokenCallback({ type: 'ElementEnd', end: { type: 'Close', prefix, local: tagName }, range });

@@ -1,26 +1,35 @@
+export const HORIZONTAL_TAB = 9; // \t
+export const LINE_FEED = 10; // \n
+export const CARRIAGE_RETURN = 13; // \r
+export const SPACE = 32; // ' '
+export const EXCLAMATION_MARK = 33; // !
+export const DOUBLE_QUOTE = 34; // "
+export const HASH = 35; // #
+export const PERCENT = 37; // %
 export const AMPERSAND = 38; // &
-export const HASHTAG = 35; // #
-export const X_LOWER = 120; // x
+export const SINGLE_QUOTE = 39; // '
+export const HYPHEN = 45; // -
+export const PERIOD = 46; // .
+export const SLASH = 47; // /
 export const ZERO = 48; // 0
 export const NINE = 57; // 9
-export const A_UPPER = 65; // A
-export const F_UPPER = 70; // F
-export const Z_UPPER = 90; // Z
-export const A_LOWER = 97; // a
-export const F_LOWER = 102; // f
-export const Z_LOWER = 122; // z
-export const SEMICOLON = 59; // ;
 export const COLON = 58; // :
+export const SEMICOLON = 59; // ;
+export const LESS_THAN = 60; // <
 export const EQUALS = 61; // =
-export const SINGLE_QUOTE = 39; // '
-export const DOUBLE_QUOTE = 34; // "
-export const UNDER_SCORE = 95; // _
-export const MINUS = 45; // -
-export const DOT = 46; // .
-export const SPACE = 32; // ' ';
-export const NEW_LINE = 10; // \n
-export const HORIZONTAL_TAB = 9; // \t
-export const CARRIAGE_RETURN = 13; // \r
+export const GREATER_THAN = 62; // >
+export const QUESTION_MARK = 63; // ?
+export const UPPERCASE_A = 65; // A
+export const UPPERCASE_F = 70; // F
+export const UPPERCASE_P = 80; // P
+export const UPPERCASE_S = 83; // S
+export const UPPERCASE_Z = 90; // Z
+export const OPEN_BRACKET = 91; // [
+export const UNDERSCORE = 95; // _
+export const LOWERCASE_A = 97; // a
+export const LOWERCASE_F = 102; // f
+export const LOWERCASE_X = 120; // x
+export const LOWERCASE_Z = 122; // z
 
 export function isAsciiDigit(byte: number): boolean {
 	return byte >= ZERO && byte <= NINE;
@@ -40,10 +49,10 @@ export function isXmlNameStart(c: string | number): boolean {
 	// Check for ASCII first
 	if (code <= 128) {
 		return (
-			(code >= A_UPPER && code <= Z_UPPER) ||
-			(code >= A_LOWER && code <= Z_LOWER) ||
+			(code >= UPPERCASE_A && code <= UPPERCASE_Z) ||
+			(code >= LOWERCASE_A && code <= LOWERCASE_Z) ||
 			code === COLON ||
-			code === UNDER_SCORE
+			code === UNDERSCORE
 		);
 	}
 
@@ -103,8 +112,8 @@ export function isXmlName(c: string | number): boolean {
  * @param c - The character to check.
  * @returns True if the character is a valid XML character, false otherwise.
  */
-export function isXmlChar(c: string): boolean {
-	const code = c.codePointAt(0);
+export function isXmlChar(c: string | number): boolean {
+	const code = typeof c === 'string' ? c.codePointAt(0) : c;
 	if (code == null) {
 		return false;
 	}
@@ -122,7 +131,9 @@ export function isXmlChar(c: string): boolean {
  * @returns True if the byte is a valid XML space, false otherwise.
  */
 export function isXmlSpaceByte(byte: number): boolean {
-	return byte === SPACE || byte === HORIZONTAL_TAB || byte === NEW_LINE || byte === CARRIAGE_RETURN;
+	return (
+		byte === SPACE || byte === HORIZONTAL_TAB || byte === LINE_FEED || byte === CARRIAGE_RETURN
+	);
 }
 
 /**
@@ -133,11 +144,11 @@ export function isXmlSpaceByte(byte: number): boolean {
 export function isXmlNameByte(byte: number): boolean {
 	return (
 		(byte >= ZERO && byte <= NINE) ||
-		(byte >= A_UPPER && byte <= Z_UPPER) ||
-		(byte >= A_LOWER && byte <= Z_LOWER) ||
+		(byte >= UPPERCASE_A && byte <= UPPERCASE_Z) ||
+		(byte >= LOWERCASE_A && byte <= LOWERCASE_Z) ||
 		byte === COLON ||
-		byte === UNDER_SCORE ||
-		byte === MINUS ||
-		byte === DOT
+		byte === UNDERSCORE ||
+		byte === HYPHEN ||
+		byte === PERIOD
 	);
 }

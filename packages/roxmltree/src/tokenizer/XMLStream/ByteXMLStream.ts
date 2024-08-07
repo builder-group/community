@@ -1,24 +1,24 @@
 import { type TRange, type TReference, type TTextPos } from '../types';
 import {
-	A_LOWER,
-	A_UPPER,
 	AMPERSAND,
 	COLON,
 	DOUBLE_QUOTE,
 	EQUALS,
-	F_LOWER,
-	F_UPPER,
-	HASHTAG,
+	HASH,
 	isAsciiDigit,
 	isXmlChar,
 	isXmlName,
 	isXmlNameStart,
 	isXmlSpaceByte,
-	NEW_LINE,
+	LINE_FEED,
+	LOWERCASE_A,
+	LOWERCASE_F,
+	LOWERCASE_X,
 	NINE,
 	SEMICOLON,
 	SINGLE_QUOTE,
-	X_LOWER,
+	UPPERCASE_A,
+	UPPERCASE_F,
 	ZERO
 } from '../utils';
 import { XmlError } from '../XmlError';
@@ -201,16 +201,16 @@ export class ByteXmlStream implements TXmlStream {
 		}
 
 		const getReference = (): TReference | null => {
-			if (this.tryConsumeByte(HASHTAG)) {
+			if (this.tryConsumeByte(HASH)) {
 				let value: string;
 				let radix: number;
 
-				if (this.tryConsumeByte(X_LOWER)) {
+				if (this.tryConsumeByte(LOWERCASE_X)) {
 					value = this.consumeBytes(
 						(byte) =>
 							(byte >= ZERO && byte <= NINE) ||
-							(byte >= A_UPPER && byte <= F_UPPER) ||
-							(byte >= A_LOWER && byte <= F_LOWER)
+							(byte >= UPPERCASE_A && byte <= UPPERCASE_F) ||
+							(byte >= LOWERCASE_A && byte <= LOWERCASE_F)
 					);
 					radix = 16;
 				} else {
@@ -362,7 +362,7 @@ export class ByteXmlStream implements TXmlStream {
 		let row = 1;
 		let col = 1;
 		for (let i = 0; i < clampedPos; i++) {
-			if (this._buffer[i] === NEW_LINE) {
+			if (this._buffer[i] === LINE_FEED) {
 				row++;
 				col = 1;
 			} else {
