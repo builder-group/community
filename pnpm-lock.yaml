@@ -530,6 +530,9 @@ importers:
       fast-xml-parser:
         specifier: ^4.4.1
         version: 4.4.1
+      roxmltree:
+        specifier: ^0.0.7
+        version: 0.0.7
       sax:
         specifier: ^1.4.1
         version: 1.4.1
@@ -4109,6 +4112,9 @@ packages:
     resolution: {integrity: sha512-6/jgnN1svF9PjNYJ4ya3l+cqutg49vOZ4rVgsDKxdl+5gpGPnByFXWGyfH9YGx9i3nfBwSu1Iyu6vGwFFA0BdQ==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
+
+  roxmltree@0.0.7:
+    resolution: {integrity: sha512-wa0+cp//YSiwiKRztjfVi6lcNosUT1DvCcUziPDgGu/SVzbSBp9yJ0U404wELqeB4shWbRSuLThLeXt0kU4JPw==}
 
   run-applescript@7.0.0:
     resolution: {integrity: sha512-9by4Ij99JUr/MCFBUkDKLWK3G9HVXmabKz9U5MlIAIuvuzkiOicRYs8XJLxX+xahD+mLiiCYDqF9dKAgtzKP1A==}
@@ -8895,6 +8901,8 @@ snapshots:
       '@rollup/rollup-win32-ia32-msvc': 4.19.2
       '@rollup/rollup-win32-x64-msvc': 4.19.2
       fsevents: 2.3.3
+
+  roxmltree@0.0.7: {}
 
   run-applescript@7.0.0: {}
 

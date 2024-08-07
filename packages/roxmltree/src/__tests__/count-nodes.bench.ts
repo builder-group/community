@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { describe } from 'node:test';
+import * as rox from 'roxmltree';
 import * as sax from 'sax';
 import * as saxen from 'saxen';
 import { beforeAll, bench, expect } from 'vitest';
@@ -18,6 +19,17 @@ void describe('count nodes', () => {
 	bench('[roxmltree:text]', () => {
 		let nodeCount = 0;
 		parseXmlStream(new TextXmlStream(xml), false, (token) => {
+			if (token.type === 'ElementStart') {
+				nodeCount++;
+			}
+		});
+
+		expect(nodeCount).toBe(10045);
+	});
+
+	bench('[roxmltree:text:npm]', () => {
+		let nodeCount = 0;
+		rox.parseXmlStream(new rox.TextXmlStream(xml), false, (token) => {
 			if (token.type === 'ElementStart') {
 				nodeCount++;
 			}

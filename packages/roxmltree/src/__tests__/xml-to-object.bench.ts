@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { describe } from 'node:test';
 import * as fastXmlParser from 'fast-xml-parser';
+import * as rox from 'roxmltree';
 import * as txml from 'txml';
 import { beforeAll, bench, expect } from 'vitest';
 import * as xml2js from 'xml2js';
@@ -16,6 +17,11 @@ void describe('xml to object', () => {
 
 	bench('[roxmltree]', () => {
 		const result = xmlToObject(xml);
+		expect(result).not.toBeNull();
+	});
+
+	bench('[roxmltree:npm]', () => {
+		const result = rox.xmlToObject(xml);
 		expect(result).not.toBeNull();
 	});
 
