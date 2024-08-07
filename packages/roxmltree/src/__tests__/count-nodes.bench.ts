@@ -10,7 +10,7 @@ void describe('count nodes', () => {
 	let xml = '';
 
 	beforeAll(async () => {
-		xml = await readFile(`${__dirname}/resources/bpmn.xml`, 'utf-8');
+		xml = await readFile(`${__dirname}/resources/midsize.xml`, 'utf-8');
 	});
 
 	bench('[roxmltree:text]', () => {
@@ -21,7 +21,7 @@ void describe('count nodes', () => {
 			}
 		});
 
-		expect(nodeCount).toBe(1497);
+		expect(nodeCount).toBe(10045);
 	});
 
 	bench('[saxen]', () => {
@@ -32,7 +32,7 @@ void describe('count nodes', () => {
 		});
 		parser.parse(xml);
 
-		expect(nodeCount).toBe(1497);
+		expect(nodeCount).toBe(10045);
 	});
 
 	bench('[sax]', () => {
@@ -43,6 +43,6 @@ void describe('count nodes', () => {
 		};
 		parser.write(xml).close();
 
-		expect(nodeCount).toBe(1497);
+		expect(nodeCount).toBe(10045);
 	});
 });
