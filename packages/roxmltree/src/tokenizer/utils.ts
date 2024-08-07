@@ -31,8 +31,8 @@ export function isAsciiDigit(byte: number): boolean {
  * @param c - The character to check.
  * @returns True if the character is a valid XML name start character, false otherwise.
  */
-export function isXmlNameStart(c: string): boolean {
-	const code = c.codePointAt(0);
+export function isXmlNameStart(c: string | number): boolean {
+	const code = typeof c === 'string' ? c.codePointAt(0) : c;
 	if (code == null) {
 		return false;
 	}

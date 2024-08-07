@@ -48,10 +48,10 @@ export class TextXmlStream implements TXmlStream {
 	}
 
 	public currByte(): number {
-		if (this.atEnd()) {
+		if (this._pos >= this._end) {
 			throw new XmlError({ type: 'UnexpectedEndOfStream' });
 		}
-		return this.currByteUnchecked();
+		return this._text.charCodeAt(this._pos);
 	}
 
 	public currByteUnchecked(): number {
@@ -103,7 +103,7 @@ export class TextXmlStream implements TXmlStream {
 	}
 
 	public skipBytes(predicate: (byte: number) => boolean): void {
-		while (!this.atEnd() && predicate(this.currByteUnchecked())) {
+		while (this._pos < this._end && predicate(this.currByteUnchecked())) {
 			this._pos += 1;
 		}
 	}
@@ -146,11 +146,11 @@ export class TextXmlStream implements TXmlStream {
 	}
 
 	public startsWithSpace(): boolean {
-		return !this.atEnd() && isXmlSpaceByte(this.currByteUnchecked());
+		return this._pos < this._end && isXmlSpaceByte(this.currByteUnchecked());
 	}
 
 	public consumeSpaces(): void {
-		if (this.atEnd()) {
+		if (this._pos >= this._end) {
 			throw new XmlError({ type: 'UnexpectedEndOfStream' }, this.genTextPos());
 		}
 
@@ -177,6 +177,7 @@ export class TextXmlStream implements TXmlStream {
 			this._pos += subStream.getPos() - start;
 			return result;
 		}
+
 		return null;
 	}
 
@@ -256,15 +257,15 @@ export class TextXmlStream implements TXmlStream {
 		const start = this._pos;
 
 		while (this._pos < this._end) {
-			const char = this._text[this._pos] as unknown as string;
+			const currByte = this.currByteUnchecked();
 			if (this._pos === start) {
-				if (!isXmlNameStart(char)) {
+				if (!isXmlNameStart(currByte)) {
 					throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 				}
-			} else if (!isXmlName(char)) {
+			} else if (!isXmlName(currByte)) {
 				break;
 			}
-			this._pos += char.length;
+			this._pos += 1;
 		}
 	}
 
@@ -316,13 +317,13 @@ export class TextXmlStream implements TXmlStream {
 	}
 
 	public consumeQuote(): number {
-		const byte = this.currByte();
-		if (byte === SINGLE_QUOTE || byte === DOUBLE_QUOTE) {
+		const currByte = this.currByte();
+		if (currByte === SINGLE_QUOTE || currByte === DOUBLE_QUOTE) {
 			this._pos += 1;
-			return byte;
+			return currByte;
 		}
 		throw new XmlError(
-			{ type: 'InvalidChar', expected: 'a quote', actual: byte },
+			{ type: 'InvalidChar', expected: 'a quote', actual: currByte },
 			this.genTextPos()
 		);
 	}
