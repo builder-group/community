@@ -17,7 +17,7 @@ void describe('xml to object', () => {
 		await wasm.initWasm();
 	});
 
-	bench('[roxmltree]', () => {
+	bench('[roxmltree:text]', () => {
 		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -- Not void
 		const result = xmlToObject(xml);
 		expect(result).not.toBeNull();

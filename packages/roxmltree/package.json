@@ -54,8 +54,5 @@
 		{
 			"path": "dist/esm/index.js"
 		}
-	],
-	"dependencies": {
-		"roxmltree": "^0.0.3"
-	}
+	]
 }

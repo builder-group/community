@@ -24,6 +24,10 @@ import {
 import { XmlError } from '../XmlError';
 import { type TXmlStream } from './types';
 
+// TODO:
+// Byte based implementation is around 5 times slower than string based
+// [roxmltree:byte]     12.4869  78.6583  83.2979  80.0840  80.4702  83.2979  83.2979  83.2979  ±1.27%       10
+// [roxmltree:text]     58.8184  15.6937  19.1283  17.0015  17.0783  19.1283  19.1283  19.1283  ±1.51%       30
 export class ByteXmlStream implements TXmlStream {
 	private _buffer: Uint8Array;
 	private _pos: number;

@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseString } from './index';
+import { parseXmlStream } from './tokenizer';
 import { type TXMLToken } from './types';
 import { XmlError } from './XmlError';
+import { ByteXmlStream, TextXmlStream } from './XmlStream';
 
 describe('tokenizer tests', () => {
 	describe('CDATA', () => {
@@ -2240,7 +2241,9 @@ interface TAttrToken {
 function collectTokens(text: string): TToken[] {
 	const tokens: TToken[] = [];
 	try {
-		parseString(text, true, (token) => {
+		const textXmlStream = new TextXmlStream(text);
+		const byteXmlStream = new ByteXmlStream(new TextEncoder().encode(text));
+		parseXmlStream(textXmlStream, true, (token) => {
 			switch (token.type) {
 				case 'EntityDeclaration':
 					tokens.push({

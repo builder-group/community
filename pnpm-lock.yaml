@@ -517,10 +517,6 @@ importers:
         version: link:../validation-adapters
 
   packages/roxmltree:
-    dependencies:
-      roxmltree:
-        specifier: ^0.0.3
-        version: 0.0.3
     devDependencies:
       '@blgc/config':
         specifier: workspace:*
@@ -4116,9 +4112,6 @@ packages:
     resolution: {integrity: sha512-6/jgnN1svF9PjNYJ4ya3l+cqutg49vOZ4rVgsDKxdl+5gpGPnByFXWGyfH9YGx9i3nfBwSu1Iyu6vGwFFA0BdQ==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
-
-  roxmltree@0.0.3:
-    resolution: {integrity: sha512-BIqoErkd7CovabT+umJswi34b7g/D51Tsjq/GwsxE79Jdzm+GeTiMX8dd8qKd4Zd44J/rDVUYOV7/7yv4Zu1mw==}
 
   run-applescript@7.0.0:
     resolution: {integrity: sha512-9by4Ij99JUr/MCFBUkDKLWK3G9HVXmabKz9U5MlIAIuvuzkiOicRYs8XJLxX+xahD+mLiiCYDqF9dKAgtzKP1A==}
@@ -8903,8 +8896,6 @@ snapshots:
       '@rollup/rollup-win32-ia32-msvc': 4.19.2
       '@rollup/rollup-win32-x64-msvc': 4.19.2
       fsevents: 2.3.3
-
-  roxmltree@0.0.3: {}
 
   run-applescript@7.0.0: {}
 
