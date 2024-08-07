@@ -20,7 +20,7 @@ void describe('xml to object', () => {
 		expect(result).not.toBeNull();
 	});
 
-	bench('[roxmltree:npm]', () => {
+	bench('[(npm) roxmltree]', () => {
 		const result = rox.xmlToObject(xml);
 		expect(result).not.toBeNull();
 	});

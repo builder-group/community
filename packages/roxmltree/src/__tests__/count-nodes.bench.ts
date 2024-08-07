@@ -27,7 +27,7 @@ void describe('count nodes', () => {
 		expect(nodeCount).toBe(10045);
 	});
 
-	bench('[roxmltree:text:npm]', () => {
+	bench('[(npm) roxmltree:text]', () => {
 		let nodeCount = 0;
 		rox.parseXmlStream(new rox.TextXmlStream(xml), false, (token) => {
 			if (token.type === 'ElementStart') {
