@@ -26,9 +26,8 @@ coverage
 out/
 build
 dist
-rust_modules
 target
-_gen
+rust_modules
 
 # Debug
 npm-debug.log*
