@@ -1163,38 +1163,40 @@ describe('tokenizer tests', () => {
 			]);
 		});
 
-		// TODO
-		// it('element_06', () => {
-		// 	assertTokens('<俄语 լեզու="ռուսերեն">данные</俄语>', [
-		// 		{
-		// 			type: 'ElementStart',
-		// 			prefix: '',
-		// 			local: '俄语',
-		// 			startPos: 0
-		// 		},
-		// 		{
-		// 			type: 'Attr',
-		// 			prefix: '',
-		// 			local: 'լեզու',
-		// 			value: 'ռուսերեն'
-		// 		},
-		// 		{
-		// 			type: 'ElementEnd',
-		// 			variant: { type: 'Open' },
-		// 			range: {start: 37, end: 38}
-		// 		},
-		// 		{
-		// 			type: 'Text',
-		// 			text: 'данные',
-		// 			range: {start: 38, end: 50}
-		// 		},
-		// 		{
-		// 			type: 'ElementEnd',
-		// 			variant: { type: 'Close', prefix: '', local: '俄语' },
-		// 			range: {start: 50, end: 59}
-		// 		}
-		// 	]);
-		// });
+		it('element_06', () => {
+			assertTokens('<俄语 լեզու="ռուսերեն">данные</俄语>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: '俄语',
+					start: 0
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'լեզու',
+					value: 'ռուսերեն'
+				},
+				{
+					type: 'ElementEnd',
+					end: { type: 'Open' },
+					range: { start: 20, end: 21 }
+					// range: { start: 37, end: 38 }  // When based on bytes
+				},
+				{
+					type: 'Text',
+					text: 'данные',
+					range: { start: 21, end: 27 }
+					// range: { start: 38, end: 50 } // When based on bytes
+				},
+				{
+					type: 'ElementEnd',
+					end: { type: 'Close', prefix: '', local: '俄语' },
+					range: { start: 27, end: 32 }
+					// range: { start: 50, end: 59 } // When based on bytes
+				}
+			]);
+		});
 
 		it('element_07', () => {
 			assertTokens('<svg:circle></svg:circle>', [
