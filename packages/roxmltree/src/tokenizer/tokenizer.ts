@@ -328,7 +328,7 @@ function parseEntityDef(s: TXmlStream, isGe: boolean): string | null {
 		const quote = s.consumeQuote();
 		const start = s.getPos();
 		s.skipBytes((_c) => _c !== quote);
-		const value = s.sliceBackSpan(start);
+		const value = s.sliceBack(start);
 		s.consumeByte(quote);
 		return value;
 	} else if (c === UPPERCASE_S || c === UPPERCASE_P) {
@@ -436,7 +436,7 @@ function parseAttribute(s: TXmlStream): [string, string, string] {
 	const quoteChar = String.fromCharCode(quote);
 	const valueStart = s.getPos();
 	s.skipChars((_, c) => c !== quoteChar && c !== '<');
-	const value = s.sliceBackSpan(valueStart);
+	const value = s.sliceBack(valueStart);
 	s.consumeByte(quote);
 	return [prefix, local, value];
 }

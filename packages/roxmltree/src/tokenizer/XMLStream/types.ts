@@ -116,13 +116,6 @@ export interface TXmlStream {
 	sliceBack: (pos: number) => string;
 
 	/**
-	 * Slices the text from the given position to the current position.
-	 * @param pos - The start position.
-	 * @returns The sliced string.
-	 */
-	sliceBackSpan: (pos: number) => string;
-
-	/**
 	 * Creates a range from the given start position to the current position.
 	 * @param start - The start position.
 	 * @returns The range object.

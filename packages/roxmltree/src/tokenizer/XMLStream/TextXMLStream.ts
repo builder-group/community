@@ -131,10 +131,6 @@ export class TextXmlStream implements TXmlStream {
 		return this._text.slice(pos, this._pos);
 	}
 
-	public sliceBackSpan(pos: number): string {
-		return this._text.slice(pos, this._pos);
-	}
-
 	public rangeFrom(start: number): TRange {
 		return { start, end: this._pos };
 	}
