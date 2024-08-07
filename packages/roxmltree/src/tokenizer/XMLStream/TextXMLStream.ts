@@ -96,25 +96,25 @@ export class TextXmlStream implements TXmlStream {
 		this._pos += text.length;
 	}
 
-	public consumeBytes(predicate: (byte: number) => boolean): string {
+	public consumeBytesWhile(predicate: (byte: number) => boolean): string {
 		const start = this._pos;
-		this.skipBytes(predicate);
+		this.skipBytesWhile(predicate);
 		return this.sliceBack(start);
 	}
 
-	public skipBytes(predicate: (byte: number) => boolean): void {
+	public skipBytesWhile(predicate: (byte: number) => boolean): void {
 		while (this._pos < this._end && predicate(this.currByteUnchecked())) {
 			this._pos += 1;
 		}
 	}
 
-	public consumeChars(predicate: (stream: TextXmlStream, char: string) => boolean): string {
+	public consumeCharsWhile(predicate: (stream: TextXmlStream, char: string) => boolean): string {
 		const start = this._pos;
-		this.skipChars(predicate);
+		this.skipCharsWhile(predicate);
 		return this.sliceBack(start);
 	}
 
-	public skipChars(predicate: (stream: TextXmlStream, char: string) => boolean): void {
+	public skipCharsWhile(predicate: (stream: TextXmlStream, char: string) => boolean): void {
 		while (this._pos < this._end) {
 			const char = this._text[this._pos] as unknown as string;
 			if (!isXmlChar(char)) {
@@ -188,7 +188,7 @@ export class TextXmlStream implements TXmlStream {
 				let radix: number;
 
 				if (this.tryConsumeByte(LOWERCASE_X)) {
-					value = this.consumeBytes(
+					value = this.consumeBytesWhile(
 						(byte) =>
 							(byte >= ZERO && byte <= NINE) ||
 							(byte >= UPPERCASE_A && byte <= UPPERCASE_F) ||
@@ -196,7 +196,7 @@ export class TextXmlStream implements TXmlStream {
 					);
 					radix = 16;
 				} else {
-					value = this.consumeBytes((byte) => isAsciiDigit(byte));
+					value = this.consumeBytesWhile((byte) => isAsciiDigit(byte));
 					radix = 10;
 				}
 

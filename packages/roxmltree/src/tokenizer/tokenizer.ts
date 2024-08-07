@@ -132,7 +132,7 @@ function consumeSpaces(s: TXmlStream): void {
 function parseComment(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(4);
-	const text = s.consumeChars((_s, c) => !(c === '-' && _s.startsWith('-->')));
+	const text = s.consumeCharsWhile((_s, c) => !(c === '-' && _s.startsWith('-->')));
 	s.skipString('-->');
 
 	if (text.includes('--') || text.endsWith('-')) {
@@ -159,7 +159,7 @@ function parsePi(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	s.advance(2);
 	const target = s.consumeName();
 	s.skipSpaces();
-	const content = s.consumeChars((_s, c) => !(c === '?' && _s.startsWith('?>')));
+	const content = s.consumeCharsWhile((_s, c) => !(c === '?' && _s.startsWith('?>')));
 
 	s.skipString('?>');
 
@@ -266,13 +266,13 @@ function parseExternalId(s: TXmlStream): boolean {
 
 		s.consumeSpaces();
 		const quote = s.consumeQuote();
-		s.consumeBytes((c) => c !== quote);
+		s.consumeBytesWhile((c) => c !== quote);
 		s.consumeByte(quote);
 
 		if (id === 'PUBLIC') {
 			s.consumeSpaces();
 			const _quote = s.consumeQuote();
-			s.consumeBytes((c) => c !== _quote);
+			s.consumeBytesWhile((c) => c !== _quote);
 			s.consumeByte(_quote);
 		}
 
@@ -327,7 +327,7 @@ function parseEntityDef(s: TXmlStream, isGe: boolean): string | null {
 	if (c === DOUBLE_QUOTE || c === SINGLE_QUOTE) {
 		const quote = s.consumeQuote();
 		const start = s.getPos();
-		s.skipBytes((_c) => _c !== quote);
+		s.skipBytesWhile((_c) => _c !== quote);
 		const value = s.sliceBack(start);
 		s.consumeByte(quote);
 		return value;
@@ -359,7 +359,7 @@ function parseEntityDef(s: TXmlStream, isGe: boolean): string | null {
  * Consumes a declaration.
  */
 function consumeDecl(s: TXmlStream): void {
-	s.skipBytes((c) => c !== GREATER_THAN);
+	s.skipBytesWhile((c) => c !== GREATER_THAN);
 	s.consumeByte(GREATER_THAN);
 }
 
@@ -435,7 +435,7 @@ function parseAttribute(s: TXmlStream): [string, string, string] {
 	const quote = s.consumeQuote();
 	const quoteChar = String.fromCharCode(quote);
 	const valueStart = s.getPos();
-	s.skipChars((_, c) => c !== quoteChar && c !== '<');
+	s.skipCharsWhile((_, c) => c !== quoteChar && c !== '<');
 	const value = s.sliceBack(valueStart);
 	s.consumeByte(quote);
 	return [prefix, local, value];
@@ -491,7 +491,7 @@ function parseContent(s: TXmlStream, tokenCallback: TTokenCallback): void {
 function parseCdata(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(9); // <![CDATA[
-	const text = s.consumeChars((_s, c) => !(c === ']' && _s.startsWith(']]>')));
+	const text = s.consumeCharsWhile((_s, c) => !(c === ']' && _s.startsWith(']]>')));
 	s.skipString(']]>');
 	const range = s.rangeFrom(start);
 	tokenCallback({ type: 'Cdata', text, range });
@@ -521,7 +521,7 @@ function parseCloseElement(s: TXmlStream, tokenCallback: TTokenCallback): void {
  */
 function parseText(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
-	const text = s.consumeChars((_, c) => c !== '<');
+	const text = s.consumeCharsWhile((_, c) => c !== '<');
 
 	// According to the spec, `]]>` must not appear inside a Text node.
 	// https://www.w3.org/TR/xml/#syntax

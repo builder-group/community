@@ -85,13 +85,13 @@ export interface TXmlStream {
 	 * @param predicate - The function to test each byte.
 	 * @returns The consumed string.
 	 */
-	consumeBytes: (predicate: (byte: number) => boolean) => string;
+	consumeBytesWhile: (predicate: (byte: number) => boolean) => string;
 
 	/**
 	 * Skips bytes that satisfy a predicate function.
 	 * @param predicate - The function to test each byte.
 	 */
-	skipBytes: (predicate: (byte: number) => boolean) => void;
+	skipBytesWhile: (predicate: (byte: number) => boolean) => void;
 
 	/**
 	 * Consumes characters that satisfy a predicate function.
@@ -99,14 +99,14 @@ export interface TXmlStream {
 	 * @returns The consumed string.
 	 * @throws XmlError if a non-XML character is encountered.
 	 */
-	consumeChars: (predicate: (stream: TXmlStream, char: string) => boolean) => string;
+	consumeCharsWhile: (predicate: (stream: TXmlStream, char: string) => boolean) => string;
 
 	/**
 	 * Skips characters that satisfy a predicate function.
 	 * @param predicate - The function to test each character.
 	 * @throws XmlError if a non-XML character is encountered.
 	 */
-	skipChars: (predicate: (stream: TXmlStream, char: string) => boolean) => void;
+	skipCharsWhile: (predicate: (stream: TXmlStream, char: string) => boolean) => void;
 
 	/**
 	 * Slices the text from the given position to the current position.

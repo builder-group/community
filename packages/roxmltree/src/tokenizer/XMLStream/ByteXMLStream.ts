@@ -107,7 +107,7 @@ export class ByteXmlStream implements TXmlStream {
 		this._pos += bytes.length;
 	}
 
-	public consumeBytes(predicate: (byte: number) => boolean): string {
+	public consumeBytesWhile(predicate: (byte: number) => boolean): string {
 		const start = this._pos;
 		while (this._pos < this._end && predicate(this._buffer[this._pos] as unknown as number)) {
 			this._pos++;
@@ -115,19 +115,19 @@ export class ByteXmlStream implements TXmlStream {
 		return this.decodeSlice(start, this._pos);
 	}
 
-	public skipBytes(predicate: (byte: number) => boolean): void {
+	public skipBytesWhile(predicate: (byte: number) => boolean): void {
 		while (this._pos < this._end && predicate(this._buffer[this._pos] as unknown as number)) {
 			this._pos++;
 		}
 	}
 
-	public consumeChars(predicate: (stream: ByteXmlStream, char: string) => boolean): string {
+	public consumeCharsWhile(predicate: (stream: ByteXmlStream, char: string) => boolean): string {
 		const start = this._pos;
-		this.skipChars(predicate);
+		this.skipCharsWhile(predicate);
 		return this.decodeSlice(start, this._pos);
 	}
 
-	public skipChars(predicate: (stream: ByteXmlStream, char: string) => boolean): void {
+	public skipCharsWhile(predicate: (stream: ByteXmlStream, char: string) => boolean): void {
 		while (this._pos < this._end) {
 			const charLength = this.getCharLength(this._buffer[this._pos] as unknown as number);
 			if (this._pos + charLength > this._end) break;
@@ -202,7 +202,7 @@ export class ByteXmlStream implements TXmlStream {
 				let radix: number;
 
 				if (this.tryConsumeByte(LOWERCASE_X)) {
-					value = this.consumeBytes(
+					value = this.consumeBytesWhile(
 						(byte) =>
 							(byte >= ZERO && byte <= NINE) ||
 							(byte >= UPPERCASE_A && byte <= UPPERCASE_F) ||
@@ -210,7 +210,7 @@ export class ByteXmlStream implements TXmlStream {
 					);
 					radix = 16;
 				} else {
-					value = this.consumeBytes((byte) => isAsciiDigit(byte));
+					value = this.consumeBytesWhile((byte) => isAsciiDigit(byte));
 					radix = 10;
 				}
 
