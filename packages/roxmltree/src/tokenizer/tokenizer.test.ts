@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { parseString } from './index';
-import { type TXmlEvents, type TXMLToken } from './types';
+import { type TXMLToken } from './types';
 import { XmlError } from './XMLError';
 
 describe('tokenizer tests', () => {
@@ -2237,44 +2237,38 @@ interface TAttrToken {
 	value: string;
 }
 
-class EventsCollector implements TXmlEvents {
-	public tokens: TToken[] = [];
-
-	public token(token: TXMLToken): void {
-		switch (token.type) {
-			case 'EntityDeclaration':
-				this.tokens.push({
-					type: 'EntityDecl',
-					name: token.name,
-					definition: token.definition.toString()
-				});
-				break;
-			case 'Attribute':
-				this.tokens.push({
-					type: 'Attr',
-					prefix: token.prefix,
-					local: token.local,
-					value: token.value.toString()
-				});
-				break;
-			default:
-				this.tokens.push(token);
-		}
-	}
-}
-
 function collectTokens(text: string): TToken[] {
-	const collector = new EventsCollector();
+	const tokens: TToken[] = [];
 	try {
-		parseString(text, true, collector);
+		parseString(text, true, (token) => {
+			switch (token.type) {
+				case 'EntityDeclaration':
+					tokens.push({
+						type: 'EntityDecl',
+						name: token.name,
+						definition: token.definition.toString()
+					});
+					break;
+				case 'Attribute':
+					tokens.push({
+						type: 'Attr',
+						prefix: token.prefix,
+						local: token.local,
+						value: token.value.toString()
+					});
+					break;
+				default:
+					tokens.push(token);
+			}
+		});
 	} catch (error) {
 		if (error instanceof XmlError) {
-			collector.tokens.push({ type: 'Error', message: error.message });
+			tokens.push({ type: 'Error', message: error.message });
 		} else {
 			console.error(error);
 		}
 	}
-	return collector.tokens;
+	return tokens;
 }
 
 function assertTokens(text: string, tokens: TToken[]): void {
