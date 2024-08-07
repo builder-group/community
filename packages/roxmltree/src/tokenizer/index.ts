@@ -1,14 +1,14 @@
 import { type TTokenCallback } from './types';
-import { XmlError } from './XMLError';
-import { XmlStream } from './XmlStream';
+import { XmlError } from './XmlError';
+import { TextXmlStream, type TXmlStream } from './XmlStream';
 
 export * from './types';
 export * from './utils';
-export * from './XMLError';
+export * from './XmlError';
 export * from './XmlStream';
 
 export function parseString(text: string, allowDtd: boolean, tokenCallback: TTokenCallback): void {
-	parseXmlStream(new XmlStream(text), allowDtd, tokenCallback);
+	parseXmlStream(new TextXmlStream(text), allowDtd, tokenCallback);
 }
 
 /**
@@ -19,7 +19,7 @@ export function parseString(text: string, allowDtd: boolean, tokenCallback: TTok
  * https://www.w3.org/TR/xml/#NT-document
  */
 export function parseXmlStream(
-	s: XmlStream,
+	s: TXmlStream,
 	allowDtd: boolean,
 	tokenCallback: TTokenCallback
 ): void {
@@ -63,7 +63,7 @@ export function parseXmlStream(
  *
  * https://www.w3.org/TR/xml/#NT-Misc
  */
-function parseMisc(s: XmlStream, tokenCallback: TTokenCallback): void {
+function parseMisc(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	while (!s.atEnd()) {
 		s.skipSpaces();
 		if (s.startsWith('<!--')) {
@@ -83,7 +83,7 @@ function parseMisc(s: XmlStream, tokenCallback: TTokenCallback): void {
  *
  * https://www.w3.org/TR/xml/#sec-prolog-dtd
  */
-function parseDeclaration(s: XmlStream): void {
+function parseDeclaration(s: TXmlStream): void {
 	s.advance(5); // <?xml
 	consumeSpaces(s);
 
@@ -107,7 +107,7 @@ function parseDeclaration(s: XmlStream): void {
 	s.skipString('?>');
 }
 
-function consumeSpaces(s: XmlStream): void {
+function consumeSpaces(s: TXmlStream): void {
 	if (s.startsWithSpace()) {
 		s.skipSpaces();
 	} else if (!s.startsWith('?>') && !s.atEnd()) {
@@ -125,7 +125,7 @@ function consumeSpaces(s: XmlStream): void {
  *
  * https://www.w3.org/TR/xml/#sec-comments
  */
-function parseComment(s: XmlStream, tokenCallback: TTokenCallback): void {
+function parseComment(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(4);
 	const text = s.consumeChars((_s, c) => !(c === '-' && _s.startsWith('-->')));
@@ -146,7 +146,7 @@ function parseComment(s: XmlStream, tokenCallback: TTokenCallback): void {
  *
  * https://www.w3.org/TR/xml/#sec-pi
  */
-function parsePi(s: XmlStream, tokenCallback: TTokenCallback): void {
+function parsePi(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	if (s.startsWith('<?xml ')) {
 		throw new XmlError({ type: 'UnexpectedDeclaration' }, s.genTextPos());
 	}
@@ -170,7 +170,7 @@ function parsePi(s: XmlStream, tokenCallback: TTokenCallback): void {
 /**
  * Parses the DOCTYPE declaration.
  */
-function parseDoctype(s: XmlStream, tokenCallback: TTokenCallback): void {
+function parseDoctype(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	parseDoctypeStart(s);
 	s.skipSpaces();
@@ -231,7 +231,7 @@ function parseDoctype(s: XmlStream, tokenCallback: TTokenCallback): void {
  *
  * https://www.w3.org/TR/xml/#NT-doctypedecl
  */
-function parseDoctypeStart(s: XmlStream): void {
+function parseDoctypeStart(s: TXmlStream): void {
 	s.advance(9);
 
 	s.consumeSpaces();
@@ -254,7 +254,7 @@ function parseDoctypeStart(s: XmlStream): void {
  *
  * https://www.w3.org/TR/xml/#NT-ExternalID
  */
-function parseExternalId(s: XmlStream): boolean {
+function parseExternalId(s: TXmlStream): boolean {
 	if (s.startsWith('SYSTEM') || s.startsWith('PUBLIC')) {
 		const start = s.getPos();
 		s.advance(6);
@@ -287,7 +287,7 @@ function parseExternalId(s: XmlStream): boolean {
  *
  * https://www.w3.org/TR/xml/#sec-entity-decl
  */
-function parseEntityDecl(s: XmlStream, tokenCallback: TTokenCallback): void {
+function parseEntityDecl(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	s.advance(8);
 	s.consumeSpaces();
 
@@ -318,7 +318,7 @@ function parseEntityDecl(s: XmlStream, tokenCallback: TTokenCallback): void {
  *
  * https://www.w3.org/TR/xml/#sec-entity-decl
  */
-function parseEntityDef(s: XmlStream, isGe: boolean): string | null {
+function parseEntityDef(s: TXmlStream, isGe: boolean): string | null {
 	const c = s.currByte();
 	if (c === 34 /* " */ || c === 39 /* ' */) {
 		const quote = s.consumeQuote();
@@ -354,7 +354,7 @@ function parseEntityDef(s: XmlStream, isGe: boolean): string | null {
 /**
  * Consumes a declaration.
  */
-function consumeDecl(s: XmlStream): void {
+function consumeDecl(s: TXmlStream): void {
 	s.skipBytes((c) => c !== 62 /* > */);
 	s.consumeByte(62 /* > */);
 }
@@ -367,7 +367,7 @@ function consumeDecl(s: XmlStream): void {
  *
  * https://www.w3.org/TR/xml/#NT-element
  */
-function parseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
+function parseElement(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(1); // '<'
 	const [prefix, local] = s.consumeQName();
@@ -425,7 +425,7 @@ function parseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
  *
  * https://www.w3.org/TR/xml/#NT-Attribute
  */
-function parseAttribute(s: XmlStream): [string, string, string] {
+function parseAttribute(s: TXmlStream): [string, string, string] {
 	const [prefix, local] = s.consumeQName();
 	s.consumeEq();
 	const quote = s.consumeQuote();
@@ -444,7 +444,7 @@ function parseAttribute(s: XmlStream): [string, string, string] {
  *
  * https://www.w3.org/TR/xml/#NT-content
  */
-function parseContent(s: XmlStream, tokenCallback: TTokenCallback): void {
+function parseContent(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	while (!s.atEnd()) {
 		const currByte = s.currByte();
 		if (currByte === 60 /* < */) {
@@ -484,7 +484,7 @@ function parseContent(s: XmlStream, tokenCallback: TTokenCallback): void {
  *
  * https://www.w3.org/TR/xml/#sec-cdata-sect
  */
-function parseCdata(s: XmlStream, tokenCallback: TTokenCallback): void {
+function parseCdata(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(9); // <![CDATA[
 	const text = s.consumeChars((_s, c) => !(c === ']' && _s.startsWith(']]>')));
@@ -500,7 +500,7 @@ function parseCdata(s: XmlStream, tokenCallback: TTokenCallback): void {
  *
  * https://www.w3.org/TR/xml/#NT-ETag
  */
-function parseCloseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
+function parseCloseElement(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(2); // </
 
@@ -515,7 +515,7 @@ function parseCloseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 /**
  * Parses text content.
  */
-function parseText(s: XmlStream, tokenCallback: TTokenCallback): void {
+function parseText(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	const text = s.consumeChars((_, c) => c !== '<');
 

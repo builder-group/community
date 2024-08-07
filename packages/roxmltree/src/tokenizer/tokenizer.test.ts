@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { parseString } from './index';
 import { type TXMLToken } from './types';
-import { XmlError } from './XMLError';
+import { XmlError } from './XmlError';
 
 describe('tokenizer tests', () => {
 	describe('CDATA', () => {

@@ -1,5 +1,29 @@
+export const AMPERSAND = 38; // &
+export const HASHTAG = 35; // #
+export const X_LOWER = 120; // x
+export const ZERO = 48; // 0
+export const NINE = 57; // 9
+export const A_UPPER = 65; // A
+export const F_UPPER = 70; // F
+export const Z_UPPER = 90; // Z
+export const A_LOWER = 97; // a
+export const F_LOWER = 102; // f
+export const Z_LOWER = 122; // z
+export const SEMICOLON = 59; // ;
+export const COLON = 58; // :
+export const EQUALS = 61; // =
+export const SINGLE_QUOTE = 39; // '
+export const DOUBLE_QUOTE = 34; // "
+export const UNDER_SCORE = 95; // _
+export const MINUS = 45; // -
+export const DOT = 46; // .
+export const SPACE = 32; // ' ';
+export const NEW_LINE = 10; // \n
+export const HORIZONTAL_TAB = 9; // \t
+export const CARRIAGE_RETURN = 13; // \r
+
 export function isAsciiDigit(byte: number): boolean {
-	return byte >= 48 /* 0 */ && byte <= 57 /* 9 */;
+	return byte >= ZERO && byte <= NINE;
 }
 
 /**
@@ -16,10 +40,10 @@ export function isXmlNameStart(c: string): boolean {
 	// Check for ASCII first
 	if (code <= 128) {
 		return (
-			(code >= 65 /* A */ && code <= 90) /* Z */ ||
-			(code >= 97 /* a */ && code <= 122) /* z */ ||
-			code === 58 /* : */ ||
-			code === 95 /* _ */
+			(code >= A_UPPER && code <= Z_UPPER) ||
+			(code >= A_LOWER && code <= Z_LOWER) ||
+			code === COLON ||
+			code === UNDER_SCORE
 		);
 	}
 
@@ -98,9 +122,7 @@ export function isXmlChar(c: string): boolean {
  * @returns True if the byte is a valid XML space, false otherwise.
  */
 export function isXmlSpaceByte(byte: number): boolean {
-	return (
-		byte === 32 /* ' ' */ || byte === 9 /* \t */ || byte === 10 /* \n */ || byte === 13 /* \r */
-	);
+	return byte === SPACE || byte === HORIZONTAL_TAB || byte === NEW_LINE || byte === CARRIAGE_RETURN;
 }
 
 /**
@@ -110,12 +132,12 @@ export function isXmlSpaceByte(byte: number): boolean {
  */
 export function isXmlNameByte(byte: number): boolean {
 	return (
-		(byte >= 48 /* 0 */ && byte <= 57) /* 9 */ ||
-		(byte >= 65 /* A */ && byte <= 90) /* Z */ ||
-		(byte >= 97 /* a */ && byte <= 122) /* z */ ||
-		byte === 58 /* : */ ||
-		byte === 95 /* _ */ ||
-		byte === 45 /* - */ ||
-		byte === 46 /* . */
+		(byte >= ZERO && byte <= NINE) ||
+		(byte >= A_UPPER && byte <= Z_UPPER) ||
+		(byte >= A_LOWER && byte <= Z_LOWER) ||
+		byte === COLON ||
+		byte === UNDER_SCORE ||
+		byte === MINUS ||
+		byte === DOT
 	);
 }
