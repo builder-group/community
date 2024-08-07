@@ -10,6 +10,8 @@ await wasm.initWasm();
 
 console.log(xmlToObject(sample));
 
+console.log(wasm.xmlToObject(sample, false));
+
 console.log(txml.parse(sample));
 
 // wasm.parseXml(

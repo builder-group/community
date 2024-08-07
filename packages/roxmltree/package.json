@@ -1,6 +1,6 @@
 {
 	"name": "roxmltree",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"description": "Read Only XML Tree",
 	"private": false,
 	"scripts": {
@@ -41,8 +41,11 @@
 		"@blgc/config": "workspace:*",
 		"@rollup/plugin-wasm": "^6.2.2",
 		"@types/node": "^20.14.10",
+		"@types/sax": "^1.2.7",
 		"@types/xml2js": "^0.4.14",
 		"fast-xml-parser": "^4.4.1",
+		"sax": "^1.4.1",
+		"saxen": "^10.0.0",
 		"txml": "^5.1.1",
 		"xml2js": "^0.6.2"
 	},
