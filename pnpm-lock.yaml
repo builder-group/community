@@ -57,22 +57,6 @@ importers:
         specifier: ^1.6.0
         version: 1.6.0(@types/node@22.1.0)
 
-  apps/playground:
-    dependencies:
-      roxmltree:
-        specifier: workspace:*
-        version: link:../../packages/roxmltree
-      txml:
-        specifier: ^5.1.1
-        version: 5.1.1
-    devDependencies:
-      typescript:
-        specifier: ^5.2.2
-        version: 5.5.4
-      vite:
-        specifier: ^5.3.4
-        version: 5.3.5(@types/node@22.1.0)
-
   examples/feature-fetch/vanilla/open-meteo:
     dependencies:
       feature-fetch:
@@ -254,6 +238,19 @@ importers:
       tsx:
         specifier: ^4.7.1
         version: 4.16.5
+
+  examples/roxmltree/vanilla/profiler:
+    dependencies:
+      roxmltree:
+        specifier: workspace:*
+        version: link:../../../../packages/roxmltree
+    devDependencies:
+      typescript:
+        specifier: ^5.2.2
+        version: 5.5.4
+      vite:
+        specifier: ^5.3.4
+        version: 5.3.5(@types/node@22.1.0)
 
   packages/cli:
     dependencies:
@@ -521,9 +518,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@rollup/plugin-wasm':
-        specifier: ^6.2.2
-        version: 6.2.2(rollup@4.19.2)
       '@types/node':
         specifier: ^20.14.10
         version: 20.14.14
@@ -1166,15 +1160,6 @@ packages:
 
   '@rollup/plugin-replace@5.0.7':
     resolution: {integrity: sha512-PqxSfuorkHz/SPpyngLyg5GCEkOcee9M1bkxiVDr41Pd61mqP1PLOoDPbpl44SB2mQGKwV/In74gqQmGITOhEQ==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-
-  '@rollup/plugin-wasm@6.2.2':
-    resolution: {integrity: sha512-gpC4R1G9Ni92ZIRTexqbhX7U+9estZrbhP+9SRb0DW9xpB9g7j34r+J2hqrcW/lRI7dJaU84MxZM0Rt82tqYPQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
@@ -5650,12 +5635,6 @@ snapshots:
     dependencies:
       '@rollup/pluginutils': 5.1.0(rollup@4.19.2)
       magic-string: 0.30.11
-    optionalDependencies:
-      rollup: 4.19.2
-
-  '@rollup/plugin-wasm@6.2.2(rollup@4.19.2)':
-    dependencies:
-      '@rollup/pluginutils': 5.1.0(rollup@4.19.2)
     optionalDependencies:
       rollup: 4.19.2
 

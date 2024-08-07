@@ -5,6 +5,7 @@
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"build:dev": "shx rm -rf dist && ../../scripts/cli.sh bundle --target=dev",
 		"start:dev": "tsc -w",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",

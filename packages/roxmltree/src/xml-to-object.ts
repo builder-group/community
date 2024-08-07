@@ -33,7 +33,7 @@ export function xmlToObject(xmlString: string, allowDtd = false): TXMLNode {
 				break;
 			}
 			case 'Attribute': {
-				currentNode.attributes[getTagName(token.local, token.prefix)] = token.value.toString();
+				currentNode.attributes[getTagName(token.local, token.prefix)] = token.value;
 				break;
 			}
 			case 'Text':
