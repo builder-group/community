@@ -7,7 +7,7 @@ import {
 	HASH,
 	isAsciiDigit,
 	isXmlChar,
-	isXmlName,
+	isXmlNameByte,
 	isXmlNameStart,
 	isXmlSpaceByte,
 	LINE_FEED,
@@ -32,7 +32,6 @@ export class ByteXmlStream implements TXmlStream {
 	private _buffer: Uint8Array;
 	private _pos: number;
 	private _end: number;
-	private _textDecoder = new TextDecoder();
 
 	public constructor(buffer: Uint8Array, pos = 0) {
 		this._buffer = buffer;
@@ -41,7 +40,7 @@ export class ByteXmlStream implements TXmlStream {
 	}
 
 	public clone(): ByteXmlStream {
-		return new ByteXmlStream(this._buffer);
+		return new ByteXmlStream(this._buffer, this._pos);
 	}
 
 	public getPos(): number {
@@ -74,8 +73,7 @@ export class ByteXmlStream implements TXmlStream {
 		this._pos = Math.min(this._pos + n, this._end);
 	}
 
-	public startsWith(text: string): boolean {
-		const bytes = new TextEncoder().encode(text);
+	public startsWith(bytes: Uint8Array): boolean {
 		if (this._end - this._pos < bytes.length) return false;
 		for (let i = 0; i < bytes.length; i++) {
 			if (this._buffer[this._pos + i] !== bytes[i]) return false;
@@ -99,52 +97,34 @@ export class ByteXmlStream implements TXmlStream {
 		return false;
 	}
 
-	public skipString(text: string): void {
-		const bytes = new TextEncoder().encode(text);
-		if (this._end - this._pos < bytes.length || !this.startsWith(text)) {
-			throw new XmlError({ type: 'InvalidString', expected: text }, this.genTextPos());
+	public skipBytes(bytes: Uint8Array): void {
+		if (this._end - this._pos < bytes.length || !this.startsWith(bytes)) {
+			throw new XmlError(
+				{ type: 'InvalidString', expected: String.fromCharCode(...bytes) },
+				this.genTextPos()
+			);
 		}
 		this._pos += bytes.length;
 	}
 
-	public consumeBytes(predicate: (byte: number) => boolean): string {
+	public consumeBytesWhile(
+		predicate: (stream: ByteXmlStream, byte: number) => boolean
+	): Uint8Array {
 		const start = this._pos;
-		while (this._pos < this._end && predicate(this._buffer[this._pos] as unknown as number)) {
+		while (this._pos < this._end && predicate(this, this._buffer[this._pos] as unknown as number)) {
 			this._pos++;
 		}
-		return this.decodeSlice(start, this._pos);
+		return this._buffer.subarray(start, this._pos);
 	}
 
-	public skipBytes(predicate: (byte: number) => boolean): void {
-		while (this._pos < this._end && predicate(this._buffer[this._pos] as unknown as number)) {
+	public skipBytesWhile(predicate: (stream: ByteXmlStream, byte: number) => boolean): void {
+		while (this._pos < this._end && predicate(this, this._buffer[this._pos] as unknown as number)) {
 			this._pos++;
 		}
 	}
 
-	public consumeChars(predicate: (stream: ByteXmlStream, char: string) => boolean): string {
-		const start = this._pos;
-		this.skipChars(predicate);
-		return this.decodeSlice(start, this._pos);
-	}
-
-	public skipChars(predicate: (stream: ByteXmlStream, char: string) => boolean): void {
-		while (this._pos < this._end) {
-			const charLength = this.getCharLength(this._buffer[this._pos] as unknown as number);
-			if (this._pos + charLength > this._end) break;
-
-			const char = this.decodeSlice(this._pos, this._pos + charLength);
-			if (!isXmlChar(char)) {
-				throw new XmlError({ type: 'NonXmlChar', char }, this.genTextPos());
-			} else if (predicate(this, char)) {
-				this._pos += charLength;
-			} else {
-				break;
-			}
-		}
-	}
-
-	public sliceBack(pos: number): string {
-		return this.decodeSlice(pos, this._pos);
+	public sliceBack(pos: number): Uint8Array {
+		return this._buffer.subarray(pos, this._pos);
 	}
 
 	public rangeFrom(start: number): TRange {
@@ -152,9 +132,7 @@ export class ByteXmlStream implements TXmlStream {
 	}
 
 	public skipSpaces(): void {
-		while (this._pos < this._end && isXmlSpaceByte(this._buffer[this._pos] as unknown as number)) {
-			this._pos++;
-		}
+		this.skipBytesWhile((_, b) => isXmlSpaceByte(b));
 	}
 
 	public startsWithSpace(): boolean {
@@ -198,28 +176,29 @@ export class ByteXmlStream implements TXmlStream {
 
 		const getReference = (): TReference | null => {
 			if (this.tryConsumeByte(HASH)) {
-				let value: string;
+				let value: number;
 				let radix: number;
 
 				if (this.tryConsumeByte(LOWERCASE_X)) {
-					value = this.consumeBytes(
-						(byte) =>
+					const hexBytes = this.consumeBytesWhile(
+						(_, byte) =>
 							(byte >= ZERO && byte <= NINE) ||
 							(byte >= UPPERCASE_A && byte <= UPPERCASE_F) ||
 							(byte >= LOWERCASE_A && byte <= LOWERCASE_F)
 					);
+					value = parseInt(String.fromCharCode(...hexBytes), 16);
 					radix = 16;
 				} else {
-					value = this.consumeBytes((byte) => isAsciiDigit(byte));
+					const digitBytes = this.consumeBytesWhile((_, byte) => isAsciiDigit(byte));
+					value = parseInt(String.fromCharCode(...digitBytes), 10);
 					radix = 10;
 				}
 
-				const n = parseInt(value, radix);
-				if (isNaN(n)) {
+				if (isNaN(value)) {
 					return null;
 				}
 
-				const c = String.fromCodePoint(n);
+				const c = String.fromCodePoint(value);
 				if (!isXmlChar(c)) {
 					return null;
 				}
@@ -228,8 +207,9 @@ export class ByteXmlStream implements TXmlStream {
 			}
 
 			const name = this.consumeName();
+			const nameStr = String.fromCharCode(...name);
 
-			switch (name) {
+			switch (nameStr) {
 				case 'quot':
 					return { type: 'Char', value: '"' };
 				case 'amp':
@@ -241,7 +221,7 @@ export class ByteXmlStream implements TXmlStream {
 				case 'gt':
 					return { type: 'Char', value: '>' };
 				default:
-					return { type: 'Entity', value: name };
+					return { type: 'Entity', value: nameStr };
 			}
 		};
 
@@ -251,11 +231,11 @@ export class ByteXmlStream implements TXmlStream {
 		return reference;
 	}
 
-	public consumeName(): string {
+	public consumeName(): Uint8Array {
 		const start = this._pos;
 		this.skipName();
 
-		const name = this.decodeSlice(start, this._pos);
+		const name = this._buffer.subarray(start, this._pos);
 		if (name.length === 0) {
 			throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 		}
@@ -267,64 +247,50 @@ export class ByteXmlStream implements TXmlStream {
 		const start = this._pos;
 
 		while (this._pos < this._end) {
-			const charLength = this.getCharLength(this._buffer[this._pos] as unknown as number);
-			if (this._pos + charLength > this._end) break;
-
-			const char = this.decodeSlice(this._pos, this._pos + charLength);
+			const currByte = this._buffer[this._pos] as unknown as number;
 			if (this._pos === start) {
-				if (!isXmlNameStart(char)) {
+				if (!isXmlNameByte(currByte)) {
 					throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 				}
-			} else if (!isXmlName(char)) {
+			} else if (!isXmlNameByte(currByte)) {
 				break;
 			}
-			this._pos += charLength;
+			this._pos++;
 		}
 	}
 
-	public consumeQName(): [string, string] {
+	public consumeQName(): [Uint8Array, Uint8Array] {
 		const start = this._pos;
 		let splitter: number | null = null;
 
 		while (this._pos < this._end) {
 			const currByte = this._buffer[this._pos] as unknown as number;
-			if (currByte < 128) {
-				if (currByte === COLON) {
-					if (splitter == null) {
-						splitter = this._pos;
-						this._pos++;
-					} else {
-						throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
-					}
-				} else if (isXmlName(currByte)) {
+			if (currByte === COLON) {
+				if (splitter == null) {
+					splitter = this._pos;
 					this._pos++;
 				} else {
-					break;
+					throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 				}
+			} else if (isXmlNameByte(currByte)) {
+				this._pos++;
 			} else {
-				const charLength = this.getCharLength(currByte);
-				if (this._pos + charLength > this._end) break;
-				const char = this.decodeSlice(this._pos, this._pos + charLength);
-				if (isXmlName(char)) {
-					this._pos += charLength;
-				} else {
-					break;
-				}
+				break;
 			}
 		}
 
-		const prefix = splitter != null ? this.decodeSlice(start, splitter) : '';
+		const prefix = splitter != null ? this._buffer.subarray(start, splitter) : new Uint8Array(0);
 		const local =
 			splitter != null
-				? this.decodeSlice(splitter + 1, this._pos)
-				: this.decodeSlice(start, this._pos);
+				? this._buffer.subarray(splitter + 1, this._pos)
+				: this._buffer.subarray(start, this._pos);
 
-		if (prefix.length > 0 && !isXmlNameStart(prefix[0] as unknown as string)) {
+		if (prefix.length > 0 && !isXmlNameStart(prefix[0] as unknown as number)) {
 			throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 		}
 
 		if (local.length > 0) {
-			if (!isXmlNameStart(local[0] as unknown as string)) {
+			if (!isXmlNameStart(local[0] as unknown as number)) {
 				throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 			}
 		} else {
@@ -366,17 +332,5 @@ export class ByteXmlStream implements TXmlStream {
 			}
 		}
 		return { row, col };
-	}
-
-	private getCharLength(byte: number): number {
-		if (byte < 128) return 1;
-		if (byte >= 240) return 4;
-		if (byte >= 224) return 3;
-		if (byte >= 192) return 2;
-		return 1; // Invalid UTF-8 byte, treat as 1-byte char
-	}
-
-	private decodeSlice(start: number, end: number): string {
-		return this._textDecoder.decode(this._buffer.subarray(start, end));
 	}
 }

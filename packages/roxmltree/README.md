@@ -69,17 +69,27 @@ The performance of `roxmltree`, was benchmarked against other popular XML parser
 
 ### Why removed Rust implementation (WASM)?
 
-To improve maintainability and because it lacked the hoped performance boost.
+We removed the Rust implementation to improve maintainability and because it didn't provide the expected performance boost.
 
-In the implementation where a TypeScript function is called from Rust on every token event (`wasmMix` benchmark), slow communication between Rust and Typescript negates Rust's performance benefits.
+Calling a TypeScript function from Rust on every token event (`wasmMix` benchmark) results in slow communication, negating Rust's performance benefits. Parsing XML entirely in Rust (`wasm` benchmark) avoids frequent communication but is still too slow due to the overhead of serializing and deserializing data between JavaScript and Rust (mainly the resulting big XML-Object). While Rust parsing without returning results is faster than any JavaScript XML parser, needing results in the JavaScript layer makes this approach impractical.
 
-Parsing XML entirely in Rust (`wasm` benchmark) avoids this frequent communication issue but is still too slow. Also here the primary bottleneck is the serialization and deserialization of data between JavaScript and Rust. While parsing without returning results is faster than any other JavaScript XML parser, the necessity of retrieving results in the JavaScript layer renders this approach impractical.
+The `roxmltree` package with the Rust implementation can be found in the `_deprecated` folder (`packages/deprecated/roxmltree_wasm`).
 
-The `roxmltree` package with the Rust implementation can be found in the `_deprecated` folder.
+### Why Port `tokenizer.rs` to TypeScript?
 
-### Why `tokenizer.rs` was ported to TypeScript?
+We ported [`tokenizer.rs`](https://github.com/RazrFalcon/roxmltree/blob/master/src/tokenizer.rs) to TypeScript because frequent communication between Rust and TypeScript negated Rust's performance benefits. The stream architecture required constant interaction between Rust and TypeScript via the `tokenCallback`, reducing overall efficiency.
 
-The port of [`tokenizer.rs`](https://github.com/RazrFalcon/roxmltree/blob/master/src/tokenizer.rs) to TypeScript was necessary because the frequent communication between Rust and TypeScript negated Rust's performance benefits. The stream architecture required constant interaction between Rust and TypeScript via the `tokenCallback`, which reduced overall efficiency.
+For token streaming, the TypeScript implementation is twice as fast as the mixed Rust-TypeScript approach. However, for complete parsing tasks (e.g., converting XML to objects), Rust remains faster but not fast enough to make up for the deserialization overhead.
 
-For token streaming, the TypeScript implementation is twice as fast as a mixed Rust-TypeScript approach. However, for complete parsing tasks (e.g., converting XML to objects), Rust is faster.
+### Why removed Byte-Based implementation?
 
+We removed the byte-based implementation to enhance maintainability and because it didn't provide the expected performance improvement.
+
+Decoding `Uint8Array` snippets to JavaScript strings is frequently necessary, nearly on every token event. This decoding process is slow, making this approach less efficient than working directly with strings.
+
+```
+// [roxmltree:byte]     12.4869  78.6583  83.2979  80.0840  80.4702  83.2979  83.2979  83.2979  ±1.27%       10
+// [roxmltree:text]     58.8184  15.6937  19.1283  17.0015  17.0783  19.1283  19.1283  19.1283  ±1.51%       30
+```
+
+The `roxmltree` package with the Byte-Based implementation can be found in the `_deprecated` folder (`packages/deprecated/roxmltree_byte-only`).
