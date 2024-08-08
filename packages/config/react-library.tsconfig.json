@@ -4,8 +4,8 @@
 	"extends": "./base.tsconfig.json",
 	"compilerOptions": {
 		// Language and Environmet
-		"target": "es6",
-		"lib": ["dom", "dom.Iterable", "es2015"],
+		"target": "es2020",
+		"lib": ["dom", "dom.Iterable", "es2020"],
 		"jsx": "react-jsx",
 
 		// Modules
@@ -16,8 +16,8 @@
 		"allowJs": true,
 
 		// Emit
-		"outDir": "./dist",
-		"rootDir": "./src"
+		// "outDir": "./dist",
+		// "rootDir": "./src"
 	},
 	"include": ["src"]
 }

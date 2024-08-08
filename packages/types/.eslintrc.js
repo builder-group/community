@@ -4,5 +4,5 @@
 module.exports = {
 	root: true,
 	extends: [require.resolve('@blgc/config/eslint/library')],
-	ignorePatterns: ['src/__tests__/*']
+	ignorePatterns: ['src/openapi/__tests__/*']
 };

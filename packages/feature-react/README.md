@@ -63,7 +63,7 @@ const state = withPersistLocalStorage(createState([]), 'tasks');
 
 await state.persist();
 
-state.addTask({ id: 1, title: 'Task 1' });
+state.set([..., state.get(), { id: 1, title: 'Task 1' }]);
 ```
 
 - **`key`**: The key used to identify the state in `localStorage`.
