@@ -30,23 +30,32 @@ A collection of open source libraries maintained by [builder.group](https://buil
 | [utils](https://github.com/builder-group/monorepo/blob/develop/packages/utils)                                   | Straightforward, typesafe, and tree-shakable collection of utility functions                                                                                                   | [`@blgc/utils`](https://www.npmjs.com/package/@blgc/utils)                       |
 | [validation-adapter](https://github.com/builder-group/monorepo/blob/develop/packages/validation-adapter)         | Universal validation adapter that integrates various validation libraries like Zod, Valibot, and Yup                                                                           | [`validation-adapter`](https://www.npmjs.com/package/validation-adapter)         |
 | [validation-adapters](https://github.com/builder-group/monorepo/blob/develop/packages/validation-adapters)       | Pre-made validation adapters for the validation-adapter library, including adapters for Zod and Valibot                                                                        | [`validation-adapters`](https://www.npmjs.com/package/validation-adapters)       |
+| [xml-tokenizer](https://github.com/builder-group/monorepo/blob/develop/packages/xml-tokenizer)       | Straightforward and typesafe XML tokenizer that streams tokens through a callback mechanism                                                                        | [`xml-tokenizer`](https://www.npmjs.com/package/xml-tokenizer)       |
 
 ### 📚 Examples
 
 > See [`/examples`](https://github.com/builder-group/monorepo/tree/develop/examples)
 
-### `feature-state`
+### `feature-fetch`
 
-- [`feature-state/react/counter`](https://github.com/builder-group/monorepo/tree/develop/examples/feature-state/react/counter)
+- [`feature-fetch/vanilla/open-meteo`](https://github.com/builder-group/monorepo/tree/develop/examples/feature-fetch/vanilla/open-meteo)
 
 ### `feature-form`
 
 - [`feature-form/react/basic`](https://github.com/builder-group/monorepo/tree/develop/examples/feature-form/react/basic)
 
+### `feature-state`
+
+- [`feature-state/react/counter`](https://github.com/builder-group/monorepo/tree/develop/examples/feature-state/react/counter)
+
 ### `openapi-router`
 
 - [`openapi-router/hono/petstore`](https://github.com/builder-group/monorepo/tree/develop/examples/openapi-router/hono/petstore)
 - [`openapi-router/express/petstore`](https://github.com/builder-group/monorepo/tree/develop/examples/openapi-router/express/petstore)
+
+### `xml-tokenizer`
+
+- [`xml-tokenizer/vanilla/profiler`](https://github.com/builder-group/monorepo/tree/develop/examples/xml-tokenizer/vanilla/profiler)
 
 ## FAQ
 
