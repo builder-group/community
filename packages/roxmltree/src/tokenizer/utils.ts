@@ -36,7 +36,8 @@ export function isAsciiDigit(byte: number): boolean {
 }
 
 /**
- * Checks if the character is within the NameStartChar range.
+ * Checks if the unicode code point (character) is within the name start char range.
+ *
  * @param codePoint - The character to check.
  * @returns True if the character is a valid XML name start character, false otherwise.
  */
@@ -72,7 +73,8 @@ export function isXmlNameStart(codePoint: number | undefined): boolean {
 }
 
 /**
- * Checks if the character is within the NameChar range.
+ * Checks if the unicode code point (character) is within the XML name char range.
+ *
  * @param codePoint - The character to check.
  * @returns True if the character is a valid XML name character, false otherwise.
  */
@@ -106,7 +108,8 @@ export function isXmlName(codePoint: number | undefined): boolean {
 }
 
 /**
- * Checks if the character is within the Char range.
+ * Checks if the unicode code point (character) is within the XML char range.
+ *
  * @param codePoint - The character to check.
  * @returns True if the character is a valid XML character, false otherwise.
  */
@@ -124,6 +127,7 @@ export function isXmlChar(codePoint: number | undefined): boolean {
 
 /**
  * Checks if the character is an XML space.
+ *
  * @param byte - The byte to check.
  * @returns True if the byte is a valid XML space, false otherwise.
  */
@@ -134,7 +138,8 @@ export function isXmlSpaceByte(byte: number): boolean {
 }
 
 /**
- * Checks if the byte is within the ASCII Char range.
+ * Checks if the byte is within the ASCII char range.
+ *
  * @param byte - The byte to check.
  * @returns True if the byte is a valid ASCII XML name character, false otherwise.
  */
