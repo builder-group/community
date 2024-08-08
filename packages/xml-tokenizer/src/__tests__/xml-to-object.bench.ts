@@ -3,7 +3,7 @@ import { describe } from 'node:test';
 import * as fastXmlParser from 'fast-xml-parser';
 import * as txml from 'txml';
 import { beforeAll, bench, expect } from 'vitest';
-import * as xt from 'xml-tokenizer';
+// import * as xt from 'xml-tokenizer';
 import * as xml2js from 'xml2js';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Ok
@@ -29,10 +29,10 @@ void describe('xml to object', () => {
 		expect(result).not.toBeNull();
 	});
 
-	bench('[xml-tokenizer (npm)]', () => {
-		const result = xt.xmlToObject(xml);
-		expect(result).not.toBeNull();
-	});
+	// bench('[xml-tokenizer (npm)]', () => {
+	// 	const result = xt.xmlToObject(xml);
+	// 	expect(result).not.toBeNull();
+	// });
 
 	bench('[fast-xml-parser]', () => {
 		const parser = new fastXmlParser.XMLParser();

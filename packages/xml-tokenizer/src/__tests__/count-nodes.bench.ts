@@ -5,7 +5,8 @@ import * as sax from 'sax';
 // @ts-expect-error -- Ok
 import * as saxen from 'saxen';
 import { beforeAll, bench, expect } from 'vitest';
-import * as xt from 'xml-tokenizer';
+
+// import * as xt from 'xml-tokenizer';
 
 import { parseXmlStream, XmlStream } from '../index';
 
@@ -27,16 +28,16 @@ void describe('count nodes', () => {
 		expect(nodeCount).toBe(10045);
 	});
 
-	bench('[xml-tokenizer (npm)]', () => {
-		let nodeCount = 0;
-		xt.parseXmlStream(new xt.XmlStream(xml), false, (token) => {
-			if (token.type === 'ElementStart') {
-				nodeCount++;
-			}
-		});
+	// bench('[xml-tokenizer (npm)]', () => {
+	// 	let nodeCount = 0;
+	// 	xt.parseXmlStream(new xt.XmlStream(xml), false, (token) => {
+	// 		if (token.type === 'ElementStart') {
+	// 			nodeCount++;
+	// 		}
+	// 	});
 
-		expect(nodeCount).toBe(10045);
-	});
+	// 	expect(nodeCount).toBe(10045);
+	// });
 
 	bench('[saxen]', () => {
 		let nodeCount = 0;
