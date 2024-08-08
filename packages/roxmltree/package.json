@@ -1,6 +1,6 @@
 {
 	"name": "roxmltree",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"description": "Read Only XML Tree",
 	"private": false,
 	"scripts": {
@@ -37,7 +37,7 @@
 		"@types/sax": "^1.2.7",
 		"@types/xml2js": "^0.4.14",
 		"fast-xml-parser": "^4.4.1",
-		"roxmltree": "^0.0.7",
+		"roxmltree": "^0.0.8",
 		"sax": "^1.4.1",
 		"saxen": "^10.0.0",
 		"txml": "^5.1.1",

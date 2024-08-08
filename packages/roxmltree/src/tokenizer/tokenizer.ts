@@ -245,9 +245,12 @@ function parseDoctypeStart(s: TXmlStream): void {
 	parseExternalId(s);
 	s.skipSpaces();
 
-	const c = s.currByte();
-	if (c !== OPEN_BRACKET && c !== GREATER_THAN) {
-		throw new XmlError({ type: 'InvalidChar', expected: "'[' or '>'", actual: c }, s.genTextPos());
+	const currByte = s.currByte();
+	if (currByte !== OPEN_BRACKET && currByte !== GREATER_THAN) {
+		throw new XmlError(
+			{ type: 'InvalidChar', expected: "'[' or '>'", actual: currByte },
+			s.genTextPos()
+		);
 	}
 }
 
@@ -323,15 +326,15 @@ function parseEntityDecl(s: TXmlStream, tokenCallback: TTokenCallback): void {
  * https://www.w3.org/TR/xml/#sec-entity-decl
  */
 function parseEntityDef(s: TXmlStream, isGe: boolean): string | null {
-	const c = s.currByte();
-	if (c === DOUBLE_QUOTE || c === SINGLE_QUOTE) {
+	const currByte = s.currByte();
+	if (currByte === DOUBLE_QUOTE || currByte === SINGLE_QUOTE) {
 		const quote = s.consumeQuote();
 		const start = s.getPos();
-		s.skipBytesWhile((_c) => _c !== quote);
+		s.skipBytesWhile((c) => c !== quote);
 		const value = s.sliceBack(start);
 		s.consumeByte(quote);
 		return value;
-	} else if (c === UPPERCASE_S || c === UPPERCASE_P) {
+	} else if (currByte === UPPERCASE_S || currByte === UPPERCASE_P) {
 		if (parseExternalId(s)) {
 			if (isGe) {
 				s.skipSpaces();
@@ -349,7 +352,7 @@ function parseEntityDef(s: TXmlStream, isGe: boolean): string | null {
 		throw new XmlError({ type: 'InvalidExternalID' }, s.genTextPos());
 	} else {
 		throw new XmlError(
-			{ type: 'InvalidChar', expected: 'a quote, SYSTEM or PUBLIC', actual: c },
+			{ type: 'InvalidChar', expected: 'a quote, SYSTEM or PUBLIC', actual: currByte },
 			s.genTextPos()
 		);
 	}
@@ -508,12 +511,12 @@ function parseCloseElement(s: TXmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(2); // </
 
-	const [prefix, tagName] = s.consumeQName();
+	const [prefix, local] = s.consumeQName();
 	s.skipSpaces();
 	s.consumeByte(GREATER_THAN);
 
 	const range = s.rangeFrom(start);
-	tokenCallback({ type: 'ElementEnd', end: { type: 'Close', prefix, local: tagName }, range });
+	tokenCallback({ type: 'ElementEnd', end: { type: 'Close', prefix, local }, range });
 }
 
 /**

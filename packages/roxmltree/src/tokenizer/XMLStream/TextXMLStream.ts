@@ -66,23 +66,26 @@ export class TextXmlStream implements TXmlStream {
 	}
 
 	public advance(n: number): void {
-		this._pos = Math.min(this._pos + n, this._end);
+		this._pos += n;
 	}
 
 	public startsWith(text: string): boolean {
 		return this._text.startsWith(text, this._pos);
 	}
 
-	public consumeByte(c: number): void {
-		const curr = this.currByte();
-		if (curr !== c) {
-			throw new XmlError({ type: 'InvalidChar', expected: c, actual: curr }, this.genTextPos());
+	public consumeByte(byte: number): void {
+		const currByte = this.currByte();
+		if (currByte !== byte) {
+			throw new XmlError(
+				{ type: 'InvalidChar', expected: byte, actual: currByte },
+				this.genTextPos()
+			);
 		}
 		this._pos += 1;
 	}
 
-	public tryConsumeByte(c: number): boolean {
-		if (this.currByte() === c) {
+	public tryConsumeByte(byte: number): boolean {
+		if (this.currByte() === byte) {
 			this._pos += 1;
 			return true;
 		}
@@ -182,57 +185,57 @@ export class TextXmlStream implements TXmlStream {
 			return null;
 		}
 
-		const getReference = (): TReference | null => {
-			if (this.tryConsumeByte(HASH)) {
-				let value: string;
-				let radix: number;
+		let reference: TReference | null;
 
-				if (this.tryConsumeByte(LOWERCASE_X)) {
-					value = this.consumeBytesWhile(
-						(byte) =>
-							(byte >= ZERO && byte <= NINE) ||
-							(byte >= UPPERCASE_A && byte <= UPPERCASE_F) ||
-							(byte >= LOWERCASE_A && byte <= LOWERCASE_F)
-					);
-					radix = 16;
-				} else {
-					value = this.consumeBytesWhile((byte) => isAsciiDigit(byte));
-					radix = 10;
-				}
+		if (this.tryConsumeByte(HASH)) {
+			let value: string;
+			let radix: number;
 
-				const n = parseInt(value, radix);
-				if (isNaN(n)) {
-					return null;
-				}
-
-				const c = String.fromCodePoint(n);
-				if (!isXmlChar(c)) {
-					return null;
-				}
-
-				return { type: 'Char', value: c };
+			if (this.tryConsumeByte(LOWERCASE_X)) {
+				value = this.consumeBytesWhile(
+					(byte) =>
+						(byte >= ZERO && byte <= NINE) ||
+						(byte >= UPPERCASE_A && byte <= UPPERCASE_F) ||
+						(byte >= LOWERCASE_A && byte <= LOWERCASE_F)
+				);
+				radix = 16;
+			} else {
+				value = this.consumeBytesWhile((byte) => isAsciiDigit(byte));
+				radix = 10;
 			}
 
+			const codePoint = parseInt(value, radix);
+			if (isNaN(codePoint) || !isXmlChar(codePoint)) {
+				reference = null;
+			} else {
+				reference = { type: 'Char', value: String.fromCodePoint(codePoint) };
+			}
+		} else {
 			const name = this.consumeName();
-
 			switch (name) {
 				case 'quot':
-					return { type: 'Char', value: '"' };
+					reference = { type: 'Char', value: '"' };
+					break;
 				case 'amp':
-					return { type: 'Char', value: '&' };
+					reference = { type: 'Char', value: '&' };
+					break;
 				case 'apos':
-					return { type: 'Char', value: "'" };
+					reference = { type: 'Char', value: "'" };
+					break;
 				case 'lt':
-					return { type: 'Char', value: '<' };
+					reference = { type: 'Char', value: '<' };
+					break;
 				case 'gt':
-					return { type: 'Char', value: '>' };
+					reference = { type: 'Char', value: '>' };
+					break;
 				default:
-					return { type: 'Entity', value: name };
+					reference = { type: 'Entity', value: name };
 			}
-		};
+		}
 
-		const reference = getReference();
-		this.consumeByte(SEMICOLON);
+		if (!this.tryConsumeByte(SEMICOLON)) {
+			return null;
+		}
 
 		return reference;
 	}
@@ -286,8 +289,16 @@ export class TextXmlStream implements TXmlStream {
 			}
 		}
 
-		const prefix = splitter != null ? this._text.slice(start, splitter) : '';
-		const local = splitter != null ? this.sliceBack(splitter + 1) : this.sliceBack(start);
+		let prefix;
+		let local;
+		if (splitter != null) {
+			prefix = this._text.slice(start, splitter);
+			local = this.sliceBack(splitter + 1);
+		} else {
+			// Empty prefix. This way we can preserve attribute start position.
+			prefix = '';
+			local = this.sliceBack(start);
+		}
 
 		// Prefix must start with a `NameStartChar`
 		if (prefix.length > 0 && !isXmlNameStart(prefix[0] as unknown as string)) {

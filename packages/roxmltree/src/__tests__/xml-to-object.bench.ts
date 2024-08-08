@@ -1,11 +1,14 @@
 import { readFile } from 'node:fs/promises';
 import { describe } from 'node:test';
 import * as fastXmlParser from 'fast-xml-parser';
-import * as rox from 'roxmltree';
+import * as roxNpm from 'roxmltree';
 import * as txml from 'txml';
 import { beforeAll, bench, expect } from 'vitest';
 import * as xml2js from 'xml2js';
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Ok
+// @ts-ignore -- Ok
+import * as roxDist from '../../dist/esm';
 import { xmlToObject } from '../index';
 
 void describe('xml to object', () => {
@@ -20,8 +23,14 @@ void describe('xml to object', () => {
 		expect(result).not.toBeNull();
 	});
 
+	bench('[(dist) roxmltree]', () => {
+		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -- Ok
+		const result = roxDist.xmlToObject(xml);
+		expect(result).not.toBeNull();
+	});
+
 	bench('[(npm) roxmltree]', () => {
-		const result = rox.xmlToObject(xml);
+		const result = roxNpm.xmlToObject(xml);
 		expect(result).not.toBeNull();
 	});
 
