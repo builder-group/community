@@ -600,9 +600,6 @@ importers:
       txml:
         specifier: ^5.1.1
         version: 5.1.1
-      xml-tokenizer:
-        specifier: ^0.0.2
-        version: 0.0.2
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -5239,9 +5236,6 @@ packages:
 
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
-
-  xml-tokenizer@0.0.2:
-    resolution: {integrity: sha512-f6avWiYnf7QRNG1rhlUIBok4S1H4C5A2TFoKIfe2UlO2saXXodoO0mOAO0/1PmIUEbHLhFdTUuEZjGsEmtEyRA==}
 
   xml2js@0.6.2:
     resolution: {integrity: sha512-T4rieHaC1EXcES0Kxxj4JWgaUQHDk+qwHcYOCFHfiwKz7tOVPLq7Hjq9dM1WCMhylqMEfP7hMcOIChvotiZegA==}
@@ -10534,8 +10528,6 @@ snapshots:
       strip-ansi: 7.1.0
 
   wrappy@1.0.2: {}
-
-  xml-tokenizer@0.0.2: {}
 
   xml2js@0.6.2:
     dependencies:
