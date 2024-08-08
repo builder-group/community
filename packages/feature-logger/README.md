@@ -29,7 +29,7 @@
 
 ### 🌟 Motivation
 
-Provide a typesafe, straightforward, and lightweight logging library designed to be modular and extendable with features like `withTimestamp()`, `withPrefix()`, ..
+Create a typesafe, straightforward, and lightweight logging library designed to be modular and extendable with features like `withTimestamp()`, `withPrefix()`, ..
 
 ### ⚖️ Alternatives
 - [winston](https://github.com/winstonjs/winston)

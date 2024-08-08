@@ -24,7 +24,7 @@
 
 ### 🌟 Motivation
 
-Provide a typesafe and straightforward wrapper around the communication between the `app/ui` and `plugin` part of a Figma Plugin.
+Create a typesafe and straightforward wrapper around the communication between the `app/ui` and `plugin` part of a Figma Plugin.
 
 ### ⚖️ Alternatives
 

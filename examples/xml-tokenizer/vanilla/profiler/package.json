@@ -1,5 +1,5 @@
 {
-	"name": "profiler",
+	"name": "xml-tokenizer-vanilla-profiler",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",

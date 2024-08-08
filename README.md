@@ -57,7 +57,7 @@ A collection of open source libraries maintained by [builder.group](https://buil
 
 - [`xml-tokenizer/vanilla/profiler`](https://github.com/builder-group/monorepo/tree/develop/examples/xml-tokenizer/vanilla/profiler)
 
-## FAQ
+## ❓ FAQ
 
 ### What does `blgc` stand for?
 

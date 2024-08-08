@@ -135,7 +135,7 @@ The `roxmltree` package with the Rust implementation can be found in the `_depre
 | roxmltree:wasmMix   | 28.17                           | 34.83         | 36.71         | 35.49          | ±0.91%                         | 
 | roxmltree:wasm      | 109.30                          | 8.30          | 13.16         | 9.15           | ±3.31%                         | 
 
-### Why Port `tokenizer.rs` to TypeScript?
+### Why ported `tokenizer.rs` to TypeScript?
 
 We ported [`tokenizer.rs`](https://github.com/RazrFalcon/roxmltree/blob/master/src/tokenizer.rs) to TypeScript because frequent communication between Rust and TypeScript negated Rust's performance benefits. The stream architecture required constant interaction between Rust and TypeScript via the `tokenCallback`, reducing overall efficiency.
 

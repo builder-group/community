@@ -33,7 +33,7 @@
 
 ### 🌟 Motivation
 
-Provide a typesafe, straightforward, and lightweight `fetch` wrapper that seamlessly integrates with OpenAPI schemas using `openapi-typescript`. It aims to simplify error handling by returning results in a predictable manner with [`ts-results-es`](https://github.com/lune-climate/ts-results-es#readme). Additionally, it is designed to be modular & extendable, enabling the creation of straightforward API wrappers, such as for the Google Web Fonts API (see [`google-webfonts-client`](https://github.com/builder-group/monorepo/tree/develop/packages/google-webfonts-client)). `feature-fetch` only depends on `fetch`, making it usable in most sandboxed environments like Figma plugins.
+Create a typesafe, straightforward, and lightweight `fetch` wrapper that seamlessly integrates with OpenAPI schemas using `openapi-typescript`. It aims to simplify error handling by returning results in a predictable manner with [`ts-results-es`](https://github.com/lune-climate/ts-results-es#readme). Additionally, it is designed to be modular & extendable, enabling the creation of straightforward API wrappers, such as for the Google Web Fonts API (see [`google-webfonts-client`](https://github.com/builder-group/monorepo/tree/develop/packages/google-webfonts-client)). `feature-fetch` only depends on `fetch`, making it usable in most sandboxed environments like Figma plugins.
 
 ### ⚖️ Alternatives
 

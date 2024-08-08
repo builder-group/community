@@ -8,9 +8,11 @@
 	"baseBranch": "origin/main",
 	"updateInternalDependencies": "patch",
 	"ignore": [
+		"feature-fetch-vanilla-open-meteo",
 		"feature-form-react-basic",
 		"feature-state-react-counter",
 		"openapi-router-express-petstore",
-		"openapi-router-hono-petstore"
+		"openapi-router-hono-petstore",
+		"xml-tokenizer-vanilla-profiler"
 	]
 }

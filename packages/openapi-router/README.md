@@ -33,7 +33,7 @@
 
 ### 🌟 Motivation
 
-The goal is to provide a typesafe and straightforward wrapper around web framework routers, seamlessly integrating with OpenAPI schemas using `openapi-typescript` and ensuring type validation with libraries like Zod and Valibot.
+Create a typesafe and straightforward wrapper around web framework routers, seamlessly integrating with OpenAPI schemas using `openapi-typescript` and ensuring type validation with libraries like Zod and Valibot.
 
 ## 📖 Usage
 

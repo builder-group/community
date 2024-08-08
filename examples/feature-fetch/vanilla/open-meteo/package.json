@@ -1,5 +1,5 @@
 {
-	"name": "open-meteo",
+	"name": "feature-fetch-vanilla-open-meteo",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
