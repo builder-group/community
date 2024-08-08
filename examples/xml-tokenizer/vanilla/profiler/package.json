@@ -8,8 +8,8 @@
 	},
 	"dependencies": {
 		"fast-xml-parser": "^4.4.1",
-		"roxmltree": "workspace:*",
 		"txml": "^5.1.1",
+		"xml-tokenizer": "workspace:*",
 		"xml2js": "^0.6.2"
 	},
 	"devDependencies": {

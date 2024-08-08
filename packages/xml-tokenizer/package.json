@@ -1,7 +1,7 @@
 {
-	"name": "roxmltree",
-	"version": "0.0.9",
-	"description": "Read Only XML Tree",
+	"name": "xml-tokenizer",
+	"version": "0.0.4",
+	"description": "Straightforward and typesafe XML tokenizer that streams tokens through a callback mechanism",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
@@ -37,10 +37,10 @@
 		"@types/sax": "^1.2.7",
 		"@types/xml2js": "^0.4.14",
 		"fast-xml-parser": "^4.4.1",
-		"roxmltree": "^0.0.9",
 		"sax": "^1.4.1",
 		"saxen": "^10.0.0",
 		"txml": "^5.1.1",
+		"xml-tokenizer": "^0.0.2",
 		"xml2js": "^0.6.2"
 	},
 	"files": [

@@ -1,9 +1,11 @@
 import { readFile } from 'node:fs/promises';
 import { describe } from 'node:test';
-import * as rox from 'roxmltree';
 import * as sax from 'sax';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Ok
+// @ts-expect-error -- Ok
 import * as saxen from 'saxen';
 import { beforeAll, bench, expect } from 'vitest';
+import * as xt from 'xml-tokenizer';
 
 import { parseXmlStream, XmlStream } from '../index';
 
@@ -14,7 +16,7 @@ void describe('count nodes', () => {
 		xml = await readFile(`${__dirname}/resources/midsize.xml`, 'utf-8');
 	});
 
-	bench('[roxmltree]', () => {
+	bench('[xml-tokenizer]', () => {
 		let nodeCount = 0;
 		parseXmlStream(new XmlStream(xml), false, (token) => {
 			if (token.type === 'ElementStart') {
@@ -25,9 +27,9 @@ void describe('count nodes', () => {
 		expect(nodeCount).toBe(10045);
 	});
 
-	bench('[(npm) roxmltree]', () => {
+	bench('[xml-tokenizer (npm)]', () => {
 		let nodeCount = 0;
-		rox.parseXmlStream(new rox.XmlStream(xml), false, (token) => {
+		xt.parseXmlStream(new xt.XmlStream(xml), false, (token) => {
 			if (token.type === 'ElementStart') {
 				nodeCount++;
 			}

@@ -239,17 +239,17 @@ importers:
         specifier: ^4.7.1
         version: 4.16.5
 
-  examples/roxmltree/vanilla/profiler:
+  examples/xml-tokenizer/vanilla/profiler:
     dependencies:
       fast-xml-parser:
         specifier: ^4.4.1
         version: 4.4.1
-      roxmltree:
-        specifier: workspace:*
-        version: link:../../../../packages/roxmltree
       txml:
         specifier: ^5.1.1
         version: 5.1.1
+      xml-tokenizer:
+        specifier: workspace:*
+        version: link:../../../../packages/xml-tokenizer
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -262,7 +262,7 @@ importers:
         version: 5.5.4
       vite:
         specifier: ^5.3.4
-        version: 5.3.5(@types/node@22.1.0)
+        version: 5.4.0(@types/node@22.1.0)
 
   packages/cli:
     dependencies:
@@ -525,39 +525,6 @@ importers:
         specifier: workspace:*
         version: link:../validation-adapters
 
-  packages/roxmltree:
-    devDependencies:
-      '@blgc/config':
-        specifier: workspace:*
-        version: link:../config
-      '@types/node':
-        specifier: ^20.14.10
-        version: 20.14.14
-      '@types/sax':
-        specifier: ^1.2.7
-        version: 1.2.7
-      '@types/xml2js':
-        specifier: ^0.4.14
-        version: 0.4.14
-      fast-xml-parser:
-        specifier: ^4.4.1
-        version: 4.4.1
-      roxmltree:
-        specifier: ^0.0.9
-        version: 0.0.9
-      sax:
-        specifier: ^1.4.1
-        version: 1.4.1
-      saxen:
-        specifier: ^10.0.0
-        version: 10.0.0
-      txml:
-        specifier: ^5.1.1
-        version: 5.1.1
-      xml2js:
-        specifier: ^0.6.2
-        version: 0.6.2
-
   packages/types:
     devDependencies:
       '@blgc/config':
@@ -606,6 +573,39 @@ importers:
       zod:
         specifier: ^3.23.8
         version: 3.23.8
+
+  packages/xml-tokenizer:
+    devDependencies:
+      '@blgc/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^20.14.10
+        version: 20.14.14
+      '@types/sax':
+        specifier: ^1.2.7
+        version: 1.2.7
+      '@types/xml2js':
+        specifier: ^0.4.14
+        version: 0.4.14
+      fast-xml-parser:
+        specifier: ^4.4.1
+        version: 4.4.1
+      sax:
+        specifier: ^1.4.1
+        version: 1.4.1
+      saxen:
+        specifier: ^10.0.0
+        version: 10.0.0
+      txml:
+        specifier: ^5.1.1
+        version: 5.1.1
+      xml-tokenizer:
+        specifier: ^0.0.2
+        version: 0.0.2
+      xml2js:
+        specifier: ^0.6.2
+        version: 0.6.2
 
 packages:
 
@@ -4453,9 +4453,6 @@ packages:
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
 
-  roxmltree@0.0.9:
-    resolution: {integrity: sha512-acLj/Z6o3kbcBMrf8Ejwn0cQn6niOFJm6c7QALcPxjYe7xL21GlNhjJPxqbyuLmbL+wqlalsfl3gGcGePcwFCQ==}
-
   run-applescript@7.0.0:
     resolution: {integrity: sha512-9by4Ij99JUr/MCFBUkDKLWK3G9HVXmabKz9U5MlIAIuvuzkiOicRYs8XJLxX+xahD+mLiiCYDqF9dKAgtzKP1A==}
     engines: {node: '>=18'}
@@ -5242,6 +5239,9 @@ packages:
 
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
+
+  xml-tokenizer@0.0.2:
+    resolution: {integrity: sha512-f6avWiYnf7QRNG1rhlUIBok4S1H4C5A2TFoKIfe2UlO2saXXodoO0mOAO0/1PmIUEbHLhFdTUuEZjGsEmtEyRA==}
 
   xml2js@0.6.2:
     resolution: {integrity: sha512-T4rieHaC1EXcES0Kxxj4JWgaUQHDk+qwHcYOCFHfiwKz7tOVPLq7Hjq9dM1WCMhylqMEfP7hMcOIChvotiZegA==}
@@ -9708,9 +9708,6 @@ snapshots:
       '@rollup/rollup-win32-ia32-msvc': 4.20.0
       '@rollup/rollup-win32-x64-msvc': 4.20.0
       fsevents: 2.3.3
-    optional: true
-
-  roxmltree@0.0.9: {}
 
   run-applescript@7.0.0: {}
 
@@ -10319,12 +10316,13 @@ snapshots:
       debug: 4.3.6
       pathe: 1.1.2
       picocolors: 1.0.1
-      vite: 5.3.5(@types/node@22.1.0)
+      vite: 5.4.0(@types/node@22.1.0)
     transitivePeerDependencies:
       - '@types/node'
       - less
       - lightningcss
       - sass
+      - sass-embedded
       - stylus
       - sugarss
       - supports-color
@@ -10377,7 +10375,6 @@ snapshots:
     optionalDependencies:
       '@types/node': 22.1.0
       fsevents: 2.3.3
-    optional: true
 
   vitest@1.6.0(@types/node@22.1.0):
     dependencies:
@@ -10398,7 +10395,7 @@ snapshots:
       strip-literal: 2.1.0
       tinybench: 2.9.0
       tinypool: 0.8.4
-      vite: 5.3.5(@types/node@22.1.0)
+      vite: 5.4.0(@types/node@22.1.0)
       vite-node: 1.6.0(@types/node@22.1.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
@@ -10407,6 +10404,7 @@ snapshots:
       - less
       - lightningcss
       - sass
+      - sass-embedded
       - stylus
       - sugarss
       - supports-color
@@ -10536,6 +10534,8 @@ snapshots:
       strip-ansi: 7.1.0
 
   wrappy@1.0.2: {}
+
+  xml-tokenizer@0.0.2: {}
 
   xml2js@0.6.2:
     dependencies:

@@ -1,6 +1,6 @@
 import * as fxp from 'fast-xml-parser';
-import { xmlToObject } from 'roxmltree';
 import * as txml from 'txml';
+import { xmlToObject } from 'xml-tokenizer';
 import * as xml2js from 'xml2js';
 
 import { bench } from './bench';
@@ -15,7 +15,7 @@ const fastXmlParser = new fxp.XMLParser();
 
 const runs = 100;
 
-bench('xmlToObject', () => xmlToObject(xml), runs);
+bench('xml-tokenizer', () => xmlToObject(xml), runs);
 bench('txml-ts', () => parse(xml), runs);
 bench('txml', () => txml.parse(xml), runs);
 bench('fast-xml-parser', () => fastXmlParser.parse(xml), runs);

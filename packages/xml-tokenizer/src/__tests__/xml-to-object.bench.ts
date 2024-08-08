@@ -1,14 +1,14 @@
 import { readFile } from 'node:fs/promises';
 import { describe } from 'node:test';
 import * as fastXmlParser from 'fast-xml-parser';
-import * as roxNpm from 'roxmltree';
 import * as txml from 'txml';
 import { beforeAll, bench, expect } from 'vitest';
+import * as xt from 'xml-tokenizer';
 import * as xml2js from 'xml2js';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Ok
 // @ts-ignore -- Ok
-import * as roxDist from '../../dist/esm';
+import * as xtDist from '../../dist/esm';
 import { xmlToObject } from '../index';
 
 void describe('xml to object', () => {
@@ -18,19 +18,19 @@ void describe('xml to object', () => {
 		xml = await readFile(`${__dirname}/resources/midsize.xml`, 'utf-8');
 	});
 
-	bench('[roxmltree]', () => {
+	bench('[xml-tokenizer]', () => {
 		const result = xmlToObject(xml);
 		expect(result).not.toBeNull();
 	});
 
-	bench('[(dist) roxmltree]', () => {
+	bench('[xml-tokenizer (dist)]', () => {
 		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -- Ok
-		const result = roxDist.xmlToObject(xml);
+		const result = xtDist.xmlToObject(xml);
 		expect(result).not.toBeNull();
 	});
 
-	bench('[(npm) roxmltree]', () => {
-		const result = roxNpm.xmlToObject(xml);
+	bench('[xml-tokenizer (npm)]', () => {
+		const result = xt.xmlToObject(xml);
 		expect(result).not.toBeNull();
 	});
 
