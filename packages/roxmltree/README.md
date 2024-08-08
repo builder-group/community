@@ -71,15 +71,13 @@ The performance of `roxmltree`, was benchmarked against other popular XML parser
 
 We removed the Rust implementation to improve maintainability and because it didn't provide the expected performance boost.
 
-Calling a TypeScript function from Rust on every token event (`wasmMix` benchmark) results in slow communication, negating Rust's performance benefits. Parsing XML entirely in Rust (`wasm` benchmark) avoids frequent communication but is still too slow due to the overhead of serializing and deserializing data between JavaScript and Rust (mainly the resulting big XML-Object). While Rust parsing without returning results is faster than any JavaScript XML parser, needing results in the JavaScript layer makes this approach impractical.
+Calling a TypeScript function from Rust on every token event (`wasmMix` benchmark) results in slow communication, negating Rust's performance benefits. Parsing XML entirely in Rust (`wasm` benchmark) avoids frequent communication but is still too slow due to the overhead of serializing and deserializing data between JavaScript and Rust (mainly the resulting XML-Object). While Rust parsing without returning results is faster than any JavaScript XML parser, needing results in the JavaScript layer makes this approach impractical.
 
 The `roxmltree` package with the Rust implementation can be found in the `_deprecated` folder (`packages/deprecated/roxmltree_wasm`).
 
 ### Why Port `tokenizer.rs` to TypeScript?
 
 We ported [`tokenizer.rs`](https://github.com/RazrFalcon/roxmltree/blob/master/src/tokenizer.rs) to TypeScript because frequent communication between Rust and TypeScript negated Rust's performance benefits. The stream architecture required constant interaction between Rust and TypeScript via the `tokenCallback`, reducing overall efficiency.
-
-For token streaming, the TypeScript implementation is twice as fast as the mixed Rust-TypeScript approach. However, for complete parsing tasks (e.g., converting XML to objects), Rust remains faster but not fast enough to make up for the deserialization overhead.
 
 ### Why removed Byte-Based implementation?
 
