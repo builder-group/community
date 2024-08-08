@@ -37,92 +37,89 @@ export function isAsciiDigit(byte: number): boolean {
 
 /**
  * Checks if the character is within the NameStartChar range.
- * @param c - The character to check.
+ * @param codePoint - The character to check.
  * @returns True if the character is a valid XML name start character, false otherwise.
  */
-export function isXmlNameStart(c: string | number): boolean {
-	const code = typeof c === 'string' ? c.codePointAt(0) : c;
-	if (code == null) {
+export function isXmlNameStart(codePoint: number | undefined): boolean {
+	if (codePoint == null) {
 		return false;
 	}
 
 	// Check for ASCII first
-	if (code <= 128) {
+	if (codePoint <= 128) {
 		return (
-			(code >= UPPERCASE_A && code <= UPPERCASE_Z) ||
-			(code >= LOWERCASE_A && code <= LOWERCASE_Z) ||
-			code === COLON ||
-			code === UNDERSCORE
+			(codePoint >= UPPERCASE_A && codePoint <= UPPERCASE_Z) ||
+			(codePoint >= LOWERCASE_A && codePoint <= LOWERCASE_Z) ||
+			codePoint === COLON ||
+			codePoint === UNDERSCORE
 		);
 	}
 
 	return (
-		(code >= 0xc0 && code <= 0xd6) ||
-		(code >= 0xd8 && code <= 0xf6) ||
-		(code >= 0xf8 && code <= 0x2ff) ||
-		(code >= 0x370 && code <= 0x37d) ||
-		(code >= 0x37f && code <= 0x1fff) ||
-		(code >= 0x200c && code <= 0x200d) ||
-		(code >= 0x2070 && code <= 0x218f) ||
-		(code >= 0x2c00 && code <= 0x2fef) ||
-		(code >= 0x3001 && code <= 0xd7ff) ||
-		(code >= 0xf900 && code <= 0xfdcf) ||
-		(code >= 0xfdf0 && code <= 0xfffd) ||
-		(code >= 0x10000 && code <= 0xeffff)
+		(codePoint >= 0xc0 && codePoint <= 0xd6) ||
+		(codePoint >= 0xd8 && codePoint <= 0xf6) ||
+		(codePoint >= 0xf8 && codePoint <= 0x2ff) ||
+		(codePoint >= 0x370 && codePoint <= 0x37d) ||
+		(codePoint >= 0x37f && codePoint <= 0x1fff) ||
+		(codePoint >= 0x200c && codePoint <= 0x200d) ||
+		(codePoint >= 0x2070 && codePoint <= 0x218f) ||
+		(codePoint >= 0x2c00 && codePoint <= 0x2fef) ||
+		(codePoint >= 0x3001 && codePoint <= 0xd7ff) ||
+		(codePoint >= 0xf900 && codePoint <= 0xfdcf) ||
+		(codePoint >= 0xfdf0 && codePoint <= 0xfffd) ||
+		(codePoint >= 0x10000 && codePoint <= 0xeffff)
 	);
 }
 
 /**
  * Checks if the character is within the NameChar range.
- * @param c - The character to check.
+ * @param codePoint - The character to check.
  * @returns True if the character is a valid XML name character, false otherwise.
  */
-export function isXmlName(c: string | number): boolean {
-	const code = typeof c === 'string' ? c.codePointAt(0) : c;
-	if (code == null) {
+export function isXmlName(codePoint: number | undefined): boolean {
+	if (codePoint == null) {
 		return false;
 	}
 
 	// Check for ASCII first
-	if (code <= 128) {
-		return isXmlNameByte(code);
+	if (codePoint <= 128) {
+		return isXmlNameByte(codePoint);
 	}
 
 	return (
-		code === 0xb7 ||
-		(code >= 0xc0 && code <= 0xd6) ||
-		(code >= 0xd8 && code <= 0xf6) ||
-		(code >= 0xf8 && code <= 0x2ff) ||
-		(code >= 0x300 && code <= 0x36f) ||
-		(code >= 0x370 && code <= 0x37d) ||
-		(code >= 0x37f && code <= 0x1fff) ||
-		(code >= 0x200c && code <= 0x200d) ||
-		(code >= 0x203f && code <= 0x2040) ||
-		(code >= 0x2070 && code <= 0x218f) ||
-		(code >= 0x2c00 && code <= 0x2fef) ||
-		(code >= 0x3001 && code <= 0xd7ff) ||
-		(code >= 0xf900 && code <= 0xfdcf) ||
-		(code >= 0xfdf0 && code <= 0xfffd) ||
-		(code >= 0x10000 && code <= 0xeffff)
+		codePoint === 0xb7 ||
+		(codePoint >= 0xc0 && codePoint <= 0xd6) ||
+		(codePoint >= 0xd8 && codePoint <= 0xf6) ||
+		(codePoint >= 0xf8 && codePoint <= 0x2ff) ||
+		(codePoint >= 0x300 && codePoint <= 0x36f) ||
+		(codePoint >= 0x370 && codePoint <= 0x37d) ||
+		(codePoint >= 0x37f && codePoint <= 0x1fff) ||
+		(codePoint >= 0x200c && codePoint <= 0x200d) ||
+		(codePoint >= 0x203f && codePoint <= 0x2040) ||
+		(codePoint >= 0x2070 && codePoint <= 0x218f) ||
+		(codePoint >= 0x2c00 && codePoint <= 0x2fef) ||
+		(codePoint >= 0x3001 && codePoint <= 0xd7ff) ||
+		(codePoint >= 0xf900 && codePoint <= 0xfdcf) ||
+		(codePoint >= 0xfdf0 && codePoint <= 0xfffd) ||
+		(codePoint >= 0x10000 && codePoint <= 0xeffff)
 	);
 }
 
 /**
  * Checks if the character is within the Char range.
- * @param c - The character to check.
+ * @param codePoint - The character to check.
  * @returns True if the character is a valid XML character, false otherwise.
  */
-export function isXmlChar(c: string | number): boolean {
-	const code = typeof c === 'string' ? c.codePointAt(0) : c;
-	if (code == null) {
+export function isXmlChar(codePoint: number | undefined): boolean {
+	if (codePoint == null) {
 		return false;
 	}
 
-	if (code < 0x20) {
-		return isXmlSpaceByte(code);
+	if (codePoint < 0x20) {
+		return isXmlSpaceByte(codePoint);
 	}
 
-	return code !== 0xffff && code !== 0xfffe;
+	return codePoint !== 0xffff && codePoint !== 0xfffe;
 }
 
 /**

@@ -119,9 +119,9 @@ export class TextXmlStream implements TXmlStream {
 
 	public skipCharsWhile(predicate: (stream: TextXmlStream, char: string) => boolean): void {
 		while (this._pos < this._end) {
-			const char = this._text[this._pos] as unknown as string;
-			if (!isXmlChar(char)) {
-				throw new XmlError({ type: 'NonXmlChar', char }, this.genTextPos());
+			const char = this._text[this._pos];
+			if (char == null || !isXmlChar(char.codePointAt(0))) {
+				throw new XmlError({ type: 'NonXmlChar', char: char ?? '\u{FFFD}' }, this.genTextPos());
 			} else if (predicate(this, char)) {
 				this._pos += char.length;
 			} else {
@@ -301,13 +301,13 @@ export class TextXmlStream implements TXmlStream {
 		}
 
 		// Prefix must start with a `NameStartChar`
-		if (prefix.length > 0 && !isXmlNameStart(prefix[0] as unknown as string)) {
+		if (prefix.length > 0 && !isXmlNameStart(prefix[0]?.codePointAt(0))) {
 			throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 		}
 
 		// Local name must start with a `NameStartChar`
 		if (local.length > 0) {
-			if (!isXmlNameStart(local[0] as unknown as string)) {
+			if (!isXmlNameStart(local[0]?.codePointAt(0))) {
 				throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 			}
 		} else {
