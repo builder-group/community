@@ -33,7 +33,7 @@
 
 ### 🌟 Motivation
 
-Provide a typesafe, straightforward, and lightweight form library designed to be modular and extendable with features.
+Create a typesafe, straightforward, and lightweight form library designed to be modular and extendable with features.
 
 ### ⚖️ Alternatives
 - [react-hook-form](https://github.com/react-hook-form/react-hook-form)

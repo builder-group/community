@@ -27,7 +27,7 @@
 
 ### 🌟 Motivation
 
-Provide a universal validation adapter that generalizes different validation libraries like Zod, Valibot, etc. for use in libraries & applications requiring diverse validation strategies like [`feature-form`](https://github.com/builder-group/monorepo/tree/develop/packages/feature-form).
+Create a universal validation adapter that generalizes different validation libraries like Zod, Valibot, etc. for use in libraries & applications requiring diverse validation strategies like [`feature-form`](https://github.com/builder-group/monorepo/tree/develop/packages/feature-form).
 
 ## 📖 Usage
 

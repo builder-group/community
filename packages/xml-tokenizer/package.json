@@ -1,0 +1,55 @@
+{
+	"name": "xml-tokenizer",
+	"version": "0.0.4",
+	"description": "Straightforward and typesafe XML tokenizer that streams tokens through a callback mechanism",
+	"private": false,
+	"scripts": {
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"build:dev": "shx rm -rf dist && ../../scripts/cli.sh bundle --target=dev",
+		"start:dev": "tsc -w",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "vitest run",
+		"bench": "vitest bench",
+		"update:latest": "pnpm update --latest",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"size": "size-limit --why"
+	},
+	"source": "./src/index.ts",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/builder-group/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennobuilder",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/builder-group/monorepo/issues"
+	},
+	"homepage": "https://builder.group/?source=package-json",
+	"devDependencies": {
+		"@blgc/config": "workspace:*",
+		"@types/node": "^20.14.10",
+		"@types/sax": "^1.2.7",
+		"@types/xml2js": "^0.4.14",
+		"fast-xml-parser": "^4.4.1",
+		"sax": "^1.4.1",
+		"saxen": "^10.0.0",
+		"txml": "^5.1.1",
+		"xml-tokenizer": "^0.0.2",
+		"xml2js": "^0.6.2"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"size-limit": [
+		{
+			"path": "dist/esm/index.js"
+		}
+	]
+}
