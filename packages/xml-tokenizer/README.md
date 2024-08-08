@@ -82,6 +82,13 @@ The following token types are supported:
 - **Text**: Text content between elements, including whitespace.
 - **Cdata**: `<![CDATA[text]]>`
 
+## 👀 Differences from [XML 1.0 Specification](https://www.w3.org/TR/xml/)
+
+- **Attribute Value Handling:**
+  - **XML 1.0:** Attributes must be explicitly assigned a value in the format `Name="Value"`. An attribute without a value is not valid XML.
+  - **Parser Behavior:** Attributes without an explicit value are interpreted as `true` (e.g., `<element attribute/>` is parsed as `attribute="true"`). 
+  - **Reason**: This behavior aligns with HTML-style parsing, which was necessary to handle HTML attributes without explicit values.
+
 ## 🚀 Benchmark
 
 The performance of `xml-tokenizer` was benchmarked against other popular XML parsers. These tests focus on XML to object conversion and node counting. Interestingly, the version of `xml-tokenizer` imported directly from npm performed significantly better. The reason for this discrepancy is unclear, but the results seem accurate based on external testing. 

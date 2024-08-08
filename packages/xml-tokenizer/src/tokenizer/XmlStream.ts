@@ -3,7 +3,6 @@ import {
 	AMPERSAND,
 	COLON,
 	DOUBLE_QUOTE,
-	EQUALS,
 	HASH,
 	isAsciiDigit,
 	isXmlChar,
@@ -110,6 +109,15 @@ export class XmlStream {
 	 */
 	public advance(n: number): void {
 		this._pos += n;
+	}
+
+	/**
+	 * Go to a new position in the stream.
+	 *
+	 *  @param pos - The new position.
+	 */
+	public goTo(pos: number): void {
+		this._pos = pos;
 	}
 
 	/**
@@ -463,15 +471,6 @@ export class XmlStream {
 		}
 
 		return [prefix, local];
-	}
-
-	/**
-	 * Consumes an equal sign, surrounded by optional whitespace.
-	 */
-	public consumeEq(): void {
-		this.skipSpaces();
-		this.consumeCodeUnit(EQUALS);
-		this.skipSpaces();
 	}
 
 	/**

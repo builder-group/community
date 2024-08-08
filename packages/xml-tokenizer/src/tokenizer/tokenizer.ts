@@ -1,6 +1,7 @@
 import { type TTokenCallback } from './types';
 import {
 	DOUBLE_QUOTE,
+	EQUALS,
 	EXCLAMATION_MARK,
 	GREATER_THAN,
 	LESS_THAN,
@@ -428,19 +429,31 @@ function parseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 /**
  * Parses an XML attribute.
  *
+ * If there's no Eq (equal sign), the value is interpreted as "true".
+ *
  * Attribute ::= Name Eq AttValue
  *
  * https://www.w3.org/TR/xml/#NT-Attribute
  */
 function parseAttribute(s: XmlStream): [string, string, string] {
 	const [prefix, local] = s.consumeQName();
-	s.consumeEq();
-	const quote = s.consumeQuote();
-	const quoteChar = String.fromCharCode(quote);
-	const valueStart = s.getPos();
-	s.skipCharsWhile((_, c) => c !== quoteChar && c !== '<');
-	const value = s.sliceBack(valueStart);
-	s.consumeCodeUnit(quote);
+	let value: string;
+	const start = s.getPos();
+
+	s.skipSpaces();
+	if (s.tryConsumeCodeUnit(EQUALS)) {
+		s.skipSpaces();
+		const quote = s.consumeQuote();
+		const quoteChar = String.fromCharCode(quote);
+		const valueStart = s.getPos();
+		s.skipCharsWhile((_, c) => c !== quoteChar && c !== '<');
+		value = s.sliceBack(valueStart);
+		s.consumeCodeUnit(quote);
+	} else {
+		s.goTo(start);
+		value = 'true';
+	}
+
 	return [prefix, local, value];
 }
 

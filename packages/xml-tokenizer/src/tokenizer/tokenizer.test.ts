@@ -1642,6 +1642,84 @@ describe('tokenizer tests', () => {
 			]);
 		});
 
+		it('attribute_08', () => {
+			assertTokens('<c a>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					start: 0
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'a',
+					value: 'true'
+				},
+				{
+					type: 'ElementEnd',
+					end: { type: 'Open' },
+					range: { start: 4, end: 5 }
+				}
+			]);
+		});
+
+		it('attribute_09', () => {
+			assertTokens('<c a/>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					start: 0
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'a',
+					value: 'true'
+				},
+				{
+					type: 'ElementEnd',
+					end: { type: 'Empty' },
+					range: { start: 4, end: 6 }
+				}
+			]);
+		});
+
+		it('attribute_10', () => {
+			assertTokens("<c a='b' q b:x />", [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					start: 0
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'a',
+					value: 'b'
+				},
+				{
+					type: 'Attr',
+					prefix: '',
+					local: 'q',
+					value: 'true'
+				},
+				{
+					type: 'Attr',
+					prefix: 'b',
+					local: 'x',
+					value: 'true'
+				},
+				{
+					type: 'ElementEnd',
+					end: { type: 'Empty' },
+					range: { start: 15, end: 17 }
+				}
+			]);
+		});
+
 		it('attribute_err_01', () => {
 			assertTokens('<c az=test>', [
 				{
@@ -1657,56 +1735,56 @@ describe('tokenizer tests', () => {
 			]);
 		});
 
-		it('attribute_err_02', () => {
-			assertTokens('<c a>', [
-				{
-					type: 'ElementStart',
-					prefix: '',
-					local: 'c',
-					start: 0
-				},
-				{
-					type: 'Error',
-					message: "expected '\\u{003D}' not '\\u{003E}' at 1:5"
-				}
-			]);
-		});
+		// it('attribute_err_02', () => {
+		// 	assertTokens('<c a>', [
+		// 		{
+		// 			type: 'ElementStart',
+		// 			prefix: '',
+		// 			local: 'c',
+		// 			start: 0
+		// 		},
+		// 		{
+		// 			type: 'Error',
+		// 			message: "expected '\\u{003D}' not '\\u{003E}' at 1:5"
+		// 		}
+		// 	]);
+		// });
 
-		it('attribute_err_03', () => {
-			assertTokens('<c a/>', [
-				{
-					type: 'ElementStart',
-					prefix: '',
-					local: 'c',
-					start: 0
-				},
-				{
-					type: 'Error',
-					message: "expected '\\u{003D}' not '\\u{002F}' at 1:5"
-				}
-			]);
-		});
+		// it('attribute_err_03', () => {
+		// 	assertTokens('<c a/>', [
+		// 		{
+		// 			type: 'ElementStart',
+		// 			prefix: '',
+		// 			local: 'c',
+		// 			start: 0
+		// 		},
+		// 		{
+		// 			type: 'Error',
+		// 			message: "expected '\\u{003D}' not '\\u{002F}' at 1:5"
+		// 		}
+		// 	]);
+		// });
 
-		it('attribute_err_04', () => {
-			assertTokens("<c a='b' q/>", [
-				{
-					type: 'ElementStart',
-					prefix: '',
-					local: 'c',
-					start: 0
-				},
-				{
-					type: 'Attr',
-					prefix: '',
-					local: 'a',
-					value: 'b'
-				},
-				{
-					type: 'Error',
-					message: "expected '\\u{003D}' not '\\u{002F}' at 1:11"
-				}
-			]);
-		});
+		// it('attribute_err_04', () => {
+		// 	assertTokens("<c a='b' q/>", [
+		// 		{
+		// 			type: 'ElementStart',
+		// 			prefix: '',
+		// 			local: 'c',
+		// 			start: 0
+		// 		},
+		// 		{
+		// 			type: 'Attr',
+		// 			prefix: '',
+		// 			local: 'a',
+		// 			value: 'b'
+		// 		},
+		// 		{
+		// 			type: 'Error',
+		// 			message: "expected '\\u{003D}' not '\\u{002F}' at 1:11"
+		// 		}
+		// 	]);
+		// });
 
 		it('attribute_err_05', () => {
 			assertTokens("<c a='<'/>", [
