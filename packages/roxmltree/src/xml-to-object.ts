@@ -1,4 +1,4 @@
-import { parseXmlStream, TextXmlStream } from './tokenizer';
+import { parseXmlStream, XmlStream } from './tokenizer';
 
 export function xmlToObject(xmlString: string, allowDtd = false): TXMLNode {
 	const root: TXMLNode = {
@@ -9,7 +9,7 @@ export function xmlToObject(xmlString: string, allowDtd = false): TXMLNode {
 	const stack: TXMLNode[] = [root];
 	let currentNode: TXMLNode = root;
 
-	parseXmlStream(new TextXmlStream(xmlString), allowDtd, (token) => {
+	parseXmlStream(new XmlStream(xmlString), allowDtd, (token) => {
 		switch (token.type) {
 			case 'ElementStart': {
 				const newNode: TXMLNode = {

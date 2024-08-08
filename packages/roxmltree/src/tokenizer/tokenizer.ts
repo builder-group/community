@@ -13,7 +13,7 @@ import {
 	UPPERCASE_S
 } from './utils';
 import { XmlError } from './XmlError';
-import { type TXmlStream } from './XmlStream';
+import { type XmlStream } from './XmlStream';
 
 /**
  * Parses an XML document.
@@ -23,7 +23,7 @@ import { type TXmlStream } from './XmlStream';
  * https://www.w3.org/TR/xml/#NT-document
  */
 export function parseXmlStream(
-	s: TXmlStream,
+	s: XmlStream,
 	allowDtd: boolean,
 	tokenCallback: TTokenCallback
 ): void {
@@ -49,7 +49,7 @@ export function parseXmlStream(
 	}
 
 	s.skipSpaces();
-	if (!s.atEnd() && s.currByte() === LESS_THAN) {
+	if (!s.atEnd() && s.currCodeUnit() === LESS_THAN) {
 		parseElement(s, tokenCallback);
 	}
 
@@ -67,7 +67,7 @@ export function parseXmlStream(
  *
  * https://www.w3.org/TR/xml/#NT-Misc
  */
-function parseMisc(s: TXmlStream, tokenCallback: TTokenCallback): void {
+function parseMisc(s: XmlStream, tokenCallback: TTokenCallback): void {
 	while (!s.atEnd()) {
 		s.skipSpaces();
 		if (s.startsWith('<!--')) {
@@ -87,7 +87,7 @@ function parseMisc(s: TXmlStream, tokenCallback: TTokenCallback): void {
  *
  * https://www.w3.org/TR/xml/#sec-prolog-dtd
  */
-function parseDeclaration(s: TXmlStream): void {
+function parseDeclaration(s: XmlStream): void {
 	s.advance(5); // <?xml
 	consumeSpaces(s);
 
@@ -111,12 +111,12 @@ function parseDeclaration(s: TXmlStream): void {
 	s.skipString('?>');
 }
 
-function consumeSpaces(s: TXmlStream): void {
+function consumeSpaces(s: XmlStream): void {
 	if (s.startsWithSpace()) {
 		s.skipSpaces();
 	} else if (!s.startsWith('?>') && !s.atEnd()) {
 		throw new XmlError(
-			{ type: 'InvalidChar', expected: 'a whitespace', actual: s.currByteUnchecked() },
+			{ type: 'InvalidChar', expected: 'a whitespace', actual: s.currCodeUnitUnchecked() },
 			s.genTextPos()
 		);
 	}
@@ -129,7 +129,7 @@ function consumeSpaces(s: TXmlStream): void {
  *
  * https://www.w3.org/TR/xml/#sec-comments
  */
-function parseComment(s: TXmlStream, tokenCallback: TTokenCallback): void {
+function parseComment(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(4);
 	const text = s.consumeCharsWhile((_s, c) => !(c === '-' && _s.startsWith('-->')));
@@ -150,7 +150,7 @@ function parseComment(s: TXmlStream, tokenCallback: TTokenCallback): void {
  *
  * https://www.w3.org/TR/xml/#sec-pi
  */
-function parsePi(s: TXmlStream, tokenCallback: TTokenCallback): void {
+function parsePi(s: XmlStream, tokenCallback: TTokenCallback): void {
 	if (s.startsWith('<?xml ')) {
 		throw new XmlError({ type: 'UnexpectedDeclaration' }, s.genTextPos());
 	}
@@ -174,12 +174,12 @@ function parsePi(s: TXmlStream, tokenCallback: TTokenCallback): void {
 /**
  * Parses the DOCTYPE declaration.
  */
-function parseDoctype(s: TXmlStream, tokenCallback: TTokenCallback): void {
+function parseDoctype(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	parseDoctypeStart(s);
 	s.skipSpaces();
 
-	if (s.currByte() === GREATER_THAN) {
+	if (s.currCodeUnit() === GREATER_THAN) {
 		s.advance(1);
 		return;
 	}
@@ -197,12 +197,12 @@ function parseDoctype(s: TXmlStream, tokenCallback: TTokenCallback): void {
 			// DTD ends with ']' S? '>', therefore we have to skip possible spaces
 			s.advance(1);
 			s.skipSpaces();
-			if (s.currByte() === GREATER_THAN) {
+			if (s.currCodeUnit() === GREATER_THAN) {
 				s.advance(1);
 				break;
 			} else {
 				throw new XmlError(
-					{ type: 'InvalidChar', expected: "'>'", actual: s.currByteUnchecked() },
+					{ type: 'InvalidChar', expected: "'>'", actual: s.currCodeUnitUnchecked() },
 					s.genTextPos()
 				);
 			}
@@ -235,7 +235,7 @@ function parseDoctype(s: TXmlStream, tokenCallback: TTokenCallback): void {
  *
  * https://www.w3.org/TR/xml/#NT-doctypedecl
  */
-function parseDoctypeStart(s: TXmlStream): void {
+function parseDoctypeStart(s: XmlStream): void {
 	s.advance(9);
 
 	s.consumeSpaces();
@@ -245,10 +245,10 @@ function parseDoctypeStart(s: TXmlStream): void {
 	parseExternalId(s);
 	s.skipSpaces();
 
-	const currByte = s.currByte();
-	if (currByte !== OPEN_BRACKET && currByte !== GREATER_THAN) {
+	const currCodeUnit = s.currCodeUnit();
+	if (currCodeUnit !== OPEN_BRACKET && currCodeUnit !== GREATER_THAN) {
 		throw new XmlError(
-			{ type: 'InvalidChar', expected: "'[' or '>'", actual: currByte },
+			{ type: 'InvalidChar', expected: "'[' or '>'", actual: currCodeUnit },
 			s.genTextPos()
 		);
 	}
@@ -261,7 +261,7 @@ function parseDoctypeStart(s: TXmlStream): void {
  *
  * https://www.w3.org/TR/xml/#NT-ExternalID
  */
-function parseExternalId(s: TXmlStream): boolean {
+function parseExternalId(s: XmlStream): boolean {
 	if (s.startsWith('SYSTEM') || s.startsWith('PUBLIC')) {
 		const start = s.getPos();
 		s.advance(6);
@@ -269,14 +269,14 @@ function parseExternalId(s: TXmlStream): boolean {
 
 		s.consumeSpaces();
 		const quote = s.consumeQuote();
-		s.consumeBytesWhile((c) => c !== quote);
-		s.consumeByte(quote);
+		s.consumeCodeUnitsWhile((c) => c !== quote);
+		s.consumeCodeUnit(quote);
 
 		if (id === 'PUBLIC') {
 			s.consumeSpaces();
 			const _quote = s.consumeQuote();
-			s.consumeBytesWhile((c) => c !== _quote);
-			s.consumeByte(_quote);
+			s.consumeCodeUnitsWhile((c) => c !== _quote);
+			s.consumeCodeUnit(_quote);
 		}
 
 		return true;
@@ -294,11 +294,11 @@ function parseExternalId(s: TXmlStream): boolean {
  *
  * https://www.w3.org/TR/xml/#sec-entity-decl
  */
-function parseEntityDecl(s: TXmlStream, tokenCallback: TTokenCallback): void {
+function parseEntityDecl(s: XmlStream, tokenCallback: TTokenCallback): void {
 	s.advance(8);
 	s.consumeSpaces();
 
-	const isGe = !s.tryConsumeByte(PERCENT);
+	const isGe = !s.tryConsumeCodeUnit(PERCENT);
 	if (!isGe) {
 		s.consumeSpaces();
 	}
@@ -310,7 +310,7 @@ function parseEntityDecl(s: TXmlStream, tokenCallback: TTokenCallback): void {
 		tokenCallback({ type: 'EntityDeclaration', name, definition });
 	}
 	s.skipSpaces();
-	s.consumeByte(GREATER_THAN);
+	s.consumeCodeUnit(GREATER_THAN);
 }
 
 /**
@@ -325,16 +325,16 @@ function parseEntityDecl(s: TXmlStream, tokenCallback: TTokenCallback): void {
  *
  * https://www.w3.org/TR/xml/#sec-entity-decl
  */
-function parseEntityDef(s: TXmlStream, isGe: boolean): string | null {
-	const currByte = s.currByte();
-	if (currByte === DOUBLE_QUOTE || currByte === SINGLE_QUOTE) {
+function parseEntityDef(s: XmlStream, isGe: boolean): string | null {
+	const currCodeUnit = s.currCodeUnit();
+	if (currCodeUnit === DOUBLE_QUOTE || currCodeUnit === SINGLE_QUOTE) {
 		const quote = s.consumeQuote();
 		const start = s.getPos();
-		s.skipBytesWhile((c) => c !== quote);
+		s.skipCodeUnitsWhile((c) => c !== quote);
 		const value = s.sliceBack(start);
-		s.consumeByte(quote);
+		s.consumeCodeUnit(quote);
 		return value;
-	} else if (currByte === UPPERCASE_S || currByte === UPPERCASE_P) {
+	} else if (currCodeUnit === UPPERCASE_S || currCodeUnit === UPPERCASE_P) {
 		if (parseExternalId(s)) {
 			if (isGe) {
 				s.skipSpaces();
@@ -352,7 +352,7 @@ function parseEntityDef(s: TXmlStream, isGe: boolean): string | null {
 		throw new XmlError({ type: 'InvalidExternalID' }, s.genTextPos());
 	} else {
 		throw new XmlError(
-			{ type: 'InvalidChar', expected: 'a quote, SYSTEM or PUBLIC', actual: currByte },
+			{ type: 'InvalidChar', expected: 'a quote, SYSTEM or PUBLIC', actual: currCodeUnit },
 			s.genTextPos()
 		);
 	}
@@ -361,9 +361,9 @@ function parseEntityDef(s: TXmlStream, isGe: boolean): string | null {
 /**
  * Consumes a declaration.
  */
-function consumeDecl(s: TXmlStream): void {
-	s.skipBytesWhile((c) => c !== GREATER_THAN);
-	s.consumeByte(GREATER_THAN);
+function consumeDecl(s: XmlStream): void {
+	s.skipCodeUnitsWhile((c) => c !== GREATER_THAN);
+	s.consumeCodeUnit(GREATER_THAN);
 }
 
 /**
@@ -374,7 +374,7 @@ function consumeDecl(s: TXmlStream): void {
  *
  * https://www.w3.org/TR/xml/#NT-element
  */
-function parseElement(s: TXmlStream, tokenCallback: TTokenCallback): void {
+function parseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(1); // '<'
 	const [prefix, local] = s.consumeQName();
@@ -385,15 +385,15 @@ function parseElement(s: TXmlStream, tokenCallback: TTokenCallback): void {
 		const hasSpace = s.startsWithSpace();
 		s.skipSpaces();
 		const _start = s.getPos();
-		const currByte = s.currByte();
+		const currCodeUnit = s.currCodeUnit();
 
-		if (currByte === SLASH) {
+		if (currCodeUnit === SLASH) {
 			s.advance(1);
-			s.consumeByte(GREATER_THAN);
+			s.consumeCodeUnit(GREATER_THAN);
 			const range = s.rangeFrom(_start);
 			tokenCallback({ type: 'ElementEnd', end: { type: 'Empty' }, range });
 			break;
-		} else if (currByte === GREATER_THAN) {
+		} else if (currCodeUnit === GREATER_THAN) {
 			s.advance(1);
 			const range = s.rangeFrom(_start);
 			tokenCallback({ type: 'ElementEnd', end: { type: 'Open' }, range });
@@ -403,7 +403,7 @@ function parseElement(s: TXmlStream, tokenCallback: TTokenCallback): void {
 			// An attribute must be preceded with a whitespace
 			if (!hasSpace) {
 				throw new XmlError(
-					{ type: 'InvalidChar', expected: 'a whitespace', actual: s.currByteUnchecked() },
+					{ type: 'InvalidChar', expected: 'a whitespace', actual: s.currCodeUnitUnchecked() },
 					s.genTextPos()
 				);
 			}
@@ -432,7 +432,7 @@ function parseElement(s: TXmlStream, tokenCallback: TTokenCallback): void {
  *
  * https://www.w3.org/TR/xml/#NT-Attribute
  */
-function parseAttribute(s: TXmlStream): [string, string, string] {
+function parseAttribute(s: XmlStream): [string, string, string] {
 	const [prefix, local] = s.consumeQName();
 	s.consumeEq();
 	const quote = s.consumeQuote();
@@ -440,7 +440,7 @@ function parseAttribute(s: TXmlStream): [string, string, string] {
 	const valueStart = s.getPos();
 	s.skipCharsWhile((_, c) => c !== quoteChar && c !== '<');
 	const value = s.sliceBack(valueStart);
-	s.consumeByte(quote);
+	s.consumeCodeUnit(quote);
 	return [prefix, local, value];
 }
 
@@ -451,12 +451,12 @@ function parseAttribute(s: TXmlStream): [string, string, string] {
  *
  * https://www.w3.org/TR/xml/#NT-content
  */
-function parseContent(s: TXmlStream, tokenCallback: TTokenCallback): void {
+function parseContent(s: XmlStream, tokenCallback: TTokenCallback): void {
 	while (!s.atEnd()) {
-		const currByte = s.currByte();
-		if (currByte === LESS_THAN) {
-			const nextByte = s.nextByte();
-			if (nextByte === EXCLAMATION_MARK) {
+		const currCodeUnit = s.currCodeUnit();
+		if (currCodeUnit === LESS_THAN) {
+			const nextCodeUnit = s.nextCodeUnit();
+			if (nextCodeUnit === EXCLAMATION_MARK) {
 				if (s.startsWith('<!--')) {
 					parseComment(s, tokenCallback);
 				} else if (s.startsWith('<![CDATA[')) {
@@ -467,9 +467,9 @@ function parseContent(s: TXmlStream, tokenCallback: TTokenCallback): void {
 						s.genTextPos()
 					);
 				}
-			} else if (nextByte === QUESTION_MARK) {
+			} else if (nextCodeUnit === QUESTION_MARK) {
 				parsePi(s, tokenCallback);
-			} else if (nextByte === SLASH) {
+			} else if (nextCodeUnit === SLASH) {
 				parseCloseElement(s, tokenCallback);
 				break;
 			} else {
@@ -491,7 +491,7 @@ function parseContent(s: TXmlStream, tokenCallback: TTokenCallback): void {
  *
  * https://www.w3.org/TR/xml/#sec-cdata-sect
  */
-function parseCdata(s: TXmlStream, tokenCallback: TTokenCallback): void {
+function parseCdata(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(9); // <![CDATA[
 	const text = s.consumeCharsWhile((_s, c) => !(c === ']' && _s.startsWith(']]>')));
@@ -507,13 +507,13 @@ function parseCdata(s: TXmlStream, tokenCallback: TTokenCallback): void {
  *
  * https://www.w3.org/TR/xml/#NT-ETag
  */
-function parseCloseElement(s: TXmlStream, tokenCallback: TTokenCallback): void {
+function parseCloseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(2); // </
 
 	const [prefix, local] = s.consumeQName();
 	s.skipSpaces();
-	s.consumeByte(GREATER_THAN);
+	s.consumeCodeUnit(GREATER_THAN);
 
 	const range = s.rangeFrom(start);
 	tokenCallback({ type: 'ElementEnd', end: { type: 'Close', prefix, local }, range });
@@ -522,7 +522,7 @@ function parseCloseElement(s: TXmlStream, tokenCallback: TTokenCallback): void {
 /**
  * Parses text content.
  */
-function parseText(s: TXmlStream, tokenCallback: TTokenCallback): void {
+function parseText(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	const text = s.consumeCharsWhile((_, c) => c !== '<');
 

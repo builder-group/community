@@ -5,7 +5,7 @@ import * as sax from 'sax';
 import * as saxen from 'saxen';
 import { beforeAll, bench, expect } from 'vitest';
 
-import { ByteXmlStream, parseXmlStream, TextXmlStream } from '../index';
+import { parseXmlStream, XmlStream } from '../index';
 
 void describe('count nodes', () => {
 	let xml = '';
@@ -16,9 +16,9 @@ void describe('count nodes', () => {
 		xmlBytes = new TextEncoder().encode(xml);
 	});
 
-	bench('[roxmltree:text]', () => {
+	bench('[roxmltree]', () => {
 		let nodeCount = 0;
-		parseXmlStream(new TextXmlStream(xml), false, (token) => {
+		parseXmlStream(new XmlStream(xml), false, (token) => {
 			if (token.type === 'ElementStart') {
 				nodeCount++;
 			}
@@ -27,20 +27,9 @@ void describe('count nodes', () => {
 		expect(nodeCount).toBe(10045);
 	});
 
-	bench('[(npm) roxmltree:text]', () => {
+	bench('[(npm) roxmltree]', () => {
 		let nodeCount = 0;
 		rox.parseXmlStream(new rox.TextXmlStream(xml), false, (token) => {
-			if (token.type === 'ElementStart') {
-				nodeCount++;
-			}
-		});
-
-		expect(nodeCount).toBe(10045);
-	});
-
-	bench('[roxmltree:byte]', () => {
-		let nodeCount = 0;
-		parseXmlStream(new ByteXmlStream(xmlBytes), false, (token) => {
 			if (token.type === 'ElementStart') {
 				nodeCount++;
 			}
