@@ -1,29 +1,22 @@
-import { parseXmlStream, TextXmlStream } from 'roxmltree';
+import * as fxp from 'fast-xml-parser';
+import { xmlToObject } from 'roxmltree';
+import * as txml from 'txml';
+import * as xml2js from 'xml2js';
+
+import { bench } from './bench';
+import { parse } from './txml';
 
 const xmlResult = await fetch('http://localhost:5173/midsize.xml');
 const xml = await xmlResult.text();
-const xmlBytes = new TextEncoder().encode(xml);
 
 console.log({ xml });
 
-console.log('TextXmlStream');
-for (let i = 0; i < 100; i++) {
-	let tokenCount = 0;
-	parseXmlStream(new TextXmlStream(xml), false, (token) => {
-		if (token.type === 'ElementStart') {
-			tokenCount++;
-		}
-	});
-	console.log(tokenCount);
-}
+const fastXmlParser = new fxp.XMLParser();
 
-// console.log('ByteXmlStream');
-// for (let i = 0; i < 100; i++) {
-// 	let tokenCount = 0;
-// 	parseXmlStream(new ByteXmlStream(xmlBytes), false, (token) => {
-// 		if (token.type === 'ElementStart') {
-// 			tokenCount++;
-// 		}
-// 	});
-// 	console.log(tokenCount);
-// }
+const runs = 100;
+
+bench('xmlToObject', () => xmlToObject(xml), runs);
+bench('txml-ts', () => parse(xml), runs);
+bench('txml', () => txml.parse(xml), runs);
+bench('fast-xml-parser', () => fastXmlParser.parse(xml), runs);
+bench('xml2js', () => xml2js.parseString(xml, () => {}), runs);

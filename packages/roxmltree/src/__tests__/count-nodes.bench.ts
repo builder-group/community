@@ -9,11 +9,9 @@ import { parseXmlStream, XmlStream } from '../index';
 
 void describe('count nodes', () => {
 	let xml = '';
-	let xmlBytes: Uint8Array;
 
 	beforeAll(async () => {
 		xml = await readFile(`${__dirname}/resources/midsize.xml`, 'utf-8');
-		xmlBytes = new TextEncoder().encode(xml);
 	});
 
 	bench('[roxmltree]', () => {
@@ -29,7 +27,7 @@ void describe('count nodes', () => {
 
 	bench('[(npm) roxmltree]', () => {
 		let nodeCount = 0;
-		rox.parseXmlStream(new rox.TextXmlStream(xml), false, (token) => {
+		rox.parseXmlStream(new rox.XmlStream(xml), false, (token) => {
 			if (token.type === 'ElementStart') {
 				nodeCount++;
 			}
