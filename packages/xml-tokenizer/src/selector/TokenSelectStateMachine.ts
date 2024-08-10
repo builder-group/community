@@ -12,14 +12,14 @@ export class TokenSelectStateMachine {
 
 	public getNextState(): TokenSelectState | null {
 		const nextIndex = this._currentState != null ? this._currentState + 1 : 0;
-		if (this._states.length < nextIndex) {
+		if (nextIndex < this._states.length) {
 			return this._states[nextIndex] ?? null;
 		}
 		return null;
 	}
 
 	public getCurrentState(): TokenSelectState | null {
-		if (this._currentState != null && this._states.length < this._currentState) {
+		if (this._currentState != null && this._currentState < this._states.length) {
 			return this._states[this._currentState] ?? null;
 		}
 		return null;
@@ -90,6 +90,6 @@ export class TokenSelectStateMachine {
 	}
 
 	public isFinalState(): boolean {
-		return this._currentState != null && this._currentState >= this._states.length;
+		return this._currentState != null && this._currentState >= this._states.length - 1;
 	}
 }

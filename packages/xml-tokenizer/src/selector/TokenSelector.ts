@@ -60,6 +60,8 @@ export class TokenSelector {
 			return;
 		}
 
+		// TODO: Reset cached node? We have to reset attributes and name but can't text?
+
 		for (const stateMachine of this._tspStateMachines) {
 			const nextState = stateMachine.getNextState();
 			if (nextState == null || !(nextState.matchCriteria & ETokenMatchCriteria.Name)) {
@@ -137,6 +139,8 @@ export class TokenSelector {
 	private _handleElementEnd(token: TElementEndToken): void {
 		if (token.end.type === 'Close' || token.end.type === 'Empty') {
 			this._currentDepth -= 1;
+
+			// TODO: Reset cached node?
 
 			for (const stateMachine of this._tspStateMachines) {
 				const currentState = stateMachine.getCurrentState();
