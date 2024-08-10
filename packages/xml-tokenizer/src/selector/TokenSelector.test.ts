@@ -2,7 +2,8 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { tokenize, type TXMLToken } from '../tokenizer';
+import { tokenize, type TXmlToken } from '../tokenizer';
+import { tokensToXml } from '../tokens-to-xml';
 import { TokenSelector } from './TokenSelector';
 
 describe('selector tests', () => {
@@ -22,7 +23,7 @@ describe('selector tests', () => {
 				{ axis: '/', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
 			]
 		]);
-		const recorded: TXMLToken[] = [];
+		const recorded: TXmlToken[] = [];
 
 		tokenize(bookStoreXml, false, (token) => {
 			selector.pipeToken(token, (recordedToken) => {
@@ -30,6 +31,7 @@ describe('selector tests', () => {
 			});
 		});
 
+		console.log(tokensToXml(recorded));
 		expect(recorded).not.toBeNull();
 	});
 });

@@ -6,7 +6,7 @@ import {
 	type TElementEndToken,
 	type TElementStartToken,
 	type TTextToken,
-	type TXMLToken
+	type TXmlToken
 } from '../tokenizer';
 import { ETokenCacheProps, ETokenMatchCriteria } from './TokenSelectState';
 import { TokenSelectStateMachine } from './TokenSelectStateMachine';
@@ -31,7 +31,7 @@ export class TokenSelector {
 		);
 	}
 
-	public pipeToken(token: TXMLToken, recorder: (token: TXMLToken) => void): void {
+	public pipeToken(token: TXmlToken, recorder: (token: TXmlToken) => void): void {
 		switch (token.type) {
 			case 'ElementStart':
 				this._handleElementStart(token);

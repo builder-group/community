@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { tokenizeXmlStream } from './tokenize';
-import { type TXMLToken } from './types';
+import { type TXmlToken } from './types';
 import { XmlError } from './XmlError';
 import { XmlStream } from './XmlStream';
 
-describe('tokenizer tests', () => {
+describe('tokenize function', () => {
 	describe('CDATA', () => {
 		it('cdata_01', () => {
 			assertTokens('<p><![CDATA[content]]></p>', [
@@ -2298,7 +2298,7 @@ describe('tokenizer tests', () => {
 	});
 });
 
-type TToken = TXMLToken | TErrorToken | TEntityDeclToken | TAttrToken;
+type TToken = TXmlToken | TErrorToken | TEntityDeclToken | TAttrToken;
 
 interface TErrorToken {
 	type: 'Error';
