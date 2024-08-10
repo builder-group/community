@@ -8,7 +8,7 @@ import { beforeAll, bench, expect } from 'vitest';
 
 // import * as xt from 'xml-tokenizer';
 
-import { parseXmlStream, XmlStream } from '../index';
+import { tokenize } from '../index';
 
 void describe('count nodes', () => {
 	let xml = '';
@@ -19,7 +19,7 @@ void describe('count nodes', () => {
 
 	bench('[xml-tokenizer]', () => {
 		let nodeCount = 0;
-		parseXmlStream(new XmlStream(xml), false, (token) => {
+		tokenize(xml, false, (token) => {
 			if (token.type === 'ElementStart') {
 				nodeCount++;
 			}

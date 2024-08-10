@@ -14,7 +14,15 @@ import {
 	UPPERCASE_S
 } from './utils';
 import { XmlError } from './XmlError';
-import { type XmlStream } from './XmlStream';
+import { XmlStream } from './XmlStream';
+
+export function tokenize(
+	xmlString: string,
+	allowDtd: boolean,
+	tokenCallback: TTokenCallback
+): void {
+	tokenizeXmlStream(new XmlStream(xmlString), allowDtd, tokenCallback);
+}
 
 /**
  * Parses an XML document.
@@ -23,7 +31,7 @@ import { type XmlStream } from './XmlStream';
  *
  * https://www.w3.org/TR/xml/#NT-document
  */
-export function parseXmlStream(
+export function tokenizeXmlStream(
 	s: XmlStream,
 	allowDtd: boolean,
 	tokenCallback: TTokenCallback

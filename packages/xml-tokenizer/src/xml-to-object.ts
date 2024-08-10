@@ -1,4 +1,5 @@
-import { parseXmlStream, XmlStream } from './tokenizer';
+import { getQName } from './get-q-name';
+import { tokenize } from './tokenizer';
 
 export function xmlToObject(xmlString: string, allowDtd = false): TXMLNode {
 	const root: TXMLNode = {
@@ -9,11 +10,11 @@ export function xmlToObject(xmlString: string, allowDtd = false): TXMLNode {
 	const stack: TXMLNode[] = [root];
 	let currentNode: TXMLNode = root;
 
-	parseXmlStream(new XmlStream(xmlString), allowDtd, (token) => {
+	tokenize(xmlString, allowDtd, (token) => {
 		switch (token.type) {
 			case 'ElementStart': {
 				const newNode: TXMLNode = {
-					tagName: getTagName(token.local, token.prefix),
+					tagName: getQName(token.local, token.prefix),
 					attributes: {},
 					children: []
 				};
@@ -33,7 +34,7 @@ export function xmlToObject(xmlString: string, allowDtd = false): TXMLNode {
 				break;
 			}
 			case 'Attribute': {
-				currentNode.attributes[getTagName(token.local, token.prefix)] = token.value;
+				currentNode.attributes[getQName(token.local, token.prefix)] = token.value;
 				break;
 			}
 			case 'Text':
@@ -57,8 +58,4 @@ export interface TXMLNode {
 	tagName: string;
 	attributes: Record<string, string>;
 	children: (TXMLNode | string)[];
-}
-
-export function getTagName(local: string, prefix: string): string {
-	return prefix.length > 0 ? `${prefix}:${local}` : local;
 }

@@ -6,8 +6,18 @@ import * as xml2js from 'xml2js';
 import { bench } from './bench';
 import { parse } from './txml';
 
-shopifyTest();
+midsizeTest();
+// shopifyTest();
 // benchmarkTest();
+
+async function midsizeTest(): Promise<void> {
+	const xmlResult = await fetch('http://localhost:5173/midsize.xml');
+	const xml = await xmlResult.text();
+
+	const result = xmlToObject(xml);
+
+	console.log({ result });
+}
 
 async function shopifyTest(): Promise<void> {
 	const shopifyResult = await fetch(

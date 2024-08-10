@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseXmlStream } from './tokenizer';
+import { tokenizeXmlStream } from './tokenize';
 import { type TXMLToken } from './types';
 import { XmlError } from './XmlError';
 import { XmlStream } from './XmlStream';
@@ -2322,7 +2322,7 @@ function collectTokens(text: string): TToken[] {
 	const tokens: TToken[] = [];
 	try {
 		const xmlStream = new XmlStream(text);
-		parseXmlStream(xmlStream, true, (token) => {
+		tokenizeXmlStream(xmlStream, true, (token) => {
 			switch (token.type) {
 				case 'EntityDeclaration':
 					tokens.push({
