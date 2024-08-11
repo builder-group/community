@@ -1,3 +1,4 @@
+export * from './ascii-constants';
 export * from './tokenize';
 export * from './types';
 export * from './utils';

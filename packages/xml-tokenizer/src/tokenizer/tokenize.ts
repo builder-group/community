@@ -1,4 +1,3 @@
-import { type TTokenCallback } from './types';
 import {
 	DOUBLE_QUOTE,
 	EQUALS,
@@ -12,7 +11,8 @@ import {
 	SLASH,
 	UPPERCASE_P,
 	UPPERCASE_S
-} from './utils';
+} from './ascii-constants';
+import { type TTokenCallback } from './types';
 import { XmlError } from './XmlError';
 import { XmlStream } from './XmlStream';
 

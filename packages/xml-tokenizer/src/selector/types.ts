@@ -1,77 +1,75 @@
 /**
- * Represents a single segment of a XPath expression.
- *
- * This interface allows for constructing XPath expressions in a object-oriented way,
- * avoiding the complexities of parsing a full XPath string.
- * If parsing a full XPath becomes necessary in the future, a tool like [Peggy](https://github.com/peggyjs/peggy)
- * could be used to facilitate the process.
- *
- * https://www.w3.org/TR/xpath-31/
+ * A limited segment of an XPath expression in an object-oriented manner.
  *
  * @example
  * // Represents the XPath expression `/bookstore/book[@category='fiction'][1]`
- * const xpathExpr: TXPathExpr = [
- *   \{ axis: '/', name: 'bookstore' \},
+ * const xpathExpr: TTokenSelectPath = [
+ *   \{ axis: '/', local: 'bookstore' \},
  *   \{
  *     axis: '/',
- *     name: 'book',
- *     predicate: \{ attribute: 'category', value: 'fiction' \},
- *     position: 1,
- *     attributes: ['category', 'lang'] // Selects the 'category' and 'lang' attributes
+ *     local: 'book',
+ *     attributes: [\{ local: 'category', value: 'fiction' \}],
+ *     position: 1
  *   \}
  * ];
  */
-export interface TTokenSelectPathPart {
+// If a string-based XPath implementation is wished,
+// tools like [Peggy](https://github.com/peggyjs/peggy) could be utilized.
+export interface TTokenSelectPathSegment {
 	/**
-	 * The axis defining the relationship between nodes.
+	 * Specifies the axis defining the relationship between nodes.
+	 *
+	 * - 'child' ('/'): Selects all children of the current node
+	 * - 'self-or-descendant' ('//'): 	Selects all descendants (children, grandchildren, etc.) of the current node and the current node itself
 	 */
 	axis: 'child' | 'self-or-descendant';
 
 	/**
-	 * The tag name of the node to match.
+	 * The local name of the node to match.
+	 *
+	 * Use '*' to match any node.
 	 */
 	local?: string | '*';
 
 	/**
-	 * An optional prefix (e.g. namespace) to qualify the node name.
+	 * An optional namespace prefix to qualify the node name.
 	 */
 	prefix?: string;
 
 	/**
-	 * An optional attribute-based filter.
+	 * Optional filters based on node attributes.
 	 *
 	 * @example
-	 * // Matches a book element with a category attribute equal to 'fiction'
-	 * predicate: \{ attribute: 'category', value: 'fiction' \}
+	 * // Matches a node with an attribute 'category' equal to 'fiction'
+	 * attributes: [\{ local: 'category', value: 'fiction' \}]
 	 */
 	attributes?: { local: string; prefix?: string; value?: string }[];
 
-	// TODO:
-	// /**
-	//  * An optional position-based filter, like [1] to select the first occurrence.
-	//  *
-	//  * @example
-	//  * // Matches the first book element in its context
-	//  * position: 1
-	//  */
-	// position?: number;
-
 	/**
-	 * An optional text content matcher.
+	 * Optional filter to match nodes containing specific text content.
 	 *
 	 * @example
-	 * // Matches elements containing the text 'bestseller'
-	 * textContains: 'bestseller'
+	 * // Matches nodes containing the text 'bestseller'
+	 * containsText: 'bestseller'
 	 */
-	textContains?: string;
+	containsText?: string;
 
-	// TODO:
-	predicate?: (node: any) => boolean;
+	/**
+	 * Optional custom predicate function to further filter nodes.
+	 *
+	 * @example
+	 * // Custom predicate to match nodes with specific characteristics
+	 * predicate: (node) =\> node.local === 'title'
+	 */
+	predicate?: (node: {
+		local: string;
+		prefix?: string;
+		attributes: Record<string, string>;
+		text?: string;
+	}) => boolean;
 }
 
 /**
- * Represents an entire XPath expression composed of multiple parts.
- * The expression is an array of `TXPathPart` objects, each defining
- * a segment of the XPath.
+ * A limited XPath expression composed of multiple segments in an object-oriented manner.
  */
-export type TTokenSelectPath = TTokenSelectPathPart[];
+export type TTokenSelectPath = TTokenSelectPathSegment[];

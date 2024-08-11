@@ -1,14 +1,14 @@
 import { getQName } from '../get-q-name';
-import { type TTokenSelectPathPart } from './types';
+import { type TTokenSelectPathSegment } from './types';
 
 export class TokenSelectState {
-	private _part: TTokenSelectPathPart;
+	private _segment: TTokenSelectPathSegment;
 	private _matchCriteria: ETokenMatchCriteria = ETokenMatchCriteria.None;
 	private _toCacheNodeProps: EToCacheNodeProps = EToCacheNodeProps.None;
 	private _enteredDepth: number | null = null;
 
-	constructor(part: TTokenSelectPathPart) {
-		this._part = part;
+	constructor(segment: TTokenSelectPathSegment) {
+		this._segment = segment;
 		this.applyLevels();
 	}
 
@@ -28,17 +28,17 @@ export class TokenSelectState {
 		let matchCriteria = ETokenMatchCriteria.None;
 		let cacheProps = EToCacheNodeProps.None;
 
-		if (this._part.local != null || this._part.prefix != null) {
+		if (this._segment.local != null || this._segment.prefix != null) {
 			matchCriteria |= ETokenMatchCriteria.Name;
 		}
-		if (this._part.attributes != null) {
+		if (this._segment.attributes != null) {
 			matchCriteria |= ETokenMatchCriteria.Attributes;
 			cacheProps |= EToCacheNodeProps.Attributes;
 		}
-		if (this._part.textContains != null) {
+		if (this._segment.containsText != null) {
 			matchCriteria |= ETokenMatchCriteria.Text;
 		}
-		if (this._part.predicate != null) {
+		if (this._segment.predicate != null) {
 			matchCriteria |= ETokenMatchCriteria.Node;
 			cacheProps |= EToCacheNodeProps.Name | EToCacheNodeProps.Attributes | EToCacheNodeProps.Text;
 		}
@@ -50,15 +50,17 @@ export class TokenSelectState {
 	public matchesName(local: string, prefix: string): boolean {
 		return (
 			// Match local
-			(this._part.local == null || this._part.local === '*' || this._part.local === local) &&
+			(this._segment.local == null ||
+				this._segment.local === '*' ||
+				this._segment.local === local) &&
 			// Match prefix
-			(this._part.prefix == null || this._part.prefix === prefix)
+			(this._segment.prefix == null || this._segment.prefix === prefix)
 		);
 	}
 
 	public matchesAttributes(attributes: Record<string, string>): boolean {
-		if (this._part.attributes != null) {
-			for (const attribute of this._part.attributes) {
+		if (this._segment.attributes != null) {
+			for (const attribute of this._segment.attributes) {
 				const qName = getQName(attribute.local, attribute.prefix);
 				if (
 					!(qName in attributes) ||
@@ -72,11 +74,11 @@ export class TokenSelectState {
 	}
 
 	public matchesText(text: string): boolean {
-		return this._part.textContains == null || text.includes(this._part.textContains);
+		return this._segment.containsText == null || text.includes(this._segment.containsText);
 	}
 
 	public matchesDepth(depth: number, parentDepth: number): boolean {
-		switch (this._part.axis) {
+		switch (this._segment.axis) {
 			case 'child':
 				return depth === parentDepth + 1;
 			case 'self-or-descendant':

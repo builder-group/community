@@ -1,14 +1,8 @@
-import { type TRange, type TReference, type TTextPos } from './types';
 import {
 	AMPERSAND,
 	COLON,
 	DOUBLE_QUOTE,
 	HASH,
-	isAsciiDigit,
-	isXmlChar,
-	isXmlName,
-	isXmlNameStart,
-	isXmlSpaceByte,
 	LINE_FEED,
 	LOWERCASE_A,
 	LOWERCASE_F,
@@ -19,11 +13,13 @@ import {
 	UPPERCASE_A,
 	UPPERCASE_F,
 	ZERO
-} from './utils';
+} from './ascii-constants';
+import { type TRange, type TReference, type TTextPos } from './types';
+import { isAsciiDigit, isXmlChar, isXmlName, isXmlNameStart, isXmlSpaceByte } from './utils';
 import { XmlError } from './XmlError';
 
 /**
- * Represents a stream of characters for parsing XML-like content.
+ * A stream of characters for parsing XML-like content.
  *
  * This implementation uses UTF-16 code units, whereas the Rust implementation is based on bytes (UTF-8).
  * This difference in encoding affects how characters are handled and parsed.

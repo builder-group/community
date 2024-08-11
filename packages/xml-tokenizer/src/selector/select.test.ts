@@ -2,12 +2,12 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { tokenize, type TXmlToken } from '../tokenizer';
+import { type TXmlToken } from '../tokenizer';
 import { tokensToXml } from '../tokens-to-xml';
-import { TokenSelector } from './TokenSelector';
+import { select } from './select';
 import { type TTokenSelectPath } from './types';
 
-describe('selector tests', () => {
+describe('select function', () => {
 	let bookStoreXml = '';
 	let inceptionXml = '';
 	let namespaceXml = '';
@@ -169,7 +169,7 @@ describe('selector tests', () => {
 				[
 					{ axis: 'child', local: 'bookstore' },
 					{ axis: 'child', local: 'book' },
-					{ axis: 'child', local: 'title', textContains: 'Harry Potter' }
+					{ axis: 'child', local: 'title', containsText: 'Harry Potter' }
 				]
 			],
 			`<title lang="en">Harry Potter</title>`
@@ -248,7 +248,7 @@ describe('selector tests', () => {
 			[
 				[
 					{ axis: 'self-or-descendant', local: 'book' },
-					{ axis: 'child', local: 'title', textContains: 'Harry Potter' }
+					{ axis: 'child', local: 'title', containsText: 'Harry Potter' }
 				]
 			],
 			`<title lang="en">Harry Potter</title>`
@@ -258,7 +258,7 @@ describe('selector tests', () => {
 	it("should match //*[contains(text(),'Harry Potter')]", () => {
 		assertSelection(
 			bookStoreXml,
-			[[{ axis: 'self-or-descendant', local: '*', textContains: 'Harry Potter' }]],
+			[[{ axis: 'self-or-descendant', local: '*', containsText: 'Harry Potter' }]],
 			`<title lang="en">Harry Potter</title>`
 		);
 	});
@@ -323,18 +323,15 @@ describe('selector tests', () => {
 
 function collectRecordedTokens(text: string, tokenSelectPaths: TTokenSelectPath[]): TXmlToken[] {
 	const recordedTokens: TXmlToken[] = [];
-	const selector = new TokenSelector(tokenSelectPaths);
-	tokenize(text, false, (token) => {
-		selector.pipeToken(token, (recordedToken) => {
-			recordedTokens.push(recordedToken);
-		});
+	select(text, tokenSelectPaths, (recordedToken) => {
+		recordedTokens.push(recordedToken);
 	});
 	return recordedTokens;
 }
 
-// Validate result via xpather.com
+// Results where validated via xpather.com
 function assertSelection(text: string, tokenSelectPaths: TTokenSelectPath[], result: string): void {
-	console.log(tokensToXml(collectRecordedTokens(text, tokenSelectPaths)));
+	// console.log(tokensToXml(collectRecordedTokens(text, tokenSelectPaths)));
 	expect(tokensToXml(collectRecordedTokens(text, tokenSelectPaths)).replaceAll(/\s/g, '')).toBe(
 		result.replaceAll(/\s/g, '')
 	);

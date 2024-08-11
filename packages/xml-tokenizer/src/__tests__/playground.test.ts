@@ -4,7 +4,7 @@ import * as camaro from 'camaro';
 import { beforeAll, expect, it } from 'vitest';
 
 import { select } from '../selector';
-import { tokenToXml } from '../tokens-to-xml';
+import { tokenToXml } from '../token-to-xml';
 
 void describe('count nodes', () => {
 	let xml = '';
