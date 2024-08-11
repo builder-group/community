@@ -41,7 +41,7 @@ export class TokenSelectStateMachine {
 	}
 
 	public record(token: TXmlToken): void {
-		if (this._hasActiveCache) {
+		if (this._hasActiveCache && this.getOffsetToFinal() <= 1) {
 			this._cachedTokens.push(token);
 		}
 	}
@@ -179,6 +179,13 @@ export class TokenSelectStateMachine {
 
 	public isFinalState(): boolean {
 		return this._currentState != null && this._currentState >= this._states.length - 1;
+	}
+
+	public getOffsetToFinal(): number {
+		if (this._currentState == null) {
+			return this._states.length;
+		}
+		return this._states.length - 1 - this._currentState;
 	}
 
 	public resetCurrentStateCache(): void {

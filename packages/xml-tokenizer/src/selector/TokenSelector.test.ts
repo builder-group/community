@@ -20,14 +20,20 @@ describe('selector tests', () => {
 	// TODO: Remove playground
 	// it('should work', () => {
 	// 	const selector = new TokenSelector([
-	// 		[
-	// 			{ axis: 'child', local: 'bookstore' },
-	// 			{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'CHILDREN' }] }
-	// 		],
-	// 		[
-	// 			{ axis: 'child', local: 'bookstore' },
-	// 			{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
-	// 		]
+	// 		[{ axis: 'self-or-descendant', local: 'title', textContains: 'Imposter' }]
+	// 		// [
+	// 		// 	{ axis: 'child', local: 'bookstore' },
+	// 		// 	{ axis: 'child', local: 'book' },
+	// 		// 	{ axis: 'child', local: 'title', textContains: 'Everyday Italian' }
+	// 		// ]
+	// 		// [
+	// 		// 	{ axis: 'child', local: 'bookstore' },
+	// 		// 	{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'CHILDREN' }] }
+	// 		// ],
+	// 		// [
+	// 		// 	{ axis: 'child', local: 'bookstore' },
+	// 		// 	{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
+	// 		// ]
 	// 	]);
 	// 	const recorded: TXmlToken[] = [];
 
@@ -146,6 +152,20 @@ describe('selector tests', () => {
 		);
 	});
 
+	it("should match /bookstore/book/title[contains(text(),'Harry Potter')]", () => {
+		assertSelection(
+			bookStoreXml,
+			[
+				[
+					{ axis: 'child', local: 'bookstore' },
+					{ axis: 'child', local: 'book' },
+					{ axis: 'child', local: 'title', textContains: 'Harry Potter' }
+				]
+			],
+			`<title lang="en">Harry Potter</title>`
+		);
+	});
+
 	it('should match //book', () => {
 		assertSelection(
 			bookStoreXml,
@@ -209,6 +229,19 @@ describe('selector tests', () => {
 				]
 			],
 			`<title lang="en">Everyday Italian</title><title lang="en">Harry Potter</title><title lang="en">XQuery Kick Start</title><title lang="en">Learning XML</title>`
+		);
+	});
+
+	it("should match //book/title[contains(text(),'Harry Potter')]", () => {
+		assertSelection(
+			bookStoreXml,
+			[
+				[
+					{ axis: 'self-or-descendant', local: 'book' },
+					{ axis: 'child', local: 'title', textContains: 'Harry Potter' }
+				]
+			],
+			`<title lang="en">Harry Potter</title>`
 		);
 	});
 
