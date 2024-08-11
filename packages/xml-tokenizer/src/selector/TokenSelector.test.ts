@@ -9,10 +9,20 @@ import { type TTokenSelectPath } from './types';
 
 describe('selector tests', () => {
 	let bookStoreXml = '';
+	let inceptionXml = '';
+	let namespaceXml = '';
 
 	beforeAll(async () => {
 		bookStoreXml = await readFile(
 			path.join(__dirname, '../__tests__/resources/bookstore.xml'),
+			'utf-8'
+		);
+		inceptionXml = await readFile(
+			path.join(__dirname, '../__tests__/resources/inception.xml'),
+			'utf-8'
+		);
+		namespaceXml = await readFile(
+			path.join(__dirname, '../__tests__/resources/namespace.xml'),
 			'utf-8'
 		);
 	});
@@ -245,6 +255,14 @@ describe('selector tests', () => {
 		);
 	});
 
+	it("should match //*[contains(text(),'Harry Potter')]", () => {
+		assertSelection(
+			bookStoreXml,
+			[[{ axis: 'self-or-descendant', local: '*', textContains: 'Harry Potter' }]],
+			`<title lang="en">Harry Potter</title>`
+		);
+	});
+
 	it('should match //book//title', () => {
 		assertSelection(
 			bookStoreXml,
@@ -255,6 +273,50 @@ describe('selector tests', () => {
 				]
 			],
 			`<title lang="en">Everyday Italian</title><title lang="en">Harry Potter</title><title lang="en">XQuery Kick Start</title><title lang="en">Learning XML</title>`
+		);
+	});
+
+	it('should match /bookstore/*/title', () => {
+		assertSelection(
+			bookStoreXml,
+			[
+				[
+					{ axis: 'child', local: 'bookstore' },
+					{ axis: 'child', local: '*' },
+					{ axis: 'child', local: 'title' }
+				]
+			],
+			`<title lang="en">Everyday Italian</title><title lang="en">Harry Potter</title><title lang="en">XQuery Kick Start</title><title lang="en">Learning XML</title>`
+		);
+	});
+
+	it('should match //node', () => {
+		assertSelection(
+			inceptionXml,
+			[[{ axis: 'self-or-descendant', local: 'node' }]],
+			`<node>
+		<node>
+            <node />
+        </node>
+	</node>`
+		);
+	});
+
+	it('should match //test:node', () => {
+		assertSelection(
+			namespaceXml,
+			[[{ axis: 'self-or-descendant', local: 'node', prefix: 'test' }]],
+			`<test:node>
+        </test:node>`
+		);
+	});
+
+	it('should match //test:*', () => {
+		assertSelection(
+			namespaceXml,
+			[[{ axis: 'self-or-descendant', local: '*', prefix: 'test' }]],
+			`<test:node>
+        </test:node>`
 		);
 	});
 });
@@ -272,7 +334,7 @@ function collectRecordedTokens(text: string, tokenSelectPaths: TTokenSelectPath[
 
 // Validate result via xpather.com
 function assertSelection(text: string, tokenSelectPaths: TTokenSelectPath[], result: string): void {
-	// console.log(tokensToXml(collectRecordedTokens(text, tokenSelectPaths)));
+	console.log(tokensToXml(collectRecordedTokens(text, tokenSelectPaths)));
 	expect(tokensToXml(collectRecordedTokens(text, tokenSelectPaths)).replaceAll(/\s/g, '')).toBe(
 		result.replaceAll(/\s/g, '')
 	);
