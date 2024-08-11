@@ -18,28 +18,28 @@ describe('selector tests', () => {
 	});
 
 	// TODO: Remove playground
-	it('should work', () => {
-		const selector = new TokenSelector([
-			[
-				{ axis: 'child', local: 'bookstore' },
-				{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'CHILDREN' }] }
-			],
-			[
-				{ axis: 'child', local: 'bookstore' },
-				{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
-			]
-		]);
-		const recorded: TXmlToken[] = [];
+	// it('should work', () => {
+	// 	const selector = new TokenSelector([
+	// 		[
+	// 			{ axis: 'child', local: 'bookstore' },
+	// 			{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'CHILDREN' }] }
+	// 		],
+	// 		[
+	// 			{ axis: 'child', local: 'bookstore' },
+	// 			{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
+	// 		]
+	// 	]);
+	// 	const recorded: TXmlToken[] = [];
 
-		tokenize(bookStoreXml, false, (token) => {
-			selector.pipeToken(token, (recordedToken) => {
-				recorded.push(recordedToken);
-			});
-		});
+	// 	tokenize(bookStoreXml, false, (token) => {
+	// 		selector.pipeToken(token, (recordedToken) => {
+	// 			recorded.push(recordedToken);
+	// 		});
+	// 	});
 
-		console.log(tokensToXml(recorded));
-		expect(recorded).not.toBeNull();
-	});
+	// 	console.log(tokensToXml(recorded));
+	// 	expect(recorded).not.toBeNull();
+	// });
 
 	it('should match /bookstore', () => {
 		assertSelection(

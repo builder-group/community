@@ -1,8 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { describe } from 'node:test';
 import * as sax from 'sax';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Ok
-// @ts-expect-error -- Ok
+// @ts-expect-error -- Javascript module
 import * as saxen from 'saxen';
 import { beforeAll, bench, expect } from 'vitest';
 
@@ -30,7 +29,7 @@ void describe('count nodes', () => {
 
 	// bench('[xml-tokenizer (npm)]', () => {
 	// 	let nodeCount = 0;
-	// 	xt.parseXmlStream(new xt.XmlStream(xml), false, (token) => {
+	// 	xt.tokenize(xml, false, (token) => {
 	// 		if (token.type === 'ElementStart') {
 	// 			nodeCount++;
 	// 		}

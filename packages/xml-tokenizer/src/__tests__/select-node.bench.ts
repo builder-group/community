@@ -41,14 +41,21 @@ void describe('count nodes', () => {
 	});
 
 	// bench('[xml-tokenizer (npm)]', () => {
-	// 	let nodeCount = 0;
-	// 	xt.parseXmlStream(new xt.XmlStream(xml), false, (token) => {
-	// 		if (token.type === 'ElementStart') {
-	// 			nodeCount++;
+	// 	let result = '';
+	// 	xt.select(
+	// 		xml,
+	// 		[
+	// 			[
+	// 				{ axis: 'child', local: 'bookstore' },
+	// 				{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
+	// 			]
+	// 		],
+	// 		(token) => {
+	// 			result += xt.tokenToXml(token);
 	// 		}
-	// 	});
+	// 	);
 
-	// 	expect(nodeCount).toBe(10045);
+	// 	expect(result).not.toBeNull();
 	// });
 
 	bench('[camaro]', async () => {
