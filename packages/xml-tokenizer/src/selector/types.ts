@@ -24,10 +24,8 @@
 export interface TTokenSelectPathPart {
 	/**
 	 * The axis defining the relationship between nodes.
-	 * '/' represents the child axis (direct child).
-	 * '//' represents the descendant-or-self axis (any level).
 	 */
-	axis: '/' | '//';
+	axis: 'child' | 'self-or-descendant';
 
 	/**
 	 * The tag name of the node to match.
