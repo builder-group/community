@@ -1,12 +1,10 @@
-/* eslint-disable no-bitwise -- Ok */
-/* eslint-disable @typescript-eslint/prefer-literal-enum-member -- Ok*/
 import { getQName } from '../get-q-name';
 import { type TTokenSelectPathPart } from './types';
 
 export class TokenSelectState {
 	private _part: TTokenSelectPathPart;
 	private _matchCriteria: ETokenMatchCriteria = ETokenMatchCriteria.None;
-	private _cacheProps: ETokenCacheProps = ETokenCacheProps.None;
+	private _toCacheNodeProps: EToCacheNodeProps = EToCacheNodeProps.None;
 	private _enteredDepth: number | null = null;
 
 	constructor(part: TTokenSelectPathPart) {
@@ -18,8 +16,8 @@ export class TokenSelectState {
 		return this._matchCriteria;
 	}
 
-	public get cacheProps(): ETokenCacheProps {
-		return this._cacheProps;
+	public get toCacheNodeProps(): EToCacheNodeProps {
+		return this._toCacheNodeProps;
 	}
 
 	public get enteredDepth(): number | null {
@@ -28,25 +26,25 @@ export class TokenSelectState {
 
 	private applyLevels(): void {
 		let matchCriteria = ETokenMatchCriteria.None;
-		let cacheProps = ETokenCacheProps.None;
+		let cacheProps = EToCacheNodeProps.None;
 
 		if (this._part.local != null || this._part.prefix != null) {
 			matchCriteria |= ETokenMatchCriteria.Name;
 		}
 		if (this._part.attributes != null) {
 			matchCriteria |= ETokenMatchCriteria.Attributes;
-			cacheProps |= ETokenCacheProps.Attributes;
+			cacheProps |= EToCacheNodeProps.Attributes;
 		}
 		if (this._part.textContains != null) {
 			matchCriteria |= ETokenMatchCriteria.Text;
 		}
 		if (this._part.predicate != null) {
 			matchCriteria |= ETokenMatchCriteria.Node;
-			cacheProps |= ETokenCacheProps.Name | ETokenCacheProps.Attributes | ETokenCacheProps.Text;
+			cacheProps |= EToCacheNodeProps.Name | EToCacheNodeProps.Attributes | EToCacheNodeProps.Text;
 		}
 
 		this._matchCriteria = matchCriteria;
-		this._cacheProps = cacheProps;
+		this._toCacheNodeProps = cacheProps;
 	}
 
 	public matchesName(local: string, prefix: string): boolean {
@@ -86,7 +84,7 @@ export class TokenSelectState {
 	}
 }
 
-export const enum ETokenCacheProps {
+export const enum EToCacheNodeProps {
 	None = 0, // Cache none
 	Name = 1 << 0, // Cache local and prefix <prefix:local
 	Attributes = 1 << 1, // Cache attributes <prefix:local attribute="x"

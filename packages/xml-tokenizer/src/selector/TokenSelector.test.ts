@@ -20,7 +20,11 @@ describe('selector tests', () => {
 		const selector = new TokenSelector([
 			[
 				{ axis: '/', local: 'bookstore' },
-				{ axis: '/', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
+				{ axis: '/', local: 'book', attributes: [{ local: 'category', value: 'CHILDREN' }] }
+			],
+			[
+				{ axis: '/', local: 'bookstore' },
+				{ axis: '/', local: 'book', attributes: [{ local: 'category', value: 'WEB' }] }
 			]
 		]);
 		const recorded: TXmlToken[] = [];

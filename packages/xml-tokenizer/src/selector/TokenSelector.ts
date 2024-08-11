@@ -1,6 +1,5 @@
 // xpather.com
 
-import { getQName } from '../get-q-name';
 import {
 	type TAttributeToken,
 	type TElementEndToken,
@@ -8,7 +7,7 @@ import {
 	type TTextToken,
 	type TXmlToken
 } from '../tokenizer';
-import { ETokenCacheProps, ETokenMatchCriteria } from './TokenSelectState';
+import { ETokenMatchCriteria } from './TokenSelectState';
 import { TokenSelectStateMachine } from './TokenSelectStateMachine';
 import { type TTokenSelectPath } from './types';
 
@@ -17,14 +16,6 @@ export class TokenSelector {
 	private _tspStateMachines: TokenSelectStateMachine[];
 	private _isRecording = false;
 
-	private _currentCacheProps: ETokenCacheProps = ETokenCacheProps.None;
-	private _currentNodeCache: TCurrentNodeCache = {
-		local: null,
-		prefix: null,
-		attributes: null,
-		text: null
-	};
-
 	constructor(tokenSelectPaths: TTokenSelectPath[]) {
 		this._tspStateMachines = tokenSelectPaths.map(
 			(tokenSelectPath) => new TokenSelectStateMachine(tokenSelectPath)
@@ -32,40 +23,62 @@ export class TokenSelector {
 	}
 
 	public pipeToken(token: TXmlToken, recorder: (token: TXmlToken) => void): void {
+		let startRecording = false;
+		let stopRecording = false;
 		switch (token.type) {
 			case 'ElementStart':
-				this._handleElementStart(token);
+				startRecording = this._handleElementStart(token);
 				break;
 			case 'Attribute':
-				this._handleAttribute(token);
+				startRecording = this._handleAttribute(token);
 				break;
 			case 'Text':
-				this._handleText(token);
+				startRecording = this._handleText(token);
 				break;
 			case 'ElementEnd': {
-				this._handleElementEnd(token);
+				stopRecording = this._handleElementEnd(token);
 				break;
 			}
 			default:
 		}
 
+		if (startRecording && !this._isRecording) {
+			this.record();
+		}
+
+		for (const stateMachine of this._tspStateMachines) {
+			stateMachine.record(token);
+			const recordedTokens = stateMachine.takeRecordedTokens();
+			if (recordedTokens != null) {
+				recordedTokens.forEach((t) => {
+					recorder(t);
+				});
+			}
+		}
+
 		if (this._isRecording) {
 			recorder(token);
 		}
+
+		if (stopRecording) {
+			this._isRecording = false;
+		}
 	}
 
-	private _handleElementStart(token: TElementStartToken): void {
+	private _handleElementStart(token: TElementStartToken): boolean {
 		this._currentDepth += 1;
-		if (this._isRecording) {
-			return;
-		}
 
-		// TODO: Reset cached node? We have to reset attributes and name but can't text?
+		let startRecording = false;
 
 		for (const stateMachine of this._tspStateMachines) {
+			stateMachine.resetCurrentStateCache();
+			if (stateMachine.isFinalState()) {
+				continue;
+			}
+
 			const nextState = stateMachine.getNextState();
 			if (nextState == null || !(nextState.matchCriteria & ETokenMatchCriteria.Name)) {
-				return;
+				continue;
 			}
 
 			const transitioned = stateMachine.transitionIfNameMatch(
@@ -74,73 +87,67 @@ export class TokenSelector {
 				this._currentDepth
 			);
 			if (transitioned && stateMachine.isFinalState()) {
-				this.record();
-				return;
+				startRecording = true;
 			}
-
-			this._currentCacheProps |= nextState.cacheProps;
 		}
 
-		if (this._currentCacheProps & ETokenCacheProps.Name) {
-			this._currentNodeCache.local = token.local;
-			this._currentNodeCache.prefix = token.prefix;
-		}
+		return startRecording;
 	}
 
-	private _handleAttribute(token: TAttributeToken): void {
-		if (this._isRecording) {
-			return;
-		}
-
-		const attributes = this._currentNodeCache.attributes ?? {};
-		attributes[getQName(token.local, token.prefix)] = token.value;
+	private _handleAttribute(token: TAttributeToken): boolean {
+		let startRecording = false;
 
 		for (const stateMachine of this._tspStateMachines) {
+			if (stateMachine.isFinalState()) {
+				continue;
+			}
+
 			const nextState = stateMachine.getNextState();
 			if (nextState == null || !(nextState.matchCriteria & ETokenMatchCriteria.Attributes)) {
-				return;
+				continue;
 			}
 
-			const transitioned = stateMachine.transitionIfAttributesMatch(attributes, this._currentDepth);
+			const transitioned = stateMachine.transitionIfAttributesMatch(
+				token.local,
+				token.prefix,
+				token.value,
+				this._currentDepth
+			);
 			if (transitioned && stateMachine.isFinalState()) {
-				this.record();
-				return;
+				startRecording = true;
 			}
 		}
 
-		if (this._currentCacheProps & ETokenCacheProps.Attributes) {
-			this._currentNodeCache.attributes = attributes;
-		}
+		return startRecording;
 	}
 
-	private _handleText(token: TTextToken): void {
-		if (this._isRecording) {
-			return;
-		}
+	private _handleText(token: TTextToken): boolean {
+		let startRecording = false;
 
 		for (const stateMachine of this._tspStateMachines) {
+			if (stateMachine.isFinalState()) {
+				continue;
+			}
+
 			const nextState = stateMachine.getNextState();
 			if (nextState == null || !(nextState.matchCriteria & ETokenMatchCriteria.Text)) {
-				return;
+				continue;
 			}
 
 			const transitioned = stateMachine.transitionIfTextMatch(token.text, this._currentDepth);
 			if (transitioned && stateMachine.isFinalState()) {
-				this.record();
-				return;
+				startRecording = true;
 			}
 		}
 
-		if (this._currentCacheProps & ETokenCacheProps.Text) {
-			this._currentNodeCache.text = token.text;
-		}
+		return startRecording;
 	}
 
-	private _handleElementEnd(token: TElementEndToken): void {
+	private _handleElementEnd(token: TElementEndToken): boolean {
 		if (token.end.type === 'Close' || token.end.type === 'Empty') {
 			this._currentDepth -= 1;
 
-			// TODO: Reset cached node?
+			let isFinalState = false;
 
 			for (const stateMachine of this._tspStateMachines) {
 				const currentState = stateMachine.getCurrentState();
@@ -148,26 +155,19 @@ export class TokenSelector {
 					continue;
 				}
 
-				if (currentState.enteredDepth != null && this._currentDepth <= currentState.enteredDepth) {
+				if (currentState.enteredDepth != null && this._currentDepth < currentState.enteredDepth) {
 					stateMachine.transitionBack(this._currentDepth);
 				}
+
+				isFinalState = isFinalState || stateMachine.isFinalState();
 			}
+
+			return !isFinalState;
 		}
+		return false;
 	}
 
 	private record(): void {
 		this._isRecording = true;
-		this._currentNodeCache.local = null;
-		this._currentNodeCache.prefix = null;
-		this._currentNodeCache.attributes = null;
-		this._currentNodeCache.text = null;
-		this._currentCacheProps = ETokenCacheProps.None;
 	}
-}
-
-interface TCurrentNodeCache {
-	attributes: Record<string, string> | null;
-	local: string | null;
-	prefix: string | null;
-	text: string | null;
 }
