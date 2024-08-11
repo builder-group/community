@@ -57,8 +57,12 @@ export class TokenSelectStateMachine {
 
 	public transitionIfNameMatch(local: string, prefix: string, depth: number): boolean {
 		const nextState = this.getNextState();
+		const currentState = this.getCurrentState();
 
-		if (nextState?.matchesName(local, prefix)) {
+		if (
+			nextState?.matchesName(local, prefix) &&
+			nextState.matchesDepth(depth, currentState?.enteredDepth ?? 0)
+		) {
 			// Cache name
 			if (
 				nextState.matchCriteria &
@@ -87,11 +91,15 @@ export class TokenSelectStateMachine {
 		depth: number
 	): boolean {
 		const nextState = this.getNextState();
+		const currentState = this.getCurrentState();
 
 		const attributes = this._cachedNodeProps.attributes ?? {};
 		attributes[getQName(local, prefix)] = value;
 
-		if (nextState?.matchesAttributes(attributes)) {
+		if (
+			nextState?.matchesAttributes(attributes) &&
+			nextState.matchesDepth(depth, currentState?.enteredDepth ?? 0)
+		) {
 			// Cache attributes
 			if (nextState.matchCriteria & (ETokenMatchCriteria.Text | ETokenMatchCriteria.Node)) {
 				this._hasActiveCache = true;
@@ -111,8 +119,12 @@ export class TokenSelectStateMachine {
 
 	public transitionIfTextMatch(text: string, depth: number): boolean {
 		const nextState = this.getNextState();
+		const currentState = this.getCurrentState();
 
-		if (nextState?.matchesText(text)) {
+		if (
+			nextState?.matchesText(text) &&
+			nextState.matchesDepth(depth, currentState?.enteredDepth ?? 0)
+		) {
 			// Cache text
 			if (nextState.matchCriteria & ETokenMatchCriteria.Node) {
 				this._hasActiveCache = true;

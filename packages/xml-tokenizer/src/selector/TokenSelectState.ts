@@ -75,6 +75,15 @@ export class TokenSelectState {
 		return this._part.textContains == null || text.includes(this._part.textContains);
 	}
 
+	public matchesDepth(depth: number, parentDepth: number): boolean {
+		switch (this._part.axis) {
+			case 'child':
+				return depth === parentDepth + 1;
+			case 'self-or-descendant':
+				return depth >= parentDepth;
+		}
+	}
+
 	public match(depth: number): void {
 		this._enteredDepth = depth;
 	}

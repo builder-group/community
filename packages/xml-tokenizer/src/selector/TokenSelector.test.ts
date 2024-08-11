@@ -133,7 +133,6 @@ describe('selector tests', () => {
 		);
 	});
 
-	// TODO: Doesn't work yet
 	it('should not match /bookstore/title', () => {
 		assertSelection(
 			bookStoreXml,
@@ -238,6 +237,7 @@ function collectRecordedTokens(text: string, tokenSelectPaths: TTokenSelectPath[
 	return recordedTokens;
 }
 
+// Validate result via xpather.com
 function assertSelection(text: string, tokenSelectPaths: TTokenSelectPath[], result: string): void {
 	// console.log(tokensToXml(collectRecordedTokens(text, tokenSelectPaths)));
 	expect(tokensToXml(collectRecordedTokens(text, tokenSelectPaths)).replaceAll(/\s/g, '')).toBe(

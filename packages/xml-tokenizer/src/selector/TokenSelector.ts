@@ -1,5 +1,3 @@
-// xpather.com
-
 import {
 	type TAttributeToken,
 	type TElementEndToken,
@@ -27,16 +25,16 @@ export class TokenSelector {
 		let stopRecording = false;
 		switch (token.type) {
 			case 'ElementStart':
-				startRecording = this._handleElementStart(token);
+				startRecording = this.handleElementStart(token);
 				break;
 			case 'Attribute':
-				startRecording = this._handleAttribute(token);
+				startRecording = this.handleAttribute(token);
 				break;
 			case 'Text':
-				startRecording = this._handleText(token);
+				startRecording = this.handleText(token);
 				break;
 			case 'ElementEnd': {
-				stopRecording = this._handleElementEnd(token);
+				stopRecording = this.handleElementEnd(token);
 				break;
 			}
 			default:
@@ -65,7 +63,7 @@ export class TokenSelector {
 		}
 	}
 
-	private _handleElementStart(token: TElementStartToken): boolean {
+	private handleElementStart(token: TElementStartToken): boolean {
 		this._currentDepth += 1;
 
 		let startRecording = false;
@@ -94,7 +92,7 @@ export class TokenSelector {
 		return startRecording;
 	}
 
-	private _handleAttribute(token: TAttributeToken): boolean {
+	private handleAttribute(token: TAttributeToken): boolean {
 		let startRecording = false;
 
 		for (const stateMachine of this._tspStateMachines) {
@@ -121,7 +119,7 @@ export class TokenSelector {
 		return startRecording;
 	}
 
-	private _handleText(token: TTextToken): boolean {
+	private handleText(token: TTextToken): boolean {
 		let startRecording = false;
 
 		for (const stateMachine of this._tspStateMachines) {
@@ -143,7 +141,7 @@ export class TokenSelector {
 		return startRecording;
 	}
 
-	private _handleElementEnd(token: TElementEndToken): boolean {
+	private handleElementEnd(token: TElementEndToken): boolean {
 		if (token.end.type === 'Close' || token.end.type === 'Empty') {
 			this._currentDepth -= 1;
 
