@@ -17,6 +17,30 @@ describe('selector tests', () => {
 		);
 	});
 
+	// TODO: Remove playground
+	it('should work', () => {
+		const selector = new TokenSelector([
+			[
+				{ axis: '/', local: 'bookstore' },
+				{ axis: '/', local: 'book', attributes: [{ local: 'category', value: 'CHILDREN' }] }
+			],
+			[
+				{ axis: '/', local: 'bookstore' },
+				{ axis: '/', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
+			]
+		]);
+		const recorded: TXmlToken[] = [];
+
+		tokenize(bookStoreXml, false, (token) => {
+			selector.pipeToken(token, (recordedToken) => {
+				recorded.push(recordedToken);
+			});
+		});
+
+		console.log(tokensToXml(recorded));
+		expect(recorded).not.toBeNull();
+	});
+
 	it('should match /bookstore', () => {
 		assertSelection(
 			bookStoreXml,
@@ -54,27 +78,144 @@ describe('selector tests', () => {
 		);
 	});
 
-	it('should work', () => {
-		const selector = new TokenSelector([
+	it('should match /bookstore/book', () => {
+		assertSelection(
+			bookStoreXml,
 			[
-				{ axis: '/', local: 'bookstore' },
-				{ axis: '/', local: 'book', attributes: [{ local: 'category', value: 'CHILDREN' }] }
+				[
+					{ axis: '/', local: 'bookstore' },
+					{ axis: '/', local: 'book' }
+				]
 			],
+			`<book category="COOKING">
+                <title lang="en">Everyday Italian</title>
+                <author>Giada De Laurentiis</author>
+                <year>2005</year>
+                <price>30.00</price>
+        </book><book category="CHILDREN">
+                <title lang="en">Harry Potter</title>
+                <author>J K. Rowling</author>
+                <year>2005</year>
+                <price>29.99</price>
+        </book><book category="WEB">
+                <title lang="en">XQuery Kick Start</title>
+                <author>James McGovern</author>
+                <author>Per Bothner</author>
+                <author>Kurt Cagle</author>
+                <author>James Linn</author>
+                <author>Vaidyanathan Nagarajan</author>
+                <year>2003</year>
+                <price>49.99</price>
+        </book><book category="WEB">
+                <title lang="en">Learning XML</title>
+                <author>Erik T. Ray</author>
+                <year>2003</year>
+                <price>39.95</price>
+        </book>`
+		);
+	});
+
+	it('should match /bookstore/book[@category="COOKING"]', () => {
+		assertSelection(
+			bookStoreXml,
 			[
-				{ axis: '/', local: 'bookstore' },
-				{ axis: '/', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
-			]
-		]);
-		const recorded: TXmlToken[] = [];
+				[
+					{ axis: '/', local: 'bookstore' },
+					{ axis: '/', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
+				]
+			],
+			`<book category="COOKING">
+                <title lang="en">Everyday Italian</title>
+                <author>Giada De Laurentiis</author>
+                <year>2005</year>
+                <price>30.00</price>
+        </book>`
+		);
+	});
 
-		tokenize(bookStoreXml, false, (token) => {
-			selector.pipeToken(token, (recordedToken) => {
-				recorded.push(recordedToken);
-			});
-		});
+	// TODO: Doesn't work yet
+	it('should not match /bookstore/title', () => {
+		assertSelection(
+			bookStoreXml,
+			[
+				[
+					{ axis: '/', local: 'bookstore' },
+					{ axis: '/', local: 'title' }
+				]
+			],
+			''
+		);
+	});
 
-		console.log(tokensToXml(recorded));
-		expect(recorded).not.toBeNull();
+	it('should match //book', () => {
+		assertSelection(
+			bookStoreXml,
+			[[{ axis: '//', local: 'book' }]],
+			`<book category="COOKING">
+                <title lang="en">Everyday Italian</title>
+                <author>Giada De Laurentiis</author>
+                <year>2005</year>
+                <price>30.00</price>
+        </book><book category="CHILDREN">
+                <title lang="en">Harry Potter</title>
+                <author>J K. Rowling</author>
+                <year>2005</year>
+                <price>29.99</price>
+        </book><book category="WEB">
+                <title lang="en">XQuery Kick Start</title>
+                <author>James McGovern</author>
+                <author>Per Bothner</author>
+                <author>Kurt Cagle</author>
+                <author>James Linn</author>
+                <author>Vaidyanathan Nagarajan</author>
+                <year>2003</year>
+                <price>49.99</price>
+        </book><book category="WEB">
+                <title lang="en">Learning XML</title>
+                <author>Erik T. Ray</author>
+                <year>2003</year>
+                <price>39.95</price>
+        </book>`
+		);
+	});
+
+	it('should match //book[@category="COOKING"]', () => {
+		assertSelection(
+			bookStoreXml,
+			[[{ axis: '//', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }]],
+			`<book category="COOKING">
+                <title lang="en">Everyday Italian</title>
+                <author>Giada De Laurentiis</author>
+                <year>2005</year>
+                <price>30.00</price>
+        </book>`
+		);
+	});
+
+	it('should match //book/title', () => {
+		assertSelection(
+			bookStoreXml,
+			[
+				[
+					{ axis: '//', local: 'book' },
+					{ axis: '/', local: 'title' }
+				]
+			],
+			`<title lang="en">Everyday Italian</title><title lang="en">Harry Potter</title><title lang="en">XQuery Kick Start</title><title lang="en">Learning XML</title>`
+		);
+	});
+
+	it('should match //book//title', () => {
+		assertSelection(
+			bookStoreXml,
+			[
+				[
+					{ axis: '//', local: 'book' },
+					{ axis: '//', local: 'title' }
+				]
+			],
+			`<title lang="en">Everyday Italian</title><title lang="en">Harry Potter</title><title lang="en">XQuery Kick Start</title><title lang="en">Learning XML</title>`
+		);
 	});
 });
 
@@ -90,6 +231,7 @@ function collectRecordedTokens(text: string, tokenSelectPaths: TTokenSelectPath[
 }
 
 function assertSelection(text: string, tokenSelectPaths: TTokenSelectPath[], result: string): void {
+	console.log(tokensToXml(collectRecordedTokens(text, tokenSelectPaths)));
 	expect(tokensToXml(collectRecordedTokens(text, tokenSelectPaths)).replaceAll(/\s/g, '')).toBe(
 		result.replaceAll(/\s/g, '')
 	);
