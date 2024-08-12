@@ -1,14 +1,21 @@
 import * as fxp from 'fast-xml-parser';
 import * as txml from 'txml';
-import { select, tokensToXml, TXmlToken, xmlToObject, xmlToSimplifiedObject } from 'xml-tokenizer';
+import {
+	processTokenForSimplifiedObject,
+	select,
+	tokensToXml,
+	TXmlToken,
+	xmlToObject,
+	xmlToSimplifiedObject
+} from 'xml-tokenizer';
 import * as xml2js from 'xml2js';
 
 import { bench } from './bench';
 import { parse } from './txml';
 
 // playground();
-// shopifyTest();
-benchmarkTest();
+shopifyTest();
+// benchmarkTest();
 
 async function playground(): Promise<void> {
 	const dom = txml.parse('<root test="2"><child attr="1">One</child><child>Two</child></root>');
@@ -29,18 +36,9 @@ async function shopifyTest(): Promise<void> {
 	);
 	const shopifyHtml = await shopifyResult.text();
 
-	// const tokens: TXMLToken[] = [];
-	// try {
-	// 	parseString(shopifyHtml, false, (token) => {
-	// 		tokens.push(token);
-	// 	});
-
-	// } catch (e) {
-	// 	// do nothing
-	// }
-
-	const result = xmlToSimplifiedObject(shopifyHtml);
-	const recoredTokens: TXmlToken[] = [];
+	const result = {};
+	const stack = [result];
+	let tokens: TXmlToken[] = [];
 	select(
 		shopifyHtml,
 		[
@@ -56,10 +54,16 @@ async function shopifyTest(): Promise<void> {
 			]
 		],
 		(token) => {
-			recoredTokens.push(token);
+			tokens.push(token);
+			processTokenForSimplifiedObject(token, stack);
 		}
 	);
-	console.log({ result, shopifyHtml, recoredTokens, recordedHtml: tokensToXml(recoredTokens) });
+
+	console.log({
+		result,
+		shopifyHtml,
+		selectedHtml: tokensToXml(tokens)
+	});
 }
 
 async function benchmarkTest(): Promise<void> {

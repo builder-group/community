@@ -102,12 +102,7 @@ describe('xmlToObject function', () => {
 					_attributes: {
 						attr: 'val1'
 					},
-					grandchild: [
-						{
-							_text: 'GC1'
-						},
-						{ _text: 'GC2' }
-					]
+					grandchild: [{ _text: 'GC1' }, { _text: 'GC2' }]
 				},
 				child2: {
 					grandchild: {
