@@ -66,6 +66,7 @@ export class TokenSelectStateMachine {
 			this._cachedNodeProps.prefix = prefix;
 		}
 
+		// Transition forward if name and depth match, and no additional criteria are required
 		if (
 			nextState.matchesName(local, prefix) &&
 			nextState.matchesDepth(depth, currentState?.enteredDepth ?? 0) &&
@@ -81,6 +82,7 @@ export class TokenSelectStateMachine {
 		return false;
 	}
 
+	// Transition forward if attributes and depth match, and no additional criteria are required
 	public transitionIfAttributesMatch(
 		local: string,
 		prefix: string,
@@ -113,6 +115,7 @@ export class TokenSelectStateMachine {
 		return false;
 	}
 
+	// Transition forward if text content and depth match, and no additional criteria are required
 	public transitionIfTextMatch(text: string, depth: number): boolean {
 		const nextState = this.getNextState();
 		const currentState = this.getCurrentState();

@@ -48,6 +48,9 @@ export interface TTokenSelectPathSegment {
 	/**
 	 * Optional filter to match nodes containing specific text content.
 	 *
+	 * Currenlty only plain text can be matched.
+	 * Text with sub nodes like <b/>, <strong/> can't be matched as of now.
+	 *
 	 * @example
 	 * // Matches nodes containing the text 'bestseller'
 	 * containsText: 'bestseller'
@@ -73,3 +76,27 @@ export interface TTokenSelectPathSegment {
  * A limited XPath expression composed of multiple segments in an object-oriented manner.
  */
 export type TTokenSelectPath = TTokenSelectPathSegment[];
+
+// TODO: Add actual selectors?
+
+// export interface TTokenSelectTemplate {
+// 	path: TTokenSelectPath;
+// 	select: Record<string, TTokenSelectItem>;
+// }
+
+// export type TTokenSelectItem = TSelectAttributeItem | TSelectTextItem | TSelectRawTextItem;
+
+// export interface TSelectAttributeItem {
+// 	type: 'Attribute';
+// 	local: string;
+// 	prefix?: string;
+// 	value?: string;
+// }
+
+// export interface TSelectTextItem {
+// 	type: 'Text';
+// }
+
+// export interface TSelectRawTextItem {
+// 	type: 'Raw';
+// }
