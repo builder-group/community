@@ -1,30 +1,20 @@
 import * as fxp from 'fast-xml-parser';
 import * as txml from 'txml';
-import { select, tokensToXml, TXmlNode, TXmlToken, xmlToObject } from 'xml-tokenizer';
+import { select, tokensToXml, TXmlToken, xmlToObject, xmlToSimplifiedObject } from 'xml-tokenizer';
 import * as xml2js from 'xml2js';
 
 import { bench } from './bench';
 import { parse } from './txml';
 
-playground();
-// midsizeTest();
+// playground();
 // shopifyTest();
-// benchmarkTest();
+benchmarkTest();
 
 async function playground(): Promise<void> {
 	const dom = txml.parse('<root test="2"><child attr="1">One</child><child>Two</child></root>');
 	const simplified = txml.simplify(dom);
 	const simplifiedLostLess = txml.simplifyLostLess(dom);
 	console.log({ simplified, simplifiedLostLess });
-}
-
-async function midsizeTest(): Promise<void> {
-	const xmlResult = await fetch('http://localhost:5173/midsize.xml');
-	const xml = await xmlResult.text();
-
-	const result = xmlToObject(xml);
-
-	console.log({ result });
 }
 
 async function shopifyTest(): Promise<void> {
@@ -49,7 +39,7 @@ async function shopifyTest(): Promise<void> {
 	// 	// do nothing
 	// }
 
-	const result = xmlToObject(shopifyHtml);
+	const result = xmlToSimplifiedObject(shopifyHtml);
 	const recoredTokens: TXmlToken[] = [];
 	select(
 		shopifyHtml,
@@ -147,12 +137,8 @@ async function benchmarkTest(): Promise<void> {
 	await bench(
 		'xml-tokenizer (dom)',
 		async () => {
-			const dom = xmlToObject(xml);
-			const cacheKey = (
-				dom.children.filter(
-					(child) => typeof child !== 'string' && child.tagName === 'cacheKey'
-				) as TXmlNode[]
-			)[0].children[0];
+			const dom = xmlToSimplifiedObject(xml);
+			const cacheKey = dom['HotelListResponse']['cacheKey']._text;
 			// console.log(cacheKey);
 		},
 		runs
