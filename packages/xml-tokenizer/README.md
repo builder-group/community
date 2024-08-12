@@ -151,3 +151,28 @@ Decoding `Uint8Array` snippets to JavaScript strings is frequently necessary, ne
 | roxmltree:byte      | 12.48                           | 78.65         | 16.45         | 14.90          | ±1.15%                         | 
 
 The `roxmltree` package with the Byte-Based implementation can be found in the `_deprecated` folder ([`packages/_deprecated/roxmltree_byte-only`](https://github.com/builder-group/community/tree/develop/packages/_deprecated/roxmltree_byte-only)).
+
+### Why not use a Generator?
+
+While generators can improve developer experience, they introduce significant performance overhead. Our benchmarks show that using a generator dramatically increases the execution time compared to the callback approach. Given our focus on performance, we chose to maintain the callback implementation. 
+
+See [Generator vs Iterator vs Callback](https://observablehq.com/@domoritz/yield-vs-iterator-vs-callback) for more details.
+
+#### Benchmark with Generator
+
+```
+[xml-tokenizer] Total Time: 5345.0000 ms | Average Time per Run: 53.4500 ms | Median Time: 53.0000 ms | Runs: 100
+[txml] Total Time: 395.0000 ms | Average Time per Run: 3.9500 ms | Median Time: 4.0000 ms | Runs: 100
+[fast-xml-parser] Total Time: 1290.0000 ms | Average Time per Run: 12.9000 ms | Median Time: 13.0000 ms | Runs: 100
+```
+
+#### Benchmark with Callback
+
+```
+[xml-tokenizer] Total Time: 662.0000 ms | Average Time per Run: 6.6200 ms | Median Time: 6.0000 ms | Runs: 100
+[txml] Total Time: 394.0000 ms | Average Time per Run: 3.9400 ms | Median Time: 4.0000 ms | Runs: 100
+[fast-xml-parser] Total Time: 1308.0000 ms | Average Time per Run: 13.0800 ms | Median Time: 13.0000 ms | Runs: 100
+```
+
+[Benchmark implementation in Vanilla Profiler](https://github.com/builder-group/monorepo/tree/develop/examples/xml-tokenizer/vanilla/profiler)
+

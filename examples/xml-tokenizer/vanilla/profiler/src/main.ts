@@ -7,8 +7,8 @@ import { bench } from './bench';
 import { parse } from './txml';
 
 // midsizeTest();
-shopifyTest();
-// benchmarkTest();
+// shopifyTest();
+benchmarkTest();
 
 async function midsizeTest(): Promise<void> {
 	const xmlResult = await fetch('http://localhost:5173/midsize.xml');
