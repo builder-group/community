@@ -10,8 +10,6 @@ export class TokenSelectStateMachine {
 	private _currentState: number | null = null;
 
 	// Current state cache
-	private _hasActiveCache = false;
-	private _toCacheNodeProps: EToCacheNodeProps = EToCacheNodeProps.None;
 	private _cachedNodeProps: TCachedNodeProps = {
 		prefix: null,
 		local: null,
@@ -41,7 +39,7 @@ export class TokenSelectStateMachine {
 	}
 
 	public record(token: TXmlToken): void {
-		if (this._hasActiveCache && this.getOffsetToFinal() <= 1) {
+		if (this.getOffsetToFinal() <= 1) {
 			this._cachedTokens.push(token);
 		}
 	}
@@ -58,25 +56,24 @@ export class TokenSelectStateMachine {
 	public transitionIfNameMatch(local: string, prefix: string, depth: number): boolean {
 		const nextState = this.getNextState();
 		const currentState = this.getCurrentState();
+		if (nextState == null) {
+			return false;
+		}
+
+		// Cache name
+		if (nextState.toCacheNodeProps & EToCacheNodeProps.Name) {
+			this._cachedNodeProps.local = local;
+			this._cachedNodeProps.prefix = prefix;
+		}
 
 		if (
-			nextState?.matchesName(local, prefix) &&
-			nextState.matchesDepth(depth, currentState?.enteredDepth ?? 0)
-		) {
-			// Cache name
-			if (
+			nextState.matchesName(local, prefix) &&
+			nextState.matchesDepth(depth, currentState?.enteredDepth ?? 0) &&
+			!(
 				nextState.matchCriteria &
 				(ETokenMatchCriteria.Attributes | ETokenMatchCriteria.Text | ETokenMatchCriteria.Node)
-			) {
-				this._hasActiveCache = true;
-				this._toCacheNodeProps |= nextState.toCacheNodeProps;
-				if (this._toCacheNodeProps & EToCacheNodeProps.Name) {
-					this._cachedNodeProps.local = local;
-					this._cachedNodeProps.prefix = prefix;
-				}
-				return false;
-			}
-
+			)
+		) {
 			this.transitionForward(depth);
 			return true;
 		}
@@ -92,24 +89,23 @@ export class TokenSelectStateMachine {
 	): boolean {
 		const nextState = this.getNextState();
 		const currentState = this.getCurrentState();
+		if (nextState == null) {
+			return false;
+		}
 
 		const attributes = this._cachedNodeProps.attributes ?? {};
 		attributes[getQName(local, prefix)] = value;
 
-		if (
-			nextState?.matchesAttributes(attributes) &&
-			nextState.matchesDepth(depth, currentState?.enteredDepth ?? 0)
-		) {
-			// Cache attributes
-			if (nextState.matchCriteria & (ETokenMatchCriteria.Text | ETokenMatchCriteria.Node)) {
-				this._hasActiveCache = true;
-				this._toCacheNodeProps |= nextState.toCacheNodeProps;
-				if (this._toCacheNodeProps & EToCacheNodeProps.Attributes) {
-					this._cachedNodeProps.attributes = attributes;
-				}
-				return false;
-			}
+		// Cache attributes
+		if (nextState.toCacheNodeProps & EToCacheNodeProps.Attributes) {
+			this._cachedNodeProps.attributes = attributes;
+		}
 
+		if (
+			nextState.matchesAttributes(attributes) &&
+			nextState.matchesDepth(depth, currentState?.enteredDepth ?? 0) &&
+			!(nextState.matchCriteria & (ETokenMatchCriteria.Text | ETokenMatchCriteria.Node))
+		) {
 			this.transitionForward(depth);
 			return true;
 		}
@@ -120,21 +116,20 @@ export class TokenSelectStateMachine {
 	public transitionIfTextMatch(text: string, depth: number): boolean {
 		const nextState = this.getNextState();
 		const currentState = this.getCurrentState();
+		if (nextState == null) {
+			return false;
+		}
+
+		// Cache text
+		if (nextState.toCacheNodeProps & EToCacheNodeProps.Text) {
+			this._cachedNodeProps.text = text;
+		}
 
 		if (
-			nextState?.matchesText(text) &&
-			nextState.matchesDepth(depth, currentState?.enteredDepth ?? 0)
+			nextState.matchesText(text) &&
+			nextState.matchesDepth(depth, currentState?.enteredDepth ?? 0) &&
+			!(nextState.matchCriteria & ETokenMatchCriteria.Node)
 		) {
-			// Cache text
-			if (nextState.matchCriteria & ETokenMatchCriteria.Node) {
-				this._hasActiveCache = true;
-				this._toCacheNodeProps |= nextState.toCacheNodeProps;
-				if (this._toCacheNodeProps & EToCacheNodeProps.Text) {
-					this._cachedNodeProps.text = text;
-				}
-				return false;
-			}
-
 			this.transitionForward(depth);
 			return true;
 		}
@@ -189,8 +184,6 @@ export class TokenSelectStateMachine {
 	}
 
 	public resetCurrentStateCache(): void {
-		this._hasActiveCache = false;
-		this._toCacheNodeProps = EToCacheNodeProps.None;
 		this._cachedNodeProps.prefix = null;
 		this._cachedNodeProps.local = null;
 		this._cachedNodeProps.attributes = null;

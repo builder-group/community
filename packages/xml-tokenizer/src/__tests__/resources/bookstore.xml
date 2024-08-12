@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <bookstore>
-	<book category="COOKING">
+	<book id="1" category="COOKING">
 		<title lang="en">Everyday Italian</title>
 		<author>Giada De Laurentiis</author>
 		<year>2005</year>
 		<price>30.00</price>
 	</book>
-	<book category="CHILDREN">
+	<book id="2" category="CHILDREN">
 		<title lang="en">Harry Potter</title>
 		<author>J K. Rowling</author>
 		<year>2005</year>
 		<price>29.99</price>
 	</book>
-	<book category="WEB">
+	<book id="3" category="WEB">
 		<title lang="en">XQuery Kick Start</title>
 		<author>James McGovern</author>
 		<author>Per Bothner</author>
@@ -22,7 +22,7 @@
 		<year>2003</year>
 		<price>49.99</price>
 	</book>
-	<book category="WEB">
+	<book id="4" category="WEB">
 		<title lang="en">Learning XML</title>
 		<author>Erik T. Ray</author>
 		<year>2003</year>

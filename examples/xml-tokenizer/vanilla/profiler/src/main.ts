@@ -1,13 +1,13 @@
 import * as fxp from 'fast-xml-parser';
 import * as txml from 'txml';
-import { xmlToObject } from 'xml-tokenizer';
+import { select, tokensToXml, TXmlToken, xmlToObject } from 'xml-tokenizer';
 import * as xml2js from 'xml2js';
 
 import { bench } from './bench';
 import { parse } from './txml';
 
-midsizeTest();
-// shopifyTest();
+// midsizeTest();
+shopifyTest();
 // benchmarkTest();
 
 async function midsizeTest(): Promise<void> {
@@ -21,7 +21,7 @@ async function midsizeTest(): Promise<void> {
 
 async function shopifyTest(): Promise<void> {
 	const shopifyResult = await fetch(
-		'https://cors-anywhere.herokuapp.com/https://apps.shopify.com/search?page=1&q=test',
+		'https://cors-anywhere.herokuapp.com/https://apps.shopify.com/search?page=1&q=review',
 		{
 			headers: {
 				'Accept': 'text/html, application/xhtml+xml',
@@ -42,7 +42,26 @@ async function shopifyTest(): Promise<void> {
 	// }
 
 	const result = xmlToObject(shopifyHtml);
-	console.log({ result, shopifyHtml });
+	const recoredTokens: TXmlToken[] = [];
+	select(
+		shopifyHtml,
+		[
+			[
+				{
+					axis: 'self-or-descendant',
+					local: 'div',
+					attributes: [
+						{ local: 'data-controller', value: 'app-card' },
+						{ local: 'data-app-card-handle-value', value: 'loox' }
+					]
+				}
+			]
+		],
+		(token) => {
+			recoredTokens.push(token);
+		}
+	);
+	console.log({ result, shopifyHtml, recoredTokens, recordedHtml: tokensToXml(recoredTokens) });
 }
 
 async function benchmarkTest(): Promise<void> {

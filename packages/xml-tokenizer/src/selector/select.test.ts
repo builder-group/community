@@ -62,19 +62,19 @@ describe('select function', () => {
 			bookStoreXml,
 			[[{ axis: 'child', local: 'bookstore' }]],
 			`<bookstore>
-        <book category="COOKING">
+        <book id="1" category="COOKING">
                 <title lang="en">Everyday Italian</title>
                 <author>Giada De Laurentiis</author>
                 <year>2005</year>
                 <price>30.00</price>
         </book>
-        <book category="CHILDREN">
+        <book id="2" category="CHILDREN">
                 <title lang="en">Harry Potter</title>
                 <author>J K. Rowling</author>
                 <year>2005</year>
                 <price>29.99</price>
         </book>
-        <book category="WEB">
+        <book id="3" category="WEB">
                 <title lang="en">XQuery Kick Start</title>
                 <author>James McGovern</author>
                 <author>Per Bothner</author>
@@ -84,7 +84,7 @@ describe('select function', () => {
                 <year>2003</year>
                 <price>49.99</price>
         </book>
-        <book category="WEB">
+        <book id="4" category="WEB">
                 <title lang="en">Learning XML</title>
                 <author>Erik T. Ray</author>
                 <year>2003</year>
@@ -103,17 +103,17 @@ describe('select function', () => {
 					{ axis: 'child', local: 'book' }
 				]
 			],
-			`<book category="COOKING">
+			`<book id="1" category="COOKING">
                 <title lang="en">Everyday Italian</title>
                 <author>Giada De Laurentiis</author>
                 <year>2005</year>
                 <price>30.00</price>
-        </book><book category="CHILDREN">
+        </book><book id="2" category="CHILDREN">
                 <title lang="en">Harry Potter</title>
                 <author>J K. Rowling</author>
                 <year>2005</year>
                 <price>29.99</price>
-        </book><book category="WEB">
+        </book><book id="3" category="WEB">
                 <title lang="en">XQuery Kick Start</title>
                 <author>James McGovern</author>
                 <author>Per Bothner</author>
@@ -122,7 +122,7 @@ describe('select function', () => {
                 <author>Vaidyanathan Nagarajan</author>
                 <year>2003</year>
                 <price>49.99</price>
-        </book><book category="WEB">
+        </book><book id="4" category="WEB">
                 <title lang="en">Learning XML</title>
                 <author>Erik T. Ray</author>
                 <year>2003</year>
@@ -140,12 +140,38 @@ describe('select function', () => {
 					{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
 				]
 			],
-			`<book category="COOKING">
+			`<book id="1" category="COOKING">
                 <title lang="en">Everyday Italian</title>
                 <author>Giada De Laurentiis</author>
                 <year>2005</year>
                 <price>30.00</price>
         </book>`
+		);
+	});
+
+	// TODO: Doesn't work
+	it('should match /bookstore/book[@category="WEB" and @id="4"]', () => {
+		assertSelection(
+			bookStoreXml,
+			[
+				[
+					{ axis: 'child', local: 'bookstore' },
+					{
+						axis: 'child',
+						local: 'book',
+						attributes: [
+							{ local: 'category', value: 'WEB' },
+							{ local: 'id', value: '4' }
+						]
+					}
+				]
+			],
+			`<book id="4" category="WEB">
+				<title lang="en">Learning XML</title>
+				<author>Erik T. Ray</author>
+				<year>2003</year>
+				<price>39.95</price>
+	</book>`
 		);
 	});
 
@@ -180,17 +206,17 @@ describe('select function', () => {
 		assertSelection(
 			bookStoreXml,
 			[[{ axis: 'self-or-descendant', local: 'book' }]],
-			`<book category="COOKING">
+			`<book id="1" category="COOKING">
                 <title lang="en">Everyday Italian</title>
                 <author>Giada De Laurentiis</author>
                 <year>2005</year>
                 <price>30.00</price>
-        </book><book category="CHILDREN">
+        </book><book id="2" category="CHILDREN">
                 <title lang="en">Harry Potter</title>
                 <author>J K. Rowling</author>
                 <year>2005</year>
                 <price>29.99</price>
-        </book><book category="WEB">
+        </book><book id="3" category="WEB">
                 <title lang="en">XQuery Kick Start</title>
                 <author>James McGovern</author>
                 <author>Per Bothner</author>
@@ -199,7 +225,7 @@ describe('select function', () => {
                 <author>Vaidyanathan Nagarajan</author>
                 <year>2003</year>
                 <price>49.99</price>
-        </book><book category="WEB">
+        </book><book id="4" category="WEB">
                 <title lang="en">Learning XML</title>
                 <author>Erik T. Ray</author>
                 <year>2003</year>
@@ -220,7 +246,7 @@ describe('select function', () => {
 					}
 				]
 			],
-			`<book category="COOKING">
+			`<book id="1" category="COOKING">
                 <title lang="en">Everyday Italian</title>
                 <author>Giada De Laurentiis</author>
                 <year>2005</year>
