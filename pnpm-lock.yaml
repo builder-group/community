@@ -241,6 +241,9 @@ importers:
 
   examples/xml-tokenizer/vanilla/profiler:
     dependencies:
+      camaro:
+        specifier: ^6.2.3
+        version: 6.2.3
       fast-xml-parser:
         specifier: ^4.4.1
         version: 4.4.1

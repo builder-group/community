@@ -176,3 +176,6 @@ See [Generator vs Iterator vs Callback](https://observablehq.com/@domoritz/yield
 
 [Benchmark implementation in Vanilla Profiler](https://github.com/builder-group/monorepo/tree/develop/examples/xml-tokenizer/vanilla/profiler)
 
+
+## 💡 Resources
+- [How I developed the fastest XML parser](https://tnickel.de/2020/08/30/2020-08-how-the-fastest-xml-parser-is-build/)

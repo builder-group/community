@@ -1,16 +1,16 @@
-export function bench(
+export async function bench(
 	name: string,
-	fn: () => void,
+	fn: () => Promise<void>,
 	runs: number = 1000,
 	logEachTime: boolean = false
-): { averageTimeMs: number; medianTimeMs: number; totalTimeMs: number; runs: number } {
+): Promise<{ averageTimeMs: number; medianTimeMs: number; totalTimeMs: number; runs: number }> {
 	const times: number[] = [];
 	const start = performance.now();
 
 	for (let i = 0; i < runs; i++) {
 		const runStart = performance.now();
 		try {
-			fn();
+			await fn();
 		} catch (e) {
 			break;
 		}

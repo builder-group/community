@@ -1,61 +1,71 @@
-import { getQName } from './get-q-name';
 import { tokenize } from './tokenizer';
 
-export function xmlToObject(xmlString: string, allowDtd = false): TXMLNode {
-	const root: TXMLNode = {
-		tagName: 'root',
-		attributes: {},
-		children: []
+export function xmlToObject(xmlString: string, allowDtd = false): TXmlNode {
+	const root: TXmlNode = {
+		local: 'root',
+		attributes: [],
+		content: []
 	};
-	const stack: TXMLNode[] = [root];
-	let currentNode: TXMLNode = root;
+	const stack: TXmlNode[] = [root];
 
 	tokenize(xmlString, allowDtd, (token) => {
 		switch (token.type) {
 			case 'ElementStart': {
-				const newNode: TXMLNode = {
-					tagName: getQName(token.local, token.prefix),
-					attributes: {},
-					children: []
+				const newNode: TXmlNode = {
+					local: token.local,
+					prefix: token.prefix.length > 0 ? token.prefix : undefined,
+					attributes: [],
+					content: []
 				};
-				currentNode.children.push(newNode);
+
+				const currentNode = stack[stack.length - 1];
+				if (currentNode != null) {
+					currentNode.content.push(newNode);
+				}
+
 				stack.push(newNode);
-				currentNode = newNode;
 				break;
 			}
 			case 'ElementEnd': {
 				if (token.end.type === 'Close' || token.end.type === 'Empty') {
 					stack.pop();
-					const newCurrentNode = stack[stack.length - 1];
-					if (newCurrentNode != null) {
-						currentNode = newCurrentNode;
-					}
 				}
 				break;
 			}
 			case 'Attribute': {
-				currentNode.attributes[getQName(token.local, token.prefix)] = token.value;
+				const currentNode = stack[stack.length - 1];
+				if (currentNode != null) {
+					currentNode.attributes.push({
+						local: token.local,
+						prefix: token.prefix.length > 0 ? token.prefix : undefined,
+						value: token.value
+					});
+				}
 				break;
 			}
 			case 'Text':
 			case 'Cdata': {
-				const trimmedText = token.text.trim();
-				if (trimmedText.length > 0) {
-					currentNode.children.push(token.text);
+				const currentNode = stack[stack.length - 1];
+				if (currentNode != null) {
+					const trimmedText = token.text.trim();
+					if (trimmedText.length > 0) {
+						currentNode.content.push(token.text);
+					}
 				}
 				break;
 			}
 			case 'Comment':
 			case 'ProcessingInstruction':
 			case 'EntityDeclaration':
-				break;
 		}
 	});
-	return root.children[0] as unknown as TXMLNode;
+
+	return root.content[0] as TXmlNode;
 }
 
-export interface TXMLNode {
-	tagName: string;
-	attributes: Record<string, string>;
-	children: (TXMLNode | string)[];
+export interface TXmlNode {
+	local: string;
+	prefix?: string;
+	attributes: { local: string; prefix?: string; value: string }[];
+	content: (TXmlNode | string)[];
 }
