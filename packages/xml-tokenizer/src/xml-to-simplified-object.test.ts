@@ -7,8 +7,8 @@ describe('xmlToObject function', () => {
 		const xml = '<root>Hello</root>';
 		const result = xmlToSimplifiedObject(xml);
 		expect(result).toEqual({
-			root: {
-				_text: 'Hello'
+			_root: {
+				text: 'Hello'
 			}
 		});
 	});
@@ -17,9 +17,9 @@ describe('xmlToObject function', () => {
 		const xml = '<root><child>Value</child></root>';
 		const result = xmlToSimplifiedObject(xml);
 		expect(result).toEqual({
-			root: {
-				child: {
-					_text: 'Value'
+			_root: {
+				_child: {
+					text: 'Value'
 				}
 			}
 		});
@@ -29,11 +29,11 @@ describe('xmlToObject function', () => {
 		const xml = '<root attr="value">Content</root>';
 		const result = xmlToSimplifiedObject(xml);
 		expect(result).toEqual({
-			root: {
-				_attributes: {
+			_root: {
+				attributes: {
 					attr: 'value'
 				},
-				_text: 'Content'
+				text: 'Content'
 			}
 		});
 	});
@@ -42,8 +42,8 @@ describe('xmlToObject function', () => {
 		const xml = '<root><child>One</child><child>Two</child></root>';
 		const result = xmlToSimplifiedObject(xml);
 		expect(result).toEqual({
-			root: {
-				child: [{ _text: 'One' }, { _text: 'Two' }]
+			_root: {
+				_child: [{ text: 'One' }, { text: 'Two' }]
 			}
 		});
 	});
@@ -52,12 +52,12 @@ describe('xmlToObject function', () => {
 		const xml = '<ns:root xmlns:ns="http://example.com"><ns:child>Value</ns:child></ns:root>';
 		const result = xmlToSimplifiedObject(xml);
 		expect(result).toEqual({
-			'ns:root': {
-				'_attributes': {
+			'_ns:root': {
+				'attributes': {
 					'xmlns:ns': 'http://example.com'
 				},
-				'ns:child': {
-					_text: 'Value'
+				'_ns:child': {
+					text: 'Value'
 				}
 			}
 		});
@@ -67,8 +67,8 @@ describe('xmlToObject function', () => {
 		const xml = '<root><![CDATA[<special> characters & such]]></root>';
 		const result = xmlToSimplifiedObject(xml);
 		expect(result).toEqual({
-			root: {
-				_text: '<special> characters & such'
+			_root: {
+				text: '<special> characters & such'
 			}
 		});
 	});
@@ -77,8 +77,8 @@ describe('xmlToObject function', () => {
 		const xml = '<root><empty/></root>';
 		const result = xmlToSimplifiedObject(xml);
 		expect(result).toEqual({
-			root: {
-				empty: {}
+			_root: {
+				_empty: {}
 			}
 		});
 	});
@@ -97,19 +97,19 @@ describe('xmlToObject function', () => {
     `;
 		const result = xmlToSimplifiedObject(xml);
 		expect(result).toEqual({
-			root: {
-				child1: {
-					_attributes: {
+			_root: {
+				_child1: {
+					attributes: {
 						attr: 'val1'
 					},
-					grandchild: [{ _text: 'GC1' }, { _text: 'GC2' }]
+					_grandchild: [{ text: 'GC1' }, { text: 'GC2' }]
 				},
-				child2: {
-					grandchild: {
-						_attributes: {
+				_child2: {
+					_grandchild: {
+						attributes: {
 							attr: 'val2'
 						},
-						_text: 'GC3'
+						text: 'GC3'
 					}
 				}
 			}
@@ -120,8 +120,8 @@ describe('xmlToObject function', () => {
 		const xml = '<root><!-- This is a comment -->Value</root>';
 		const result = xmlToSimplifiedObject(xml);
 		expect(result).toEqual({
-			root: {
-				_text: 'Value'
+			_root: {
+				text: 'Value'
 			}
 		});
 	});
@@ -130,8 +130,8 @@ describe('xmlToObject function', () => {
 		const xml = '<?xml version="1.0" encoding="UTF-8"?><root>Value</root>';
 		const result = xmlToSimplifiedObject(xml);
 		expect(result).toEqual({
-			root: {
-				_text: 'Value'
+			_root: {
+				text: 'Value'
 			}
 		});
 	});
@@ -140,8 +140,8 @@ describe('xmlToObject function', () => {
 		const xml = '<root>Text <child>Child Text</child> More Text</root>';
 		const result = xmlToSimplifiedObject(xml);
 		expect(result).toEqual({
-			root: {
-				_content: ['Text', { _tag: 'child', _text: 'Child Text' }, 'More Text']
+			_root: {
+				content: ['Text', { tag: 'child', text: 'Child Text' }, 'More Text']
 			}
 		});
 	});
@@ -150,12 +150,12 @@ describe('xmlToObject function', () => {
 		const xml = '<root attr1="value1" attr2="value2">Content</root>';
 		const result = xmlToSimplifiedObject(xml);
 		expect(result).toEqual({
-			root: {
-				_attributes: {
+			_root: {
+				attributes: {
 					attr1: 'value1',
 					attr2: 'value2'
 				},
-				_text: 'Content'
+				text: 'Content'
 			}
 		});
 	});

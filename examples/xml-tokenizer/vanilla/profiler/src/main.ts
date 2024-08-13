@@ -4,6 +4,7 @@ import {
 	processTokenForSimplifiedObject,
 	select,
 	tokensToXml,
+	TSimplifiedXmlNode,
 	TXmlToken,
 	xmlToObject,
 	xmlToSimplifiedObject
@@ -36,7 +37,7 @@ async function shopifyTest(): Promise<void> {
 	);
 	const shopifyHtml = await shopifyResult.text();
 
-	const result = {};
+	const result: any = {};
 	const stack = [result];
 	let tokens: TXmlToken[] = [];
 	select(
@@ -47,8 +48,8 @@ async function shopifyTest(): Promise<void> {
 					axis: 'self-or-descendant',
 					local: 'div',
 					attributes: [
-						{ local: 'data-controller', value: 'app-card' },
-						{ local: 'data-app-card-handle-value', value: 'loox' }
+						{ local: 'data-controller', value: 'app-card' }
+						// { local: 'data-app-card-handle-value', value: 'loox' }
 					]
 				}
 			]
@@ -64,6 +65,7 @@ async function shopifyTest(): Promise<void> {
 		shopifyHtml,
 		selectedHtml: tokensToXml(tokens)
 	});
+	console.log(result.div.map((div: any) => div._attributes['data-app-card-handle-value']));
 }
 
 async function benchmarkTest(): Promise<void> {
@@ -142,7 +144,9 @@ async function benchmarkTest(): Promise<void> {
 		'xml-tokenizer (dom)',
 		async () => {
 			const dom = xmlToSimplifiedObject(xml);
-			const cacheKey = dom['HotelListResponse']['cacheKey']._text;
+			const cacheKey = (
+				(dom['_HotelListResponse'] as TSimplifiedXmlNode)['_cacheKey'] as TSimplifiedXmlNode
+			).text;
 			// console.log(cacheKey);
 		},
 		runs

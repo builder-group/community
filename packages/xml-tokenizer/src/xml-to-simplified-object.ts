@@ -19,23 +19,24 @@ export function processTokenForSimplifiedObject(
 	switch (token.type) {
 		case 'ElementStart': {
 			const tagName = getQName(token.local, token.prefix);
+			const tagNameWithPrefix: TSimplifiedXmlNodeTagName = `_${tagName}`;
 			const newNode: TSimplifiedXmlNode = {};
 
 			const currentNode = stack[stack.length - 1];
 			if (currentNode != null) {
-				if (currentNode._content != null) {
-					newNode._tag = tagName;
-					currentNode._content.push(newNode);
-				} else if (currentNode._text != null) {
-					newNode._tag = tagName;
-					currentNode._content = [currentNode._text, newNode];
-					delete currentNode._text;
-				} else if (currentNode[tagName] == null) {
-					currentNode[tagName] = newNode;
-				} else if (Array.isArray(currentNode[tagName])) {
-					(currentNode[tagName] as TSimplifiedXmlNode[]).push(newNode);
+				if (currentNode.content != null) {
+					newNode.tag = tagName;
+					currentNode.content.push(newNode);
+				} else if (currentNode.text != null) {
+					newNode.tag = tagName;
+					currentNode.content = [currentNode.text, newNode];
+					delete currentNode.text;
+				} else if (currentNode[tagNameWithPrefix] == null) {
+					currentNode[tagNameWithPrefix] = newNode;
+				} else if (Array.isArray(currentNode[tagNameWithPrefix])) {
+					currentNode[tagNameWithPrefix].push(newNode);
 				} else {
-					currentNode[tagName] = [currentNode[tagName] as TSimplifiedXmlNode, newNode];
+					currentNode[tagNameWithPrefix] = [currentNode[tagNameWithPrefix], newNode];
 				}
 			}
 
@@ -52,10 +53,10 @@ export function processTokenForSimplifiedObject(
 			const currentNode = stack[stack.length - 1];
 			if (currentNode != null) {
 				const attrName = getQName(token.local, token.prefix);
-				if (currentNode._attributes != null) {
-					currentNode._attributes[attrName] = token.value;
+				if (currentNode.attributes != null) {
+					currentNode.attributes[attrName] = token.value;
 				} else {
-					currentNode._attributes = {
+					currentNode.attributes = {
 						[attrName]: token.value
 					};
 				}
@@ -68,13 +69,13 @@ export function processTokenForSimplifiedObject(
 			if (currentNode != null) {
 				const trimmedText = token.text.trim();
 				if (trimmedText.length > 0) {
-					if (currentNode._content != null) {
-						currentNode._content.push(trimmedText);
-					} else if (currentNode._text != null) {
-						currentNode._content = [currentNode._text, trimmedText];
-						delete currentNode._text;
+					if (currentNode.content != null) {
+						currentNode.content.push(trimmedText);
+					} else if (currentNode.text != null) {
+						currentNode.content = [currentNode.text, trimmedText];
+						delete currentNode.text;
 					} else {
-						currentNode._text = trimmedText;
+						currentNode.text = trimmedText;
 					}
 				}
 			}
@@ -87,15 +88,12 @@ export function processTokenForSimplifiedObject(
 }
 
 export interface TSimplifiedXmlNode {
-	_tag?: string;
-	_attributes?: Record<string, string>;
-	_text?: string;
-	_content?: (string | TSimplifiedXmlNode)[];
-	[key: string]:
-		| TSimplifiedXmlNode
-		| TSimplifiedXmlNode[]
-		| string
-		| (string | TSimplifiedXmlNode)[]
-		| Record<string, string>
-		| undefined;
+	tag?: string;
+	attributes?: Record<string, string>;
+	text?: string;
+	content?: (string | TSimplifiedXmlNode)[];
+	// TODO: Do we need a prefix to make it typesafe?
+	[key: TSimplifiedXmlNodeTagName]: TSimplifiedXmlNode | TSimplifiedXmlNode[];
 }
+
+type TSimplifiedXmlNodeTagName = `_${string}`;
