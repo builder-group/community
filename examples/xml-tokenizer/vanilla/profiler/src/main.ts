@@ -15,8 +15,8 @@ import { bench } from './bench';
 import { parse } from './txml';
 
 // playground();
-shopifyTest();
-// benchmarkTest();
+// shopifyTest();
+benchmarkTest();
 
 async function playground(): Promise<void> {
 	const dom = txml.parse('<root test="2"><child attr="1">One</child><child>Two</child></root>');
