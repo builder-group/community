@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { type TXmlToken } from '../tokenizer';
 import { tokensToXml } from '../tokens-to-xml';
 import { select } from './select';
-import { type TTokenSelectPath } from './types';
+import { type TSelectedXmlToken, type TTokenSelectPath } from './types';
 
 describe('select function', () => {
 	let bookStoreXml = '';
@@ -347,8 +347,11 @@ describe('select function', () => {
 	});
 });
 
-function collectRecordedTokens(text: string, tokenSelectPaths: TTokenSelectPath[]): TXmlToken[] {
-	const recordedTokens: TXmlToken[] = [];
+function collectRecordedTokens(
+	text: string,
+	tokenSelectPaths: TTokenSelectPath[]
+): TSelectedXmlToken[] {
+	const recordedTokens: TSelectedXmlToken[] = [];
 	select(text, tokenSelectPaths, (recordedToken) => {
 		recordedTokens.push(recordedToken);
 	});
@@ -358,7 +361,7 @@ function collectRecordedTokens(text: string, tokenSelectPaths: TTokenSelectPath[
 // Results where validated via xpather.com
 function assertSelection(text: string, tokenSelectPaths: TTokenSelectPath[], result: string): void {
 	// console.log(tokensToXml(collectRecordedTokens(text, tokenSelectPaths)));
-	expect(tokensToXml(collectRecordedTokens(text, tokenSelectPaths)).replaceAll(/\s/g, '')).toBe(
-		result.replaceAll(/\s/g, '')
-	);
+	expect(
+		tokensToXml(collectRecordedTokens(text, tokenSelectPaths) as TXmlToken[]).replaceAll(/\s/g, '')
+	).toBe(result.replaceAll(/\s/g, ''));
 }

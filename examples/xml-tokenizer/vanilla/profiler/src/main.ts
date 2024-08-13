@@ -4,6 +4,7 @@ import {
 	processTokenForSimplifiedObject,
 	select,
 	tokensToXml,
+	TSelectedXmlToken,
 	TSimplifiedXmlNode,
 	TXmlToken,
 	xmlToObject,
@@ -37,9 +38,9 @@ async function shopifyTest(): Promise<void> {
 	);
 	const shopifyHtml = await shopifyResult.text();
 
-	const result: any = {};
-	const stack = [result];
-	let tokens: TXmlToken[] = [];
+	const results: any[] = [];
+	let stack: any[] = [];
+	let tokens: TSelectedXmlToken[] = [];
 	select(
 		shopifyHtml,
 		[
@@ -56,16 +57,28 @@ async function shopifyTest(): Promise<void> {
 		],
 		(token) => {
 			tokens.push(token);
-			processTokenForSimplifiedObject(token, stack);
+
+			if (token.type === 'SelectionStart') {
+				const result: any = {};
+				results.push(result);
+				stack = [result];
+				return;
+			}
+
+			if (token.type === 'SelectionEnd') {
+				return;
+			}
+
+			processTokenForSimplifiedObject(token as TXmlToken, stack);
 		}
 	);
 
 	console.log({
-		result,
+		results,
 		shopifyHtml,
-		selectedHtml: tokensToXml(tokens)
+		selectedHtml: tokensToXml(tokens as TXmlToken[])
 	});
-	console.log(result._div.map((div: any) => div.attributes['data-app-card-handle-value']));
+	console.log(results.map((result: any) => result._div.attributes['data-app-card-handle-value']));
 }
 
 async function benchmarkTest(): Promise<void> {
@@ -144,7 +157,6 @@ async function bench2(xml: string, runs = 100) {
 		await bench(
 			'xml-tokenizer',
 			async () => {
-				// let selection = '';
 				let cacheKey = '';
 				select(
 					xml,
@@ -155,7 +167,6 @@ async function bench2(xml: string, runs = 100) {
 						]
 					],
 					(token) => {
-						// selection += tokenToXml(token);
 						if (token.type === 'Text') {
 							cacheKey = token.text;
 						}

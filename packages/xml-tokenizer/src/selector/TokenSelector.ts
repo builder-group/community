@@ -7,7 +7,7 @@ import {
 } from '../tokenizer';
 import { ETokenMatchCriteria } from './TokenSelectState';
 import { TokenSelectStateMachine } from './TokenSelectStateMachine';
-import { type TTokenSelectPath } from './types';
+import { type TSelectedXmlToken, type TTokenSelectPath } from './types';
 
 export class TokenSelector {
 	private _currentDepth = 0;
@@ -20,7 +20,7 @@ export class TokenSelector {
 		);
 	}
 
-	public pipeToken(token: TXmlToken, recorder: (token: TXmlToken) => void): void {
+	public pipeToken(token: TXmlToken, recorder: (token: TSelectedXmlToken) => void): void {
 		let startRecording = false;
 		let stopRecording = false;
 		switch (token.type) {
@@ -41,7 +41,8 @@ export class TokenSelector {
 		}
 
 		if (startRecording && !this._isRecording) {
-			this.record();
+			this._isRecording = true;
+			recorder({ type: 'SelectionStart' });
 		}
 
 		for (const stateMachine of this._tspStateMachines) {
@@ -59,6 +60,7 @@ export class TokenSelector {
 		}
 
 		if (stopRecording) {
+			recorder({ type: 'SelectionEnd' });
 			this._isRecording = false;
 		}
 	}
@@ -163,9 +165,5 @@ export class TokenSelector {
 			return !isFinalState;
 		}
 		return false;
-	}
-
-	private record(): void {
-		this._isRecording = true;
 	}
 }

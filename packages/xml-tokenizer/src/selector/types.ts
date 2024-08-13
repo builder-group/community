@@ -1,3 +1,9 @@
+import { type TXmlToken } from '../tokenizer';
+
+export type TSelectedXmlToken = TXmlToken | { type: 'SelectionStart' } | { type: 'SelectionEnd' };
+
+export type TSelectedTokenCallback = (token: TSelectedXmlToken) => void;
+
 /**
  * A limited segment of an XPath expression in an object-oriented manner.
  *

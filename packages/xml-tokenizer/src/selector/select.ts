@@ -1,11 +1,11 @@
-import { tokenize, type TTokenCallback } from '../tokenizer';
+import { tokenize } from '../tokenizer';
 import { TokenSelector } from './TokenSelector';
-import { type TTokenSelectPath } from './types';
+import { type TSelectedTokenCallback, type TTokenSelectPath } from './types';
 
 export function select(
 	xml: string,
 	tokenSelectPaths: TTokenSelectPath[],
-	callback: TTokenCallback
+	callback: TSelectedTokenCallback
 ): void {
 	const selector = new TokenSelector(tokenSelectPaths);
 	tokenize(xml, false, (token) => {
