@@ -7,9 +7,9 @@ describe('xmlToObject function', () => {
 		const xml = '<root>Hello</root>';
 		const result = xmlToObject(xml);
 		expect(result).toEqual({
-			tagName: 'root',
-			attributes: {},
-			children: ['Hello']
+			local: 'root',
+			attributes: [],
+			content: ['Hello']
 		});
 	});
 
@@ -17,13 +17,13 @@ describe('xmlToObject function', () => {
 		const xml = '<root><child>Value</child></root>';
 		const result = xmlToObject(xml);
 		expect(result).toEqual({
-			tagName: 'root',
-			attributes: {},
-			children: [
+			local: 'root',
+			attributes: [],
+			content: [
 				{
-					tagName: 'child',
-					attributes: {},
-					children: ['Value']
+					local: 'child',
+					attributes: [],
+					content: ['Value']
 				}
 			]
 		});
@@ -33,9 +33,9 @@ describe('xmlToObject function', () => {
 		const xml = '<root attr="value">Content</root>';
 		const result = xmlToObject(xml);
 		expect(result).toEqual({
-			tagName: 'root',
-			attributes: { attr: 'value' },
-			children: ['Content']
+			local: 'root',
+			attributes: [{ local: 'attr', value: 'value' }],
+			content: ['Content']
 		});
 	});
 
@@ -43,18 +43,18 @@ describe('xmlToObject function', () => {
 		const xml = '<root><child>One</child><child>Two</child></root>';
 		const result = xmlToObject(xml);
 		expect(result).toEqual({
-			tagName: 'root',
-			attributes: {},
-			children: [
+			local: 'root',
+			attributes: [],
+			content: [
 				{
-					tagName: 'child',
-					attributes: {},
-					children: ['One']
+					local: 'child',
+					attributes: [],
+					content: ['One']
 				},
 				{
-					tagName: 'child',
-					attributes: {},
-					children: ['Two']
+					local: 'child',
+					attributes: [],
+					content: ['Two']
 				}
 			]
 		});
@@ -64,13 +64,15 @@ describe('xmlToObject function', () => {
 		const xml = '<ns:root xmlns:ns="http://example.com"><ns:child>Value</ns:child></ns:root>';
 		const result = xmlToObject(xml);
 		expect(result).toEqual({
-			tagName: 'ns:root',
-			attributes: { 'xmlns:ns': 'http://example.com' },
-			children: [
+			prefix: 'ns',
+			local: 'root',
+			attributes: [{ prefix: 'xmlns', local: 'ns', value: 'http://example.com' }],
+			content: [
 				{
-					tagName: 'ns:child',
-					attributes: {},
-					children: ['Value']
+					prefix: 'ns',
+					local: 'child',
+					attributes: [],
+					content: ['Value']
 				}
 			]
 		});
@@ -80,9 +82,9 @@ describe('xmlToObject function', () => {
 		const xml = '<root><![CDATA[<special> characters & such]]></root>';
 		const result = xmlToObject(xml);
 		expect(result).toEqual({
-			tagName: 'root',
-			attributes: {},
-			children: ['<special> characters & such']
+			local: 'root',
+			attributes: [],
+			content: ['<special> characters & such']
 		});
 	});
 
@@ -90,13 +92,13 @@ describe('xmlToObject function', () => {
 		const xml = '<root><empty/></root>';
 		const result = xmlToObject(xml);
 		expect(result).toEqual({
-			tagName: 'root',
-			attributes: {},
-			children: [
+			local: 'root',
+			attributes: [],
+			content: [
 				{
-					tagName: 'empty',
-					attributes: {},
-					children: []
+					local: 'empty',
+					attributes: [],
+					content: []
 				}
 			]
 		});
@@ -116,33 +118,33 @@ describe('xmlToObject function', () => {
     `;
 		const result = xmlToObject(xml);
 		expect(result).toEqual({
-			tagName: 'root',
-			attributes: {},
-			children: [
+			local: 'root',
+			attributes: [],
+			content: [
 				{
-					tagName: 'child1',
-					attributes: { attr: 'val1' },
-					children: [
+					local: 'child1',
+					attributes: [{ local: 'attr', value: 'val1' }],
+					content: [
 						{
-							tagName: 'grandchild',
-							attributes: {},
-							children: ['GC1']
+							local: 'grandchild',
+							attributes: [],
+							content: ['GC1']
 						},
 						{
-							tagName: 'grandchild',
-							attributes: {},
-							children: ['GC2']
+							local: 'grandchild',
+							attributes: [],
+							content: ['GC2']
 						}
 					]
 				},
 				{
-					tagName: 'child2',
-					attributes: {},
-					children: [
+					local: 'child2',
+					attributes: [],
+					content: [
 						{
-							tagName: 'grandchild',
-							attributes: { attr: 'val2' },
-							children: ['GC3']
+							local: 'grandchild',
+							attributes: [{ local: 'attr', value: 'val2' }],
+							content: ['GC3']
 						}
 					]
 				}
@@ -154,19 +156,19 @@ describe('xmlToObject function', () => {
 		const xml = '<root><!-- This is a comment -->Value</root>';
 		const result = xmlToObject(xml);
 		expect(result).toEqual({
-			tagName: 'root',
-			attributes: {},
-			children: ['Value']
+			local: 'root',
+			attributes: [],
+			content: ['Value']
 		});
 	});
 
-	it('should handle processing instructions', () => {
+	it('should ignore processing instructions', () => {
 		const xml = '<?xml version="1.0" encoding="UTF-8"?><root>Value</root>';
 		const result = xmlToObject(xml);
 		expect(result).toEqual({
-			tagName: 'root',
-			attributes: {},
-			children: ['Value']
+			local: 'root',
+			attributes: [],
+			content: ['Value']
 		});
 	});
 
@@ -174,14 +176,14 @@ describe('xmlToObject function', () => {
 		const xml = '<root>Text <child>Child Text</child> More Text</root>';
 		const result = xmlToObject(xml);
 		expect(result).toEqual({
-			tagName: 'root',
-			attributes: {},
-			children: [
+			local: 'root',
+			attributes: [],
+			content: [
 				'Text ',
 				{
-					tagName: 'child',
-					attributes: {},
-					children: ['Child Text']
+					local: 'child',
+					attributes: [],
+					content: ['Child Text']
 				},
 				' More Text'
 			]
@@ -192,9 +194,12 @@ describe('xmlToObject function', () => {
 		const xml = '<root attr1="value1" attr2="value2">Content</root>';
 		const result = xmlToObject(xml);
 		expect(result).toEqual({
-			tagName: 'root',
-			attributes: { attr1: 'value1', attr2: 'value2' },
-			children: ['Content']
+			local: 'root',
+			attributes: [
+				{ local: 'attr1', value: 'value1' },
+				{ local: 'attr2', value: 'value2' }
+			],
+			content: ['Content']
 		});
 	});
 });

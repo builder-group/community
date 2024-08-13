@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment -- Ok */
 import { readFile } from 'node:fs/promises';
 import { describe } from 'node:test';
 import * as fastXmlParser from 'fast-xml-parser';
@@ -6,8 +7,7 @@ import { beforeAll, bench, expect } from 'vitest';
 // import * as xt from 'xml-tokenizer';
 import * as xml2js from 'xml2js';
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Ok
-// @ts-ignore -- Ok
+// @ts-ignore -- Javascript module
 import * as xtDist from '../../dist/esm';
 import { xmlToObject } from '../index';
 
@@ -24,7 +24,7 @@ void describe('xml to object', () => {
 	});
 
 	bench('[xml-tokenizer (dist)]', () => {
-		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -- Ok
+		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -- Javascript module
 		const result = xtDist.xmlToObject(xml);
 		expect(result).not.toBeNull();
 	});

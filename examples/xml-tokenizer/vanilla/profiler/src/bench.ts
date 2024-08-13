@@ -1,16 +1,25 @@
-export function bench(
+export async function bench(
 	name: string,
-	fn: () => void,
+	fn: () => Promise<void>,
 	runs: number = 1000,
 	logEachTime: boolean = false
-): { averageTimeMs: number; medianTimeMs: number; totalTimeMs: number; runs: number } {
+): Promise<{
+	name: string;
+	averageTimeMs: number;
+	medianTimeMs: number;
+	totalTimeMs: number;
+	minTimeMs: number;
+	maxTimeMs: number;
+	runs: number;
+	success: boolean;
+}> {
 	const times: number[] = [];
 	const start = performance.now();
 
 	for (let i = 0; i < runs; i++) {
 		const runStart = performance.now();
 		try {
-			fn();
+			await fn();
 		} catch (e) {
 			break;
 		}
@@ -25,22 +34,18 @@ export function bench(
 	const totalTimeMs = performance.now() - start;
 	const averageTimeMs = totalTimeMs / runs;
 	const medianTimeMs = calculateMedian(times);
-
-	if (runs === times.length) {
-		console.info(
-			`[${name}] Total Time: ${totalTimeMs.toFixed(4)} ms | Average Time per Run: ${averageTimeMs.toFixed(4)} ms | Median Time: ${medianTimeMs.toFixed(4)} ms | Runs: ${runs}`
-		);
-	} else {
-		console.error(
-			`[${name}] Total Time: ${totalTimeMs.toFixed(4)} ms | Average Time per Run: ${averageTimeMs.toFixed(4)} ms | Median Time: ${medianTimeMs.toFixed(4)} ms | Runs: ${runs} | Failed at: ${times.length}`
-		);
-	}
+	const maxTimeMs = Math.max(...times);
+	const minTimeMs = Math.min(...times);
 
 	return {
+		name,
 		averageTimeMs,
 		medianTimeMs,
 		totalTimeMs,
-		runs
+		runs,
+		minTimeMs,
+		maxTimeMs,
+		success: times.length > 0
 	};
 }
 

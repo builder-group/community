@@ -1,4 +1,4 @@
-export type TTokenCallback = (token: TXMLToken) => void;
+export type TTokenCallback = (token: TXmlToken) => void;
 
 /**
  * A Processing Instruction token.
@@ -100,7 +100,7 @@ export interface TCdataToken {
 	range: TRange;
 }
 
-export type TXMLToken =
+export type TXmlToken =
 	| TProcessingInstructionToken
 	| TCommentToken
 	| TEntityDeclarationToken

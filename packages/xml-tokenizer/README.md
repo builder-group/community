@@ -20,10 +20,11 @@
 > Status: Experimental
 
 `xml-tokenizer` is a straightforward and typesafe XML tokenizer that streams tokens through a callback mechanism. 
-The implementation is based on the [roxmltree](https://github.com/RazrFalcon/roxmltree) [`tokenizer.rs`](https://github.com/RazrFalcon/roxmltree/blob/master/src/tokenizer.rs). See the [FAQ](#-faq) why we did not embed the [roxmltree](https://github.com/RazrFalcon/roxmltree) crate via WASM.
+The implementation is based on the [roxmltree](https://github.com/RazrFalcon/roxmltree) [`tokenizer.rs`](https://github.com/RazrFalcon/roxmltree/blob/master/src/tokenizer.rs). See the [FAQ](#-faq) why we did not embed the [roxmltree](https://github.com/RazrFalcon/roxmltree) crate as WASM.
 
-- **Streaming XML Tokenization**: Processes XML documents as a stream, emitting tokens on the fly
+- **XML Token Stream**: Processes XML documents as a stream, emitting tokens on the fly similar to the [`SAX`](https://www.baeldung.com/java-sax-parser) approach
 - **Wide Range of Tokens**: Handles processing instructions, comments, entity declarations, element starts/ends, attributes, text, and CDATA sections
+- **Validate XML**: Validates XML while processing which makes it slower than [`txml`](https://github.com/TobiasNickel/tXml) but its still twice as fast as [`fast-xml-parser`](https://github.com/NaturalIntelligence/fast-xml-parser)
 - **Typesafe**: Build with TypeScript for strong type safety
 
 ### 📚 Examples
@@ -34,7 +35,7 @@ The implementation is based on the [roxmltree](https://github.com/RazrFalcon/rox
 
 Create a typesafe, straightforward, and lightweight [XML](https://de.wikipedia.org/wiki/Extensible_Markup_Language) parser. Many existing parsers either lack TypeScript support, aren't actively maintained, or exceed 20kB gzipped.
 
-My goal was to develop an efficient & flexible alternative by porting [roxmltree](https://github.com/RazrFalcon/roxmltree) to TypeScript or integrating it via WASM. While it functions well and is quite flexible due to its streaming approach, it's not as fast as I hoped.
+My goal was to develop an efficient & flexible alternative by porting [roxmltree](https://github.com/RazrFalcon/roxmltree) to TypeScript or integrating it via WASM. While it functions well and is quite versatile due to its streaming approach, it's not as fast as I hoped.
 
 ### ⚖️ Alternatives
 
@@ -45,13 +46,16 @@ My goal was to develop an efficient & flexible alternative by porting [roxmltree
 ## 📖 Usage
 
 ```ts
-import { xmlToObject, parseString } from 'xml-tokenizer';
+import { xmlToObject, xmlToSimplifiedObject, tokenize, select } from 'xml-tokenizer';
 
-// Parse XML to Javascript object (uses `parseString` under the hood)
+// Parse XML to Javascript object without information lost (uses `tokenize` under the hood)
 const xmlObject = xmlToObject("<p>Hello World</p>");
 
+// Or, parse XML to easy to queryable Javascript object
+const simplifiedXmlObject = xmlToSimplifiedObject("<p>Hello World</p>");
+
 // Or, parse XML to a stream of tokens 
-parseString("<p>Hello World</p>", false, (token) => {
+tokenize("<p>Hello World</p>", false, (token) => {
     switch (token.type) {
         case 'ElementStart':
             console.log('Start of element:', token);
@@ -63,6 +67,16 @@ parseString("<p>Hello World</p>", false, (token) => {
         default:
             console.log('Token:', token);
     }
+});
+
+// Or, stream only a selection of tokens
+select(xml, [
+    [
+        { axis: 'child', local: 'bookstore' },
+        { axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
+    ]
+], (selectedToken) => {
+    // Handle selected token
 });
 ```
 
@@ -151,3 +165,33 @@ Decoding `Uint8Array` snippets to JavaScript strings is frequently necessary, ne
 | roxmltree:byte      | 12.48                           | 78.65         | 16.45         | 14.90          | ±1.15%                         | 
 
 The `roxmltree` package with the Byte-Based implementation can be found in the `_deprecated` folder ([`packages/_deprecated/roxmltree_byte-only`](https://github.com/builder-group/community/tree/develop/packages/_deprecated/roxmltree_byte-only)).
+
+### Why not use a Generator?
+
+While generators can improve developer experience, they introduce significant performance overhead. Our benchmarks show that using a generator dramatically increases the execution time compared to the callback approach. Given our focus on performance, we chose to maintain the callback implementation. 
+
+See [Generator vs Iterator vs Callback](https://observablehq.com/@domoritz/yield-vs-iterator-vs-callback) for more details.
+
+#### Benchmark with Generator
+
+```
+[xml-tokenizer] Total Time: 5345.0000 ms | Average Time per Run: 53.4500 ms | Median Time: 53.0000 ms | Runs: 100
+[txml] Total Time: 395.0000 ms | Average Time per Run: 3.9500 ms | Median Time: 4.0000 ms | Runs: 100
+[fast-xml-parser] Total Time: 1290.0000 ms | Average Time per Run: 12.9000 ms | Median Time: 13.0000 ms | Runs: 100
+```
+
+#### Benchmark with Callback
+
+```
+[xml-tokenizer] Total Time: 662.0000 ms | Average Time per Run: 6.6200 ms | Median Time: 6.0000 ms | Runs: 100
+[txml] Total Time: 394.0000 ms | Average Time per Run: 3.9400 ms | Median Time: 4.0000 ms | Runs: 100
+[fast-xml-parser] Total Time: 1308.0000 ms | Average Time per Run: 13.0800 ms | Median Time: 13.0000 ms | Runs: 100
+```
+
+[Benchmark implementation in Vanilla Profiler](https://github.com/builder-group/monorepo/tree/develop/examples/xml-tokenizer/vanilla/profiler)
+
+
+## 💡 Resources
+- [How I developed the fastest XML parser](https://tnickel.de/2020/08/30/2020-08-how-the-fastest-xml-parser-is-build/)
+- [txml](https://github.com/TobiasNickel/tXml)
+- [roxmltree](https://github.com/RazrFalcon/roxmltree)

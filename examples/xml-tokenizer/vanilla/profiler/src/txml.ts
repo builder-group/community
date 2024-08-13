@@ -53,24 +53,27 @@ export function parse(source: string, options: TParseOptions = {}): (TNode | str
 		const children: (TNode | string)[] = [];
 		while (source[currentPos]) {
 			if (source.charCodeAt(currentPos) === OPEN_BRACKET) {
+				// Check for closing tag
 				if (source.charCodeAt(currentPos + 1) === SLASH) {
 					const closeStart = currentPos + 2;
 					currentPos = source.indexOf('>', currentPos);
 
-					const closeTag = source.substring(closeStart, currentPos);
+					const closeTag = source.slice(closeStart, currentPos);
 					if (closeTag.indexOf(tagName) === -1) {
-						const parsedText = source.substring(0, currentPos).split('\n');
+						const parsedText = source.slice(0, currentPos).split('\n');
 						throw new Error(
 							`Unexpected close tag\nLine: ${parsedText.length - 1}\nColumn: ${parsedText[parsedText.length - 1].length + 1}\nChar: ${source[currentPos]}`
 						);
 					}
 
-					if (currentPos + 1) currentPos += 1;
+					currentPos += 1;
 
 					return children;
-				} else if (source.charCodeAt(currentPos + 1) === EXCLAMATION) {
+				}
+				// Check for Comment, CDATA or Doctype
+				else if (source.charCodeAt(currentPos + 1) === EXCLAMATION) {
+					// Check for Comment
 					if (source.charCodeAt(currentPos + 2) === MINUS) {
-						// Comment support
 						const startCommentPos = currentPos;
 						while (
 							currentPos !== -1 &&
@@ -86,25 +89,27 @@ export function parse(source: string, options: TParseOptions = {}): (TNode | str
 							currentPos = source.length;
 						}
 						if (keepComments) {
-							children.push(source.substring(startCommentPos, currentPos + 1));
+							children.push(source.slice(startCommentPos, currentPos + 1));
 						}
-					} else if (
+					}
+					// Check for CDATA
+					else if (
 						source.charCodeAt(currentPos + 2) === OPEN_CORNER_BRACKET &&
 						source.charCodeAt(currentPos + 8) === OPEN_CORNER_BRACKET &&
-						source.substr(currentPos + 3, 5).toLowerCase() === 'cdata'
+						source.slice(currentPos + 3, 5).toLowerCase() === 'cdata'
 					) {
-						// CDATA
 						const cdataEndIndex = source.indexOf(']]>', currentPos);
 						if (cdataEndIndex === -1) {
-							children.push(source.substr(currentPos + 9));
+							children.push(source.slice(currentPos + 10));
 							currentPos = source.length;
 						} else {
-							children.push(source.substring(currentPos + 9, cdataEndIndex));
+							children.push(source.slice(currentPos + 9, cdataEndIndex));
 							currentPos = cdataEndIndex + 3;
 						}
 						continue;
-					} else {
-						// Doctype support
+					}
+					// Handle Doctype
+					else {
 						const startDoctype = currentPos + 1;
 						currentPos += 2;
 						let encapsulated = false;
@@ -119,7 +124,7 @@ export function parse(source: string, options: TParseOptions = {}): (TNode | str
 							}
 							currentPos++;
 						}
-						children.push(source.substring(startDoctype, currentPos));
+						children.push(source.slice(startDoctype, currentPos));
 					}
 					currentPos++;
 					continue;
@@ -130,7 +135,9 @@ export function parse(source: string, options: TParseOptions = {}): (TNode | str
 					children.push(...node.children);
 					node.children = [];
 				}
-			} else {
+			}
+			// Handle text
+			else {
 				const text = parseText();
 				if (keepWhitespace) {
 					if (text.length > 0) {
@@ -252,7 +259,7 @@ export function parse(source: string, options: TParseOptions = {}): (TNode | str
 			if (currentPos !== -1) {
 				out.push(parseNode());
 			}
-			source = source.substr(currentPos);
+			source = source.slice(currentPos + 1);
 			currentPos = 0;
 		}
 	} else if (options.parseNode) {

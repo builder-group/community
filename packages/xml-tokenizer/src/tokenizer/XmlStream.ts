@@ -1,14 +1,8 @@
-import { type TRange, type TReference, type TTextPos } from './types';
 import {
 	AMPERSAND,
 	COLON,
 	DOUBLE_QUOTE,
 	HASH,
-	isAsciiDigit,
-	isXmlChar,
-	isXmlName,
-	isXmlNameStart,
-	isXmlSpaceByte,
 	LINE_FEED,
 	LOWERCASE_A,
 	LOWERCASE_F,
@@ -19,11 +13,13 @@ import {
 	UPPERCASE_A,
 	UPPERCASE_F,
 	ZERO
-} from './utils';
+} from './ascii-constants';
+import { type TRange, type TReference, type TTextPos } from './types';
+import { isAsciiDigit, isXmlChar, isXmlName, isXmlNameStart, isXmlSpaceByte } from './utils';
 import { XmlError } from './XmlError';
 
 /**
- * Represents a stream of characters for parsing XML-like content.
+ * A stream of characters for parsing XML-like content.
  *
  * This implementation uses UTF-16 code units, whereas the Rust implementation is based on bytes (UTF-8).
  * This difference in encoding affects how characters are handled and parsed.
@@ -197,6 +193,30 @@ export class XmlStream {
 			this._pos += 1;
 		}
 	}
+
+	// Doesn't really improve performance compared to 'consumeCharsWhile()'
+	// maybe 5% and without validation 25%.
+	// Note: Not the validation is the slow part but the loop is.
+	// When removing the validation in 'consumeCharsWhile()'
+	// it doesn't yield noticable performance gains.
+	//
+	// public consumeCharsUntilIndexOf(text: string): string {
+	// 	const start = this._pos;
+	// 	const nextPos = this._text.indexOf(text, this._pos);
+	//  const endPos = nextPos >= 0 ? nextPos : this._end;
+
+	//   // Iterate over the slice to ensure all characters are valid XML characters
+	// 	for (let i = start; i < endPos; i++) {
+	// 		const char = this._text[i];
+	// 		if (char == null || !isXmlChar(char.codePointAt(0))) {
+	// 			throw new XmlError({ type: 'NonXmlChar', char: char ?? '\u{FFFD}' }, this.genTextPos());
+	// 		}
+	// 	}
+
+	// 	this._pos = endPos;
+
+	// 	return this.sliceBack(start);
+	// }
 
 	/**
 	 * Consumes characters that satisfy a predicate function.
