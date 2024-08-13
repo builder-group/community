@@ -1,5 +1,11 @@
 # xml-tokenizer
 
+## 0.0.10
+
+### Patch Changes
+
+- [#62](https://github.com/builder-group/community/pull/62) [`7be5a0f`](https://github.com/builder-group/community/commit/7be5a0f6294a6ea2893633096747e0e166371123) Thanks [@bennobuilder](https://github.com/bennobuilder)! - Added very basic select functionality
+
 ## 0.0.5
 
 ### Patch Changes
