@@ -20,10 +20,11 @@
 > Status: Experimental
 
 `xml-tokenizer` is a straightforward and typesafe XML tokenizer that streams tokens through a callback mechanism. 
-The implementation is based on the [roxmltree](https://github.com/RazrFalcon/roxmltree) [`tokenizer.rs`](https://github.com/RazrFalcon/roxmltree/blob/master/src/tokenizer.rs). See the [FAQ](#-faq) why we did not embed the [roxmltree](https://github.com/RazrFalcon/roxmltree) crate via WASM.
+The implementation is based on the [roxmltree](https://github.com/RazrFalcon/roxmltree) [`tokenizer.rs`](https://github.com/RazrFalcon/roxmltree/blob/master/src/tokenizer.rs). See the [FAQ](#-faq) why we did not embed the [roxmltree](https://github.com/RazrFalcon/roxmltree) crate as WASM.
 
-- **Streaming XML Tokenization**: Processes XML documents as a stream, emitting tokens on the fly
+- **XML Token Stream**: Processes XML documents as a stream, emitting tokens on the fly similar to the [`SAX`](https://www.baeldung.com/java-sax-parser) approach
 - **Wide Range of Tokens**: Handles processing instructions, comments, entity declarations, element starts/ends, attributes, text, and CDATA sections
+- **Validate XML**: Validates XML while processing which makes it slower than [`txml`](https://github.com/TobiasNickel/tXml) but its still twice as fast as [`fast-xml-parser`](https://github.com/NaturalIntelligence/fast-xml-parser)
 - **Typesafe**: Build with TypeScript for strong type safety
 
 ### 📚 Examples
@@ -179,3 +180,5 @@ See [Generator vs Iterator vs Callback](https://observablehq.com/@domoritz/yield
 
 ## 💡 Resources
 - [How I developed the fastest XML parser](https://tnickel.de/2020/08/30/2020-08-how-the-fastest-xml-parser-is-build/)
+- [txml](https://github.com/TobiasNickel/tXml)
+- [roxmltree](https://github.com/RazrFalcon/roxmltree)
