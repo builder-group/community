@@ -195,7 +195,10 @@ export class XmlStream {
 	}
 
 	// Doesn't really improve performance compared to 'consumeCharsWhile()'
-	// maybe 5% and without validation 25%
+	// maybe 5% and without validation 25%.
+	// Note: Not the validation is the slow part but the loop is.
+	// When removing the validation in 'consumeCharsWhile()'
+	// it doesn't yield noticable performance gains.
 	//
 	// public consumeCharsUntilIndexOf(text: string): string {
 	// 	const start = this._pos;
