@@ -1,4 +1,3 @@
-import { type TTokenCallback } from './types';
 import {
 	DOUBLE_QUOTE,
 	EQUALS,
@@ -12,9 +11,39 @@ import {
 	SLASH,
 	UPPERCASE_P,
 	UPPERCASE_S
-} from './utils';
+} from './ascii-constants';
+import { type TTokenCallback } from './types';
 import { XmlError } from './XmlError';
-import { type XmlStream } from './XmlStream';
+import { XmlStream } from './XmlStream';
+
+const BOM = '\uFEFF';
+const XML_DECLARATION_START = '<?xml ';
+const XML_DECLARATION_END = '?>';
+const ENTITY_DECLARATION_START = '<!ENTITY';
+const ELEMENT_DECLARATION_START = '<!ELEMENT';
+const ATTLIST_DECLARATION_START = '<!ATTLIST';
+const NOTATION_DECLARATION_START = '<!NOTATION';
+const DOCTYPE_START = '<!DOCTYPE';
+const PI_START = '<?';
+const PI_END = '?>';
+const COMMENT_START = '<!--';
+const COMMENT_END = '-->';
+const CDATA_START = '<![CDATA[';
+const CDATA_END = ']]>';
+const NDATA = 'NDATA';
+const PUBLIC = 'PUBLIC';
+const SYSTEM = 'SYSTEM';
+const VERSION = 'version';
+const ENCODING = 'encoding';
+const STANDALONE = 'standalone';
+
+export function tokenize(
+	xmlString: string,
+	allowDtd: boolean,
+	tokenCallback: TTokenCallback
+): void {
+	tokenizeXmlStream(new XmlStream(xmlString), allowDtd, tokenCallback);
+}
 
 /**
  * Parses an XML document.
@@ -23,24 +52,24 @@ import { type XmlStream } from './XmlStream';
  *
  * https://www.w3.org/TR/xml/#NT-document
  */
-export function parseXmlStream(
+export function tokenizeXmlStream(
 	s: XmlStream,
 	allowDtd: boolean,
 	tokenCallback: TTokenCallback
 ): void {
 	// Skip UTF-8 BOM
-	if (s.startsWith('\uFEFF')) {
+	if (s.startsWith(BOM)) {
 		s.advance(1);
 	}
 
-	if (s.startsWith('<?xml ')) {
+	if (s.startsWith(XML_DECLARATION_START)) {
 		parseDeclaration(s);
 	}
 
 	parseMisc(s, tokenCallback);
 
 	s.skipSpaces();
-	if (s.startsWith('<!DOCTYPE')) {
+	if (s.startsWith(DOCTYPE_START)) {
 		if (!allowDtd) {
 			throw new XmlError({ type: 'DtdDetected' });
 		}
@@ -71,9 +100,9 @@ export function parseXmlStream(
 function parseMisc(s: XmlStream, tokenCallback: TTokenCallback): void {
 	while (!s.atEnd()) {
 		s.skipSpaces();
-		if (s.startsWith('<!--')) {
+		if (s.startsWith(COMMENT_START)) {
 			parseComment(s, tokenCallback);
-		} else if (s.startsWith('<?')) {
+		} else if (s.startsWith(PI_START)) {
 			parsePi(s, tokenCallback);
 		} else {
 			break;
@@ -89,38 +118,38 @@ function parseMisc(s: XmlStream, tokenCallback: TTokenCallback): void {
  * https://www.w3.org/TR/xml/#sec-prolog-dtd
  */
 function parseDeclaration(s: XmlStream): void {
+	function consumeSpaces(_s: XmlStream): void {
+		if (_s.startsWithSpace()) {
+			_s.skipSpaces();
+		} else if (!_s.startsWith(XML_DECLARATION_END) && !_s.atEnd()) {
+			throw new XmlError(
+				{ type: 'InvalidChar', expected: 'a whitespace', actual: _s.currCodeUnitUnchecked() },
+				_s.genTextPos()
+			);
+		}
+	}
+
 	s.advance(5); // <?xml
 	consumeSpaces(s);
 
 	// The `version` "attribute" is mandatory
-	if (!s.startsWith('version')) {
+	if (!s.startsWith(VERSION)) {
 		throw new XmlError({ type: 'InvalidString', expected: 'version' }, s.genTextPos());
 	}
 	parseAttribute(s);
 	consumeSpaces(s);
 
-	if (s.startsWith('encoding')) {
+	if (s.startsWith(ENCODING)) {
 		parseAttribute(s);
 		consumeSpaces(s);
 	}
 
-	if (s.startsWith('standalone')) {
+	if (s.startsWith(STANDALONE)) {
 		parseAttribute(s);
 	}
 
 	s.skipSpaces();
-	s.skipString('?>');
-}
-
-function consumeSpaces(s: XmlStream): void {
-	if (s.startsWithSpace()) {
-		s.skipSpaces();
-	} else if (!s.startsWith('?>') && !s.atEnd()) {
-		throw new XmlError(
-			{ type: 'InvalidChar', expected: 'a whitespace', actual: s.currCodeUnitUnchecked() },
-			s.genTextPos()
-		);
-	}
+	s.skipString(XML_DECLARATION_END);
 }
 
 /**
@@ -133,8 +162,8 @@ function consumeSpaces(s: XmlStream): void {
 function parseComment(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(4);
-	const text = s.consumeCharsWhile((_s, c) => !(c === '-' && _s.startsWith('-->')));
-	s.skipString('-->');
+	const text = s.consumeCharsWhile((_s, c) => !(c === '-' && _s.startsWith(COMMENT_END)));
+	s.skipString(COMMENT_END);
 
 	if (text.includes('--') || text.endsWith('-')) {
 		throw new XmlError({ type: 'InvalidComment' }, s.genTextPosFrom(start));
@@ -152,7 +181,7 @@ function parseComment(s: XmlStream, tokenCallback: TTokenCallback): void {
  * https://www.w3.org/TR/xml/#sec-pi
  */
 function parsePi(s: XmlStream, tokenCallback: TTokenCallback): void {
-	if (s.startsWith('<?xml ')) {
+	if (s.startsWith(XML_DECLARATION_START)) {
 		throw new XmlError({ type: 'UnexpectedDeclaration' }, s.genTextPos());
 	}
 
@@ -160,9 +189,9 @@ function parsePi(s: XmlStream, tokenCallback: TTokenCallback): void {
 	s.advance(2);
 	const target = s.consumeName();
 	s.skipSpaces();
-	const content = s.consumeCharsWhile((_s, c) => !(c === '?' && _s.startsWith('?>')));
+	const content = s.consumeCharsWhile((_s, c) => !(c === '?' && _s.startsWith(PI_END)));
 
-	s.skipString('?>');
+	s.skipString(PI_END);
 
 	tokenCallback({
 		type: 'ProcessingInstruction',
@@ -188,11 +217,11 @@ function parseDoctype(s: XmlStream, tokenCallback: TTokenCallback): void {
 	s.advance(1); // '['
 	while (!s.atEnd()) {
 		s.skipSpaces();
-		if (s.startsWith('<!ENTITY')) {
+		if (s.startsWith(ENTITY_DECLARATION_START)) {
 			parseEntityDecl(s, tokenCallback);
-		} else if (s.startsWith('<!--')) {
+		} else if (s.startsWith(COMMENT_START)) {
 			parseComment(s, tokenCallback);
-		} else if (s.startsWith('<?')) {
+		} else if (s.startsWith(PI_START)) {
 			parsePi(s, tokenCallback);
 		} else if (s.startsWith(']')) {
 			// DTD ends with ']' S? '>', therefore we have to skip possible spaces
@@ -208,9 +237,9 @@ function parseDoctype(s: XmlStream, tokenCallback: TTokenCallback): void {
 				);
 			}
 		} else if (
-			s.startsWith('<!ELEMENT') ||
-			s.startsWith('<!ATTLIST') ||
-			s.startsWith('<!NOTATION')
+			s.startsWith(ELEMENT_DECLARATION_START) ||
+			s.startsWith(ATTLIST_DECLARATION_START) ||
+			s.startsWith(NOTATION_DECLARATION_START)
 		) {
 			try {
 				consumeDecl(s);
@@ -263,7 +292,7 @@ function parseDoctypeStart(s: XmlStream): void {
  * https://www.w3.org/TR/xml/#NT-ExternalID
  */
 function parseExternalId(s: XmlStream): boolean {
-	if (s.startsWith('SYSTEM') || s.startsWith('PUBLIC')) {
+	if (s.startsWith(SYSTEM) || s.startsWith(PUBLIC)) {
 		const start = s.getPos();
 		s.advance(6);
 		const id = s.sliceBack(start);
@@ -273,7 +302,7 @@ function parseExternalId(s: XmlStream): boolean {
 		s.consumeCodeUnitsWhile((c) => c !== quote);
 		s.consumeCodeUnit(quote);
 
-		if (id === 'PUBLIC') {
+		if (id === PUBLIC) {
 			s.consumeSpaces();
 			const _quote = s.consumeQuote();
 			s.consumeCodeUnitsWhile((c) => c !== _quote);
@@ -339,7 +368,7 @@ function parseEntityDef(s: XmlStream, isGe: boolean): string | null {
 		if (parseExternalId(s)) {
 			if (isGe) {
 				s.skipSpaces();
-				if (s.startsWith('NDATA')) {
+				if (s.startsWith(NDATA)) {
 					s.advance(5);
 					s.consumeSpaces();
 					s.skipName();
@@ -445,9 +474,7 @@ function parseAttribute(s: XmlStream): [string, string, string] {
 		s.skipSpaces();
 		const quote = s.consumeQuote();
 		const quoteChar = String.fromCharCode(quote);
-		const valueStart = s.getPos();
-		s.skipCharsWhile((_, c) => c !== quoteChar && c !== '<');
-		value = s.sliceBack(valueStart);
+		value = s.consumeCharsWhile((_, c) => c !== quoteChar && c !== '<');
 		s.consumeCodeUnit(quote);
 	} else {
 		s.goTo(start);
@@ -470,9 +497,9 @@ function parseContent(s: XmlStream, tokenCallback: TTokenCallback): void {
 		if (currCodeUnit === LESS_THAN) {
 			const nextCodeUnit = s.nextCodeUnit();
 			if (nextCodeUnit === EXCLAMATION_MARK) {
-				if (s.startsWith('<!--')) {
+				if (s.startsWith(COMMENT_START)) {
 					parseComment(s, tokenCallback);
-				} else if (s.startsWith('<![CDATA[')) {
+				} else if (s.startsWith(CDATA_START)) {
 					parseCdata(s, tokenCallback);
 				} else {
 					throw new XmlError(
@@ -507,8 +534,8 @@ function parseContent(s: XmlStream, tokenCallback: TTokenCallback): void {
 function parseCdata(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(9); // <![CDATA[
-	const text = s.consumeCharsWhile((_s, c) => !(c === ']' && _s.startsWith(']]>')));
-	s.skipString(']]>');
+	const text = s.consumeCharsWhile((_s, c) => !(c === ']' && _s.startsWith(CDATA_END)));
+	s.skipString(CDATA_END);
 	const range = s.rangeFrom(start);
 	tokenCallback({ type: 'Cdata', text, range });
 }
@@ -541,9 +568,7 @@ function parseText(s: XmlStream, tokenCallback: TTokenCallback): void {
 
 	// According to the spec, `]]>` must not appear inside a Text node.
 	// https://www.w3.org/TR/xml/#syntax
-	//
-	// Search for `>` first, since it's a bit faster than looking for `]]>`.
-	if (text.includes('>') && text.includes(']]>')) {
+	if (text.includes(CDATA_END)) {
 		throw new XmlError({ type: 'InvalidCharacterData' }, s.genTextPos());
 	}
 

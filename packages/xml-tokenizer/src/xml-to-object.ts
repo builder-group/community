@@ -1,64 +1,75 @@
-import { parseXmlStream, XmlStream } from './tokenizer';
+import { tokenize, type TXmlToken } from './tokenizer';
 
-export function xmlToObject(xmlString: string, allowDtd = false): TXMLNode {
-	const root: TXMLNode = {
-		tagName: 'root',
-		attributes: {},
-		children: []
+export function xmlToObject(xmlString: string, allowDtd = false): TXmlNode {
+	const root: TXmlNode = {
+		local: 'root',
+		attributes: [],
+		content: []
 	};
-	const stack: TXMLNode[] = [root];
-	let currentNode: TXMLNode = root;
+	const stack: TXmlNode[] = [root];
 
-	parseXmlStream(new XmlStream(xmlString), allowDtd, (token) => {
-		switch (token.type) {
-			case 'ElementStart': {
-				const newNode: TXMLNode = {
-					tagName: getTagName(token.local, token.prefix),
-					attributes: {},
-					children: []
-				};
-				currentNode.children.push(newNode);
-				stack.push(newNode);
-				currentNode = newNode;
-				break;
+	tokenize(xmlString, allowDtd, (token) => {
+		processTokenForObject(token, stack);
+	});
+
+	return root.content[0] as TXmlNode;
+}
+
+export function processTokenForObject(token: TXmlToken, stack: TXmlNode[]): void {
+	switch (token.type) {
+		case 'ElementStart': {
+			const newNode: TXmlNode = {
+				local: token.local,
+				prefix: token.prefix.length > 0 ? token.prefix : undefined,
+				attributes: [],
+				content: []
+			};
+
+			const currentNode = stack[stack.length - 1];
+			if (currentNode != null) {
+				currentNode.content.push(newNode);
 			}
-			case 'ElementEnd': {
-				if (token.end.type === 'Close' || token.end.type === 'Empty') {
-					stack.pop();
-					const newCurrentNode = stack[stack.length - 1];
-					if (newCurrentNode != null) {
-						currentNode = newCurrentNode;
-					}
-				}
-				break;
+
+			stack.push(newNode);
+			break;
+		}
+		case 'ElementEnd': {
+			if (token.end.type === 'Close' || token.end.type === 'Empty') {
+				stack.pop();
 			}
-			case 'Attribute': {
-				currentNode.attributes[getTagName(token.local, token.prefix)] = token.value;
-				break;
+			break;
+		}
+		case 'Attribute': {
+			const currentNode = stack[stack.length - 1];
+			if (currentNode != null) {
+				currentNode.attributes.push({
+					local: token.local,
+					prefix: token.prefix.length > 0 ? token.prefix : undefined,
+					value: token.value
+				});
 			}
-			case 'Text':
-			case 'Cdata': {
+			break;
+		}
+		case 'Text':
+		case 'Cdata': {
+			const currentNode = stack[stack.length - 1];
+			if (currentNode != null) {
 				const trimmedText = token.text.trim();
 				if (trimmedText.length > 0) {
-					currentNode.children.push(token.text);
+					currentNode.content.push(token.text);
 				}
-				break;
 			}
-			case 'Comment':
-			case 'ProcessingInstruction':
-			case 'EntityDeclaration':
-				break;
+			break;
 		}
-	});
-	return root.children[0] as unknown as TXMLNode;
+		case 'Comment':
+		case 'ProcessingInstruction':
+		case 'EntityDeclaration':
+	}
 }
 
-export interface TXMLNode {
-	tagName: string;
-	attributes: Record<string, string>;
-	children: (TXMLNode | string)[];
-}
-
-export function getTagName(local: string, prefix: string): string {
-	return prefix.length > 0 ? `${prefix}:${local}` : local;
+export interface TXmlNode {
+	local: string;
+	prefix?: string;
+	attributes: { local: string; prefix?: string; value: string }[];
+	content: (TXmlNode | string)[];
 }

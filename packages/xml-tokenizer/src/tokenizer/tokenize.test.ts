@@ -1,11 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseXmlStream } from './tokenizer';
-import { type TXMLToken } from './types';
+import { tokenize } from './tokenize';
+import { type TXmlToken } from './types';
 import { XmlError } from './XmlError';
-import { XmlStream } from './XmlStream';
 
-describe('tokenizer tests', () => {
+describe('tokenize function', () => {
 	describe('CDATA', () => {
 		it('cdata_01', () => {
 			assertTokens('<p><![CDATA[content]]></p>', [
@@ -826,7 +825,7 @@ describe('tokenizer tests', () => {
 				'<!DOCTYPE svg [\n    <!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">\n]>',
 				[
 					{
-						type: 'EntityDecl',
+						type: 'EntityDeclaration',
 						name: 'ns_extend',
 						definition: 'http://ns.adobe.com/Extensibility/1.0/'
 					}
@@ -839,7 +838,7 @@ describe('tokenizer tests', () => {
 				'<!DOCTYPE svg [\n    <!ENTITY Pub-Status "This is a pre-release of the\nspecification.">\n]>',
 				[
 					{
-						type: 'EntityDecl',
+						type: 'EntityDeclaration',
 						name: 'Pub-Status',
 						definition: 'This is a pre-release of the\nspecification.'
 					}
@@ -881,7 +880,7 @@ describe('tokenizer tests', () => {
 				'<!DOCTYPE svg [\n    <!ELEMENT sgml ANY>\n    <!ENTITY ns_extend "http://ns.adobe.com/Extensibility/1.0/">\n    <!NOTATION example1SVG-rdf SYSTEM "example1.svg.rdf">\n    <!ATTLIST img data ENTITY #IMPLIED>\n]>',
 				[
 					{
-						type: 'EntityDecl',
+						type: 'EntityDeclaration',
 						name: 'ns_extend',
 						definition: 'http://ns.adobe.com/Extensibility/1.0/'
 					}
@@ -1172,10 +1171,11 @@ describe('tokenizer tests', () => {
 					start: 0
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'լեզու',
-					value: 'ռուսերեն'
+					value: 'ռուսերեն',
+					range: { start: 4, end: 20 }
 				},
 				{
 					type: 'ElementEnd',
@@ -1271,10 +1271,11 @@ describe('tokenizer tests', () => {
 					start: 0
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'x',
-					value: 'test'
+					value: 'test',
+					range: { start: 3, end: 11 }
 				},
 				{
 					type: 'Error',
@@ -1479,10 +1480,11 @@ describe('tokenizer tests', () => {
 					start: 0
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'ax',
-					value: 'test'
+					value: 'test',
+					range: { start: 3, end: 12 }
 				},
 				{
 					type: 'ElementEnd',
@@ -1501,10 +1503,11 @@ describe('tokenizer tests', () => {
 					start: 0
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'ax',
-					value: 'test'
+					value: 'test',
+					range: { start: 3, end: 12 }
 				},
 				{
 					type: 'ElementEnd',
@@ -1523,16 +1526,18 @@ describe('tokenizer tests', () => {
 					start: 0
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'b',
-					value: 'test1'
+					value: 'test1',
+					range: { start: 3, end: 12 }
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'c',
-					value: 'test2'
+					value: 'test2',
+					range: { start: 13, end: 22 }
 				},
 				{
 					type: 'ElementEnd',
@@ -1551,16 +1556,18 @@ describe('tokenizer tests', () => {
 					start: 0
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'b',
-					value: '"test1"'
+					value: '"test1"',
+					range: { start: 3, end: 14 }
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'c',
-					value: "'test2'"
+					value: "'test2'",
+					range: { start: 15, end: 26 }
 				},
 				{
 					type: 'ElementEnd',
@@ -1579,16 +1586,18 @@ describe('tokenizer tests', () => {
 					start: 0
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'a',
-					value: "test1' c='test2"
+					value: "test1' c='test2",
+					range: { start: 3, end: 22 }
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'b',
-					value: 'test1" c="test2'
+					value: 'test1" c="test2',
+					range: { start: 23, end: 42 }
 				},
 				{
 					type: 'ElementEnd',
@@ -1607,10 +1616,11 @@ describe('tokenizer tests', () => {
 					start: 0
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'a',
-					value: 'test1'
+					value: 'test1',
+					range: { start: 5, end: 21 }
 				},
 				{
 					type: 'ElementEnd',
@@ -1629,10 +1639,11 @@ describe('tokenizer tests', () => {
 					start: 0
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: 'q',
 					local: 'a',
-					value: 'b'
+					value: 'b',
+					range: { start: 3, end: 10 }
 				},
 				{
 					type: 'ElementEnd',
@@ -1651,10 +1662,11 @@ describe('tokenizer tests', () => {
 					start: 0
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'a',
-					value: 'true'
+					value: 'true',
+					range: { start: 3, end: 4 }
 				},
 				{
 					type: 'ElementEnd',
@@ -1673,10 +1685,11 @@ describe('tokenizer tests', () => {
 					start: 0
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'a',
-					value: 'true'
+					value: 'true',
+					range: { start: 3, end: 4 }
 				},
 				{
 					type: 'ElementEnd',
@@ -1695,22 +1708,25 @@ describe('tokenizer tests', () => {
 					start: 0
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'a',
-					value: 'b'
+					value: 'b',
+					range: { start: 3, end: 8 }
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'q',
-					value: 'true'
+					value: 'true',
+					range: { start: 9, end: 10 }
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: 'b',
 					local: 'x',
-					value: 'true'
+					value: 'true',
+					range: { start: 11, end: 14 }
 				},
 				{
 					type: 'ElementEnd',
@@ -1825,10 +1841,11 @@ describe('tokenizer tests', () => {
 					start: 0
 				},
 				{
-					type: 'Attr',
+					type: 'Attribute',
 					prefix: '',
 					local: 'a',
-					value: 'v'
+					value: 'v',
+					range: { start: 3, end: 8 }
 				},
 				{
 					type: 'Error',
@@ -2298,50 +2315,18 @@ describe('tokenizer tests', () => {
 	});
 });
 
-type TToken = TXMLToken | TErrorToken | TEntityDeclToken | TAttrToken;
+type TToken = TXmlToken | TErrorToken;
 
 interface TErrorToken {
 	type: 'Error';
 	message: string;
 }
 
-interface TEntityDeclToken {
-	type: 'EntityDecl';
-	name: string;
-	definition: string;
-}
-
-interface TAttrToken {
-	type: 'Attr';
-	prefix: string;
-	local: string;
-	value: string;
-}
-
 function collectTokens(text: string): TToken[] {
 	const tokens: TToken[] = [];
 	try {
-		const xmlStream = new XmlStream(text);
-		parseXmlStream(xmlStream, true, (token) => {
-			switch (token.type) {
-				case 'EntityDeclaration':
-					tokens.push({
-						type: 'EntityDecl',
-						name: token.name,
-						definition: token.definition.toString()
-					});
-					break;
-				case 'Attribute':
-					tokens.push({
-						type: 'Attr',
-						prefix: token.prefix,
-						local: token.local,
-						value: token.value.toString()
-					});
-					break;
-				default:
-					tokens.push(token);
-			}
+		tokenize(text, true, (token) => {
+			tokens.push(token);
 		});
 	} catch (error) {
 		if (error instanceof XmlError) {

@@ -1,35 +1,19 @@
-export const HORIZONTAL_TAB = 9; // \t
-export const LINE_FEED = 10; // \n
-export const CARRIAGE_RETURN = 13; // \r
-export const SPACE = 32; // ' '
-export const EXCLAMATION_MARK = 33; // !
-export const DOUBLE_QUOTE = 34; // "
-export const HASH = 35; // #
-export const PERCENT = 37; // %
-export const AMPERSAND = 38; // &
-export const SINGLE_QUOTE = 39; // '
-export const HYPHEN = 45; // -
-export const PERIOD = 46; // .
-export const SLASH = 47; // /
-export const ZERO = 48; // 0
-export const NINE = 57; // 9
-export const COLON = 58; // :
-export const SEMICOLON = 59; // ;
-export const LESS_THAN = 60; // <
-export const EQUALS = 61; // =
-export const GREATER_THAN = 62; // >
-export const QUESTION_MARK = 63; // ?
-export const UPPERCASE_A = 65; // A
-export const UPPERCASE_F = 70; // F
-export const UPPERCASE_P = 80; // P
-export const UPPERCASE_S = 83; // S
-export const UPPERCASE_Z = 90; // Z
-export const OPEN_BRACKET = 91; // [
-export const UNDERSCORE = 95; // _
-export const LOWERCASE_A = 97; // a
-export const LOWERCASE_F = 102; // f
-export const LOWERCASE_X = 120; // x
-export const LOWERCASE_Z = 122; // z
+import {
+	CARRIAGE_RETURN,
+	COLON,
+	HORIZONTAL_TAB,
+	HYPHEN,
+	LINE_FEED,
+	LOWERCASE_A,
+	LOWERCASE_Z,
+	NINE,
+	PERIOD,
+	SPACE,
+	UNDERSCORE,
+	UPPERCASE_A,
+	UPPERCASE_Z,
+	ZERO
+} from './ascii-constants';
 
 export function isAsciiDigit(byte: number): boolean {
 	return byte >= ZERO && byte <= NINE;
