@@ -35,7 +35,7 @@ The implementation is based on the [roxmltree](https://github.com/RazrFalcon/rox
 
 Create a typesafe, straightforward, and lightweight [XML](https://de.wikipedia.org/wiki/Extensible_Markup_Language) parser. Many existing parsers either lack TypeScript support, aren't actively maintained, or exceed 20kB gzipped.
 
-My goal was to develop an efficient & flexible alternative by porting [roxmltree](https://github.com/RazrFalcon/roxmltree) to TypeScript or integrating it via WASM. While it functions well and is quite flexible due to its streaming approach, it's not as fast as I hoped.
+My goal was to develop an efficient & flexible alternative by porting [roxmltree](https://github.com/RazrFalcon/roxmltree) to TypeScript or integrating it via WASM. While it functions well and is quite versatile due to its streaming approach, it's not as fast as I hoped.
 
 ### ⚖️ Alternatives
 
@@ -46,13 +46,16 @@ My goal was to develop an efficient & flexible alternative by porting [roxmltree
 ## 📖 Usage
 
 ```ts
-import { xmlToObject, parseString } from 'xml-tokenizer';
+import { xmlToObject, xmlToSimplifiedObject, tokenize, select } from 'xml-tokenizer';
 
-// Parse XML to Javascript object (uses `parseString` under the hood)
+// Parse XML to Javascript object without information lost (uses `tokenize` under the hood)
 const xmlObject = xmlToObject("<p>Hello World</p>");
 
+// Or, parse XML to easy to queryable Javascript object
+const simplifiedXmlObject = xmlToSimplifiedObject("<p>Hello World</p>");
+
 // Or, parse XML to a stream of tokens 
-parseString("<p>Hello World</p>", false, (token) => {
+tokenize("<p>Hello World</p>", false, (token) => {
     switch (token.type) {
         case 'ElementStart':
             console.log('Start of element:', token);
@@ -64,6 +67,16 @@ parseString("<p>Hello World</p>", false, (token) => {
         default:
             console.log('Token:', token);
     }
+});
+
+// Or, stream only a selection of tokens
+select(xml, [
+    [
+        { axis: 'child', local: 'bookstore' },
+        { axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
+    ]
+], (selectedToken) => {
+    // Handle selected token
 });
 ```
 
