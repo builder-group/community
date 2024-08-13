@@ -65,7 +65,7 @@ async function shopifyTest(): Promise<void> {
 		shopifyHtml,
 		selectedHtml: tokensToXml(tokens)
 	});
-	console.log(result.div.map((div: any) => div._attributes['data-app-card-handle-value']));
+	console.log(result._div.map((div: any) => div.attributes['data-app-card-handle-value']));
 }
 
 async function benchmarkTest(): Promise<void> {

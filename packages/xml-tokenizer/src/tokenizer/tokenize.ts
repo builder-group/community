@@ -453,9 +453,7 @@ function parseAttribute(s: XmlStream): [string, string, string] {
 		s.skipSpaces();
 		const quote = s.consumeQuote();
 		const quoteChar = String.fromCharCode(quote);
-		const valueStart = s.getPos();
-		s.skipCharsWhile((_, c) => c !== quoteChar && c !== '<');
-		value = s.sliceBack(valueStart);
+		value = s.consumeCharsWhile((_, c) => c !== quoteChar && c !== '<');
 		s.consumeCodeUnit(quote);
 	} else {
 		s.goTo(start);
