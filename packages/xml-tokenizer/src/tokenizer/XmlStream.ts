@@ -194,6 +194,27 @@ export class XmlStream {
 		}
 	}
 
+	// Doesn't really improve performance compared to 'consumeCharsWhile()'
+	// maybe 5% and without validation 25%
+	//
+	// public consumeCharsUntilIndexOf(text: string): string {
+	// 	const start = this._pos;
+	// 	const nextPos = this._text.indexOf(text, this._pos);
+	//  const endPos = nextPos >= 0 ? nextPos : this._end;
+
+	//   // Iterate over the slice to ensure all characters are valid XML characters
+	// 	for (let i = start; i < endPos; i++) {
+	// 		const char = this._text[i];
+	// 		if (char == null || !isXmlChar(char.codePointAt(0))) {
+	// 			throw new XmlError({ type: 'NonXmlChar', char: char ?? '\u{FFFD}' }, this.genTextPos());
+	// 		}
+	// 	}
+
+	// 	this._pos = endPos;
+
+	// 	return this.sliceBack(start);
+	// }
+
 	/**
 	 * Consumes characters that satisfy a predicate function.
 	 *
