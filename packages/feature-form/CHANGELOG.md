@@ -1,5 +1,14 @@
 # feature-form
 
+## 0.0.17
+
+### Patch Changes
+
+- Updated dependencies [[`8138857`](https://github.com/builder-group/community/commit/8138857cd8a4b1a67153fd33938f9cd559476ec1)]:
+  - @blgc/utils@0.0.16
+  - feature-state@0.0.21
+  - validation-adapter@0.0.9
+
 ## 0.0.16
 
 ### Patch Changes

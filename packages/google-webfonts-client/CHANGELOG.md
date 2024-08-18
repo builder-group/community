@@ -1,5 +1,12 @@
 # google-webfonts-client
 
+## 0.0.15
+
+### Patch Changes
+
+- Updated dependencies [[`8138857`](https://github.com/builder-group/community/commit/8138857cd8a4b1a67153fd33938f9cd559476ec1)]:
+  - feature-fetch@0.0.16
+
 ## 0.0.14
 
 ### Patch Changes
