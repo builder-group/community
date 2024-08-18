@@ -4,4 +4,12 @@ export * from './features';
 export * from './helper';
 export * from './types';
 
-export * from 'ts-results-es';
+export {
+	Err,
+	Ok,
+	unwrapErr,
+	unwrapOk,
+	type TErrResult,
+	type TOkResult,
+	type TResult
+} from '@blgc/utils';

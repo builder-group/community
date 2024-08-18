@@ -364,9 +364,6 @@ importers:
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
-      ts-results-es:
-        specifier: 4.2.0
-        version: 4.2.0
     devDependencies:
       '@blgc/config':
         specifier: workspace:*
@@ -4896,9 +4893,6 @@ packages:
         optional: true
       '@swc/wasm':
         optional: true
-
-  ts-results-es@4.2.0:
-    resolution: {integrity: sha512-GfpRk+qvHxa/6gADH8WMN/jXvs5oHYbKtMQc6X9L3VhToy5Lri3iQowyYSytaRcvPDiTT2z3vurzQZXFQFXKRA==}
 
   tsconfck@3.1.1:
     resolution: {integrity: sha512-00eoI6WY57SvZEVjm13stEVE90VkEdJAFGgpFLTsZbJyW/LwFQ7uQxJHWpZ2hzSWgCPKc9AnBnNP+0X7o3hAmQ==}
@@ -10215,8 +10209,6 @@ snapshots:
       typescript: 5.5.4
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
-
-  ts-results-es@4.2.0: {}
 
   tsconfck@3.1.1(typescript@5.5.4):
     optionalDependencies:
