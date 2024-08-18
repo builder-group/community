@@ -1,4 +1,4 @@
-import type { Result, TFetchClient, TOpenApiFetchResponse } from 'feature-fetch';
+import type { TFetchClient, TOpenApiFetchResponse, TResult } from 'feature-fetch';
 
 import type { paths } from './gen/v1';
 
@@ -19,7 +19,7 @@ declare module 'feature-fetch' {
 					fontStyle?: 'italic' | 'regular';
 					capability?: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>['capability'];
 				}
-			): Promise<Result<string | null, Error>>;
+			): Promise<TResult<string | null, Error>>;
 			downloadFontFile(
 				familiy: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>['family'],
 				options: {
@@ -27,7 +27,7 @@ declare module 'feature-fetch' {
 					fontStyle?: 'italic' | 'regular';
 					capability?: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>['capability'];
 				}
-			): Promise<Result<Uint8Array | null, Error>>;
+			): Promise<TResult<Uint8Array | null, Error>>;
 		};
 	}
 }
