@@ -31,8 +31,7 @@
 	"homepage": "https://builder.group/?source=package-json",
 	"dependencies": {
 		"@blgc/types": "workspace:*",
-		"@blgc/utils": "workspace:*",
-		"ts-results-es": "4.2.0"
+		"@blgc/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",

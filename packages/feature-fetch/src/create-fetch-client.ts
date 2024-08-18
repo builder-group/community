@@ -1,4 +1,4 @@
-import { Err, Ok } from 'ts-results-es';
+import { Err, Ok } from '@blgc/utils';
 
 import { FetchError } from './exceptions';
 import {

@@ -1,4 +1,4 @@
-import type { Result } from 'ts-results-es';
+import { type TResult } from '@blgc/utils';
 
 import type { FetchError, NetworkError, RequestError } from '../exceptions';
 import type { FetchHeaders } from '../helper';
@@ -124,7 +124,7 @@ export type TFetchResponse<
 	GSuccessResponseBody,
 	GErrorResponseBody,
 	GParseAs extends TParseAs
-> = Result<
+> = TResult<
 	TFetchResponseSuccess<GSuccessResponseBody, GParseAs>,
 	TFetchResponseError<GErrorResponseBody>
 >;

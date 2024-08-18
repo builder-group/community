@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { unwrapErr } from '@blgc/utils';
 
 import { createFetchClient } from './create-fetch-client';
 
@@ -54,6 +55,6 @@ describe('createFetchClient function', () => {
 		const result = await client._baseFetch('/test', 'GET', {});
 
 		expect(result.isErr()).toBe(true);
-		expect(result.unwrapErr()).toBeInstanceOf(Error);
+		expect(unwrapErr(result)).toBeInstanceOf(Error);
 	});
 });
