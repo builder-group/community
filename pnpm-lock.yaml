@@ -247,6 +247,9 @@ importers:
       fast-xml-parser:
         specifier: ^4.4.1
         version: 4.4.1
+      tinybench:
+        specifier: ^2.9.0
+        version: 2.9.0
       txml:
         specifier: ^5.1.1
         version: 5.1.1

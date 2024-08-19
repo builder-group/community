@@ -1,18 +1,16 @@
 import * as fxp from 'fast-xml-parser';
+import { Bench } from 'tinybench';
 import * as txml from 'txml';
 import {
 	processTokenForSimplifiedObject,
 	select,
 	tokensToXml,
 	TSelectedXmlToken,
-	TSimplifiedXmlNode,
 	TXmlToken,
 	xmlToObject,
 	xmlToSimplifiedObject
 } from 'xml-tokenizer';
-import * as xml2js from 'xml2js';
 
-import { bench } from './bench';
 import { parse } from './txml';
 
 // playground();
@@ -89,125 +87,96 @@ async function benchmarkTest(): Promise<void> {
 	await bench2(xml, 100);
 }
 
-async function bench1(xml: string, runs = 100) {
+async function bench1(xml: string, time = 100) {
+	const bench = new Bench({ time });
+
 	const fastXmlParser = new fxp.XMLParser();
 
-	const benchmarkResults = [
-		await bench(
-			'xml-tokenizer',
-			async () => {
-				xmlToObject(xml);
-			},
-			runs
-		),
-		await bench(
-			'xml-tokenizer (simplified)',
-			async () => {
-				xmlToSimplifiedObject(xml);
-			},
-			runs
-		),
-		await bench(
-			'txml-ts',
-			async () => {
-				parse(xml);
-			},
-			runs
-		),
-		await bench(
-			'txml',
-			async () => {
-				txml.parse(xml);
-			},
-			runs
-		),
-		await bench(
-			'txml (simplified)',
-			async () => {
-				txml.simplifyLostLess(txml.parse(xml)[0].children);
-			},
-			runs
-		),
-		await bench(
-			'fast-xml-parser',
-			async () => {
-				fastXmlParser.parse(xml);
-			},
-			runs
-		),
-		await bench(
-			'xml2js',
-			async () => {
-				xml2js.parseString(xml, () => {});
-			},
-			runs
-		)
-	];
+	bench
+		.add('xml-tokenizer', () => {
+			xmlToObject(xml);
+		})
+		.add('xml-tokenizer (simplified)', () => {
+			xmlToSimplifiedObject(xml);
+		})
+		.add('txml-ts', () => {
+			parse(xml);
+		})
+		.add('txml', () => {
+			txml.parse(xml);
+		})
+		.add('txml (simplified)', () => {
+			txml.simplifyLostLess(txml.parse(xml)[0].children);
+		})
+		.add('fast-xml-parser', () => {
+			fastXmlParser.parse(xml);
+		});
+	// TODO: Doesn't work
+	// .add('xml2js', () => {
+	// 	xml2js.parseString(xml, () => {});
+	// });
+
+	await bench.warmup();
+	await bench.run();
 
 	console.log('Xml to object');
 	console.table(
-		benchmarkResults.sort(
-			(a, b) => Number(b.success) - Number(a.success) || a.averageTimeMs - b.averageTimeMs
-		)
+		bench
+			.table()
+			.sort(
+				(a, b) =>
+					parseInt(b?.['ops/sec'].toString() ?? '0') - parseInt(a?.['ops/sec'].toString() ?? '0')
+			)
 	);
 }
 
-async function bench2(xml: string, runs = 100) {
-	const benchmarkResults = [
-		await bench(
-			'xml-tokenizer',
-			async () => {
-				let cacheKey = '';
-				select(
-					xml,
+async function bench2(xml: string, time = 100) {
+	const bench = new Bench({ time });
+
+	bench
+		.add('xml-tokenizer', () => {
+			let cacheKey = '';
+			select(
+				xml,
+				[
 					[
-						[
-							{ axis: 'child', local: 'HotelListResponse' },
-							{ axis: 'child', local: 'cacheKey' }
-						]
-					],
-					(token) => {
-						if (token.type === 'Text') {
-							cacheKey = token.text;
-						}
+						{ axis: 'child', local: 'HotelListResponse' },
+						{ axis: 'child', local: 'cacheKey' }
+					]
+				],
+				(token) => {
+					if (token.type === 'Text') {
+						cacheKey = token.text;
 					}
-				);
-				// console.log(cacheKey);
-			},
-			runs
-		),
-		await bench(
-			'xml-tokenizer (dom)',
-			async () => {
-				const dom = xmlToSimplifiedObject(xml);
-				const cacheKey = (
-					(dom['_HotelListResponse'] as TSimplifiedXmlNode)['_cacheKey'] as TSimplifiedXmlNode
-				).text;
-				// console.log(cacheKey);
-			},
-			runs
-		),
-		await bench(
-			'txml',
-			async () => {
-				const dom = txml.parse(xml);
-				const d = txml.simplifyLostLess(dom[0].children);
-				const cacheKey = d.cacheKey[0];
-				// console.log(cacheKey);
-			},
-			runs
-		)
-		// TODO: Can't make it work in browser env: ReferenceError: process is not defined
-		// await bench('camaro', async () => {
-		// 	const result = await camaro.transform(xml, { raw: 'raw(/HotelListResponse/cacheKey)' });
-		// 	console.log({ result });
-		// })
-	];
+				}
+			);
+			// console.log(cacheKey);
+		})
+		.add('xml-tokenizer (dom)', () => {
+			const dom = xmlToSimplifiedObject(xml);
+			const cacheKey = dom._HotelListResponse[0]._cacheKey[0].text;
+		})
+		.add('txml', () => {
+			const dom = txml.parse(xml);
+			const d = txml.simplifyLostLess(dom[0].children);
+			const cacheKey = d.cacheKey[0];
+		});
+	// TODO: Can't make it work in browser env: ReferenceError: process is not defined
+	// .add('amaro', async () => {
+	// 	const result = await camaro.transform(xml, { raw: 'raw(/HotelListResponse/cacheKey)' });
+	// 	console.log({ result });
+	// });
+
+	await bench.warmup();
+	await bench.run();
 
 	console.log('Select Xml node');
 	console.table(
-		benchmarkResults.sort(
-			(a, b) => Number(b.success) - Number(a.success) || a.averageTimeMs - b.averageTimeMs
-		)
+		bench
+			.table()
+			.sort(
+				(a, b) =>
+					parseInt(b?.['ops/sec'].toString() ?? '0') - parseInt(a?.['ops/sec'].toString() ?? '0')
+			)
 	);
 }
