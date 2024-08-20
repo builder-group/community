@@ -1,4 +1,5 @@
-import { getQName } from '../get-q-name';
+import { matchString } from './match-string';
+import { type TCachedAttribute } from './TokenSelectStateMachine';
 import { type TTokenSelectPathSegment } from './types';
 
 export class TokenSelectState {
@@ -35,7 +36,7 @@ export class TokenSelectState {
 			matchCriteria |= ETokenMatchCriteria.Attributes;
 			cacheProps |= EToCacheNodeProps.Attributes;
 		}
-		if (this._segment.containsText != null) {
+		if (this._segment.text != null) {
 			matchCriteria |= ETokenMatchCriteria.Text;
 		}
 		if (this._segment.predicate != null) {
@@ -50,31 +51,46 @@ export class TokenSelectState {
 	public matchesName(local: string, prefix: string): boolean {
 		return (
 			// Match local
-			(this._segment.local == null ||
-				this._segment.local === '*' ||
-				this._segment.local === local) &&
+			(this._segment.local == null || matchString(local, this._segment.local)) &&
 			// Match prefix
-			(this._segment.prefix == null || this._segment.prefix === prefix)
+			(this._segment.prefix == null || matchString(prefix, this._segment.prefix))
 		);
 	}
 
-	public matchesAttributes(attributes: Record<string, string>): boolean {
-		if (this._segment.attributes != null) {
-			for (const attribute of this._segment.attributes) {
-				const qName = getQName(attribute.local, attribute.prefix);
-				if (
-					!(qName in attributes) ||
-					(attribute.value != null && attributes[qName] !== attribute.value)
-				) {
-					return false;
+	public matchesAttributes(attributes: TCachedAttribute[]): boolean {
+		if (this._segment.attributes == null) {
+			return true;
+		}
+
+		for (const attributeConfig of this._segment.attributes) {
+			let matchFound = false;
+
+			for (const attribute of attributes) {
+				const localMatch =
+					attributeConfig.local == null || matchString(attribute.local, attributeConfig.local);
+				const valueMatch =
+					attributeConfig.value == null ||
+					(attribute.value != null && matchString(attribute.value, attributeConfig.value));
+				const prefixMatch =
+					attributeConfig.prefix == null ||
+					(attribute.prefix != null && matchString(attribute.prefix, attributeConfig.prefix));
+
+				if (localMatch && valueMatch && prefixMatch) {
+					matchFound = true;
+					break;
 				}
 			}
+
+			if (!matchFound) {
+				return false;
+			}
 		}
+
 		return true;
 	}
 
 	public matchesText(text: string): boolean {
-		return this._segment.containsText == null || text.includes(this._segment.containsText);
+		return this._segment.text == null || matchString(text, this._segment.text);
 	}
 
 	public matchesDepth(depth: number, parentDepth: number): boolean {

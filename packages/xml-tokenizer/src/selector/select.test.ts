@@ -195,7 +195,7 @@ describe('select function', () => {
 				[
 					{ axis: 'child', local: 'bookstore' },
 					{ axis: 'child', local: 'book' },
-					{ axis: 'child', local: 'title', containsText: 'Harry Potter' }
+					{ axis: 'child', local: 'title', text: 'Harry Potter' }
 				]
 			],
 			`<title lang="en">Harry Potter</title>`
@@ -274,7 +274,7 @@ describe('select function', () => {
 			[
 				[
 					{ axis: 'self-or-descendant', local: 'book' },
-					{ axis: 'child', local: 'title', containsText: 'Harry Potter' }
+					{ axis: 'child', local: 'title', text: 'Harry Potter' }
 				]
 			],
 			`<title lang="en">Harry Potter</title>`
@@ -284,7 +284,7 @@ describe('select function', () => {
 	it("should match //*[contains(text(),'Harry Potter')]", () => {
 		assertSelection(
 			bookStoreXml,
-			[[{ axis: 'self-or-descendant', local: '*', containsText: 'Harry Potter' }]],
+			[[{ axis: 'self-or-descendant', local: { matchStrategy: 'ANY' }, text: 'Harry Potter' }]],
 			`<title lang="en">Harry Potter</title>`
 		);
 	});
@@ -308,7 +308,7 @@ describe('select function', () => {
 			[
 				[
 					{ axis: 'child', local: 'bookstore' },
-					{ axis: 'child', local: '*' },
+					{ axis: 'child', local: { matchStrategy: 'ANY' } },
 					{ axis: 'child', local: 'title' }
 				]
 			],
@@ -340,7 +340,7 @@ describe('select function', () => {
 	it('should match //test:*', () => {
 		assertSelection(
 			namespaceXml,
-			[[{ axis: 'self-or-descendant', local: '*', prefix: 'test' }]],
+			[[{ axis: 'self-or-descendant', local: { matchStrategy: 'ANY' }, prefix: 'test' }]],
 			`<test:node>
         </test:node>`
 		);

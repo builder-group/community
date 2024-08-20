@@ -1,6 +1,10 @@
 import { type TXmlToken } from '../tokenizer';
 
-export type TSelectedXmlToken = TXmlToken | { type: 'SelectionStart' } | { type: 'SelectionEnd' };
+export type TSelectedXmlToken = (
+	| TXmlToken
+	| { type: 'SelectionStart' }
+	| { type: 'SelectionEnd' }
+) & { key?: string };
 
 export type TSelectedTokenCallback = (token: TSelectedXmlToken) => void;
 
@@ -22,6 +26,8 @@ export type TSelectedTokenCallback = (token: TSelectedXmlToken) => void;
 // If a string-based XPath implementation is wished,
 // tools like [Peggy](https://github.com/peggyjs/peggy) could be utilized.
 export interface TTokenSelectPathSegment {
+	key?: string;
+
 	/**
 	 * Specifies the axis defining the relationship between nodes.
 	 *
@@ -31,16 +37,14 @@ export interface TTokenSelectPathSegment {
 	axis: 'child' | 'self-or-descendant';
 
 	/**
-	 * The local name of the node to match.
-	 *
-	 * Use '*' to match any node.
+	 * Optional local name of the node to match.
 	 */
-	local?: string | '*';
+	local?: TStringMatch;
 
 	/**
-	 * An optional namespace prefix to qualify the node name.
+	 * Optional namespace prefix to qualify the node name.
 	 */
-	prefix?: string;
+	prefix?: TStringMatch;
 
 	/**
 	 * Optional filters based on node attributes.
@@ -49,7 +53,7 @@ export interface TTokenSelectPathSegment {
 	 * // Matches a node with an attribute 'category' equal to 'fiction'
 	 * attributes: [\{ local: 'category', value: 'fiction' \}]
 	 */
-	attributes?: { local: string; prefix?: string; value?: string }[];
+	attributes?: { local?: TStringMatch; prefix?: TStringMatch; value?: TStringMatch }[];
 
 	/**
 	 * Optional filter to match nodes containing specific text content.
@@ -61,7 +65,7 @@ export interface TTokenSelectPathSegment {
 	 * // Matches nodes containing the text 'bestseller'
 	 * containsText: 'bestseller'
 	 */
-	containsText?: string;
+	text?: TStringMatch;
 
 	/**
 	 * Optional custom predicate function to further filter nodes.
@@ -83,26 +87,12 @@ export interface TTokenSelectPathSegment {
  */
 export type TTokenSelectPath = TTokenSelectPathSegment[];
 
-// TODO: Add actual selectors?
+export type TStringMatchStrategy = 'EXACT' | 'CONTAINS' | 'STARTS_WITH' | 'ENDS_WITH' | 'ANY';
 
-// export interface TTokenSelectTemplate {
-// 	path: TTokenSelectPath;
-// 	select: Record<string, TTokenSelectItem>;
-// }
-
-// export type TTokenSelectItem = TSelectAttributeItem | TSelectTextItem | TSelectRawTextItem;
-
-// export interface TSelectAttributeItem {
-// 	type: 'Attribute';
-// 	local: string;
-// 	prefix?: string;
-// 	value?: string;
-// }
-
-// export interface TSelectTextItem {
-// 	type: 'Text';
-// }
-
-// export interface TSelectRawTextItem {
-// 	type: 'Raw';
-// }
+export type TStringMatch =
+	| string
+	| { matchStrategy: 'ANY' }
+	| {
+			matchStrategy: Exclude<TStringMatchStrategy, 'ANY'>;
+			value: string;
+	  };
