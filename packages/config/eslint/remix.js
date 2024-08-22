@@ -101,6 +101,9 @@ module.exports = {
 	// 	}
 	// ],
 	rules: {
+		// Typescript
+		'@typescript-eslint/only-throw-error': OFF, // Often required in loader functions, ..
+
 		// EsLint
 		'import/no-default-export': OFF,
 
