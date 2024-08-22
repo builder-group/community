@@ -45,6 +45,13 @@
 		"vitest": "^1.6.0"
 	},
 	"packageManager": "pnpm@9.2.0",
+	"pnpm": {
+		"updateConfig": {
+			"ignoreDependencies": [
+				"eslint"
+			]
+		}
+	},
 	"engines": {
 		"node": ">=20"
 	}

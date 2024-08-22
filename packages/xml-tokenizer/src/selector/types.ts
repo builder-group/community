@@ -67,19 +67,19 @@ export interface TTokenSelectPathSegment {
 	 */
 	text?: TStringMatch;
 
-	/**
-	 * Optional custom predicate function to further filter nodes.
-	 *
-	 * @example
-	 * // Custom predicate to match nodes with specific characteristics
-	 * predicate: (node) =\> node.local === 'title'
-	 */
-	predicate?: (node: {
-		local: string;
-		prefix?: string;
-		attributes: Record<string, string>;
-		text?: string;
-	}) => boolean;
+	// /**
+	//  * Optional custom predicate function to further filter nodes.
+	//  *
+	//  * @example
+	//  * // Custom predicate to match nodes with specific characteristics
+	//  * predicate: (node) =\> node.local === 'title'
+	//  */
+	// predicate?: (node: {
+	// 	local: string;
+	// 	prefix?: string;
+	// 	attributes: { local: string; prefix: string; value: string }[];
+	// 	text?: string;
+	// }) => boolean;
 }
 
 /**
