@@ -1,15 +1,18 @@
 import type { TUnionToIntersection } from '@blgc/types/utils';
 
 import type { TApiFeature } from './api';
+import { type TGraphQLFeature } from './graphql';
 import type { TOpenApiFeature } from './openapi';
 
 export * from './api';
+export * from './graphql';
 export * from './openapi';
 
 export type TFeatures<GPaths extends object = object> = {
 	base: { _: null }; // TODO: Placeholder Feature: Figure out how to make the TS infer work with [] (empty array -> no feature)
 	api: TApiFeature;
 	openapi: TOpenApiFeature<GPaths>;
+	graphql: TGraphQLFeature;
 	retry: { _: null };
 	delay: { _: null };
 } & TThirdPartyFeatures<GPaths>;
