@@ -1,1 +1,3 @@
-export const gql = (strings: TemplateStringsArray): string | undefined => strings[0];
+export const gql = (strings: TemplateStringsArray): string => {
+	return strings.raw[0] ?? '';
+};
