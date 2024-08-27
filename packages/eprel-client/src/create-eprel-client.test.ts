@@ -48,7 +48,6 @@ describe('createEPRELClient function tests', () => {
 			},
 			parseAs: 'json'
 		});
-		const data = productLabelsResult.unwrap().data;
 		expect(productLabelsResult.isOk()).toBeTruthy();
 	});
 
@@ -58,7 +57,8 @@ describe('createEPRELClient function tests', () => {
 			{
 				pathParams: {
 					registrationNumber: '15414'
-				}
+				},
+				parseAs: 'blob'
 			}
 		);
 		expect(productNestedLabelResult.isOk()).toBeTruthy();

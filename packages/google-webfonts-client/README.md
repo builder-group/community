@@ -42,13 +42,7 @@ const client = createGoogleWebfontsClient({
 Fetches the available web fonts from the Google Fonts API.
 
 ```ts
-const fontsResponse = await client.getWebFonts();
-
-if (fontsResponse.isOk()) {
-    console.log('Available fonts:', fontsResponse.value.data.items);
-} else {
-    console.error('Error fetching fonts:', fontsResponse.error.message);
-}
+const webFonts = await client.getWebFonts();
 ```
 
 ### Fetch Font File URL
@@ -56,17 +50,10 @@ if (fontsResponse.isOk()) {
 Fetches the URL of a specific font file based on the provided family, weight, and style.
 
 ```ts
-const urlResponse = await client.getFontFileUrl('Roboto Serif', {
+const fontUrl = await client.getFontFileUrl('Roboto Serif', {
     fontWeight: 400,
     fontStyle: 'regular'
 });
-
-if (urlResponse.isOk()) {
-    const fontUrl = urlResponse.value;
-    console.log('Font URL:', fontUrl);
-} else {
-    console.error('Error fetching font URL:', urlResponse.error.message);
-}
 ```
 
 ### Download a Font File
@@ -74,17 +61,10 @@ if (urlResponse.isOk()) {
 Use the client to download a font file, specifying the font family, weight, and style.
 
 ```ts
-const fileResponse = await client.downloadFontFile('Roboto Serif', {
+const fontFile = await client.downloadFontFile('Roboto Serif', {
     fontWeight: 100,
     fontStyle: 'italic'
 });
-
-if (fileResponse.isOk()) {
-    const fontFile = fileResponse.value;
-    console.log('Font file downloaded:', fontFile);
-} else {
-    console.error('Error downloading font file:', fileResponse.error.message);
-}
 ```
 
 ### Error Handling
@@ -97,8 +77,10 @@ Errors can occur during API requests, and the client will return detailed error 
 
 ```ts
 try {
-  const data = urlResponse.unwrap();
-  console.log(data);
+  const fontUrl = await client.getFontFileUrl('Roboto Serif', {
+    fontWeight: 400,
+    fontStyle: 'regular'
+  });
 } catch (error) {
   if (error instanceof NetworkError) {
     console.error('Network error:', error.message);

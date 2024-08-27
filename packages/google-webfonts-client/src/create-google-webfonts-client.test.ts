@@ -8,22 +8,20 @@ describe('createGoogleWebfontsClient function tests', () => {
 			apiKey: 'YOUR_API_KEY'
 		});
 
-		const fileResponse = await client.downloadFontFile('Roboto Serif', {
+		const fontFile = await client.downloadFontFile('Roboto Serif', {
 			fontWeight: 100,
 			fontStyle: 'italic'
 		});
 
-		const urlResponse = await client.getFontFileUrl('Roboto Serif', {
+		const fontUrl = await client.getFontFileUrl('Roboto Serif', {
 			fontWeight: 400,
 			fontStyle: 'regular'
 		});
 
-		const webfontsResponse = await client.get('/webfonts', {
-			queryParams: {
-				key: 'test'
-			}
+		const webFontsResult = await client.get('/webfonts', {
+			queryParams: {}
 		});
 
-		expect(fileResponse).not.toBeNull();
+		expect(fontFile).not.toBeNull();
 	});
 });
