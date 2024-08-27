@@ -19,7 +19,7 @@
 
 > Status: Experimental
 
-`eprel-client` is a typesafe and straightforward fetch client for interacting  with the European Product Registry for Energy Labelling (EPREL) API using [`feature-fetch`](https://github.com/builder-group/monorepo/tree/develop/packages/feature-fetch). This client provides typesafe methods for fetching and downloading Google Fonts.
+`eprel-client` is a typesafe and straightforward fetch client for interacting  with the European Product Registry for Energy Labelling (EPREL) API using [`feature-fetch`](https://github.com/builder-group/monorepo/tree/develop/packages/feature-fetch). 
 
 - [EPREL API Docs](https://webgate.ec.europa.eu/fpfis/wikis/display/EPREL/EPREL+Public+site+-+API)
 
@@ -42,7 +42,7 @@ const client = createEPRELClient({
 Fetches the available product groups from the ERAP API.
 
 ```ts
-const products = await client.getProductGroups();
+const productGroups = await client.getProductGroups();
 ```
 
 ### Error Handling
@@ -55,7 +55,7 @@ Errors can occur during API requests, and the client will return detailed error 
 
 ```ts
 try {
-  const products = await client.getProductGroups();
+  const productGroups = await client.getProductGroups();
 } catch (error) {
   if (error instanceof NetworkError) {
     console.error('Network error:', error.message);
