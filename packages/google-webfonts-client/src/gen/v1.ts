@@ -11,20 +11,22 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Retrieve the list of fonts */
+        /**
+         * Retrieve the list of fonts
+         * @description Returns a list of available font families, optionally filtered and sorted based on query parameters.
+         *
+         */
         get: {
             parameters: {
-                query: {
-                    /** @description Your developer API Key. */
-                    key: string;
-                    /** @description Name of a font family. */
-                    family?: string;
-                    /** @description Name of a font subset. */
-                    subset?: string;
-                    /** @description Type of font source file. */
-                    capability?: "VF" | "WOFF2";
-                    /** @description alpha | date | popularity | style | trending. */
-                    sort?: "alpha" | "date" | "popularity" | "style" | "trending";
+                query?: {
+                    /** @description Name of a font family to filter results. */
+                    family?: components["parameters"]["Family"];
+                    /** @description Name of a font subset to filter results. */
+                    subset?: components["parameters"]["Subset"];
+                    /** @description Type of font source file to filter results. */
+                    capability?: components["parameters"]["Capability"];
+                    /** @description Sorting order for the results. */
+                    sort?: components["parameters"]["Sort"];
                 };
                 header?: never;
                 path?: never;
@@ -32,57 +34,18 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description A list of fonts */
+                /** @description A successful response containing the list of fonts */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @description The kind of object, a webfont object. */
-                            kind?: string;
-                            items?: {
-                                /** @description The name of the family. */
-                                family?: string;
-                                /** @description A list of scripts supported by the family. */
-                                subsets?: string[];
-                                /** @description A url to the family subset covering only the name of the family. */
-                                menu?: string;
-                                /** @description The different styles available for the family. */
-                                variants?: string[];
-                                /** @description The font family version. */
-                                version?: string;
-                                /**
-                                 * Format: date
-                                 * @description The date (format "yyyy-MM-dd") the font family was modified for the last time.
-                                 */
-                                lastModified?: string;
-                                /** @description The font family files (with all supported scripts) for each one of the available variants. */
-                                files?: {
-                                    [key: string]: string | undefined;
-                                };
-                                /** @description Category of the font (ex: sans-serif, monospace). */
-                                category?: string;
-                                /** @description The kind of object, a webfont object. */
-                                kind?: string;
-                                axes?: {
-                                    /** @description Tag of the variable font axis. */
-                                    tag?: string;
-                                    /**
-                                     * Format: float
-                                     * @description Start of the range of the variable font axis.
-                                     */
-                                    start?: number;
-                                    /**
-                                     * Format: float
-                                     * @description End of the range of the variable font axis.
-                                     */
-                                    end?: number;
-                                }[];
-                            }[];
-                        };
+                        "application/json": components["schemas"]["WebfontList"];
                     };
                 };
+                400: components["responses"]["BadRequest"];
+                401: components["responses"]["Unauthorized"];
+                403: components["responses"]["Forbidden"];
             };
         };
         put?: never;
@@ -96,9 +59,103 @@ export interface paths {
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
-    responses: never;
-    parameters: never;
+    schemas: {
+        WebfontList: {
+            /** @description The kind of object, always "webfonts#webfontList". */
+            kind?: string;
+            items?: components["schemas"]["Webfont"][];
+        };
+        Webfont: {
+            /** @description The name of the font family. */
+            family?: string;
+            /** @description A list of scripts supported by the family. */
+            subsets?: string[];
+            /**
+             * Format: uri
+             * @description A URL to the family subset covering only the name of the family.
+             */
+            menu?: string;
+            /** @description The different styles available for the family. */
+            variants?: string[];
+            /** @description The font family version. */
+            version?: string;
+            /**
+             * Format: date
+             * @description The date (format "yyyy-MM-dd") the font family was last modified.
+             */
+            lastModified?: string;
+            /** @description The font family files for each available variant. */
+            files?: {
+                [key: string]: string;
+            };
+            /** @description Category of the font (e.g., sans-serif, monospace). */
+            category?: string;
+            /** @description The kind of object, always "webfonts#webfont". */
+            kind?: string;
+            /** @description Axis information for variable fonts. */
+            axes?: components["schemas"]["Axis"][];
+        };
+        Axis: {
+            /** @description Tag of the variable font axis. */
+            tag?: string;
+            /**
+             * Format: float
+             * @description Start of the range of the variable font axis.
+             */
+            start?: number;
+            /**
+             * Format: float
+             * @description End of the range of the variable font axis.
+             */
+            end?: number;
+        };
+        Error: {
+            error?: {
+                code?: number;
+                message?: string;
+                status?: string;
+            };
+        };
+    };
+    responses: {
+        /** @description Bad request. Invalid parameters. */
+        BadRequest: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Unauthorized. Invalid or missing API key. */
+        Unauthorized: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Forbidden. Insufficient permissions. */
+        Forbidden: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+    };
+    parameters: {
+        /** @description Name of a font family to filter results. */
+        Family: string;
+        /** @description Name of a font subset to filter results. */
+        Subset: string;
+        /** @description Type of font source file to filter results. */
+        Capability: "VF" | "WOFF2";
+        /** @description Sorting order for the results. */
+        Sort: "alpha" | "date" | "popularity" | "style" | "trending";
+    };
     requestBodies: never;
     headers: never;
     pathItems: never;

@@ -1,12 +1,12 @@
 {
-	"name": "google-webfonts-client",
-	"description": "Typesafe and straightforward fetch client for interacting with the Google Web Fonts API using feature-fetch",
-	"version": "0.0.15",
+	"name": "eprel-client",
+	"description": "Typesafe and straightforward fetch client for interacting with the European Product Registry for Energy Labelling (EPREL) API using feature-fetch",
+	"version": "0.0.2",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
 		"start:dev": "tsc -w",
-		"openapi:gen": "npx openapi-typescript ./resources/openapi-v1.yaml -o ./src/gen/v1.ts",
+		"openapi:gen": "npx openapi-typescript ./resources/openapi_v1-0-58.yaml -o ./src/gen/v1.ts",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",

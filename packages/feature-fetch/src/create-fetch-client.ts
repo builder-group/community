@@ -22,6 +22,7 @@ import type {
 	TQueryParams,
 	TSerializedBody
 } from './types';
+import { type TRequestInitWithHeadersObject } from './types/fetch';
 
 export function createFetchClient<GPaths extends object = object>(
 	options: TFetchClientOptions = {}
@@ -85,7 +86,7 @@ export function createFetchClient<GPaths extends object = object>(
 			}
 
 			// Build request init object
-			let requestInit: RequestInit = {
+			let requestInit: TRequestInitWithHeadersObject = {
 				redirect: 'follow',
 				...this._config.fetchProps,
 				...fetchProps,
@@ -97,7 +98,7 @@ export function createFetchClient<GPaths extends object = object>(
 			// Remove `Content-Type` if body is FormData.
 			// Browser will correctly set Content-Type & boundary expression.
 			if (typeof FormData !== 'undefined' && requestInit.body instanceof FormData) {
-				mergedHeaders.delete('Content-Type');
+				delete requestInit.headers['Content-Type'];
 			}
 
 			// Process before request middlewares
