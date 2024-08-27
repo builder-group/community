@@ -1,7 +1,7 @@
 {
 	"name": "feature-logger",
 	"description": "Straightforward, typesafe, and feature-based logging library",
-	"version": "0.0.20",
+	"version": "0.0.21",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
