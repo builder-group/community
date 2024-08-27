@@ -3,7 +3,12 @@ import { type TResult } from '@blgc/utils';
 import type { FetchError, NetworkError, RequestError } from '../exceptions';
 import type { FetchHeaders } from '../helper';
 import type { TFeatureKeys, TSelectFeatures } from './features';
-import { type TParseAs, type TParseAsResponse, type TRequestMethod } from './fetch';
+import {
+	type TParseAs,
+	type TParseAsResponse,
+	type TRequestInitWithHeadersObject,
+	type TRequestMethod
+} from './fetch';
 
 export type TFetchClient<
 	GSelectedFeatureKeys extends TFeatureKeys[],
@@ -74,7 +79,7 @@ export type TBeforeRequestMiddleware = (
 ) => Promise<Partial<TBeforeRequestMiddlewareData>>;
 
 export interface TBeforeRequestMiddlewareData {
-	requestInit: RequestInit;
+	requestInit: TRequestInitWithHeadersObject;
 	pathParams?: TPathParams;
 	queryParams?: TQueryParams;
 }

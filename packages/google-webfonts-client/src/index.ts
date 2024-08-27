@@ -4,11 +4,12 @@ import type { paths } from './gen/v1';
 
 export * from 'feature-fetch';
 export * from './create-google-webfonts-client';
+export * from './with-google-webfonts';
 
 declare module 'feature-fetch' {
 	interface TThirdPartyFeatures<GPaths> {
 		'google-webfonts': {
-			rawFetchClient: TFetchClient<['base', 'api']>;
+			raw: TFetchClient<['base', 'api']>;
 			getWebFonts(
 				options?: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>
 			): Promise<TOpenApiFetchResponse<paths['/webfonts']['get'], 'json'>>;
