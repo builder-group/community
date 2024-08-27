@@ -1,5 +1,11 @@
 # @blgc/config
 
+## 0.0.22
+
+### Patch Changes
+
+- [#68](https://github.com/builder-group/community/pull/68) [`3af0165`](https://github.com/builder-group/community/commit/3af0165843a03c051520ae35a15d5d76b874f804) Thanks [@bennobuilder](https://github.com/bennobuilder)! - Updated vitest config to esm (enforced)
+
 ## 0.0.17
 
 ### Patch Changes
