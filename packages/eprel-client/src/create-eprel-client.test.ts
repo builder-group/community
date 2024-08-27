@@ -13,6 +13,7 @@ describe('createEPRELClient function tests', () => {
 
 	it('should retrieve product groups successfully', async () => {
 		const productsResult = await client.get('/product-groups');
+		const productGroups = await client.getProductGroups();
 		expect(productsResult.isOk()).toBeTruthy();
 	});
 
@@ -22,6 +23,7 @@ describe('createEPRELClient function tests', () => {
 				registrationNumber: '15414'
 			}
 		});
+		const product = await client.getProductByRegistrationNumber('15414');
 		expect(productResult.isOk()).toBeTruthy();
 	});
 
@@ -35,6 +37,7 @@ describe('createEPRELClient function tests', () => {
 			},
 			parseAs: 'json'
 		});
+		const productFiches = await client.getProductFiches('15414', { noRedirect: true });
 		expect(productFichesResult.isOk()).toBeTruthy();
 	});
 
@@ -48,6 +51,7 @@ describe('createEPRELClient function tests', () => {
 			},
 			parseAs: 'json'
 		});
+		const productLabels = await client.getProductLabels('15414', { noRedirect: true });
 		expect(productLabelsResult.isOk()).toBeTruthy();
 	});
 
@@ -61,17 +65,19 @@ describe('createEPRELClient function tests', () => {
 				parseAs: 'blob'
 			}
 		);
+		const productNestedLabel = await client.getNestedLabel('15414');
 		expect(productNestedLabelResult.isOk()).toBeTruthy();
 	});
 
 	it('should retrieve products in a product group successfully', async () => {
-		const productsInProductGroup = await client.get('/products/{productGroup}', {
+		const productsInProductGroupResult = await client.get('/products/{productGroup}', {
 			pathParams: {
 				productGroup: 'airconditioners'
 			},
 			queryParams: {}
 		});
-		expect(productsInProductGroup.isOk()).toBeTruthy();
+		const productsIngroup = await client.getModelsInProductGroup('airconditioners');
+		expect(productsInProductGroupResult.isOk()).toBeTruthy();
 	});
 });
 

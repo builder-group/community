@@ -84,7 +84,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		},
 
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100857
-		async getProductFiche(
+		async getProductFiches(
 			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
 			registrationNumber: TRegistrationNumber,
 			options: {
@@ -92,18 +92,18 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 				language?: TLanguage;
 			} = {}
 		) {
-			const { noRedirect, language } = options;
+			const { noRedirect = false, language } = options;
 			const result = await this.get('/product/{registrationNumber}/fiches', {
 				pathParams: { registrationNumber },
 				queryParams: { noRedirect, language },
 				parseAs: noRedirect ? 'json' : 'arrayBuffer'
 			});
 			const data = result.unwrap().data;
-			return data instanceof ArrayBuffer ? new Uint8Array(data) : (data as TFileAddress);
+			return data instanceof ArrayBuffer ? (new Uint8Array(data) as any) : (data as TFileAddress);
 		},
 
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100858
-		async getProductLabel(
+		async getProductLabels(
 			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
 			registrationNumber: TRegistrationNumber,
 			options: {
@@ -127,7 +127,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 				parseAs: noRedirect ? 'json' : 'arrayBuffer'
 			});
 			const data = result.unwrap().data;
-			return data instanceof ArrayBuffer ? new Uint8Array(data) : (data as TFileAddress);
+			return data instanceof ArrayBuffer ? (new Uint8Array(data) as any) : (data as TFileAddress);
 		},
 
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100859

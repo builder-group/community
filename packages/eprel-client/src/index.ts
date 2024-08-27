@@ -34,24 +34,28 @@ declare module 'feature-fetch' {
 				registrationNumber: TRegistrationNumber
 			): Promise<components['schemas']['ModelDetails']>;
 
-			getProductFiche(
-				registrationNumber: TRegistrationNumber,
-				options?: {
+			getProductFiches<
+				GOptions extends {
 					noRedirect?: boolean;
 					language?: TLanguage;
-				}
-			): Promise<TFileAddress | Uint8Array>;
-
-			getProductLabel(
+				} = {}
+			>(
 				registrationNumber: TRegistrationNumber,
-				options?: {
+				options?: GOptions
+			): Promise<TReturnType<GOptions>>;
+
+			getProductLabels<
+				GOptions extends {
 					noRedirect?: boolean;
 					format?: TLabelFormat;
 					instance?: number;
 					supplier_label?: boolean;
 					type?: TLabelType;
-				}
-			): Promise<TFileAddress | Uint8Array>;
+				} = {}
+			>(
+				registrationNumber: TRegistrationNumber,
+				options?: GOptions
+			): Promise<TReturnType<GOptions>>;
 
 			getNestedLabel(registrationNumber: TRegistrationNumber): Promise<Uint8Array>;
 
@@ -59,3 +63,9 @@ declare module 'feature-fetch' {
 		};
 	}
 }
+
+type TReturnType<GOptions> = GOptions extends { noRedirect?: boolean }
+	? GOptions['noRedirect'] extends true
+		? TFileAddress
+		: Uint8Array
+	: Uint8Array;
