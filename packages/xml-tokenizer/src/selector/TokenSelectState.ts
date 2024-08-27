@@ -39,10 +39,10 @@ export class TokenSelectState {
 		if (this._segment.text != null) {
 			matchCriteria |= ETokenMatchCriteria.Text;
 		}
-		if (this._segment.predicate != null) {
-			matchCriteria |= ETokenMatchCriteria.Node;
-			cacheProps |= EToCacheNodeProps.Name | EToCacheNodeProps.Attributes | EToCacheNodeProps.Text;
-		}
+		// if (this._segment.predicate != null) {
+		// 	matchCriteria |= ETokenMatchCriteria.Node;
+		// 	cacheProps |= EToCacheNodeProps.Name | EToCacheNodeProps.Attributes | EToCacheNodeProps.Text;
+		// }
 
 		this._matchCriteria = matchCriteria;
 		this._toCacheNodeProps = cacheProps;
