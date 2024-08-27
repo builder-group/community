@@ -15,3 +15,7 @@ export type TParseAsResponse<
 	GParseAs extends TParseAs,
 	GJson = unknown
 > = TBodyType<GJson>[GParseAs];
+
+export type TRequestInitWithHeadersObject = Omit<RequestInit, 'headers'> & {
+	headers: Record<string, string[]>;
+};

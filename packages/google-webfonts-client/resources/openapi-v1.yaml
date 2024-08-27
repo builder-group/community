@@ -1,0 +1,167 @@
+openapi: 3.0.3
+info:
+  title: Google Fonts Developer API
+  description: |
+    This API provides access to metadata for all font families served by Google Fonts.
+  version: 1.0.0
+servers:
+  - url: https://www.googleapis.com/webfonts/v1
+security:
+  - ApiKeyAuth: []
+paths:
+  /webfonts:
+    get:
+      summary: Retrieve the list of fonts
+      description: |
+        Returns a list of available font families, optionally filtered and sorted based on query parameters.
+      parameters:
+        - $ref: '#/components/parameters/Family'
+        - $ref: '#/components/parameters/Subset'
+        - $ref: '#/components/parameters/Capability'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: A successful response containing the list of fonts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebfontList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: query
+      name: key
+  parameters:
+    Family:
+      name: family
+      in: query
+      schema:
+        type: string
+      description: Name of a font family to filter results.
+    Subset:
+      name: subset
+      in: query
+      schema:
+        type: string
+      description: Name of a font subset to filter results.
+    Capability:
+      name: capability
+      in: query
+      schema:
+        type: string
+        enum: [VF, WOFF2]
+      description: Type of font source file to filter results.
+    Sort:
+      name: sort
+      in: query
+      schema:
+        type: string
+        enum: [alpha, date, popularity, style, trending]
+      description: Sorting order for the results.
+  schemas:
+    WebfontList:
+      type: object
+      properties:
+        kind:
+          type: string
+          description: The kind of object, always "webfonts#webfontList".
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Webfont'
+    Webfont:
+      type: object
+      properties:
+        family:
+          type: string
+          description: The name of the font family.
+        subsets:
+          type: array
+          items:
+            type: string
+          description: A list of scripts supported by the family.
+        menu:
+          type: string
+          format: uri
+          description: A URL to the family subset covering only the name of the family.
+        variants:
+          type: array
+          items:
+            type: string
+          description: The different styles available for the family.
+        version:
+          type: string
+          description: The font family version.
+        lastModified:
+          type: string
+          format: date
+          description: The date (format "yyyy-MM-dd") the font family was last modified.
+        files:
+          type: object
+          additionalProperties:
+            type: string
+            format: uri
+          description: The font family files for each available variant.
+        category:
+          type: string
+          description: Category of the font (e.g., sans-serif, monospace).
+        kind:
+          type: string
+          description: The kind of object, always "webfonts#webfont".
+        axes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Axis'
+          description: Axis information for variable fonts.
+    Axis:
+      type: object
+      properties:
+        tag:
+          type: string
+          description: Tag of the variable font axis.
+        start:
+          type: number
+          format: float
+          description: Start of the range of the variable font axis.
+        end:
+          type: number
+          format: float
+          description: End of the range of the variable font axis.
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+            message:
+              type: string
+            status:
+              type: string
+  responses:
+    BadRequest:
+      description: Bad request. Invalid parameters.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized. Invalid or missing API key.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Forbidden. Insufficient permissions.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

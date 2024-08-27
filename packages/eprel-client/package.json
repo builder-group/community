@@ -1,0 +1,51 @@
+{
+	"name": "eprel-client",
+	"description": "Typesafe and straightforward fetch client for interacting with the European Product Registry for Energy Labelling (EPREL) API using feature-fetch",
+	"version": "0.0.2",
+	"private": false,
+	"scripts": {
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"start:dev": "tsc -w",
+		"openapi:gen": "npx openapi-typescript ./resources/openapi_v1-0-58.yaml -o ./src/gen/v1.ts",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"size": "size-limit --why"
+	},
+	"source": "./src/index.ts",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/builder-group/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennobuilder",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/builder-group/monorepo/issues"
+	},
+	"homepage": "https://builder.group/?source=package-json",
+	"dependencies": {
+		"feature-fetch": "workspace:*"
+	},
+	"devDependencies": {
+		"@blgc/config": "workspace:*",
+		"@types/node": "^22.5.0",
+		"dotenv": "^16.4.5",
+		"openapi-typescript": "^7.3.0"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"size-limit": [
+		{
+			"path": "dist/esm/index.js"
+		}
+	]
+}

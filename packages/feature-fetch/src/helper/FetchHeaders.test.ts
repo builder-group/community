@@ -73,7 +73,7 @@ describe('FetchHeaders class', () => {
 		const headers = new FetchHeaders();
 		headers.append('Accept', 'application/json');
 		const headersInit = headers.toHeadersInit();
-		expect(headersInit).toEqual({ accept: 'application/json' });
+		expect(headersInit).toEqual({ accept: ['application/json'] });
 	});
 
 	it('should handle multiple values for the same header correctly', () => {
@@ -83,8 +83,8 @@ describe('FetchHeaders class', () => {
 		headers.append('Content-Type', 'application/x-www-form-urlencoded');
 		const headersInit = headers.toHeadersInit();
 		expect(headersInit).toEqual({
-			'accept': 'application/json, text/plain',
-			'content-type': 'application/x-www-form-urlencoded'
+			'accept': ['application/json', 'text/plain'],
+			'content-type': ['application/x-www-form-urlencoded']
 		});
 	});
 
@@ -135,10 +135,7 @@ describe('FetchHeaders class', () => {
 		const headers1 = new FetchHeaders([['Accept', 'application/json']]);
 		const headers2 = new FetchHeaders([['Accept', 'application/xml']]);
 		const merged = FetchHeaders.merge(headers1, headers2);
-		expect([...merged.getHeaders()]).toContainEqual([
-			'accept',
-			['application/json', 'application/xml']
-		]);
+		expect([...merged.headers]).toContainEqual(['accept', ['application/json', 'application/xml']]);
 	});
 
 	it('should retain multiple values for the same header when merged', () => {

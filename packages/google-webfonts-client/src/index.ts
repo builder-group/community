@@ -1,33 +1,46 @@
-import type { TFetchClient, TOpenApiFetchResponse, TResult } from 'feature-fetch';
+/* eslint-disable @typescript-eslint/method-signature-style -- Ok here */
+import type { TFetchClient } from 'feature-fetch';
 
-import type { paths } from './gen/v1';
+import type { components } from './gen/v1';
+import {
+	type TFontCapability,
+	type TFontFamily,
+	type TFontStyle,
+	type TFontSubset,
+	type TSort
+} from './types';
 
 export * from 'feature-fetch';
 export * from './create-google-webfonts-client';
+export * from './types';
+export * from './with-google-webfonts';
 
 declare module 'feature-fetch' {
 	interface TThirdPartyFeatures<GPaths> {
 		'google-webfonts': {
-			rawFetchClient: TFetchClient<['base', 'api']>;
-			getWebFonts(
-				options?: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>
-			): Promise<TOpenApiFetchResponse<paths['/webfonts']['get'], 'json'>>;
+			_apiFetchClient: TFetchClient<['base', 'api']>;
+			getWebFonts(options?: {
+				family?: TFontFamily;
+				subset?: TFontSubset;
+				capability?: TFontCapability;
+				sort?: TSort;
+			}): Promise<components['schemas']['WebfontList']>;
 			getFontFileUrl(
-				familiy: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>['family'],
+				familiy: TFontFamily,
 				options: {
 					fontWeight?: number;
-					fontStyle?: 'italic' | 'regular';
-					capability?: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>['capability'];
+					fontStyle?: TFontStyle;
+					capability?: TFontCapability;
 				}
-			): Promise<TResult<string | null, Error>>;
+			): Promise<string | null>;
 			downloadFontFile(
-				familiy: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>['family'],
+				familiy: TFontFamily,
 				options: {
 					fontWeight?: number;
-					fontStyle?: 'italic' | 'regular';
-					capability?: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>['capability'];
+					fontStyle?: TFontStyle;
+					capability?: TFontCapability;
 				}
-			): Promise<TResult<Uint8Array | null, Error>>;
+			): Promise<Uint8Array | null>;
 		};
 	}
 }

@@ -135,6 +135,51 @@ Enhance `feature-fetch` with [OpenAPI](https://www.openapis.org/) support to cre
    });
    ```
 
+### `withGraphQL()`
+
+Enhance `feature-fetch` to create a typesafe `fetch` wrapper specifically for GraphQL requests. This feature allows you to send GraphQL queries and mutations, ensuring requests and responses are typed.
+
+1. **Create a GraphQL Fetch Client**:
+   Use `withGraphQL` to extend your existing fetch client with GraphQL capabilities.
+
+   ```ts
+   import { withGraphQL, gql } from 'feature-fetch';
+   import createFetchClient from './createFetchClient';
+
+   const baseFetchClient = createFetchClient({
+       prefixUrl: 'https://api.example.com/v1/graphql'
+   });
+
+   const graphqlClient = withGraphQL(baseFetchClient);
+   ```
+
+2. **Define GraphQL Queries**:
+   Use the `gql` tagged template literal to define your GraphQL queries with syntax highlighting.
+
+   ```ts
+   const GET_USER = gql`
+     query GetUser($id: ID!) {
+       user(id: $id) {
+         id
+         name
+         email
+       }
+     }
+   `;
+   ```
+
+3. **Send GraphQL Requests**:
+   Use the GraphQL-enabled fetch client to send requests, specifying the response type for better type safety.
+
+   ```ts
+   // Send GraphQL query
+   const response = await graphqlClient.query<{id: number}, { user: { id: string; name: string; email: string } }>(GET_USER, {
+       variables: {
+           id: '123'
+       }
+   });
+   ```
+
 ## 🚨 Errors
 
 When handling API error responses (`response.isErr()`), `response` can be one of three [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) types, each representing a different kind of failure.

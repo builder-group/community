@@ -1,7 +1,7 @@
 {
 	"name": "@blgc/config",
 	"description": "Collection of ESLint, Vite and Typescript configurations",
-	"version": "0.0.17",
+	"version": "0.0.21",
 	"private": false,
 	"scripts": {
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
@@ -22,15 +22,15 @@
 	"homepage": "https://builder.group/?source=github",
 	"dependencies": {
 		"@vercel/style-guide": "^6.0.0",
-		"eslint-config-turbo": "^2.0.11",
-		"vite-tsconfig-paths": "^4.3.2"
+		"eslint-config-turbo": "^2.0.14",
+		"vite-tsconfig-paths": "^5.0.1"
 	},
 	"peerDependencies": {
 		"@next/eslint-plugin-next": "^14.2.5",
-		"@remix-run/eslint-config": "^2.11.0"
+		"eslint": "^8.57.0"
 	},
 	"devDependencies": {
-		"@next/eslint-plugin-next": "^14.2.3",
-		"@remix-run/eslint-config": "^2.11.0"
+		"@next/eslint-plugin-next": "^14.2.6",
+		"eslint": "^8.57.0"
 	}
 }

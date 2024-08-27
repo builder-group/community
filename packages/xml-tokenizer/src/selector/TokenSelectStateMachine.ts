@@ -1,4 +1,3 @@
-import { getQName } from '../get-q-name';
 import { type TXmlToken } from '../tokenizer';
 import { EToCacheNodeProps, ETokenMatchCriteria, TokenSelectState } from './TokenSelectState';
 import { type TTokenSelectPath } from './types';
@@ -95,8 +94,8 @@ export class TokenSelectStateMachine {
 			return false;
 		}
 
-		const attributes = this._cachedNodeProps.attributes ?? {};
-		attributes[getQName(local, prefix)] = value;
+		const attributes = this._cachedNodeProps.attributes ?? [];
+		attributes.push({ local, prefix, value });
 
 		// Cache attributes
 		if (nextState.toCacheNodeProps & EToCacheNodeProps.Attributes) {
@@ -195,9 +194,15 @@ export class TokenSelectStateMachine {
 	}
 }
 
-interface TCachedNodeProps {
+export interface TCachedNodeProps {
 	prefix: string | null;
 	local: string | null;
-	attributes: Record<string, string> | null;
+	attributes: TCachedAttribute[] | null;
 	text: string | null;
+}
+
+export interface TCachedAttribute {
+	local: string;
+	prefix?: string;
+	value?: string;
 }

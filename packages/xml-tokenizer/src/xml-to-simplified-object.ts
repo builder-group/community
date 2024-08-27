@@ -32,7 +32,7 @@ export function processTokenForSimplifiedObject(
 					currentNode.content = [currentNode.text, newNode];
 					delete currentNode.text;
 				} else if (currentNode[tagNameWithPrefix] == null) {
-					currentNode[tagNameWithPrefix] = newNode;
+					currentNode[tagNameWithPrefix] = [newNode];
 				} else if (Array.isArray(currentNode[tagNameWithPrefix])) {
 					currentNode[tagNameWithPrefix].push(newNode);
 				} else {
@@ -93,7 +93,7 @@ export interface TSimplifiedXmlNode {
 	text?: string;
 	content?: (string | TSimplifiedXmlNode)[];
 	// TODO: Do we need a prefix to make it typesafe?
-	[key: TSimplifiedXmlNodeTagName]: TSimplifiedXmlNode | TSimplifiedXmlNode[];
+	[key: TSimplifiedXmlNodeTagName]: TSimplifiedXmlNode[];
 }
 
-type TSimplifiedXmlNodeTagName = `_${string}`;
+export type TSimplifiedXmlNodeTagName = `_${string}`;
