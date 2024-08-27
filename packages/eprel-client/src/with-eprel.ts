@@ -14,7 +14,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	if (!hasFeatures(fetchClient, ['openapi'])) {
 		throw Error('FetchClient must have "openapi" feature to use withEPREL');
 	}
-	fetchClient._features.push('google-webfonts');
+	fetchClient._features.push('eprel');
 
 	const eprelFeature: TSelectFeatures<['eprel']> = {};
 

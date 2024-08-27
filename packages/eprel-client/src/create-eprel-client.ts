@@ -3,7 +3,7 @@ import { createOpenApiFetchClient, type TFetchClient } from 'feature-fetch';
 import type { paths } from './gen/v1';
 import { withEPREL } from './with-eprel';
 
-export function createGoogleWebfontsClient(
+export function createEPRELClient(
 	config: TEPRELClientConfig
 ): TFetchClient<['base', 'openapi', 'eprel'], paths> {
 	const { prefixUrl = 'https://eprel.ec.europa.eu/api', apiKey } = config;

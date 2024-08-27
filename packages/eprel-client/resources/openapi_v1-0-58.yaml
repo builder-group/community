@@ -474,6 +474,11 @@ components:
         $ref: '#/components/schemas/ProductGroup'
     ProductGroup:
       type: object
+      required:
+        - code
+        - url_code
+        - name
+        - regulation
       properties:
         code:
           type: string

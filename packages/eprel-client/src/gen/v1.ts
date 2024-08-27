@@ -517,13 +517,13 @@ export interface components {
         ProductGroupList: components["schemas"]["ProductGroup"][];
         ProductGroup: {
             /** @example AIR_CONDITIONER */
-            code?: string;
+            code: string;
             /** @example airconditioners */
-            url_code?: string;
+            url_code: string;
             /** @example Air conditioners */
-            name?: string;
+            name: string;
             /** @example Regulation (EU) 626/2011 */
-            regulation?: string;
+            regulation: string;
         };
         ModelsList: {
             /** @example 1 */

@@ -1,3 +1,4 @@
+import { type TMediaType } from '@blgc/types/api';
 import type {
 	TOperationErrorResponseContent,
 	TOperationPathParams,
@@ -75,8 +76,14 @@ export type TOpenApiDelete<GPaths extends object> = <
 // =============================================================================
 
 export type TOpenApiFetchResponse<GPathOperation, GParseAs extends TParseAs> = TFetchResponse<
-	TOperationSuccessResponseContent<GPathOperation>,
-	TOperationErrorResponseContent<GPathOperation>,
+	TOperationSuccessResponseContent<
+		GPathOperation,
+		GParseAs extends 'json' ? 'application/json' : TMediaType
+	>,
+	TOperationErrorResponseContent<
+		GPathOperation,
+		GParseAs extends 'json' ? 'application/json' : TMediaType
+	>,
 	GParseAs
 >;
 

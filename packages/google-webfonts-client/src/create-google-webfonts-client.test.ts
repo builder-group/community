@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createGoogleWebfontsClient } from './create-google-webfonts-client';
 
-describe('createGoogleClient function tests', () => {
+describe('createGoogleWebfontsClient function tests', () => {
 	it('should have correct types', async () => {
 		const client = createGoogleWebfontsClient({
 			apiKey: 'YOUR_API_KEY'
