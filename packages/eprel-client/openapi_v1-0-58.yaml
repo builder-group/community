@@ -1,0 +1,615 @@
+openapi: 3.0.3
+info:
+  title: EPREL Public API
+  description: |
+    API for accessing public data on energy labels from the European Product Registry for Energy Labelling (EPREL) database.
+    This API provides information about product groups, models, and their associated energy labels and product fiches.
+  version: "1.0.58"
+servers:
+  - url: https://public-energy-label-acceptance.ec.europa.eu/api
+    description: Acceptance environment
+  - url: https://eprel.ec.europa.eu/api
+    description: Production environment
+security:
+  - apiKeyAuth: []
+
+tags:
+  - name: Product Groups
+    description: Operations related to product groups
+  - name: Products
+    description: Operations related to products and models
+  - name: Documents
+    description: Operations for retrieving product fiches and labels
+
+paths:
+  # https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100854
+  /product-groups:
+    get:
+      summary: Get list of product groups
+      description: Returns a list of product groups with their associated regulation details.
+      tags:
+        - Product Groups
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductGroupList'
+        '4XX':
+          $ref: '#/components/responses/ClientError'
+        '5XX':
+          $ref: '#/components/responses/ServerError'
+
+  # https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100855
+  /products/{productGroup}:
+    get:
+      summary: Get models in a product group
+      description: Retrieve all models within a specific product group.
+      tags:
+        - Products
+      parameters:
+        - $ref: '#/components/parameters/ProductGroup'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Sort0'
+        - $ref: '#/components/parameters/Order0'
+        - $ref: '#/components/parameters/Sort1'
+        - $ref: '#/components/parameters/Order1'
+        - $ref: '#/components/parameters/Sort2'
+        - $ref: '#/components/parameters/Order2'
+        - $ref: '#/components/parameters/IncludeOldProducts'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelsList'
+        '4XX':
+          $ref: '#/components/responses/ClientError'
+        '5XX':
+          $ref: '#/components/responses/ServerError'
+
+  # https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100856
+  /product/{registrationNumber}:
+    get:
+      summary: Get a product by registration number
+      description: Retrieves detailed information about a product using its registration number.
+      tags:
+        - Products
+      parameters:
+        - $ref: '#/components/parameters/RegistrationNumber'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelDetails'
+        '4XX':
+          $ref: '#/components/responses/ClientError'
+        '5XX':
+          $ref: '#/components/responses/ServerError'
+
+  # https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100857
+  /product/{registrationNumber}/fiches:
+    get:
+      summary: Retrieve Product Fiche
+      description: Retrieves the product information sheet (fiche) in PDF format for a specific model.
+      tags:
+        - Documents
+      parameters:
+        - $ref: '#/components/parameters/RegistrationNumber'
+        - $ref: '#/components/parameters/NoRedirect'
+        - $ref: '#/components/parameters/Language'
+      responses:
+        '200':
+          description: Successful response containing the fiche.
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+                description: ZIP file containing fiches in all languages.
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+                description: PDF file containing the fiche in the specified language.
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileAddress'
+        '4XX':
+          $ref: '#/components/responses/ClientError'
+        '5XX':
+          $ref: '#/components/responses/ServerError'
+
+  # https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100858
+  /product/{registrationNumber}/labels:
+    get:
+      summary: Retrieve Product Label
+      description: Retrieves the label for a specific model in the specified format(s).
+      tags:
+        - Documents
+      parameters:
+        - $ref: '#/components/parameters/RegistrationNumber'
+        - $ref: '#/components/parameters/NoRedirect'
+        - $ref: '#/components/parameters/LabelFormat'
+        - $ref: '#/components/parameters/Instance'
+        - $ref: '#/components/parameters/SupplierLabel'
+        - $ref: '#/components/parameters/LabelType'
+      responses:
+        '200':
+          description: Successful response containing the label(s).
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+                description: ZIP file containing labels in all formats.
+            image/png:
+              schema:
+                type: string
+                format: binary
+                description: PNG file containing the label.
+            image/svg+xml:
+              schema:
+                type: string
+                format: binary
+                description: SVG file containing the label.
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+                description: PDF file containing the label.
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileAddress'
+        '4XX':
+          $ref: '#/components/responses/ClientError'
+        '5XX':
+          $ref: '#/components/responses/ServerError'
+
+  # https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100859
+  /product/{registrationNumber}/nested-label:
+    get:
+      summary: Retrieve Nested Label
+      description: Retrieves the nested label (SVG image of the arrow with energy efficiency class) for a specific model.
+      tags:
+        - Documents
+      parameters:
+        - $ref: '#/components/parameters/RegistrationNumber'
+      responses:
+        '200':
+          description: Successful response containing the nested label.
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+                format: binary
+                description: SVG file containing the nested label.
+        '4XX':
+          $ref: '#/components/responses/ClientError'
+        '5XX':
+          $ref: '#/components/responses/ServerError'
+
+  # https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100860
+  /products/{productGroup}/{registrationNumber}:
+    get:
+      summary: Retrieve Model Details by Product Group
+      description: Retrieves detailed information about a product model within a specific product group using its unique registration number.
+      tags:
+        - Products
+      parameters:
+        - $ref: '#/components/parameters/ProductGroup'
+        - $ref: '#/components/parameters/RegistrationNumber'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelsList'
+        '4XX':
+          $ref: '#/components/responses/ClientError'
+        '5XX':
+          $ref: '#/components/responses/ServerError'
+
+  # https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100861
+  /products/{productGroup}/{registrationNumber}/fiches:
+    get:
+      summary: Retrieve Product Fiche
+      description: Retrieves the product information sheet (fiche) in PDF format for a specific model.
+      tags:
+        - Documents
+      parameters:
+        - $ref: '#/components/parameters/ProductGroup'
+        - $ref: '#/components/parameters/RegistrationNumber'
+        - $ref: '#/components/parameters/NoRedirect'
+        - $ref: '#/components/parameters/Language'
+      responses:
+        '200':
+          description: Successful response containing the fiche.
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+                description: ZIP file containing fiches in all languages.
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+                description: PDF file containing the fiche in the specified language.
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileAddress'
+        '4XX':
+          $ref: '#/components/responses/ClientError'
+        '5XX':
+          $ref: '#/components/responses/ServerError'
+
+  # https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100862
+  /products/{productGroup}/{registrationNumber}/labels:
+    get:
+      summary: Retrieve Product Label
+      description: Retrieves the label for a specific model in the specified format(s).
+      tags:
+        - Documents
+      parameters:
+        - $ref: '#/components/parameters/ProductGroup'
+        - $ref: '#/components/parameters/RegistrationNumber'
+        - $ref: '#/components/parameters/NoRedirect'
+        - $ref: '#/components/parameters/LabelFormat'
+        - $ref: '#/components/parameters/Instance'
+        - $ref: '#/components/parameters/SupplierLabel'
+        - $ref: '#/components/parameters/LabelType'
+      responses:
+        '200':
+          description: Successful response containing the label(s).
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+                description: ZIP file containing labels in all formats.
+            image/png:
+              schema:
+                type: string
+                format: binary
+                description: PNG file containing the label.
+            image/svg+xml:
+              schema:
+                type: string
+                format: binary
+                description: SVG file containing the label.
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+                description: PDF file containing the label.
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileAddress'
+        '4XX':
+          $ref: '#/components/responses/ClientError'
+        '5XX':
+          $ref: '#/components/responses/ServerError'
+
+  # https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100908
+  /exportProducts/{productGroup}:
+    get:
+      summary: Get product group's models in a ZIP file
+      description: Retrieves all models in a product group in a ZIP file. This endpoint is restricted by API key.
+      tags:
+        - Products
+      parameters:
+        - $ref: '#/components/parameters/ProductGroup'
+      security:
+        - apiKeyAuth: []
+      responses:
+        '200':
+          description: Successful response containing the ZIP file with model data.
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+                description: ZIP file containing JSON files with model data.
+        '4XX':
+          $ref: '#/components/responses/ClientError'
+        '5XX':
+          $ref: '#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key for authentication. 
+
+  parameters:
+    ProductGroup:
+      name: productGroup
+      in: path
+      required: true
+      description: The product group (e.g., ovens, electronicdisplays).
+      schema:
+        type: string
+    RegistrationNumber:
+      name: registrationNumber
+      in: path
+      required: true
+      description: Unique identifier of the model in the EPREL database.
+      schema:
+        type: string
+    Page:
+      name: _page
+      in: query
+      required: false
+      description: Page number for pagination.
+      schema:
+        type: integer
+        default: 1
+    Limit:
+      name: _limit
+      in: query
+      required: false
+      description: Number of results per page (min 1, max 100).
+      schema:
+        type: integer
+        default: 20
+    Sort0:
+      name: sort0
+      in: query
+      required: false
+      description: Primary sorting field. Belongs to list of sorting parameters and their direction to apply to the query in the format of sort0=[Field name]&order0=[ASC/DESC].
+      schema:
+        type: string
+    Order0:
+      name: order0
+      in: query
+      required: false
+      description: Primary sorting order (ASC or DESC). Belongs to list of sorting parameters and their direction to apply to the query in the format of sort0=[Field name]&order0=[ASC/DESC].
+      schema:
+        type: string
+        enum: [ASC, DESC]
+    Sort1:
+      name: sort1
+      in: query
+      required: false
+      description: Primary sorting field. Belongs to list of sorting parameters and their direction to apply to the query in the format of sort0=[Field name]&order0=[ASC/DESC].
+      schema:
+        type: string
+    Order1:
+      name: order1
+      in: query
+      required: false
+      description: Primary sorting order (ASC or DESC). Belongs to list of sorting parameters and their direction to apply to the query in the format of sort0=[Field name]&order0=[ASC/DESC].
+      schema:
+        type: string
+        enum: [ASC, DESC]
+    Sort2:
+      name: sort2
+      in: query
+      required: false
+      description: Primary sorting field. Belongs to list of sorting parameters and their direction to apply to the query in the format of sort0=[Field name]&order0=[ASC/DESC].
+      schema:
+        type: string
+    Order2:
+      name: order2
+      in: query
+      required: false
+      description: Primary sorting order (ASC or DESC). Belongs to list of sorting parameters and their direction to apply to the query in the format of sort0=[Field name]&order0=[ASC/DESC].
+      schema:
+        type: string
+        enum: [ASC, DESC]
+    IncludeOldProducts:
+      name: includeOldProducts
+      in: query
+      required: false
+      description: Include products that are no longer on the market.
+      schema:
+        type: boolean
+    NoRedirect:
+      name: noRedirect
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: false
+      description: If true, returns the address of the file without redirection.
+    Language:
+      name: language
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [BG, CS, DA, DE, ET, EL, EN, ES, FR, GA, HR, IT, LV, LT, HU, MT, NL, PL, PT, RO, SK, SL, FI, SV]
+      description: The language in which the fiche should be returned. If not specified, all languages will be returned in a ZIP file.
+    LabelFormat:
+      name: format
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [PNG, PDF, SVG]
+      description: The format in which the label should be returned. If not specified, all formats will be returned.
+    Instance:
+      name: instance
+      in: query
+      required: false
+      schema:
+        type: integer
+      description: Used only for domestic ovens, indicating the cavity number.
+    SupplierLabel:
+      name: supplier_label
+      in: query
+      required: false
+      schema:
+        type: boolean
+        default: false
+      description: If true, returns the supplier's label if it exists.
+    LabelType:
+      name: type
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [BIG_BW, BIG_COLOR, SMALL_BW, SMALL_COLOR]
+      description: Used only for light sources to specify the type of label.
+
+  responses:
+    ClientError:
+      description: Client error
+    ServerError:
+      description: Server error
+
+  schemas:
+    ProductGroupList:
+      type: array
+      items:
+        $ref: '#/components/schemas/ProductGroup'
+    ProductGroup:
+      type: object
+      properties:
+        code:
+          type: string
+          example: AIR_CONDITIONER
+        url_code:
+          type: string
+          example: airconditioners
+        name:
+          type: string
+          example: Air conditioners
+        regulation:
+          type: string
+          example: Regulation (EU) 626/2011
+
+    ModelsList:
+      type: object
+      properties:
+        size:
+          type: integer
+          example: 1
+        offset:
+          type: integer
+          example: 0
+        hits:
+          type: array
+          items:
+            $ref: '#/components/schemas/ModelDetails'
+    ModelDetails:
+      type: object
+      description: Only contains product group comprehensive properties (https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100878).
+      properties:
+        implementingAct:
+          type: string
+          example: EU_2019_2017
+        modelIdentifier:
+          type: string
+          example: Test remove I accept label
+        onMarketStartDate:
+          type: array
+          example: [2020,5,8]
+          items:
+            type: number
+        onMarketEndDate:
+          type: array
+          nullable: true
+          example: [2020,5,8]
+          items:
+            type: number
+        lastVersion:
+          type: boolean
+          example: false
+        versionId:
+          type: integer
+          example: 72 
+        status:
+          type: string
+          enum: [PUBLISHED, DRAFT, ARCHIVED]
+          example: PUBLISHED
+        eprelRegistrationNumber:
+          type: string
+          example: "72"
+        productModelCoreId:
+          type: integer
+          example: 72
+        energyClass:
+          type: string
+          example: A
+        energyClassImage:
+          type: string
+          example: arrow.png
+        contactDetails:
+          $ref: '#/components/schemas/ContactDetails'
+        versionNumber:
+          type: integer
+          example: 1
+        productGroup:
+          type: string
+          example: electronicdisplays
+        registrantNature:
+          type: string
+          enum: [AUTHORISED_REPRESENTATIVE, IMPORTER, MANUFACTURER]
+          example: MANUFACTURER
+
+    ContactDetails:
+      type: object
+      properties:
+        lastName:
+          type: string
+          example: Smith
+        country:
+          type: string
+          example: BE
+        streetNumber:
+          type: string
+          example: "1"
+        city:
+          type: string
+          example: Brussels
+        postalCode:
+          type: string
+          example: "1000"
+        municipality:
+          type: string
+          example: Brussels City
+        serviceName:
+          type: string
+          example: Support service
+        webSiteURL: 
+          type: string
+          example: support.service.co
+        firstName: 
+          type: string
+          example: John
+        addressBloc:
+          type: string
+          example: Main street 1, 1000 Brussels, BE
+        province:
+          type: string
+          example: Brussels-Capital
+        phone:
+          type: string
+          example: "+32123456789"
+        street:
+          type: string
+          example: Main street
+        email:
+          type: string
+          format: email
+          example: support@service.co
+
+    FileAddress:
+      type: object
+      description: File address when noRedirect is set to true
+      properties:
+        address:
+          type: string
+          description: "[API_URL]/informationsheet/fiche_[REGISTRATION_NUMBER]_ES.pdf"
+          format: uri
+          example: https://api.example.com/label/Label_117273.png
