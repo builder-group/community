@@ -16,10 +16,10 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	}
 	fetchClient._features.push('google-webfonts');
 
-	const googleFeature: TSelectFeatures<['eprel']> = {};
+	const eprelFeature: TSelectFeatures<['eprel']> = {};
 
 	// Merge existing features from the state with the new api feature
-	const _fetchClient = Object.assign(fetchClient, googleFeature);
+	const _fetchClient = Object.assign(fetchClient, eprelFeature);
 
 	return _fetchClient as TFetchClient<['eprel', ...GSelectedFeatureKeys], paths>;
 }

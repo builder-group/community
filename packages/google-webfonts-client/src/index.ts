@@ -9,7 +9,7 @@ export * from './with-google-webfonts';
 declare module 'feature-fetch' {
 	interface TThirdPartyFeatures<GPaths> {
 		'google-webfonts': {
-			raw: TFetchClient<['base', 'api']>;
+			_apiFetchClient: TFetchClient<['base', 'api']>;
 			getWebFonts(
 				options?: Omit<paths['/webfonts']['get']['parameters']['query'], 'key'>
 			): Promise<TOpenApiFetchResponse<paths['/webfonts']['get'], 'json'>>;

@@ -22,8 +22,8 @@ export function withGoogleWebfonts<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	}
 	fetchClient._features.push('google-webfonts');
 
-	const googleFeature: TSelectFeatures<['google-webfonts']> = {
-		raw: createApiFetchClient(),
+	const googleWebfontsFeature: TSelectFeatures<['google-webfonts']> = {
+		_apiFetchClient: createApiFetchClient(),
 		async getWebFonts(
 			this: TFetchClient<['base', 'openapi', 'google-webfonts'], paths>,
 			options = {}
@@ -88,7 +88,7 @@ export function withGoogleWebfonts<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			}
 
 			// Fetch font binary
-			const response = await this.raw.get(downloadUrl, { parseAs: 'arrayBuffer' });
+			const response = await this._apiFetchClient.get(downloadUrl, { parseAs: 'arrayBuffer' });
 			if (response.isErr()) {
 				if (isStatusCode(response.error, 404)) {
 					return Ok(null);
@@ -101,7 +101,7 @@ export function withGoogleWebfonts<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	};
 
 	// Merge existing features from the state with the new api feature
-	const _fetchClient = Object.assign(fetchClient, googleFeature);
+	const _fetchClient = Object.assign(fetchClient, googleWebfontsFeature);
 
 	return _fetchClient as TFetchClient<['google-webfonts', ...GSelectedFeatureKeys], paths>;
 }

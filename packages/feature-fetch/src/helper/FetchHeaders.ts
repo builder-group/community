@@ -10,7 +10,7 @@ export class FetchHeaders {
 
 		if (init instanceof FetchHeaders) {
 			init.headers.forEach((values, key) => {
-				this._headers.set(key, values);
+				this._headers.set(key, [...values]);
 			});
 		} else if (Array.isArray(init)) {
 			init.forEach(([key, value]) => {
@@ -61,7 +61,7 @@ export class FetchHeaders {
 		return new Map(this._headers);
 	}
 
-	public toHeadersInit(): Record<string, string[]> /* RequestInit */ {
+	public toHeadersInit(): Record<string, string[]> /* RequestInit['headers'] */ {
 		const headersInit: Record<string, string[]> = {};
 		this._headers.forEach((value, key) => {
 			headersInit[key] = value;
