@@ -515,18 +515,18 @@ components:
           example: EU_2019_2017
         modelIdentifier:
           type: string
-          example: Test remove I accept label
+          example: P2422H
         onMarketStartDate:
           type: array
           example: [2020,5,8]
           items:
-            type: number
+            type: integer
         onMarketEndDate:
           type: array
           nullable: true
           example: [2020,5,8]
           items:
-            type: number
+            type: integer
         lastVersion:
           type: boolean
           example: false
