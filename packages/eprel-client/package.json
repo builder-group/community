@@ -6,7 +6,7 @@
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
 		"start:dev": "tsc -w",
-		"openapi:gen": "npx openapi-typescript ./resources/openapi_v1-0-58.yaml -o ./src/gen/v1.ts",
+		"openapi:generate": "npx openapi-typescript ./resources/openapi_v1-0-58.yaml -o ./src/gen/v1.ts",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
