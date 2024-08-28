@@ -1,7 +1,7 @@
-import { createHonoOpenApiRouter } from '@blgc/openapi-router';
 import { Hono } from 'hono';
 import { zValidator } from 'validation-adapters/zod';
 import * as z from 'zod';
+import { createHonoOpenApiRouter } from '@blgc/openapi-router';
 
 import { paths } from './gen/v1';
 import { PetSchema } from './schemas';

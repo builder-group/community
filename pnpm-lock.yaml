@@ -186,8 +186,8 @@ importers:
         specifier: ^4.19.2
         version: 4.19.2
       valibot:
-        specifier: ^0.35.0
-        version: 0.35.0
+        specifier: ^0.39.0
+        version: 0.39.0(typescript@5.5.4)
       validation-adapters:
         specifier: workspace:*
         version: link:../../../../packages/validation-adapters
@@ -199,17 +199,17 @@ importers:
         specifier: ^4.17.21
         version: 4.17.21
       '@types/node':
-        specifier: ^20.14.10
-        version: 20.14.14
+        specifier: ^22.5.1
+        version: 22.5.1
       nodemon:
         specifier: ^3.1.4
         version: 3.1.4
       openapi-typescript:
-        specifier: ^7.0.2
+        specifier: ^7.3.0
         version: 7.3.0(typescript@5.5.4)
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.14.14)(typescript@5.5.4)
+        version: 10.9.2(@types/node@22.5.1)(typescript@5.5.4)
 
   examples/openapi-router/hono/petstore:
     dependencies:
@@ -217,14 +217,14 @@ importers:
         specifier: workspace:*
         version: link:../../../../packages/openapi-router
       '@hono/node-server':
-        specifier: ^1.12.0
-        version: 1.12.0
+        specifier: ^1.12.2
+        version: 1.12.2(hono@4.5.9)
       '@hono/zod-validator':
         specifier: ^0.2.2
-        version: 0.2.2(hono@4.5.3)(zod@3.23.8)
+        version: 0.2.2(hono@4.5.9)(zod@3.23.8)
       hono:
-        specifier: ^4.4.12
-        version: 4.5.3
+        specifier: ^4.5.9
+        version: 4.5.9
       validation-adapters:
         specifier: workspace:*
         version: link:../../../../packages/validation-adapters
@@ -233,11 +233,11 @@ importers:
         version: 3.23.8
     devDependencies:
       '@types/node':
-        specifier: ^20.11.17
-        version: 20.14.14
+        specifier: ^22.5.1
+        version: 22.5.1
       tsx:
-        specifier: ^4.7.1
-        version: 4.16.5
+        specifier: ^4.19.0
+        version: 4.19.0
 
   examples/xml-tokenizer/vanilla/profiler:
     dependencies:
@@ -1130,9 +1130,11 @@ packages:
   '@figma/plugin-typings@1.97.0':
     resolution: {integrity: sha512-AcmZey7TBbc43g2dO+9hjrcTbgb0UFY32do3to3rFU1OXb9hinsrmmbddyhD5105DHzRDac4oT7A5+VOow7p1Q==}
 
-  '@hono/node-server@1.12.0':
-    resolution: {integrity: sha512-e6oHjNiErRxsZRZBmc2KucuvY3btlO/XPncIpP2X75bRdTilF9GLjm3NHvKKunpJbbJJj31/FoPTksTf8djAVw==}
+  '@hono/node-server@1.12.2':
+    resolution: {integrity: sha512-xjzhqhSWUE/OhN0g3KCNVzNsQMlFUAL+/8GgPUr3TKcU7cvgZVBGswFofJ8WwGEHTqobzze1lDpGJl9ZNckDhA==}
     engines: {node: '>=18.14.1'}
+    peerDependencies:
+      hono: ^4
 
   '@hono/zod-validator@0.2.2':
     resolution: {integrity: sha512-dSDxaPV70Py8wuIU2QNpoVEIOSzSXZ/6/B/h4xA7eOMz7+AarKTSGV8E6QwrdcCbBLkpqfJ4Q2TmBO0eP1tCBQ==}
@@ -3007,10 +3009,6 @@ packages:
   headers-polyfill@4.0.3:
     resolution: {integrity: sha512-IScLbePpkvO846sIwOtOTDjutRMWdXdJmXdMvk6gCBHxFO8d+QKOQedyZSxFTTFYRSmlgSTDtXqqq4pcenBXLQ==}
 
-  hono@4.5.3:
-    resolution: {integrity: sha512-r26WwwbKD3BAYdfB294knNnegNda7VfV1tVn66D9Kvl9WQTdrR+5eKdoeaQNHQcC3Gr0KBikzAtjd6VsRGVSaw==}
-    engines: {node: '>=16.0.0'}
-
   hono@4.5.9:
     resolution: {integrity: sha512-zz8ktqMDRrZETjxBrv8C5PQRFbrTRCLNVAjD1SNQyOzv4VjmX68Uxw83xQ6oxdAB60HiWnGEatiKA8V3SZLDkQ==}
     engines: {node: '>=16.0.0'}
@@ -4769,8 +4767,8 @@ packages:
     peerDependencies:
       typescript: '>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta'
 
-  tsx@4.16.5:
-    resolution: {integrity: sha512-ArsiAQHEW2iGaqZ8fTA1nX0a+lN5mNTyuGRRO6OW3H/Yno1y9/t1f9YOI1Cfoqz63VAthn++ZYcbDP7jPflc+A==}
+  tsx@4.19.0:
+    resolution: {integrity: sha512-bV30kM7bsLZKZIOCHeMNVMJ32/LuJzLVajkQI/qf92J2Qr08ueLQvW00PUZGiuLPP760UINwupgUj8qrSCPUKg==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -5704,11 +5702,13 @@ snapshots:
 
   '@figma/plugin-typings@1.97.0': {}
 
-  '@hono/node-server@1.12.0': {}
-
-  '@hono/zod-validator@0.2.2(hono@4.5.3)(zod@3.23.8)':
+  '@hono/node-server@1.12.2(hono@4.5.9)':
     dependencies:
-      hono: 4.5.3
+      hono: 4.5.9
+
+  '@hono/zod-validator@0.2.2(hono@4.5.9)(zod@3.23.8)':
+    dependencies:
+      hono: 4.5.9
       zod: 3.23.8
 
   '@humanwhocodes/config-array@0.11.14':
@@ -6169,7 +6169,7 @@ snapshots:
   '@types/body-parser@1.19.5':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 20.14.14
+      '@types/node': 22.5.1
 
   '@types/cli-progress@3.11.6':
     dependencies:
@@ -6177,7 +6177,7 @@ snapshots:
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 20.14.14
+      '@types/node': 22.5.1
 
   '@types/cookie@0.6.0': {}
 
@@ -6260,7 +6260,7 @@ snapshots:
   '@types/serve-static@1.15.7':
     dependencies:
       '@types/http-errors': 2.0.4
-      '@types/node': 20.14.14
+      '@types/node': 22.5.1
       '@types/send': 0.17.4
 
   '@types/statuses@2.0.5': {}
@@ -7922,8 +7922,6 @@ snapshots:
   hdr-histogram-percentiles-obj@3.0.0: {}
 
   headers-polyfill@4.0.3: {}
-
-  hono@4.5.3: {}
 
   hono@4.5.9: {}
 
@@ -9613,6 +9611,25 @@ snapshots:
       typescript: 5.5.4
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
+    optional: true
+
+  ts-node@10.9.2(@types/node@22.5.1)(typescript@5.5.4):
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      '@tsconfig/node10': 1.0.11
+      '@tsconfig/node12': 1.0.11
+      '@tsconfig/node14': 1.0.3
+      '@tsconfig/node16': 1.0.4
+      '@types/node': 22.5.1
+      acorn: 8.12.1
+      acorn-walk: 8.3.3
+      arg: 4.1.3
+      create-require: 1.1.1
+      diff: 4.0.2
+      make-error: 1.3.6
+      typescript: 5.5.4
+      v8-compile-cache-lib: 3.0.1
+      yn: 3.1.1
 
   tsconfck@3.1.1(typescript@5.5.4):
     optionalDependencies:
@@ -9634,9 +9651,9 @@ snapshots:
       tslib: 1.14.1
       typescript: 5.5.4
 
-  tsx@4.16.5:
+  tsx@4.19.0:
     dependencies:
-      esbuild: 0.21.5
+      esbuild: 0.23.1
       get-tsconfig: 4.7.6
     optionalDependencies:
       fsevents: 2.3.3

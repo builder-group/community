@@ -25,7 +25,10 @@ declare module 'feature-fetch' {
 				options?: {
 					page?: number;
 					limit?: number;
+					// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100870
 					sort?: TSortOption[];
+					// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100863
+					filter?: Record<string, string>;
 					includeOldProducts?: boolean;
 				}
 			): Promise<components['schemas']['ModelsList']>;
@@ -38,7 +41,7 @@ declare module 'feature-fetch' {
 				GOptions extends {
 					noRedirect?: boolean;
 					language?: TLanguage;
-				} = {}
+				}
 			>(
 				registrationNumber: TRegistrationNumber,
 				options?: GOptions
@@ -49,9 +52,9 @@ declare module 'feature-fetch' {
 					noRedirect?: boolean;
 					format?: TLabelFormat;
 					instance?: number;
-					supplier_label?: boolean;
+					supplierLabel?: boolean;
 					type?: TLabelType;
-				} = {}
+				}
 			>(
 				registrationNumber: TRegistrationNumber,
 				options?: GOptions
