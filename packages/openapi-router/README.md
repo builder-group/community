@@ -76,6 +76,8 @@ app.use('/*', router);
 
 ### Hono
 
+> Hono's TypeScript integration provides type suggestions for `c.json()` based on generically defined response types, but doesn't enforce these types at compile-time. For example, `c.json('')` won't raise a type error even if the expected type is `{someType: string}`. This is due to Hono's internal use of `TypedResponse<T>`, which infers but doesn't strictly enforce the passed generic type.
+
 ```ts
 import { Hono } from 'hono';
 import * as v from 'valibot';
