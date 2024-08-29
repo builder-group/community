@@ -42,7 +42,8 @@ const client = createGoogleWebfontsClient({
 Fetches the available web fonts from the Google Fonts API.
 
 ```ts
-const webFonts = await client.getWebFonts();
+const webFontsResult = await client.getWebFonts();
+const webFonts = webFontsResult.unwrap();
 ```
 
 ### Fetch Font File URL
@@ -50,10 +51,11 @@ const webFonts = await client.getWebFonts();
 Fetches the URL of a specific font file based on the provided family, weight, and style.
 
 ```ts
-const fontUrl = await client.getFontFileUrl('Roboto Serif', {
+const fontUrlResult = await client.getFontFileUrl('Roboto Serif', {
     fontWeight: 400,
     fontStyle: 'regular'
 });
+const fontUrl = fontUrlResult.unwrap();
 ```
 
 ### Download a Font File
@@ -61,10 +63,11 @@ const fontUrl = await client.getFontFileUrl('Roboto Serif', {
 Use the client to download a font file, specifying the font family, weight, and style.
 
 ```ts
-const fontFile = await client.downloadFontFile('Roboto Serif', {
+const fontFileResult = await client.downloadFontFile('Roboto Serif', {
     fontWeight: 100,
     fontStyle: 'italic'
 });
+const fontFile = fontFileResult.unwrap();
 ```
 
 ### Error Handling
@@ -76,11 +79,28 @@ Errors can occur during API requests, and the client will return detailed error 
 - **`FetchError`**: A general exception type that can encompass other error scenarios not covered by `NetworkError` or `RequestError`, for example when the response couldn't be parsed, ..
 
 ```ts
+const fontUrlResult = await client.getFontFileUrl('Roboto Serif', {
+  fontWeight: 400,
+  fontStyle: 'regular',
+});
+
+// First Approach: Handle error using `isErr()`
+if (fontUrlResult.isErr()) {
+  const { error } = fontUrlResult;
+  if (error instanceof NetworkError) {
+    console.error('Network error:', error.message);
+  } else if (error instanceof RequestError) {
+    console.error('Request error:', error.message, 'Status:', error.status);
+  } else if (error instanceof FetchError) {
+    console.error('Service error:', error.message, 'Code:', error.code);
+  } else {
+    console.error('Unexpected error:', error);
+  }
+}
+
+// Second Approach: Unwrap response with `try-catch`
 try {
-  const fontUrl = await client.getFontFileUrl('Roboto Serif', {
-    fontWeight: 400,
-    fontStyle: 'regular'
-  });
+  const fontUrl = fontUrlResult.unwrap();
 } catch (error) {
   if (error instanceof NetworkError) {
     console.error('Network error:', error.message);
@@ -92,4 +112,5 @@ try {
     console.error('Unexpected error:', error);
   }
 }
+
 ```

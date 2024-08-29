@@ -42,7 +42,8 @@ const client = createEPRELClient({
 Fetches the available product groups from the ERAP API.
 
 ```ts
-const productGroups = await client.getProductGroups();
+const productGroupsResult = await client.getProductGroups();
+const productGroups = productGroupsResult.unwrap();
 ```
 
 ### Error Handling
@@ -54,8 +55,25 @@ Errors can occur during API requests, and the client will return detailed error 
 - **`FetchError`**: A general exception type that can encompass other error scenarios not covered by `NetworkError` or `RequestError`, for example when the response couldn't be parsed, ..
 
 ```ts
+const productGroupsResult = await client.getProductGroups();
+
+// First Approach: Handle error using `isErr()`
+if (productGroupsResult.isErr()) {
+  const { error } = productGroupsResult;
+  if (error instanceof NetworkError) {
+    console.error('Network error:', error.message);
+  } else if (error instanceof RequestError) {
+    console.error('Request error:', error.message, 'Status:', error.status);
+  } else if (error instanceof FetchError) {
+    console.error('Service error:', error.message, 'Code:', error.code);
+  } else {
+    console.error('Unexpected error:', error);
+  }
+}
+
+// Second Approach: Unwrap response with `try-catch`
 try {
-  const productGroups = await client.getProductGroups();
+  const productGroups = productGroupsResult.unwrap();
 } catch (error) {
   if (error instanceof NetworkError) {
     console.error('Network error:', error.message);
@@ -67,4 +85,5 @@ try {
     console.error('Unexpected error:', error);
   }
 }
+
 ```
