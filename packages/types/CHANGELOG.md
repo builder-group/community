@@ -1,5 +1,11 @@
 # @blgc/types
 
+## 0.0.7
+
+### Patch Changes
+
+- [#71](https://github.com/builder-group/community/pull/71) [`a1e928b`](https://github.com/builder-group/community/commit/a1e928b30a13d0d974e862e8f27e97bf6047e854) Thanks [@github-actions](https://github.com/apps/github-actions)! - Prettier run
+
 ## 0.0.6
 
 ### Patch Changes
