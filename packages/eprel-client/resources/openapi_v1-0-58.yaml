@@ -102,7 +102,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/RegistrationNumber'
         - $ref: '#/components/parameters/NoRedirect'
-        - $ref: '#/components/parameters/Language'
+        - $ref: '#/components/parameters/FicheLanguage'
       responses:
         '200':
           description: Successful response containing the fiche.
@@ -227,7 +227,7 @@ paths:
         - $ref: '#/components/parameters/ProductGroup'
         - $ref: '#/components/parameters/RegistrationNumber'
         - $ref: '#/components/parameters/NoRedirect'
-        - $ref: '#/components/parameters/Language'
+        - $ref: '#/components/parameters/FicheLanguage'
       responses:
         '200':
           description: Successful response containing the fiche.
@@ -421,13 +421,12 @@ components:
         type: boolean
         default: false
       description: If true, returns the address of the file without redirection.
-    Language:
+    FicheLanguage:
       name: language
       in: query
       required: false
       schema:
-        type: string
-        enum: [BG, CS, DA, DE, ET, EL, EN, ES, FR, GA, HR, IT, LV, LT, HU, MT, NL, PL, PT, RO, SK, SL, FI, SV]
+        $ref: '#/components/schemas/FicheLanguage'
       description: The language in which the fiche should be returned. If not specified, all languages will be returned in a ZIP file.
     LabelFormat:
       name: format
@@ -629,3 +628,7 @@ components:
           description: "[API_URL]/informationsheet/fiche_[REGISTRATION_NUMBER]_ES.pdf"
           format: uri
           example: https://api.example.com/label/Label_117273.png
+          
+    FicheLanguage:
+      type: string
+      enum: [BG, CS, DA, DE, ET, EL, EN, ES, FR, GA, HR, IT, LV, LT, HU, MT, NL, PL, PT, RO, SK, SL, FI, SV]

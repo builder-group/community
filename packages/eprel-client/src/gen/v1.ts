@@ -169,7 +169,7 @@ export interface paths {
                     /** @description If true, returns the address of the file without redirection. */
                     noRedirect?: components["parameters"]["NoRedirect"];
                     /** @description The language in which the fiche should be returned. If not specified, all languages will be returned in a ZIP file. */
-                    language?: components["parameters"]["Language"];
+                    language?: components["parameters"]["FicheLanguage"];
                 };
                 header?: never;
                 path: {
@@ -369,7 +369,7 @@ export interface paths {
                     /** @description If true, returns the address of the file without redirection. */
                     noRedirect?: components["parameters"]["NoRedirect"];
                     /** @description The language in which the fiche should be returned. If not specified, all languages will be returned in a ZIP file. */
-                    language?: components["parameters"]["Language"];
+                    language?: components["parameters"]["FicheLanguage"];
                 };
                 header?: never;
                 path: {
@@ -626,6 +626,8 @@ export interface components {
              */
             address?: string;
         };
+        /** @enum {string} */
+        FicheLanguage: "BG" | "CS" | "DA" | "DE" | "ET" | "EL" | "EN" | "ES" | "FR" | "GA" | "HR" | "IT" | "LV" | "LT" | "HU" | "MT" | "NL" | "PL" | "PT" | "RO" | "SK" | "SL" | "FI" | "SV";
     };
     responses: {
         /** @description Client error */
@@ -669,7 +671,7 @@ export interface components {
         /** @description If true, returns the address of the file without redirection. */
         NoRedirect: boolean;
         /** @description The language in which the fiche should be returned. If not specified, all languages will be returned in a ZIP file. */
-        Language: "BG" | "CS" | "DA" | "DE" | "ET" | "EL" | "EN" | "ES" | "FR" | "GA" | "HR" | "IT" | "LV" | "LT" | "HU" | "MT" | "NL" | "PL" | "PT" | "RO" | "SK" | "SL" | "FI" | "SV";
+        FicheLanguage: components["schemas"]["FicheLanguage"];
         /** @description The format in which the label should be returned. If not specified, all formats will be returned. */
         LabelFormat: "PNG" | "PDF" | "SVG";
         /** @description Used only for domestic ovens, indicating the cavity number. */

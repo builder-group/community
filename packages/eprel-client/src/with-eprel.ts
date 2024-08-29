@@ -12,13 +12,14 @@ import {
 } from 'feature-fetch';
 
 import type { paths } from './gen/v1';
+import { getLabelUrl, getLanguageSet, getSheetUrl } from './helper';
 import {
 	type TFileAddress,
 	type TLabelFormat,
 	type TLabelType,
-	type TLanguage,
 	type TProductGroup,
 	type TRegistrationNumber,
+	type TSheetLanguage,
 	type TSortOption
 } from './types';
 
@@ -95,12 +96,12 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		},
 
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100857
-		async getProductFiches(
+		async getProductSheets(
 			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
 			registrationNumber: TRegistrationNumber,
 			options: {
 				noRedirect?: boolean;
-				language?: TLanguage;
+				language?: TSheetLanguage;
 			} = {}
 		) {
 			const { noRedirect = false, language } = options;
@@ -119,6 +120,58 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 					? (new Uint8Array(result.value.data) as any)
 					: (result.value.data as TFileAddress)
 			);
+		},
+
+		async getProductSheetUrls(
+			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
+			registrationNumber: TRegistrationNumber
+		) {
+			const result = await this.getProductByRegistrationNumber(registrationNumber);
+			if (result.isErr()) {
+				if (isStatusCode(result.error, 404)) {
+					return Ok([]);
+				}
+				return Err(result.error);
+			}
+
+			const { productGroup, placementCountries } = result.value ?? {};
+			if (productGroup == null || placementCountries == null) {
+				return Ok([]);
+			}
+
+			const languageSet = getLanguageSet(placementCountries);
+			return Ok(
+				Array.from(languageSet).map((l) => ({
+					language: l,
+					url: getSheetUrl(productGroup, registrationNumber, l)
+				}))
+			);
+		},
+
+		async getProductSheetUrl(
+			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
+			registrationNumber,
+			language
+		) {
+			const result = await this.getProductByRegistrationNumber(registrationNumber);
+			if (result.isErr()) {
+				if (isStatusCode(result.error, 404)) {
+					return Ok(null);
+				}
+				return Err(result.error);
+			}
+
+			const { productGroup, placementCountries } = result.value ?? {};
+			if (productGroup == null || placementCountries == null) {
+				return Ok(null);
+			}
+
+			const languageSet = getLanguageSet(placementCountries);
+			if (languageSet.has(language)) {
+				return Ok(getSheetUrl(productGroup, registrationNumber, language));
+			}
+
+			return Ok(null);
 		},
 
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100858
@@ -155,6 +208,27 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 					? (new Uint8Array(result.value.data) as any)
 					: (result.value.data as TFileAddress)
 			);
+		},
+
+		async getProductLabelUrl(
+			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
+			registrationNumber,
+			format
+		) {
+			const result = await this.getProductByRegistrationNumber(registrationNumber);
+			if (result.isErr()) {
+				if (isStatusCode(result.error, 404)) {
+					return Ok(null);
+				}
+				return Err(result.error);
+			}
+
+			const { productGroup } = result.value ?? {};
+			if (productGroup == null) {
+				return Ok(null);
+			}
+
+			return Ok(getLabelUrl(productGroup, registrationNumber, format));
 		},
 
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100859

@@ -6,14 +6,15 @@ import {
 	type TFileAddress,
 	type TLabelFormat,
 	type TLabelType,
-	type TLanguage,
 	type TProductGroup,
 	type TRegistrationNumber,
+	type TSheetLanguage,
 	type TSortOption
 } from './types';
 
 export * from 'feature-fetch';
 export * from './create-eprel-client';
+export * from './helper';
 export * from './types';
 export * from './with-eprel';
 
@@ -39,15 +40,24 @@ declare module 'feature-fetch' {
 				registrationNumber: TRegistrationNumber
 			): Promise<TResult<components['schemas']['ModelDetails'] | null, FetchError>>;
 
-			getProductFiches<
+			getProductSheets<
 				GOptions extends {
 					noRedirect?: boolean;
-					language?: TLanguage;
+					language?: TSheetLanguage;
 				}
 			>(
 				registrationNumber: TRegistrationNumber,
 				options?: GOptions
 			): Promise<TResult<TFileAddressReturnType<GOptions>, FetchError>>;
+
+			getProductSheetUrls(
+				registrationNumber: TRegistrationNumber
+			): Promise<TResult<{ language: TSheetLanguage; url: string }[], FetchError>>;
+
+			getProductSheetUrl(
+				registrationNumber: TRegistrationNumber,
+				language: TSheetLanguage
+			): Promise<TResult<string | null, FetchError>>;
 
 			getProductLabels<
 				GOptions extends {
@@ -61,6 +71,11 @@ declare module 'feature-fetch' {
 				registrationNumber: TRegistrationNumber,
 				options?: GOptions
 			): Promise<TResult<TFileAddressReturnType<GOptions>, FetchError>>;
+
+			getProductLabelUrl(
+				registrationNumber: TRegistrationNumber,
+				format: TLabelFormat
+			): Promise<TResult<string | null, FetchError>>;
 
 			getNestedLabel(
 				registrationNumber: TRegistrationNumber
