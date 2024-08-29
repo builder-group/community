@@ -1,5 +1,5 @@
-import { sleep } from '@blgc/utils';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { sleep } from '@blgc/utils';
 
 import { createState } from '../create-state';
 import { FAILED_TO_LOAD_IDENTIFIER, withPersist, type StorageInterface } from './with-persist';

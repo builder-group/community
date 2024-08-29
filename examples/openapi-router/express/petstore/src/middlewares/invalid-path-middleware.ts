@@ -1,5 +1,5 @@
-import { AppError } from '@blgc/openapi-router';
 import type express from 'express';
+import { AppError } from '@blgc/openapi-router';
 
 export function invalidPathMiddleware(
 	req: express.Request,

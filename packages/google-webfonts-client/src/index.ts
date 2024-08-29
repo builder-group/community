@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/method-signature-style -- Ok here */
-import type { TFetchClient } from 'feature-fetch';
+import type { FetchError, TFetchClient, TResult } from 'feature-fetch';
 
 import type { components } from './gen/v1';
 import {
@@ -24,7 +24,7 @@ declare module 'feature-fetch' {
 				subset?: TFontSubset;
 				capability?: TFontCapability;
 				sort?: TSort;
-			}): Promise<components['schemas']['WebfontList']>;
+			}): Promise<TResult<components['schemas']['WebfontList'], FetchError>>;
 			getFontFileUrl(
 				familiy: TFontFamily,
 				options: {
@@ -32,7 +32,7 @@ declare module 'feature-fetch' {
 					fontStyle?: TFontStyle;
 					capability?: TFontCapability;
 				}
-			): Promise<string | null>;
+			): Promise<TResult<string | null, FetchError>>;
 			downloadFontFile(
 				familiy: TFontFamily,
 				options: {
@@ -40,7 +40,7 @@ declare module 'feature-fetch' {
 					fontStyle?: TFontStyle;
 					capability?: TFontCapability;
 				}
-			): Promise<Uint8Array | null>;
+			): Promise<TResult<Uint8Array | null, FetchError>>;
 		};
 	}
 }

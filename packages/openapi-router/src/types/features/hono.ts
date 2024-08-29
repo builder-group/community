@@ -1,3 +1,6 @@
+import type { Hono } from 'hono';
+import type hono from 'hono/types';
+import { type TValidator } from 'validation-adapter';
 import {
 	type TOperationPathParams,
 	type TOperationQueryParams,
@@ -6,9 +9,6 @@ import {
 	type TRequestBody
 } from '@blgc/types/openapi';
 import { type TFilterKeys } from '@blgc/types/utils';
-import type { Hono } from 'hono';
-import type hono from 'hono/types';
-import { type TValidator } from 'validation-adapter';
 
 export interface TOpenApiHonoFeature<GPaths extends object> {
 	_hono: Hono;
@@ -89,9 +89,10 @@ export interface TOpenApiHonoRequestBody<GPathOperation> {
 	out: { json: TRequestBody<GPathOperation> };
 }
 
-export type TOpenApiHonoResponse<GPathOperation> = hono.HandlerResponse<
-	TOperationSuccessResponseContent<GPathOperation>
->;
+// https://github.com/orgs/honojs/discussions/3331
+export type TOpenApiHonoResponse<GPathOperation> =
+	| hono.TypedResponse<TOperationSuccessResponseContent<GPathOperation>>
+	| Promise<hono.TypedResponse<TOperationSuccessResponseContent<GPathOperation>>>;
 
 // =============================================================================
 // Router Options

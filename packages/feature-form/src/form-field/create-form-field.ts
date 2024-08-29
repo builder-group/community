@@ -1,6 +1,6 @@
-import { bitwiseFlag, deepCopy } from '@blgc/utils';
 import { createState } from 'feature-state';
 import { createValidator } from 'validation-adapter';
+import { bitwiseFlag, deepCopy } from '@blgc/utils';
 
 import {
 	FormFieldReValidateMode,

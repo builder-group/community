@@ -5,12 +5,14 @@ This example demonstrates how to create a [Hono](https://hono.dev/) TypeScript s
 ## Setup Instructions
 
 1. **Build the Monorepo** (only required once):
+
    - At the root of the monorepo, run:
      ```bash
      pnpm build
      ```
 
 2. **Install Dependencies**:
+
    - In this example directory, run:
      ```bash
      pnpm install
@@ -25,6 +27,7 @@ This example demonstrates how to create a [Hono](https://hono.dev/) TypeScript s
 ## About
 
 This project was bootstrapped using the Hono TypeScript template:
+
 ```bash
 pnpm create hono@latest
 ```

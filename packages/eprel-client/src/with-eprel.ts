@@ -1,6 +1,10 @@
 import {
+	Err,
 	FetchError,
 	hasFeatures,
+	isStatusCode,
+	mapOk,
+	Ok,
 	type TEnforceFeatures,
 	type TFeatureKeys,
 	type TFetchClient,
@@ -30,7 +34,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100854
 		async getProductGroups(this: TFetchClient<['base', 'openapi', 'eprel'], paths>) {
 			const result = await this.get('/product-groups');
-			return result.unwrap().data;
+			return mapOk(result, (ok) => ok.data);
 		},
 
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100855
@@ -69,7 +73,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 				}
 			});
 
-			return result.unwrap().data;
+			return mapOk(result, (ok) => ok.data);
 		},
 
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100856
@@ -80,7 +84,14 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			const result = await this.get('/product/{registrationNumber}', {
 				pathParams: { registrationNumber }
 			});
-			return result.unwrap().data;
+			if (result.isErr()) {
+				if (isStatusCode(result.error, 404)) {
+					return Ok(null);
+				}
+				return Err(result.error);
+			}
+
+			return Ok(result.value.data);
 		},
 
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100857
@@ -93,13 +104,21 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			} = {}
 		) {
 			const { noRedirect = false, language } = options;
+
 			const result = await this.get('/product/{registrationNumber}/fiches', {
 				pathParams: { registrationNumber },
 				queryParams: { noRedirect, language },
 				parseAs: noRedirect ? 'json' : 'arrayBuffer'
 			});
-			const data = result.unwrap().data;
-			return data instanceof ArrayBuffer ? (new Uint8Array(data) as any) : (data as TFileAddress);
+			if (result.isErr()) {
+				return Err(result.error);
+			}
+
+			return Ok(
+				result.value.data instanceof ArrayBuffer
+					? (new Uint8Array(result.value.data) as any)
+					: (result.value.data as TFileAddress)
+			);
 		},
 
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100858
@@ -115,6 +134,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			} = {}
 		) {
 			const { noRedirect = false, format, instance, supplierLabel, type } = options;
+
 			const result = await this.get('/product/{registrationNumber}/labels', {
 				pathParams: { registrationNumber },
 				queryParams: {
@@ -126,8 +146,15 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 				},
 				parseAs: noRedirect ? 'json' : 'arrayBuffer'
 			});
-			const data = result.unwrap().data;
-			return data instanceof ArrayBuffer ? (new Uint8Array(data) as any) : (data as TFileAddress);
+
+			if (result.isErr()) {
+				return Err(result.error);
+			}
+			return Ok(
+				result.value.data instanceof ArrayBuffer
+					? (new Uint8Array(result.value.data) as any)
+					: (result.value.data as TFileAddress)
+			);
 		},
 
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100859
@@ -139,7 +166,14 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 				pathParams: { registrationNumber },
 				parseAs: 'arrayBuffer'
 			});
-			return new Uint8Array(result.unwrap().data);
+			if (result.isErr()) {
+				if (isStatusCode(result.error, 404)) {
+					return Ok(null);
+				}
+				return Err(result.error);
+			}
+
+			return Ok(new Uint8Array(result.value.data));
 		},
 
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100908
@@ -151,7 +185,14 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 				pathParams: { productGroup },
 				parseAs: 'arrayBuffer'
 			});
-			return new Uint8Array(result.unwrap().data);
+			if (result.isErr()) {
+				if (isStatusCode(result.error, 404)) {
+					return Ok(null);
+				}
+				return Err(result.error);
+			}
+
+			return Ok(new Uint8Array(result.value.data));
 		}
 	};
 

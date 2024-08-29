@@ -4,22 +4,22 @@
 	"private": true,
 	"scripts": {
 		"dev": "nodemon --config ./nodemon.json",
-		"gen:openapi": "npx openapi-typescript ./resources/openapi-v1.yaml -o ./src/gen/v1.ts"
+		"openapi:generate": "npx openapi-typescript ./resources/openapi-v1.yaml -o ./src/gen/v1.ts"
 	},
 	"source": "./src/index.ts",
 	"main": "./dist/index.js",
 	"dependencies": {
 		"@blgc/openapi-router": "workspace:*",
 		"express": "^4.19.2",
-		"valibot": "^0.35.0",
+		"valibot": "^0.39.0",
 		"validation-adapters": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@types/express": "^4.17.21",
-		"@types/node": "^20.14.10",
+		"@types/node": "^22.5.1",
 		"nodemon": "^3.1.4",
-		"openapi-typescript": "^7.0.2",
+		"openapi-typescript": "^7.3.0",
 		"ts-node": "^10.9.2"
 	},
 	"files": [

@@ -44,6 +44,7 @@ import express, { Router } from 'express';
 import * as v from 'valibot';
 import { vValidator } from 'validation-adapters/valibot';
 import { createExpressOpenApiRouter } from '@blgc/openapi-router';
+
 import { paths } from './path/to/openapi/types';
 
 const app = express();
@@ -54,21 +55,21 @@ const router = Router();
 const openapiRouter = createExpressOpenApiRouter<paths>(router);
 
 openapiRouter.get('/pet/{petId}', {
-    pathValidator: vValidator(
-        v.object({
-            petId: v.number()
-        })
-    ),
-    handler: async (req, res, next) => {}
+	pathValidator: vValidator(
+		v.object({
+			petId: v.number()
+		})
+	),
+	handler: async (req, res, next) => {}
 });
 
 openapiRouter.get('/pet/findByTags', {
-    queryValidator: vValidator(
-        v.object({
-            tags: v.optional(v.array(v.string()))
-        })
-    ),
-    handler: (req, res, next) => {}
+	queryValidator: vValidator(
+		v.object({
+			tags: v.optional(v.array(v.string()))
+		})
+	),
+	handler: (req, res, next) => {}
 });
 
 app.use('/*', router);
@@ -76,11 +77,14 @@ app.use('/*', router);
 
 ### Hono
 
+> Hono's TypeScript integration provides type suggestions for `c.json()` based on generically defined response types, but doesn't enforce these types at compile-time. For example, `c.json('')` won't raise a type error even if the expected type is `{someType: string}`. This is due to Hono's internal use of `TypedResponse<T>`, which infers but doesn't strictly enforce the passed generic type. [Hono Discussion](https://github.com/orgs/honojs/discussions/3331)
+
 ```ts
 import { Hono } from 'hono';
 import * as v from 'valibot';
 import { vValidator } from 'validation-adapters/valibot';
 import { createHonoOpenApiRouter } from '@blgc/openapi-router';
+
 import { paths } from './path/to/openapi/types';
 
 export const app = new Hono();
@@ -89,21 +93,21 @@ const router = new Hono();
 const openapiRouter = createHonoOpenApiRouter<paths>(router);
 
 openapiRouter.get('/pet/{petId}', {
-    pathValidator: vValidator(
-        v.object({
-            petId: v.number()
-        })
-    ),
-    handler: async (c) => {}
+	pathValidator: vValidator(
+		v.object({
+			petId: v.number()
+		})
+	),
+	handler: async (c) => {}
 });
 
 openapiRouter.get('/pet/findByTags', {
-    queryValidator: vValidator(
-        v.object({
-            tags: v.optional(v.array(v.string()))
-        })
-    ),
-    handler: (c) => {}
+	queryValidator: vValidator(
+		v.object({
+			tags: v.optional(v.array(v.string()))
+		})
+	),
+	handler: (c) => {}
 });
 
 // Application endpoint

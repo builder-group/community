@@ -1,6 +1,6 @@
-import { AppError } from '@blgc/openapi-router';
 import type * as hono from 'hono/types';
 import { StatusCode } from 'hono/utils/http-status';
+import { AppError } from '@blgc/openapi-router';
 
 import { components } from '../gen/v1';
 

@@ -21,13 +21,14 @@
 ### [Typescript](https://www.typescriptlang.org/)
 
 `tsconfig.json`
+
 ```json
 {
 	"extends": "@blgc/config/react-library.tsconfig.json",
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./src",
-		"declarationDir": "./dist/types",
+		"declarationDir": "./dist/types"
 	},
 	"include": ["src"]
 }
@@ -36,6 +37,7 @@
 ### [ESLint](https://eslint.org/)
 
 `.eslintrc.js`
+
 ```js
 /**
  * @type {import('eslint').Linter.Config}
@@ -49,6 +51,7 @@ module.exports = {
 ### [Vitest](https://vitest.dev/)
 
 `vitest.config.js`
+
 ```js
 const { defineConfig, mergeConfig } = require('vitest/config');
 const { nodeConfig } = require('@blgc/config/vite/node.config');
@@ -60,7 +63,7 @@ module.exports = mergeConfig(nodeConfig, defineConfig({}));
 
 ### Debugging ESLint Configuration
 
-If you are encountering issues or unexpected behavior with ESLint, you can use the following command to output the final configuration. 
+If you are encountering issues or unexpected behavior with ESLint, you can use the following command to output the final configuration.
 
 ```bash
 npx eslint --print-config ./some/file/to/test/on.ts

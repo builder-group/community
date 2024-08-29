@@ -1,4 +1,3 @@
-import { randomHex, shortId } from '@blgc/utils';
 import {
 	bitwiseFlag,
 	createForm,
@@ -12,6 +11,7 @@ import { withGlobalBind } from 'feature-react/state';
 import React from 'react';
 import * as v from 'valibot';
 import * as z from 'zod';
+import { randomHex, shortId } from '@blgc/utils';
 
 import './App.css';
 

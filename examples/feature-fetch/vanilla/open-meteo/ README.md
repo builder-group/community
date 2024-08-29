@@ -5,12 +5,14 @@ This example demonstrates how to use the [Open Meteo API](https://open-meteo.com
 ## Setup Instructions
 
 1. **Build the Monorepo** (only required once):
+
    - At the root of the monorepo, run:
      ```bash
      pnpm build
      ```
 
 2. **Install Dependencies**:
+
    - In this example directory, run:
      ```bash
      pnpm install
@@ -25,6 +27,7 @@ This example demonstrates how to use the [Open Meteo API](https://open-meteo.com
 ## About
 
 This project was bootstrapped using Vite with the Vanilla TypeScript template:
+
 ```bash
 pnpm create vite example-name --template vanilla-ts
 ```
