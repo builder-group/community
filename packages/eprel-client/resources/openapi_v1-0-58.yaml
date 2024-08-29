@@ -561,6 +561,17 @@ components:
           type: string
           enum: [AUTHORISED_REPRESENTATIVE, IMPORTER, MANUFACTURER]
           example: MANUFACTURER
+    placementCountries:
+      type: array
+      items:
+        type: object
+        properties:
+          country:
+            type: string
+            example: "DE"
+          orderNumber:
+            type: integer
+            example: 1
 
     ContactDetails:
       type: object

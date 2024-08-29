@@ -536,7 +536,7 @@ export interface components {
 		ModelDetails: {
 			/** @example EU_2019_2017 */
 			implementingAct?: string;
-			/** @example Test remove I accept label */
+			/** @example P2422H */
 			modelIdentifier?: string;
 			/** @example [
 			 *       2020,
@@ -578,6 +578,12 @@ export interface components {
 			 */
 			registrantNature?: 'AUTHORISED_REPRESENTATIVE' | 'IMPORTER' | 'MANUFACTURER';
 		};
+		placementCountries: {
+			/** @example DE */
+			country?: string;
+			/** @example 1 */
+			orderNumber?: number;
+		}[];
 		ContactDetails: {
 			/** @example Smith */
 			lastName?: string;
