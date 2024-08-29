@@ -426,7 +426,8 @@ components:
       in: query
       required: false
       schema:
-        $ref: '#/components/schemas/FicheLanguage'
+        type: string
+        enum: [BG, CS, DA, DE, ET, EL, EN, ES, FR, GA, HR, IT, LV, LT, HU, MT, NL, PL, PT, RO, SK, SL, FI, SV]
       description: The language in which the fiche should be returned. If not specified, all languages will be returned in a ZIP file.
     LabelFormat:
       name: format
@@ -628,7 +629,3 @@ components:
           description: "[API_URL]/informationsheet/fiche_[REGISTRATION_NUMBER]_ES.pdf"
           format: uri
           example: https://api.example.com/label/Label_117273.png
-          
-    FicheLanguage:
-      type: string
-      enum: [BG, CS, DA, DE, ET, EL, EN, ES, FR, GA, HR, IT, LV, LT, HU, MT, NL, PL, PT, RO, SK, SL, FI, SV]

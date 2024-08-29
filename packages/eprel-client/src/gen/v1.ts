@@ -626,8 +626,6 @@ export interface components {
              */
             address?: string;
         };
-        /** @enum {string} */
-        FicheLanguage: "BG" | "CS" | "DA" | "DE" | "ET" | "EL" | "EN" | "ES" | "FR" | "GA" | "HR" | "IT" | "LV" | "LT" | "HU" | "MT" | "NL" | "PL" | "PT" | "RO" | "SK" | "SL" | "FI" | "SV";
     };
     responses: {
         /** @description Client error */
@@ -671,7 +669,7 @@ export interface components {
         /** @description If true, returns the address of the file without redirection. */
         NoRedirect: boolean;
         /** @description The language in which the fiche should be returned. If not specified, all languages will be returned in a ZIP file. */
-        FicheLanguage: components["schemas"]["FicheLanguage"];
+        FicheLanguage: "BG" | "CS" | "DA" | "DE" | "ET" | "EL" | "EN" | "ES" | "FR" | "GA" | "HR" | "IT" | "LV" | "LT" | "HU" | "MT" | "NL" | "PL" | "PT" | "RO" | "SK" | "SL" | "FI" | "SV";
         /** @description The format in which the label should be returned. If not specified, all formats will be returned. */
         LabelFormat: "PNG" | "PDF" | "SVG";
         /** @description Used only for domestic ovens, indicating the cavity number. */
