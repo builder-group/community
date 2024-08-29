@@ -8,7 +8,7 @@ import { formatPath, parseParams } from '../../helper';
 import {
 	type TEnforceFeatures,
 	type TFeatureKeys,
-	type TOpenApiHonoParamsParsers,
+	type TOpenApiHonoParamsParserOptions,
 	type TOpenApiHonoValidators,
 	type TOpenApiRouter,
 	type TSelectFeatures
@@ -67,22 +67,24 @@ export function withHono<
 	return _router;
 }
 
-function parseParamsMiddleware(paramsParser: TOpenApiHonoParamsParsers = {}): hono.Handler {
+function parseParamsMiddleware(paramsParser: TOpenApiHonoParamsParserOptions = {}): hono.Handler {
 	const {
 		parseParams: shouldParseParams = true,
 		parsePathParams = parseParams,
-		parseQueryParams = parseParams
+		parsePathParamsBlacklist,
+		parseQueryParams = parseParams,
+		parseQueryParamsBlacklist
 	} = paramsParser;
 	return async (c, next) => {
 		// Extend Hono query params & path params parsing to handle numbers and booleans
 		// as primitive type instead of string.
 		c.req.addValidatedData(
 			'query',
-			shouldParseParams ? parseQueryParams(c.req.query()) : c.req.query()
+			shouldParseParams ? parseQueryParams(c.req.query(), parseQueryParamsBlacklist) : c.req.query()
 		);
 		c.req.addValidatedData(
 			'param',
-			shouldParseParams ? parsePathParams(c.req.param()) : c.req.param()
+			shouldParseParams ? parsePathParams(c.req.param(), parsePathParamsBlacklist) : c.req.param()
 		);
 
 		await next();

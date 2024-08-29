@@ -92,7 +92,7 @@ export type TOpenApiExpressResponse<GPathOperation> = express.Response<
 export type TOpenApiExpressRouteConfig<GPathOperation> = {
 	handler: TOpenApiExpressRequestHandler<GPathOperation>;
 } & TOpenApiExpressValidators<GPathOperation> &
-	TOpenApiExpressParamsParsers;
+	TOpenApiExpressParamsParserOptions;
 
 // =============================================================================
 // Validators
@@ -130,8 +130,10 @@ export type TDefaultExpressValidator = TValidator<Record<string, unknown>>;
 // Parsers
 // =============================================================================
 
-export interface TOpenApiExpressParamsParsers {
+export interface TOpenApiExpressParamsParserOptions {
 	parseParams?: boolean;
 	parseQueryParams?: TParseParams;
+	parseQueryParamsBlacklist?: string[];
 	parsePathParams?: TParseParams;
+	parsePathParamsBlacklist?: string[];
 }

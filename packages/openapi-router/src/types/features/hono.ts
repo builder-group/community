@@ -103,7 +103,7 @@ export type TOpenApiHonoResponse<GPathOperation> =
 export type TOpenApiHonoRouteConfig<GPath extends string, GPathOperation> = {
 	handler: TOpenApiHonoRequestHandler<GPath, GPathOperation>;
 } & TOpenApiHonoValidators<GPathOperation> &
-	TOpenApiHonoParamsParsers;
+	TOpenApiHonoParamsParserOptions;
 
 // =============================================================================
 // Validators
@@ -141,8 +141,10 @@ export type TDefaultHonoValidator = TValidator<Record<string, unknown>>;
 // Parsers
 // =============================================================================
 
-export interface TOpenApiHonoParamsParsers {
+export interface TOpenApiHonoParamsParserOptions {
 	parseParams?: boolean;
 	parseQueryParams?: TParseParams;
+	parseQueryParamsBlacklist?: string[];
 	parsePathParams?: TParseParams;
+	parsePathParamsBlacklist?: string[];
 }
