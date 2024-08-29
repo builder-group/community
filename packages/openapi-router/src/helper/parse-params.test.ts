@@ -36,4 +36,12 @@ describe('parseRequestQuery function', () => {
 		const parsed = parseParams(query);
 		expect(parsed.nested).toEqual({ bool: false, number: 42 });
 	});
+
+	it('should not parse blacklisted keys', () => {
+		const query = { parse: 'true', dontParse: '123', alsoparse: 'false' };
+		const parsed = parseParams(query, ['dontParse']);
+		expect(parsed.parse).toBe(true);
+		expect(parsed.dontParse).toBe('123');
+		expect(parsed.alsoparse).toBe(false);
+	});
 });
