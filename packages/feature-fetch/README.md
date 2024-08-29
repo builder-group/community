@@ -46,29 +46,29 @@ Create a typesafe, straightforward, and lightweight `fetch` wrapper that seamles
 import { createApiFetchClient } from 'feature-fetch';
 
 const fetchClient = createApiFetchClient({
-   prefixUrl: 'https://api.example.com/v1'
+	prefixUrl: 'https://api.example.com/v1'
 });
 
 // Send request
 const response = await fetchClient.get<{ id: string }>('/blogposts/{postId}', {
-    pathParams: {
-       postId: '123'
-   }
+	pathParams: {
+		postId: '123'
+	}
 });
 
 // Handle response
 if (response.isOk()) {
-    console.log(response.value.data); // Handle successful response
+	console.log(response.value.data); // Handle successful response
 } else {
-    console.error(response.error.message); // Handle error response or network exception
+	console.error(response.error.message); // Handle error response or network exception
 }
 
 // Or unwrap the response, throwing an exception on error
 try {
-    const data = response.unwrap().data;
-    console.log(data);
+	const data = response.unwrap().data;
+	console.log(data);
 } catch (error) {
-  console.error(error.message);
+	console.error(error.message);
 }
 ```
 
@@ -83,7 +83,7 @@ Enhance `feature-fetch` to create a typesafe `fetch` wrapper. This feature provi
    import { createApiFetchClient } from 'feature-fetch';
 
    const fetchClient = createApiFetchClient({
-       prefixUrl: 'https://api.example.com/v1'
+   	prefixUrl: 'https://api.example.com/v1'
    });
    ```
 
@@ -93,9 +93,9 @@ Enhance `feature-fetch` to create a typesafe `fetch` wrapper. This feature provi
    ```ts
    // Send request
    const response = await fetchClient.get<{ id: string }>('/blogposts/{postId}', {
-      pathParams: {
-          postId: '123'
-      }
+   	pathParams: {
+   		postId: '123'
+   	}
    });
    ```
 
@@ -109,6 +109,7 @@ Enhance `feature-fetch` with [OpenAPI](https://www.openapis.org/) support to cre
    ```bash
    npx openapi-typescript ./path/to/my/schema.yaml -o ./path/to/my/schema.d.ts
    ```
+
    [More info](https://github.com/drwpow/openapi-typescript/tree/main/packages/openapi-typescript)
 
 2. **Create an OpenAPI Fetch Client**:
@@ -116,10 +117,11 @@ Enhance `feature-fetch` with [OpenAPI](https://www.openapis.org/) support to cre
 
    ```ts
    import { createOpenApiFetchClient } from 'feature-fetch';
+
    import { paths } from './openapi-paths';
 
    const fetchClient = createOpenApiFetchClient<paths>({
-       prefixUrl: 'https://api.example.com/v1'
+   	prefixUrl: 'https://api.example.com/v1'
    });
    ```
 
@@ -129,9 +131,9 @@ Enhance `feature-fetch` with [OpenAPI](https://www.openapis.org/) support to cre
    ```ts
    // Send request
    const response = await fetchClient.get('/blogposts/{postId}', {
-      pathParams: {
-          postId: '123'
-      }
+   	pathParams: {
+   		postId: '123'
+   	}
    });
    ```
 
@@ -143,11 +145,12 @@ Enhance `feature-fetch` to create a typesafe `fetch` wrapper specifically for Gr
    Use `withGraphQL` to extend your existing fetch client with GraphQL capabilities.
 
    ```ts
-   import { withGraphQL, gql } from 'feature-fetch';
+   import { gql, withGraphQL } from 'feature-fetch';
+
    import createFetchClient from './createFetchClient';
 
    const baseFetchClient = createFetchClient({
-       prefixUrl: 'https://api.example.com/v1/graphql'
+   	prefixUrl: 'https://api.example.com/v1/graphql'
    });
 
    const graphqlClient = withGraphQL(baseFetchClient);
@@ -158,13 +161,13 @@ Enhance `feature-fetch` to create a typesafe `fetch` wrapper specifically for Gr
 
    ```ts
    const GET_USER = gql`
-     query GetUser($id: ID!) {
-       user(id: $id) {
-         id
-         name
-         email
-       }
-     }
+   	query GetUser($id: ID!) {
+   		user(id: $id) {
+   			id
+   			name
+   			email
+   		}
+   	}
    `;
    ```
 
@@ -173,10 +176,13 @@ Enhance `feature-fetch` to create a typesafe `fetch` wrapper specifically for Gr
 
    ```ts
    // Send GraphQL query
-   const response = await graphqlClient.query<{id: number}, { user: { id: string; name: string; email: string } }>(GET_USER, {
-       variables: {
-           id: '123'
-       }
+   const response = await graphqlClient.query<
+   	{ id: number },
+   	{ user: { id: string; name: string; email: string } }
+   >(GET_USER, {
+   	variables: {
+   		id: '123'
+   	}
    });
    ```
 
@@ -190,7 +196,7 @@ Indicates a failure in network communication, such as loss of connectivity.
 
 ```ts
 if (response.isErr() && response.error instanceof NetworkError) {
-  console.error('Network error:', response.error.message);
+	console.error('Network error:', response.error.message);
 }
 ```
 
@@ -200,7 +206,7 @@ Occurs when the server returns a response with a status code indicating an error
 
 ```ts
 if (response.isErr() && response.error instanceof RequestError) {
-  console.error('Request error:', response.error.message, 'Status:', response.error.status);
+	console.error('Request error:', response.error.message, 'Status:', response.error.status);
 }
 ```
 
@@ -210,7 +216,7 @@ A general exception type that can encompass other error scenarios not covered by
 
 ```ts
 if (response.isErr() && response.error instanceof FetchError) {
-  console.error('Service error:', response.error.message);
+	console.error('Service error:', response.error.message);
 }
 ```
 
@@ -218,22 +224,22 @@ if (response.isErr() && response.error instanceof FetchError) {
 
 ```ts
 if (response.isErr()) {
-    const error = response.error;
+	const error = response.error;
 
-    if (isStatusCode(error, 404)) {
-        console.error('Not found:', error.data)
-    }
+	if (isStatusCode(error, 404)) {
+		console.error('Not found:', error.data);
+	}
 
-    if (error instanceof NetworkError) {
-        console.error('Network error:', error.message);
-    } else if (error instanceof RequestError) {
-        console.error('Request error:', error.message, 'Status:', error.status);
-    } else if (error instanceof FetchError) {
-        console.error('Service error:', error.message);
-    } else {
-        console.error('Unexpected error:', error);
-    }
-} 
+	if (error instanceof NetworkError) {
+		console.error('Network error:', error.message);
+	} else if (error instanceof RequestError) {
+		console.error('Request error:', error.message, 'Status:', error.status);
+	} else if (error instanceof FetchError) {
+		console.error('Service error:', error.message);
+	} else {
+		console.error('Unexpected error:', error);
+	}
+}
 ```
 
 ## 📙 Features
@@ -245,11 +251,14 @@ Retries each request using an exponential backoff strategy if a network exceptio
 ```ts
 import { createApiFetchClient, withRetry } from 'feature-fetch';
 
-const fetchClient = withRetry(createApiFetchClient({
-    prefixUrl: 'https://api.example.com/v1'
-}), {
-    maxRetries: 3
-});
+const fetchClient = withRetry(
+	createApiFetchClient({
+		prefixUrl: 'https://api.example.com/v1'
+	}),
+	{
+		maxRetries: 3
+	}
+);
 ```
 
 - **`maxRetries`**: Maximum number of retry attempts
@@ -261,9 +270,12 @@ Delays each request by a specified number of milliseconds before sending it.
 ```ts
 import { createApiFetchClient, withDelay } from 'feature-fetch';
 
-const fetchClient = withDelay(createApiFetchClient({
-    prefixUrl: 'https://api.example.com/v1'
-}), 1000);
+const fetchClient = withDelay(
+	createApiFetchClient({
+		prefixUrl: 'https://api.example.com/v1'
+	}),
+	1000
+);
 ```
 
 - **`delayInMs`**: Delay duration in milliseconds

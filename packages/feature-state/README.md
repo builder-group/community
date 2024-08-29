@@ -34,6 +34,7 @@
 Create a typesafe, straightforward, and lightweight state management library designed to be modular and extendable with features like `withPersist()`, `withUndo()`, .. Having previously built [AgileTs](https://agile-ts.org/), I realized the importance of simplicity and modularity. AgileTs, while powerful, became bloated and complex. Learning from that experience, I followed the KISS (Keep It Simple, Stupid) principle for `feature-state`, aiming to provide a more streamlined and efficient solution. Because no code is the best code.
 
 ### ⚖️ Alternatives
+
 - [nanostores](https://github.com/nanostores/nanostores)
 - [jotai](https://github.com/pmndrs/jotai)
 - [AgileTs](https://github.com/agile-ts/agile)
@@ -41,30 +42,35 @@ Create a typesafe, straightforward, and lightweight state management library des
 ## 📖 Usage
 
 `store/tasks.ts`
+
 ```ts
 import { createState } from 'feature-state';
 
 export const $tasks = createState<Task[]>([]);
 
 export function addTask(task: Task) {
-    $tasks.set([...$tasks.get(), task]);
+	$tasks.set([...$tasks.get(), task]);
 }
 ```
 
 `components/Tasks.tsx`
+
 ```tsx
 import { useGlobalState } from 'feature-state-react';
+
 import { $tasks } from '../store/tasks';
 
 export const Tasks = () => {
-    const tasks = useGlobalState($tasks);
+	const tasks = useGlobalState($tasks);
 
-    return (
-        <ul>
-            {tasks.map(task => <li>{task.title}</li>)}
-        </ul>
-    );
-}
+	return (
+		<ul>
+			{tasks.map((task) => (
+				<li>{task.title}</li>
+			))}
+		</ul>
+	);
+};
 ```
 
 ### Atom-based
@@ -101,11 +107,11 @@ Listener callbacks will receive the new value as the first argument.
 
 ```ts
 const unsubscribe = $temperature.subscribe((newValue) => {
-  console.log(`Temperature changed to ${newValue}°C`);
+	console.log(`Temperature changed to ${newValue}°C`);
 });
 ```
 
-Unlike `$state.listen(callback)`, `$state.subscribe(callback)` immediately invokes the listener during the subscription. 
+Unlike `$state.listen(callback)`, `$state.subscribe(callback)` immediately invokes the listener during the subscription.
 
 ## 📙 Features
 
@@ -117,18 +123,18 @@ Adds persistence functionality to the state, allowing the state to be saved to a
 import { createState, withPersist } from 'feature-state';
 
 const storage = {
-    async save(key, value) {
-        localStorage.setItem(key, JSON.stringify(value));
-        return true;
-    },
-    async load(key) {
-        const value = localStorage.getItem(key);
-        return value ? JSON.parse(value) : undefined;
-    },
-    async delete(key) {
-        localStorage.removeItem(key);
-        return true;
-    }
+	async save(key, value) {
+		localStorage.setItem(key, JSON.stringify(value));
+		return true;
+	},
+	async load(key) {
+		const value = localStorage.getItem(key);
+		return value ? JSON.parse(value) : undefined;
+	},
+	async delete(key) {
+		localStorage.removeItem(key);
+		return true;
+	}
 };
 
 const state = withPersist(createState([]), storage, 'tasks');
@@ -161,7 +167,7 @@ state.undo();
 Adds multi-undo functionality to the state, allowing the state to revert to multiple previous values at once.
 
 ```ts
-import { createState, withUndo, withMultiUndo } from 'feature-state';
+import { createState, withMultiUndo, withUndo } from 'feature-state';
 
 const state = withMultiUndo(withUndo(createState([]), 50));
 

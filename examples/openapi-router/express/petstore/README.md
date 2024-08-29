@@ -5,12 +5,14 @@ This example demonstrates how to create a [Express](https://expressjs.com/) Type
 ## Setup Instructions
 
 1. **Build the Monorepo** (only required once):
+
    - At the root of the monorepo, run:
      ```bash
      pnpm build
      ```
 
 2. **Install Dependencies**:
+
    - In this example directory, run:
      ```bash
      pnpm install

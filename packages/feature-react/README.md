@@ -20,7 +20,7 @@
 `feature-react` is the ReactJs extension for the `feature-state` and `feature-form` library, providing hooks and features for easy state management in ReactJs.
 
 - **Lightweight & Tree Shakable**: Function-based and modular design (< 1KB minified)
-- **Modular & Extendable**: Easily extendable with features like `withPersistLocalStorage()`, .. 
+- **Modular & Extendable**: Easily extendable with features like `withPersistLocalStorage()`, ..
 - **Seamless Integration**: Designed to work effortlessly with `feature-state`
 - **Typesafe**: Build with TypeScript for strong type safety
 
@@ -147,4 +147,3 @@ export const MyFormComponent: React.FC = () => {
 - **`handleSubmit(options?)`**: Returns a function to handle form submission with optional configuration for preventing default behavior and including additional data.
 - **`field(formFieldKey)`**: Retrieves the form field object for the given key.
 - **`status(formFieldKey)`**: Retrieves the status of the form field for the given key.
- 

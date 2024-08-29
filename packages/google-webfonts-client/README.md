@@ -33,7 +33,7 @@ Use `createGoogleWebfontsClient()` to create a client with your API key.
 import { createGoogleWebfontsClient } from 'google-webfonts-client';
 
 const client = createGoogleWebfontsClient({
-  apiKey: 'YOUR_API_KEY'
+	apiKey: 'YOUR_API_KEY'
 });
 ```
 
@@ -52,8 +52,8 @@ Fetches the URL of a specific font file based on the provided family, weight, an
 
 ```ts
 const fontUrlResult = await client.getFontFileUrl('Roboto Serif', {
-    fontWeight: 400,
-    fontStyle: 'regular'
+	fontWeight: 400,
+	fontStyle: 'regular'
 });
 const fontUrl = fontUrlResult.unwrap();
 ```
@@ -64,8 +64,8 @@ Use the client to download a font file, specifying the font family, weight, and 
 
 ```ts
 const fontFileResult = await client.downloadFontFile('Roboto Serif', {
-    fontWeight: 100,
-    fontStyle: 'italic'
+	fontWeight: 100,
+	fontStyle: 'italic'
 });
 const fontFile = fontFileResult.unwrap();
 ```
@@ -80,37 +80,36 @@ Errors can occur during API requests, and the client will return detailed error 
 
 ```ts
 const fontUrlResult = await client.getFontFileUrl('Roboto Serif', {
-  fontWeight: 400,
-  fontStyle: 'regular',
+	fontWeight: 400,
+	fontStyle: 'regular'
 });
 
 // First Approach: Handle error using `isErr()`
 if (fontUrlResult.isErr()) {
-  const { error } = fontUrlResult;
-  if (error instanceof NetworkError) {
-    console.error('Network error:', error.message);
-  } else if (error instanceof RequestError) {
-    console.error('Request error:', error.message, 'Status:', error.status);
-  } else if (error instanceof FetchError) {
-    console.error('Service error:', error.message, 'Code:', error.code);
-  } else {
-    console.error('Unexpected error:', error);
-  }
+	const { error } = fontUrlResult;
+	if (error instanceof NetworkError) {
+		console.error('Network error:', error.message);
+	} else if (error instanceof RequestError) {
+		console.error('Request error:', error.message, 'Status:', error.status);
+	} else if (error instanceof FetchError) {
+		console.error('Service error:', error.message, 'Code:', error.code);
+	} else {
+		console.error('Unexpected error:', error);
+	}
 }
 
 // Second Approach: Unwrap response with `try-catch`
 try {
-  const fontUrl = fontUrlResult.unwrap();
+	const fontUrl = fontUrlResult.unwrap();
 } catch (error) {
-  if (error instanceof NetworkError) {
-    console.error('Network error:', error.message);
-  } else if (error instanceof RequestError) {
-    console.error('Request error:', error.message, 'Status:', error.status);
-  } else if (error instanceof FetchError) {
-    console.error('Service error:', error.message, 'Code:', error.code);
-  } else {
-    console.error('Unexpected error:', error);
-  }
+	if (error instanceof NetworkError) {
+		console.error('Network error:', error.message);
+	} else if (error instanceof RequestError) {
+		console.error('Request error:', error.message, 'Status:', error.status);
+	} else if (error instanceof FetchError) {
+		console.error('Service error:', error.message, 'Code:', error.code);
+	} else {
+		console.error('Unexpected error:', error);
+	}
 }
-
 ```

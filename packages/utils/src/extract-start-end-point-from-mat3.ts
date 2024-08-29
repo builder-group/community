@@ -15,8 +15,8 @@ export function extractStartEndPointFromMat3(size: TVec2, mat3: TMat3): [TVec2, 
 		[1.0, 0.5]
 	];
 
-	const transformedStartEndPoint = startEndPoint.map(
-		(point) => applyMat3ToPoint(mat3Inv, point)
+	const transformedStartEndPoint = startEndPoint.map((point) =>
+		applyMat3ToPoint(mat3Inv, point)
 	) as [TVec2, TVec2];
 
 	return [

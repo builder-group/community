@@ -83,6 +83,7 @@ For specific packages, additional fields should be included as shown below. Note
 For more details: [Microsoft/types-publisher/issues/81](https://github.com/Microsoft/types-publisher/issues/81).
 
 Alternatives:
+
 - Move `TUnionToIntersection` into each package
 - Enforce `@blgc/types` as a `peerDependency`
 

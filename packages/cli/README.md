@@ -19,9 +19,11 @@
 `@blgc/cli` is a straightforward CLI tool for bundling TypeScript libraries with presets, powered by Rollup and Esbuild.
 
 ### 🌟 Motivation
+
 Eliminate the hassle of manually configuring Rollup over and over by providing a flexible wrapper with preset configurations for Figma plugins, Rust (Wasm), and TypeScript library bundling.
 
 ### ⚖️ Alternatives
+
 - [tsup](https://github.com/egoist/tsup)
 
 ## 📖 Usage
@@ -29,20 +31,24 @@ Eliminate the hassle of manually configuring Rollup over and over by providing a
 ### Bundle Files
 
 To bundle your files, run:
+
 ```bash
 blgc bundle
 ```
 
 Define the source file and output locations in `package.json`:
+
 ```json
 {
-  "source": "./src/index.ts",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts"
+	"source": "./src/index.ts",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts"
 }
 ```
+
 Output:
+
 - `dist/esm`: ESM bundle
 - `dist/cjs`: CommonJS bundle
 - `dist/types`: TypeScript types
@@ -50,19 +56,22 @@ Output:
 ### Bundle multiple Files
 
 To bundle multiple files, use the `exports` field:
+
 ```json
 {
-  "exports": {
-    "./package1": {
-      "source": "./src/index.ts",
-      "main": "./dist/package1/cjs/index.js",
-      "module": "./dist/package1/esm/index.js",
-      "types": "./dist/package1/types/index.d.ts"
-    }
-  }
+	"exports": {
+		"./package1": {
+			"source": "./src/index.ts",
+			"main": "./dist/package1/cjs/index.js",
+			"module": "./dist/package1/esm/index.js",
+			"types": "./dist/package1/types/index.d.ts"
+		}
+	}
 }
 ```
+
 Output:
+
 - `dist/package1/esm`: ESM bundle
 - `dist/package1/cjs`: CommonJS bundle
 - `dist/package1/types`: TypeScript types
@@ -76,6 +85,7 @@ Expand the preset configuration via a `dyn.config.js` file.
 The `@blgc/cli` allows combining two Rollup configurations using plugin placeholders.
 
 - **`override`** (`isBase = false`): Fill placeholders in `overrideConfig` with plugins from `baseConfig`.
+
   ```javascript
   // Base Configuration (rollup.config.base.js)
   export default {
@@ -92,6 +102,7 @@ The `@blgc/cli` allows combining two Rollup configurations using plugin placehol
   ```
 
 - **`base`** (`isBase = true`): Fill placeholders in `baseConfig` with plugins from `overrideConfig`.
+
   ```javascript
   // Base Configuration (rollup.config.base.js)
   export default {
@@ -124,5 +135,3 @@ module.exports = {
 	}
 };
 ```
-
-
