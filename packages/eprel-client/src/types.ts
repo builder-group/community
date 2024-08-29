@@ -38,3 +38,9 @@ export const ESheetLanguage: Record<TSheetLanguage, TSheetLanguage> = {
 	FI: 'FI',
 	SV: 'SV'
 };
+
+export const ELabelFormat: Record<TLabelFormat, TLabelFormat> = {
+	PNG: 'PNG',
+	SVG: 'SVG',
+	PDF: 'PDF'
+};
