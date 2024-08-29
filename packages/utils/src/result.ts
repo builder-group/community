@@ -75,3 +75,27 @@ export function unwrapErr<T, E extends TResultError>(result: TResult<T, E>): E {
 	}
 	throw new Error('Expected an Err result');
 }
+
+// Maps the value inside an Ok result using the provided function, returning a new Ok result.
+// If the input is an Err result, it returns the Err result unchanged.
+export function mapOk<T, E extends TResultError, U>(
+	result: TResult<T, E>,
+	mapFn: (value: T) => U
+): TResult<U, E> {
+	if (result.isOk()) {
+		return Ok(mapFn(result.value));
+	}
+	return Err(result.error);
+}
+
+// Maps the error inside an Err result using the provided function, returning a new Err result.
+// If the input is an Ok result, it returns the Ok result unchanged.
+export function mapErr<T, E extends TResultError, F extends TResultError>(
+	result: TResult<T, E>,
+	mapFn: (error: E) => F
+): TResult<T, F> {
+	if (result.isErr()) {
+		return Err(mapFn(result.error));
+	}
+	return Ok(result.value);
+}

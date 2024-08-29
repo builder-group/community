@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { Err, Ok, unwrapErr, unwrapOk, type TResult } from './result';
+import { Err, mapErr, mapOk, Ok, unwrapErr, unwrapOk, type TResult } from './result';
 
 describe('Result implementation', () => {
 	it('should create an Ok result correctly', () => {
@@ -78,5 +78,33 @@ describe('Result implementation', () => {
 	it('should throw error on unwrapOk for Err result', () => {
 		const result = Err('Error occurred');
 		expect(() => unwrapOk(result)).toThrow('Expected an Ok result');
+	});
+
+	it('should correctly map an Ok result using mapOk', () => {
+		const result = Ok(5);
+		const mappedResult = mapOk(result, (value) => value * 2);
+		expect(mappedResult.isOk()).toBe(true);
+		expect(mappedResult.unwrap()).toBe(10);
+	});
+
+	it('should leave an Err result unchanged using mapOk', () => {
+		const result = Err<string, string>('Some error');
+		const mappedResult = mapOk(result, (value) => value.toUpperCase());
+		expect(mappedResult.isErr()).toBe(true);
+		expect(unwrapErr(mappedResult)).toBe('Some error');
+	});
+
+	it('should correctly map an Err result using mapErr', () => {
+		const result = Err<number, string>('Some error');
+		const mappedResult = mapErr(result, (error) => `Mapped: ${error}`);
+		expect(mappedResult.isErr()).toBe(true);
+		expect(unwrapErr(mappedResult)).toBe('Mapped: Some error');
+	});
+
+	it('should leave an Ok result unchanged using mapErr', () => {
+		const result = Ok<number, string>(42);
+		const mappedResult = mapErr(result, (error) => `Mapped: ${error}`);
+		expect(mappedResult.isOk()).toBe(true);
+		expect(mappedResult.unwrap()).toBe(42);
 	});
 });

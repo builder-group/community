@@ -1,7 +1,10 @@
 import {
 	createApiFetchClient,
+	Err,
 	hasFeatures,
 	isStatusCode,
+	mapOk,
+	Ok,
 	type TEnforceFeatures,
 	type TFeatureKeys,
 	type TFetchClient,
@@ -31,7 +34,7 @@ export function withGoogleWebfonts<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			const reuslt = await this.get('/webfonts', {
 				queryParams: { capability, family, sort, subset }
 			});
-			return reuslt.unwrap().data;
+			return mapOk(reuslt, (ok) => ok.data);
 		},
 		async getFontFileUrl(
 			this: TFetchClient<['base', 'openapi', 'google-webfonts'], paths>,
@@ -46,16 +49,16 @@ export function withGoogleWebfonts<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			});
 			if (reuslt.isErr()) {
 				if (isStatusCode(reuslt.error, 404)) {
-					return null;
+					return Ok(null);
 				}
-				throw reuslt.error;
+				return Err(reuslt.error);
 			}
 
 			// Find the closest match for font family, weight and style
 			const items = reuslt.value.data.items ?? [];
 			const font = items.find((f) => f.family === family);
 			if (font == null) {
-				return null;
+				return Ok(null);
 			}
 			const closestVariant = findClosestVariant(font.variants ?? [], fontWeight, fontStyle);
 
@@ -63,11 +66,11 @@ export function withGoogleWebfonts<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			if (font.files != null && closestVariant != null) {
 				const fileUrl = font.files[closestVariant];
 				if (fileUrl != null) {
-					return fileUrl.replace('http://', 'https://');
+					return Ok(fileUrl.replace('http://', 'https://'));
 				}
 			}
 
-			return null;
+			return Ok(null);
 		},
 		async downloadFontFile(
 			this: TFetchClient<['base', 'openapi', 'google-webfonts'], paths>,
@@ -75,21 +78,25 @@ export function withGoogleWebfonts<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			options = {}
 		) {
 			// Fetch font download url
-			const downloadUrl = await this.getFontFileUrl(family, options);
+			const downloadUrlResult = await this.getFontFileUrl(family, options);
+			if (downloadUrlResult.isErr()) {
+				return Err(downloadUrlResult.error);
+			}
+			const downloadUrl = downloadUrlResult.value;
 			if (downloadUrl == null) {
-				return null;
+				return Ok(null);
 			}
 
 			// Fetch font binary
 			const result = await this._apiFetchClient.get(downloadUrl, { parseAs: 'arrayBuffer' });
 			if (result.isErr()) {
 				if (isStatusCode(result.error, 404)) {
-					return null;
+					return Ok(null);
 				}
-				throw result.error;
+				return Err(result.error);
 			}
 
-			return new Uint8Array(result.value.data);
+			return Ok(new Uint8Array(result.value.data));
 		}
 	};
 

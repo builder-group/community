@@ -7,6 +7,8 @@ export * from './types';
 export {
 	Err,
 	Ok,
+	mapErr,
+	mapOk,
 	unwrapErr,
 	unwrapOk,
 	type TErrResult,
