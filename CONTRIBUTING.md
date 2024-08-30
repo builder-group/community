@@ -26,7 +26,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"version": "0.0.1",
 	"private": true, // Or false if package should be published to NPM
 	"scripts": {
-		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
 		"start:dev": "tsc -w",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
