@@ -11,10 +11,8 @@ export function createEPRELClient(
 		createOpenApiFetchClient<paths>({
 			prefixUrl,
 			beforeRequestMiddlewares: [
-				async (data) => {
-					const { requestInit } = data;
-					requestInit.headers['x-api-key'] = [apiKey];
-					return { requestInit };
+				(data) => {
+					data.requestInit.headers['x-api-key'] = [apiKey];
 				}
 			]
 		})

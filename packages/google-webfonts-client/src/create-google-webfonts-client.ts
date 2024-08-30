@@ -11,10 +11,8 @@ export function createGoogleWebfontsClient(
 		createOpenApiFetchClient<paths>({
 			prefixUrl,
 			beforeRequestMiddlewares: [
-				async (data) => {
-					const { queryParams = {} } = data;
-					queryParams.key = apiKey;
-					return { queryParams };
+				(data) => {
+					data.queryParams.key = apiKey;
 				}
 			]
 		})
