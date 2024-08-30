@@ -7,8 +7,6 @@ import {
 	mapErrorToFetchError,
 	mapErrorToNetworkError,
 	mapResponseToRequestError,
-	processBeforeRequestMiddlewares,
-	processRequestMiddlewares,
 	serializeBody,
 	serializePathParams,
 	serializeQueryParams
@@ -18,8 +16,6 @@ import type {
 	TFetchClientConfig,
 	TFetchClientOptions,
 	TFetchLike,
-	TPathParams,
-	TQueryParams,
 	TSerializedBody
 } from './types';
 import { type TRequestInitWithHeadersObject } from './types/fetch';
@@ -68,12 +64,12 @@ export function createFetchClient<GPaths extends object = object>(
 				body = undefined,
 				prefixUrl = this._config.prefixUrl,
 				fetchProps = {},
-				middlewareProps
+				middlewareProps,
+				pathParams = {},
+				queryParams = {}
 			} = baseFetchOptions;
 			const headers = new FetchHeaders(baseFetchOptions.headers);
 			const mergedHeaders = FetchHeaders.merge(headers, this._config.headers);
-			let pathParams: TPathParams | undefined = baseFetchOptions.pathParams;
-			let queryParams: TQueryParams | undefined = baseFetchOptions.queryParams;
 
 			// Serialize body
 			let serializedBody: TSerializedBody;
@@ -86,7 +82,7 @@ export function createFetchClient<GPaths extends object = object>(
 			}
 
 			// Build request init object
-			let requestInit: TRequestInitWithHeadersObject = {
+			const requestInit: TRequestInitWithHeadersObject = {
 				redirect: 'follow',
 				...this._config.fetchProps,
 				...fetchProps,
@@ -103,18 +99,16 @@ export function createFetchClient<GPaths extends object = object>(
 
 			// Process before request middlewares
 			try {
-				const middlewaresResponse = await processBeforeRequestMiddlewares(
-					this._config.beforeRequestMiddlewares,
-					{
+				for (const middleware of this._config.beforeRequestMiddlewares) {
+					// eslint-disable-next-line no-await-in-loop -- Needs to be processed in order
+					await middleware({
+						path,
+						props: middlewareProps,
 						requestInit,
 						queryParams,
 						pathParams
-					},
-					middlewareProps
-				);
-				requestInit = middlewaresResponse.requestInit;
-				pathParams = middlewaresResponse.pathParams;
-				queryParams = middlewaresResponse.queryParams;
+					});
+				}
 			} catch (error) {
 				return Err(mapErrorToFetchError(error, '#ERR_MIDDLEWARE'));
 			}
@@ -129,7 +123,10 @@ export function createFetchClient<GPaths extends object = object>(
 			});
 
 			// Process request middlewares
-			const baseFetch = processRequestMiddlewares(this._config.requestMiddlewares, this._fetchLike);
+			const baseFetch = this._config.requestMiddlewares.reduceRight(
+				(acc, middleware) => middleware(acc),
+				this._fetchLike
+			);
 
 			// Send request
 			let response: Response;
