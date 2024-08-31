@@ -4,9 +4,9 @@ import type { paths } from './gen/v1';
 import { withEPREL } from './with-eprel';
 
 export function createEPRELClient(
-	config: TEPRELClientConfig
+	options: TEPRELClientOptions = {}
 ): TFetchClient<['base', 'openapi', 'eprel'], paths> {
-	const { prefixUrl = 'https://eprel.ec.europa.eu/api', apiKey } = config;
+	const { prefixUrl = 'https://eprel.ec.europa.eu/api', apiKey } = options;
 	return withEPREL(
 		createOpenApiFetchClient<paths>({
 			prefixUrl,
@@ -22,7 +22,7 @@ export function createEPRELClient(
 	);
 }
 
-export interface TEPRELClientConfig {
+export interface TEPRELClientOptions {
 	prefixUrl?: string;
 	apiKey?: string;
 }
