@@ -32,12 +32,14 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	fetchClient._features.push('eprel');
 
 	const eprelFeature: TSelectFeatures<['eprel']> = {
-		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100854
+		// Open, thus no API Key required
+		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100941
 		async getProductGroups(this: TFetchClient<['base', 'openapi', 'eprel'], paths>) {
 			const result = await this.get('/product-groups');
 			return mapOk(result, (ok) => ok.data);
 		},
 
+		// API Key required
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100855
 		async getModelsInProductGroup(
 			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
@@ -77,6 +79,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			return mapOk(result, (ok) => ok.data);
 		},
 
+		// Open, thus no API Key required
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100856
 		async getProductByRegistrationNumber(
 			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
@@ -95,6 +98,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			return Ok(result.value.data);
 		},
 
+		// Open, thus no API Key required
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100857
 		async getProductSheets(
 			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
@@ -122,6 +126,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			);
 		},
 
+		// Open, thus no API Key required
 		async getProductSheetUrls(
 			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
 			registrationNumber: TRegistrationNumber
@@ -148,6 +153,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			);
 		},
 
+		// Open, thus no API Key required
 		async getProductSheetUrl(
 			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
 			registrationNumber,
@@ -174,6 +180,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			return Ok(null);
 		},
 
+		// Open, thus no API Key required
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100858
 		async getProductLabels(
 			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
@@ -210,6 +217,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			);
 		},
 
+		// Open, thus no API Key required
 		async getProductLabelUrl(
 			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
 			registrationNumber,
@@ -231,6 +239,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			return Ok(getLabelUrl(productGroup, registrationNumber, format));
 		},
 
+		// Open, thus no API Key required
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100859
 		async getNestedLabel(
 			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
@@ -250,6 +259,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			return Ok(new Uint8Array(result.value.data));
 		},
 
+		// API Key required
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100908
 		async exportProductGroupModels(
 			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,

@@ -10,16 +10,19 @@ export function createEPRELClient(
 	return withEPREL(
 		createOpenApiFetchClient<paths>({
 			prefixUrl,
-			beforeRequestMiddlewares: [
-				(data) => {
-					data.requestInit.headers['x-api-key'] = [apiKey];
-				}
-			]
+			beforeRequestMiddlewares:
+				apiKey != null
+					? [
+							(data) => {
+								data.requestInit.headers['x-api-key'] = [apiKey];
+							}
+						]
+					: undefined
 		})
 	);
 }
 
 export interface TEPRELClientConfig {
 	prefixUrl?: string;
-	apiKey: string;
+	apiKey?: string;
 }
