@@ -33,8 +33,8 @@ export function createFormField<GValue>(
 	// Notify form field listeners if status has changed
 	if (notifyOnStatusChange) {
 		status.listen(
-			() => {
-				formFieldState._notify({ additionalData: { source: 'status' } });
+			(data) => {
+				formFieldState._notify({ additionalData: { source: 'status', status: data.value } });
 			},
 			{ key: 'form-field' }
 		);

@@ -194,7 +194,7 @@ function App() {
 			<StatusMessage $status={status('image')} />
 
 			<button type="submit">Submit</button>
-			<p>Is Valid: {$form.isValid.toString()}</p>
+			<p>Is Valid: {$form.isValid.get().toString()}</p>
 			<p>Render Count: {renderCount}</p>
 			<p>Data: {data}</p>
 		</form>

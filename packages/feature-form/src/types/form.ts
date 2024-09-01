@@ -1,3 +1,4 @@
+import { type TState } from 'feature-state';
 import { type TCollectErrorMode } from 'validation-adapter';
 
 import { type TFeatureKeys, type TSelectFeatures } from './features';
@@ -16,15 +17,15 @@ export type TForm<GFormData extends TFormData, GSelectedFeatureKeys extends TFea
 	_validSubmitCallbacks: TValidSubmitCallback<GFormData>[];
 	_invalidSubmitCallbacks: TInvalidSubmitCallback<GFormData>[];
 	fields: TFormFields<GFormData>;
-	isValid: boolean;
-	isValidating: boolean;
-	isSubmitted: boolean;
-	isSubmitting: boolean;
+	isValid: TState<boolean, ['base']>;
+	isValidating: TState<boolean, ['base']>;
+	isSubmitted: TState<boolean, ['base']>;
+	isSubmitting: TState<boolean, ['base']>;
 	_revalidate: (cached?: boolean) => Promise<boolean>;
 	submit: (options?: TSubmitOptions<GFormData>) => Promise<boolean>;
 	validate: () => Promise<boolean>;
 	getField: <GKey extends keyof TFormFields<GFormData>>(key: GKey) => TFormFields<GFormData>[GKey];
-	getData: () => Readonly<GFormData> | null;
+	getValidData: () => Readonly<GFormData> | null;
 	getErrors: () => TInvalidFormFieldErrors<GFormData>;
 	reset: () => void;
 } & TSelectFeatures<GFormData, GSelectedFeatureKeys>;
@@ -62,7 +63,7 @@ export interface TAdditionalSubmitCallbackData {
 }
 
 export type TInvalidFormFieldErrors<GFormData extends TFormData> = {
-	[Key in keyof GFormData]?: Readonly<TInvalidFormFieldError[]>;
+	[Key in keyof GFormData]?: readonly TInvalidFormFieldError[];
 };
 
 export interface TFormConfig {

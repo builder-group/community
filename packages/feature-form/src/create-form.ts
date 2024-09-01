@@ -1,3 +1,4 @@
+import { createState } from 'feature-state';
 import { type TEntries } from '@blgc/types/utils';
 import { bitwiseFlag, deepCopy, type BitwiseFlag } from '@blgc/utils';
 
@@ -56,21 +57,21 @@ export function createForm<GFormData extends TFormData>(
 				]
 			)
 		) as TFormFields<GFormData>,
-		isValid: false,
-		isValidating: false,
-		isSubmitted: false,
-		isSubmitting: false,
+		isValid: createState(false),
+		isValidating: createState(false),
+		isSubmitted: createState(false),
+		isSubmitting: createState(false),
 		async _revalidate(this: TForm<GFormData, ['base']>, cached = false) {
 			const formFields = Object.values(this.fields) as TFormFields<GFormData>[keyof GFormData][];
 
 			if (!cached) {
-				this.isValidating = true;
+				this.isValidating.set(true);
 				await Promise.all(formFields.map((formField) => formField.validate()));
-				this.isValidating = false;
+				this.isValidating.set(false);
 			}
 
-			this.isValid = formFields.every((formField) => formField.isValid());
-			return this.isValid;
+			this.isValid.set(formFields.every((formField) => formField.isValid()));
+			return this.isValid.get();
 		},
 		async submit(this: TForm<GFormData, ['base']>, options = {}) {
 			const {
@@ -79,12 +80,14 @@ export function createForm<GFormData extends TFormData>(
 				onInvalidSubmit: _onInvalidSubmit,
 				onValidSubmit: _onValidSubmit
 			} = options;
-			this.isSubmitting = true;
+			this.isSubmitting.set(true);
 
+			// Validate form fields
 			const validationPromises: Promise<boolean>[] = [];
 			for (const formField of Object.values(
 				this.fields
 			) as TFormFields<GFormData>[keyof GFormData][]) {
+				formField.isSubmitting = true;
 				if (
 					(formField.isSubmitted &&
 						formField._config.reValidateMode.has(FormFieldReValidateMode.OnSubmit)) ||
@@ -93,11 +96,11 @@ export function createForm<GFormData extends TFormData>(
 				) {
 					validationPromises.push(formField.validate());
 				}
-				this.isSubmitting = true;
 			}
 			await Promise.all(validationPromises);
 
-			const data = this.getData();
+			// Call submit callbacks
+			const data = this.getValidData();
 			if (data != null) {
 				const promises = this._validSubmitCallbacks.map((callback) =>
 					callback(data, additionalData)
@@ -117,6 +120,7 @@ export function createForm<GFormData extends TFormData>(
 				await Promise.all(promises);
 			}
 
+			// Update form field states
 			for (const [fieldKey, formField] of Object.entries(this.fields) as TEntries<
 				TFormFields<GFormData>
 			>) {
@@ -129,10 +133,10 @@ export function createForm<GFormData extends TFormData>(
 				formField.isSubmitting = false;
 			}
 
-			this.isSubmitted = true;
-			this.isSubmitting = false;
+			this.isSubmitted.set(true);
+			this.isSubmitting.set(false);
 
-			return this.isValid;
+			return this.isValid.get();
 		},
 		async validate(this: TForm<GFormData, ['base']>) {
 			return this._revalidate(false);
@@ -140,8 +144,8 @@ export function createForm<GFormData extends TFormData>(
 		getField(this: TForm<GFormData, ['base']>, fieldKey) {
 			return this.fields[fieldKey];
 		},
-		getData(this: TForm<GFormData, ['base']>) {
-			if (!this.isValid) {
+		getValidData(this: TForm<GFormData, ['base']>) {
+			if (!this.isValid.get()) {
 				return null;
 			}
 
@@ -188,8 +192,8 @@ export function createForm<GFormData extends TFormData>(
 			) as TFormFields<GFormData>[keyof GFormData][]) {
 				formField.reset();
 			}
-			this.isSubmitted = false;
-			// isValid is reset by form field
+			this.isSubmitted.set(false);
+			// isValid is reset by form field (_revalidate is called in form field status listener)
 		}
 	};
 
