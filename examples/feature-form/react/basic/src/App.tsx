@@ -7,7 +7,7 @@ import {
 	TFormFieldValidator
 } from 'feature-form';
 import { useForm } from 'feature-react/form';
-import { withGlobalBind } from 'feature-react/state';
+import { useGlobalState, withGlobalBind } from 'feature-react/state';
 import React from 'react';
 import * as v from 'valibot';
 import * as z from 'zod';
@@ -125,6 +125,7 @@ let renderCount = 0;
 function App() {
 	const { handleSubmit, status, field, register } = useForm($form);
 	const [data, setData] = React.useState('');
+	const isValid = useGlobalState($form.isValid);
 
 	renderCount++;
 
@@ -194,7 +195,7 @@ function App() {
 			<StatusMessage $status={status('image')} />
 
 			<button type="submit">Submit</button>
-			<p>Is Valid: {$form.isValid.get().toString()}</p>
+			<p>Is Valid: {isValid.toString()}</p>
 			<p>Render Count: {renderCount}</p>
 			<p>Data: {data}</p>
 		</form>
