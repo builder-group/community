@@ -39,8 +39,8 @@ export function useForm<GFormData extends TFormData>(
 			return registerFormField<GFormData[GKey], GKey>(form.getField(formFieldKey), controlled);
 		},
 		handleSubmit: (options = {}) => {
-			const { preventDefault = true, postSubmitCallback, ...submitOptions } = options;
-			return async (event?: React.BaseSyntheticEvent) => {
+			const { preventDefault = true, ...submitOptions } = options;
+			return (event?: React.BaseSyntheticEvent) => {
 				if (preventDefault) {
 					event?.preventDefault();
 				}
@@ -51,9 +51,7 @@ export function useForm<GFormData extends TFormData>(
 					submitOptions.additionalData = { event };
 				}
 
-				const valid = await form.submit(submitOptions);
-				postSubmitCallback?.(form);
-				return valid;
+				return form.submit(submitOptions);
 			};
 		},
 		field(formFieldKey) {
@@ -79,5 +77,4 @@ export interface TUseFormResponse<GFormData extends TFormData> {
 
 interface THandleSubmitOptions<GFormData extends TFormData> extends TSubmitOptions<GFormData> {
 	preventDefault?: boolean;
-	postSubmitCallback?: (form: TForm<GFormData, ['base']>) => void;
 }

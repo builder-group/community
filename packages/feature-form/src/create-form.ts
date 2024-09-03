@@ -15,6 +15,7 @@ import {
 	type TInvalidFormFieldError,
 	type TInvalidFormFieldErrors,
 	type TInvalidSubmitCallback,
+	type TSubmitCallbackResponse,
 	type TValidSubmitCallback
 } from './types';
 
@@ -78,7 +79,8 @@ export function createForm<GFormData extends TFormData>(
 				additionalData,
 				assignToInitial = false,
 				onInvalidSubmit: _onInvalidSubmit,
-				onValidSubmit: _onValidSubmit
+				onValidSubmit: _onValidSubmit,
+				postSubmitCallback
 			} = options;
 			this.isSubmitting.set(true);
 
@@ -99,25 +101,36 @@ export function createForm<GFormData extends TFormData>(
 			}
 			await Promise.all(validationPromises);
 
-			// Call submit callbacks
+			// Execute submit callbacks
 			const data = this.getValidData();
+			const submitCallbackPromises: TSubmitCallbackResponse[] = [];
 			if (data != null) {
-				const promises = this._validSubmitCallbacks.map((callback) =>
-					callback(data, additionalData)
-				);
-				if (typeof _onValidSubmit === 'function') {
-					promises.push(_onValidSubmit(data, additionalData));
+				for (const callback of this._validSubmitCallbacks) {
+					submitCallbackPromises.push(callback(data, additionalData));
 				}
-				await Promise.all(promises);
+				if (typeof _onValidSubmit === 'function') {
+					submitCallbackPromises.push(_onValidSubmit(data, additionalData));
+				}
 			} else {
 				const errors = this.getErrors();
-				const promises = this._invalidSubmitCallbacks.map((callback) =>
-					callback(errors, additionalData)
-				);
-				if (typeof _onInvalidSubmit === 'function') {
-					promises.push(_onInvalidSubmit(errors, additionalData));
+				for (const callback of this._invalidSubmitCallbacks) {
+					submitCallbackPromises.push(callback(errors, additionalData));
 				}
-				await Promise.all(promises);
+				if (typeof _onInvalidSubmit === 'function') {
+					submitCallbackPromises.push(_onInvalidSubmit(errors, additionalData));
+				}
+			}
+
+			let submitCallbackData: Record<string, unknown> | null = null;
+			if (postSubmitCallback != null) {
+				submitCallbackData = (await Promise.all(submitCallbackPromises)).reduce((acc, result) => {
+					if (result != null && typeof result === 'object') {
+						return { ...acc, ...result };
+					}
+					return acc;
+				}, {}) as Record<string, unknown>;
+			} else {
+				await Promise.all(submitCallbackPromises);
 			}
 
 			// Update form field states
@@ -136,6 +149,7 @@ export function createForm<GFormData extends TFormData>(
 			this.isSubmitted.set(true);
 			this.isSubmitting.set(false);
 
+			postSubmitCallback?.(this, submitCallbackData ?? {});
 			return this.isValid.get();
 		},
 		async validate(this: TForm<GFormData, ['base']>) {
@@ -197,6 +211,7 @@ export function createForm<GFormData extends TFormData>(
 		}
 	};
 
+	// Register listener
 	for (const field of Object.values(form.fields) as TFormFields<GFormData>[keyof GFormData][]) {
 		field.listen(
 			async ({ source }) => {

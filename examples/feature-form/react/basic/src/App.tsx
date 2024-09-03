@@ -109,9 +109,11 @@ const $form = withGlobalBind(
 		},
 		onValidSubmit: (data, additionalData) => {
 			console.log('ValidSubmit', { data, additionalData });
+			return { valid: true };
 		},
 		onInvalidSubmit: (errors, additionalData) => {
 			console.log('Invalid Submit', { errors, additionalData });
+			return { valid: false };
 		},
 		notifyOnStatusChange: false,
 		validateMode: bitwiseFlag(FormFieldValidateMode.OnSubmit),
@@ -133,7 +135,10 @@ function App() {
 		<form
 			onSubmit={handleSubmit({
 				onValidSubmit: (data) => setData(JSON.stringify(data)),
-				preventDefault: true
+				preventDefault: true,
+				postSubmitCallback: (form, data) => {
+					console.log('postSubmit', { form, data });
+				}
 			})}
 		>
 			<h1>Sign Up</h1>
