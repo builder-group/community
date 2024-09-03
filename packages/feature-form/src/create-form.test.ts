@@ -8,28 +8,30 @@ describe('createForm function', () => {
 	it('shoudl work', async () => {
 		const form = createForm({
 			fields: {
-				item5: fromValidator<number>(
+				item5: fromValidator<string>(
 					createValidator([
 						{
-							key: 'date',
+							key: 'length',
 							validate: (cx) => {
-								if (typeof cx.value === 'number') {
-									const date = new Date(cx.value);
+								if (typeof cx.value === 'string' && cx.value.length < 5) {
+									cx.registerError({ code: 'LENGTH' });
 								}
 							}
 						}
 					]),
 					{
-						defaultValue: Date.now()
+						defaultValue: ''
 					}
 				)
 			}
 		});
 
-		const test = form.getField('item5');
+		const item5 = form.getField('item5');
+		item5.set('jeff');
 
-		const isValid = await form.validate();
 		await form.submit();
+
+		form.reset();
 
 		expect(form).not.toBeNull();
 	});
