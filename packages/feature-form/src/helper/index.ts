@@ -1,3 +1,3 @@
 export * from './from-validator';
 export * from './has-form-changed';
-export * from './reset-submitted';
+export * from './reset-form-submitted';
