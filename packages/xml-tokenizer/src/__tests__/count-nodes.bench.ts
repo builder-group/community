@@ -18,7 +18,7 @@ void describe('count nodes', () => {
 
 	bench('[xml-tokenizer]', () => {
 		let nodeCount = 0;
-		tokenize(xml, false, (token) => {
+		tokenize(xml, (token) => {
 			if (token.type === 'ElementStart') {
 				nodeCount++;
 			}
@@ -29,7 +29,7 @@ void describe('count nodes', () => {
 
 	// bench('[xml-tokenizer (npm)]', () => {
 	// 	let nodeCount = 0;
-	// 	xt.tokenize(xml, false, (token) => {
+	// 	xt.tokenize(xml, (token) => {
 	// 		if (token.type === 'ElementStart') {
 	// 			nodeCount++;
 	// 		}

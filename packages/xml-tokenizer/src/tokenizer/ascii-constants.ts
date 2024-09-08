@@ -25,6 +25,7 @@ export const UPPERCASE_P = 80; // P
 export const UPPERCASE_S = 83; // S
 export const UPPERCASE_Z = 90; // Z
 export const OPEN_BRACKET = 91; // [
+export const CLOSE_BRACKET = 93; // ]
 export const UNDERSCORE = 95; // _
 export const LOWERCASE_A = 97; // a
 export const LOWERCASE_F = 102; // f

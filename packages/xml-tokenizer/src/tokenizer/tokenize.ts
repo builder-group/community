@@ -1,8 +1,10 @@
 import {
+	CLOSE_BRACKET,
 	DOUBLE_QUOTE,
 	EQUALS,
 	EXCLAMATION_MARK,
 	GREATER_THAN,
+	HYPHEN,
 	LESS_THAN,
 	OPEN_BRACKET,
 	PERCENT,
@@ -14,7 +16,7 @@ import {
 } from './ascii-constants';
 import { type TTokenCallback } from './types';
 import { XmlError } from './XmlError';
-import { XmlStream } from './XmlStream';
+import { XmlStream, type TXmlStreamOptions } from './XmlStream';
 
 const BOM = '\uFEFF';
 const XML_DECLARATION_START = '<?xml ';
@@ -39,10 +41,10 @@ const STANDALONE = 'standalone';
 
 export function tokenize(
 	xmlString: string,
-	allowDtd: boolean,
-	tokenCallback: TTokenCallback
+	tokenCallback: TTokenCallback,
+	options: TXmlStreamOptions = {}
 ): void {
-	tokenizeXmlStream(new XmlStream(xmlString), allowDtd, tokenCallback);
+	tokenizeXmlStream(new XmlStream(xmlString, options), tokenCallback);
 }
 
 /**
@@ -52,11 +54,7 @@ export function tokenize(
  *
  * https://www.w3.org/TR/xml/#NT-document
  */
-export function tokenizeXmlStream(
-	s: XmlStream,
-	allowDtd: boolean,
-	tokenCallback: TTokenCallback
-): void {
+export function tokenizeXmlStream(s: XmlStream, tokenCallback: TTokenCallback): void {
 	// Skip UTF-8 BOM
 	if (s.startsWith(BOM)) {
 		s.advance(1);
@@ -70,7 +68,7 @@ export function tokenizeXmlStream(
 
 	s.skipSpaces();
 	if (s.startsWith(DOCTYPE_START)) {
-		if (!allowDtd) {
+		if (!s.config.allowDtd) {
 			throw new XmlError({ type: 'DtdDetected' });
 		}
 
@@ -79,14 +77,26 @@ export function tokenizeXmlStream(
 	}
 
 	s.skipSpaces();
-	if (!s.atEnd() && s.currCodeUnit() === LESS_THAN) {
-		parseElement(s, tokenCallback);
-	}
 
-	parseMisc(s, tokenCallback);
+	if (s.config.strict) {
+		if (!s.atEnd() && s.currCodeUnit() === LESS_THAN) {
+			parseElement(s, tokenCallback);
+		}
 
-	if (!s.atEnd()) {
-		throw new XmlError({ type: 'UnknownToken', message: 'Not at end' }, s.genTextPos());
+		parseMisc(s, tokenCallback);
+
+		if (!s.atEnd()) {
+			throw new XmlError({ type: 'UnknownToken', message: 'Not at end' }, s.genTextPos());
+		}
+	} else {
+		while (!s.atEnd()) {
+			if (s.currCodeUnit() === LESS_THAN) {
+				parseElement(s, tokenCallback);
+			} else {
+				parseText(s, tokenCallback);
+			}
+			parseMisc(s, tokenCallback);
+		}
 	}
 }
 
@@ -162,7 +172,7 @@ function parseDeclaration(s: XmlStream): void {
 function parseComment(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(4);
-	const text = s.consumeCharsWhile((_s, c) => !(c === '-' && _s.startsWith(COMMENT_END)));
+	const text = s.consumeCodeUnitsWhile((c, _s) => !(c === HYPHEN && _s.startsWith(COMMENT_END)));
 	s.skipString(COMMENT_END);
 
 	if (text.includes('--') || text.endsWith('-')) {
@@ -189,7 +199,9 @@ function parsePi(s: XmlStream, tokenCallback: TTokenCallback): void {
 	s.advance(2);
 	const target = s.consumeName();
 	s.skipSpaces();
-	const content = s.consumeCharsWhile((_s, c) => !(c === '?' && _s.startsWith(PI_END)));
+	const content = s.consumeCodeUnitsWhile(
+		(c, _s) => !(c === QUESTION_MARK && _s.startsWith(PI_END))
+	);
 
 	s.skipString(PI_END);
 
@@ -473,9 +485,13 @@ function parseAttribute(s: XmlStream): [string, string, string] {
 	if (s.tryConsumeCodeUnit(EQUALS)) {
 		s.skipSpaces();
 		const quote = s.consumeQuote();
-		const quoteChar = String.fromCharCode(quote);
-		value = s.consumeCharsWhile((_, c) => c !== quoteChar && c !== '<');
+		value = s.consumeCodeUnitsWhile((c) => c !== quote && c !== LESS_THAN);
 		s.consumeCodeUnit(quote);
+	} else if (s.config.strict) {
+		throw new XmlError(
+			{ type: 'InvalidChar', expected: EQUALS, actual: s.currCodeUnit() },
+			s.genTextPos()
+		);
 	} else {
 		s.goTo(start);
 		value = 'true';
@@ -534,7 +550,9 @@ function parseContent(s: XmlStream, tokenCallback: TTokenCallback): void {
 function parseCdata(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(9); // <![CDATA[
-	const text = s.consumeCharsWhile((_s, c) => !(c === ']' && _s.startsWith(CDATA_END)));
+	const text = s.consumeCodeUnitsWhile(
+		(c, _s) => !(c === CLOSE_BRACKET && _s.startsWith(CDATA_END))
+	);
 	s.skipString(CDATA_END);
 	const range = s.rangeFrom(start);
 	tokenCallback({ type: 'Cdata', text, range });
@@ -564,7 +582,7 @@ function parseCloseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
  */
 function parseText(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
-	const text = s.consumeCharsWhile((_, c) => c !== '<');
+	const text = s.consumeCodeUnitsWhile((c) => c !== LESS_THAN);
 
 	// According to the spec, `]]>` must not appear inside a Text node.
 	// https://www.w3.org/TR/xml/#syntax

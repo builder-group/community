@@ -17,7 +17,7 @@ describe('tokensToXml function', () => {
 
 	it('should work', () => {
 		const tokens: TXmlToken[] = [];
-		tokenize(bookStoreXml, false, (token) => tokens.push(token));
+		tokenize(bookStoreXml, (token) => tokens.push(token));
 
 		const result = tokensToXml(tokens);
 

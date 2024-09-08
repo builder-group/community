@@ -177,7 +177,6 @@ export class ByteXmlStream implements TXmlStream {
 		const getReference = (): TReference | null => {
 			if (this.tryConsumeByte(HASH)) {
 				let value: number;
-				let radix: number;
 
 				if (this.tryConsumeByte(LOWERCASE_X)) {
 					const hexBytes = this.consumeBytesWhile(
@@ -187,11 +186,9 @@ export class ByteXmlStream implements TXmlStream {
 							(byte >= LOWERCASE_A && byte <= LOWERCASE_F)
 					);
 					value = parseInt(String.fromCharCode(...hexBytes), 16);
-					radix = 16;
 				} else {
 					const digitBytes = this.consumeBytesWhile((_, byte) => isAsciiDigit(byte));
 					value = parseInt(String.fromCharCode(...digitBytes), 10);
-					radix = 10;
 				}
 
 				if (isNaN(value)) {

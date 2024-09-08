@@ -47,7 +47,7 @@ describe('select function', () => {
 	// 	]);
 	// 	const recorded: TXmlToken[] = [];
 
-	// 	tokenize(bookStoreXml, false, (token) => {
+	// 	tokenize(bookStoreXml, (token) => {
 	// 		selector.pipeToken(token, (recordedToken) => {
 	// 			recorded.push(recordedToken);
 	// 		});

@@ -1,6 +1,6 @@
-import { tokenize, type TXmlToken } from './tokenizer';
+import { tokenize, type TXmlStreamOptions, type TXmlToken } from './tokenizer';
 
-export function xmlToObject(xmlString: string, allowDtd = false): TXmlNode {
+export function xmlToObject(xmlString: string, options: TXmlStreamOptions = {}): TXmlNode {
 	const root: TXmlNode = {
 		local: 'root',
 		attributes: [],
@@ -8,9 +8,13 @@ export function xmlToObject(xmlString: string, allowDtd = false): TXmlNode {
 	};
 	const stack: TXmlNode[] = [root];
 
-	tokenize(xmlString, allowDtd, (token) => {
-		processTokenForObject(token, stack);
-	});
+	tokenize(
+		xmlString,
+		(token) => {
+			processTokenForObject(token, stack);
+		},
+		options
+	);
 
 	return root.content[0] as TXmlNode;
 }

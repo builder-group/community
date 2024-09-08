@@ -55,7 +55,7 @@ const xmlObject = xmlToObject('<p>Hello World</p>');
 const simplifiedXmlObject = xmlToSimplifiedObject('<p>Hello World</p>');
 
 // Or, parse XML to a stream of tokens
-tokenize('<p>Hello World</p>', false, (token) => {
+tokenize('<p>Hello World</p>', (token) => {
 	switch (token.type) {
 		case 'ElementStart':
 			console.log('Start of element:', token);

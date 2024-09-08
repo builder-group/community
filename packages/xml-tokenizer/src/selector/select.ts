@@ -8,7 +8,7 @@ export function select(
 	callback: TSelectedTokenCallback
 ): void {
 	const selector = new TokenSelector(tokenSelectPaths);
-	tokenize(xml, false, (token) => {
+	tokenize(xml, (token) => {
 		selector.pipeToken(token, (recordedToken) => {
 			callback(recordedToken);
 		});
