@@ -100,6 +100,25 @@ export interface TCdataToken {
 	range: TRange;
 }
 
+export type TLiquidToken = TLiquidObjectToken | TLiquidTagToken;
+
+export interface TLiquidObjectToken {
+	type: 'LiquidObject';
+	content: string;
+	range: TRange;
+}
+
+export interface TLiquidTagToken {
+	type: 'LiquidTag';
+	name: string;
+	content: string;
+	range: TRange;
+	control: {
+		left: boolean;
+		right: boolean;
+	};
+}
+
 export type TXmlToken =
 	| TProcessingInstructionToken
 	| TCommentToken
