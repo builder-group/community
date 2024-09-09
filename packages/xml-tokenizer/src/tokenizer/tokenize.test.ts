@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { tokenize } from './tokenize';
 import { type TXmlToken } from './types';
 import { XmlError } from './XmlError';
+import { type TXmlStreamOptions } from './XmlStream';
 
 describe('tokenize function', () => {
 	describe('CDATA', () => {
@@ -1653,87 +1654,99 @@ describe('tokenize function', () => {
 			]);
 		});
 
-		it('attribute_08', () => {
-			assertTokens('<c a>', [
-				{
-					type: 'ElementStart',
-					prefix: '',
-					local: 'c',
-					start: 0
-				},
-				{
-					type: 'Attribute',
-					prefix: '',
-					local: 'a',
-					value: 'true',
-					range: { start: 3, end: 4 }
-				},
-				{
-					type: 'ElementEnd',
-					end: { type: 'Open' },
-					range: { start: 4, end: 5 }
-				}
-			]);
+		it('[!strict] attribute_08', () => {
+			assertTokens(
+				'<c a>',
+				[
+					{
+						type: 'ElementStart',
+						prefix: '',
+						local: 'c',
+						start: 0
+					},
+					{
+						type: 'Attribute',
+						prefix: '',
+						local: 'a',
+						value: 'true',
+						range: { start: 3, end: 4 }
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Open' },
+						range: { start: 4, end: 5 }
+					}
+				],
+				{ strict: false }
+			);
 		});
 
-		it('attribute_09', () => {
-			assertTokens('<c a/>', [
-				{
-					type: 'ElementStart',
-					prefix: '',
-					local: 'c',
-					start: 0
-				},
-				{
-					type: 'Attribute',
-					prefix: '',
-					local: 'a',
-					value: 'true',
-					range: { start: 3, end: 4 }
-				},
-				{
-					type: 'ElementEnd',
-					end: { type: 'Empty' },
-					range: { start: 4, end: 6 }
-				}
-			]);
+		it('[!strict] attribute_09', () => {
+			assertTokens(
+				'<c a/>',
+				[
+					{
+						type: 'ElementStart',
+						prefix: '',
+						local: 'c',
+						start: 0
+					},
+					{
+						type: 'Attribute',
+						prefix: '',
+						local: 'a',
+						value: 'true',
+						range: { start: 3, end: 4 }
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Empty' },
+						range: { start: 4, end: 6 }
+					}
+				],
+				{ strict: false }
+			);
 		});
 
-		it('attribute_10', () => {
-			assertTokens("<c a='b' q b:x />", [
-				{
-					type: 'ElementStart',
-					prefix: '',
-					local: 'c',
-					start: 0
-				},
-				{
-					type: 'Attribute',
-					prefix: '',
-					local: 'a',
-					value: 'b',
-					range: { start: 3, end: 8 }
-				},
-				{
-					type: 'Attribute',
-					prefix: '',
-					local: 'q',
-					value: 'true',
-					range: { start: 9, end: 10 }
-				},
-				{
-					type: 'Attribute',
-					prefix: 'b',
-					local: 'x',
-					value: 'true',
-					range: { start: 11, end: 14 }
-				},
-				{
-					type: 'ElementEnd',
-					end: { type: 'Empty' },
-					range: { start: 15, end: 17 }
-				}
-			]);
+		it('[!strict] attribute_10', () => {
+			assertTokens(
+				"<c a='b' q b:x />",
+				[
+					{
+						type: 'ElementStart',
+						prefix: '',
+						local: 'c',
+						start: 0
+					},
+					{
+						type: 'Attribute',
+						prefix: '',
+						local: 'a',
+						value: 'b',
+						range: { start: 3, end: 8 }
+					},
+					{
+						type: 'Attribute',
+						prefix: '',
+						local: 'q',
+						value: 'true',
+						range: { start: 9, end: 10 }
+					},
+					{
+						type: 'Attribute',
+						prefix: 'b',
+						local: 'x',
+						value: 'true',
+						range: { start: 11, end: 14 }
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Empty' },
+						range: { start: 15, end: 17 }
+					}
+				],
+				{ strict: false }
+			);
 		});
 
 		it('attribute_err_01', () => {
@@ -1751,56 +1764,57 @@ describe('tokenize function', () => {
 			]);
 		});
 
-		// it('attribute_err_02', () => {
-		// 	assertTokens('<c a>', [
-		// 		{
-		// 			type: 'ElementStart',
-		// 			prefix: '',
-		// 			local: 'c',
-		// 			start: 0
-		// 		},
-		// 		{
-		// 			type: 'Error',
-		// 			message: "expected '\\u{003D}' not '\\u{003E}' at 1:5"
-		// 		}
-		// 	]);
-		// });
+		it('attribute_err_02', () => {
+			assertTokens('<c a>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					start: 0
+				},
+				{
+					type: 'Error',
+					message: "expected '\\u{003D}' not '\\u{003E}' at 1:5"
+				}
+			]);
+		});
 
-		// it('attribute_err_03', () => {
-		// 	assertTokens('<c a/>', [
-		// 		{
-		// 			type: 'ElementStart',
-		// 			prefix: '',
-		// 			local: 'c',
-		// 			start: 0
-		// 		},
-		// 		{
-		// 			type: 'Error',
-		// 			message: "expected '\\u{003D}' not '\\u{002F}' at 1:5"
-		// 		}
-		// 	]);
-		// });
+		it('attribute_err_03', () => {
+			assertTokens('<c a/>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					start: 0
+				},
+				{
+					type: 'Error',
+					message: "expected '\\u{003D}' not '\\u{002F}' at 1:5"
+				}
+			]);
+		});
 
-		// it('attribute_err_04', () => {
-		// 	assertTokens("<c a='b' q/>", [
-		// 		{
-		// 			type: 'ElementStart',
-		// 			prefix: '',
-		// 			local: 'c',
-		// 			start: 0
-		// 		},
-		// 		{
-		// 			type: 'Attr',
-		// 			prefix: '',
-		// 			local: 'a',
-		// 			value: 'b'
-		// 		},
-		// 		{
-		// 			type: 'Error',
-		// 			message: "expected '\\u{003D}' not '\\u{002F}' at 1:11"
-		// 		}
-		// 	]);
-		// });
+		it('attribute_err_04', () => {
+			assertTokens("<c a='b' q/>", [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'c',
+					start: 0
+				},
+				{
+					type: 'Attribute',
+					prefix: '',
+					local: 'a',
+					value: 'b',
+					range: { start: 3, end: 8 }
+				},
+				{
+					type: 'Error',
+					message: "expected '\\u{003D}' not '\\u{002F}' at 1:11"
+				}
+			]);
+		});
 
 		it('attribute_err_05', () => {
 			assertTokens("<c a='<'/>", [
@@ -2322,12 +2336,16 @@ interface TErrorToken {
 	message: string;
 }
 
-function collectTokens(text: string): TToken[] {
+function collectTokens(text: string, options: TXmlStreamOptions = {}): TToken[] {
 	const tokens: TToken[] = [];
 	try {
-		tokenize(text, true, (token) => {
-			tokens.push(token);
-		});
+		tokenize(
+			text,
+			(token) => {
+				tokens.push(token);
+			},
+			options
+		);
 	} catch (error) {
 		if (error instanceof XmlError) {
 			tokens.push({ type: 'Error', message: error.message });
@@ -2338,6 +2356,6 @@ function collectTokens(text: string): TToken[] {
 	return tokens;
 }
 
-function assertTokens(text: string, tokens: TToken[]): void {
-	expect(collectTokens(text)).toStrictEqual(tokens);
+function assertTokens(text: string, tokens: TToken[], options: TXmlStreamOptions = {}): void {
+	expect(collectTokens(text, options)).toStrictEqual(tokens);
 }
