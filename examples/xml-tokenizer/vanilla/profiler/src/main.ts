@@ -1,20 +1,10 @@
 import * as fxp from 'fast-xml-parser';
 import { Bench } from 'tinybench';
+// @ts-expect-error -- Javascript module
 import * as txml from 'txml';
-import {
-	processTokenForSimplifiedObject,
-	select,
-	tokensToXml,
-	TSelectedXmlToken,
-	TXmlToken,
-	xmlToObject,
-	xmlToSimplifiedObject
-} from 'xml-tokenizer';
-
-import { parse } from './txml';
+import { select, xmlToObject, xmlToSimplifiedObject } from 'xml-tokenizer';
 
 // playground();
-// shopifyTest();
 benchmarkTest();
 
 async function playground(): Promise<void> {
@@ -22,61 +12,6 @@ async function playground(): Promise<void> {
 	const simplified = txml.simplify(dom);
 	const simplifiedLostLess = txml.simplifyLostLess(dom);
 	console.log({ simplified, simplifiedLostLess });
-}
-
-async function shopifyTest(): Promise<void> {
-	const shopifyResult = await fetch(
-		'https://cors-anywhere.herokuapp.com/https://apps.shopify.com/search?page=1&q=review',
-		{
-			headers: {
-				'Accept': 'text/html, application/xhtml+xml',
-				'Turbo-Frame': 'search_page'
-			}
-		}
-	);
-	const shopifyHtml = await shopifyResult.text();
-
-	const results: any[] = [];
-	let stack: any[] = [];
-	let tokens: TSelectedXmlToken[] = [];
-	select(
-		shopifyHtml,
-		[
-			[
-				{
-					axis: 'self-or-descendant',
-					local: 'div',
-					attributes: [
-						{ local: 'data-controller', value: 'app-card' }
-						// { local: 'data-app-card-handle-value', value: 'loox' }
-					]
-				}
-			]
-		],
-		(token) => {
-			tokens.push(token);
-
-			if (token.type === 'SelectionStart') {
-				const result: any = {};
-				results.push(result);
-				stack = [result];
-				return;
-			}
-
-			if (token.type === 'SelectionEnd') {
-				return;
-			}
-
-			processTokenForSimplifiedObject(token as TXmlToken, stack);
-		}
-	);
-
-	console.log({
-		results,
-		shopifyHtml,
-		selectedHtml: tokensToXml(tokens as TXmlToken[])
-	});
-	console.log(results.map((result: any) => result._div.attributes['data-app-card-handle-value']));
 }
 
 async function benchmarkTest(): Promise<void> {
@@ -98,9 +33,6 @@ async function bench1(xml: string, time = 100) {
 		})
 		.add('xml-tokenizer (simplified)', () => {
 			xmlToSimplifiedObject(xml);
-		})
-		.add('txml-ts', () => {
-			parse(xml);
 		})
 		.add('txml', () => {
 			txml.parse(xml);

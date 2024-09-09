@@ -39,7 +39,9 @@ void describe('count nodes', () => {
 				]
 			],
 			(token) => {
-				xmlString += tokenToXml(token);
+				if (token.type !== 'SelectionStart' && token.type !== 'SelectionEnd') {
+					xmlString += tokenToXml(token);
+				}
 			}
 		);
 
