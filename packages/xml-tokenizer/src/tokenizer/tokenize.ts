@@ -1,12 +1,14 @@
 import {
-	CLOSE_BRACKET,
+	CLOSE_CURLY_BRACKET,
+	CLOSE_SQUARE_BRACKET,
 	DOUBLE_QUOTE,
 	EQUALS,
 	EXCLAMATION_MARK,
 	GREATER_THAN,
 	HYPHEN,
 	LESS_THAN,
-	OPEN_BRACKET,
+	OPEN_CURLY_BRACKET,
+	OPEN_SQUARE_BRACKET,
 	PERCENT,
 	QUESTION_MARK,
 	SINGLE_QUOTE,
@@ -15,6 +17,7 @@ import {
 	UPPERCASE_S
 } from './ascii-constants';
 import { type TTokenCallback } from './types';
+import { isXmlSpaceByte } from './utils';
 import { XmlError } from './XmlError';
 import { XmlStream, type TXmlStreamOptions } from './XmlStream';
 
@@ -110,7 +113,9 @@ export function tokenizeXmlStream(s: XmlStream, tokenCallback: TTokenCallback): 
 function parseMisc(s: XmlStream, tokenCallback: TTokenCallback): void {
 	while (!s.atEnd()) {
 		s.skipSpaces();
-		if (s.startsWith(COMMENT_START)) {
+		if (s.currCodeUnit() === OPEN_CURLY_BRACKET) {
+			parseLiquid(s);
+		} else if (s.startsWith(COMMENT_START)) {
 			parseComment(s, tokenCallback);
 		} else if (s.startsWith(PI_START)) {
 			parsePi(s, tokenCallback);
@@ -288,7 +293,7 @@ function parseDoctypeStart(s: XmlStream): void {
 	s.skipSpaces();
 
 	const currCodeUnit = s.currCodeUnit();
-	if (currCodeUnit !== OPEN_BRACKET && currCodeUnit !== GREATER_THAN) {
+	if (currCodeUnit !== OPEN_SQUARE_BRACKET && currCodeUnit !== GREATER_THAN) {
 		throw new XmlError(
 			{ type: 'InvalidChar', expected: "'[' or '>'", actual: currCodeUnit },
 			s.genTextPos()
@@ -429,7 +434,9 @@ function parseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 		const _start = s.getPos();
 		const currCodeUnit = s.currCodeUnit();
 
-		if (currCodeUnit === SLASH) {
+		if (currCodeUnit === OPEN_CURLY_BRACKET) {
+			parseLiquid(s);
+		} else if (currCodeUnit === SLASH) {
 			s.advance(1);
 			s.consumeCodeUnit(GREATER_THAN);
 			const range = s.rangeFrom(_start);
@@ -467,6 +474,62 @@ function parseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 	}
 }
 
+function parseLiquid(s: XmlStream): { type: string; content: string } {
+	const start = s.getPos();
+	let type: string;
+	let content: string;
+
+	if (s.startsWith('{{')) {
+		type = 'output';
+		s.advance(2);
+		content = s.consumeCodeUnitsWhile((c, _s) => !_s.startsWith('}}'));
+		s.advance(2);
+	} else if (s.startsWith('{%')) {
+		s.advance(2);
+		s.skipSpaces();
+		const tagName = s.consumeCodeUnitsWhile((c) => !isXmlSpaceByte(c) && c !== PERCENT);
+
+		if (tagName === 'comment') {
+			type = 'comment';
+			s.skipSpaces();
+			s.consumeCodeUnit(PERCENT);
+			s.consumeCodeUnit(CLOSE_CURLY_BRACKET);
+			content = s.consumeCodeUnitsWhile((c, _s) => !_s.startsWith('{% endcomment %}'));
+			s.skipString('{% endcomment %}');
+		} else if (['if', 'unless', 'case', 'for', 'tablerow'].includes(tagName)) {
+			type = 'block-start';
+			content = tagName + s.consumeCodeUnitsWhile((c, _s) => !_s.startsWith('%}'));
+			s.advance(2);
+		} else if (tagName.startsWith('end')) {
+			type = 'block-end';
+			content = tagName;
+			s.consumeCodeUnitsWhile((c, _s) => !_s.startsWith('%}'));
+			s.advance(2);
+		} else {
+			type = 'tag';
+			content = tagName + s.consumeCodeUnitsWhile((c, _s) => !_s.startsWith('%}'));
+			s.advance(2);
+		}
+	} else {
+		throw new XmlError({ type: 'InvalidComment' }, s.genTextPos());
+	}
+
+	// Handle whitespace control characters
+	if (content.startsWith('-')) {
+		content = content.slice(1);
+		type += '-left';
+	}
+	if (content.endsWith('-')) {
+		content = content.slice(0, -1);
+		type += '-right';
+	}
+
+	console.log('Liquid Token', { type, content: s.sliceBack(start) });
+
+	const end = s.getPos();
+	return { type, content: s.sliceBack(start) };
+}
+
 /**
  * Parses an XML attribute.
  *
@@ -478,15 +541,29 @@ function parseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
  */
 function parseAttribute(s: XmlStream): [string, string, string] {
 	const [prefix, local] = s.consumeQName();
-	let value: string;
+	let value = '';
 	const start = s.getPos();
 
 	s.skipSpaces();
 	if (s.tryConsumeCodeUnit(EQUALS)) {
 		s.skipSpaces();
 		const quote = s.consumeQuote();
-		value = s.consumeCodeUnitsWhile((c) => c !== quote && c !== LESS_THAN);
-		s.consumeCodeUnit(quote);
+		while (!s.atEnd()) {
+			const c = s.currCodeUnit();
+			if (c === quote) {
+				s.consumeCodeUnit(quote);
+				break;
+			} else if (c === LESS_THAN) {
+				throw new XmlError({ type: 'InvalidChar', expected: quote, actual: c }, s.genTextPos());
+			} else if (c === OPEN_CURLY_BRACKET) {
+				const liquidStart = s.getPos();
+				parseLiquid(s);
+				value = s.sliceBack(liquidStart);
+			} else {
+				value += String.fromCodePoint(c);
+				s.consumeCodeUnit(c);
+			}
+		}
 	} else if (s.config.strict) {
 		throw new XmlError(
 			{ type: 'InvalidChar', expected: EQUALS, actual: s.currCodeUnit() },
@@ -551,7 +628,7 @@ function parseCdata(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(9); // <![CDATA[
 	const text = s.consumeCodeUnitsWhile(
-		(c, _s) => !(c === CLOSE_BRACKET && _s.startsWith(CDATA_END))
+		(c, _s) => !(c === CLOSE_SQUARE_BRACKET && _s.startsWith(CDATA_END))
 	);
 	s.skipString(CDATA_END);
 	const range = s.rangeFrom(start);
@@ -582,7 +659,20 @@ function parseCloseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
  */
 function parseText(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
-	const text = s.consumeCodeUnitsWhile((c) => c !== LESS_THAN);
+	let text = '';
+	while (!s.atEnd()) {
+		const c = s.currCodeUnit();
+		if (c === LESS_THAN) {
+			break;
+		} else if (c === OPEN_CURLY_BRACKET) {
+			const liquidStart = s.getPos();
+			parseLiquid(s);
+			text = s.sliceBack(liquidStart);
+		} else {
+			text += String.fromCodePoint(c);
+			s.consumeCodeUnit(c);
+		}
+	}
 
 	// According to the spec, `]]>` must not appear inside a Text node.
 	// https://www.w3.org/TR/xml/#syntax
