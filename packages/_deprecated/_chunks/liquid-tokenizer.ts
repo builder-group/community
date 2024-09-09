@@ -1,4 +1,5 @@
 import {
+	CLOSE_CURLY_BRACKET,
 	CLOSE_SQUARE_BRACKET,
 	DOUBLE_QUOTE,
 	EQUALS,
@@ -6,6 +7,7 @@ import {
 	GREATER_THAN,
 	HYPHEN,
 	LESS_THAN,
+	OPEN_CURLY_BRACKET,
 	OPEN_SQUARE_BRACKET,
 	PERCENT,
 	QUESTION_MARK,
@@ -14,7 +16,8 @@ import {
 	UPPERCASE_P,
 	UPPERCASE_S
 } from './ascii-constants';
-import { type TTokenCallback } from './types';
+import { type TLiquidToken, type TTokenCallback } from './types';
+import { isXmlSpaceByte } from './utils';
 import { XmlError } from './XmlError';
 import { XmlStream, type TXmlStreamOptions } from './XmlStream';
 
@@ -90,7 +93,7 @@ export function tokenizeXmlStream(s: XmlStream, tokenCallback: TTokenCallback): 
 		}
 	} else {
 		while (!s.atEnd()) {
-			if (s.currCodeUnit() === LESS_THAN) {
+			if (s.currCodeUnitUnchecked() === LESS_THAN) {
 				parseElement(s, tokenCallback);
 			} else {
 				parseText(s, tokenCallback);
@@ -110,7 +113,9 @@ export function tokenizeXmlStream(s: XmlStream, tokenCallback: TTokenCallback): 
 function parseMisc(s: XmlStream, tokenCallback: TTokenCallback): void {
 	while (!s.atEnd()) {
 		s.skipSpaces();
-		if (s.startsWith(COMMENT_START)) {
+		if (s.currCodeUnit() === OPEN_CURLY_BRACKET) {
+			parseLiquid(s);
+		} else if (s.startsWith(COMMENT_START)) {
 			parseComment(s, tokenCallback);
 		} else if (s.startsWith(PI_START)) {
 			parsePi(s, tokenCallback);
@@ -429,7 +434,9 @@ function parseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 		const _start = s.getPos();
 		const currCodeUnit = s.currCodeUnit();
 
-		if (currCodeUnit === SLASH) {
+		if (currCodeUnit === OPEN_CURLY_BRACKET) {
+			parseLiquid(s);
+		} else if (currCodeUnit === SLASH) {
 			s.advance(1);
 			s.consumeCodeUnit(GREATER_THAN);
 			const range = s.rangeFrom(_start);
@@ -478,15 +485,29 @@ function parseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
  */
 function parseAttribute(s: XmlStream): [string, string, string] {
 	const [prefix, local] = s.consumeQName();
-	let value: string;
+	let value = '';
 	const start = s.getPos();
 
 	s.skipSpaces();
 	if (s.tryConsumeCodeUnit(EQUALS)) {
 		s.skipSpaces();
 		const quote = s.consumeQuote();
-		value = s.consumeCodeUnitsWhile((c) => c !== quote && c !== LESS_THAN);
-		s.consumeCodeUnit(quote);
+		while (!s.atEnd()) {
+			const c = s.currCodeUnitUnchecked();
+			if (c === quote) {
+				s.consumeCodeUnit(quote);
+				break;
+			} else if (c === LESS_THAN) {
+				throw new XmlError({ type: 'InvalidChar', expected: quote, actual: c }, s.genTextPos());
+			} else if (c === OPEN_CURLY_BRACKET) {
+				const liquidStart = s.getPos();
+				parseLiquid(s);
+				value = s.sliceBack(liquidStart);
+			} else {
+				value += String.fromCodePoint(c);
+				s.consumeCodeUnit(c);
+			}
+		}
 	} else if (s.config.strict) {
 		throw new XmlError(
 			{ type: 'InvalidChar', expected: EQUALS, actual: s.currCodeUnit() },
@@ -509,7 +530,7 @@ function parseAttribute(s: XmlStream): [string, string, string] {
  */
 function parseContent(s: XmlStream, tokenCallback: TTokenCallback): void {
 	while (!s.atEnd()) {
-		const currCodeUnit = s.currCodeUnit();
+		const currCodeUnit = s.currCodeUnitUnchecked();
 		if (currCodeUnit === LESS_THAN) {
 			const nextCodeUnit = s.nextCodeUnit();
 			if (nextCodeUnit === EXCLAMATION_MARK) {
@@ -582,7 +603,20 @@ function parseCloseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
  */
 function parseText(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
-	const text = s.consumeCodeUnitsWhile((c) => c !== LESS_THAN);
+	let text = '';
+	while (!s.atEnd()) {
+		const c = s.currCodeUnitUnchecked();
+		if (c === LESS_THAN) {
+			break;
+		} else if (c === OPEN_CURLY_BRACKET) {
+			const liquidStart = s.getPos();
+			parseLiquid(s);
+			text = s.sliceBack(liquidStart);
+		} else {
+			text += String.fromCodePoint(c);
+			s.consumeCodeUnit(c);
+		}
+	}
 
 	// According to the spec, `]]>` must not appear inside a Text node.
 	// https://www.w3.org/TR/xml/#syntax
@@ -591,4 +625,123 @@ function parseText(s: XmlStream, tokenCallback: TTokenCallback): void {
 	}
 
 	tokenCallback({ type: 'Text', text, range: s.rangeFrom(start) });
+}
+
+function parseLiquid(s: XmlStream): TLiquidToken {
+	const start = s.getPos();
+
+	if (s.startsWith('{{')) {
+		const content = parseLiquidObject(s);
+
+		console.log('Liquid Object', { content });
+		return { type: 'LiquidObject', content, range: s.rangeFrom(start) };
+	}
+
+	if (s.startsWith('{%')) {
+		const tag = parseLiquidTag(s);
+		let content: string;
+
+		switch (tag.name) {
+			case 'comment': {
+				content = '';
+				while (!s.atEnd()) {
+					const c = s.currCodeUnitUnchecked();
+					if (c === OPEN_CURLY_BRACKET && s.startsWith('{%')) {
+						const nextTag = parseLiquidTag(s);
+						if (nextTag.name === 'endcomment') {
+							break;
+						}
+					} else {
+						content += String.fromCodePoint(c);
+						s.consumeCodeUnit(c);
+					}
+				}
+				break;
+			}
+			default: {
+				content = tag.content;
+			}
+		}
+
+		console.log('Liquid Tag', { tag: tag.name, content });
+		return {
+			type: 'LiquidTag',
+			name: tag.name,
+			content,
+			control: tag.control,
+			range: s.rangeFrom(start)
+		};
+	}
+
+	throw new XmlError({ type: 'InvalidComment' }, s.genTextPos());
+}
+
+function parseLiquidTag(s: XmlStream): {
+	name: string;
+	content: string;
+	control: {
+		left: boolean;
+		right: boolean;
+	};
+} {
+	let leftControl = false;
+	let rightControl = false;
+	let content = '';
+
+	if (s.startsWith('{%-')) {
+		leftControl = true;
+	}
+	s.advance(leftControl ? 3 : 2);
+
+	s.skipSpaces();
+
+	const name = s.consumeCodeUnitsWhile(
+		(c, _s) => !(isXmlSpaceByte(c) || (c === PERCENT && _s.startsWith('%}')))
+	);
+	s.skipSpaces();
+
+	if (!s.startsWith('%}')) {
+		content = s.consumeCodeUnitsWhile((c, _s) => {
+			if (c === PERCENT && _s.startsWith('%}')) {
+				return false;
+			} else if (c === HYPHEN && _s.startsWith('-%}')) {
+				rightControl = true;
+				return false;
+			}
+			return true;
+		});
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Not true
+	s.advance(rightControl ? 3 : 2);
+
+	return { name, content, control: { left: leftControl, right: rightControl } };
+}
+
+function parseLiquidObject(s: XmlStream): string {
+	s.advance(2);
+	const content = s.consumeCodeUnitsWhile(
+		(c, _s) => !(c === CLOSE_CURLY_BRACKET && _s.startsWith('}}'))
+	);
+	s.advance(2);
+	return content;
+}
+
+export type TLiquidToken = TLiquidObjectToken | TLiquidTagToken;
+
+export interface TLiquidObjectToken {
+	type: 'LiquidObject';
+	content: string;
+	range: TRange;
+}
+
+export interface TLiquidTagToken {
+	type: 'LiquidTag';
+	name: string;
+	content: string;
+	range: TRange;
+	control: {
+		left: boolean;
+		right: boolean;
+	};
 }

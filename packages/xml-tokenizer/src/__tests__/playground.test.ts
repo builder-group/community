@@ -5,27 +5,12 @@ import { beforeAll, expect, it } from 'vitest';
 
 import { select } from '../selector';
 import { tokenToXml } from '../token-to-xml';
-import { tokenize, type TXmlToken } from '../tokenizer';
 
 void describe('count nodes', () => {
 	let xml = '';
 
 	beforeAll(async () => {
-		xml = await readFile(`${__dirname}/resources/test.liquid`, 'utf-8');
-	});
-
-	it('should work', () => {
-		const tokens: TXmlToken[] = [];
-
-		tokenize(
-			xml,
-			(token) => {
-				tokens.push(token);
-			},
-			{ strict: false }
-		);
-
-		expect(tokens).not.toBeNull();
+		xml = await readFile(`${__dirname}/resources/bookstore.xml`, 'utf-8');
 	});
 
 	it('[camaro] shoud work', async () => {
@@ -54,7 +39,7 @@ void describe('count nodes', () => {
 				]
 			],
 			(token) => {
-				xmlString += tokenToXml(token as TXmlToken);
+				xmlString += tokenToXml(token);
 			}
 		);
 
