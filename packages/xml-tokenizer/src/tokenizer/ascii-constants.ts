@@ -31,5 +31,5 @@ export const LOWERCASE_A = 97; // a
 export const LOWERCASE_F = 102; // f
 export const LOWERCASE_X = 120; // x
 export const LOWERCASE_Z = 122; // z
-export const OPEN_CURLY_BRACKET = 123; // {
-export const CLOSE_CURLY_BRACKET = 125; // }
+// export const OPEN_CURLY_BRACKET = 123; // {
+// export const CLOSE_CURLY_BRACKET = 125; // }

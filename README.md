@@ -56,7 +56,7 @@ A collection of open source libraries maintained by [builder.group](https://buil
 
 ### `xml-tokenizer`
 
-- [`xml-tokenizer/vanilla/profiler`](https://github.com/builder-group/monorepo/tree/develop/examples/xml-tokenizer/vanilla/profiler)
+- [`xml-tokenizer/vanilla/playground`](https://github.com/builder-group/monorepo/tree/develop/examples/xml-tokenizer/vanilla/playground)
 
 ## ❓ FAQ
 
