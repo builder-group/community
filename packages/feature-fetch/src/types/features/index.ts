@@ -15,6 +15,8 @@ export type TFeatures<GPaths extends object = object> = {
 	graphql: TGraphQLFeature;
 	retry: { _: null };
 	delay: { _: null };
+	cache: { _: null };
+	graphqlCache: { _: null };
 } & TThirdPartyFeatures<GPaths>;
 
 // Global registry for third party features

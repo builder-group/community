@@ -1,6 +1,7 @@
-import { Err, Ok, type TResult } from '@blgc/utils';
+import { print } from '@0no-co/graphql.web';
+import { Ok, type TResult } from '@blgc/utils';
 
-import { FetchError } from '../../exceptions';
+import { type FetchError } from '../../exceptions';
 import { type TDocumentInput } from '../../types';
 
 export function getQueryString<
@@ -15,5 +16,5 @@ export function getQueryString<
 		return Ok(document.loc.source.body);
 	}
 
-	return Err(new FetchError('#ERR_UNSUPPORTED_QUERY_FORMAT'));
+	return Ok(print(document));
 }
