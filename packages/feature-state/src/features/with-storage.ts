@@ -1,23 +1,21 @@
 import type { TEnforceFeatures, TFeatureKeys, TSelectFeatures, TState } from '../types';
 
-export const FAILED_TO_LOAD_IDENTIFIER = undefined;
+export const FAILED_TO_LOAD_FROM_STORAGE_IDENTIFIER = null;
 
 export interface TStorageInterface<GStorageValue> {
 	save: (key: string, value: GStorageValue) => Promise<boolean> | boolean;
 	load: (
 		key: string
 	) =>
-		| Promise<GStorageValue | typeof FAILED_TO_LOAD_IDENTIFIER>
+		| Promise<GStorageValue | typeof FAILED_TO_LOAD_FROM_STORAGE_IDENTIFIER>
 		| GStorageValue
-		| typeof FAILED_TO_LOAD_IDENTIFIER;
+		| typeof FAILED_TO_LOAD_FROM_STORAGE_IDENTIFIER;
 	delete: (key: string) => Promise<boolean> | boolean;
 }
 
-export function withPersist<
+export function withStorage<
 	GValue,
 	GSelectedFeatureKeys extends TFeatureKeys<GValue>[],
-	// TODO: For whatever reason Typescript infers type from storage and not state argument
-	// thus I need this extra GStorageValue
 	GStorageValue extends GValue = GValue
 >(
 	state: TState<GValue, TEnforceFeatures<GSelectedFeatureKeys, ['base']>>,
@@ -26,14 +24,9 @@ export function withPersist<
 ): TState<GValue, [...GSelectedFeatureKeys, 'persist']> {
 	const persistFeature: TSelectFeatures<GValue, ['persist']> = {
 		async persist() {
-			let success = false;
-
 			// Load persisted value or store inital value
-			const persistedValue = await storage.load(key);
-			if (persistedValue !== FAILED_TO_LOAD_IDENTIFIER) {
-				state.set(persistedValue);
-				success = true;
-			} else {
+			let success = await this.loadFormStorage();
+			if (!success) {
 				success = await storage.save(key, state._value as GStorageValue);
 			}
 
@@ -47,7 +40,18 @@ export function withPersist<
 
 			return success;
 		},
-		async deletePersisted() {
+		async loadFormStorage() {
+			let success = false;
+
+			const persistedValue = await storage.load(key);
+			if (persistedValue !== FAILED_TO_LOAD_FROM_STORAGE_IDENTIFIER) {
+				state.set(persistedValue);
+				success = true;
+			}
+
+			return success;
+		},
+		async deleteFormStorage() {
 			return storage.delete(key);
 		}
 	};

@@ -21,7 +21,7 @@
 
 - **Lightweight & Tree Shakable**: Function-based and modular design (< 1KB minified)
 - **Fast**: Minimal code ensures high performance, and state changes can be deferred in "the bucket"
-- **Modular & Extendable**: Easily extendable with features like `withPersist()`, `withUndo()`, ..
+- **Modular & Extendable**: Easily extendable with features like `withStorage()`, `withUndo()`, ..
 - **Typesafe**: Build with TypeScript for strong type safety
 - **Standalone**: Zero dependencies, ensuring ease of use in various environments
 
@@ -31,7 +31,7 @@
 
 ### 🌟 Motivation
 
-Create a typesafe, straightforward, and lightweight state management library designed to be modular and extendable with features like `withPersist()`, `withUndo()`, .. Having previously built [AgileTs](https://agile-ts.org/), I realized the importance of simplicity and modularity. AgileTs, while powerful, became bloated and complex. Learning from that experience, I followed the KISS (Keep It Simple, Stupid) principle for `feature-state`, aiming to provide a more streamlined and efficient solution. Because no code is the best code.
+Create a typesafe, straightforward, and lightweight state management library designed to be modular and extendable with features like `withStorage()`, `withUndo()`, .. Having previously built [AgileTs](https://agile-ts.org/), I realized the importance of simplicity and modularity. AgileTs, while powerful, became bloated and complex. Learning from that experience, I followed the KISS (Keep It Simple, Stupid) principle for `feature-state`, aiming to provide a more streamlined and efficient solution. Because no code is the best code.
 
 ### ⚖️ Alternatives
 
@@ -115,12 +115,12 @@ Unlike `$state.listen(callback)`, `$state.subscribe(callback)` immediately invok
 
 ## 📙 Features
 
-### `withPersist()`
+### `withStorage()`
 
 Adds persistence functionality to the state, allowing the state to be saved to and loaded from a storage medium.
 
 ```ts
-import { createState, withPersist } from 'feature-state';
+import { createState, withStorage } from 'feature-state';
 
 const storage = {
 	async save(key, value) {
@@ -137,7 +137,7 @@ const storage = {
 	}
 };
 
-const state = withPersist(createState([]), storage, 'tasks');
+const state = withStorage(createState([]), storage, 'tasks');
 
 await state.persist();
 

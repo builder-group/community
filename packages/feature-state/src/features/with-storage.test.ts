@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { sleep } from '@blgc/utils';
 
 import { createState } from '../create-state';
-import { FAILED_TO_LOAD_IDENTIFIER, withPersist, type TStorageInterface } from './with-persist';
+import {
+	FAILED_TO_LOAD_FROM_STORAGE_IDENTIFIER,
+	withStorage,
+	type TStorageInterface
+} from './with-storage';
 
 class MockStorage<GValue> implements TStorageInterface<GValue> {
 	private store: Record<string, GValue> = {};
@@ -12,8 +16,8 @@ class MockStorage<GValue> implements TStorageInterface<GValue> {
 		return true;
 	}
 
-	async load(key: string): Promise<GValue | typeof FAILED_TO_LOAD_IDENTIFIER> {
-		return this.store[key] ?? FAILED_TO_LOAD_IDENTIFIER;
+	async load(key: string): Promise<GValue | typeof FAILED_TO_LOAD_FROM_STORAGE_IDENTIFIER> {
+		return this.store[key] ?? FAILED_TO_LOAD_FROM_STORAGE_IDENTIFIER;
 	}
 
 	async delete(key: string): Promise<boolean> {
@@ -29,7 +33,7 @@ class MockStorage<GValue> implements TStorageInterface<GValue> {
 	}
 }
 
-describe('withPersist function', () => {
+describe('withStorage function', () => {
 	let mockStorage: MockStorage<any>;
 
 	beforeEach(() => {
@@ -41,7 +45,7 @@ describe('withPersist function', () => {
 		const key = 'testKey';
 		const persistedValue = 42;
 		await mockStorage.save(key, persistedValue);
-		const state = withPersist(createState(0), mockStorage, key);
+		const state = withStorage(createState(0), mockStorage, key);
 
 		// Act
 		const result = await state.persist();
@@ -54,7 +58,7 @@ describe('withPersist function', () => {
 	it('should persist state changes', async () => {
 		// Prepare
 		const key = 'testKey';
-		const state = withPersist(createState(10), mockStorage, key);
+		const state = withStorage(createState(10), mockStorage, key);
 		await state.persist();
 
 		// Act
@@ -68,24 +72,24 @@ describe('withPersist function', () => {
 	it('should delete persisted state', async () => {
 		// Prepare
 		const key = 'testKey';
-		const state = withPersist(createState(10), mockStorage, key);
+		const state = withStorage(createState(10), mockStorage, key);
 		await state.persist();
 
 		// Act
-		const deleteResult = await state.deletePersisted();
+		const deleteResult = await state.deleteFormStorage();
 
 		// Assert
 		expect(deleteResult).toBe(true);
-		expect(await mockStorage.load(key)).toBe(FAILED_TO_LOAD_IDENTIFIER);
+		expect(await mockStorage.load(key)).toBe(FAILED_TO_LOAD_FROM_STORAGE_IDENTIFIER);
 	});
 
 	it('should return false if deleting non-existent key', async () => {
 		// Prepare
 		const key = 'nonExistentKey';
-		const state = withPersist(createState(10), mockStorage, key);
+		const state = withStorage(createState(10), mockStorage, key);
 
 		// Act
-		const deleteResult = await state.deletePersisted();
+		const deleteResult = await state.deleteFormStorage();
 
 		// Assert
 		expect(deleteResult).toBe(false);
@@ -96,7 +100,7 @@ describe('withPersist function', () => {
 		const key = 'testKey';
 
 		// Act
-		const state = withPersist(createState(10), mockStorage, key);
+		const state = withStorage(createState(10), mockStorage, key);
 		await state.persist();
 
 		// Assert
