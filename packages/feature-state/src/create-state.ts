@@ -1,6 +1,7 @@
 import type { TListener, TListenerQueueItem, TState } from './types';
 
 const GLOBAL_LISTENER_QUEUE: TListenerQueueItem[] = [];
+export const SET_SOURCE_KEY = 'set';
 
 export function createState<GValue>(
 	initialValue: GValue,
@@ -49,7 +50,7 @@ export function createState<GValue>(
 					: newValueOrUpdater;
 			if (this._value !== newValue) {
 				const { additionalData = {}, processListenerQueue = true } = setOptions;
-				additionalData.source = additionalData.source ?? 'set';
+				additionalData.source = additionalData.source ?? SET_SOURCE_KEY;
 				this._value = newValue;
 				this._notify({
 					additionalData,

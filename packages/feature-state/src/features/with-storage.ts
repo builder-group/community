@@ -1,6 +1,7 @@
 import type { TEnforceFeatures, TFeatureKeys, TSelectFeatures, TState } from '../types';
 
 export const FAILED_TO_LOAD_FROM_STORAGE_IDENTIFIER = null;
+export const LOAD_FROM_STORAGE_SOURCE_KEY = 'loadFromStorage';
 
 export interface TStorageInterface<GStorageValue> {
 	save: (key: string, value: GStorageValue) => Promise<boolean> | boolean;
@@ -32,8 +33,10 @@ export function withStorage<
 
 			// Setup listener
 			state.listen(
-				async ({ value }) => {
-					await storage.save(key, value as GStorageValue);
+				async ({ value, source }) => {
+					if (source !== LOAD_FROM_STORAGE_SOURCE_KEY) {
+						await storage.save(key, value as GStorageValue);
+					}
 				},
 				{ key: 'with-persist' }
 			);
@@ -45,7 +48,7 @@ export function withStorage<
 
 			const persistedValue = await storage.load(key);
 			if (persistedValue !== FAILED_TO_LOAD_FROM_STORAGE_IDENTIFIER) {
-				state.set(persistedValue);
+				state.set(persistedValue, { additionalData: { source: LOAD_FROM_STORAGE_SOURCE_KEY } });
 				success = true;
 			}
 
