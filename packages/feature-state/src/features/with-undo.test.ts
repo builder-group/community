@@ -11,7 +11,7 @@ describe('withUndo function', () => {
 
 	it('should allow undoing the last set operation', () => {
 		// Prepare
-		const state = withUndo(createState(10, false));
+		const state = withUndo(createState(10));
 
 		// Act
 		state.set(20);
@@ -23,7 +23,7 @@ describe('withUndo function', () => {
 
 	it('should handle multiple undos correctly', () => {
 		// Prepare
-		const state = withUndo(createState('initial', false));
+		const state = withUndo(createState('initial'));
 
 		// Act
 		state.set('first');
@@ -37,7 +37,7 @@ describe('withUndo function', () => {
 
 	it('should do nothing if there is nothing to undo', () => {
 		// Prepare
-		const state = withUndo(createState(10, false));
+		const state = withUndo(createState(10));
 
 		// Act
 		state.undo();
@@ -48,7 +48,7 @@ describe('withUndo function', () => {
 
 	it('should only record distinct consecutive values for undo', () => {
 		// Prepare
-		const state = withUndo(createState(10, false));
+		const state = withUndo(createState(10));
 
 		// Act
 		state.set(10); // Same as initial, should not be recorded
@@ -63,7 +63,7 @@ describe('withUndo function', () => {
 	it('should respect the history stack size limit', () => {
 		// Prepare
 		const historyLimit = 5;
-		const state = withUndo(createState(0, false), historyLimit);
+		const state = withUndo(createState(0), historyLimit);
 
 		// Act
 		for (let i = 1; i <= 10; i++) {

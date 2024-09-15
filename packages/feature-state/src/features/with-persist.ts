@@ -2,7 +2,7 @@ import type { TEnforceFeatures, TFeatureKeys, TSelectFeatures, TState } from '..
 
 export const FAILED_TO_LOAD_IDENTIFIER = undefined;
 
-export interface StorageInterface<GStorageValue> {
+export interface TStorageInterface<GStorageValue> {
 	save: (key: string, value: GStorageValue) => Promise<boolean> | boolean;
 	load: (
 		key: string
@@ -21,7 +21,7 @@ export function withPersist<
 	GStorageValue extends GValue = GValue
 >(
 	state: TState<GValue, TEnforceFeatures<GSelectedFeatureKeys, ['base']>>,
-	storage: StorageInterface<GStorageValue>,
+	storage: TStorageInterface<GStorageValue>,
 	key: string
 ): TState<GValue, [...GSelectedFeatureKeys, 'persist']> {
 	const persistFeature: TSelectFeatures<GValue, ['persist']> = {

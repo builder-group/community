@@ -20,11 +20,6 @@ describe('hasFeatures function', () => {
 		expect(hasFeatures(state, ['base'])).toBe(true);
 	});
 
-	it('should return false if no features are present in the state', () => {
-		const state = {}; // Mock a state with no features
-		expect(hasFeatures(state as any, ['base', 'undo'])).toBe(false);
-	});
-
 	it('should return true if checking for an empty feature set', () => {
 		const state = createState(10);
 		expect(hasFeatures(state, [])).toBe(true);

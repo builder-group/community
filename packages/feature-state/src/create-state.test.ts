@@ -24,6 +24,8 @@ describe('createState function', () => {
 		// Act and Assert for number
 		numberState.set(20);
 		expect(numberState.get()).toBe(20);
+		numberState.set((v) => v + 10);
+		expect(numberState.get()).toBe(30);
 
 		// Act and Assert for string
 		stringState.set('world');
@@ -76,7 +78,7 @@ describe('createState function', () => {
 		});
 
 		// Assert
-		expect(listener).toHaveBeenCalledWith(20);
+		expect(listener).toHaveBeenCalledWith({ source: 'set', value: 20 });
 	});
 
 	it('should not call listeners when set with the same value', () => {
@@ -97,8 +99,8 @@ describe('createState function', () => {
 		const state = createState(10);
 		const firstListener = vi.fn();
 		const secondListener = vi.fn();
-		state.listen(firstListener, 0);
-		state.listen(secondListener, 1);
+		state.listen(firstListener);
+		state.listen(secondListener);
 
 		// Act
 		state.set(20);
@@ -140,6 +142,6 @@ describe('createState function', () => {
 		state.subscribe(listener);
 
 		// Assert
-		expect(listener).toHaveBeenCalledWith(initialState);
+		expect(listener).toHaveBeenCalledWith({ value: initialState });
 	});
 });

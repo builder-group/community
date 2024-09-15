@@ -2,9 +2,9 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { sleep } from '@blgc/utils';
 
 import { createState } from '../create-state';
-import { FAILED_TO_LOAD_IDENTIFIER, withPersist, type StorageInterface } from './with-persist';
+import { FAILED_TO_LOAD_IDENTIFIER, withPersist, type TStorageInterface } from './with-persist';
 
-class MockStorage<GValue> implements StorageInterface<GValue> {
+class MockStorage<GValue> implements TStorageInterface<GValue> {
 	private store: Record<string, GValue> = {};
 
 	async save(key: string, value: GValue): Promise<boolean> {
@@ -96,7 +96,7 @@ describe('withPersist function', () => {
 		const key = 'testKey';
 
 		// Act
-		const state = withPersist(createState(10, false), mockStorage, key);
+		const state = withPersist(createState(10), mockStorage, key);
 		await state.persist();
 
 		// Assert
