@@ -405,6 +405,9 @@ importers:
 
   packages/feature-fetch:
     dependencies:
+      '@0no-co/graphql.web':
+        specifier: ^1.0.8
+        version: 1.0.8(graphql@16.9.0)
       '@blgc/types':
         specifier: workspace:*
         version: link:../types
@@ -412,9 +415,6 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
-      '@0no-co/graphql.web':
-        specifier: ^1.0.8
-        version: 1.0.8(graphql@16.9.0)
       '@blgc/config':
         specifier: workspace:*
         version: link:../config

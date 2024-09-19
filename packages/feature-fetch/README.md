@@ -279,3 +279,9 @@ const fetchClient = withDelay(
 ```
 
 - **`delayInMs`**: Delay duration in milliseconds
+
+## ❓ FAQ
+
+### Why is `@0no-co/graphql.web` a dependency if it's not always used?
+
+`@0no-co/graphql.web` is listed as a dependency because it's dynamically imported in the `getQueryString()` function. If the function isn’t used, Webpack's tree shaking should exclude it from the final bundle. This ensures that only necessary modules are included, keeping your build clean.
