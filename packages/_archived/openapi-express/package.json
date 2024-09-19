@@ -1,0 +1,50 @@
+{
+	"name": "openapi-express",
+	"description": "Typesafe Express Router wrapper supporting OpenAPI types",
+	"version": "0.0.7",
+	"private": false,
+	"scripts": {
+		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
+		"start:dev": "tsc -w",
+		"lint": "eslint --ext .js,.ts src/",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"size": "size-limit --why"
+	},
+	"source": "./src/index.ts",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/builder-group/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennobuilder",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/builder-group/monorepo/issues"
+	},
+	"homepage": "https://builder.group/?source=package-json",
+	"devDependencies": {
+		"@blgc/config": "workspace:*",
+		"@blgc/types": "workspace:*",
+		"@types/express": "^4.17.21",
+		"@types/express-serve-static-core": "^4.19.3",
+		"@types/node": "^20.14.2",
+		"express": "^4.19.2",
+		"zod": "^3.23.8"
+	},
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"size-limit": [
+		{
+			"path": "dist/esm/index.js"
+		}
+	]
+}

@@ -10,6 +10,8 @@ import {
 } from '@blgc/types/openapi';
 import { type TFilterKeys } from '@blgc/types/utils';
 
+import { type TParseParams } from '../utils';
+
 export interface TOpenApiExpressFeature<GPaths extends object> {
 	_router: express.Router;
 	get: TOpenApiExpressGet<GPaths>;
@@ -89,10 +91,11 @@ export type TOpenApiExpressResponse<GPathOperation> = express.Response<
 
 export type TOpenApiExpressRouteConfig<GPathOperation> = {
 	handler: TOpenApiExpressRequestHandler<GPathOperation>;
-} & TOpenApiExpressValidators<GPathOperation>;
+} & TOpenApiExpressValidators<GPathOperation> &
+	TOpenApiExpressParamsParserOptions;
 
 // =============================================================================
-// Validation
+// Validators
 // =============================================================================
 
 export type TOpenApiExpressValidators<GPathOperation> =
@@ -122,3 +125,15 @@ export type TOpenApiExpressBodyValidator<GPathOperation> =
 			: { bodyValidator: TValidator<TRequestBody<GPathOperation>> };
 
 export type TDefaultExpressValidator = TValidator<Record<string, unknown>>;
+
+// =============================================================================
+// Parsers
+// =============================================================================
+
+export interface TOpenApiExpressParamsParserOptions {
+	parseParams?: boolean;
+	parseQueryParams?: TParseParams;
+	parseQueryParamsBlacklist?: string[];
+	parsePathParams?: TParseParams;
+	parsePathParamsBlacklist?: string[];
+}

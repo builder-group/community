@@ -1,14 +1,22 @@
+import { Err } from '@blgc/utils';
+
 import type { TEnforceFeatures, TFeatureKeys, TFetchClient, TSelectFeatures } from '../../types';
+import { getQueryString } from './get-query-string';
 
 export function withGraphQL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base']>>
 ): TFetchClient<['graphql', ...GSelectedFeatureKeys]> {
 	const graphqlFeature: TSelectFeatures<['graphql']> = {
-		async query(this: TFetchClient<['base']>, query: string, options = {}) {
+		async query(this: TFetchClient<['base']>, query, options = {}) {
+			const maybeQueryString = getQueryString(query);
+			if (maybeQueryString.isErr()) {
+				return Err(maybeQueryString.error);
+			}
+
 			return this._baseFetch('', 'POST', {
 				...options,
 				body: {
-					query,
+					query: maybeQueryString.value,
 					variables: options.variables ?? {}
 				}
 			});

@@ -72,16 +72,14 @@ export type TBodySerializer<GBody = unknown, GResult extends TSerializedBody = T
 
 export type TRequestMiddleware = (next: TFetchLike) => TFetchLike;
 
-export type TBeforeRequestMiddleware = (
-	data: {
-		props: unknown;
-	} & TBeforeRequestMiddlewareData
-) => Promise<Partial<TBeforeRequestMiddlewareData>>;
+export type TBeforeRequestMiddleware = (data: TBeforeRequestMiddlewareData) => void | Promise<void>;
 
 export interface TBeforeRequestMiddlewareData {
+	path: string;
+	props: unknown;
 	requestInit: TRequestInitWithHeadersObject;
-	pathParams?: TPathParams;
-	queryParams?: TQueryParams;
+	pathParams: TPathParams;
+	queryParams: TQueryParams;
 }
 
 export type TPathParams = Record<string, unknown>;

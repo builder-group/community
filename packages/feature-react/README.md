@@ -20,7 +20,7 @@
 `feature-react` is the ReactJs extension for the `feature-state` and `feature-form` library, providing hooks and features for easy state management in ReactJs.
 
 - **Lightweight & Tree Shakable**: Function-based and modular design (< 1KB minified)
-- **Modular & Extendable**: Easily extendable with features like `withPersistLocalStorage()`, ..
+- **Modular & Extendable**: Easily extendable with features like `withLocalStorage()`, ..
 - **Seamless Integration**: Designed to work effortlessly with `feature-state`
 - **Typesafe**: Build with TypeScript for strong type safety
 
@@ -51,15 +51,15 @@ export const Tasks = () => {
 
 ## 📙 Features
 
-### `withPersistLocalStorage()`
+### `withLocalStorage()`
 
 Adds persistence functionality to the state, using [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage?retiredLocale=de) to save and load the state.
 
 ```ts
 import { createState } from 'feature-state';
-import { withPersistLocalStorage } from 'feature-react';
+import { withLocalStorage } from 'feature-react';
 
-const state = withPersistLocalStorage(createState([]), 'tasks');
+const state = withLocalStorage(createState([]), 'tasks');
 
 await state.persist();
 

@@ -1,6 +1,6 @@
-# Contributing to builder.group (blgc)
+# Contributing to Builder.Group Community (blgc)
 
-We are open and grateful for any contribution made by the community. If you're interested in contributing to builder.group, this document might make the process for you easier.
+We are open and grateful for any contribution made by the community. If you're interested in contributing to Builder.Group Community, this document might make the process for you easier.
 
 The [Open Source Guides](https://opensource.guide/) website has a collection of resources for individuals,
 communities, and companies who want to learn how to run and contribute to an open-source project.
@@ -26,7 +26,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"version": "0.0.1",
 	"private": true, // Or false if package should be published to NPM
 	"scripts": {
-		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
 		"start:dev": "tsc -w",
 		"lint": "eslint --ext .js,.ts src/",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
@@ -43,7 +43,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"bugs": {
 		"url": "https://github.com/builder-group/monorepo/issues"
 	},
-	"homepage": "https://builder.group/?source=github",
+	"homepage": "https://Builder.Group Community/?source=github",
 	"dependencies": {
 		// Project dependencies here
 	},
@@ -89,7 +89,7 @@ Alternatives:
 
 ## 📄 License
 
-By contributing to builder.group, you agree that your contributions will be licensed under the license defined in [`LICENSE.md`](./LICENSE.md).
+By contributing to Builder.Group Community, you agree that your contributions will be licensed under the license defined in [`LICENSE.md`](./LICENSE.md).
 
 ## 🎉 Credits
 

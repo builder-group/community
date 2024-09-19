@@ -1,11 +1,13 @@
-export function parseParams<GParams extends Record<string, unknown>>(params: GParams): GParams {
+import { type TParams } from '../types';
+
+export function parseParams(params: TParams, blacklist?: string[]): Record<string, unknown> {
 	const parsedParams: Record<string, unknown> = {};
 
 	for (const [key, value] of Object.entries(params)) {
-		parsedParams[key] = parseValue(value);
+		parsedParams[key] = blacklist?.includes(key) ? value : parseValue(value);
 	}
 
-	return parsedParams as GParams;
+	return parsedParams;
 }
 
 function parseValue(value: unknown): unknown {

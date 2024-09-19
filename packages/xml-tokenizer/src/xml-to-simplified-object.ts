@@ -1,13 +1,20 @@
 import { getQName } from './get-q-name';
-import { tokenize, type TXmlToken } from './tokenizer';
+import { tokenize, type TXmlStreamOptions, type TXmlToken } from './tokenizer';
 
-export function xmlToSimplifiedObject(xmlString: string, allowDtd = false): TSimplifiedXmlNode {
+export function xmlToSimplifiedObject(
+	xmlString: string,
+	options: TXmlStreamOptions = {}
+): TSimplifiedXmlNode {
 	const result: TSimplifiedXmlNode = {};
 	const stack: TSimplifiedXmlNode[] = [result];
 
-	tokenize(xmlString, allowDtd, (token) => {
-		processTokenForSimplifiedObject(token, stack);
-	});
+	tokenize(
+		xmlString,
+		(token) => {
+			processTokenForSimplifiedObject(token, stack);
+		},
+		options
+	);
 
 	return result;
 }

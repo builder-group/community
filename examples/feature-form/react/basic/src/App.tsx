@@ -7,7 +7,7 @@ import {
 	TFormFieldValidator
 } from 'feature-form';
 import { useForm } from 'feature-react/form';
-import { withGlobalBind } from 'feature-react/state';
+import { useGlobalState, withGlobalBind } from 'feature-react/state';
 import React from 'react';
 import * as v from 'valibot';
 import * as z from 'zod';
@@ -109,9 +109,11 @@ const $form = withGlobalBind(
 		},
 		onValidSubmit: (data, additionalData) => {
 			console.log('ValidSubmit', { data, additionalData });
+			return { valid: true };
 		},
 		onInvalidSubmit: (errors, additionalData) => {
 			console.log('Invalid Submit', { errors, additionalData });
+			return { valid: false };
 		},
 		notifyOnStatusChange: false,
 		validateMode: bitwiseFlag(FormFieldValidateMode.OnSubmit),
@@ -125,6 +127,7 @@ let renderCount = 0;
 function App() {
 	const { handleSubmit, status, field, register } = useForm($form);
 	const [data, setData] = React.useState('');
+	const isValid = useGlobalState($form.isValid);
 
 	renderCount++;
 
@@ -132,7 +135,10 @@ function App() {
 		<form
 			onSubmit={handleSubmit({
 				onValidSubmit: (data) => setData(JSON.stringify(data)),
-				preventDefault: true
+				preventDefault: true,
+				postSubmitCallback: (form, data) => {
+					console.log('postSubmit', { form, data });
+				}
 			})}
 		>
 			<h1>Sign Up</h1>
@@ -194,7 +200,7 @@ function App() {
 			<StatusMessage $status={status('image')} />
 
 			<button type="submit">Submit</button>
-			<p>Is Valid: {$form.isValid.toString()}</p>
+			<p>Is Valid: {isValid.toString()}</p>
 			<p>Render Count: {renderCount}</p>
 			<p>Data: {data}</p>
 		</form>

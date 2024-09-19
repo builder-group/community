@@ -30,10 +30,14 @@ export class XmlStream {
 	private _pos: number;
 	private _end: number;
 
-	public constructor(text: string, pos = 0) {
+	public readonly config: TXmlStreamConfig;
+
+	public constructor(text: string, options: TXmlStreamOptions = {}) {
+		const { pos = 0, strict = true, allowDtd = true } = options;
 		this._text = text;
 		this._pos = pos;
 		this._end = this._text.length;
+		this.config = { strict, allowDtd };
 	}
 
 	/**
@@ -42,7 +46,7 @@ export class XmlStream {
 	 * @returns A new instance of XmlStream with the same state.
 	 */
 	public clone(): XmlStream {
-		return new XmlStream(this._text, this._pos);
+		return new XmlStream(this._text, { pos: this._pos, ...this.config });
 	}
 
 	/**
@@ -99,34 +103,6 @@ export class XmlStream {
 	}
 
 	/**
-	 * Advances the stream position by the specified number of characters.
-	 *
-	 * @param n - The number of characters to advance.
-	 */
-	public advance(n: number): void {
-		this._pos += n;
-	}
-
-	/**
-	 * Go to a new position in the stream.
-	 *
-	 *  @param pos - The new position.
-	 */
-	public goTo(pos: number): void {
-		this._pos = pos;
-	}
-
-	/**
-	 * Checks if the stream starts with the given text.
-	 *
-	 * @param text - The text to check.
-	 * @returns True if the stream starts with the text, false otherwise.
-	 */
-	public startsWith(text: string): boolean {
-		return this._text.startsWith(text, this._pos);
-	}
-
-	/**
 	 * Consumes a specific code unit (character) from the stream.
 	 *
 	 * @param codeUnit - The code unit to consume.
@@ -159,25 +135,14 @@ export class XmlStream {
 	}
 
 	/**
-	 * Skips a specific string in the stream.
-	 *
-	 * @param text - The string to skip.
-	 * @throws XmlError if the stream doesn't start with the given string.
-	 */
-	public skipString(text: string): void {
-		if (!this.startsWith(text)) {
-			throw new XmlError({ type: 'InvalidString', expected: text }, this.genTextPos());
-		}
-		this._pos += text.length;
-	}
-
-	/**
 	 * Consumes code units that satisfy a predicate function.
 	 *
 	 * @param predicate - The function to test each code unit.
 	 * @returns The consumed string.
 	 */
-	public consumeCodeUnitsWhile(predicate: (codeUnit: number) => boolean): string {
+	public consumeCodeUnitsWhile(
+		predicate: (codeUnit: number, stream: XmlStream) => boolean
+	): string {
 		const start = this._pos;
 		this.skipCodeUnitsWhile(predicate);
 		return this.sliceBack(start);
@@ -188,66 +153,60 @@ export class XmlStream {
 	 *
 	 * @param predicate - The function to test each code unit.
 	 */
-	public skipCodeUnitsWhile(predicate: (codeUnit: number) => boolean): void {
-		while (this._pos < this._end && predicate(this.currCodeUnitUnchecked())) {
+	public skipCodeUnitsWhile(predicate: (codeUnit: number, stream: XmlStream) => boolean): void {
+		while (this._pos < this._end && predicate(this.currCodeUnitUnchecked(), this)) {
+			if (!isXmlChar(this.currCodeUnitUnchecked())) {
+				throw new XmlError(
+					{
+						type: 'NonXmlChar',
+						char: String.fromCodePoint(this.currCodeUnitUnchecked())
+					},
+					this.genTextPos()
+				);
+			}
 			this._pos += 1;
 		}
 	}
 
-	// Doesn't really improve performance compared to 'consumeCharsWhile()'
-	// maybe 5% and without validation 25%.
-	// Note: Not the validation is the slow part but the loop is.
-	// When removing the validation in 'consumeCharsWhile()'
-	// it doesn't yield noticable performance gains.
-	//
-	// public consumeCharsUntilIndexOf(text: string): string {
-	// 	const start = this._pos;
-	// 	const nextPos = this._text.indexOf(text, this._pos);
-	//  const endPos = nextPos >= 0 ? nextPos : this._end;
-
-	//   // Iterate over the slice to ensure all characters are valid XML characters
-	// 	for (let i = start; i < endPos; i++) {
-	// 		const char = this._text[i];
-	// 		if (char == null || !isXmlChar(char.codePointAt(0))) {
-	// 			throw new XmlError({ type: 'NonXmlChar', char: char ?? '\u{FFFD}' }, this.genTextPos());
-	// 		}
-	// 	}
-
-	// 	this._pos = endPos;
-
-	// 	return this.sliceBack(start);
-	// }
-
 	/**
-	 * Consumes characters that satisfy a predicate function.
+	 * Advances the stream position by the specified number of characters.
 	 *
-	 * @param predicate - The function to test each character.
-	 * @returns The consumed string.
-	 * @throws XmlError if a non-XML character is encountered.
+	 * @param n - The number of characters to advance.
 	 */
-	public consumeCharsWhile(predicate: (stream: XmlStream, char: string) => boolean): string {
-		const start = this._pos;
-		this.skipCharsWhile(predicate);
-		return this.sliceBack(start);
+	public advance(n: number): void {
+		this._pos += n;
 	}
 
 	/**
-	 * Skips characters that satisfy a predicate function.
+	 * Go to a new position in the stream.
 	 *
-	 * @param predicate - The function to test each character.
-	 * @throws XmlError if a non-XML character is encountered.
+	 *  @param pos - The new position.
 	 */
-	public skipCharsWhile(predicate: (stream: XmlStream, char: string) => boolean): void {
-		while (this._pos < this._end) {
-			const char = this._text[this._pos];
-			if (char == null || !isXmlChar(char.codePointAt(0))) {
-				throw new XmlError({ type: 'NonXmlChar', char: char ?? '\u{FFFD}' }, this.genTextPos());
-			} else if (predicate(this, char)) {
-				this._pos += char.length;
-			} else {
-				break;
-			}
+	public goTo(pos: number): void {
+		this._pos = pos;
+	}
+
+	/**
+	 * Checks if the stream starts with the given text.
+	 *
+	 * @param text - The text to check.
+	 * @returns True if the stream starts with the text, false otherwise.
+	 */
+	public startsWith(text: string): boolean {
+		return this._text.startsWith(text, this._pos);
+	}
+
+	/**
+	 * Skips a specific string in the stream.
+	 *
+	 * @param text - The string to skip.
+	 * @throws XmlError if the stream doesn't start with the given string.
+	 */
+	public skipString(text: string): void {
+		if (!this.startsWith(text)) {
+			throw new XmlError({ type: 'InvalidString', expected: text }, this.genTextPos());
 		}
+		this._pos += text.length;
 	}
 
 	/**
@@ -543,3 +502,11 @@ export class XmlStream {
 		return { row, col };
 	}
 }
+
+// TODO: Should XMLStream be owner of this config although it doesn't use it
+export interface TXmlStreamConfig {
+	strict: boolean;
+	allowDtd: boolean;
+}
+
+export type TXmlStreamOptions = { pos?: number } & Partial<TXmlStreamConfig>;

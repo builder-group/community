@@ -1,0 +1,22 @@
+{
+	"name": "xml-tokenizer-vanilla-playground",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite"
+	},
+	"dependencies": {
+		"camaro": "^6.2.3",
+		"fast-xml-parser": "^4.4.1",
+		"tinybench": "^2.9.0",
+		"txml": "^5.1.1",
+		"xml-tokenizer": "workspace:*",
+		"xml2js": "^0.6.2"
+	},
+	"devDependencies": {
+		"@types/xml2js": "^0.4.14",
+		"typescript": "^5.2.2",
+		"vite": "^5.3.4"
+	}
+}

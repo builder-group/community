@@ -8,7 +8,11 @@ export type TFeatures<GValue = unknown> = {
 	multiundo: {
 		multiUndo: (count: number) => void;
 	};
-	persist: { persist: () => Promise<boolean>; deletePersisted: () => Promise<boolean> };
+	persist: {
+		persist: () => Promise<boolean>;
+		loadFormStorage: () => Promise<boolean>;
+		deleteFormStorage: () => Promise<boolean>;
+	};
 } & TThirdPartyFeatures<GValue>;
 
 // Global registry for third party features

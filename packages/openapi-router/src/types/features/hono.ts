@@ -10,6 +10,8 @@ import {
 } from '@blgc/types/openapi';
 import { type TFilterKeys } from '@blgc/types/utils';
 
+import { type TParseParams } from '../utils';
+
 export interface TOpenApiHonoFeature<GPaths extends object> {
 	_hono: Hono;
 	get: TOpenApiHonoGet<GPaths>;
@@ -100,10 +102,11 @@ export type TOpenApiHonoResponse<GPathOperation> =
 
 export type TOpenApiHonoRouteConfig<GPath extends string, GPathOperation> = {
 	handler: TOpenApiHonoRequestHandler<GPath, GPathOperation>;
-} & TOpenApiHonoValidators<GPathOperation>;
+} & TOpenApiHonoValidators<GPathOperation> &
+	TOpenApiHonoParamsParserOptions;
 
 // =============================================================================
-// Validation
+// Validators
 // =============================================================================
 
 export type TOpenApiHonoValidators<GPathOperation> =
@@ -133,3 +136,15 @@ export type TOpenApiHonoBodyValidator<GPathOperation> =
 			: { bodyValidator: TValidator<TRequestBody<GPathOperation>> };
 
 export type TDefaultHonoValidator = TValidator<Record<string, unknown>>;
+
+// =============================================================================
+// Parsers
+// =============================================================================
+
+export interface TOpenApiHonoParamsParserOptions {
+	parseParams?: boolean;
+	parseQueryParams?: TParseParams;
+	parseQueryParamsBlacklist?: string[];
+	parsePathParams?: TParseParams;
+	parsePathParamsBlacklist?: string[];
+}

@@ -32,6 +32,7 @@ module.exports = {
 		'@typescript-eslint/ban-types': WARNING,
 		'@typescript-eslint/no-explicit-any': WARNING,
 		'@typescript-eslint/no-floating-promises': WARNING,
+		'@typescript-eslint/no-invalid-void-type': WARNING,
 
 		// Its everywhere although Typescript can infer it
 		'@typescript-eslint/no-unsafe-assignment': OFF,

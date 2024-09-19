@@ -13,9 +13,7 @@ export function withDelay<GSelectedFeatureKeys extends TFeatureKeys[]>(
 	delayInMs: number
 ): TFetchClient<['delay', ...GSelectedFeatureKeys]> {
 	fetchClient._features.push('delay');
-
 	fetchClient._config.requestMiddlewares.push(createDelayMiddleware(delayInMs));
-
 	return fetchClient as TFetchClient<['delay', ...GSelectedFeatureKeys]>;
 }
 

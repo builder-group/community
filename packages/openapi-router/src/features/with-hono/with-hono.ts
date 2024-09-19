@@ -8,6 +8,7 @@ import { formatPath, parseParams } from '../../helper';
 import {
 	type TEnforceFeatures,
 	type TFeatureKeys,
+	type TOpenApiHonoParamsParserOptions,
 	type TOpenApiHonoValidators,
 	type TOpenApiRouter,
 	type TSelectFeatures
@@ -25,7 +26,7 @@ export function withHono<
 		get(this: TOpenApiRouter<['base', 'hono'], GPaths>, path, config) {
 			this._hono.get(
 				formatPath(path),
-				parseParamsMiddleware(),
+				parseParamsMiddleware(config),
 				validationMiddleware(config),
 				config.handler
 			);
@@ -33,7 +34,7 @@ export function withHono<
 		post(this: TOpenApiRouter<['base', 'hono'], GPaths>, path, config) {
 			this._hono.post(
 				formatPath(path),
-				parseParamsMiddleware(),
+				parseParamsMiddleware(config),
 				validationMiddleware(config),
 				config.handler
 			);
@@ -41,7 +42,7 @@ export function withHono<
 		put(this: TOpenApiRouter<['base', 'hono'], GPaths>, path, config) {
 			this._hono.put(
 				formatPath(path),
-				parseParamsMiddleware(),
+				parseParamsMiddleware(config),
 				validationMiddleware(config),
 				config.handler
 			);
@@ -49,7 +50,7 @@ export function withHono<
 		del(this: TOpenApiRouter<['base', 'hono'], GPaths>, path, config) {
 			this._hono.delete(
 				formatPath(path),
-				parseParamsMiddleware(),
+				parseParamsMiddleware(config),
 				validationMiddleware(config),
 				config.handler
 			);
@@ -66,12 +67,25 @@ export function withHono<
 	return _router;
 }
 
-function parseParamsMiddleware(): hono.Handler {
+function parseParamsMiddleware(paramsParser: TOpenApiHonoParamsParserOptions = {}): hono.Handler {
+	const {
+		parseParams: shouldParseParams = true,
+		parsePathParams = parseParams,
+		parsePathParamsBlacklist,
+		parseQueryParams = parseParams,
+		parseQueryParamsBlacklist
+	} = paramsParser;
 	return async (c, next) => {
 		// Extend Hono query params & path params parsing to handle numbers and booleans
 		// as primitive type instead of string.
-		c.req.addValidatedData('query', parseParams(c.req.query()));
-		c.req.addValidatedData('param', parseParams(c.req.param()));
+		c.req.addValidatedData(
+			'query',
+			shouldParseParams ? parseQueryParams(c.req.query(), parseQueryParamsBlacklist) : c.req.query()
+		);
+		c.req.addValidatedData(
+			'param',
+			shouldParseParams ? parsePathParams(c.req.param(), parsePathParamsBlacklist) : c.req.param()
+		);
 
 		await next();
 	};

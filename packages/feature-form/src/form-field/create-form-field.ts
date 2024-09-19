@@ -33,8 +33,8 @@ export function createFormField<GValue>(
 	// Notify form field listeners if status has changed
 	if (notifyOnStatusChange) {
 		status.listen(
-			() => {
-				formFieldState._notify({ additionalData: { source: 'status' } });
+			(data) => {
+				formFieldState._notify({ additionalData: { source: 'status', status: data.value } });
 			},
 			{ key: 'form-field' }
 		);
@@ -89,7 +89,7 @@ export function createFormField<GValue>(
 			this.isTouched = true;
 		},
 		reset(this: TFormField<GValue>) {
-			this.set(this._intialValue);
+			this.set(this._intialValue, { additionalData: { source: 'reset' } });
 			this.isTouched = false;
 			this.isSubmitted = false;
 			this.isSubmitting = false;

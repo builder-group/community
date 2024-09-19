@@ -29,12 +29,12 @@ export interface TFormFieldStateConfig {
 	/**
 	 * Validation strategy before submitting.
 	 */
-	// TODO: Is BitwiseFlag to confusing for enduser?
+	// TODO: Is BitwiseFlag to confusing for user
 	validateMode: BitwiseFlag<FormFieldValidateMode>;
 	/**
 	 * Validation strategy after submitting.
 	 */
-	// TODO: Is BitwiseFlag to confusing for enduser?
+	// TODO: Is BitwiseFlag to confusing for user
 	reValidateMode: BitwiseFlag<FormFieldReValidateMode>;
 	collectErrorMode: TCollectErrorMode;
 }

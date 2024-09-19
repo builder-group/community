@@ -9,23 +9,23 @@
 	"dependencies": {
 		"@blgc/utils": "workspace:*",
 		"feature-form": "workspace:*",
-		"validation-adapters": "workspace:*",
 		"feature-react": "workspace:*",
-		"react": "^18.2.0",
-		"react-dom": "^18.2.0",
-		"valibot": "^0.35.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"valibot": "^0.40.0",
+		"validation-adapters": "workspace:*",
 		"zod": "^3.23.8"
 	},
 	"devDependencies": {
-		"@types/react": "^18.2.66",
-		"@types/react-dom": "^18.2.22",
-		"@typescript-eslint/eslint-plugin": "^7.2.0",
-		"@typescript-eslint/parser": "^7.2.0",
-		"@vitejs/plugin-react": "^4.2.1",
+		"@types/react": "^18.3.5",
+		"@types/react-dom": "^18.3.0",
+		"@typescript-eslint/eslint-plugin": "^8.3.0",
+		"@typescript-eslint/parser": "^8.3.0",
+		"@vitejs/plugin-react": "^4.3.1",
 		"eslint": "^8.57.0",
-		"eslint-plugin-react-hooks": "^4.6.0",
-		"eslint-plugin-react-refresh": "^0.4.6",
-		"typescript": "^5.2.2",
-		"vite": "^5.2.0"
+		"eslint-plugin-react-hooks": "^4.6.2",
+		"eslint-plugin-react-refresh": "^0.4.11",
+		"typescript": "^5.5.4",
+		"vite": "^5.4.2"
 	}
 }

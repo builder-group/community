@@ -27,9 +27,12 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	 * $state.set("Hello World");
 	 * ```
 	 *
-	 * @param newValue - The new value to set for the state, of type `GValue`.
+	 * @param newValueOrUpdater - The new value to set for the state, of type `GValue`.
 	 */
-	set: (newValue: GValue, options?: TStateSetOptions) => void;
+	set: (
+		newValueOrUpdater: GValue | ((value: GValue) => GValue),
+		options?: TStateSetOptions
+	) => void;
 	/**
 	 * Subscribes to state changes without immediately invoking the callback.
 	 * Use this to listen for changes that occur after the subscription.

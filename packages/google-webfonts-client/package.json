@@ -1,10 +1,10 @@
 {
 	"name": "google-webfonts-client",
 	"description": "Typesafe and straightforward fetch client for interacting with the Google Web Fonts API using feature-fetch",
-	"version": "0.0.18",
+	"version": "0.0.19",
 	"private": false,
 	"scripts": {
-		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
 		"start:dev": "tsc -w",
 		"openapi:generate": "npx openapi-typescript ./resources/openapi-v1.yaml -o ./src/gen/v1.ts",
 		"lint": "eslint --ext .js,.ts src/",
@@ -31,6 +31,7 @@
 	},
 	"homepage": "https://builder.group/?source=package-json",
 	"dependencies": {
+		"@blgc/utils": "workspace:*",
 		"feature-fetch": "workspace:*"
 	},
 	"devDependencies": {

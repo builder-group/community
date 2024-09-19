@@ -29,7 +29,7 @@ The implementation is based on the [roxmltree](https://github.com/RazrFalcon/rox
 
 ### 📚 Examples
 
-- [Vanilla Profiler](https://github.com/builder-group/monorepo/tree/develop/examples/xml-tokenizer/vanilla/profiler)
+- [Vanilla Profiler](https://github.com/builder-group/monorepo/tree/develop/examples/xml-tokenizer/vanilla/playground)
 
 ### 🌟 Motivation
 
@@ -55,7 +55,7 @@ const xmlObject = xmlToObject('<p>Hello World</p>');
 const simplifiedXmlObject = xmlToSimplifiedObject('<p>Hello World</p>');
 
 // Or, parse XML to a stream of tokens
-tokenize('<p>Hello World</p>', false, (token) => {
+tokenize('<p>Hello World</p>', (token) => {
 	switch (token.type) {
 		case 'ElementStart':
 			console.log('Start of element:', token);
@@ -194,7 +194,7 @@ See [Generator vs Iterator vs Callback](https://observablehq.com/@domoritz/yield
 [fast-xml-parser] Total Time: 1308.0000 ms | Average Time per Run: 13.0800 ms | Median Time: 13.0000 ms | Runs: 100
 ```
 
-[Benchmark implementation in Vanilla Profiler](https://github.com/builder-group/monorepo/tree/develop/examples/xml-tokenizer/vanilla/profiler)
+[Benchmark implementation in Vanilla Profiler](https://github.com/builder-group/monorepo/tree/develop/examples/xml-tokenizer/vanilla/playground)
 
 ## 💡 Resources
 

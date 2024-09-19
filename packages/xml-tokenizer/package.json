@@ -1,10 +1,10 @@
 {
 	"name": "xml-tokenizer",
-	"version": "0.0.13",
+	"version": "0.0.14",
 	"description": "Straightforward and typesafe XML tokenizer that streams tokens through a callback mechanism",
 	"private": false,
 	"scripts": {
-		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle",
+		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
 		"build:dev": "shx rm -rf dist && ../../scripts/cli.sh bundle --target=dev",
 		"start:dev": "tsc -w",
 		"lint": "eslint --ext .js,.ts src/",

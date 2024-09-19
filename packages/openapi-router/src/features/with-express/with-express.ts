@@ -1,4 +1,5 @@
 import type * as express from 'express';
+import { type ParamsDictionary } from 'express-serve-static-core';
 import { createValidationContext, type TValidationError } from 'validation-adapter';
 import { type TOperationPathParams, type TOperationQueryParams } from '@blgc/types/openapi';
 
@@ -7,8 +8,10 @@ import { formatPath, parseParams } from '../../helper';
 import {
 	type TEnforceFeatures,
 	type TFeatureKeys,
+	type TOpenApiExpressParamsParserOptions,
 	type TOpenApiExpressValidators,
 	type TOpenApiRouter,
+	type TParams,
 	type TSelectFeatures
 } from '../../types';
 
@@ -24,7 +27,7 @@ export function withExpress<
 		get(this: TOpenApiRouter<['base', 'express'], GPaths>, path, config) {
 			this._router.get(
 				formatPath(path),
-				parseParamsMiddleware(),
+				parseParamsMiddleware(config),
 				validationMiddleware(config),
 				requestHandler(config.handler as express.RequestHandler)
 			);
@@ -32,7 +35,7 @@ export function withExpress<
 		post(this: TOpenApiRouter<['base', 'express'], GPaths>, path, config) {
 			this._router.post(
 				formatPath(path),
-				parseParamsMiddleware(),
+				parseParamsMiddleware(config),
 				validationMiddleware(config),
 				requestHandler(config.handler as express.RequestHandler)
 			);
@@ -40,7 +43,7 @@ export function withExpress<
 		put(this: TOpenApiRouter<['base', 'express'], GPaths>, path, config) {
 			this._router.put(
 				formatPath(path),
-				parseParamsMiddleware(),
+				parseParamsMiddleware(config),
 				validationMiddleware(config),
 				requestHandler(config.handler as express.RequestHandler)
 			);
@@ -48,7 +51,7 @@ export function withExpress<
 		del(this: TOpenApiRouter<['base', 'express'], GPaths>, path, config) {
 			this._router.delete(
 				formatPath(path),
-				parseParamsMiddleware(),
+				parseParamsMiddleware(config),
 				validationMiddleware(config),
 				requestHandler(config.handler as express.RequestHandler)
 			);
@@ -65,15 +68,31 @@ export function withExpress<
 	return _router;
 }
 
-function parseParamsMiddleware(): express.RequestHandler {
-	return (req, _res, next) => {
-		// Extend Express query params & path params parsing to handle numbers and booleans
-		// as primitive type instead of string.
-		// See: https://expressjs.com/en/5x/api.html#req.query
-		//      https://github.com/ljharb/qs/issues/91
-		req.query = parseParams(req.query);
-		req.params = parseParams(req.params);
+function parseParamsMiddleware(
+	paramsParser: TOpenApiExpressParamsParserOptions = {}
+): express.RequestHandler {
+	const {
+		parseParams: shouldParseParams = true,
+		parsePathParams = parseParams,
+		parsePathParamsBlacklist,
+		parseQueryParams = parseParams,
+		parseQueryParamsBlacklist
+	} = paramsParser;
 
+	if (shouldParseParams) {
+		return (req, _res, next) => {
+			// Extend Express query params & path params parsing to handle numbers and booleans
+			// as primitive type instead of string.
+			// See: https://expressjs.com/en/5x/api.html#req.query
+			//      https://github.com/ljharb/qs/issues/91
+			req.query = parseQueryParams(req.query, parseQueryParamsBlacklist) as TParams;
+			req.params = parsePathParams(req.params, parsePathParamsBlacklist) as ParamsDictionary;
+
+			next();
+		};
+	}
+
+	return (_req, _res, next) => {
 		next();
 	};
 }

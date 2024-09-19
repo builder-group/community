@@ -13,6 +13,6 @@
 		"feature-state-react-counter",
 		"openapi-router-express-petstore",
 		"openapi-router-hono-petstore",
-		"xml-tokenizer-vanilla-profiler"
+		"xml-tokenizer-vanilla-playground"
 	]
 }
