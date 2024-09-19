@@ -4,14 +4,4 @@ export * from './features';
 export * from './helper';
 export * from './types';
 
-export {
-	Err,
-	Ok,
-	mapErr,
-	mapOk,
-	unwrapErr,
-	unwrapOk,
-	type TErrResult,
-	type TOkResult,
-	type TResult
-} from '@blgc/utils';
+export { Err, Ok, type TErrResult, type TOkResult, type TResult } from '@blgc/utils';

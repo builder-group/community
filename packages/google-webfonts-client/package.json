@@ -31,6 +31,7 @@
 	},
 	"homepage": "https://builder.group/?source=package-json",
 	"dependencies": {
+		"@blgc/utils": "workspace:*",
 		"feature-fetch": "workspace:*"
 	},
 	"devDependencies": {

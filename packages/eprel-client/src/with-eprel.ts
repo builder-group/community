@@ -3,13 +3,13 @@ import {
 	FetchError,
 	hasFeatures,
 	isStatusCode,
-	mapOk,
 	Ok,
 	type TEnforceFeatures,
 	type TFeatureKeys,
 	type TFetchClient,
 	type TSelectFeatures
 } from 'feature-fetch';
+import { mapOk } from '@blgc/utils';
 
 import type { paths } from './gen/v1';
 import { getLabelUrl, getLanguageSet, getSheetUrl } from './helper';
