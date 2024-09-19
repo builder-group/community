@@ -1,7 +1,7 @@
 {
 	"name": "eprel-client",
 	"description": "Typesafe and straightforward fetch client for interacting with the European Product Registry for Energy Labelling (EPREL) API using feature-fetch",
-	"version": "0.0.16",
+	"version": "0.0.17",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",

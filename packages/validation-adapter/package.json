@@ -1,7 +1,7 @@
 {
 	"name": "validation-adapter",
 	"description": "Universal validation adapter that integrates various validation libraries like Zod, Valibot, and Yup",
-	"version": "0.0.11",
+	"version": "0.0.12",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
