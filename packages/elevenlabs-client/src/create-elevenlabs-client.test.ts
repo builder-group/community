@@ -17,20 +17,36 @@ describe('createElevenLabsClient function tests', () => {
 		});
 	});
 
-	it('should work', async () => {
+	it('should genertate text to speak', async () => {
 		const result = await client.generateTextToSpeach({
-			text: 'Hello World',
+			text: 'Hello',
 			voice: 'Sarah' // EXAVITQu4vr4xnSDxMaL
 		});
 
-		const audioStream = result.unwrap();
+		const audioStream = result.unwrap().stream;
 		const filePath = path.join(process.cwd(), 'test-audio.mp3');
 
-		// Write the stream to the file using pipeline
 		await pipelineAsync(audioStream, fs.createWriteStream(filePath));
 
-		// Confirm that the file exists after the stream is written
 		const fileExists = fs.existsSync(filePath);
 		expect(fileExists).toBe(true);
+	});
+
+	it('should get voices', async () => {
+		const result = await client.getVoices();
+
+		// const voicesMap = result.unwrap().voices.reduce(
+		// 	(map, voice) => ({
+		// 		...map,
+		// 		[voice.name]: {
+		// 			voiceId: voice.voice_id,
+		// 			labels: voice.labels,
+		// 			previewUrl: voice.preview_url
+		// 		}
+		// 	}),
+		// 	{}
+		// );
+
+		expect(result.isOk()).toBe(true);
 	});
 });

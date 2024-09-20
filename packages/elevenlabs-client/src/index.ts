@@ -13,9 +13,18 @@ declare module 'feature-fetch' {
 	interface TThirdPartyFeatures<GPaths> {
 		elevenlabs: {
 			getVoices(): Promise<TResult<TVoiceResponse, FetchError>>;
-			generateTextToSpeach(
-				config: TGenerateTextToSpeechConfig
-			): Promise<TResult<ReadableStream, FetchError>>;
+			generateTextToSpeach(config: TGenerateTextToSpeechConfig): Promise<
+				TResult<
+					{
+						stream: ReadableStream;
+						characterCost?: string;
+						contentType?: string;
+						historyItemId?: string;
+						requestId?: string;
+					},
+					FetchError
+				>
+			>;
 		};
 	}
 }
