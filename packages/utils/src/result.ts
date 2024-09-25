@@ -102,8 +102,13 @@ export function mapErr<T, E extends TResultError, F extends TResultError>(
 
 // Returns the value inside an Ok result or null if it's an Err.
 export function unwrapOrNull<T, E extends TResultError>(result: TResult<T, E>): T | null {
+	return unwrapOr(result, null as T | null);
+}
+
+// Returns the value inside an Ok result or the specified default value if it's an Err.
+export function unwrapOr<T, E extends TResultError>(result: TResult<T, E>, defaultValue: T): T {
 	if (result.isOk()) {
 		return result.value;
 	}
-	return null;
+	return defaultValue;
 }
