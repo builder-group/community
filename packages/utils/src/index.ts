@@ -10,6 +10,7 @@ export * from './define-config';
 export * from './extract-error-data';
 export * from './extract-start-end-point-from-mat3';
 export * from './from-hex';
+export * from './get-nested-property';
 export * from './has-property';
 export * from './hex-to-rgb';
 export * from './inverse-mat3';

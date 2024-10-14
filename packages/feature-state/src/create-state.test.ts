@@ -144,4 +144,26 @@ describe('createState function', () => {
 		// Assert
 		expect(listener).toHaveBeenCalledWith({ value: initialState });
 	});
+
+	it('should call listener if property changed', async () => {
+		// Prepare
+		const state = createState({ key: 'value', name: 'jeff' });
+		const firstListener = vi.fn();
+		const secondListener = vi.fn();
+		const thirdListener = vi.fn();
+		state.listen(firstListener, { selectedProperty: 'key' });
+		state.listen(secondListener, { selectedProperty: 'name' });
+		state.listen(thirdListener);
+
+		// Act
+		state.set((v) => ({ ...v, key: 'jeff' }));
+		await new Promise((resolve) => {
+			setTimeout(resolve, 0);
+		});
+
+		// Assert
+		expect(firstListener).toHaveBeenCalled();
+		expect(secondListener).not.toHaveBeenCalled();
+		expect(thirdListener).toHaveBeenCalled();
+	});
 });

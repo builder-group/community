@@ -1,3 +1,5 @@
+import { getNestedProperty } from '@blgc/utils';
+
 import type { TListener, TListenerQueueItem, TState } from './types';
 
 const GLOBAL_LISTENER_QUEUE: TListenerQueueItem[] = [];
@@ -18,21 +20,32 @@ export function createState<GValue>(
 			const {
 				processListenerQueue = true,
 				additionalData = {},
-				deferred: innerDeferred = deferred
+				deferred: innerDeferred = deferred,
+				changedProperty,
+				prevValue
 			} = notifyOptions;
 
 			// Push current state's listeners to the queue
-			this._listeners.forEach((listener) => {
-				GLOBAL_LISTENER_QUEUE.push({
-					data: { ...additionalData, value: this._value as Readonly<GValue> },
-					callback: listener.callback,
-					level: listener.level
-				});
-			});
+			for (const listener of this._listeners) {
+				if (
+					listener.selectedProperty == null ||
+					(changedProperty != null &&
+						listener.selectedProperty.toString().startsWith(changedProperty.toString())) ||
+					(prevValue != null &&
+						getNestedProperty(prevValue as GValue, listener.selectedProperty) !==
+							getNestedProperty(this._value, listener.selectedProperty))
+				) {
+					GLOBAL_LISTENER_QUEUE.push({
+						data: { ...additionalData, value: this._value as Readonly<GValue> },
+						callback: listener.callback,
+						level: listener.level
+					});
+				}
+			}
 
 			// Process queue
 			if (processListenerQueue) {
-				// Defer processing using setTimeout
+				// Defer processing using setTimeout()
 				innerDeferred
 					? setTimeout(() => {
 							void processQueue();
@@ -48,21 +61,24 @@ export function createState<GValue>(
 				typeof newValueOrUpdater === 'function'
 					? (newValueOrUpdater as (value: GValue) => GValue)(this._value)
 					: newValueOrUpdater;
-			if (this._value !== newValue) {
+			const prevValue = this._value;
+			if (prevValue !== newValue) {
 				const { additionalData = {}, processListenerQueue = true } = setOptions;
 				additionalData.source = additionalData.source ?? SET_SOURCE_KEY;
 				this._value = newValue;
 				this._notify({
 					additionalData,
-					processListenerQueue
+					processListenerQueue,
+					prevValue
 				});
 			}
 		},
 		listen(callback, listenOptions = {}) {
-			const { level = 0, key } = listenOptions;
+			const { level = 0, key, selectedProperty: selectProperty } = listenOptions;
 			const listener: TListener<GValue> = {
 				key,
 				level,
+				selectedProperty: selectProperty,
 				callback
 			};
 			this._listeners.push(listener);

@@ -4,7 +4,7 @@ import { type TStateSetOptions } from './state';
 
 export type TFeatures<GValue = unknown> = {
 	base: { _: null }; // TODO: Placeholder Feature: Figure out how to make the TS infer work with [] (empty array -> no feature)
-	undo: { undo: (options?: TStateSetOptions) => void; _history: GValue[] };
+	undo: { undo: (options?: TStateSetOptions<GValue>) => void; _history: GValue[] };
 	multiundo: {
 		multiUndo: (count: number) => void;
 	};

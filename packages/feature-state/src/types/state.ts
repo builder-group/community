@@ -1,3 +1,5 @@
+import { type TNestedPath } from '@blgc/utils';
+
 import type { TFeatureKeys, TSelectFeatures } from './features';
 
 export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> = {
@@ -7,7 +9,7 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	/**
 	 * Triggers all registered listeners to run with the current state value.
 	 */
-	_notify: (options?: TStateNotifyOptions) => void;
+	_notify: (options?: TStateNotifyOptions<GValue>) => void;
 	/**
 	 * Retrieves the current state value.
 	 *
@@ -31,7 +33,7 @@ export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> 
 	 */
 	set: (
 		newValueOrUpdater: GValue | ((value: GValue) => GValue),
-		options?: TStateSetOptions
+		options?: TStateSetOptions<GValue>
 	) => void;
 	/**
 	 * Subscribes to state changes without immediately invoking the callback.
@@ -86,6 +88,7 @@ export interface TAdditionalListenerCallbackData {
 export interface TListener<GValue> {
 	key?: string;
 	level: number;
+	selectedProperty?: TNestedPath<GValue>;
 	callback: TListenerCallback<GValue>;
 }
 
@@ -93,10 +96,12 @@ export type TListenerQueueItem<GValue = any> = {
 	data: TListenerCallbackData<GValue>;
 } & TListener<GValue>;
 
-export type TStateSetOptions = TStateNotifyOptions;
+export type TStateSetOptions<GValue> = TStateNotifyOptions<GValue>;
 
-export interface TStateNotifyOptions {
+export interface TStateNotifyOptions<GValue> {
 	processListenerQueue?: boolean;
 	additionalData?: TAdditionalListenerCallbackData;
 	deferred?: boolean;
+	changedProperty?: TNestedPath<GValue>;
+	prevValue?: GValue;
 }

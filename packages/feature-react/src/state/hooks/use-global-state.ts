@@ -19,5 +19,5 @@ export function useGlobalState<GValue>(state: TState<GValue, ['base']>): Readonl
 		};
 	}, [state]);
 
-	return state.get();
+	return state._value;
 }
