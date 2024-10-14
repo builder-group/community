@@ -28,9 +28,14 @@ export function createState<GValue>(
 			// Push current state's listeners to the queue
 			for (const listener of this._listeners) {
 				if (
+					// Notify if no specific property is selected (listen to all changes)
 					listener.selectedProperty == null ||
+					// Notify if we can't verify what changed (assume everything changed)
+					(changedProperty == null && prevValue == null) ||
+					// Notify if the changed property matches or is a parent of the selected property
 					(changedProperty != null &&
 						listener.selectedProperty.toString().startsWith(changedProperty.toString())) ||
+					// Notify if the selected property's value has changed
 					(prevValue != null &&
 						getNestedProperty(prevValue as GValue, listener.selectedProperty) !==
 							getNestedProperty(this._value, listener.selectedProperty))
