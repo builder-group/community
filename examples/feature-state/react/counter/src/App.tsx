@@ -10,14 +10,14 @@ export default function App() {
 			<p>{counter}</p>
 			<button
 				onClick={() => {
-					$counter.set($counter.get() + 1);
+					$counter.set((c) => c + 1);
 				}}
 			>
 				+
 			</button>
 			<button
 				onClick={() => {
-					$counter.set($counter.get() - 1);
+					$counter.set((c) => c - 1);
 				}}
 			>
 				-
