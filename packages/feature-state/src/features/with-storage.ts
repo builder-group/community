@@ -28,7 +28,7 @@ export function withStorage<
 			// Load persisted value or store inital value
 			let success = await this.loadFormStorage();
 			if (!success) {
-				success = await storage.save(key, state._value as GStorageValue);
+				success = await storage.save(key, state._v as GStorageValue);
 			}
 
 			// Setup listener

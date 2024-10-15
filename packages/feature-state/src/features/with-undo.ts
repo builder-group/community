@@ -5,7 +5,7 @@ export function withUndo<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValu
 	historyLimit = 50
 ): TState<GValue, ['undo', ...GSelectedFeatureKeys]> {
 	const undoFeature: TSelectFeatures<GValue, ['undo']> = {
-		_history: [state._value],
+		_history: [state._v],
 		undo(this: TState<GValue, ['undo']>, options) {
 			if (this._history.length > 1) {
 				this._history.pop(); // Pop current value

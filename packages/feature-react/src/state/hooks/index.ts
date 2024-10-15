@@ -1,2 +1,2 @@
 export * from './use-global-state';
-export * from './use-selected';
+export * from './use-selector';

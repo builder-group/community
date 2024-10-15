@@ -47,7 +47,7 @@ export function createFormField<GValue>(
 			reValidateMode,
 			collectErrorMode
 		},
-		_intialValue: deepCopy(formFieldState._value),
+		_intialValue: deepCopy(formFieldState._v),
 		_validator: validator,
 		key,
 		isTouched: false,
