@@ -10,16 +10,16 @@
 	"main": "./dist/index.js",
 	"dependencies": {
 		"@blgc/openapi-router": "workspace:*",
-		"express": "^4.19.2",
-		"valibot": "^0.39.0",
+		"express": "^4.21.1",
+		"valibot": "^0.42.1",
 		"validation-adapters": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/express": "^4.17.21",
-		"@types/node": "^22.5.1",
-		"nodemon": "^3.1.4",
-		"openapi-typescript": "^7.3.0",
+		"@types/express": "^5.0.0",
+		"@types/node": "^22.8.5",
+		"nodemon": "^3.1.7",
+		"openapi-typescript": "^7.4.2",
 		"ts-node": "^10.9.2"
 	},
 	"files": [
