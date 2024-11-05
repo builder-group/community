@@ -35,7 +35,7 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^20.14.1"
+		"@types/node": "^22.9.0"
 	},
 	"files": [
 		"dist",

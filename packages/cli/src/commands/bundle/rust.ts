@@ -179,6 +179,5 @@ export default class Rust extends DynCommand {
 			)}.`
 		);
 		this.log(`\n`);
-		this.exit(0);
 	}
 }

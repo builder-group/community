@@ -36,9 +36,9 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.5.0",
+		"@types/node": "^22.9.0",
 		"dotenv": "^16.4.5",
-		"openapi-typescript": "^7.3.0"
+		"openapi-typescript": "^7.4.2"
 	},
 	"files": [
 		"dist",

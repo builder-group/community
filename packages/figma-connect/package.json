@@ -53,9 +53,9 @@
 		"@blgc/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"@figma/plugin-typings": "^1.95.0",
 		"@blgc/config": "workspace:*",
-		"@types/node": "^20.14.2"
+		"@figma/plugin-typings": "^1.100.2",
+		"@types/node": "^22.9.0"
 	},
 	"files": [
 		"dist",

@@ -55,8 +55,8 @@
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@blgc/utils": "workspace:*",
-		"@types/node": "^22.5.2",
-		"@types/react": "^18.3.5",
+		"@types/node": "^22.9.0",
+		"@types/react": "^18.3.12",
 		"feature-form": "workspace:*",
 		"feature-state": "workspace:*",
 		"react": "^18.3.1"
