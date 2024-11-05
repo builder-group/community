@@ -1,7 +1,7 @@
 {
 	"name": "feature-fetch",
 	"description": "Straightforward, typesafe, and feature-based fetch wrapper supporting OpenAPI types",
-	"version": "0.0.27",
+	"version": "0.0.30",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
@@ -30,15 +30,15 @@
 	},
 	"homepage": "https://builder.group/?source=package-json",
 	"dependencies": {
+		"@0no-co/graphql.web": "^1.0.11",
 		"@blgc/types": "workspace:*",
 		"@blgc/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"@0no-co/graphql.web": "^1.0.8",
 		"@blgc/config": "workspace:*",
-		"@types/node": "^20.14.1",
+		"@types/node": "^22.9.0",
 		"@types/url-parse": "^1.4.11",
-		"msw": "^2.3.1"
+		"msw": "^2.6.0"
 	},
 	"files": [
 		"dist",

@@ -22,8 +22,10 @@ export function withElevenLabs<GSelectedFeatureKeys extends TFeatureKeys[]>(
 
 	const elevenLabsFeatures: TSelectFeatures<['elevenlabs']> = {
 		async getVoices(this: TFetchClient<['base', 'openapi', 'elevenlabs'], paths>) {
-			const result = await this.get('/v1/voices', { queryParams: { show_legacy: true } });
-			return mapOk(result, (ok) => ok.data);
+			return mapOk(
+				await this.get('/v1/voices', { queryParams: { show_legacy: true } }),
+				(ok) => ok.data
+			);
 		},
 		async generateTextToSpeach(
 			this: TFetchClient<['base', 'openapi', 'elevenlabs'], paths>,
@@ -94,11 +96,23 @@ export function withElevenLabs<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			if (result.isErr()) {
 				return Err(result.error);
 			}
-			if (result.value.data == null) {
+			const {
+				value: {
+					data,
+					response: { headers }
+				}
+			} = result;
+
+			if (data == null) {
 				return Err(new FetchError('#ERR_INVALID_STREAM'));
 			}
 
-			return Ok(result.value.data);
+			const contentType = headers.get('content-type') ?? undefined;
+			const characterCost = headers.get('character-cost') ?? undefined;
+			const historyItemId = headers.get('history-item-id') ?? undefined;
+			const requestId = headers.get('request-id') ?? undefined;
+
+			return Ok({ stream: data, contentType, characterCost, historyItemId, requestId });
 		}
 	};
 

@@ -181,9 +181,9 @@ export function createForm<GFormData extends TFormData>(
 			for (const [fieldKey, formField] of Object.entries(this.fields) as TEntries<
 				TFormFields<GFormData>
 			>) {
-				switch (formField.status._value.type) {
+				switch (formField.status._v.type) {
 					case 'INVALID':
-						errors[fieldKey] = formField.status._value.errors;
+						errors[fieldKey] = formField.status._v.errors;
 						break;
 					case 'UNVALIDATED':
 						errors[fieldKey] = [

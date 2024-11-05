@@ -33,11 +33,11 @@
 	"homepage": "https://builder.group/?source=package-json",
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^20.14.10",
+		"@types/node": "^22.9.0",
 		"@types/sax": "^1.2.7",
 		"@types/xml2js": "^0.4.14",
 		"camaro": "^6.2.3",
-		"fast-xml-parser": "^4.4.1",
+		"fast-xml-parser": "^4.5.0",
 		"sax": "^1.4.1",
 		"saxen": "^10.0.0",
 		"txml": "^5.1.1",

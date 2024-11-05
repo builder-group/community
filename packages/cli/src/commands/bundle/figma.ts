@@ -141,7 +141,6 @@ export default class Figma extends DynCommand {
 			)}.`
 		);
 		this.log(`\n`);
-		this.exit(0);
 	}
 
 	private async getPackageJson(): Promise<PackageJson | null> {

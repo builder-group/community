@@ -9,7 +9,7 @@ export function registerFormField<GValue, GKey = string>(
 	return {
 		name: formField.key,
 		defaultValue: formField._intialValue,
-		value: controlled ? formField._value : undefined,
+		value: controlled ? formField._v : undefined,
 		onBlur: () => {
 			formField.blur();
 		},

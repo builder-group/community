@@ -1,7 +1,7 @@
 {
 	"name": "feature-form",
 	"description": "Straightforward, typesafe, and feature-based form library for ReactJs",
-	"version": "0.0.28",
+	"version": "0.0.29",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
@@ -37,7 +37,7 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^20.14.1"
+		"@types/node": "^22.9.0"
 	},
 	"files": [
 		"dist",

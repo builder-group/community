@@ -8,7 +8,7 @@ export function withGraphQL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 ): TFetchClient<['graphql', ...GSelectedFeatureKeys]> {
 	const graphqlFeature: TSelectFeatures<['graphql']> = {
 		async query(this: TFetchClient<['base']>, query, options = {}) {
-			const maybeQueryString = getQueryString(query);
+			const maybeQueryString = await getQueryString(query);
 			if (maybeQueryString.isErr()) {
 				return Err(maybeQueryString.error);
 			}

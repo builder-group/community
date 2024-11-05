@@ -13,26 +13,35 @@ export function createState<GValue>(
 		_: null,
 		_features: ['base'],
 		_listeners: [],
-		_value: initialValue,
+		_v: initialValue,
 		_notify(notifyOptions = {}) {
 			const {
 				processListenerQueue = true,
 				additionalData = {},
-				deferred: innerDeferred = deferred
+				deferred: innerDeferred = deferred,
+				prevValue
 			} = notifyOptions;
 
 			// Push current state's listeners to the queue
-			this._listeners.forEach((listener) => {
-				GLOBAL_LISTENER_QUEUE.push({
-					data: { ...additionalData, value: this._value as Readonly<GValue> },
-					callback: listener.callback,
-					level: listener.level
-				});
-			});
+			for (const listener of this._listeners) {
+				if (
+					listener.callIf == null ||
+					listener.callIf({ newValue: this._v, prevValue, additionalData })
+				) {
+					GLOBAL_LISTENER_QUEUE.push({
+						data: {
+							...additionalData,
+							value: this._v as Readonly<GValue>
+						},
+						callback: listener.callback,
+						level: listener.level
+					});
+				}
+			}
 
 			// Process queue
 			if (processListenerQueue) {
-				// Defer processing using setTimeout
+				// Defer processing using setTimeout()
 				innerDeferred
 					? setTimeout(() => {
 							void processQueue();
@@ -41,29 +50,32 @@ export function createState<GValue>(
 			}
 		},
 		get() {
-			return this._value;
+			return this._v;
 		},
 		set(newValueOrUpdater, setOptions = {}) {
 			const newValue =
 				typeof newValueOrUpdater === 'function'
-					? (newValueOrUpdater as (value: GValue) => GValue)(this._value)
+					? (newValueOrUpdater as (value: GValue) => GValue)(this._v)
 					: newValueOrUpdater;
-			if (this._value !== newValue) {
+			const prevValue = this._v;
+			if (prevValue !== newValue) {
 				const { additionalData = {}, processListenerQueue = true } = setOptions;
 				additionalData.source = additionalData.source ?? SET_SOURCE_KEY;
-				this._value = newValue;
+				this._v = newValue;
 				this._notify({
 					additionalData,
-					processListenerQueue
+					processListenerQueue,
+					prevValue
 				});
 			}
 		},
 		listen(callback, listenOptions = {}) {
-			const { level = 0, key } = listenOptions;
+			const { level = 0, key, callIf } = listenOptions;
 			const listener: TListener<GValue> = {
 				key,
 				level,
-				callback
+				callback,
+				callIf
 			};
 			this._listeners.push(listener);
 
@@ -77,7 +89,7 @@ export function createState<GValue>(
 		},
 		subscribe(callback, subscribeOptions) {
 			const unbind = this.listen(callback, subscribeOptions);
-			void callback({ value: this._value });
+			void callback({ value: this._v });
 			return unbind;
 		}
 	};

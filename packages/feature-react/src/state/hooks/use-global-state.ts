@@ -17,7 +17,7 @@ export function useGlobalState<GValue>(state: TState<GValue, ['base']>): Readonl
 		return () => {
 			unbind();
 		};
-	}, []);
+	}, [state]);
 
-	return state.get();
+	return state._v;
 }

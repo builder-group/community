@@ -1,10 +1,11 @@
 import type { TUnionToIntersection } from '@blgc/types/utils';
+import { type TNestedPath } from '@blgc/utils';
 
-import { type TStateSetOptions } from './state';
+import { type TListenerCallback, type TListenerOptions, type TStateSetOptions } from './state';
 
 export type TFeatures<GValue = unknown> = {
 	base: { _: null }; // TODO: Placeholder Feature: Figure out how to make the TS infer work with [] (empty array -> no feature)
-	undo: { undo: (options?: TStateSetOptions) => void; _history: GValue[] };
+	undo: { undo: (options?: TStateSetOptions<GValue>) => void; _history: GValue[] };
 	multiundo: {
 		multiUndo: (count: number) => void;
 	};
@@ -12,6 +13,13 @@ export type TFeatures<GValue = unknown> = {
 		persist: () => Promise<boolean>;
 		loadFormStorage: () => Promise<boolean>;
 		deleteFormStorage: () => Promise<boolean>;
+	};
+	selector: {
+		listenToSelected: (
+			callIf: TNestedPath<GValue>[] | ((value: GValue) => unknown),
+			callback: TListenerCallback<GValue>,
+			options?: Omit<TListenerOptions<GValue>, 'callIf'>
+		) => () => void;
 	};
 } & TThirdPartyFeatures<GValue>;
 

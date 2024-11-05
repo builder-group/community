@@ -62,8 +62,8 @@
 	"homepage": "https://builder.group/?source=github",
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^20.14.1",
-		"valibot": "^0.35.0",
+		"@types/node": "^22.9.0",
+		"valibot": "1.0.0-beta.3",
 		"validation-adapter": "workspace:*",
 		"yup": "^1.4.0",
 		"zod": "^3.23.8"

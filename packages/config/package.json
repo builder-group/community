@@ -22,11 +22,11 @@
 	"homepage": "https://builder.group/?source=github",
 	"dependencies": {
 		"@vercel/style-guide": "^6.0.0",
-		"eslint-config-turbo": "^2.0.14",
-		"vite-tsconfig-paths": "^5.0.1"
+		"eslint-config-turbo": "^2.2.3",
+		"vite-tsconfig-paths": "^5.1.0"
 	},
 	"peerDependencies": {
-		"@next/eslint-plugin-next": "^14.2.5",
+		"@next/eslint-plugin-next": "^14.2.6",
 		"eslint": "^8.57.0"
 	},
 	"devDependencies": {

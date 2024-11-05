@@ -28,6 +28,7 @@ export async function createBaseRollupConfig(
 				resolveDTsSource: true
 			}),
 			'import-css', // Plugin placeholder for "rollup-plugin-import-css"
+			'rollup-plugin-sass', // Plugin placeholder for "rollup-plugin-sass"
 			'wasm', // Plugin placeholder for "rollup-plugin-wasm"
 			// Transpile TypeScript code to JavaScript (ES6), and minify in production
 			esbuild({
