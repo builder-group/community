@@ -1,5 +1,11 @@
 # feature-react
 
+## 0.0.30
+
+### Patch Changes
+
+- [#78](https://github.com/builder-group/community/pull/78) [`9d85e49`](https://github.com/builder-group/community/commit/9d85e497aac194ad5773f644b374967a45260088) Thanks [@github-actions](https://github.com/apps/github-actions)! - Bumped dependency versions
+
 ## 0.0.26
 
 ### Patch Changes

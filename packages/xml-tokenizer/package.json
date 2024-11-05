@@ -1,6 +1,6 @@
 {
 	"name": "xml-tokenizer",
-	"version": "0.0.15",
+	"version": "0.0.16",
 	"description": "Straightforward and typesafe XML tokenizer that streams tokens through a callback mechanism",
 	"private": false,
 	"scripts": {

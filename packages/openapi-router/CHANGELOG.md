@@ -1,5 +1,15 @@
 # @blgc/openapi-router
 
+## 0.0.21
+
+### Patch Changes
+
+- [#78](https://github.com/builder-group/community/pull/78) [`9d85e49`](https://github.com/builder-group/community/commit/9d85e497aac194ad5773f644b374967a45260088) Thanks [@github-actions](https://github.com/apps/github-actions)! - Bumped dependency versions
+
+- Updated dependencies [[`9d85e49`](https://github.com/builder-group/community/commit/9d85e497aac194ad5773f644b374967a45260088)]:
+  - validation-adapter@0.0.13
+  - @blgc/types@0.0.7
+
 ## 0.0.20
 
 ### Patch Changes
