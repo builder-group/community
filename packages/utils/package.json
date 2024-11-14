@@ -1,7 +1,7 @@
 {
 	"name": "@blgc/utils",
 	"description": "Straightforward, typesafe, and tree-shakable collection of utility functions",
-	"version": "0.0.24",
+	"version": "0.0.25",
 	"private": false,
 	"scripts": {
 		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
