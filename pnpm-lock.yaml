@@ -678,9 +678,6 @@ importers:
 
   packages/xml-tokenizer:
     devDependencies:
-      '@blgc/config':
-        specifier: workspace:*
-        version: link:../config
       '@blgc/style-guide':
         specifier: workspace:*
         version: link:../style-guide
