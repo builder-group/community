@@ -29,6 +29,7 @@
 	"devDependencies": {
 		"@blgc/cli": "workspace:*",
 		"@blgc/config": "workspace:*",
+		"@blgc/style-guide": "workspace:*",
 		"@changesets/changelog-github": "^0.5.0",
 		"@changesets/cli": "^2.27.9",
 		"@ianvs/prettier-plugin-sort-imports": "^4.3.1",

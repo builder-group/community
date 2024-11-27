@@ -13,8 +13,10 @@
 		"./eslint/*": "./eslint/*.js",
 		"./vite/*": "./vite/*.js",
 		"./prettier": "./prettier/index.js",
-		"./typescript": "./typescript/tsconfig.base.json",
-		"./typescript/node20": "./typescript/tsconfig.node20.json"
+		"./typescript/base": "./typescript/tsconfig.base.json",
+		"./typescript/next": "./typescript/tsconfig.next.json",
+		"./typescript/node20": "./typescript/tsconfig.node20.json",
+		"./typescript/react-internal": "./typescript/tsconfig.react-internal.json"
 	},
 	"repository": {
 		"type": "git",
