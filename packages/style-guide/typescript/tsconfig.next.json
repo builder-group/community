@@ -1,0 +1,37 @@
+// https://github.com/tsconfig/bases/blob/main/bases/next.json
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"display": "Typescript configuration for applications that use Next.js",
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		// Language and Environment
+		"target": "esnext",
+		"lib": ["esnext", "dom", "dom.iterable"],
+		"jsx": "preserve",
+
+		// Modules
+		"module": "esnext",
+		"moduleResolution": "bundler",
+
+		// Javascript Support
+		"allowJs": true,
+
+		// Emit
+		"noEmit": true,
+		"incremental": true,
+
+		// Plugins
+		"plugins": [
+			{
+				"name": "next"
+			}
+		],
+
+		// Path Aliases
+		"paths": {
+			"@/*": ["./src/*"]
+		}
+	},
+	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+	"exclude": ["node_modules"]
+} 

@@ -1,0 +1,51 @@
+{
+	"name": "@blgc/style-guide",
+	"description": "Builder.Group's engineering style guide",
+	"version": "0.0.1",
+	"private": false,
+	"scripts": {
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"update:latest": "pnpm update --latest",
+		"publish:patch": "pnpm version patch && pnpm publish --no-git-checks --access=public"
+	},
+	"exports": {
+		"./eslint/*": "./eslint/*.js",
+		"./vite/*": "./vite/*.js",
+		"./prettier": "./prettier/index.js",
+		"./typescript": "./typescript/tsconfig.base.json",
+		"./typescript/node20": "./typescript/tsconfig.node20.json"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/builder-group/monorepo.git"
+	},
+	"keywords": [],
+	"author": "@bennobuilder",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/builder-group/monorepo/issues"
+	},
+	"homepage": "https://builder.group/?source=github",
+	"dependencies": {
+		"@ianvs/prettier-plugin-sort-imports": "^4.3.1",
+		"@next/eslint-plugin-next": "^14.2.6",
+		"@typescript-eslint/eslint-plugin": "^8.16.0",
+		"@typescript-eslint/parser": "^8.16.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-only-warn": "^1.1.0",
+		"eslint-plugin-react": "^7.37.2",
+		"eslint-plugin-react-hooks": "^5.0.0",
+		"eslint-plugin-turbo": "^2.3.3",
+		"prettier-plugin-packagejson": "^2.5.6",
+		"prettier-plugin-tailwindcss": "^0.6.8",
+		"typescript-eslint": "^8.16.0",
+		"vite-tsconfig-paths": "^5.1.0"
+	},
+	"peerDependencies": {
+		"eslint": "^9.15.0"
+	},
+	"devDependencies": {
+		"eslint": "^9.15.0"
+	}
+}

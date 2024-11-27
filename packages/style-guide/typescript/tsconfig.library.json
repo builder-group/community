@@ -1,0 +1,22 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"display": "Typescript configuration for TypeScript libraries",
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		// Language and Environment
+		"lib": ["esnext"],
+		"target": "esnext",
+
+		// Modules
+		"module": "commonjs",
+		"moduleResolution": "node",
+
+		// Javascript Support
+		"allowJs": true,
+
+		// Emit
+		"outDir": "./dist",
+		"rootDir": "./src",
+	},
+	"include": ["src"]
+} 
