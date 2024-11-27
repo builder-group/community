@@ -1,16 +1,16 @@
-import pluginNext from '@next/eslint-plugin-next';
-import pluginReact from 'eslint-plugin-react';
-import pluginReactHooks from 'eslint-plugin-react-hooks';
-import globals from 'globals';
-
-import { config as baseConfig } from './base.js';
+const pluginNext = require('@next/eslint-plugin-next');
+const pluginReact = require('eslint-plugin-react');
+const pluginReactHooks = require('eslint-plugin-react-hooks');
+const globals = require('globals');
+const { baseConfig } = require('./base.js');
 
 /**
  * ESLint configuration for applications that use Next.js.
  *
+ * @see https://eslint.org/docs/latest/use/configure/configuration-files
  * @type {import("eslint").Linter.Config}
- * */
-export const nextJsConfig = [
+ */
+module.exports = [
 	...baseConfig,
 	{
 		...pluginReact.configs.flat.recommended,

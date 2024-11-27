@@ -1,11 +1,12 @@
-import { config as baseConfig } from './base.js';
+const { baseConfig } = require('./base.js');
 
 /**
  * ESLint configuration for TypeScript libraries.
  *
+ * @see https://eslint.org/docs/latest/use/configure/configuration-files
  * @type {import("eslint").Linter.Config}
  */
-export const libraryConfig = [
+module.exports = [
 	...baseConfig,
 	{
 		rules: {}

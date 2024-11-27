@@ -1,5 +1,6 @@
 /**
- * @type {import("@ianvs/prettier-plugin-sort-imports").PrettierConfig}
+ * @see https://prettier.io/docs/en/configuration.html
+ * @type {import("prettier").Config}
  */
 module.exports = {
 	// Editor Config Overrides

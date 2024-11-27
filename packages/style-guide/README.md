@@ -32,11 +32,11 @@ The following configs are available, and are designed to be used together.
 >
 > See: https://prettier.io/docs/en/install.html
 
-To use the shared Prettier config, set the following in `package.json`.
+To use the shared Prettier config, set the following in `package.json`:
 
 ```json
 {
-  "prettier": "@vercel/style-guide/prettier"
+  "prettier": "@blgc/style-guide/prettier"
 }
 ```
 
@@ -45,9 +45,11 @@ To use the shared Prettier config, set the following in `package.json`.
 > Note: Typescript is a peer-dependency of this package, and should be installed
 > at the root of your project.
 
+To use the shared Typescript config, set the following in `tsconfig.json`:
+
 ```json
 {
-	"extends": "@blgc/style-guide/typescript/react-library",
+	"extends": "@blgc/style-guide/typescript/library",
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./src",
@@ -64,17 +66,26 @@ To use the shared Prettier config, set the following in `package.json`.
 >
 > See: https://eslint.org/docs/user-guide/getting-started#installation-and-usage
 
+
+To use the shared ESLint config, set the following in `eslint.config.js`:
+    
 ```js
+const styleGuide = require('@blgc/style-guide/eslint/library');
+
 /**
  * @type {import('eslint').Linter.Config}
  */
-module.exports = {
-	root: true,
-	extends: [require.resolve('@blgc/style-guide/eslint/react-internal'), 'plugin:storybook/recommended']
-};
+module.exports = [
+    ...styleGuide,
+	{
+		// Any additional custom rules
+	}
+];
 ```
 
 ### [Vitest](https://vitest.dev/)
+
+To use the shared Vitest config, set the following in `vitest.config.js`:
 
 ```js
 const { defineConfig, mergeConfig } = require('vitest/config');
