@@ -50,7 +50,7 @@ function resolveInputPathFromPackageJson(
 
 	// Try to resolve relative input path
 	let relativeInputPath = './src/index.ts';
-	const propertyValue: unknown = exportConditions.source;
+	const propertyValue: unknown = exportConditions['source'];
 	if (typeof propertyValue === 'string') {
 		relativeInputPath = propertyValue;
 	}

@@ -58,8 +58,8 @@
 	},
 	"devDependencies": {
 		"@blgc/style-guide": "workspace:*",
-		"@figma/plugin-typings": "^1.100.2",
-		"@types/node": "^22.9.0"
+		"@figma/plugin-typings": "^1.103.0",
+		"@types/node": "^22.10.0"
 	},
 	"size-limit": [
 		{

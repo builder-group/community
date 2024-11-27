@@ -41,7 +41,7 @@
 	},
 	"devDependencies": {
 		"@blgc/style-guide": "workspace:*",
-		"@types/node": "^22.9.0"
+		"@types/node": "^22.10.0"
 	},
 	"size-limit": [
 		{

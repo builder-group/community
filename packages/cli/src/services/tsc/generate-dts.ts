@@ -118,7 +118,7 @@ function adjustCompilerOptionsForResolvedPaths(
 	compilerOptions: TTsConfigCompilerOptions,
 	relativeDeclarationDirPath: string
 ): TTsConfigCompilerOptions {
-	const basePath = path.resolve(compilerOptions.pathsBasePath?.toString() ?? process.cwd());
+	const basePath = path.resolve(compilerOptions['pathsBasePath']?.toString() ?? process.cwd());
 	const relativeRootDir = path.relative(basePath, compilerOptions.rootDir ?? './src');
 
 	// Update paths to reflect the new relative declaration directory

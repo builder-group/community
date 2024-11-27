@@ -66,8 +66,8 @@
 	},
 	"devDependencies": {
 		"@blgc/style-guide": "workspace:*",
-		"@types/node": "^22.9.0",
-		"valibot": "1.0.0-beta.3",
+		"@types/node": "^22.10.0",
+		"valibot": "1.0.0-beta.8",
 		"validation-adapter": "workspace:*",
 		"yup": "^1.4.0",
 		"zod": "^3.23.8"

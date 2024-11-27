@@ -40,11 +40,11 @@
 	"devDependencies": {
 		"@blgc/style-guide": "workspace:*",
 		"@types/express": "^5.0.0",
-		"@types/express-serve-static-core": "^5.0.1",
-		"@types/node": "^22.9.0",
+		"@types/express-serve-static-core": "^5.0.2",
+		"@types/node": "^22.10.0",
 		"express": "^4.21.1",
-		"hono": "^4.6.9",
-		"valibot": "1.0.0-beta.3",
+		"hono": "^4.6.12",
+		"valibot": "1.0.0-beta.8",
 		"validation-adapters": "workspace:*"
 	},
 	"size-limit": [

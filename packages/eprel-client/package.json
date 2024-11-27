@@ -40,9 +40,9 @@
 	},
 	"devDependencies": {
 		"@blgc/style-guide": "workspace:*",
-		"@types/node": "^22.9.0",
+		"@types/node": "^22.10.0",
 		"dotenv": "^16.4.5",
-		"openapi-typescript": "^7.4.2"
+		"openapi-typescript": "^7.4.3"
 	},
 	"size-limit": [
 		{

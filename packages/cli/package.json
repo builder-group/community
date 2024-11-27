@@ -47,7 +47,7 @@
 		}
 	},
 	"dependencies": {
-		"@oclif/core": "^4.0.31",
+		"@oclif/core": "^4.0.33",
 		"@rollup/plugin-commonjs": "^28.0.1",
 		"@rollup/plugin-html": "^1.0.4",
 		"@rollup/plugin-json": "^6.1.0",
@@ -59,7 +59,7 @@
 		"figlet": "^1.8.0",
 		"lodash": "^4.17.21",
 		"maxmin": "^4.1.0",
-		"rollup": "^4.24.4",
+		"rollup": "^4.27.4",
 		"rollup-plugin-bundle-size": "^1.0.3",
 		"rollup-plugin-esbuild": "^6.1.1",
 		"rollup-plugin-license": "^3.5.3",
@@ -70,8 +70,8 @@
 		"@blgc/style-guide": "workspace:*",
 		"@types/figlet": "^1.7.0",
 		"@types/lodash": "^4.17.13",
-		"@types/node": "^22.9.0",
-		"type-fest": "^4.26.1"
+		"@types/node": "^22.10.0",
+		"type-fest": "^4.29.0"
 	},
 	"pnpm": {
 		"updateConfig": {

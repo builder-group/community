@@ -38,7 +38,7 @@ export async function mapResponseToRequestError(
 // Helper function to extract error description from various possible fields
 function getErrorDescription(data: unknown): string | null {
 	if (isObject(data)) {
-		return data.error_description || data.error?.toString() || data.message || null;
+		return data['error_description'] || data['error']?.toString() || data['message'] || null;
 	}
 	return null;
 }
@@ -46,7 +46,9 @@ function getErrorDescription(data: unknown): string | null {
 // Helper function to extract error code from various possible fields
 function getErrorCode(data: unknown): TErrorCode | null {
 	if (isObject(data)) {
-		return data.error_code || data.status || data.code || getErrorCode(data.error) || null;
+		return (
+			data['error_code'] || data['status'] || data['code'] || getErrorCode(data['error']) || null
+		);
 	}
 	return null;
 }

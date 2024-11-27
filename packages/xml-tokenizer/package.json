@@ -37,7 +37,7 @@
 	},
 	"devDependencies": {
 		"@blgc/style-guide": "workspace:*",
-		"@types/node": "^22.9.0",
+		"@types/node": "^22.10.0",
 		"@types/sax": "^1.2.7",
 		"@types/xml2js": "^0.4.14",
 		"camaro": "^6.2.3",

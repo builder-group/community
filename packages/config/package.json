@@ -22,7 +22,7 @@
 	},
 	"dependencies": {
 		"@vercel/style-guide": "^6.0.0",
-		"eslint-config-turbo": "^2.2.3",
+	    "eslint-config-turbo": "^2.2.3",
 		"vite-tsconfig-paths": "^5.1.0"
 	},
 	"devDependencies": {

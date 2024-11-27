@@ -11,7 +11,7 @@ export function createGoogleWebfontsClient(
 			prefixUrl,
 			beforeRequestMiddlewares: [
 				(data) => {
-					data.queryParams.key = apiKey;
+					data.queryParams['key'] = apiKey;
 				}
 			]
 		})

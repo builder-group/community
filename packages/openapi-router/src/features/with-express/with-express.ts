@@ -110,7 +110,7 @@ function validationMiddleware<GPathOperation>(
 				const bodyValidationContext = createValidationContext(req.body);
 				await bodyValidator.validate(bodyValidationContext);
 				for (const error of bodyValidationContext.errors) {
-					error.source = 'body';
+					error['source'] = 'body';
 					validationErrors.push(error);
 				}
 			}
@@ -121,7 +121,7 @@ function validationMiddleware<GPathOperation>(
 				);
 				await pathValidator.validate(pathValidationContext);
 				for (const error of pathValidationContext.errors) {
-					error.source = 'path';
+					error['source'] = 'path';
 					validationErrors.push(error);
 				}
 			}
@@ -132,7 +132,7 @@ function validationMiddleware<GPathOperation>(
 				>(req.query as TOperationQueryParams<GPathOperation>);
 				await queryValidator.validate(queryValidationContext);
 				for (const error of queryValidationContext.errors) {
-					error.source = 'query';
+					error['source'] = 'query';
 					validationErrors.push(error);
 				}
 			}
