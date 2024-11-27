@@ -5,7 +5,7 @@ import globals from 'globals';
 import { config as baseConfig } from './base.js';
 
 /**
- * ESLint configuration for applications and libraries that use React.
+ * ESLint configuration for applications and libraries that use ReactJs.
  *
  * @type {import("eslint").Linter.Config} */
 export const config = [
