@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi, type SpyInstance } from 'vitest';
-
 import { LOG_LEVEL, Logger } from './Logger';
 
 describe('Logger class tests', () => {

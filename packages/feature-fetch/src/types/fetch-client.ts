@@ -1,5 +1,4 @@
 import { type TResult } from '@blgc/utils';
-
 import type { FetchError, NetworkError, RequestError } from '../exceptions';
 import type { FetchHeaders } from '../helper';
 import type { TFeatureKeys, TSelectFeatures } from './features';

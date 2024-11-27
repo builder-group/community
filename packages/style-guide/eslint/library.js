@@ -1,5 +1,3 @@
-const { baseConfig } = require('./base.js');
-
 /**
  * ESLint configuration for TypeScript libraries.
  *
@@ -7,7 +5,7 @@ const { baseConfig } = require('./base.js');
  * @type {import("eslint").Linter.Config}
  */
 module.exports = [
-	...baseConfig,
+	...require('./base.js'),
 	{
 		rules: {}
 	}

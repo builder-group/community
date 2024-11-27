@@ -1,11 +1,11 @@
-import type express from 'express';
-import type * as core from 'express-serve-static-core';
 import type {
 	TOperationPathParams,
 	TOperationQueryParams,
 	TOperationSuccessResponseContent,
 	TRequestBody
 } from '@blgc/types/openapi';
+import type express from 'express';
+import type * as core from 'express-serve-static-core';
 
 // =============================================================================
 // Request Options

@@ -1,5 +1,4 @@
 import type { PackageJson } from 'type-fest';
-
 import { resolvePathsFromPackageJson } from './resolve-paths-from-package-json';
 import { toArray } from './to-array';
 

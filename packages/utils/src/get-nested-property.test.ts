@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { getNestedProperty } from './get-nested-property';
 
 describe('getNestedProperty function', () => {

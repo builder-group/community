@@ -1,6 +1,5 @@
 import path from 'node:path';
 import chalk from 'chalk';
-
 import type { DynCommand } from '../../DynCommand';
 import { readJsFile } from '../../utils';
 import type { TDynConfig } from './types';

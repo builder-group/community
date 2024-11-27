@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { shortId } from './short-id';
 
 describe('shortId function', () => {

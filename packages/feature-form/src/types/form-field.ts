@@ -1,10 +1,10 @@
+import { type BitwiseFlag } from '@blgc/utils';
 import { type TState } from 'feature-state';
 import {
 	type TBaseValidationContext,
 	type TCollectErrorMode,
 	type TValidator
 } from 'validation-adapter';
-import { type BitwiseFlag } from '@blgc/utils';
 
 export type TFormField<GValue> = TState<GValue | undefined, ['base', 'form-field']>;
 

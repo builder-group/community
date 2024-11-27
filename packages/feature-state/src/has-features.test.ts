@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { createState } from './create-state';
 import { withUndo } from './features';
 import { hasFeatures } from './has-features';

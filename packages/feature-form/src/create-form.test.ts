@@ -1,6 +1,5 @@
 import { createValidator } from 'validation-adapter';
 import { describe, expect, it } from 'vitest';
-
 import { createForm } from './create-form';
 import { fromValidator } from './helper';
 

@@ -1,16 +1,19 @@
 {
 	"name": "@blgc/types",
-	"description": "A collection of utility types",
 	"version": "0.0.7",
 	"private": false,
-	"scripts": {
-		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle -b typesonly",
-		"lint": "eslint --ext .js,.ts src/",
-		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
-		"install:clean": "pnpm run clean && pnpm install",
-		"update:latest": "pnpm update --latest",
-		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public"
+	"description": "A collection of utility types",
+	"keywords": [],
+	"homepage": "https://builder.group/?source=package-json",
+	"bugs": {
+		"url": "https://github.com/builder-group/monorepo/issues"
 	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/builder-group/monorepo.git"
+	},
+	"license": "MIT",
+	"author": "@bennobuilder",
 	"exports": {
 		"./api": {
 			"source": "./src/api/index.ts",
@@ -38,22 +41,19 @@
 			]
 		}
 	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/builder-group/monorepo.git"
-	},
-	"keywords": [],
-	"author": "@bennobuilder",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/builder-group/monorepo/issues"
-	},
-	"homepage": "https://builder.group/?source=package-json",
-	"devDependencies": {
-		"@blgc/config": "workspace:*"
-	},
 	"files": [
 		"dist",
 		"README.md"
-	]
+	],
+	"scripts": {
+		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle -b typesonly",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"lint": "eslint --ext .js,.ts src/",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"update:latest": "pnpm update --latest"
+	},
+	"devDependencies": {
+		"@blgc/config": "workspace:*"
+	}
 }

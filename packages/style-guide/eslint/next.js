@@ -2,7 +2,6 @@ const pluginNext = require('@next/eslint-plugin-next');
 const pluginReact = require('eslint-plugin-react');
 const pluginReactHooks = require('eslint-plugin-react-hooks');
 const globals = require('globals');
-const { baseConfig } = require('./base.js');
 
 /**
  * ESLint configuration for applications that use Next.js.
@@ -11,7 +10,7 @@ const { baseConfig } = require('./base.js');
  * @type {import("eslint").Linter.Config}
  */
 module.exports = [
-	...baseConfig,
+	...require('./base.js'),
 	{
 		...pluginReact.configs.flat.recommended,
 		languageOptions: {

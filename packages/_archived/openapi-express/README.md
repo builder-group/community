@@ -48,7 +48,6 @@ Import the generated `paths` and use `createOpenApiRouter()` to create an OpenAP
 
 ```ts
 import { createOpenApiRouter } from 'openapi-express';
-
 import { paths } from './openapi-paths'; // Import generated paths
 
 export const router: Router = Router();
@@ -63,7 +62,6 @@ Integrate the OpenAPI router into your Express application to handle requests. U
 
 ```ts
 import express from 'express';
-
 import { router } from './router';
 
 const app = express();
@@ -82,7 +80,6 @@ Define your API endpoints with full type safety and request validation using Zod
 ```ts
 import { Router } from 'express';
 import { z } from 'zod';
-
 import { openApiRouter } from '../router';
 
 const posts = [

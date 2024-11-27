@@ -4,5984 +4,6009 @@
  */
 
 export interface paths {
-    "/v1/history": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Generated Items
-         * @description Returns metadata about all your generated audio.
-         */
-        get: operations["Get_generated_items_v1_history_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/history/{history_item_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get History Item By Id
-         * @description Returns information about an history item by its ID.
-         */
-        get: operations["Get_history_item_by_ID_v1_history__history_item_id__get"];
-        put?: never;
-        post?: never;
-        /**
-         * Delete History Item
-         * @description Delete a history item by its ID
-         */
-        delete: operations["Delete_history_item_v1_history__history_item_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/history/{history_item_id}/audio": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Audio From History Item
-         * @description Returns the audio of an history item.
-         */
-        get: operations["Get_audio_from_history_item_v1_history__history_item_id__audio_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/history/download": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Download History Items
-         * @description Download one or more history items. If one history item ID is provided, we will return a single audio file. If more than one history item IDs are provided, we will provide the history items packed into a .zip file.
-         */
-        post: operations["Download_history_items_v1_history_download_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/sound-generation": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Sound Generation
-         * @description Converts a text of your choice into sound
-         */
-        post: operations["Sound_Generation_v1_sound_generation_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/audio-isolation": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Audio Isolation
-         * @description Removes background noise from audio
-         */
-        post: operations["Audio_Isolation_v1_audio_isolation_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/audio-isolation/stream": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Audio Isolation Stream
-         * @description Removes background noise from audio and streams the result
-         */
-        post: operations["Audio_Isolation_Stream_v1_audio_isolation_stream_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/voices/{voice_id}/samples/{sample_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Delete Sample
-         * @description Removes a sample by its ID.
-         */
-        delete: operations["Delete_sample_v1_voices__voice_id__samples__sample_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/voices/{voice_id}/samples/{sample_id}/audio": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Audio From Sample
-         * @description Returns the audio corresponding to a sample attached to a voice.
-         */
-        get: operations["Get_audio_from_sample_v1_voices__voice_id__samples__sample_id__audio_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/text-to-speech/{voice_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Text To Speech
-         * @description Converts text into speech using a voice of your choice and returns audio.
-         */
-        post: operations["Text_to_speech_v1_text_to_speech__voice_id__post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/text-to-speech/{voice_id}/with-timestamps": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Text To Speech With Timestamps
-         * @description Converts text into speech using a voice of your choice and returns JSON containing audio as a base64 encoded string together with information on when which character was spoken.
-         */
-        post: operations["Text_to_speech_with_timestamps_v1_text_to_speech__voice_id__with_timestamps_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/text-to-speech/{voice_id}/stream": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Text To Speech Streaming
-         * @description Converts text into speech using a voice of your choice and returns audio as an audio stream.
-         */
-        post: operations["Text_to_speech_streaming_v1_text_to_speech__voice_id__stream_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/text-to-speech/{voice_id}/stream/with-timestamps": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Text To Speech Streaming With Timestamps
-         * @description Converts text into speech using a voice of your choice and returns a stream of JSONs containing audio as a base64 encoded string together with information on when which character was spoken.
-         */
-        post: operations["Text_to_speech_streaming_with_timestamps_v1_text_to_speech__voice_id__stream_with_timestamps_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/speech-to-speech/{voice_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Speech To Speech
-         * @description Create speech by combining the content and emotion of the uploaded audio with a voice of your choice.
-         */
-        post: operations["Speech_to_Speech_v1_speech_to_speech__voice_id__post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/speech-to-speech/{voice_id}/stream": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Speech To Speech Streaming
-         * @description Create speech by combining the content and emotion of the uploaded audio with a voice of your choice and returns an audio stream.
-         */
-        post: operations["Speech_to_Speech_Streaming_v1_speech_to_speech__voice_id__stream_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/voice-generation/generate-voice/parameters": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Voice Generation Parameters
-         * @description Get possible parameters for the /v1/voice-generation/generate-voice endpoint.
-         */
-        get: operations["Voice_Generation_Parameters_v1_voice_generation_generate_voice_parameters_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/voice-generation/generate-voice": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Generate A Random Voice
-         * @description Generate a random voice based on parameters. This method returns a generated_voice_id in the response header, and a sample of the voice in the body. If you like the generated voice call /v1/voice-generation/create-voice with the generated_voice_id to create the voice.
-         */
-        post: operations["Generate_a_random_voice_v1_voice_generation_generate_voice_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/voice-generation/create-voice": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Create A Previously Generated Voice
-         * @description Create a previously generated voice. This endpoint should be called after you fetched a generated_voice_id using /v1/voice-generation/generate-voice.
-         */
-        post: operations["Create_a_previously_generated_voice_v1_voice_generation_create_voice_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user/subscription": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get User Subscription Info
-         * @description Gets extended information about the users subscription
-         */
-        get: operations["Get_user_subscription_info_v1_user_subscription_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get User Info
-         * @description Gets information about the user
-         */
-        get: operations["Get_user_info_v1_user_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/voices": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Voices
-         * @description Gets a list of all available voices for a user.
-         */
-        get: operations["Get_voices_v1_voices_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/voices/settings/default": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Default Voice Settings.
-         * @description Gets the default settings for voices. "similarity_boost" corresponds to"Clarity + Similarity Enhancement" in the web app and "stability" corresponds to "Stability" slider in the web app.
-         */
-        get: operations["Get_default_voice_settings__v1_voices_settings_default_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/voices/{voice_id}/settings": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Voice Settings
-         * @description Returns the settings for a specific voice. "similarity_boost" corresponds to"Clarity + Similarity Enhancement" in the web app and "stability" corresponds to "Stability" slider in the web app.
-         */
-        get: operations["Get_voice_settings_v1_voices__voice_id__settings_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/voices/{voice_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Voice
-         * @description Returns metadata about a specific voice.
-         */
-        get: operations["Get_voice_v1_voices__voice_id__get"];
-        put?: never;
-        post?: never;
-        /**
-         * Delete Voice
-         * @description Deletes a voice by its ID.
-         */
-        delete: operations["Delete_voice_v1_voices__voice_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/voices/{voice_id}/settings/edit": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Edit Voice Settings
-         * @description Edit your settings for a specific voice. "similarity_boost" corresponds to"Clarity + Similarity Enhancement" in the web app and "stability" corresponds to "Stability" slider in the web app.
-         */
-        post: operations["Edit_voice_settings_v1_voices__voice_id__settings_edit_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/voices/add": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Add Voice
-         * @description Add a new voice to your collection of voices in VoiceLab.
-         */
-        post: operations["Add_voice_v1_voices_add_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/voices/{voice_id}/edit": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Edit Voice
-         * @description Edit a voice created by you.
-         */
-        post: operations["Edit_voice_v1_voices__voice_id__edit_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/voices/add/{public_user_id}/{voice_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Add Sharing Voice
-         * @description Add a sharing voice to your collection of voices in VoiceLab.
-         */
-        post: operations["Add_sharing_voice_v1_voices_add__public_user_id___voice_id__post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/projects": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Projects
-         * @description Returns a list of your projects together and its metadata.
-         */
-        get: operations["Get_projects_v1_projects_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/projects/add": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Add Project
-         * @description Creates a new project, it can be either initialized as blank, from a document or from a URL.
-         */
-        post: operations["Add_project_v1_projects_add_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/projects/{project_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Project By Id
-         * @description Returns information about a specific project. This endpoint returns more detailed information about a project than GET api.elevenlabs.io/v1/projects.
-         */
-        get: operations["Get_project_by_ID_v1_projects__project_id__get"];
-        put?: never;
-        /**
-         * Edit Basic Project Info
-         * @description Edits basic project info.
-         */
-        post: operations["Edit_basic_project_info_v1_projects__project_id__post"];
-        /**
-         * Delete Project
-         * @description Delete a project by its project_id.
-         */
-        delete: operations["Delete_project_v1_projects__project_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/projects/{project_id}/convert": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Convert Project
-         * @description Starts conversion of a project and all of its chapters.
-         */
-        post: operations["Convert_project_v1_projects__project_id__convert_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/projects/{project_id}/snapshots": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Project Snapshots
-         * @description Gets the snapshots of a project.
-         */
-        get: operations["Get_project_snapshots_v1_projects__project_id__snapshots_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/projects/{project_id}/snapshots/{project_snapshot_id}/stream": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Stream Project Audio
-         * @description Stream the audio from a project snapshot.
-         */
-        post: operations["Stream_project_audio_v1_projects__project_id__snapshots__project_snapshot_id__stream_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/projects/{project_id}/snapshots/{project_snapshot_id}/archive": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Streams Archive With Project Audio
-         * @description Streams archive with project audio.
-         */
-        post: operations["Streams_archive_with_project_audio_v1_projects__project_id__snapshots__project_snapshot_id__archive_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/projects/{project_id}/chapters": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Chapters
-         * @description Returns a list of your chapters for a project together and its metadata.
-         */
-        get: operations["Get_chapters_v1_projects__project_id__chapters_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/projects/{project_id}/chapters/{chapter_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Chapter By Id
-         * @description Returns information about a specific chapter.
-         */
-        get: operations["Get_chapter_by_ID_v1_projects__project_id__chapters__chapter_id__get"];
-        put?: never;
-        post?: never;
-        /**
-         * Delete Chapter
-         * @description Delete a chapter by its chapter_id.
-         */
-        delete: operations["Delete_chapter_v1_projects__project_id__chapters__chapter_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/projects/{project_id}/chapters/add": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Add Chapter To A Project
-         * @description Creates a new chapter either as blank or from a URL.
-         */
-        post: operations["Add_chapter_to_a_project_v1_projects__project_id__chapters_add_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/projects/{project_id}/chapters/{chapter_id}/convert": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Convert Chapter
-         * @description Starts conversion of a specific chapter.
-         */
-        post: operations["Convert_chapter_v1_projects__project_id__chapters__chapter_id__convert_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/projects/{project_id}/chapters/{chapter_id}/snapshots": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Chapter Snapshots
-         * @description Gets information about all the snapshots of a chapter, each snapshot corresponds can be downloaded as audio. Whenever a chapter is converted a snapshot will be automatically created.
-         */
-        get: operations["Get_chapter_snapshots_v1_projects__project_id__chapters__chapter_id__snapshots_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/projects/{project_id}/chapters/{chapter_id}/snapshots/{chapter_snapshot_id}/stream": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Stream Chapter Audio
-         * @description Stream the audio from a chapter snapshot. Use `GET /v1/projects/{project_id}/chapters/{chapter_id}/snapshots` to return the chapter snapshots of a chapter.
-         */
-        post: operations["Stream_chapter_audio_v1_projects__project_id__chapters__chapter_id__snapshots__chapter_snapshot_id__stream_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/projects/{project_id}/update-pronunciation-dictionaries": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Update Pronunciation Dictionaries
-         * @description Updates the set of pronunciation dictionaries acting on a project. This will automatically mark text within this project as requiring reconverting where the new dictionary would apply or the old one no longer does.
-         */
-        post: operations["Update_Pronunciation_Dictionaries_v1_projects__project_id__update_pronunciation_dictionaries_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/dubbing": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Dub A Video Or An Audio File
-         * @description Dubs provided audio or video file into given language.
-         */
-        post: operations["Dub_a_video_or_an_audio_file_v1_dubbing_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/dubbing/{dubbing_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Dubbing Project Metadata
-         * @description Returns metadata about a dubbing project, including whether it's still in progress or not
-         */
-        get: operations["Get_dubbing_project_metadata_v1_dubbing__dubbing_id__get"];
-        put?: never;
-        post?: never;
-        /**
-         * Delete Dubbing Project
-         * @description Deletes a dubbing project.
-         */
-        delete: operations["Delete_dubbing_project_v1_dubbing__dubbing_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/dubbing/{dubbing_id}/audio/{language_code}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Dubbed File
-         * @description Returns dubbed file as a streamed file. Videos will be returned in MP4 format and audio only dubs will be returned in MP3.
-         */
-        get: operations["Get_dubbed_file_v1_dubbing__dubbing_id__audio__language_code__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/dubbing/{dubbing_id}/transcript/{language_code}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Transcript For Dub
-         * @description Returns transcript for the dub as an SRT file.
-         */
-        get: operations["Get_transcript_for_dub_v1_dubbing__dubbing_id__transcript__language_code__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/admin/n8enylacgd/sso-provider": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get Sso Provider Admin */
-        get: operations["get_sso_provider_admin_admin_n8enylacgd_sso_provider_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/models": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Models
-         * @description Gets a list of available models.
-         */
-        get: operations["Get_Models_v1_models_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/audio-native": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Creates Audionative Enabled Project.
-         * @description Creates AudioNative enabled project, optionally starts conversion and returns project id and embeddable html snippet.
-         */
-        post: operations["Creates_AudioNative_enabled_project__v1_audio_native_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/shared-voices": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Voices
-         * @description Gets a list of shared voices.
-         */
-        get: operations["Get_voices_v1_shared_voices_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/similar-voices": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Get Similar Library Voices
-         * @description Returns a list of shared voices similar to the provided audio sample. If neither similarity_threshold nor top_k is provided, we will apply default values.
-         */
-        post: operations["Get_similar_library_voices_v1_similar_voices_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/usage/character-stats": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Characters Usage Metrics
-         * @description Returns the credit usage metrics for the current user or the entire workspace they are part of. The response will return a time axis with unix timestamps for each day and daily usage along that axis. The usage will be broken down by the specified breakdown type. For example, breakdown type "voice" will return the usage of each voice along the time axis.
-         */
-        get: operations["Get_characters_usage_metrics_v1_usage_character_stats_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/pronunciation-dictionaries/add-from-file": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Add A Pronunciation Dictionary
-         * @description Creates a new pronunciation dictionary from a lexicon .PLS file
-         */
-        post: operations["Add_a_pronunciation_dictionary_v1_pronunciation_dictionaries_add_from_file_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/pronunciation-dictionaries/{pronunciation_dictionary_id}/add-rules": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Add Rules To The Pronunciation Dictionary
-         * @description Add rules to the pronunciation dictionary
-         */
-        post: operations["Add_rules_to_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__add_rules_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/pronunciation-dictionaries/{pronunciation_dictionary_id}/remove-rules": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Remove Rules From The Pronunciation Dictionary
-         * @description Remove rules from the pronunciation dictionary
-         */
-        post: operations["Remove_rules_from_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__remove_rules_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/pronunciation-dictionaries/{dictionary_id}/{version_id}/download": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Pls File With A Pronunciation Dictionary Version Rules
-         * @description Get PLS file with a pronunciation dictionary version rules
-         */
-        get: operations["Get_PLS_file_with_a_pronunciation_dictionary_version_rules_v1_pronunciation_dictionaries__dictionary_id___version_id__download_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/pronunciation-dictionaries/{pronunciation_dictionary_id}/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Metadata For A Pronunciation Dictionary
-         * @description Get metadata for a pronunciation dictionary
-         */
-        get: operations["Get_metadata_for_a_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id___get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/pronunciation-dictionaries/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Pronunciation Dictionaries
-         * @description Get a list of the pronunciation dictionaries you have access to and their metadata
-         */
-        get: operations["Get_Pronunciation_Dictionaries_v1_pronunciation_dictionaries__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/workspace/invites/add": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Invite User
-         * @description Sends an email invitation to join your workspace to the provided email. If the user doesn't have an account they will be prompted to create one. If the user accepts this invite they will be added as a user to your workspace and your subscription using one of your seats. This endpoint may only be called by workspace administrators.
-         */
-        post: operations["Invite_user_v1_workspace_invites_add_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/workspace/invites": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Delete Existing Invitation
-         * @description Invalidates an existing email invitation. The invitation will still show up in the inbox it has been delivered to, but activating it to join the workspace won't work. This endpoint may only be called by workspace administrators.
-         */
-        delete: operations["Delete_existing_invitation_v1_workspace_invites_delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/v1/workspace/members": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Update Member
-         * @description Updates attributes of a workspace member. Apart from the email identifier, all parameters will remain unchanged unless specified. This endpoint may only be called by workspace administrators.
-         */
-        post: operations["Update_member_v1_workspace_members_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/profile/{handle}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get A Profile Page
-         * @description Gets a profile page based on a handle
-         */
-        get: operations["Get_a_profile_page_profile__handle__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/docs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Redirect To Mintlify */
-        get: operations["redirect_to_mintlify_docs_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
+	'/v1/history': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Generated Items
+		 * @description Returns metadata about all your generated audio.
+		 */
+		get: operations['Get_generated_items_v1_history_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/history/{history_item_id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get History Item By Id
+		 * @description Returns information about an history item by its ID.
+		 */
+		get: operations['Get_history_item_by_ID_v1_history__history_item_id__get'];
+		put?: never;
+		post?: never;
+		/**
+		 * Delete History Item
+		 * @description Delete a history item by its ID
+		 */
+		delete: operations['Delete_history_item_v1_history__history_item_id__delete'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/history/{history_item_id}/audio': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Audio From History Item
+		 * @description Returns the audio of an history item.
+		 */
+		get: operations['Get_audio_from_history_item_v1_history__history_item_id__audio_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/history/download': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Download History Items
+		 * @description Download one or more history items. If one history item ID is provided, we will return a single audio file. If more than one history item IDs are provided, we will provide the history items packed into a .zip file.
+		 */
+		post: operations['Download_history_items_v1_history_download_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/sound-generation': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Sound Generation
+		 * @description Converts a text of your choice into sound
+		 */
+		post: operations['Sound_Generation_v1_sound_generation_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/audio-isolation': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Audio Isolation
+		 * @description Removes background noise from audio
+		 */
+		post: operations['Audio_Isolation_v1_audio_isolation_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/audio-isolation/stream': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Audio Isolation Stream
+		 * @description Removes background noise from audio and streams the result
+		 */
+		post: operations['Audio_Isolation_Stream_v1_audio_isolation_stream_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/voices/{voice_id}/samples/{sample_id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		post?: never;
+		/**
+		 * Delete Sample
+		 * @description Removes a sample by its ID.
+		 */
+		delete: operations['Delete_sample_v1_voices__voice_id__samples__sample_id__delete'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/voices/{voice_id}/samples/{sample_id}/audio': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Audio From Sample
+		 * @description Returns the audio corresponding to a sample attached to a voice.
+		 */
+		get: operations['Get_audio_from_sample_v1_voices__voice_id__samples__sample_id__audio_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/text-to-speech/{voice_id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Text To Speech
+		 * @description Converts text into speech using a voice of your choice and returns audio.
+		 */
+		post: operations['Text_to_speech_v1_text_to_speech__voice_id__post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/text-to-speech/{voice_id}/with-timestamps': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Text To Speech With Timestamps
+		 * @description Converts text into speech using a voice of your choice and returns JSON containing audio as a base64 encoded string together with information on when which character was spoken.
+		 */
+		post: operations['Text_to_speech_with_timestamps_v1_text_to_speech__voice_id__with_timestamps_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/text-to-speech/{voice_id}/stream': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Text To Speech Streaming
+		 * @description Converts text into speech using a voice of your choice and returns audio as an audio stream.
+		 */
+		post: operations['Text_to_speech_streaming_v1_text_to_speech__voice_id__stream_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/text-to-speech/{voice_id}/stream/with-timestamps': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Text To Speech Streaming With Timestamps
+		 * @description Converts text into speech using a voice of your choice and returns a stream of JSONs containing audio as a base64 encoded string together with information on when which character was spoken.
+		 */
+		post: operations['Text_to_speech_streaming_with_timestamps_v1_text_to_speech__voice_id__stream_with_timestamps_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/speech-to-speech/{voice_id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Speech To Speech
+		 * @description Create speech by combining the content and emotion of the uploaded audio with a voice of your choice.
+		 */
+		post: operations['Speech_to_Speech_v1_speech_to_speech__voice_id__post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/speech-to-speech/{voice_id}/stream': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Speech To Speech Streaming
+		 * @description Create speech by combining the content and emotion of the uploaded audio with a voice of your choice and returns an audio stream.
+		 */
+		post: operations['Speech_to_Speech_Streaming_v1_speech_to_speech__voice_id__stream_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/voice-generation/generate-voice/parameters': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Voice Generation Parameters
+		 * @description Get possible parameters for the /v1/voice-generation/generate-voice endpoint.
+		 */
+		get: operations['Voice_Generation_Parameters_v1_voice_generation_generate_voice_parameters_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/voice-generation/generate-voice': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Generate A Random Voice
+		 * @description Generate a random voice based on parameters. This method returns a generated_voice_id in the response header, and a sample of the voice in the body. If you like the generated voice call /v1/voice-generation/create-voice with the generated_voice_id to create the voice.
+		 */
+		post: operations['Generate_a_random_voice_v1_voice_generation_generate_voice_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/voice-generation/create-voice': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Create A Previously Generated Voice
+		 * @description Create a previously generated voice. This endpoint should be called after you fetched a generated_voice_id using /v1/voice-generation/generate-voice.
+		 */
+		post: operations['Create_a_previously_generated_voice_v1_voice_generation_create_voice_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/user/subscription': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get User Subscription Info
+		 * @description Gets extended information about the users subscription
+		 */
+		get: operations['Get_user_subscription_info_v1_user_subscription_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/user': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get User Info
+		 * @description Gets information about the user
+		 */
+		get: operations['Get_user_info_v1_user_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/voices': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Voices
+		 * @description Gets a list of all available voices for a user.
+		 */
+		get: operations['Get_voices_v1_voices_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/voices/settings/default': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Default Voice Settings.
+		 * @description Gets the default settings for voices. "similarity_boost" corresponds to"Clarity + Similarity Enhancement" in the web app and "stability" corresponds to "Stability" slider in the web app.
+		 */
+		get: operations['Get_default_voice_settings__v1_voices_settings_default_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/voices/{voice_id}/settings': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Voice Settings
+		 * @description Returns the settings for a specific voice. "similarity_boost" corresponds to"Clarity + Similarity Enhancement" in the web app and "stability" corresponds to "Stability" slider in the web app.
+		 */
+		get: operations['Get_voice_settings_v1_voices__voice_id__settings_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/voices/{voice_id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Voice
+		 * @description Returns metadata about a specific voice.
+		 */
+		get: operations['Get_voice_v1_voices__voice_id__get'];
+		put?: never;
+		post?: never;
+		/**
+		 * Delete Voice
+		 * @description Deletes a voice by its ID.
+		 */
+		delete: operations['Delete_voice_v1_voices__voice_id__delete'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/voices/{voice_id}/settings/edit': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Edit Voice Settings
+		 * @description Edit your settings for a specific voice. "similarity_boost" corresponds to"Clarity + Similarity Enhancement" in the web app and "stability" corresponds to "Stability" slider in the web app.
+		 */
+		post: operations['Edit_voice_settings_v1_voices__voice_id__settings_edit_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/voices/add': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Add Voice
+		 * @description Add a new voice to your collection of voices in VoiceLab.
+		 */
+		post: operations['Add_voice_v1_voices_add_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/voices/{voice_id}/edit': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Edit Voice
+		 * @description Edit a voice created by you.
+		 */
+		post: operations['Edit_voice_v1_voices__voice_id__edit_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/voices/add/{public_user_id}/{voice_id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Add Sharing Voice
+		 * @description Add a sharing voice to your collection of voices in VoiceLab.
+		 */
+		post: operations['Add_sharing_voice_v1_voices_add__public_user_id___voice_id__post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/projects': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Projects
+		 * @description Returns a list of your projects together and its metadata.
+		 */
+		get: operations['Get_projects_v1_projects_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/projects/add': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Add Project
+		 * @description Creates a new project, it can be either initialized as blank, from a document or from a URL.
+		 */
+		post: operations['Add_project_v1_projects_add_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/projects/{project_id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Project By Id
+		 * @description Returns information about a specific project. This endpoint returns more detailed information about a project than GET api.elevenlabs.io/v1/projects.
+		 */
+		get: operations['Get_project_by_ID_v1_projects__project_id__get'];
+		put?: never;
+		/**
+		 * Edit Basic Project Info
+		 * @description Edits basic project info.
+		 */
+		post: operations['Edit_basic_project_info_v1_projects__project_id__post'];
+		/**
+		 * Delete Project
+		 * @description Delete a project by its project_id.
+		 */
+		delete: operations['Delete_project_v1_projects__project_id__delete'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/projects/{project_id}/convert': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Convert Project
+		 * @description Starts conversion of a project and all of its chapters.
+		 */
+		post: operations['Convert_project_v1_projects__project_id__convert_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/projects/{project_id}/snapshots': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Project Snapshots
+		 * @description Gets the snapshots of a project.
+		 */
+		get: operations['Get_project_snapshots_v1_projects__project_id__snapshots_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/projects/{project_id}/snapshots/{project_snapshot_id}/stream': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Stream Project Audio
+		 * @description Stream the audio from a project snapshot.
+		 */
+		post: operations['Stream_project_audio_v1_projects__project_id__snapshots__project_snapshot_id__stream_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/projects/{project_id}/snapshots/{project_snapshot_id}/archive': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Streams Archive With Project Audio
+		 * @description Streams archive with project audio.
+		 */
+		post: operations['Streams_archive_with_project_audio_v1_projects__project_id__snapshots__project_snapshot_id__archive_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/projects/{project_id}/chapters': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Chapters
+		 * @description Returns a list of your chapters for a project together and its metadata.
+		 */
+		get: operations['Get_chapters_v1_projects__project_id__chapters_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/projects/{project_id}/chapters/{chapter_id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Chapter By Id
+		 * @description Returns information about a specific chapter.
+		 */
+		get: operations['Get_chapter_by_ID_v1_projects__project_id__chapters__chapter_id__get'];
+		put?: never;
+		post?: never;
+		/**
+		 * Delete Chapter
+		 * @description Delete a chapter by its chapter_id.
+		 */
+		delete: operations['Delete_chapter_v1_projects__project_id__chapters__chapter_id__delete'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/projects/{project_id}/chapters/add': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Add Chapter To A Project
+		 * @description Creates a new chapter either as blank or from a URL.
+		 */
+		post: operations['Add_chapter_to_a_project_v1_projects__project_id__chapters_add_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/projects/{project_id}/chapters/{chapter_id}/convert': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Convert Chapter
+		 * @description Starts conversion of a specific chapter.
+		 */
+		post: operations['Convert_chapter_v1_projects__project_id__chapters__chapter_id__convert_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/projects/{project_id}/chapters/{chapter_id}/snapshots': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Chapter Snapshots
+		 * @description Gets information about all the snapshots of a chapter, each snapshot corresponds can be downloaded as audio. Whenever a chapter is converted a snapshot will be automatically created.
+		 */
+		get: operations['Get_chapter_snapshots_v1_projects__project_id__chapters__chapter_id__snapshots_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/projects/{project_id}/chapters/{chapter_id}/snapshots/{chapter_snapshot_id}/stream': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Stream Chapter Audio
+		 * @description Stream the audio from a chapter snapshot. Use `GET /v1/projects/{project_id}/chapters/{chapter_id}/snapshots` to return the chapter snapshots of a chapter.
+		 */
+		post: operations['Stream_chapter_audio_v1_projects__project_id__chapters__chapter_id__snapshots__chapter_snapshot_id__stream_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/projects/{project_id}/update-pronunciation-dictionaries': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Update Pronunciation Dictionaries
+		 * @description Updates the set of pronunciation dictionaries acting on a project. This will automatically mark text within this project as requiring reconverting where the new dictionary would apply or the old one no longer does.
+		 */
+		post: operations['Update_Pronunciation_Dictionaries_v1_projects__project_id__update_pronunciation_dictionaries_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/dubbing': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Dub A Video Or An Audio File
+		 * @description Dubs provided audio or video file into given language.
+		 */
+		post: operations['Dub_a_video_or_an_audio_file_v1_dubbing_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/dubbing/{dubbing_id}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Dubbing Project Metadata
+		 * @description Returns metadata about a dubbing project, including whether it's still in progress or not
+		 */
+		get: operations['Get_dubbing_project_metadata_v1_dubbing__dubbing_id__get'];
+		put?: never;
+		post?: never;
+		/**
+		 * Delete Dubbing Project
+		 * @description Deletes a dubbing project.
+		 */
+		delete: operations['Delete_dubbing_project_v1_dubbing__dubbing_id__delete'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/dubbing/{dubbing_id}/audio/{language_code}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Dubbed File
+		 * @description Returns dubbed file as a streamed file. Videos will be returned in MP4 format and audio only dubs will be returned in MP3.
+		 */
+		get: operations['Get_dubbed_file_v1_dubbing__dubbing_id__audio__language_code__get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/dubbing/{dubbing_id}/transcript/{language_code}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Transcript For Dub
+		 * @description Returns transcript for the dub as an SRT file.
+		 */
+		get: operations['Get_transcript_for_dub_v1_dubbing__dubbing_id__transcript__language_code__get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/admin/n8enylacgd/sso-provider': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get Sso Provider Admin */
+		get: operations['get_sso_provider_admin_admin_n8enylacgd_sso_provider_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/models': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Models
+		 * @description Gets a list of available models.
+		 */
+		get: operations['Get_Models_v1_models_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/audio-native': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Creates Audionative Enabled Project.
+		 * @description Creates AudioNative enabled project, optionally starts conversion and returns project id and embeddable html snippet.
+		 */
+		post: operations['Creates_AudioNative_enabled_project__v1_audio_native_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/shared-voices': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Voices
+		 * @description Gets a list of shared voices.
+		 */
+		get: operations['Get_voices_v1_shared_voices_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/similar-voices': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Get Similar Library Voices
+		 * @description Returns a list of shared voices similar to the provided audio sample. If neither similarity_threshold nor top_k is provided, we will apply default values.
+		 */
+		post: operations['Get_similar_library_voices_v1_similar_voices_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/usage/character-stats': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Characters Usage Metrics
+		 * @description Returns the credit usage metrics for the current user or the entire workspace they are part of. The response will return a time axis with unix timestamps for each day and daily usage along that axis. The usage will be broken down by the specified breakdown type. For example, breakdown type "voice" will return the usage of each voice along the time axis.
+		 */
+		get: operations['Get_characters_usage_metrics_v1_usage_character_stats_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/pronunciation-dictionaries/add-from-file': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Add A Pronunciation Dictionary
+		 * @description Creates a new pronunciation dictionary from a lexicon .PLS file
+		 */
+		post: operations['Add_a_pronunciation_dictionary_v1_pronunciation_dictionaries_add_from_file_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/pronunciation-dictionaries/{pronunciation_dictionary_id}/add-rules': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Add Rules To The Pronunciation Dictionary
+		 * @description Add rules to the pronunciation dictionary
+		 */
+		post: operations['Add_rules_to_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__add_rules_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/pronunciation-dictionaries/{pronunciation_dictionary_id}/remove-rules': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Remove Rules From The Pronunciation Dictionary
+		 * @description Remove rules from the pronunciation dictionary
+		 */
+		post: operations['Remove_rules_from_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__remove_rules_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/pronunciation-dictionaries/{dictionary_id}/{version_id}/download': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Pls File With A Pronunciation Dictionary Version Rules
+		 * @description Get PLS file with a pronunciation dictionary version rules
+		 */
+		get: operations['Get_PLS_file_with_a_pronunciation_dictionary_version_rules_v1_pronunciation_dictionaries__dictionary_id___version_id__download_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/pronunciation-dictionaries/{pronunciation_dictionary_id}/': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Metadata For A Pronunciation Dictionary
+		 * @description Get metadata for a pronunciation dictionary
+		 */
+		get: operations['Get_metadata_for_a_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id___get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/pronunciation-dictionaries/': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get Pronunciation Dictionaries
+		 * @description Get a list of the pronunciation dictionaries you have access to and their metadata
+		 */
+		get: operations['Get_Pronunciation_Dictionaries_v1_pronunciation_dictionaries__get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/workspace/invites/add': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Invite User
+		 * @description Sends an email invitation to join your workspace to the provided email. If the user doesn't have an account they will be prompted to create one. If the user accepts this invite they will be added as a user to your workspace and your subscription using one of your seats. This endpoint may only be called by workspace administrators.
+		 */
+		post: operations['Invite_user_v1_workspace_invites_add_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/workspace/invites': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		post?: never;
+		/**
+		 * Delete Existing Invitation
+		 * @description Invalidates an existing email invitation. The invitation will still show up in the inbox it has been delivered to, but activating it to join the workspace won't work. This endpoint may only be called by workspace administrators.
+		 */
+		delete: operations['Delete_existing_invitation_v1_workspace_invites_delete'];
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/v1/workspace/members': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/**
+		 * Update Member
+		 * @description Updates attributes of a workspace member. Apart from the email identifier, all parameters will remain unchanged unless specified. This endpoint may only be called by workspace administrators.
+		 */
+		post: operations['Update_member_v1_workspace_members_post'];
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/profile/{handle}': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/**
+		 * Get A Profile Page
+		 * @description Gets a profile page based on a handle
+		 */
+		get: operations['Get_a_profile_page_profile__handle__get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	'/docs': {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Redirect To Mintlify */
+		get: operations['redirect_to_mintlify_docs_get'];
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        /** AddChapterResponseModel */
-        AddChapterResponseModel: {
-            chapter: components["schemas"]["ChapterResponseModel"];
-        };
-        /** AddProjectResponseModel */
-        AddProjectResponseModel: {
-            project: components["schemas"]["ProjectResponseModel"];
-        };
-        /** AddPronunciationDictionaryResponseModel */
-        AddPronunciationDictionaryResponseModel: {
-            /** Id */
-            id: string;
-            /** Name */
-            name: string;
-            /** Created By */
-            created_by: string;
-            /** Creation Time Unix */
-            creation_time_unix: number;
-            /** Version Id */
-            version_id: string;
-            /** Description */
-            description?: string;
-        };
-        /** AddPronunciationDictionaryRulesResponseModel */
-        AddPronunciationDictionaryRulesResponseModel: {
-            /** Id */
-            id: string;
-            /** Version Id */
-            version_id: string;
-        };
-        /** AddVoiceResponseModel */
-        AddVoiceResponseModel: {
-            /** Voice Id */
-            voice_id: string;
-        };
-        /** AudioNativeCreateProjectResponseModel */
-        AudioNativeCreateProjectResponseModel: {
-            /** Project Id */
-            project_id: string;
-            /** Converting */
-            converting: boolean;
-            /** Html Snippet */
-            html_snippet: string;
-        };
-        /** Body_Add_a_pronunciation_dictionary_v1_pronunciation_dictionaries_add_from_file_post */
-        Body_Add_a_pronunciation_dictionary_v1_pronunciation_dictionaries_add_from_file_post: {
-            /**
-             * Name
-             * @description The name of the pronunciation dictionary, used for identification only.
-             */
-            name: string;
-            /**
-             * File
-             * Format: binary
-             * @description A lexicon .pls file which we will use to initialize the project with.
-             */
-            file?: string;
-            /**
-             * Description
-             * @description A description of the pronunciation dictionary, used for identification only.
-             */
-            description?: string;
-            /**
-             * Workspace Access
-             * @description Should be one of 'editor' or 'viewer'. If not provided, defaults to no access.
-             * @enum {string}
-             */
-            workspace_access?: "admin" | "editor" | "viewer";
-        };
-        /** Body_Add_chapter_to_a_project_v1_projects__project_id__chapters_add_post */
-        Body_Add_chapter_to_a_project_v1_projects__project_id__chapters_add_post: {
-            /**
-             * Name
-             * @description The name of the chapter, used for identification only.
-             */
-            name: string;
-            /**
-             * From Url
-             * @description An optional URL from which we will extract content to initialize the project. If this is set, 'from_url' must be null. If neither 'from_url' or 'from_document' are provided we will initialize the project as blank.
-             */
-            from_url?: string;
-        };
-        /** Body_Add_project_v1_projects_add_post */
-        Body_Add_project_v1_projects_add_post: {
-            /**
-             * Name
-             * @description The name of the project, used for identification only.
-             */
-            name: string;
-            /**
-             * Default Title Voice Id
-             * @description The voice_id that corresponds to the default voice used for new titles.
-             */
-            default_title_voice_id: string;
-            /**
-             * Default Paragraph Voice Id
-             * @description The voice_id that corresponds to the default voice used for new paragraphs.
-             */
-            default_paragraph_voice_id: string;
-            /**
-             * Default Model Id
-             * @description The model_id of the model to be used for this project, you can query GET https://api.elevenlabs.io/v1/models to list all available models.
-             */
-            default_model_id: string;
-            /**
-             * From Url
-             * @description An optional URL from which we will extract content to initialize the project. If this is set, 'from_url' must be null. If neither 'from_url' or 'from_document' are provided we will initialize the project as blank.
-             */
-            from_url?: string;
-            /**
-             * From Document
-             * Format: binary
-             * @description An optional .epub, .pdf, .txt or similar file can be provided. If provided, we will initialize the project with its content. If this is set, 'from_url' must be null.  If neither 'from_url' or 'from_document' are provided we will initialize the project as blank.
-             */
-            from_document?: string;
-            /**
-             * Quality of the generated audio.
-             * @description Output quality of the generated audio. Must be one of:
-             *     standard - standard output format, 128kbps with 44.1kHz sample rate.
-             *     high - high quality output format, 192kbps with 44.1kHz sample rate and major improvements on our side. Using this setting increases the credit cost by 20%.
-             *     ultra - ultra quality output format, 192kbps with 44.1kHz sample rate and highest improvements on our side. Using this setting increases the credit cost by 50%.
-             *     ultra lossless - ultra quality output format, 705.6kbps with 44.1kHz sample rate and highest improvements on our side in a fully lossless format. Using this setting increases the credit cost by 100%.
-             *
-             * @default standard
-             */
-            quality_preset: string;
-            /**
-             * Title
-             * @description An optional name of the author of the project, this will be added as metadata to the mp3 file on project / chapter download.
-             */
-            title?: string;
-            /**
-             * Author
-             * @description An optional name of the author of the project, this will be added as metadata to the mp3 file on project / chapter download.
-             */
-            author?: string;
-            /**
-             * Isbn Number
-             * @description An optional ISBN number of the project you want to create, this will be added as metadata to the mp3 file on project / chapter download.
-             */
-            isbn_number?: string;
-            /**
-             * Acx Volume Normalization
-             * @description [Deprecated] When the project is downloaded, should the returned audio have postprocessing in order to make it compliant with audiobook normalized volume requirements
-             * @default false
-             */
-            acx_volume_normalization: boolean;
-            /**
-             * Volume Normalization
-             * @description When the project is downloaded, should the returned audio have postprocessing in order to make it compliant with audiobook normalized volume requirements
-             * @default false
-             */
-            volume_normalization: boolean;
-            /**
-             * Pronunciation Dictionary Locators
-             * @description A list of pronunciation dictionary locators (pronunciation_dictionary_id, version_id) encoded as a list of JSON strings for pronunciation dictionaries to be applied to the text.  A list of json encoded strings is required as adding projects may occur through formData as opposed to jsonBody. To specify multiple dictionaries use multiple --form lines in your curl, such as --form 'pronunciation_dictionary_locators="{\"pronunciation_dictionary_id\":\"Vmd4Zor6fplcA7WrINey\",\"version_id\":\"hRPaxjlTdR7wFMhV4w0b\"}"' --form 'pronunciation_dictionary_locators="{\"pronunciation_dictionary_id\":\"JzWtcGQMJ6bnlWwyMo7e\",\"version_id\":\"lbmwxiLu4q6txYxgdZqn\"}"'. Note that multiple dictionaries are not currently supported by our UI which will only show the first.
-             */
-            pronunciation_dictionary_locators?: string[];
-            /**
-             * Callback Url
-             * @description [Deprecated] A url that will be called by our service when the project is converted with a json containing the status of the conversion
-             */
-            callback_url?: string;
-        };
-        /** Body_Add_rules_to_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__add_rules_post */
-        Body_Add_rules_to_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__add_rules_post: {
-            /**
-             * Rules
-             * @description List of pronunciation rules. Rule can be either:
-             *         an alias rule: {'string_to_replace': 'a', 'type': 'alias', 'alias': 'b', }
-             *         or a phoneme rule: {'string_to_replace': 'a', 'type': 'phoneme', 'phoneme': 'b', 'alphabet': 'ipa' }
-             */
-            rules: (components["schemas"]["PronunciationDictionaryAliasRuleRequestModel"] | components["schemas"]["PronunciationDictionaryPhonemeRuleRequestModel"])[];
-        };
-        /** Body_Add_sharing_voice_v1_voices_add__public_user_id___voice_id__post */
-        Body_Add_sharing_voice_v1_voices_add__public_user_id___voice_id__post: {
-            /**
-             * New Name
-             * @description The name that identifies this voice. This will be displayed in the dropdown of the website.
-             */
-            new_name: string;
-        };
-        /** Body_Add_voice_v1_voices_add_post */
-        Body_Add_voice_v1_voices_add_post: {
-            /**
-             * Name
-             * @description The name that identifies this voice. This will be displayed in the dropdown of the website.
-             */
-            name: string;
-            /**
-             * Files
-             * @description A list of file paths to audio recordings intended for voice cloning
-             */
-            files: string[];
-            /**
-             * Description
-             * @description How would you describe the voice?
-             */
-            description?: string;
-            /**
-             * Labels
-             * @description Serialized labels dictionary for the voice.
-             */
-            labels?: string;
-        };
-        /** Body_Audio_Isolation_Stream_v1_audio_isolation_stream_post */
-        Body_Audio_Isolation_Stream_v1_audio_isolation_stream_post: {
-            /**
-             * Audio
-             * Format: binary
-             * @description The audio file from which vocals/speech will be isolated from.
-             */
-            audio: string;
-        };
-        /** Body_Audio_Isolation_v1_audio_isolation_post */
-        Body_Audio_Isolation_v1_audio_isolation_post: {
-            /**
-             * Audio
-             * Format: binary
-             * @description The audio file from which vocals/speech will be isolated from.
-             */
-            audio: string;
-        };
-        /** Body_Create_a_previously_generated_voice_v1_voice_generation_create_voice_post */
-        Body_Create_a_previously_generated_voice_v1_voice_generation_create_voice_post: {
-            /**
-             * Voice Name
-             * @description Name to use for the created voice.
-             */
-            voice_name: string;
-            /**
-             * Voice Description
-             * @description Description to use for the created voice.
-             */
-            voice_description: string;
-            /**
-             * Generated Voice Id
-             * @description The generated_voice_id to create, call POST /v1/voice-generation/generate-voice and fetch the generated_voice_id from the response header if don't have one yet.
-             */
-            generated_voice_id: string;
-            /**
-             * Labels
-             * @description Optional, metadata to add to the created voice. Defaults to None.
-             */
-            labels?: {
-                [key: string]: string;
-            };
-        };
-        /** Body_Creates_AudioNative_enabled_project__v1_audio_native_post */
-        Body_Creates_AudioNative_enabled_project__v1_audio_native_post: {
-            /**
-             * Name
-             * @description Project name.
-             */
-            name: string;
-            /**
-             * Image
-             * @description Image URL used in the player. If not provided, default image set in the Player settings is used.
-             */
-            image?: string;
-            /**
-             * Author
-             * @description Author used in the player and inserted at the start of the uploaded article. If not provided, the default author set in the Player settings is used.
-             */
-            author?: string;
-            /**
-             * Title
-             * @description Title used in the player and inserted at the top of the uploaded article. If not provided, the default title set in the Player settings is used.
-             */
-            title?: string;
-            /**
-             * Small
-             * @description Whether to use small player or not. If not provided, default value set in the Player settings is used.
-             * @default false
-             */
-            small: boolean;
-            /**
-             * Text Color
-             * @description Text color used in the player. If not provided, default text color set in the Player settings is used.
-             */
-            text_color?: string;
-            /**
-             * Background Color
-             * @description Background color used in the player. If not provided, default background color set in the Player settings is used.
-             */
-            background_color?: string;
-            /**
-             * Sessionization
-             * @description Specifies for how many minutes to persist the session across page reloads. If not provided, default sessionization set in the Player settings is used.
-             * @default 0
-             */
-            sessionization: number;
-            /**
-             * Voice Id
-             * @description Voice ID used to voice the content. If not provided, default voice ID set in the Player settings is used.
-             */
-            voice_id?: string;
-            /**
-             * Model Id
-             * @description TTS Model ID used in the player. If not provided, default model ID set in the Player settings is used.
-             */
-            model_id?: string;
-            /**
-             * File
-             * Format: binary
-             * @description Either txt or HTML input file containing the article content. HTML should be formatted as follows '&lt;html&gt;&lt;body&gt;&lt;div&gt;&lt;p&gt;Your content&lt;/p&gt;&lt;h5&gt;More of your content&lt;/h5&gt;&lt;p&gt;Some more of your content&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;'
-             */
-            file?: string;
-            /**
-             * Auto Convert
-             * @description Whether to auto convert the project to audio or not.
-             * @default false
-             */
-            auto_convert: boolean;
-        };
-        /** Body_Delete_existing_invitation_v1_workspace_invites_delete */
-        Body_Delete_existing_invitation_v1_workspace_invites_delete: {
-            /**
-             * Email
-             * @description Email of the target user.
-             */
-            email: string;
-        };
-        /** Body_Download_history_items_v1_history_download_post */
-        Body_Download_history_items_v1_history_download_post: {
-            /**
-             * History Item Ids
-             * @description A list of history items to download, you can get IDs of history items and other metadata using the GET https://api.elevenlabs.io/v1/history endpoint.
-             */
-            history_item_ids: string[];
-            /**
-             * Output Format
-             * @description Output format to transcode the audio file, can be wav or default.
-             */
-            output_format?: string;
-        };
-        /** Body_Dub_a_video_or_an_audio_file_v1_dubbing_post */
-        Body_Dub_a_video_or_an_audio_file_v1_dubbing_post: {
-            /**
-             * File
-             * Format: binary
-             * @description A list of file paths to audio recordings intended for voice cloning
-             */
-            file?: string;
-            /**
-             * Name
-             * @description Name of the dubbing project.
-             */
-            name?: string;
-            /**
-             * Source Url
-             * @description URL of the source video/audio file.
-             */
-            source_url?: string;
-            /**
-             * Source Lang
-             * @description Source language.
-             * @default auto
-             */
-            source_lang: string;
-            /**
-             * Target Lang
-             * @description The Target language to dub the content into.
-             */
-            target_lang?: string;
-            /**
-             * Num Speakers
-             * @description Number of speakers to use for the dubbing. Set to 0 to automatically detect the number of speakers
-             * @default 0
-             */
-            num_speakers: number;
-            /**
-             * Watermark
-             * @description Whether to apply watermark to the output video.
-             * @default false
-             */
-            watermark: boolean;
-            /**
-             * Start Time
-             * @description Start time of the source video/audio file.
-             */
-            start_time?: number;
-            /**
-             * End Time
-             * @description End time of the source video/audio file.
-             */
-            end_time?: number;
-            /**
-             * Highest Resolution
-             * @description Whether to use the highest resolution available.
-             * @default false
-             */
-            highest_resolution: boolean;
-            /**
-             * Drop Background Audio
-             * @description An advanced setting. Whether to drop background audio from the final dub. This can improve dub quality where it's known that audio shouldn't have a background track such as for speeches or monologues.
-             * @default false
-             */
-            drop_background_audio: boolean;
-            /**
-             * Use Profanity Filter
-             * @description [BETA] Whether transcripts should have profanities censored with the words '[censored]'
-             */
-            use_profanity_filter?: boolean;
-        };
-        /** Body_Edit_basic_project_info_v1_projects__project_id__post */
-        Body_Edit_basic_project_info_v1_projects__project_id__post: {
-            /**
-             * Name
-             * @description The name of the project, used for identification only.
-             */
-            name: string;
-            /**
-             * Default Title Voice Id
-             * @description The voice_id that corresponds to the default voice used for new titles.
-             */
-            default_title_voice_id: string;
-            /**
-             * Default Paragraph Voice Id
-             * @description The voice_id that corresponds to the default voice used for new paragraphs.
-             */
-            default_paragraph_voice_id: string;
-            /**
-             * Title
-             * @description An optional name of the author of the project, this will be added as metadata to the mp3 file on project / chapter download.
-             */
-            title?: string;
-            /**
-             * Author
-             * @description An optional name of the author of the project, this will be added as metadata to the mp3 file on project / chapter download.
-             */
-            author?: string;
-            /**
-             * Isbn Number
-             * @description An optional ISBN number of the project you want to create, this will be added as metadata to the mp3 file on project / chapter download.
-             */
-            isbn_number?: string;
-            /**
-             * Volume Normalization
-             * @description When the project is downloaded, should the returned audio have postprocessing in order to make it compliant with audiobook normalized volume requirements
-             * @default false
-             */
-            volume_normalization: boolean;
-        };
-        /** Body_Edit_voice_v1_voices__voice_id__edit_post */
-        Body_Edit_voice_v1_voices__voice_id__edit_post: {
-            /**
-             * Name
-             * @description The name that identifies this voice. This will be displayed in the dropdown of the website.
-             */
-            name: string;
-            /**
-             * Files
-             * @description Audio files to add to the voice
-             */
-            files?: string[];
-            /**
-             * Description
-             * @description How would you describe the voice?
-             */
-            description?: string;
-            /**
-             * Labels
-             * @description Serialized labels dictionary for the voice.
-             */
-            labels?: string;
-        };
-        /** Body_Generate_a_random_voice_v1_voice_generation_generate_voice_post */
-        Body_Generate_a_random_voice_v1_voice_generation_generate_voice_post: {
-            /**
-             * Gender
-             * @description Category code corresponding to the gender of the generated voice. Possible values: female, male.
-             * @enum {string}
-             */
-            gender: "female" | "male";
-            /**
-             * Accent
-             * @description Category code corresponding to the accent of the generated voice. Possible values: american, british, african, australian, indian.
-             */
-            accent: string;
-            /**
-             * Age
-             * @description Category code corresponding to the age of the generated voice. Possible values: young, middle_aged, old.
-             * @enum {string}
-             */
-            age: "young" | "middle_aged" | "old";
-            /**
-             * Accent Strength
-             * @description The strength of the accent of the generated voice. Has to be between 0.3 and 2.0.
-             */
-            accent_strength: number;
-            /**
-             * Text
-             * @description Text to generate, text length has to be between 100 and 1000.
-             */
-            text: string;
-        };
-        /** Body_Get_similar_library_voices_v1_similar_voices_post */
-        Body_Get_similar_library_voices_v1_similar_voices_post: {
-            /**
-             * Audio File
-             * Format: binary
-             */
-            audio_file?: string;
-            /**
-             * Similarity Threshold
-             * @description Threshold for voice similarity between provided sample and library voices. Must be in range <0, 2>. The smaller the value the more similar voices will be returned.
-             */
-            similarity_threshold?: number;
-            /**
-             * Top K
-             * @description Number of most similar voices to return. If similarity_threshold is provided, less than this number of voices may be returned. Must be in range <1, 100>.
-             */
-            top_k?: number;
-        };
-        /** Body_Invite_user_v1_workspace_invites_add_post */
-        Body_Invite_user_v1_workspace_invites_add_post: {
-            /**
-             * Email
-             * @description Email of the target user.
-             */
-            email: string;
-        };
-        /** Body_Remove_rules_from_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__remove_rules_post */
-        Body_Remove_rules_from_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__remove_rules_post: {
-            /**
-             * Rule Strings
-             * @description List of strings to remove from the pronunciation dictionary.
-             */
-            rule_strings: string[];
-        };
-        /** Body_Sound_Generation_v1_sound_generation_post */
-        Body_Sound_Generation_v1_sound_generation_post: {
-            /**
-             * Text
-             * @description The text that will get converted into a sound effect.
-             */
-            text: string;
-            /**
-             * Duration Seconds
-             * @description The duration of the sound which will be generated in seconds. Must be at least 0.5 and at most 22. If set to None we will guess the optimal duration using the prompt. Defaults to None.
-             */
-            duration_seconds?: number;
-            /**
-             * Prompt Influence
-             * @description A higher prompt influence makes your generation follow the prompt more closely while also making generations less variable. Must be a value between 0 and 1. Defaults to 0.3.
-             * @default 0.3
-             */
-            prompt_influence: number;
-        };
-        /** Body_Speech_to_Speech_Streaming_v1_speech_to_speech__voice_id__stream_post */
-        Body_Speech_to_Speech_Streaming_v1_speech_to_speech__voice_id__stream_post: {
-            /**
-             * Audio
-             * Format: binary
-             * @description The audio file which holds the content and emotion that will control the generated speech.
-             */
-            audio: string;
-            /**
-             * Model Id
-             * @description Identifier of the model that will be used, you can query them using GET /v1/models. The model needs to have support for speech to speech, you can check this using the can_do_voice_conversion property.
-             * @default eleven_english_sts_v2
-             */
-            model_id: string;
-            /**
-             * Voice Settings
-             * @description Voice settings overriding stored setttings for the given voice. They are applied only on the given request. Needs to be send as a JSON encoded string.
-             */
-            voice_settings?: string;
-            /**
-             * Seed
-             * @description If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed.
-             */
-            seed?: number;
-        };
-        /** Body_Speech_to_Speech_v1_speech_to_speech__voice_id__post */
-        Body_Speech_to_Speech_v1_speech_to_speech__voice_id__post: {
-            /**
-             * Audio
-             * Format: binary
-             * @description The audio file which holds the content and emotion that will control the generated speech.
-             */
-            audio: string;
-            /**
-             * Model Id
-             * @description Identifier of the model that will be used, you can query them using GET /v1/models. The model needs to have support for speech to speech, you can check this using the can_do_voice_conversion property.
-             * @default eleven_english_sts_v2
-             */
-            model_id: string;
-            /**
-             * Voice Settings
-             * @description Voice settings overriding stored setttings for the given voice. They are applied only on the given request. Needs to be send as a JSON encoded string.
-             */
-            voice_settings?: string;
-            /**
-             * Seed
-             * @description If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed.
-             */
-            seed?: number;
-        };
-        /** Body_Stream_chapter_audio_v1_projects__project_id__chapters__chapter_id__snapshots__chapter_snapshot_id__stream_post */
-        Body_Stream_chapter_audio_v1_projects__project_id__chapters__chapter_id__snapshots__chapter_snapshot_id__stream_post: {
-            /**
-             * Convert To Mpeg
-             * @description Whether to convert the audio to mpeg format.
-             * @default false
-             */
-            convert_to_mpeg: boolean;
-        };
-        /** Body_Stream_project_audio_v1_projects__project_id__snapshots__project_snapshot_id__stream_post */
-        Body_Stream_project_audio_v1_projects__project_id__snapshots__project_snapshot_id__stream_post: {
-            /**
-             * Convert To Mpeg
-             * @description Whether to convert the audio to mpeg format.
-             * @default false
-             */
-            convert_to_mpeg: boolean;
-        };
-        /** Body_Text_to_speech_streaming_v1_text_to_speech__voice_id__stream_post */
-        Body_Text_to_speech_streaming_v1_text_to_speech__voice_id__stream_post: {
-            /**
-             * Text
-             * @description The text that will get converted into speech.
-             */
-            text: string;
-            /**
-             * Model Id
-             * @description Identifier of the model that will be used, you can query them using GET /v1/models. The model needs to have support for text to speech, you can check this using the can_do_text_to_speech property.
-             * @default eleven_monolingual_v1
-             */
-            model_id: string;
-            /**
-             * Language Code
-             * @description Language code (ISO 639-1) used to enforce a language for the model. Currently only Turbo v2.5 supports language enforcement. For other models, an error will be returned if language code is provided.
-             */
-            language_code?: string;
-            /**
-             * Voice Settings
-             * @description Voice settings overriding stored setttings for the given voice. They are applied only on the given request.
-             */
-            voice_settings?: components["schemas"]["VoiceSettingsResponseModel"];
-            /**
-             * Pronunciation Dictionary Locators
-             * @description A list of pronunciation dictionary locators (id, version_id) to be applied to the text. They will be applied in order. You may have up to 3 locators per request
-             * @default []
-             */
-            pronunciation_dictionary_locators: components["schemas"]["PronunciationDictionaryVersionLocatorDBModel"][];
-            /**
-             * Seed
-             * @description If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed.
-             */
-            seed?: number;
-            /**
-             * Previous Text
-             * @description The text that came before the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
-             */
-            previous_text?: string;
-            /**
-             * Next Text
-             * @description The text that comes after the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
-             */
-            next_text?: string;
-            /**
-             * Previous Request Ids
-             * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both previous_text and previous_request_ids is send, previous_text will be ignored. A maximum of 3 request_ids can be send.
-             * @default []
-             */
-            previous_request_ids: string[];
-            /**
-             * Next Request Ids
-             * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both next_text and next_request_ids is send, next_text will be ignored. A maximum of 3 request_ids can be send.
-             * @default []
-             */
-            next_request_ids: string[];
-            /**
-             * Use Pvc As Ivc
-             * @deprecated
-             * @description If true, we won't use PVC version of the voice for the generation but the IVC version. This is a temporary workaround for higher latency in PVC versions.
-             * @default false
-             */
-            use_pvc_as_ivc: boolean;
-        };
-        /** Body_Text_to_speech_streaming_with_timestamps_v1_text_to_speech__voice_id__stream_with_timestamps_post */
-        Body_Text_to_speech_streaming_with_timestamps_v1_text_to_speech__voice_id__stream_with_timestamps_post: {
-            /**
-             * Text
-             * @description The text that will get converted into speech.
-             */
-            text: string;
-            /**
-             * Model Id
-             * @description Identifier of the model that will be used, you can query them using GET /v1/models. The model needs to have support for text to speech, you can check this using the can_do_text_to_speech property.
-             * @default eleven_monolingual_v1
-             */
-            model_id: string;
-            /**
-             * Language Code
-             * @description Language code (ISO 639-1) used to enforce a language for the model. Currently only Turbo v2.5 supports language enforcement. For other models, an error will be returned if language code is provided.
-             */
-            language_code?: string;
-            /**
-             * Voice Settings
-             * @description Voice settings overriding stored setttings for the given voice. They are applied only on the given request.
-             */
-            voice_settings?: components["schemas"]["VoiceSettingsResponseModel"];
-            /**
-             * Pronunciation Dictionary Locators
-             * @description A list of pronunciation dictionary locators (id, version_id) to be applied to the text. They will be applied in order. You may have up to 3 locators per request
-             * @default []
-             */
-            pronunciation_dictionary_locators: components["schemas"]["PronunciationDictionaryVersionLocatorDBModel"][];
-            /**
-             * Seed
-             * @description If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed.
-             */
-            seed?: number;
-            /**
-             * Previous Text
-             * @description The text that came before the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
-             */
-            previous_text?: string;
-            /**
-             * Next Text
-             * @description The text that comes after the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
-             */
-            next_text?: string;
-            /**
-             * Previous Request Ids
-             * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both previous_text and previous_request_ids is send, previous_text will be ignored. A maximum of 3 request_ids can be send.
-             * @default []
-             */
-            previous_request_ids: string[];
-            /**
-             * Next Request Ids
-             * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both next_text and next_request_ids is send, next_text will be ignored. A maximum of 3 request_ids can be send.
-             * @default []
-             */
-            next_request_ids: string[];
-            /**
-             * Use Pvc As Ivc
-             * @deprecated
-             * @description If true, we won't use PVC version of the voice for the generation but the IVC version. This is a temporary workaround for higher latency in PVC versions.
-             * @default false
-             */
-            use_pvc_as_ivc: boolean;
-        };
-        /** Body_Text_to_speech_v1_text_to_speech__voice_id__post */
-        Body_Text_to_speech_v1_text_to_speech__voice_id__post: {
-            /**
-             * Text
-             * @description The text that will get converted into speech.
-             */
-            text: string;
-            /**
-             * Model Id
-             * @description Identifier of the model that will be used, you can query them using GET /v1/models. The model needs to have support for text to speech, you can check this using the can_do_text_to_speech property.
-             * @default eleven_monolingual_v1
-             */
-            model_id: string;
-            /**
-             * Language Code
-             * @description Language code (ISO 639-1) used to enforce a language for the model. Currently only Turbo v2.5 supports language enforcement. For other models, an error will be returned if language code is provided.
-             */
-            language_code?: string;
-            /**
-             * Voice Settings
-             * @description Voice settings overriding stored setttings for the given voice. They are applied only on the given request.
-             */
-            voice_settings?: components["schemas"]["VoiceSettingsResponseModel"];
-            /**
-             * Pronunciation Dictionary Locators
-             * @description A list of pronunciation dictionary locators (id, version_id) to be applied to the text. They will be applied in order. You may have up to 3 locators per request
-             * @default []
-             */
-            pronunciation_dictionary_locators: components["schemas"]["PronunciationDictionaryVersionLocatorDBModel"][];
-            /**
-             * Seed
-             * @description If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed.
-             */
-            seed?: number;
-            /**
-             * Previous Text
-             * @description The text that came before the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
-             */
-            previous_text?: string;
-            /**
-             * Next Text
-             * @description The text that comes after the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
-             */
-            next_text?: string;
-            /**
-             * Previous Request Ids
-             * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both previous_text and previous_request_ids is send, previous_text will be ignored. A maximum of 3 request_ids can be send.
-             * @default []
-             */
-            previous_request_ids: string[];
-            /**
-             * Next Request Ids
-             * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both next_text and next_request_ids is send, next_text will be ignored. A maximum of 3 request_ids can be send.
-             * @default []
-             */
-            next_request_ids: string[];
-            /**
-             * Use Pvc As Ivc
-             * @deprecated
-             * @description If true, we won't use PVC version of the voice for the generation but the IVC version. This is a temporary workaround for higher latency in PVC versions.
-             * @default false
-             */
-            use_pvc_as_ivc: boolean;
-        };
-        /** Body_Text_to_speech_with_timestamps_v1_text_to_speech__voice_id__with_timestamps_post */
-        Body_Text_to_speech_with_timestamps_v1_text_to_speech__voice_id__with_timestamps_post: {
-            /**
-             * Text
-             * @description The text that will get converted into speech.
-             */
-            text: string;
-            /**
-             * Model Id
-             * @description Identifier of the model that will be used, you can query them using GET /v1/models. The model needs to have support for text to speech, you can check this using the can_do_text_to_speech property.
-             * @default eleven_monolingual_v1
-             */
-            model_id: string;
-            /**
-             * Language Code
-             * @description Language code (ISO 639-1) used to enforce a language for the model. Currently only Turbo v2.5 supports language enforcement. For other models, an error will be returned if language code is provided.
-             */
-            language_code?: string;
-            /**
-             * Voice Settings
-             * @description Voice settings overriding stored setttings for the given voice. They are applied only on the given request.
-             */
-            voice_settings?: components["schemas"]["VoiceSettingsResponseModel"];
-            /**
-             * Pronunciation Dictionary Locators
-             * @description A list of pronunciation dictionary locators (id, version_id) to be applied to the text. They will be applied in order. You may have up to 3 locators per request
-             * @default []
-             */
-            pronunciation_dictionary_locators: components["schemas"]["PronunciationDictionaryVersionLocatorDBModel"][];
-            /**
-             * Seed
-             * @description If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed.
-             */
-            seed?: number;
-            /**
-             * Previous Text
-             * @description The text that came before the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
-             */
-            previous_text?: string;
-            /**
-             * Next Text
-             * @description The text that comes after the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
-             */
-            next_text?: string;
-            /**
-             * Previous Request Ids
-             * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both previous_text and previous_request_ids is send, previous_text will be ignored. A maximum of 3 request_ids can be send.
-             * @default []
-             */
-            previous_request_ids: string[];
-            /**
-             * Next Request Ids
-             * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both next_text and next_request_ids is send, next_text will be ignored. A maximum of 3 request_ids can be send.
-             * @default []
-             */
-            next_request_ids: string[];
-            /**
-             * Use Pvc As Ivc
-             * @deprecated
-             * @description If true, we won't use PVC version of the voice for the generation but the IVC version. This is a temporary workaround for higher latency in PVC versions.
-             * @default false
-             */
-            use_pvc_as_ivc: boolean;
-        };
-        /** Body_Update_Pronunciation_Dictionaries_v1_projects__project_id__update_pronunciation_dictionaries_post */
-        Body_Update_Pronunciation_Dictionaries_v1_projects__project_id__update_pronunciation_dictionaries_post: {
-            /**
-             * Pronunciation Dictionary Locators
-             * @description A list of pronunciation dictionary locators (pronunciation_dictionary_id, version_id) encoded as a list of JSON strings for pronunciation dictionaries to be applied to the text.  A list of json encoded strings is required as adding projects may occur through formData as opposed to jsonBody. To specify multiple dictionaries use multiple --form lines in your curl, such as --form 'pronunciation_dictionary_locators="{\"pronunciation_dictionary_id\":\"Vmd4Zor6fplcA7WrINey\",\"version_id\":\"hRPaxjlTdR7wFMhV4w0b\"}"' --form 'pronunciation_dictionary_locators="{\"pronunciation_dictionary_id\":\"JzWtcGQMJ6bnlWwyMo7e\",\"version_id\":\"lbmwxiLu4q6txYxgdZqn\"}"'. Note that multiple dictionaries are not currently supported by our UI which will only show the first.
-             */
-            pronunciation_dictionary_locators: components["schemas"]["PronunciationDictionaryVersionLocatorDBModel"][];
-        };
-        /** Body_Update_member_v1_workspace_members_post */
-        Body_Update_member_v1_workspace_members_post: {
-            /**
-             * Email
-             * @description Email of the target user.
-             */
-            email: string;
-            /**
-             * Is Locked
-             * @description Whether to lock or unlock the user account.
-             */
-            is_locked?: boolean;
-            /**
-             * Workspace Role
-             * @description Role dictating permissions in the workspace.
-             * @enum {string}
-             */
-            workspace_role?: "workspace_admin" | "workspace_member";
-        };
-        /** ChapterResponseModel */
-        ChapterResponseModel: {
-            /** Chapter Id */
-            chapter_id: string;
-            /** Name */
-            name: string;
-            /** Last Conversion Date Unix */
-            last_conversion_date_unix: number;
-            /** Last Block Conversion Unix Ms */
-            last_block_conversion_unix_ms: number;
-            /** Conversion Progress */
-            conversion_progress: number;
-            /** Can Be Downloaded */
-            can_be_downloaded: boolean;
-            /**
-             * State
-             * @enum {string}
-             */
-            state: "default" | "converting";
-            statistics: components["schemas"]["ChapterStatisticsResponseModel"];
-        };
-        /** ChapterSnapshotResponseModel */
-        ChapterSnapshotResponseModel: {
-            /** Chapter Snapshot Id */
-            chapter_snapshot_id: string;
-            /** Project Id */
-            project_id: string;
-            /** Chapter Id */
-            chapter_id: string;
-            /** Created At Unix */
-            created_at_unix: number;
-            /** Name */
-            name: string;
-        };
-        /** ChapterSnapshotsResponseModel */
-        ChapterSnapshotsResponseModel: {
-            /** Snapshots */
-            snapshots: components["schemas"]["ChapterSnapshotResponseModel"][];
-        };
-        /** ChapterStatisticsResponseModel */
-        ChapterStatisticsResponseModel: {
-            /** Characters Unconverted */
-            characters_unconverted: number;
-            /** Characters Converted */
-            characters_converted: number;
-            /** Paragraphs Converted */
-            paragraphs_converted: number;
-            /** Paragraphs Unconverted */
-            paragraphs_unconverted: number;
-        };
-        /** DoDubbingResponseModel */
-        DoDubbingResponseModel: {
-            /** Dubbing Id */
-            dubbing_id: string;
-            /** Expected Duration Sec */
-            expected_duration_sec: number;
-        };
-        /** DubbingMetadataResponse */
-        DubbingMetadataResponse: {
-            /** Dubbing Id */
-            dubbing_id: string;
-            /** Name */
-            name: string;
-            /** Status */
-            status: string;
-            /** Target Languages */
-            target_languages: string[];
-            /** Error */
-            error?: string;
-        };
-        /** EditProjectResponseModel */
-        EditProjectResponseModel: {
-            project: components["schemas"]["ProjectResponseModel"];
-        };
-        /** ExtendedSubscriptionResponseModel */
-        ExtendedSubscriptionResponseModel: {
-            /** Tier */
-            tier: string;
-            /** Character Count */
-            character_count: number;
-            /** Character Limit */
-            character_limit: number;
-            /** Can Extend Character Limit */
-            can_extend_character_limit: boolean;
-            /** Allowed To Extend Character Limit */
-            allowed_to_extend_character_limit: boolean;
-            /** Next Character Count Reset Unix */
-            next_character_count_reset_unix: number;
-            /** Voice Limit */
-            voice_limit: number;
-            /** Max Voice Add Edits */
-            max_voice_add_edits: number;
-            /** Voice Add Edit Counter */
-            voice_add_edit_counter: number;
-            /** Professional Voice Limit */
-            professional_voice_limit: number;
-            /** Can Extend Voice Limit */
-            can_extend_voice_limit: boolean;
-            /** Can Use Instant Voice Cloning */
-            can_use_instant_voice_cloning: boolean;
-            /** Can Use Professional Voice Cloning */
-            can_use_professional_voice_cloning: boolean;
-            /**
-             * Currency
-             * @enum {string}
-             */
-            currency: "usd" | "eur";
-            /**
-             * Status
-             * @enum {string}
-             */
-            status: "trialing" | "active" | "incomplete" | "incomplete_expired" | "past_due" | "canceled" | "unpaid" | "free";
-            /**
-             * Billing Period
-             * @enum {string}
-             */
-            billing_period: "monthly_period" | "annual_period";
-            /**
-             * Character Refresh Period
-             * @enum {string}
-             */
-            character_refresh_period: "monthly_period" | "annual_period";
-            next_invoice: components["schemas"]["InvoiceResponseModel"];
-            /** Has Open Invoices */
-            has_open_invoices: boolean;
-        };
-        /** FeedbackResponseModel */
-        FeedbackResponseModel: {
-            /** Thumbs Up */
-            thumbs_up: boolean;
-            /** Feedback */
-            feedback: string;
-            /** Emotions */
-            emotions: boolean;
-            /** Inaccurate Clone */
-            inaccurate_clone: boolean;
-            /** Glitches */
-            glitches: boolean;
-            /** Audio Quality */
-            audio_quality: boolean;
-            /** Other */
-            other: boolean;
-            /**
-             * Review Status
-             * @default not_reviewed
-             */
-            review_status: string;
-        };
-        /** FineTuningResponseModel */
-        FineTuningResponseModel: {
-            /** Is Allowed To Fine Tune */
-            is_allowed_to_fine_tune: boolean;
-            /** State */
-            state: {
-                [key: string]: "not_started" | "queued" | "fine_tuning" | "fine_tuned" | "failed" | "delayed";
-            };
-            /** Verification Failures */
-            verification_failures: string[];
-            /** Verification Attempts Count */
-            verification_attempts_count: number;
-            /** Manual Verification Requested */
-            manual_verification_requested: boolean;
-            /** Language */
-            language?: string;
-            /** Progress */
-            progress?: {
-                [key: string]: number;
-            };
-            /** Message */
-            message?: {
-                [key: string]: string;
-            };
-            /** Dataset Duration Seconds */
-            dataset_duration_seconds?: number;
-            /** Verification Attempts */
-            verification_attempts?: components["schemas"]["VerificationAttemptResponseModel"][];
-            /** Slice Ids */
-            slice_ids?: string[];
-            manual_verification?: components["schemas"]["ManualVerificationResponseModel"];
-        };
-        /** GetChaptersResponseModel */
-        GetChaptersResponseModel: {
-            /** Chapters */
-            chapters: components["schemas"]["ChapterResponseModel"][];
-        };
-        /** GetLibraryVoicesResponseModel */
-        GetLibraryVoicesResponseModel: {
-            /** Voices */
-            voices: components["schemas"]["LibraryVoiceResponseModel"][];
-            /** Has More */
-            has_more: boolean;
-            /** Last Sort Id */
-            last_sort_id?: string;
-        };
-        /** GetProjectsResponseModel */
-        GetProjectsResponseModel: {
-            /** Projects */
-            projects: components["schemas"]["ProjectResponseModel"][];
-        };
-        /** GetPronunciationDictionariesMetadataResponseModel */
-        GetPronunciationDictionariesMetadataResponseModel: {
-            /** Pronunciation Dictionaries */
-            pronunciation_dictionaries: components["schemas"]["GetPronunciationDictionaryMetadataResponseModel"][];
-            /** Next Cursor */
-            next_cursor: string;
-            /** Has More */
-            has_more: boolean;
-        };
-        /** GetPronunciationDictionaryMetadataResponseModel */
-        GetPronunciationDictionaryMetadataResponseModel: {
-            /** Id */
-            id: string;
-            /** Latest Version Id */
-            latest_version_id: string;
-            /** Name */
-            name: string;
-            /** Created By */
-            created_by: string;
-            /** Creation Time Unix */
-            creation_time_unix: number;
-            /** Description */
-            description?: string;
-        };
-        /** GetSpeechHistoryResponseModel */
-        GetSpeechHistoryResponseModel: {
-            /** History */
-            history: components["schemas"]["SpeechHistoryItemResponseModel"][];
-            /** Last History Item Id */
-            last_history_item_id: string;
-            /** Has More */
-            has_more: boolean;
-        };
-        /** GetVoicesResponseModel */
-        GetVoicesResponseModel: {
-            /** Voices */
-            voices: components["schemas"]["VoiceResponseModel"][];
-        };
-        /** HTTPValidationError */
-        HTTPValidationError: {
-            /** Detail */
-            detail?: components["schemas"]["ValidationError"][];
-        };
-        /** HistoryAlignmentResponseModel */
-        HistoryAlignmentResponseModel: {
-            /** Characters */
-            characters: string[];
-            /** Character Start Times Seconds */
-            character_start_times_seconds: number[];
-            /** Character End Times Seconds */
-            character_end_times_seconds: number[];
-        };
-        /** HistoryAlignmentsResponseModel */
-        HistoryAlignmentsResponseModel: {
-            alignment: components["schemas"]["HistoryAlignmentResponseModel"];
-            normalized_alignment: components["schemas"]["HistoryAlignmentResponseModel"];
-        };
-        /** InvoiceResponseModel */
-        InvoiceResponseModel: {
-            /** Amount Due Cents */
-            amount_due_cents: number;
-            /** Next Payment Attempt Unix */
-            next_payment_attempt_unix: number;
-        };
-        /** LanguageResponseModel */
-        LanguageResponseModel: {
-            /** Language Id */
-            language_id: string;
-            /** Name */
-            name: string;
-        };
-        /** LibraryVoiceResponseModel */
-        LibraryVoiceResponseModel: {
-            /** Public Owner Id */
-            public_owner_id: string;
-            /** Voice Id */
-            voice_id: string;
-            /** Date Unix */
-            date_unix: number;
-            /** Name */
-            name: string;
-            /** Accent */
-            accent: string;
-            /** Gender */
-            gender: string;
-            /** Age */
-            age: string;
-            /** Descriptive */
-            descriptive: string;
-            /** Use Case */
-            use_case: string;
-            /**
-             * Category
-             * @enum {string}
-             */
-            category: "generated" | "cloned" | "premade" | "professional" | "famous" | "high_quality";
-            /** Language */
-            language: string;
-            /** Description */
-            description: string;
-            /** Preview Url */
-            preview_url: string;
-            /** Usage Character Count 1Y */
-            usage_character_count_1y: number;
-            /** Usage Character Count 7D */
-            usage_character_count_7d: number;
-            /** Play Api Usage Character Count 1Y */
-            play_api_usage_character_count_1y: number;
-            /** Cloned By Count */
-            cloned_by_count: number;
-            /** Rate */
-            rate: number;
-            /** Free Users Allowed */
-            free_users_allowed: boolean;
-            /** Live Moderation Enabled */
-            live_moderation_enabled: boolean;
-            /** Featured */
-            featured: boolean;
-            /** Notice Period */
-            notice_period?: number;
-            /** Instagram Username */
-            instagram_username?: string;
-            /** Twitter Username */
-            twitter_username?: string;
-            /** Youtube Username */
-            youtube_username?: string;
-            /** Tiktok Username */
-            tiktok_username?: string;
-            /** Image Url */
-            image_url?: string;
-        };
-        /** ManualVerificationFileResponseModel */
-        ManualVerificationFileResponseModel: {
-            /** File Id */
-            file_id: string;
-            /** File Name */
-            file_name: string;
-            /** Mime Type */
-            mime_type: string;
-            /** Size Bytes */
-            size_bytes: number;
-            /** Upload Date Unix */
-            upload_date_unix: number;
-        };
-        /** ManualVerificationResponseModel */
-        ManualVerificationResponseModel: {
-            /** Extra Text */
-            extra_text: string;
-            /** Request Time Unix */
-            request_time_unix: number;
-            /** Files */
-            files: components["schemas"]["ManualVerificationFileResponseModel"][];
-        };
-        /** ModelRatesResponseModel */
-        ModelRatesResponseModel: {
-            /** Character Cost Multiplier */
-            character_cost_multiplier: number;
-        };
-        /** ModelResponseModel */
-        ModelResponseModel: {
-            /** Model Id */
-            model_id: string;
-            /** Name */
-            name: string;
-            /** Can Be Finetuned */
-            can_be_finetuned: boolean;
-            /** Can Do Text To Speech */
-            can_do_text_to_speech: boolean;
-            /** Can Do Voice Conversion */
-            can_do_voice_conversion: boolean;
-            /** Can Use Style */
-            can_use_style: boolean;
-            /** Can Use Speaker Boost */
-            can_use_speaker_boost: boolean;
-            /** Serves Pro Voices */
-            serves_pro_voices: boolean;
-            /** Token Cost Factor */
-            token_cost_factor: number;
-            /** Description */
-            description: string;
-            /** Requires Alpha Access */
-            requires_alpha_access: boolean;
-            /** Max Characters Request Free User */
-            max_characters_request_free_user: number;
-            /** Max Characters Request Subscribed User */
-            max_characters_request_subscribed_user: number;
-            /** Maximum Text Length Per Request */
-            maximum_text_length_per_request: number;
-            /** Languages */
-            languages: components["schemas"]["LanguageResponseModel"][];
-            model_rates: components["schemas"]["ModelRatesResponseModel"];
-            /**
-             * Concurrency Group
-             * @enum {string}
-             */
-            concurrency_group: "standard" | "turbo";
-        };
-        /** ProfilePageResponseModel */
-        ProfilePageResponseModel: {
-            /** Handle */
-            handle: string;
-            /** Public User Id */
-            public_user_id: string;
-            /** Name */
-            name: string;
-            /** Bio */
-            bio: string;
-            /** Profile Picture */
-            profile_picture: string;
-        };
-        /** ProjectExtendedResponseModel */
-        ProjectExtendedResponseModel: {
-            /** Project Id */
-            project_id: string;
-            /** Name */
-            name: string;
-            /** Create Date Unix */
-            create_date_unix: number;
-            /** Default Title Voice Id */
-            default_title_voice_id: string;
-            /** Default Paragraph Voice Id */
-            default_paragraph_voice_id: string;
-            /** Default Model Id */
-            default_model_id: string;
-            /**
-             * Quality Preset
-             * @enum {string}
-             */
-            quality_preset: "standard" | "high" | "highest" | "ultra" | "ultra_lossless";
-            /** Last Conversion Date Unix */
-            last_conversion_date_unix: number;
-            /** Can Be Downloaded */
-            can_be_downloaded: boolean;
-            /**
-             * State
-             * @enum {string}
-             */
-            state: "default" | "converting" | "in_queue";
-            /** Chapters */
-            chapters: components["schemas"]["ChapterResponseModel"][];
-            /** Pronunciation Dictionary Versions */
-            pronunciation_dictionary_versions: components["schemas"]["PronunciationDictionaryVersionResponseModel"][];
-            /** Volume Normalization */
-            volume_normalization: boolean;
-            /** Title */
-            title: string;
-            /** Author */
-            author: string;
-            /** Isbn Number */
-            isbn_number: string;
-        };
-        /** ProjectResponseModel */
-        ProjectResponseModel: {
-            /** Project Id */
-            project_id: string;
-            /** Name */
-            name: string;
-            /** Create Date Unix */
-            create_date_unix: number;
-            /** Default Title Voice Id */
-            default_title_voice_id: string;
-            /** Default Paragraph Voice Id */
-            default_paragraph_voice_id: string;
-            /** Default Model Id */
-            default_model_id: string;
-            /** Last Conversion Date Unix */
-            last_conversion_date_unix: number;
-            /** Can Be Downloaded */
-            can_be_downloaded: boolean;
-            /** Title */
-            title: string;
-            /** Author */
-            author: string;
-            /** Isbn Number */
-            isbn_number: string;
-            /** Volume Normalization */
-            volume_normalization: boolean;
-            /**
-             * State
-             * @enum {string}
-             */
-            state: "default" | "converting" | "in_queue";
-        };
-        /** ProjectSnapshotResponseModel */
-        ProjectSnapshotResponseModel: {
-            /** Project Snapshot Id */
-            project_snapshot_id: string;
-            /** Project Id */
-            project_id: string;
-            /** Created At Unix */
-            created_at_unix: number;
-            /** Name */
-            name: string;
-            audio_upload?: components["schemas"]["ProjectSnapshotUploadResponseModel"];
-            zip_upload?: components["schemas"]["ProjectSnapshotUploadResponseModel"];
-        };
-        /** ProjectSnapshotUploadResponseModel */
-        ProjectSnapshotUploadResponseModel: {
-            /**
-             * Status
-             * @enum {string}
-             */
-            status: "success" | "in_queue" | "pending" | "failed";
-            /** Acx Volume Normalization */
-            acx_volume_normalization?: boolean;
-        };
-        /** ProjectSnapshotsResponseModel */
-        ProjectSnapshotsResponseModel: {
-            /** Snapshots */
-            snapshots: components["schemas"]["ProjectSnapshotResponseModel"][];
-        };
-        /** PronunciationDictionaryAliasRuleRequestModel */
-        PronunciationDictionaryAliasRuleRequestModel: {
-            /**
-             * Type
-             * @enum {string}
-             */
-            type: "alias";
-            /** String To Replace */
-            string_to_replace: string;
-            /** Alias */
-            alias: string;
-        };
-        /** PronunciationDictionaryPhonemeRuleRequestModel */
-        PronunciationDictionaryPhonemeRuleRequestModel: {
-            /**
-             * Type
-             * @enum {string}
-             */
-            type: "phoneme";
-            /** String To Replace */
-            string_to_replace: string;
-            /** Phoneme */
-            phoneme: string;
-            /** Alphabet */
-            alphabet: string;
-        };
-        /** PronunciationDictionaryVersionLocatorDBModel */
-        PronunciationDictionaryVersionLocatorDBModel: {
-            /** Pronunciation Dictionary Id */
-            pronunciation_dictionary_id: string;
-            /** Version Id */
-            version_id: string;
-        };
-        /** PronunciationDictionaryVersionResponseModel */
-        PronunciationDictionaryVersionResponseModel: {
-            /** Version Id */
-            version_id: string;
-            /** Pronunciation Dictionary Id */
-            pronunciation_dictionary_id: string;
-            /** Dictionary Name */
-            dictionary_name: string;
-            /** Version Name */
-            version_name: string;
-            /** Created By */
-            created_by: string;
-            /** Creation Time Unix */
-            creation_time_unix: number;
-        };
-        /** RecordingResponseModel */
-        RecordingResponseModel: {
-            /** Recording Id */
-            recording_id: string;
-            /** Mime Type */
-            mime_type: string;
-            /** Size Bytes */
-            size_bytes: number;
-            /** Upload Date Unix */
-            upload_date_unix: number;
-            /** Transcription */
-            transcription: string;
-        };
-        /** RemovePronunciationDictionaryRulesResponseModel */
-        RemovePronunciationDictionaryRulesResponseModel: {
-            /** Id */
-            id: string;
-            /** Version Id */
-            version_id: string;
-        };
-        /** SampleResponseModel */
-        SampleResponseModel: {
-            /** Sample Id */
-            sample_id: string;
-            /** File Name */
-            file_name: string;
-            /** Mime Type */
-            mime_type: string;
-            /** Size Bytes */
-            size_bytes: number;
-            /** Hash */
-            hash: string;
-        };
-        /** SpeechHistoryItemResponseModel */
-        SpeechHistoryItemResponseModel: {
-            /** History Item Id */
-            history_item_id: string;
-            /** Request Id */
-            request_id: string;
-            /** Voice Id */
-            voice_id: string;
-            /** Model Id */
-            model_id: string;
-            /** Voice Name */
-            voice_name: string;
-            /**
-             * Voice Category
-             * @enum {string}
-             */
-            voice_category: "premade" | "cloned" | "generated" | "professional";
-            /** Text */
-            text: string;
-            /** Date Unix */
-            date_unix: number;
-            /** Character Count Change From */
-            character_count_change_from: number;
-            /** Character Count Change To */
-            character_count_change_to: number;
-            /** Content Type */
-            content_type: string;
-            /**
-             * State
-             * @enum {string}
-             */
-            state: "created" | "deleted" | "processing";
-            /** Settings */
-            settings: Record<string, never>;
-            feedback: components["schemas"]["FeedbackResponseModel"];
-            /** Share Link Id */
-            share_link_id: string;
-            /**
-             * Source
-             * @enum {string}
-             */
-            source: "TTS" | "STS";
-            alignments?: components["schemas"]["HistoryAlignmentsResponseModel"];
-        };
-        /** SsoProviderResponseModel */
-        SsoProviderResponseModel: {
-            /**
-             * Provider Type
-             * @enum {string}
-             */
-            provider_type: "saml" | "oidc";
-            /** Provider Id */
-            provider_id: string;
-            /** Domains */
-            domains: string[];
-        };
-        /** SubscriptionResponseModel */
-        SubscriptionResponseModel: {
-            /** Tier */
-            tier: string;
-            /** Character Count */
-            character_count: number;
-            /** Character Limit */
-            character_limit: number;
-            /** Can Extend Character Limit */
-            can_extend_character_limit: boolean;
-            /** Allowed To Extend Character Limit */
-            allowed_to_extend_character_limit: boolean;
-            /** Next Character Count Reset Unix */
-            next_character_count_reset_unix: number;
-            /** Voice Limit */
-            voice_limit: number;
-            /** Max Voice Add Edits */
-            max_voice_add_edits: number;
-            /** Voice Add Edit Counter */
-            voice_add_edit_counter: number;
-            /** Professional Voice Limit */
-            professional_voice_limit: number;
-            /** Can Extend Voice Limit */
-            can_extend_voice_limit: boolean;
-            /** Can Use Instant Voice Cloning */
-            can_use_instant_voice_cloning: boolean;
-            /** Can Use Professional Voice Cloning */
-            can_use_professional_voice_cloning: boolean;
-            /**
-             * Currency
-             * @enum {string}
-             */
-            currency: "usd" | "eur";
-            /**
-             * Status
-             * @enum {string}
-             */
-            status: "trialing" | "active" | "incomplete" | "incomplete_expired" | "past_due" | "canceled" | "unpaid" | "free";
-            /**
-             * Billing Period
-             * @enum {string}
-             */
-            billing_period: "monthly_period" | "annual_period";
-            /**
-             * Character Refresh Period
-             * @enum {string}
-             */
-            character_refresh_period: "monthly_period" | "annual_period";
-        };
-        /** UsageCharactersResponseModel */
-        UsageCharactersResponseModel: {
-            /** Time */
-            time: number[];
-            /** Usage */
-            usage: {
-                [key: string]: number[];
-            };
-        };
-        /** UserResponseModel */
-        UserResponseModel: {
-            subscription: components["schemas"]["SubscriptionResponseModel"];
-            /** Is New User */
-            is_new_user: boolean;
-            /** Xi Api Key */
-            xi_api_key: string;
-            /** Can Use Delayed Payment Methods */
-            can_use_delayed_payment_methods: boolean;
-            /** Is Onboarding Completed */
-            is_onboarding_completed: boolean;
-            /** Is Onboarding Checklist Completed */
-            is_onboarding_checklist_completed: boolean;
-            /** First Name */
-            first_name?: string;
-            /**
-             * Is Api Key Hashed
-             * @default false
-             */
-            is_api_key_hashed: boolean;
-            /** Xi Api Key Preview */
-            xi_api_key_preview?: string;
-        };
-        /** ValidationError */
-        ValidationError: {
-            /** Location */
-            loc: (string | number)[];
-            /** Message */
-            msg: string;
-            /** Error Type */
-            type: string;
-        };
-        /** VerificationAttemptResponseModel */
-        VerificationAttemptResponseModel: {
-            /** Text */
-            text: string;
-            /** Date Unix */
-            date_unix: number;
-            /** Accepted */
-            accepted: boolean;
-            /** Similarity */
-            similarity: number;
-            /** Levenshtein Distance */
-            levenshtein_distance: number;
-            recording?: components["schemas"]["RecordingResponseModel"];
-        };
-        /** VoiceGenerationParameterOptionResponseModel */
-        VoiceGenerationParameterOptionResponseModel: {
-            /** Name */
-            name: string;
-            /** Code */
-            code: string;
-        };
-        /** VoiceGenerationParameterResponseModel */
-        VoiceGenerationParameterResponseModel: {
-            /** Genders */
-            genders: components["schemas"]["VoiceGenerationParameterOptionResponseModel"][];
-            /** Accents */
-            accents: components["schemas"]["VoiceGenerationParameterOptionResponseModel"][];
-            /** Ages */
-            ages: components["schemas"]["VoiceGenerationParameterOptionResponseModel"][];
-            /** Minimum Characters */
-            minimum_characters: number;
-            /** Maximum Characters */
-            maximum_characters: number;
-            /** Minimum Accent Strength */
-            minimum_accent_strength: number;
-            /** Maximum Accent Strength */
-            maximum_accent_strength: number;
-        };
-        /** VoiceResponseModel */
-        VoiceResponseModel: {
-            /** Voice Id */
-            voice_id: string;
-            /** Name */
-            name: string;
-            /** Samples */
-            samples: components["schemas"]["SampleResponseModel"][];
-            /**
-             * Category
-             * @enum {string}
-             */
-            category: "generated" | "cloned" | "premade" | "professional" | "famous" | "high_quality";
-            fine_tuning: components["schemas"]["FineTuningResponseModel"];
-            /** Labels */
-            labels: {
-                [key: string]: string;
-            };
-            /** Description */
-            description: string;
-            /** Preview Url */
-            preview_url: string;
-            /** Available For Tiers */
-            available_for_tiers: string[];
-            settings: components["schemas"]["VoiceSettingsResponseModel"];
-            sharing: components["schemas"]["VoiceSharingResponseModel"];
-            /** High Quality Base Model Ids */
-            high_quality_base_model_ids: string[];
-            /**
-             * Safety Control
-             * @enum {string}
-             */
-            safety_control?: "NONE" | "BAN" | "CAPTCHA" | "CAPTCHA_AND_MODERATION";
-            voice_verification?: components["schemas"]["VoiceVerificationResponseModel"];
-            /** Permission On Resource */
-            permission_on_resource?: string;
-            /**
-             * Is Legacy
-             * @default false
-             */
-            is_legacy: boolean;
-            /**
-             * Is Mixed
-             * @default false
-             */
-            is_mixed: boolean;
-        };
-        /** VoiceSettingsResponseModel */
-        VoiceSettingsResponseModel: {
-            /** Stability */
-            stability: number;
-            /** Similarity Boost */
-            similarity_boost: number;
-            /**
-             * Style
-             * @default 0
-             */
-            style: number;
-            /**
-             * Use Speaker Boost
-             * @default true
-             */
-            use_speaker_boost: boolean;
-        };
-        /** VoiceSharingResponseModel */
-        VoiceSharingResponseModel: {
-            /**
-             * Status
-             * @enum {string}
-             */
-            status: "enabled" | "disabled" | "copied" | "copied_disabled";
-            /** History Item Sample Id */
-            history_item_sample_id: string;
-            /** Date Unix */
-            date_unix: number;
-            /** Whitelisted Emails */
-            whitelisted_emails: string[];
-            /** Public Owner Id */
-            public_owner_id: string;
-            /** Original Voice Id */
-            original_voice_id: string;
-            /** Financial Rewards Enabled */
-            financial_rewards_enabled: boolean;
-            /** Free Users Allowed */
-            free_users_allowed: boolean;
-            /** Live Moderation Enabled */
-            live_moderation_enabled: boolean;
-            /** Rate */
-            rate: number;
-            /** Notice Period */
-            notice_period: number;
-            /** Disable At Unix */
-            disable_at_unix: number;
-            /** Voice Mixing Allowed */
-            voice_mixing_allowed: boolean;
-            /** Featured */
-            featured: boolean;
-            /**
-             * Category
-             * @enum {string}
-             */
-            category: "generated" | "professional" | "high_quality" | "famous";
-            /** Reader App Enabled */
-            reader_app_enabled: boolean;
-            /** Image Url */
-            image_url: string;
-            /** Ban Reason */
-            ban_reason: string;
-            /** Liked By Count */
-            liked_by_count: number;
-            /** Cloned By Count */
-            cloned_by_count: number;
-            /** Name */
-            name: string;
-            /** Description */
-            description: string;
-            /** Labels */
-            labels: {
-                [key: string]: string;
-            };
-            /**
-             * Review Status
-             * @enum {string}
-             */
-            review_status: "not_requested" | "pending" | "declined" | "allowed" | "allowed_with_changes";
-            /** Review Message */
-            review_message: string;
-            /** Enabled In Library */
-            enabled_in_library: boolean;
-            /** Instagram Username */
-            instagram_username?: string;
-            /** Twitter Username */
-            twitter_username?: string;
-            /** Youtube Username */
-            youtube_username?: string;
-            /** Tiktok Username */
-            tiktok_username?: string;
-        };
-        /** VoiceVerificationResponseModel */
-        VoiceVerificationResponseModel: {
-            /** Requires Verification */
-            requires_verification: boolean;
-            /** Is Verified */
-            is_verified: boolean;
-            /** Verification Failures */
-            verification_failures: string[];
-            /** Verification Attempts Count */
-            verification_attempts_count: number;
-            /** Language */
-            language?: string;
-            /** Verification Attempts */
-            verification_attempts?: components["schemas"]["VerificationAttemptResponseModel"][];
-        };
-    };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+	schemas: {
+		/** AddChapterResponseModel */
+		AddChapterResponseModel: {
+			chapter: components['schemas']['ChapterResponseModel'];
+		};
+		/** AddProjectResponseModel */
+		AddProjectResponseModel: {
+			project: components['schemas']['ProjectResponseModel'];
+		};
+		/** AddPronunciationDictionaryResponseModel */
+		AddPronunciationDictionaryResponseModel: {
+			/** Id */
+			id: string;
+			/** Name */
+			name: string;
+			/** Created By */
+			created_by: string;
+			/** Creation Time Unix */
+			creation_time_unix: number;
+			/** Version Id */
+			version_id: string;
+			/** Description */
+			description?: string;
+		};
+		/** AddPronunciationDictionaryRulesResponseModel */
+		AddPronunciationDictionaryRulesResponseModel: {
+			/** Id */
+			id: string;
+			/** Version Id */
+			version_id: string;
+		};
+		/** AddVoiceResponseModel */
+		AddVoiceResponseModel: {
+			/** Voice Id */
+			voice_id: string;
+		};
+		/** AudioNativeCreateProjectResponseModel */
+		AudioNativeCreateProjectResponseModel: {
+			/** Project Id */
+			project_id: string;
+			/** Converting */
+			converting: boolean;
+			/** Html Snippet */
+			html_snippet: string;
+		};
+		/** Body_Add_a_pronunciation_dictionary_v1_pronunciation_dictionaries_add_from_file_post */
+		Body_Add_a_pronunciation_dictionary_v1_pronunciation_dictionaries_add_from_file_post: {
+			/**
+			 * Name
+			 * @description The name of the pronunciation dictionary, used for identification only.
+			 */
+			name: string;
+			/**
+			 * File
+			 * Format: binary
+			 * @description A lexicon .pls file which we will use to initialize the project with.
+			 */
+			file?: string;
+			/**
+			 * Description
+			 * @description A description of the pronunciation dictionary, used for identification only.
+			 */
+			description?: string;
+			/**
+			 * Workspace Access
+			 * @description Should be one of 'editor' or 'viewer'. If not provided, defaults to no access.
+			 * @enum {string}
+			 */
+			workspace_access?: 'admin' | 'editor' | 'viewer';
+		};
+		/** Body_Add_chapter_to_a_project_v1_projects__project_id__chapters_add_post */
+		Body_Add_chapter_to_a_project_v1_projects__project_id__chapters_add_post: {
+			/**
+			 * Name
+			 * @description The name of the chapter, used for identification only.
+			 */
+			name: string;
+			/**
+			 * From Url
+			 * @description An optional URL from which we will extract content to initialize the project. If this is set, 'from_url' must be null. If neither 'from_url' or 'from_document' are provided we will initialize the project as blank.
+			 */
+			from_url?: string;
+		};
+		/** Body_Add_project_v1_projects_add_post */
+		Body_Add_project_v1_projects_add_post: {
+			/**
+			 * Name
+			 * @description The name of the project, used for identification only.
+			 */
+			name: string;
+			/**
+			 * Default Title Voice Id
+			 * @description The voice_id that corresponds to the default voice used for new titles.
+			 */
+			default_title_voice_id: string;
+			/**
+			 * Default Paragraph Voice Id
+			 * @description The voice_id that corresponds to the default voice used for new paragraphs.
+			 */
+			default_paragraph_voice_id: string;
+			/**
+			 * Default Model Id
+			 * @description The model_id of the model to be used for this project, you can query GET https://api.elevenlabs.io/v1/models to list all available models.
+			 */
+			default_model_id: string;
+			/**
+			 * From Url
+			 * @description An optional URL from which we will extract content to initialize the project. If this is set, 'from_url' must be null. If neither 'from_url' or 'from_document' are provided we will initialize the project as blank.
+			 */
+			from_url?: string;
+			/**
+			 * From Document
+			 * Format: binary
+			 * @description An optional .epub, .pdf, .txt or similar file can be provided. If provided, we will initialize the project with its content. If this is set, 'from_url' must be null.  If neither 'from_url' or 'from_document' are provided we will initialize the project as blank.
+			 */
+			from_document?: string;
+			/**
+			 * Quality of the generated audio.
+			 * @description Output quality of the generated audio. Must be one of:
+			 *     standard - standard output format, 128kbps with 44.1kHz sample rate.
+			 *     high - high quality output format, 192kbps with 44.1kHz sample rate and major improvements on our side. Using this setting increases the credit cost by 20%.
+			 *     ultra - ultra quality output format, 192kbps with 44.1kHz sample rate and highest improvements on our side. Using this setting increases the credit cost by 50%.
+			 *     ultra lossless - ultra quality output format, 705.6kbps with 44.1kHz sample rate and highest improvements on our side in a fully lossless format. Using this setting increases the credit cost by 100%.
+			 *
+			 * @default standard
+			 */
+			quality_preset: string;
+			/**
+			 * Title
+			 * @description An optional name of the author of the project, this will be added as metadata to the mp3 file on project / chapter download.
+			 */
+			title?: string;
+			/**
+			 * Author
+			 * @description An optional name of the author of the project, this will be added as metadata to the mp3 file on project / chapter download.
+			 */
+			author?: string;
+			/**
+			 * Isbn Number
+			 * @description An optional ISBN number of the project you want to create, this will be added as metadata to the mp3 file on project / chapter download.
+			 */
+			isbn_number?: string;
+			/**
+			 * Acx Volume Normalization
+			 * @description [Deprecated] When the project is downloaded, should the returned audio have postprocessing in order to make it compliant with audiobook normalized volume requirements
+			 * @default false
+			 */
+			acx_volume_normalization: boolean;
+			/**
+			 * Volume Normalization
+			 * @description When the project is downloaded, should the returned audio have postprocessing in order to make it compliant with audiobook normalized volume requirements
+			 * @default false
+			 */
+			volume_normalization: boolean;
+			/**
+			 * Pronunciation Dictionary Locators
+			 * @description A list of pronunciation dictionary locators (pronunciation_dictionary_id, version_id) encoded as a list of JSON strings for pronunciation dictionaries to be applied to the text.  A list of json encoded strings is required as adding projects may occur through formData as opposed to jsonBody. To specify multiple dictionaries use multiple --form lines in your curl, such as --form 'pronunciation_dictionary_locators="{\"pronunciation_dictionary_id\":\"Vmd4Zor6fplcA7WrINey\",\"version_id\":\"hRPaxjlTdR7wFMhV4w0b\"}"' --form 'pronunciation_dictionary_locators="{\"pronunciation_dictionary_id\":\"JzWtcGQMJ6bnlWwyMo7e\",\"version_id\":\"lbmwxiLu4q6txYxgdZqn\"}"'. Note that multiple dictionaries are not currently supported by our UI which will only show the first.
+			 */
+			pronunciation_dictionary_locators?: string[];
+			/**
+			 * Callback Url
+			 * @description [Deprecated] A url that will be called by our service when the project is converted with a json containing the status of the conversion
+			 */
+			callback_url?: string;
+		};
+		/** Body_Add_rules_to_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__add_rules_post */
+		Body_Add_rules_to_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__add_rules_post: {
+			/**
+			 * Rules
+			 * @description List of pronunciation rules. Rule can be either:
+			 *         an alias rule: {'string_to_replace': 'a', 'type': 'alias', 'alias': 'b', }
+			 *         or a phoneme rule: {'string_to_replace': 'a', 'type': 'phoneme', 'phoneme': 'b', 'alphabet': 'ipa' }
+			 */
+			rules: (
+				| components['schemas']['PronunciationDictionaryAliasRuleRequestModel']
+				| components['schemas']['PronunciationDictionaryPhonemeRuleRequestModel']
+			)[];
+		};
+		/** Body_Add_sharing_voice_v1_voices_add__public_user_id___voice_id__post */
+		Body_Add_sharing_voice_v1_voices_add__public_user_id___voice_id__post: {
+			/**
+			 * New Name
+			 * @description The name that identifies this voice. This will be displayed in the dropdown of the website.
+			 */
+			new_name: string;
+		};
+		/** Body_Add_voice_v1_voices_add_post */
+		Body_Add_voice_v1_voices_add_post: {
+			/**
+			 * Name
+			 * @description The name that identifies this voice. This will be displayed in the dropdown of the website.
+			 */
+			name: string;
+			/**
+			 * Files
+			 * @description A list of file paths to audio recordings intended for voice cloning
+			 */
+			files: string[];
+			/**
+			 * Description
+			 * @description How would you describe the voice?
+			 */
+			description?: string;
+			/**
+			 * Labels
+			 * @description Serialized labels dictionary for the voice.
+			 */
+			labels?: string;
+		};
+		/** Body_Audio_Isolation_Stream_v1_audio_isolation_stream_post */
+		Body_Audio_Isolation_Stream_v1_audio_isolation_stream_post: {
+			/**
+			 * Audio
+			 * Format: binary
+			 * @description The audio file from which vocals/speech will be isolated from.
+			 */
+			audio: string;
+		};
+		/** Body_Audio_Isolation_v1_audio_isolation_post */
+		Body_Audio_Isolation_v1_audio_isolation_post: {
+			/**
+			 * Audio
+			 * Format: binary
+			 * @description The audio file from which vocals/speech will be isolated from.
+			 */
+			audio: string;
+		};
+		/** Body_Create_a_previously_generated_voice_v1_voice_generation_create_voice_post */
+		Body_Create_a_previously_generated_voice_v1_voice_generation_create_voice_post: {
+			/**
+			 * Voice Name
+			 * @description Name to use for the created voice.
+			 */
+			voice_name: string;
+			/**
+			 * Voice Description
+			 * @description Description to use for the created voice.
+			 */
+			voice_description: string;
+			/**
+			 * Generated Voice Id
+			 * @description The generated_voice_id to create, call POST /v1/voice-generation/generate-voice and fetch the generated_voice_id from the response header if don't have one yet.
+			 */
+			generated_voice_id: string;
+			/**
+			 * Labels
+			 * @description Optional, metadata to add to the created voice. Defaults to None.
+			 */
+			labels?: {
+				[key: string]: string;
+			};
+		};
+		/** Body_Creates_AudioNative_enabled_project__v1_audio_native_post */
+		Body_Creates_AudioNative_enabled_project__v1_audio_native_post: {
+			/**
+			 * Name
+			 * @description Project name.
+			 */
+			name: string;
+			/**
+			 * Image
+			 * @description Image URL used in the player. If not provided, default image set in the Player settings is used.
+			 */
+			image?: string;
+			/**
+			 * Author
+			 * @description Author used in the player and inserted at the start of the uploaded article. If not provided, the default author set in the Player settings is used.
+			 */
+			author?: string;
+			/**
+			 * Title
+			 * @description Title used in the player and inserted at the top of the uploaded article. If not provided, the default title set in the Player settings is used.
+			 */
+			title?: string;
+			/**
+			 * Small
+			 * @description Whether to use small player or not. If not provided, default value set in the Player settings is used.
+			 * @default false
+			 */
+			small: boolean;
+			/**
+			 * Text Color
+			 * @description Text color used in the player. If not provided, default text color set in the Player settings is used.
+			 */
+			text_color?: string;
+			/**
+			 * Background Color
+			 * @description Background color used in the player. If not provided, default background color set in the Player settings is used.
+			 */
+			background_color?: string;
+			/**
+			 * Sessionization
+			 * @description Specifies for how many minutes to persist the session across page reloads. If not provided, default sessionization set in the Player settings is used.
+			 * @default 0
+			 */
+			sessionization: number;
+			/**
+			 * Voice Id
+			 * @description Voice ID used to voice the content. If not provided, default voice ID set in the Player settings is used.
+			 */
+			voice_id?: string;
+			/**
+			 * Model Id
+			 * @description TTS Model ID used in the player. If not provided, default model ID set in the Player settings is used.
+			 */
+			model_id?: string;
+			/**
+			 * File
+			 * Format: binary
+			 * @description Either txt or HTML input file containing the article content. HTML should be formatted as follows '&lt;html&gt;&lt;body&gt;&lt;div&gt;&lt;p&gt;Your content&lt;/p&gt;&lt;h5&gt;More of your content&lt;/h5&gt;&lt;p&gt;Some more of your content&lt;/p&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;'
+			 */
+			file?: string;
+			/**
+			 * Auto Convert
+			 * @description Whether to auto convert the project to audio or not.
+			 * @default false
+			 */
+			auto_convert: boolean;
+		};
+		/** Body_Delete_existing_invitation_v1_workspace_invites_delete */
+		Body_Delete_existing_invitation_v1_workspace_invites_delete: {
+			/**
+			 * Email
+			 * @description Email of the target user.
+			 */
+			email: string;
+		};
+		/** Body_Download_history_items_v1_history_download_post */
+		Body_Download_history_items_v1_history_download_post: {
+			/**
+			 * History Item Ids
+			 * @description A list of history items to download, you can get IDs of history items and other metadata using the GET https://api.elevenlabs.io/v1/history endpoint.
+			 */
+			history_item_ids: string[];
+			/**
+			 * Output Format
+			 * @description Output format to transcode the audio file, can be wav or default.
+			 */
+			output_format?: string;
+		};
+		/** Body_Dub_a_video_or_an_audio_file_v1_dubbing_post */
+		Body_Dub_a_video_or_an_audio_file_v1_dubbing_post: {
+			/**
+			 * File
+			 * Format: binary
+			 * @description A list of file paths to audio recordings intended for voice cloning
+			 */
+			file?: string;
+			/**
+			 * Name
+			 * @description Name of the dubbing project.
+			 */
+			name?: string;
+			/**
+			 * Source Url
+			 * @description URL of the source video/audio file.
+			 */
+			source_url?: string;
+			/**
+			 * Source Lang
+			 * @description Source language.
+			 * @default auto
+			 */
+			source_lang: string;
+			/**
+			 * Target Lang
+			 * @description The Target language to dub the content into.
+			 */
+			target_lang?: string;
+			/**
+			 * Num Speakers
+			 * @description Number of speakers to use for the dubbing. Set to 0 to automatically detect the number of speakers
+			 * @default 0
+			 */
+			num_speakers: number;
+			/**
+			 * Watermark
+			 * @description Whether to apply watermark to the output video.
+			 * @default false
+			 */
+			watermark: boolean;
+			/**
+			 * Start Time
+			 * @description Start time of the source video/audio file.
+			 */
+			start_time?: number;
+			/**
+			 * End Time
+			 * @description End time of the source video/audio file.
+			 */
+			end_time?: number;
+			/**
+			 * Highest Resolution
+			 * @description Whether to use the highest resolution available.
+			 * @default false
+			 */
+			highest_resolution: boolean;
+			/**
+			 * Drop Background Audio
+			 * @description An advanced setting. Whether to drop background audio from the final dub. This can improve dub quality where it's known that audio shouldn't have a background track such as for speeches or monologues.
+			 * @default false
+			 */
+			drop_background_audio: boolean;
+			/**
+			 * Use Profanity Filter
+			 * @description [BETA] Whether transcripts should have profanities censored with the words '[censored]'
+			 */
+			use_profanity_filter?: boolean;
+		};
+		/** Body_Edit_basic_project_info_v1_projects__project_id__post */
+		Body_Edit_basic_project_info_v1_projects__project_id__post: {
+			/**
+			 * Name
+			 * @description The name of the project, used for identification only.
+			 */
+			name: string;
+			/**
+			 * Default Title Voice Id
+			 * @description The voice_id that corresponds to the default voice used for new titles.
+			 */
+			default_title_voice_id: string;
+			/**
+			 * Default Paragraph Voice Id
+			 * @description The voice_id that corresponds to the default voice used for new paragraphs.
+			 */
+			default_paragraph_voice_id: string;
+			/**
+			 * Title
+			 * @description An optional name of the author of the project, this will be added as metadata to the mp3 file on project / chapter download.
+			 */
+			title?: string;
+			/**
+			 * Author
+			 * @description An optional name of the author of the project, this will be added as metadata to the mp3 file on project / chapter download.
+			 */
+			author?: string;
+			/**
+			 * Isbn Number
+			 * @description An optional ISBN number of the project you want to create, this will be added as metadata to the mp3 file on project / chapter download.
+			 */
+			isbn_number?: string;
+			/**
+			 * Volume Normalization
+			 * @description When the project is downloaded, should the returned audio have postprocessing in order to make it compliant with audiobook normalized volume requirements
+			 * @default false
+			 */
+			volume_normalization: boolean;
+		};
+		/** Body_Edit_voice_v1_voices__voice_id__edit_post */
+		Body_Edit_voice_v1_voices__voice_id__edit_post: {
+			/**
+			 * Name
+			 * @description The name that identifies this voice. This will be displayed in the dropdown of the website.
+			 */
+			name: string;
+			/**
+			 * Files
+			 * @description Audio files to add to the voice
+			 */
+			files?: string[];
+			/**
+			 * Description
+			 * @description How would you describe the voice?
+			 */
+			description?: string;
+			/**
+			 * Labels
+			 * @description Serialized labels dictionary for the voice.
+			 */
+			labels?: string;
+		};
+		/** Body_Generate_a_random_voice_v1_voice_generation_generate_voice_post */
+		Body_Generate_a_random_voice_v1_voice_generation_generate_voice_post: {
+			/**
+			 * Gender
+			 * @description Category code corresponding to the gender of the generated voice. Possible values: female, male.
+			 * @enum {string}
+			 */
+			gender: 'female' | 'male';
+			/**
+			 * Accent
+			 * @description Category code corresponding to the accent of the generated voice. Possible values: american, british, african, australian, indian.
+			 */
+			accent: string;
+			/**
+			 * Age
+			 * @description Category code corresponding to the age of the generated voice. Possible values: young, middle_aged, old.
+			 * @enum {string}
+			 */
+			age: 'young' | 'middle_aged' | 'old';
+			/**
+			 * Accent Strength
+			 * @description The strength of the accent of the generated voice. Has to be between 0.3 and 2.0.
+			 */
+			accent_strength: number;
+			/**
+			 * Text
+			 * @description Text to generate, text length has to be between 100 and 1000.
+			 */
+			text: string;
+		};
+		/** Body_Get_similar_library_voices_v1_similar_voices_post */
+		Body_Get_similar_library_voices_v1_similar_voices_post: {
+			/**
+			 * Audio File
+			 * Format: binary
+			 */
+			audio_file?: string;
+			/**
+			 * Similarity Threshold
+			 * @description Threshold for voice similarity between provided sample and library voices. Must be in range <0, 2>. The smaller the value the more similar voices will be returned.
+			 */
+			similarity_threshold?: number;
+			/**
+			 * Top K
+			 * @description Number of most similar voices to return. If similarity_threshold is provided, less than this number of voices may be returned. Must be in range <1, 100>.
+			 */
+			top_k?: number;
+		};
+		/** Body_Invite_user_v1_workspace_invites_add_post */
+		Body_Invite_user_v1_workspace_invites_add_post: {
+			/**
+			 * Email
+			 * @description Email of the target user.
+			 */
+			email: string;
+		};
+		/** Body_Remove_rules_from_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__remove_rules_post */
+		Body_Remove_rules_from_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__remove_rules_post: {
+			/**
+			 * Rule Strings
+			 * @description List of strings to remove from the pronunciation dictionary.
+			 */
+			rule_strings: string[];
+		};
+		/** Body_Sound_Generation_v1_sound_generation_post */
+		Body_Sound_Generation_v1_sound_generation_post: {
+			/**
+			 * Text
+			 * @description The text that will get converted into a sound effect.
+			 */
+			text: string;
+			/**
+			 * Duration Seconds
+			 * @description The duration of the sound which will be generated in seconds. Must be at least 0.5 and at most 22. If set to None we will guess the optimal duration using the prompt. Defaults to None.
+			 */
+			duration_seconds?: number;
+			/**
+			 * Prompt Influence
+			 * @description A higher prompt influence makes your generation follow the prompt more closely while also making generations less variable. Must be a value between 0 and 1. Defaults to 0.3.
+			 * @default 0.3
+			 */
+			prompt_influence: number;
+		};
+		/** Body_Speech_to_Speech_Streaming_v1_speech_to_speech__voice_id__stream_post */
+		Body_Speech_to_Speech_Streaming_v1_speech_to_speech__voice_id__stream_post: {
+			/**
+			 * Audio
+			 * Format: binary
+			 * @description The audio file which holds the content and emotion that will control the generated speech.
+			 */
+			audio: string;
+			/**
+			 * Model Id
+			 * @description Identifier of the model that will be used, you can query them using GET /v1/models. The model needs to have support for speech to speech, you can check this using the can_do_voice_conversion property.
+			 * @default eleven_english_sts_v2
+			 */
+			model_id: string;
+			/**
+			 * Voice Settings
+			 * @description Voice settings overriding stored setttings for the given voice. They are applied only on the given request. Needs to be send as a JSON encoded string.
+			 */
+			voice_settings?: string;
+			/**
+			 * Seed
+			 * @description If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed.
+			 */
+			seed?: number;
+		};
+		/** Body_Speech_to_Speech_v1_speech_to_speech__voice_id__post */
+		Body_Speech_to_Speech_v1_speech_to_speech__voice_id__post: {
+			/**
+			 * Audio
+			 * Format: binary
+			 * @description The audio file which holds the content and emotion that will control the generated speech.
+			 */
+			audio: string;
+			/**
+			 * Model Id
+			 * @description Identifier of the model that will be used, you can query them using GET /v1/models. The model needs to have support for speech to speech, you can check this using the can_do_voice_conversion property.
+			 * @default eleven_english_sts_v2
+			 */
+			model_id: string;
+			/**
+			 * Voice Settings
+			 * @description Voice settings overriding stored setttings for the given voice. They are applied only on the given request. Needs to be send as a JSON encoded string.
+			 */
+			voice_settings?: string;
+			/**
+			 * Seed
+			 * @description If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed.
+			 */
+			seed?: number;
+		};
+		/** Body_Stream_chapter_audio_v1_projects__project_id__chapters__chapter_id__snapshots__chapter_snapshot_id__stream_post */
+		Body_Stream_chapter_audio_v1_projects__project_id__chapters__chapter_id__snapshots__chapter_snapshot_id__stream_post: {
+			/**
+			 * Convert To Mpeg
+			 * @description Whether to convert the audio to mpeg format.
+			 * @default false
+			 */
+			convert_to_mpeg: boolean;
+		};
+		/** Body_Stream_project_audio_v1_projects__project_id__snapshots__project_snapshot_id__stream_post */
+		Body_Stream_project_audio_v1_projects__project_id__snapshots__project_snapshot_id__stream_post: {
+			/**
+			 * Convert To Mpeg
+			 * @description Whether to convert the audio to mpeg format.
+			 * @default false
+			 */
+			convert_to_mpeg: boolean;
+		};
+		/** Body_Text_to_speech_streaming_v1_text_to_speech__voice_id__stream_post */
+		Body_Text_to_speech_streaming_v1_text_to_speech__voice_id__stream_post: {
+			/**
+			 * Text
+			 * @description The text that will get converted into speech.
+			 */
+			text: string;
+			/**
+			 * Model Id
+			 * @description Identifier of the model that will be used, you can query them using GET /v1/models. The model needs to have support for text to speech, you can check this using the can_do_text_to_speech property.
+			 * @default eleven_monolingual_v1
+			 */
+			model_id: string;
+			/**
+			 * Language Code
+			 * @description Language code (ISO 639-1) used to enforce a language for the model. Currently only Turbo v2.5 supports language enforcement. For other models, an error will be returned if language code is provided.
+			 */
+			language_code?: string;
+			/**
+			 * Voice Settings
+			 * @description Voice settings overriding stored setttings for the given voice. They are applied only on the given request.
+			 */
+			voice_settings?: components['schemas']['VoiceSettingsResponseModel'];
+			/**
+			 * Pronunciation Dictionary Locators
+			 * @description A list of pronunciation dictionary locators (id, version_id) to be applied to the text. They will be applied in order. You may have up to 3 locators per request
+			 * @default []
+			 */
+			pronunciation_dictionary_locators: components['schemas']['PronunciationDictionaryVersionLocatorDBModel'][];
+			/**
+			 * Seed
+			 * @description If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed.
+			 */
+			seed?: number;
+			/**
+			 * Previous Text
+			 * @description The text that came before the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
+			 */
+			previous_text?: string;
+			/**
+			 * Next Text
+			 * @description The text that comes after the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
+			 */
+			next_text?: string;
+			/**
+			 * Previous Request Ids
+			 * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both previous_text and previous_request_ids is send, previous_text will be ignored. A maximum of 3 request_ids can be send.
+			 * @default []
+			 */
+			previous_request_ids: string[];
+			/**
+			 * Next Request Ids
+			 * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both next_text and next_request_ids is send, next_text will be ignored. A maximum of 3 request_ids can be send.
+			 * @default []
+			 */
+			next_request_ids: string[];
+			/**
+			 * Use Pvc As Ivc
+			 * @deprecated
+			 * @description If true, we won't use PVC version of the voice for the generation but the IVC version. This is a temporary workaround for higher latency in PVC versions.
+			 * @default false
+			 */
+			use_pvc_as_ivc: boolean;
+		};
+		/** Body_Text_to_speech_streaming_with_timestamps_v1_text_to_speech__voice_id__stream_with_timestamps_post */
+		Body_Text_to_speech_streaming_with_timestamps_v1_text_to_speech__voice_id__stream_with_timestamps_post: {
+			/**
+			 * Text
+			 * @description The text that will get converted into speech.
+			 */
+			text: string;
+			/**
+			 * Model Id
+			 * @description Identifier of the model that will be used, you can query them using GET /v1/models. The model needs to have support for text to speech, you can check this using the can_do_text_to_speech property.
+			 * @default eleven_monolingual_v1
+			 */
+			model_id: string;
+			/**
+			 * Language Code
+			 * @description Language code (ISO 639-1) used to enforce a language for the model. Currently only Turbo v2.5 supports language enforcement. For other models, an error will be returned if language code is provided.
+			 */
+			language_code?: string;
+			/**
+			 * Voice Settings
+			 * @description Voice settings overriding stored setttings for the given voice. They are applied only on the given request.
+			 */
+			voice_settings?: components['schemas']['VoiceSettingsResponseModel'];
+			/**
+			 * Pronunciation Dictionary Locators
+			 * @description A list of pronunciation dictionary locators (id, version_id) to be applied to the text. They will be applied in order. You may have up to 3 locators per request
+			 * @default []
+			 */
+			pronunciation_dictionary_locators: components['schemas']['PronunciationDictionaryVersionLocatorDBModel'][];
+			/**
+			 * Seed
+			 * @description If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed.
+			 */
+			seed?: number;
+			/**
+			 * Previous Text
+			 * @description The text that came before the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
+			 */
+			previous_text?: string;
+			/**
+			 * Next Text
+			 * @description The text that comes after the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
+			 */
+			next_text?: string;
+			/**
+			 * Previous Request Ids
+			 * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both previous_text and previous_request_ids is send, previous_text will be ignored. A maximum of 3 request_ids can be send.
+			 * @default []
+			 */
+			previous_request_ids: string[];
+			/**
+			 * Next Request Ids
+			 * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both next_text and next_request_ids is send, next_text will be ignored. A maximum of 3 request_ids can be send.
+			 * @default []
+			 */
+			next_request_ids: string[];
+			/**
+			 * Use Pvc As Ivc
+			 * @deprecated
+			 * @description If true, we won't use PVC version of the voice for the generation but the IVC version. This is a temporary workaround for higher latency in PVC versions.
+			 * @default false
+			 */
+			use_pvc_as_ivc: boolean;
+		};
+		/** Body_Text_to_speech_v1_text_to_speech__voice_id__post */
+		Body_Text_to_speech_v1_text_to_speech__voice_id__post: {
+			/**
+			 * Text
+			 * @description The text that will get converted into speech.
+			 */
+			text: string;
+			/**
+			 * Model Id
+			 * @description Identifier of the model that will be used, you can query them using GET /v1/models. The model needs to have support for text to speech, you can check this using the can_do_text_to_speech property.
+			 * @default eleven_monolingual_v1
+			 */
+			model_id: string;
+			/**
+			 * Language Code
+			 * @description Language code (ISO 639-1) used to enforce a language for the model. Currently only Turbo v2.5 supports language enforcement. For other models, an error will be returned if language code is provided.
+			 */
+			language_code?: string;
+			/**
+			 * Voice Settings
+			 * @description Voice settings overriding stored setttings for the given voice. They are applied only on the given request.
+			 */
+			voice_settings?: components['schemas']['VoiceSettingsResponseModel'];
+			/**
+			 * Pronunciation Dictionary Locators
+			 * @description A list of pronunciation dictionary locators (id, version_id) to be applied to the text. They will be applied in order. You may have up to 3 locators per request
+			 * @default []
+			 */
+			pronunciation_dictionary_locators: components['schemas']['PronunciationDictionaryVersionLocatorDBModel'][];
+			/**
+			 * Seed
+			 * @description If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed.
+			 */
+			seed?: number;
+			/**
+			 * Previous Text
+			 * @description The text that came before the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
+			 */
+			previous_text?: string;
+			/**
+			 * Next Text
+			 * @description The text that comes after the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
+			 */
+			next_text?: string;
+			/**
+			 * Previous Request Ids
+			 * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both previous_text and previous_request_ids is send, previous_text will be ignored. A maximum of 3 request_ids can be send.
+			 * @default []
+			 */
+			previous_request_ids: string[];
+			/**
+			 * Next Request Ids
+			 * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both next_text and next_request_ids is send, next_text will be ignored. A maximum of 3 request_ids can be send.
+			 * @default []
+			 */
+			next_request_ids: string[];
+			/**
+			 * Use Pvc As Ivc
+			 * @deprecated
+			 * @description If true, we won't use PVC version of the voice for the generation but the IVC version. This is a temporary workaround for higher latency in PVC versions.
+			 * @default false
+			 */
+			use_pvc_as_ivc: boolean;
+		};
+		/** Body_Text_to_speech_with_timestamps_v1_text_to_speech__voice_id__with_timestamps_post */
+		Body_Text_to_speech_with_timestamps_v1_text_to_speech__voice_id__with_timestamps_post: {
+			/**
+			 * Text
+			 * @description The text that will get converted into speech.
+			 */
+			text: string;
+			/**
+			 * Model Id
+			 * @description Identifier of the model that will be used, you can query them using GET /v1/models. The model needs to have support for text to speech, you can check this using the can_do_text_to_speech property.
+			 * @default eleven_monolingual_v1
+			 */
+			model_id: string;
+			/**
+			 * Language Code
+			 * @description Language code (ISO 639-1) used to enforce a language for the model. Currently only Turbo v2.5 supports language enforcement. For other models, an error will be returned if language code is provided.
+			 */
+			language_code?: string;
+			/**
+			 * Voice Settings
+			 * @description Voice settings overriding stored setttings for the given voice. They are applied only on the given request.
+			 */
+			voice_settings?: components['schemas']['VoiceSettingsResponseModel'];
+			/**
+			 * Pronunciation Dictionary Locators
+			 * @description A list of pronunciation dictionary locators (id, version_id) to be applied to the text. They will be applied in order. You may have up to 3 locators per request
+			 * @default []
+			 */
+			pronunciation_dictionary_locators: components['schemas']['PronunciationDictionaryVersionLocatorDBModel'][];
+			/**
+			 * Seed
+			 * @description If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result. Determinism is not guaranteed.
+			 */
+			seed?: number;
+			/**
+			 * Previous Text
+			 * @description The text that came before the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
+			 */
+			previous_text?: string;
+			/**
+			 * Next Text
+			 * @description The text that comes after the text of the current request. Can be used to improve the flow of prosody when concatenating together multiple generations or to influence the prosody in the current generation.
+			 */
+			next_text?: string;
+			/**
+			 * Previous Request Ids
+			 * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both previous_text and previous_request_ids is send, previous_text will be ignored. A maximum of 3 request_ids can be send.
+			 * @default []
+			 */
+			previous_request_ids: string[];
+			/**
+			 * Next Request Ids
+			 * @description A list of request_id of the samples that were generated before this generation. Can be used to improve the flow of prosody when splitting up a large task into multiple requests. The results will be best when the same model is used across the generations. In case both next_text and next_request_ids is send, next_text will be ignored. A maximum of 3 request_ids can be send.
+			 * @default []
+			 */
+			next_request_ids: string[];
+			/**
+			 * Use Pvc As Ivc
+			 * @deprecated
+			 * @description If true, we won't use PVC version of the voice for the generation but the IVC version. This is a temporary workaround for higher latency in PVC versions.
+			 * @default false
+			 */
+			use_pvc_as_ivc: boolean;
+		};
+		/** Body_Update_Pronunciation_Dictionaries_v1_projects__project_id__update_pronunciation_dictionaries_post */
+		Body_Update_Pronunciation_Dictionaries_v1_projects__project_id__update_pronunciation_dictionaries_post: {
+			/**
+			 * Pronunciation Dictionary Locators
+			 * @description A list of pronunciation dictionary locators (pronunciation_dictionary_id, version_id) encoded as a list of JSON strings for pronunciation dictionaries to be applied to the text.  A list of json encoded strings is required as adding projects may occur through formData as opposed to jsonBody. To specify multiple dictionaries use multiple --form lines in your curl, such as --form 'pronunciation_dictionary_locators="{\"pronunciation_dictionary_id\":\"Vmd4Zor6fplcA7WrINey\",\"version_id\":\"hRPaxjlTdR7wFMhV4w0b\"}"' --form 'pronunciation_dictionary_locators="{\"pronunciation_dictionary_id\":\"JzWtcGQMJ6bnlWwyMo7e\",\"version_id\":\"lbmwxiLu4q6txYxgdZqn\"}"'. Note that multiple dictionaries are not currently supported by our UI which will only show the first.
+			 */
+			pronunciation_dictionary_locators: components['schemas']['PronunciationDictionaryVersionLocatorDBModel'][];
+		};
+		/** Body_Update_member_v1_workspace_members_post */
+		Body_Update_member_v1_workspace_members_post: {
+			/**
+			 * Email
+			 * @description Email of the target user.
+			 */
+			email: string;
+			/**
+			 * Is Locked
+			 * @description Whether to lock or unlock the user account.
+			 */
+			is_locked?: boolean;
+			/**
+			 * Workspace Role
+			 * @description Role dictating permissions in the workspace.
+			 * @enum {string}
+			 */
+			workspace_role?: 'workspace_admin' | 'workspace_member';
+		};
+		/** ChapterResponseModel */
+		ChapterResponseModel: {
+			/** Chapter Id */
+			chapter_id: string;
+			/** Name */
+			name: string;
+			/** Last Conversion Date Unix */
+			last_conversion_date_unix: number;
+			/** Last Block Conversion Unix Ms */
+			last_block_conversion_unix_ms: number;
+			/** Conversion Progress */
+			conversion_progress: number;
+			/** Can Be Downloaded */
+			can_be_downloaded: boolean;
+			/**
+			 * State
+			 * @enum {string}
+			 */
+			state: 'default' | 'converting';
+			statistics: components['schemas']['ChapterStatisticsResponseModel'];
+		};
+		/** ChapterSnapshotResponseModel */
+		ChapterSnapshotResponseModel: {
+			/** Chapter Snapshot Id */
+			chapter_snapshot_id: string;
+			/** Project Id */
+			project_id: string;
+			/** Chapter Id */
+			chapter_id: string;
+			/** Created At Unix */
+			created_at_unix: number;
+			/** Name */
+			name: string;
+		};
+		/** ChapterSnapshotsResponseModel */
+		ChapterSnapshotsResponseModel: {
+			/** Snapshots */
+			snapshots: components['schemas']['ChapterSnapshotResponseModel'][];
+		};
+		/** ChapterStatisticsResponseModel */
+		ChapterStatisticsResponseModel: {
+			/** Characters Unconverted */
+			characters_unconverted: number;
+			/** Characters Converted */
+			characters_converted: number;
+			/** Paragraphs Converted */
+			paragraphs_converted: number;
+			/** Paragraphs Unconverted */
+			paragraphs_unconverted: number;
+		};
+		/** DoDubbingResponseModel */
+		DoDubbingResponseModel: {
+			/** Dubbing Id */
+			dubbing_id: string;
+			/** Expected Duration Sec */
+			expected_duration_sec: number;
+		};
+		/** DubbingMetadataResponse */
+		DubbingMetadataResponse: {
+			/** Dubbing Id */
+			dubbing_id: string;
+			/** Name */
+			name: string;
+			/** Status */
+			status: string;
+			/** Target Languages */
+			target_languages: string[];
+			/** Error */
+			error?: string;
+		};
+		/** EditProjectResponseModel */
+		EditProjectResponseModel: {
+			project: components['schemas']['ProjectResponseModel'];
+		};
+		/** ExtendedSubscriptionResponseModel */
+		ExtendedSubscriptionResponseModel: {
+			/** Tier */
+			tier: string;
+			/** Character Count */
+			character_count: number;
+			/** Character Limit */
+			character_limit: number;
+			/** Can Extend Character Limit */
+			can_extend_character_limit: boolean;
+			/** Allowed To Extend Character Limit */
+			allowed_to_extend_character_limit: boolean;
+			/** Next Character Count Reset Unix */
+			next_character_count_reset_unix: number;
+			/** Voice Limit */
+			voice_limit: number;
+			/** Max Voice Add Edits */
+			max_voice_add_edits: number;
+			/** Voice Add Edit Counter */
+			voice_add_edit_counter: number;
+			/** Professional Voice Limit */
+			professional_voice_limit: number;
+			/** Can Extend Voice Limit */
+			can_extend_voice_limit: boolean;
+			/** Can Use Instant Voice Cloning */
+			can_use_instant_voice_cloning: boolean;
+			/** Can Use Professional Voice Cloning */
+			can_use_professional_voice_cloning: boolean;
+			/**
+			 * Currency
+			 * @enum {string}
+			 */
+			currency: 'usd' | 'eur';
+			/**
+			 * Status
+			 * @enum {string}
+			 */
+			status:
+				| 'trialing'
+				| 'active'
+				| 'incomplete'
+				| 'incomplete_expired'
+				| 'past_due'
+				| 'canceled'
+				| 'unpaid'
+				| 'free';
+			/**
+			 * Billing Period
+			 * @enum {string}
+			 */
+			billing_period: 'monthly_period' | 'annual_period';
+			/**
+			 * Character Refresh Period
+			 * @enum {string}
+			 */
+			character_refresh_period: 'monthly_period' | 'annual_period';
+			next_invoice: components['schemas']['InvoiceResponseModel'];
+			/** Has Open Invoices */
+			has_open_invoices: boolean;
+		};
+		/** FeedbackResponseModel */
+		FeedbackResponseModel: {
+			/** Thumbs Up */
+			thumbs_up: boolean;
+			/** Feedback */
+			feedback: string;
+			/** Emotions */
+			emotions: boolean;
+			/** Inaccurate Clone */
+			inaccurate_clone: boolean;
+			/** Glitches */
+			glitches: boolean;
+			/** Audio Quality */
+			audio_quality: boolean;
+			/** Other */
+			other: boolean;
+			/**
+			 * Review Status
+			 * @default not_reviewed
+			 */
+			review_status: string;
+		};
+		/** FineTuningResponseModel */
+		FineTuningResponseModel: {
+			/** Is Allowed To Fine Tune */
+			is_allowed_to_fine_tune: boolean;
+			/** State */
+			state: {
+				[key: string]:
+					| 'not_started'
+					| 'queued'
+					| 'fine_tuning'
+					| 'fine_tuned'
+					| 'failed'
+					| 'delayed';
+			};
+			/** Verification Failures */
+			verification_failures: string[];
+			/** Verification Attempts Count */
+			verification_attempts_count: number;
+			/** Manual Verification Requested */
+			manual_verification_requested: boolean;
+			/** Language */
+			language?: string;
+			/** Progress */
+			progress?: {
+				[key: string]: number;
+			};
+			/** Message */
+			message?: {
+				[key: string]: string;
+			};
+			/** Dataset Duration Seconds */
+			dataset_duration_seconds?: number;
+			/** Verification Attempts */
+			verification_attempts?: components['schemas']['VerificationAttemptResponseModel'][];
+			/** Slice Ids */
+			slice_ids?: string[];
+			manual_verification?: components['schemas']['ManualVerificationResponseModel'];
+		};
+		/** GetChaptersResponseModel */
+		GetChaptersResponseModel: {
+			/** Chapters */
+			chapters: components['schemas']['ChapterResponseModel'][];
+		};
+		/** GetLibraryVoicesResponseModel */
+		GetLibraryVoicesResponseModel: {
+			/** Voices */
+			voices: components['schemas']['LibraryVoiceResponseModel'][];
+			/** Has More */
+			has_more: boolean;
+			/** Last Sort Id */
+			last_sort_id?: string;
+		};
+		/** GetProjectsResponseModel */
+		GetProjectsResponseModel: {
+			/** Projects */
+			projects: components['schemas']['ProjectResponseModel'][];
+		};
+		/** GetPronunciationDictionariesMetadataResponseModel */
+		GetPronunciationDictionariesMetadataResponseModel: {
+			/** Pronunciation Dictionaries */
+			pronunciation_dictionaries: components['schemas']['GetPronunciationDictionaryMetadataResponseModel'][];
+			/** Next Cursor */
+			next_cursor: string;
+			/** Has More */
+			has_more: boolean;
+		};
+		/** GetPronunciationDictionaryMetadataResponseModel */
+		GetPronunciationDictionaryMetadataResponseModel: {
+			/** Id */
+			id: string;
+			/** Latest Version Id */
+			latest_version_id: string;
+			/** Name */
+			name: string;
+			/** Created By */
+			created_by: string;
+			/** Creation Time Unix */
+			creation_time_unix: number;
+			/** Description */
+			description?: string;
+		};
+		/** GetSpeechHistoryResponseModel */
+		GetSpeechHistoryResponseModel: {
+			/** History */
+			history: components['schemas']['SpeechHistoryItemResponseModel'][];
+			/** Last History Item Id */
+			last_history_item_id: string;
+			/** Has More */
+			has_more: boolean;
+		};
+		/** GetVoicesResponseModel */
+		GetVoicesResponseModel: {
+			/** Voices */
+			voices: components['schemas']['VoiceResponseModel'][];
+		};
+		/** HTTPValidationError */
+		HTTPValidationError: {
+			/** Detail */
+			detail?: components['schemas']['ValidationError'][];
+		};
+		/** HistoryAlignmentResponseModel */
+		HistoryAlignmentResponseModel: {
+			/** Characters */
+			characters: string[];
+			/** Character Start Times Seconds */
+			character_start_times_seconds: number[];
+			/** Character End Times Seconds */
+			character_end_times_seconds: number[];
+		};
+		/** HistoryAlignmentsResponseModel */
+		HistoryAlignmentsResponseModel: {
+			alignment: components['schemas']['HistoryAlignmentResponseModel'];
+			normalized_alignment: components['schemas']['HistoryAlignmentResponseModel'];
+		};
+		/** InvoiceResponseModel */
+		InvoiceResponseModel: {
+			/** Amount Due Cents */
+			amount_due_cents: number;
+			/** Next Payment Attempt Unix */
+			next_payment_attempt_unix: number;
+		};
+		/** LanguageResponseModel */
+		LanguageResponseModel: {
+			/** Language Id */
+			language_id: string;
+			/** Name */
+			name: string;
+		};
+		/** LibraryVoiceResponseModel */
+		LibraryVoiceResponseModel: {
+			/** Public Owner Id */
+			public_owner_id: string;
+			/** Voice Id */
+			voice_id: string;
+			/** Date Unix */
+			date_unix: number;
+			/** Name */
+			name: string;
+			/** Accent */
+			accent: string;
+			/** Gender */
+			gender: string;
+			/** Age */
+			age: string;
+			/** Descriptive */
+			descriptive: string;
+			/** Use Case */
+			use_case: string;
+			/**
+			 * Category
+			 * @enum {string}
+			 */
+			category: 'generated' | 'cloned' | 'premade' | 'professional' | 'famous' | 'high_quality';
+			/** Language */
+			language: string;
+			/** Description */
+			description: string;
+			/** Preview Url */
+			preview_url: string;
+			/** Usage Character Count 1Y */
+			usage_character_count_1y: number;
+			/** Usage Character Count 7D */
+			usage_character_count_7d: number;
+			/** Play Api Usage Character Count 1Y */
+			play_api_usage_character_count_1y: number;
+			/** Cloned By Count */
+			cloned_by_count: number;
+			/** Rate */
+			rate: number;
+			/** Free Users Allowed */
+			free_users_allowed: boolean;
+			/** Live Moderation Enabled */
+			live_moderation_enabled: boolean;
+			/** Featured */
+			featured: boolean;
+			/** Notice Period */
+			notice_period?: number;
+			/** Instagram Username */
+			instagram_username?: string;
+			/** Twitter Username */
+			twitter_username?: string;
+			/** Youtube Username */
+			youtube_username?: string;
+			/** Tiktok Username */
+			tiktok_username?: string;
+			/** Image Url */
+			image_url?: string;
+		};
+		/** ManualVerificationFileResponseModel */
+		ManualVerificationFileResponseModel: {
+			/** File Id */
+			file_id: string;
+			/** File Name */
+			file_name: string;
+			/** Mime Type */
+			mime_type: string;
+			/** Size Bytes */
+			size_bytes: number;
+			/** Upload Date Unix */
+			upload_date_unix: number;
+		};
+		/** ManualVerificationResponseModel */
+		ManualVerificationResponseModel: {
+			/** Extra Text */
+			extra_text: string;
+			/** Request Time Unix */
+			request_time_unix: number;
+			/** Files */
+			files: components['schemas']['ManualVerificationFileResponseModel'][];
+		};
+		/** ModelRatesResponseModel */
+		ModelRatesResponseModel: {
+			/** Character Cost Multiplier */
+			character_cost_multiplier: number;
+		};
+		/** ModelResponseModel */
+		ModelResponseModel: {
+			/** Model Id */
+			model_id: string;
+			/** Name */
+			name: string;
+			/** Can Be Finetuned */
+			can_be_finetuned: boolean;
+			/** Can Do Text To Speech */
+			can_do_text_to_speech: boolean;
+			/** Can Do Voice Conversion */
+			can_do_voice_conversion: boolean;
+			/** Can Use Style */
+			can_use_style: boolean;
+			/** Can Use Speaker Boost */
+			can_use_speaker_boost: boolean;
+			/** Serves Pro Voices */
+			serves_pro_voices: boolean;
+			/** Token Cost Factor */
+			token_cost_factor: number;
+			/** Description */
+			description: string;
+			/** Requires Alpha Access */
+			requires_alpha_access: boolean;
+			/** Max Characters Request Free User */
+			max_characters_request_free_user: number;
+			/** Max Characters Request Subscribed User */
+			max_characters_request_subscribed_user: number;
+			/** Maximum Text Length Per Request */
+			maximum_text_length_per_request: number;
+			/** Languages */
+			languages: components['schemas']['LanguageResponseModel'][];
+			model_rates: components['schemas']['ModelRatesResponseModel'];
+			/**
+			 * Concurrency Group
+			 * @enum {string}
+			 */
+			concurrency_group: 'standard' | 'turbo';
+		};
+		/** ProfilePageResponseModel */
+		ProfilePageResponseModel: {
+			/** Handle */
+			handle: string;
+			/** Public User Id */
+			public_user_id: string;
+			/** Name */
+			name: string;
+			/** Bio */
+			bio: string;
+			/** Profile Picture */
+			profile_picture: string;
+		};
+		/** ProjectExtendedResponseModel */
+		ProjectExtendedResponseModel: {
+			/** Project Id */
+			project_id: string;
+			/** Name */
+			name: string;
+			/** Create Date Unix */
+			create_date_unix: number;
+			/** Default Title Voice Id */
+			default_title_voice_id: string;
+			/** Default Paragraph Voice Id */
+			default_paragraph_voice_id: string;
+			/** Default Model Id */
+			default_model_id: string;
+			/**
+			 * Quality Preset
+			 * @enum {string}
+			 */
+			quality_preset: 'standard' | 'high' | 'highest' | 'ultra' | 'ultra_lossless';
+			/** Last Conversion Date Unix */
+			last_conversion_date_unix: number;
+			/** Can Be Downloaded */
+			can_be_downloaded: boolean;
+			/**
+			 * State
+			 * @enum {string}
+			 */
+			state: 'default' | 'converting' | 'in_queue';
+			/** Chapters */
+			chapters: components['schemas']['ChapterResponseModel'][];
+			/** Pronunciation Dictionary Versions */
+			pronunciation_dictionary_versions: components['schemas']['PronunciationDictionaryVersionResponseModel'][];
+			/** Volume Normalization */
+			volume_normalization: boolean;
+			/** Title */
+			title: string;
+			/** Author */
+			author: string;
+			/** Isbn Number */
+			isbn_number: string;
+		};
+		/** ProjectResponseModel */
+		ProjectResponseModel: {
+			/** Project Id */
+			project_id: string;
+			/** Name */
+			name: string;
+			/** Create Date Unix */
+			create_date_unix: number;
+			/** Default Title Voice Id */
+			default_title_voice_id: string;
+			/** Default Paragraph Voice Id */
+			default_paragraph_voice_id: string;
+			/** Default Model Id */
+			default_model_id: string;
+			/** Last Conversion Date Unix */
+			last_conversion_date_unix: number;
+			/** Can Be Downloaded */
+			can_be_downloaded: boolean;
+			/** Title */
+			title: string;
+			/** Author */
+			author: string;
+			/** Isbn Number */
+			isbn_number: string;
+			/** Volume Normalization */
+			volume_normalization: boolean;
+			/**
+			 * State
+			 * @enum {string}
+			 */
+			state: 'default' | 'converting' | 'in_queue';
+		};
+		/** ProjectSnapshotResponseModel */
+		ProjectSnapshotResponseModel: {
+			/** Project Snapshot Id */
+			project_snapshot_id: string;
+			/** Project Id */
+			project_id: string;
+			/** Created At Unix */
+			created_at_unix: number;
+			/** Name */
+			name: string;
+			audio_upload?: components['schemas']['ProjectSnapshotUploadResponseModel'];
+			zip_upload?: components['schemas']['ProjectSnapshotUploadResponseModel'];
+		};
+		/** ProjectSnapshotUploadResponseModel */
+		ProjectSnapshotUploadResponseModel: {
+			/**
+			 * Status
+			 * @enum {string}
+			 */
+			status: 'success' | 'in_queue' | 'pending' | 'failed';
+			/** Acx Volume Normalization */
+			acx_volume_normalization?: boolean;
+		};
+		/** ProjectSnapshotsResponseModel */
+		ProjectSnapshotsResponseModel: {
+			/** Snapshots */
+			snapshots: components['schemas']['ProjectSnapshotResponseModel'][];
+		};
+		/** PronunciationDictionaryAliasRuleRequestModel */
+		PronunciationDictionaryAliasRuleRequestModel: {
+			/**
+			 * Type
+			 * @enum {string}
+			 */
+			type: 'alias';
+			/** String To Replace */
+			string_to_replace: string;
+			/** Alias */
+			alias: string;
+		};
+		/** PronunciationDictionaryPhonemeRuleRequestModel */
+		PronunciationDictionaryPhonemeRuleRequestModel: {
+			/**
+			 * Type
+			 * @enum {string}
+			 */
+			type: 'phoneme';
+			/** String To Replace */
+			string_to_replace: string;
+			/** Phoneme */
+			phoneme: string;
+			/** Alphabet */
+			alphabet: string;
+		};
+		/** PronunciationDictionaryVersionLocatorDBModel */
+		PronunciationDictionaryVersionLocatorDBModel: {
+			/** Pronunciation Dictionary Id */
+			pronunciation_dictionary_id: string;
+			/** Version Id */
+			version_id: string;
+		};
+		/** PronunciationDictionaryVersionResponseModel */
+		PronunciationDictionaryVersionResponseModel: {
+			/** Version Id */
+			version_id: string;
+			/** Pronunciation Dictionary Id */
+			pronunciation_dictionary_id: string;
+			/** Dictionary Name */
+			dictionary_name: string;
+			/** Version Name */
+			version_name: string;
+			/** Created By */
+			created_by: string;
+			/** Creation Time Unix */
+			creation_time_unix: number;
+		};
+		/** RecordingResponseModel */
+		RecordingResponseModel: {
+			/** Recording Id */
+			recording_id: string;
+			/** Mime Type */
+			mime_type: string;
+			/** Size Bytes */
+			size_bytes: number;
+			/** Upload Date Unix */
+			upload_date_unix: number;
+			/** Transcription */
+			transcription: string;
+		};
+		/** RemovePronunciationDictionaryRulesResponseModel */
+		RemovePronunciationDictionaryRulesResponseModel: {
+			/** Id */
+			id: string;
+			/** Version Id */
+			version_id: string;
+		};
+		/** SampleResponseModel */
+		SampleResponseModel: {
+			/** Sample Id */
+			sample_id: string;
+			/** File Name */
+			file_name: string;
+			/** Mime Type */
+			mime_type: string;
+			/** Size Bytes */
+			size_bytes: number;
+			/** Hash */
+			hash: string;
+		};
+		/** SpeechHistoryItemResponseModel */
+		SpeechHistoryItemResponseModel: {
+			/** History Item Id */
+			history_item_id: string;
+			/** Request Id */
+			request_id: string;
+			/** Voice Id */
+			voice_id: string;
+			/** Model Id */
+			model_id: string;
+			/** Voice Name */
+			voice_name: string;
+			/**
+			 * Voice Category
+			 * @enum {string}
+			 */
+			voice_category: 'premade' | 'cloned' | 'generated' | 'professional';
+			/** Text */
+			text: string;
+			/** Date Unix */
+			date_unix: number;
+			/** Character Count Change From */
+			character_count_change_from: number;
+			/** Character Count Change To */
+			character_count_change_to: number;
+			/** Content Type */
+			content_type: string;
+			/**
+			 * State
+			 * @enum {string}
+			 */
+			state: 'created' | 'deleted' | 'processing';
+			/** Settings */
+			settings: Record<string, never>;
+			feedback: components['schemas']['FeedbackResponseModel'];
+			/** Share Link Id */
+			share_link_id: string;
+			/**
+			 * Source
+			 * @enum {string}
+			 */
+			source: 'TTS' | 'STS';
+			alignments?: components['schemas']['HistoryAlignmentsResponseModel'];
+		};
+		/** SsoProviderResponseModel */
+		SsoProviderResponseModel: {
+			/**
+			 * Provider Type
+			 * @enum {string}
+			 */
+			provider_type: 'saml' | 'oidc';
+			/** Provider Id */
+			provider_id: string;
+			/** Domains */
+			domains: string[];
+		};
+		/** SubscriptionResponseModel */
+		SubscriptionResponseModel: {
+			/** Tier */
+			tier: string;
+			/** Character Count */
+			character_count: number;
+			/** Character Limit */
+			character_limit: number;
+			/** Can Extend Character Limit */
+			can_extend_character_limit: boolean;
+			/** Allowed To Extend Character Limit */
+			allowed_to_extend_character_limit: boolean;
+			/** Next Character Count Reset Unix */
+			next_character_count_reset_unix: number;
+			/** Voice Limit */
+			voice_limit: number;
+			/** Max Voice Add Edits */
+			max_voice_add_edits: number;
+			/** Voice Add Edit Counter */
+			voice_add_edit_counter: number;
+			/** Professional Voice Limit */
+			professional_voice_limit: number;
+			/** Can Extend Voice Limit */
+			can_extend_voice_limit: boolean;
+			/** Can Use Instant Voice Cloning */
+			can_use_instant_voice_cloning: boolean;
+			/** Can Use Professional Voice Cloning */
+			can_use_professional_voice_cloning: boolean;
+			/**
+			 * Currency
+			 * @enum {string}
+			 */
+			currency: 'usd' | 'eur';
+			/**
+			 * Status
+			 * @enum {string}
+			 */
+			status:
+				| 'trialing'
+				| 'active'
+				| 'incomplete'
+				| 'incomplete_expired'
+				| 'past_due'
+				| 'canceled'
+				| 'unpaid'
+				| 'free';
+			/**
+			 * Billing Period
+			 * @enum {string}
+			 */
+			billing_period: 'monthly_period' | 'annual_period';
+			/**
+			 * Character Refresh Period
+			 * @enum {string}
+			 */
+			character_refresh_period: 'monthly_period' | 'annual_period';
+		};
+		/** UsageCharactersResponseModel */
+		UsageCharactersResponseModel: {
+			/** Time */
+			time: number[];
+			/** Usage */
+			usage: {
+				[key: string]: number[];
+			};
+		};
+		/** UserResponseModel */
+		UserResponseModel: {
+			subscription: components['schemas']['SubscriptionResponseModel'];
+			/** Is New User */
+			is_new_user: boolean;
+			/** Xi Api Key */
+			xi_api_key: string;
+			/** Can Use Delayed Payment Methods */
+			can_use_delayed_payment_methods: boolean;
+			/** Is Onboarding Completed */
+			is_onboarding_completed: boolean;
+			/** Is Onboarding Checklist Completed */
+			is_onboarding_checklist_completed: boolean;
+			/** First Name */
+			first_name?: string;
+			/**
+			 * Is Api Key Hashed
+			 * @default false
+			 */
+			is_api_key_hashed: boolean;
+			/** Xi Api Key Preview */
+			xi_api_key_preview?: string;
+		};
+		/** ValidationError */
+		ValidationError: {
+			/** Location */
+			loc: (string | number)[];
+			/** Message */
+			msg: string;
+			/** Error Type */
+			type: string;
+		};
+		/** VerificationAttemptResponseModel */
+		VerificationAttemptResponseModel: {
+			/** Text */
+			text: string;
+			/** Date Unix */
+			date_unix: number;
+			/** Accepted */
+			accepted: boolean;
+			/** Similarity */
+			similarity: number;
+			/** Levenshtein Distance */
+			levenshtein_distance: number;
+			recording?: components['schemas']['RecordingResponseModel'];
+		};
+		/** VoiceGenerationParameterOptionResponseModel */
+		VoiceGenerationParameterOptionResponseModel: {
+			/** Name */
+			name: string;
+			/** Code */
+			code: string;
+		};
+		/** VoiceGenerationParameterResponseModel */
+		VoiceGenerationParameterResponseModel: {
+			/** Genders */
+			genders: components['schemas']['VoiceGenerationParameterOptionResponseModel'][];
+			/** Accents */
+			accents: components['schemas']['VoiceGenerationParameterOptionResponseModel'][];
+			/** Ages */
+			ages: components['schemas']['VoiceGenerationParameterOptionResponseModel'][];
+			/** Minimum Characters */
+			minimum_characters: number;
+			/** Maximum Characters */
+			maximum_characters: number;
+			/** Minimum Accent Strength */
+			minimum_accent_strength: number;
+			/** Maximum Accent Strength */
+			maximum_accent_strength: number;
+		};
+		/** VoiceResponseModel */
+		VoiceResponseModel: {
+			/** Voice Id */
+			voice_id: string;
+			/** Name */
+			name: string;
+			/** Samples */
+			samples: components['schemas']['SampleResponseModel'][];
+			/**
+			 * Category
+			 * @enum {string}
+			 */
+			category: 'generated' | 'cloned' | 'premade' | 'professional' | 'famous' | 'high_quality';
+			fine_tuning: components['schemas']['FineTuningResponseModel'];
+			/** Labels */
+			labels: {
+				[key: string]: string;
+			};
+			/** Description */
+			description: string;
+			/** Preview Url */
+			preview_url: string;
+			/** Available For Tiers */
+			available_for_tiers: string[];
+			settings: components['schemas']['VoiceSettingsResponseModel'];
+			sharing: components['schemas']['VoiceSharingResponseModel'];
+			/** High Quality Base Model Ids */
+			high_quality_base_model_ids: string[];
+			/**
+			 * Safety Control
+			 * @enum {string}
+			 */
+			safety_control?: 'NONE' | 'BAN' | 'CAPTCHA' | 'CAPTCHA_AND_MODERATION';
+			voice_verification?: components['schemas']['VoiceVerificationResponseModel'];
+			/** Permission On Resource */
+			permission_on_resource?: string;
+			/**
+			 * Is Legacy
+			 * @default false
+			 */
+			is_legacy: boolean;
+			/**
+			 * Is Mixed
+			 * @default false
+			 */
+			is_mixed: boolean;
+		};
+		/** VoiceSettingsResponseModel */
+		VoiceSettingsResponseModel: {
+			/** Stability */
+			stability: number;
+			/** Similarity Boost */
+			similarity_boost: number;
+			/**
+			 * Style
+			 * @default 0
+			 */
+			style: number;
+			/**
+			 * Use Speaker Boost
+			 * @default true
+			 */
+			use_speaker_boost: boolean;
+		};
+		/** VoiceSharingResponseModel */
+		VoiceSharingResponseModel: {
+			/**
+			 * Status
+			 * @enum {string}
+			 */
+			status: 'enabled' | 'disabled' | 'copied' | 'copied_disabled';
+			/** History Item Sample Id */
+			history_item_sample_id: string;
+			/** Date Unix */
+			date_unix: number;
+			/** Whitelisted Emails */
+			whitelisted_emails: string[];
+			/** Public Owner Id */
+			public_owner_id: string;
+			/** Original Voice Id */
+			original_voice_id: string;
+			/** Financial Rewards Enabled */
+			financial_rewards_enabled: boolean;
+			/** Free Users Allowed */
+			free_users_allowed: boolean;
+			/** Live Moderation Enabled */
+			live_moderation_enabled: boolean;
+			/** Rate */
+			rate: number;
+			/** Notice Period */
+			notice_period: number;
+			/** Disable At Unix */
+			disable_at_unix: number;
+			/** Voice Mixing Allowed */
+			voice_mixing_allowed: boolean;
+			/** Featured */
+			featured: boolean;
+			/**
+			 * Category
+			 * @enum {string}
+			 */
+			category: 'generated' | 'professional' | 'high_quality' | 'famous';
+			/** Reader App Enabled */
+			reader_app_enabled: boolean;
+			/** Image Url */
+			image_url: string;
+			/** Ban Reason */
+			ban_reason: string;
+			/** Liked By Count */
+			liked_by_count: number;
+			/** Cloned By Count */
+			cloned_by_count: number;
+			/** Name */
+			name: string;
+			/** Description */
+			description: string;
+			/** Labels */
+			labels: {
+				[key: string]: string;
+			};
+			/**
+			 * Review Status
+			 * @enum {string}
+			 */
+			review_status: 'not_requested' | 'pending' | 'declined' | 'allowed' | 'allowed_with_changes';
+			/** Review Message */
+			review_message: string;
+			/** Enabled In Library */
+			enabled_in_library: boolean;
+			/** Instagram Username */
+			instagram_username?: string;
+			/** Twitter Username */
+			twitter_username?: string;
+			/** Youtube Username */
+			youtube_username?: string;
+			/** Tiktok Username */
+			tiktok_username?: string;
+		};
+		/** VoiceVerificationResponseModel */
+		VoiceVerificationResponseModel: {
+			/** Requires Verification */
+			requires_verification: boolean;
+			/** Is Verified */
+			is_verified: boolean;
+			/** Verification Failures */
+			verification_failures: string[];
+			/** Verification Attempts Count */
+			verification_attempts_count: number;
+			/** Language */
+			language?: string;
+			/** Verification Attempts */
+			verification_attempts?: components['schemas']['VerificationAttemptResponseModel'][];
+		};
+	};
+	responses: never;
+	parameters: never;
+	requestBodies: never;
+	headers: never;
+	pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    Get_generated_items_v1_history_get: {
-        parameters: {
-            query?: {
-                /** @description How many history items to return at maximum. Can not exceed 1000, defaults to 100. */
-                page_size?: number;
-                /** @description After which ID to start fetching, use this parameter to paginate across a large collection of history items. In case this parameter is not provided history items will be fetched starting from the most recently created one ordered descending by their creation date. */
-                start_after_history_item_id?: string;
-                /** @description Voice ID to be filtered for, you can use GET https://api.elevenlabs.io/v1/voices to receive a list of voices and their IDs. */
-                voice_id?: string;
-            };
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GetSpeechHistoryResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_history_item_by_ID_v1_history__history_item_id__get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description History item ID to be used, you can use GET https://api.elevenlabs.io/v1/history to receive a list of history items and their IDs.
-                 * @example VW7YKqPnjY4h39yTbx2L
-                 */
-                history_item_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SpeechHistoryItemResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Delete_history_item_v1_history__history_item_id__delete: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description History item ID to be used, you can use GET https://api.elevenlabs.io/v1/history to receive a list of history items and their IDs.
-                 * @example VW7YKqPnjY4h39yTbx2L
-                 */
-                history_item_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_audio_from_history_item_v1_history__history_item_id__audio_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description History item ID to be used, you can use GET https://api.elevenlabs.io/v1/history to receive a list of history items and their IDs.
-                 * @example VW7YKqPnjY4h39yTbx2L
-                 */
-                history_item_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "audio/mpeg": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Download_history_items_v1_history_download_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Download_history_items_v1_history_download_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Sound_Generation_v1_sound_generation_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Sound_Generation_v1_sound_generation_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "audio/mpeg": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Audio_Isolation_v1_audio_isolation_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": components["schemas"]["Body_Audio_Isolation_v1_audio_isolation_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "audio/mpeg": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Audio_Isolation_Stream_v1_audio_isolation_stream_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": components["schemas"]["Body_Audio_Isolation_Stream_v1_audio_isolation_stream_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "audio/mpeg": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Delete_sample_v1_voices__voice_id__samples__sample_id__delete: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                voice_id: string;
-                /**
-                 * @description Sample ID to be used, you can use GET https://api.elevenlabs.io/v1/voices/{voice_id} to list all the available samples for a voice.
-                 * @example VW7YKqPnjY4h39yTbx2L
-                 */
-                sample_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_audio_from_sample_v1_voices__voice_id__samples__sample_id__audio_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                voice_id: string;
-                /**
-                 * @description Sample ID to be used, you can use GET https://api.elevenlabs.io/v1/voices/{voice_id} to list all the available samples for a voice.
-                 * @example VW7YKqPnjY4h39yTbx2L
-                 */
-                sample_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "audio/*": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Text_to_speech_v1_text_to_speech__voice_id__post: {
-        parameters: {
-            query?: {
-                /** @description When enable_logging is set to false full privacy mode will be used for the request. This will mean history features are unavailable for this request, including request stitching. Full privacy mode may only be used by enterprise customers. */
-                enable_logging?: boolean;
-                /**
-                 * @deprecated
-                 * @description You can turn on latency optimizations at some cost of quality. The best possible final latency varies by model. Possible values:
-                 *     0 - default mode (no latency optimizations)
-                 *     1 - normal latency optimizations (about 50% of possible latency improvement of option 3)
-                 *     2 - strong latency optimizations (about 75% of possible latency improvement of option 3)
-                 *     3 - max latency optimizations
-                 *     4 - max latency optimizations, but also with text normalizer turned off for even more latency savings (best latency, but can mispronounce eg numbers and dates).
-                 *
-                 *     Defaults to None.
-                 *
-                 */
-                optimize_streaming_latency?: number;
-                /** @description Output format of the generated audio. Must be one of:
-                 *     mp3_22050_32 - output format, mp3 with 22.05kHz sample rate at 32kbps.
-                 *     mp3_44100_32 - output format, mp3 with 44.1kHz sample rate at 32kbps.
-                 *     mp3_44100_64 - output format, mp3 with 44.1kHz sample rate at 64kbps.
-                 *     mp3_44100_96 - output format, mp3 with 44.1kHz sample rate at 96kbps.
-                 *     mp3_44100_128 - default output format, mp3 with 44.1kHz sample rate at 128kbps.
-                 *     mp3_44100_192 - output format, mp3 with 44.1kHz sample rate at 192kbps. Requires you to be subscribed to Creator tier or above.
-                 *     pcm_16000 - PCM format (S16LE) with 16kHz sample rate.
-                 *     pcm_22050 - PCM format (S16LE) with 22.05kHz sample rate.
-                 *     pcm_24000 - PCM format (S16LE) with 24kHz sample rate.
-                 *     pcm_44100 - PCM format (S16LE) with 44.1kHz sample rate. Requires you to be subscribed to Pro tier or above.
-                 *     ulaw_8000 - μ-law format (sometimes written mu-law, often approximated as u-law) with 8kHz sample rate. Note that this format is commonly used for Twilio audio inputs.
-                 *      */
-                output_format?: string;
-            };
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                voice_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Text_to_speech_v1_text_to_speech__voice_id__post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "audio/mpeg": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Text_to_speech_with_timestamps_v1_text_to_speech__voice_id__with_timestamps_post: {
-        parameters: {
-            query?: {
-                /** @description When enable_logging is set to false full privacy mode will be used for the request. This will mean history features are unavailable for this request, including request stitching. Full privacy mode may only be used by enterprise customers. */
-                enable_logging?: boolean;
-                /**
-                 * @deprecated
-                 * @description You can turn on latency optimizations at some cost of quality. The best possible final latency varies by model. Possible values:
-                 *     0 - default mode (no latency optimizations)
-                 *     1 - normal latency optimizations (about 50% of possible latency improvement of option 3)
-                 *     2 - strong latency optimizations (about 75% of possible latency improvement of option 3)
-                 *     3 - max latency optimizations
-                 *     4 - max latency optimizations, but also with text normalizer turned off for even more latency savings (best latency, but can mispronounce eg numbers and dates).
-                 *
-                 *     Defaults to None.
-                 *
-                 */
-                optimize_streaming_latency?: number;
-                /** @description Output format of the generated audio. Must be one of:
-                 *     mp3_22050_32 - output format, mp3 with 22.05kHz sample rate at 32kbps.
-                 *     mp3_44100_32 - output format, mp3 with 44.1kHz sample rate at 32kbps.
-                 *     mp3_44100_64 - output format, mp3 with 44.1kHz sample rate at 64kbps.
-                 *     mp3_44100_96 - output format, mp3 with 44.1kHz sample rate at 96kbps.
-                 *     mp3_44100_128 - default output format, mp3 with 44.1kHz sample rate at 128kbps.
-                 *     mp3_44100_192 - output format, mp3 with 44.1kHz sample rate at 192kbps. Requires you to be subscribed to Creator tier or above.
-                 *     pcm_16000 - PCM format (S16LE) with 16kHz sample rate.
-                 *     pcm_22050 - PCM format (S16LE) with 22.05kHz sample rate.
-                 *     pcm_24000 - PCM format (S16LE) with 24kHz sample rate.
-                 *     pcm_44100 - PCM format (S16LE) with 44.1kHz sample rate. Requires you to be subscribed to Pro tier or above.
-                 *     ulaw_8000 - μ-law format (sometimes written mu-law, often approximated as u-law) with 8kHz sample rate. Note that this format is commonly used for Twilio audio inputs.
-                 *      */
-                output_format?: string;
-            };
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                voice_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Text_to_speech_with_timestamps_v1_text_to_speech__voice_id__with_timestamps_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Text_to_speech_streaming_v1_text_to_speech__voice_id__stream_post: {
-        parameters: {
-            query?: {
-                /** @description When enable_logging is set to false full privacy mode will be used for the request. This will mean history features are unavailable for this request, including request stitching. Full privacy mode may only be used by enterprise customers. */
-                enable_logging?: boolean;
-                /**
-                 * @deprecated
-                 * @description You can turn on latency optimizations at some cost of quality. The best possible final latency varies by model. Possible values:
-                 *     0 - default mode (no latency optimizations)
-                 *     1 - normal latency optimizations (about 50% of possible latency improvement of option 3)
-                 *     2 - strong latency optimizations (about 75% of possible latency improvement of option 3)
-                 *     3 - max latency optimizations
-                 *     4 - max latency optimizations, but also with text normalizer turned off for even more latency savings (best latency, but can mispronounce eg numbers and dates).
-                 *
-                 *     Defaults to None.
-                 *
-                 */
-                optimize_streaming_latency?: number;
-                /** @description Output format of the generated audio. Must be one of:
-                 *     mp3_22050_32 - output format, mp3 with 22.05kHz sample rate at 32kbps.
-                 *     mp3_44100_32 - output format, mp3 with 44.1kHz sample rate at 32kbps.
-                 *     mp3_44100_64 - output format, mp3 with 44.1kHz sample rate at 64kbps.
-                 *     mp3_44100_96 - output format, mp3 with 44.1kHz sample rate at 96kbps.
-                 *     mp3_44100_128 - default output format, mp3 with 44.1kHz sample rate at 128kbps.
-                 *     mp3_44100_192 - output format, mp3 with 44.1kHz sample rate at 192kbps. Requires you to be subscribed to Creator tier or above.
-                 *     pcm_16000 - PCM format (S16LE) with 16kHz sample rate.
-                 *     pcm_22050 - PCM format (S16LE) with 22.05kHz sample rate.
-                 *     pcm_24000 - PCM format (S16LE) with 24kHz sample rate.
-                 *     pcm_44100 - PCM format (S16LE) with 44.1kHz sample rate. Requires you to be subscribed to Pro tier or above.
-                 *     ulaw_8000 - μ-law format (sometimes written mu-law, often approximated as u-law) with 8kHz sample rate. Note that this format is commonly used for Twilio audio inputs.
-                 *      */
-                output_format?: string;
-            };
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                voice_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Text_to_speech_streaming_v1_text_to_speech__voice_id__stream_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Text_to_speech_streaming_with_timestamps_v1_text_to_speech__voice_id__stream_with_timestamps_post: {
-        parameters: {
-            query?: {
-                /** @description When enable_logging is set to false full privacy mode will be used for the request. This will mean history features are unavailable for this request, including request stitching. Full privacy mode may only be used by enterprise customers. */
-                enable_logging?: boolean;
-                /**
-                 * @deprecated
-                 * @description You can turn on latency optimizations at some cost of quality. The best possible final latency varies by model. Possible values:
-                 *     0 - default mode (no latency optimizations)
-                 *     1 - normal latency optimizations (about 50% of possible latency improvement of option 3)
-                 *     2 - strong latency optimizations (about 75% of possible latency improvement of option 3)
-                 *     3 - max latency optimizations
-                 *     4 - max latency optimizations, but also with text normalizer turned off for even more latency savings (best latency, but can mispronounce eg numbers and dates).
-                 *
-                 *     Defaults to None.
-                 *
-                 */
-                optimize_streaming_latency?: number;
-                /** @description Output format of the generated audio. Must be one of:
-                 *     mp3_22050_32 - output format, mp3 with 22.05kHz sample rate at 32kbps.
-                 *     mp3_44100_32 - output format, mp3 with 44.1kHz sample rate at 32kbps.
-                 *     mp3_44100_64 - output format, mp3 with 44.1kHz sample rate at 64kbps.
-                 *     mp3_44100_96 - output format, mp3 with 44.1kHz sample rate at 96kbps.
-                 *     mp3_44100_128 - default output format, mp3 with 44.1kHz sample rate at 128kbps.
-                 *     mp3_44100_192 - output format, mp3 with 44.1kHz sample rate at 192kbps. Requires you to be subscribed to Creator tier or above.
-                 *     pcm_16000 - PCM format (S16LE) with 16kHz sample rate.
-                 *     pcm_22050 - PCM format (S16LE) with 22.05kHz sample rate.
-                 *     pcm_24000 - PCM format (S16LE) with 24kHz sample rate.
-                 *     pcm_44100 - PCM format (S16LE) with 44.1kHz sample rate. Requires you to be subscribed to Pro tier or above.
-                 *     ulaw_8000 - μ-law format (sometimes written mu-law, often approximated as u-law) with 8kHz sample rate. Note that this format is commonly used for Twilio audio inputs.
-                 *      */
-                output_format?: string;
-            };
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                voice_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Text_to_speech_streaming_with_timestamps_v1_text_to_speech__voice_id__stream_with_timestamps_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Speech_to_Speech_v1_speech_to_speech__voice_id__post: {
-        parameters: {
-            query?: {
-                /** @description When enable_logging is set to false full privacy mode will be used for the request. This will mean history features are unavailable for this request, including request stitching. Full privacy mode may only be used by enterprise customers. */
-                enable_logging?: boolean;
-                /**
-                 * @deprecated
-                 * @description You can turn on latency optimizations at some cost of quality. The best possible final latency varies by model. Possible values:
-                 *     0 - default mode (no latency optimizations)
-                 *     1 - normal latency optimizations (about 50% of possible latency improvement of option 3)
-                 *     2 - strong latency optimizations (about 75% of possible latency improvement of option 3)
-                 *     3 - max latency optimizations
-                 *     4 - max latency optimizations, but also with text normalizer turned off for even more latency savings (best latency, but can mispronounce eg numbers and dates).
-                 *
-                 *     Defaults to None.
-                 *
-                 */
-                optimize_streaming_latency?: number;
-                /** @description Output format of the generated audio. Must be one of:
-                 *     mp3_22050_32 - output format, mp3 with 22.05kHz sample rate at 32kbps.
-                 *     mp3_44100_32 - output format, mp3 with 44.1kHz sample rate at 32kbps.
-                 *     mp3_44100_64 - output format, mp3 with 44.1kHz sample rate at 64kbps.
-                 *     mp3_44100_96 - output format, mp3 with 44.1kHz sample rate at 96kbps.
-                 *     mp3_44100_128 - default output format, mp3 with 44.1kHz sample rate at 128kbps.
-                 *     mp3_44100_192 - output format, mp3 with 44.1kHz sample rate at 192kbps. Requires you to be subscribed to Creator tier or above.
-                 *     pcm_16000 - PCM format (S16LE) with 16kHz sample rate.
-                 *     pcm_22050 - PCM format (S16LE) with 22.05kHz sample rate.
-                 *     pcm_24000 - PCM format (S16LE) with 24kHz sample rate.
-                 *     pcm_44100 - PCM format (S16LE) with 44.1kHz sample rate. Requires you to be subscribed to Pro tier or above.
-                 *     ulaw_8000 - μ-law format (sometimes written mu-law, often approximated as u-law) with 8kHz sample rate. Note that this format is commonly used for Twilio audio inputs.
-                 *      */
-                output_format?: string;
-            };
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                voice_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": components["schemas"]["Body_Speech_to_Speech_v1_speech_to_speech__voice_id__post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "audio/mpeg": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Speech_to_Speech_Streaming_v1_speech_to_speech__voice_id__stream_post: {
-        parameters: {
-            query?: {
-                /** @description When enable_logging is set to false full privacy mode will be used for the request. This will mean history features are unavailable for this request, including request stitching. Full privacy mode may only be used by enterprise customers. */
-                enable_logging?: boolean;
-                /**
-                 * @deprecated
-                 * @description You can turn on latency optimizations at some cost of quality. The best possible final latency varies by model. Possible values:
-                 *     0 - default mode (no latency optimizations)
-                 *     1 - normal latency optimizations (about 50% of possible latency improvement of option 3)
-                 *     2 - strong latency optimizations (about 75% of possible latency improvement of option 3)
-                 *     3 - max latency optimizations
-                 *     4 - max latency optimizations, but also with text normalizer turned off for even more latency savings (best latency, but can mispronounce eg numbers and dates).
-                 *
-                 *     Defaults to None.
-                 *
-                 */
-                optimize_streaming_latency?: number;
-                /** @description Output format of the generated audio. Must be one of:
-                 *     mp3_22050_32 - output format, mp3 with 22.05kHz sample rate at 32kbps.
-                 *     mp3_44100_32 - output format, mp3 with 44.1kHz sample rate at 32kbps.
-                 *     mp3_44100_64 - output format, mp3 with 44.1kHz sample rate at 64kbps.
-                 *     mp3_44100_96 - output format, mp3 with 44.1kHz sample rate at 96kbps.
-                 *     mp3_44100_128 - default output format, mp3 with 44.1kHz sample rate at 128kbps.
-                 *     mp3_44100_192 - output format, mp3 with 44.1kHz sample rate at 192kbps. Requires you to be subscribed to Creator tier or above.
-                 *     pcm_16000 - PCM format (S16LE) with 16kHz sample rate.
-                 *     pcm_22050 - PCM format (S16LE) with 22.05kHz sample rate.
-                 *     pcm_24000 - PCM format (S16LE) with 24kHz sample rate.
-                 *     pcm_44100 - PCM format (S16LE) with 44.1kHz sample rate. Requires you to be subscribed to Pro tier or above.
-                 *     ulaw_8000 - μ-law format (sometimes written mu-law, often approximated as u-law) with 8kHz sample rate. Note that this format is commonly used for Twilio audio inputs.
-                 *      */
-                output_format?: string;
-            };
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                voice_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": components["schemas"]["Body_Speech_to_Speech_Streaming_v1_speech_to_speech__voice_id__stream_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Voice_Generation_Parameters_v1_voice_generation_generate_voice_parameters_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["VoiceGenerationParameterResponseModel"];
-                };
-            };
-        };
-    };
-    Generate_a_random_voice_v1_voice_generation_generate_voice_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Generate_a_random_voice_v1_voice_generation_generate_voice_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "audio/mpeg": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Create_a_previously_generated_voice_v1_voice_generation_create_voice_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Create_a_previously_generated_voice_v1_voice_generation_create_voice_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["VoiceResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_user_subscription_info_v1_user_subscription_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ExtendedSubscriptionResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_user_info_v1_user_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_voices_v1_voices_get: {
-        parameters: {
-            query?: {
-                /**
-                 * @description If set to true, legacy premade voices will be included in responses from /v1/voices
-                 * @example true
-                 */
-                show_legacy?: boolean;
-            };
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GetVoicesResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_default_voice_settings__v1_voices_settings_default_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["VoiceSettingsResponseModel"];
-                };
-            };
-        };
-    };
-    Get_voice_settings_v1_voices__voice_id__settings_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                voice_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["VoiceSettingsResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_voice_v1_voices__voice_id__get: {
-        parameters: {
-            query?: {
-                /** @description If set will return settings information corresponding to the voice, requires authorization. */
-                with_settings?: boolean;
-            };
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                voice_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["VoiceResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Delete_voice_v1_voices__voice_id__delete: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                voice_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Edit_voice_settings_v1_voices__voice_id__settings_edit_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                voice_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["VoiceSettingsResponseModel"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Add_voice_v1_voices_add_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": components["schemas"]["Body_Add_voice_v1_voices_add_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AddVoiceResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Edit_voice_v1_voices__voice_id__edit_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                voice_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": components["schemas"]["Body_Edit_voice_v1_voices__voice_id__edit_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Add_sharing_voice_v1_voices_add__public_user_id___voice_id__post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description Public user ID used to publicly identify ElevenLabs users.
-                 * @example 63e06b7e7cafdc46be4d2e0b3f045940231ae058d508589653d74d1265a574ca
-                 */
-                public_user_id: string;
-                /**
-                 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                voice_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Add_sharing_voice_v1_voices_add__public_user_id___voice_id__post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AddVoiceResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_projects_v1_projects_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GetProjectsResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Add_project_v1_projects_add_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": components["schemas"]["Body_Add_project_v1_projects_add_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AddProjectResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_project_by_ID_v1_projects__project_id__get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProjectExtendedResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Edit_basic_project_info_v1_projects__project_id__post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Edit_basic_project_info_v1_projects__project_id__post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["EditProjectResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Delete_project_v1_projects__project_id__delete: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Convert_project_v1_projects__project_id__convert_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_project_snapshots_v1_projects__project_id__snapshots_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProjectSnapshotsResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Stream_project_audio_v1_projects__project_id__snapshots__project_snapshot_id__stream_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_id: string;
-                /**
-                 * @description The project_snapshot_id of the project snapshot. You can query GET /v1/projects/{project_id}/snapshots to list all available snapshots for a project.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_snapshot_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["Body_Stream_project_audio_v1_projects__project_id__snapshots__project_snapshot_id__stream_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Streams_archive_with_project_audio_v1_projects__project_id__snapshots__project_snapshot_id__archive_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_id: string;
-                /**
-                 * @description The project_snapshot_id of the project snapshot. You can query GET /v1/projects/{project_id}/snapshots to list all available snapshots for a project.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_snapshot_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_chapters_v1_projects__project_id__chapters_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GetChaptersResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_chapter_by_ID_v1_projects__project_id__chapters__chapter_id__get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_id: string;
-                /**
-                 * @description The chapter_id of the chapter. You can query GET https://api.elevenlabs.io/v1/projects/{project_id}/chapters to list all available chapters for a project.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                chapter_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ChapterResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Delete_chapter_v1_projects__project_id__chapters__chapter_id__delete: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_id: string;
-                /**
-                 * @description The chapter_id of the chapter. You can query GET https://api.elevenlabs.io/v1/projects/{project_id}/chapters to list all available chapters for a project.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                chapter_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Add_chapter_to_a_project_v1_projects__project_id__chapters_add_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Add_chapter_to_a_project_v1_projects__project_id__chapters_add_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AddChapterResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Convert_chapter_v1_projects__project_id__chapters__chapter_id__convert_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_id: string;
-                /**
-                 * @description The chapter_id of the chapter. You can query GET https://api.elevenlabs.io/v1/projects/{project_id}/chapters to list all available chapters for a project.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                chapter_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_chapter_snapshots_v1_projects__project_id__chapters__chapter_id__snapshots_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_id: string;
-                /**
-                 * @description The chapter_id of the chapter. You can query GET https://api.elevenlabs.io/v1/projects/{project_id}/chapters to list all available chapters for a project.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                chapter_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ChapterSnapshotsResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Stream_chapter_audio_v1_projects__project_id__chapters__chapter_id__snapshots__chapter_snapshot_id__stream_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_id: string;
-                /**
-                 * @description The chapter_id of the chapter. You can query GET https://api.elevenlabs.io/v1/projects/{project_id}/chapters to list all available chapters for a project.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                chapter_id: string;
-                /**
-                 * @description The chapter_snapshot_id of the chapter snapshot. You can query GET /v1/projects/{project_id}/chapters/{chapter_id}/snapshots to the all available snapshots for a chapter.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                chapter_snapshot_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["Body_Stream_chapter_audio_v1_projects__project_id__chapters__chapter_id__snapshots__chapter_snapshot_id__stream_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Update_Pronunciation_Dictionaries_v1_projects__project_id__update_pronunciation_dictionaries_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                project_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Update_Pronunciation_Dictionaries_v1_projects__project_id__update_pronunciation_dictionaries_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Dub_a_video_or_an_audio_file_v1_dubbing_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "multipart/form-data": components["schemas"]["Body_Dub_a_video_or_an_audio_file_v1_dubbing_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DoDubbingResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_dubbing_project_metadata_v1_dubbing__dubbing_id__get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /** @description ID of the dubbing project. */
-                dubbing_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["DubbingMetadataResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Delete_dubbing_project_v1_dubbing__dubbing_id__delete: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /** @description ID of the dubbing project. */
-                dubbing_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_dubbed_file_v1_dubbing__dubbing_id__audio__language_code__get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /** @description ID of the dubbing project. */
-                dubbing_id: string;
-                /** @description ID of the language. */
-                language_code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/octet-stream": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_transcript_for_dub_v1_dubbing__dubbing_id__transcript__language_code__get: {
-        parameters: {
-            query?: {
-                /** @description Format to use for the subtitle file, either 'srt' or 'webvtt' */
-                format_type?: "srt" | "webvtt";
-            };
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /** @description ID of the dubbing project. */
-                dubbing_id: string;
-                /** @description ID of the language. */
-                language_code: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                    "application/text": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_sso_provider_admin_admin_n8enylacgd_sso_provider_get: {
-        parameters: {
-            query: {
-                workspace_id: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SsoProviderResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_Models_v1_models_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ModelResponseModel"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Creates_AudioNative_enabled_project__v1_audio_native_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": components["schemas"]["Body_Creates_AudioNative_enabled_project__v1_audio_native_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AudioNativeCreateProjectResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_voices_v1_shared_voices_get: {
-        parameters: {
-            query?: {
-                /** @description How many shared voices to return at maximum. Can not exceed 100, defaults to 30. */
-                page_size?: number;
-                /**
-                 * @description voice category used for filtering
-                 * @example professional
-                 */
-                category?: string;
-                /**
-                 * @description gender used for filtering
-                 * @example male
-                 */
-                gender?: string;
-                /**
-                 * @description age used for filtering
-                 * @example young
-                 */
-                age?: string;
-                /**
-                 * @description accent used for filtering
-                 * @example american
-                 */
-                accent?: string;
-                /**
-                 * @description language used for filtering
-                 * @example en
-                 */
-                language?: string;
-                /**
-                 * @description search term used for filtering
-                 * @example tiktok
-                 */
-                search?: string;
-                /**
-                 * @description use-case used for filtering
-                 * @example audiobook
-                 */
-                use_cases?: string[];
-                /**
-                 * @description search term used for filtering
-                 * @example tiktok
-                 */
-                descriptives?: string[];
-                /**
-                 * @description Filter featured voices
-                 * @example true
-                 */
-                featured?: boolean;
-                /**
-                 * @description Filter voices that are enabled for the reader app
-                 * @example true
-                 */
-                reader_app_enabled?: boolean;
-                /**
-                 * @description Filter voices by public owner ID
-                 * @example 7c9fab611d9a0e1fb2e7448a0c294a8804efc2bcc324b0a366a5d5232b7d1532
-                 */
-                owner_id?: string;
-                /**
-                 * @description sort criteria
-                 * @example created_date
-                 */
-                sort?: string;
-                page?: number;
-            };
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GetLibraryVoicesResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_similar_library_voices_v1_similar_voices_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "multipart/form-data": components["schemas"]["Body_Get_similar_library_voices_v1_similar_voices_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GetLibraryVoicesResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_characters_usage_metrics_v1_usage_character_stats_get: {
-        parameters: {
-            query: {
-                /**
-                 * @description UTC Unix timestamp for the start of the usage window, in milliseconds. To include the first day of the window, the timestamp should be at 00:00:00 of that day.
-                 * @example 1685574000
-                 */
-                start_unix: number;
-                /**
-                 * @description UTC Unix timestamp for the end of the usage window, in milliseconds. To include the last day of the window, the timestamp should be at 23:59:59 of that day.
-                 * @example 1688165999
-                 */
-                end_unix: number;
-                /** @description Whether or not to include the statistics of the entire workspace. */
-                include_workspace_metrics?: boolean;
-                /** @description How to break down the information. Cannot be "user" if include_workspace_metrics is False. */
-                breakdown_type?: "none" | "voice" | "user" | "api_keys" | "product_type";
-            };
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UsageCharactersResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Add_a_pronunciation_dictionary_v1_pronunciation_dictionaries_add_from_file_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "multipart/form-data": components["schemas"]["Body_Add_a_pronunciation_dictionary_v1_pronunciation_dictionaries_add_from_file_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AddPronunciationDictionaryResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Add_rules_to_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__add_rules_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The id of the pronunciation dictionary
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                pronunciation_dictionary_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Add_rules_to_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__add_rules_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AddPronunciationDictionaryRulesResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Remove_rules_from_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__remove_rules_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The id of the pronunciation dictionary
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                pronunciation_dictionary_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Remove_rules_from_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__remove_rules_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RemovePronunciationDictionaryRulesResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_PLS_file_with_a_pronunciation_dictionary_version_rules_v1_pronunciation_dictionaries__dictionary_id___version_id__download_get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The id of the pronunciation dictionary
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                dictionary_id: string;
-                /**
-                 * @description The id of the version of the pronunciation dictionary
-                 * @example BdF0s0aZ3oFoKnDYdTox
-                 */
-                version_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "text/plain": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_metadata_for_a_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id___get: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path: {
-                /**
-                 * @description The id of the pronunciation dictionary
-                 * @example 21m00Tcm4TlvDq8ikWAM
-                 */
-                pronunciation_dictionary_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GetPronunciationDictionaryMetadataResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_Pronunciation_Dictionaries_v1_pronunciation_dictionaries__get: {
-        parameters: {
-            query?: {
-                /** @description Used for fetching next page. Cursor is returned in the response. */
-                cursor?: string;
-                /** @description How many pronunciation dictionaries to return at maximum. Can not exceed 100, defaults to 30. */
-                page_size?: number;
-            };
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GetPronunciationDictionariesMetadataResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Invite_user_v1_workspace_invites_add_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Invite_user_v1_workspace_invites_add_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Delete_existing_invitation_v1_workspace_invites_delete: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Delete_existing_invitation_v1_workspace_invites_delete"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Update_member_v1_workspace_members_post: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
-                "xi-api-key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["Body_Update_member_v1_workspace_members_post"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    Get_a_profile_page_profile__handle__get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Handle for a VA's profile page
-                 * @example talexgeorge
-                 */
-                handle: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProfilePageResponseModel"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    redirect_to_mintlify_docs_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
-    };
+	Get_generated_items_v1_history_get: {
+		parameters: {
+			query?: {
+				/** @description How many history items to return at maximum. Can not exceed 1000, defaults to 100. */
+				page_size?: number;
+				/** @description After which ID to start fetching, use this parameter to paginate across a large collection of history items. In case this parameter is not provided history items will be fetched starting from the most recently created one ordered descending by their creation date. */
+				start_after_history_item_id?: string;
+				/** @description Voice ID to be filtered for, you can use GET https://api.elevenlabs.io/v1/voices to receive a list of voices and their IDs. */
+				voice_id?: string;
+			};
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetSpeechHistoryResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_history_item_by_ID_v1_history__history_item_id__get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description History item ID to be used, you can use GET https://api.elevenlabs.io/v1/history to receive a list of history items and their IDs.
+				 * @example VW7YKqPnjY4h39yTbx2L
+				 */
+				history_item_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['SpeechHistoryItemResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Delete_history_item_v1_history__history_item_id__delete: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description History item ID to be used, you can use GET https://api.elevenlabs.io/v1/history to receive a list of history items and their IDs.
+				 * @example VW7YKqPnjY4h39yTbx2L
+				 */
+				history_item_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_audio_from_history_item_v1_history__history_item_id__audio_get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description History item ID to be used, you can use GET https://api.elevenlabs.io/v1/history to receive a list of history items and their IDs.
+				 * @example VW7YKqPnjY4h39yTbx2L
+				 */
+				history_item_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'audio/mpeg': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Download_history_items_v1_history_download_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Download_history_items_v1_history_download_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Sound_Generation_v1_sound_generation_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Sound_Generation_v1_sound_generation_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'audio/mpeg': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Audio_Isolation_v1_audio_isolation_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'multipart/form-data': components['schemas']['Body_Audio_Isolation_v1_audio_isolation_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'audio/mpeg': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Audio_Isolation_Stream_v1_audio_isolation_stream_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'multipart/form-data': components['schemas']['Body_Audio_Isolation_Stream_v1_audio_isolation_stream_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'audio/mpeg': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Delete_sample_v1_voices__voice_id__samples__sample_id__delete: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				voice_id: string;
+				/**
+				 * @description Sample ID to be used, you can use GET https://api.elevenlabs.io/v1/voices/{voice_id} to list all the available samples for a voice.
+				 * @example VW7YKqPnjY4h39yTbx2L
+				 */
+				sample_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_audio_from_sample_v1_voices__voice_id__samples__sample_id__audio_get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				voice_id: string;
+				/**
+				 * @description Sample ID to be used, you can use GET https://api.elevenlabs.io/v1/voices/{voice_id} to list all the available samples for a voice.
+				 * @example VW7YKqPnjY4h39yTbx2L
+				 */
+				sample_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'audio/*': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Text_to_speech_v1_text_to_speech__voice_id__post: {
+		parameters: {
+			query?: {
+				/** @description When enable_logging is set to false full privacy mode will be used for the request. This will mean history features are unavailable for this request, including request stitching. Full privacy mode may only be used by enterprise customers. */
+				enable_logging?: boolean;
+				/**
+				 * @deprecated
+				 * @description You can turn on latency optimizations at some cost of quality. The best possible final latency varies by model. Possible values:
+				 *     0 - default mode (no latency optimizations)
+				 *     1 - normal latency optimizations (about 50% of possible latency improvement of option 3)
+				 *     2 - strong latency optimizations (about 75% of possible latency improvement of option 3)
+				 *     3 - max latency optimizations
+				 *     4 - max latency optimizations, but also with text normalizer turned off for even more latency savings (best latency, but can mispronounce eg numbers and dates).
+				 *
+				 *     Defaults to None.
+				 *
+				 */
+				optimize_streaming_latency?: number;
+				/** @description Output format of the generated audio. Must be one of:
+				 *     mp3_22050_32 - output format, mp3 with 22.05kHz sample rate at 32kbps.
+				 *     mp3_44100_32 - output format, mp3 with 44.1kHz sample rate at 32kbps.
+				 *     mp3_44100_64 - output format, mp3 with 44.1kHz sample rate at 64kbps.
+				 *     mp3_44100_96 - output format, mp3 with 44.1kHz sample rate at 96kbps.
+				 *     mp3_44100_128 - default output format, mp3 with 44.1kHz sample rate at 128kbps.
+				 *     mp3_44100_192 - output format, mp3 with 44.1kHz sample rate at 192kbps. Requires you to be subscribed to Creator tier or above.
+				 *     pcm_16000 - PCM format (S16LE) with 16kHz sample rate.
+				 *     pcm_22050 - PCM format (S16LE) with 22.05kHz sample rate.
+				 *     pcm_24000 - PCM format (S16LE) with 24kHz sample rate.
+				 *     pcm_44100 - PCM format (S16LE) with 44.1kHz sample rate. Requires you to be subscribed to Pro tier or above.
+				 *     ulaw_8000 - μ-law format (sometimes written mu-law, often approximated as u-law) with 8kHz sample rate. Note that this format is commonly used for Twilio audio inputs.
+				 *      */
+				output_format?: string;
+			};
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				voice_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Text_to_speech_v1_text_to_speech__voice_id__post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'audio/mpeg': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Text_to_speech_with_timestamps_v1_text_to_speech__voice_id__with_timestamps_post: {
+		parameters: {
+			query?: {
+				/** @description When enable_logging is set to false full privacy mode will be used for the request. This will mean history features are unavailable for this request, including request stitching. Full privacy mode may only be used by enterprise customers. */
+				enable_logging?: boolean;
+				/**
+				 * @deprecated
+				 * @description You can turn on latency optimizations at some cost of quality. The best possible final latency varies by model. Possible values:
+				 *     0 - default mode (no latency optimizations)
+				 *     1 - normal latency optimizations (about 50% of possible latency improvement of option 3)
+				 *     2 - strong latency optimizations (about 75% of possible latency improvement of option 3)
+				 *     3 - max latency optimizations
+				 *     4 - max latency optimizations, but also with text normalizer turned off for even more latency savings (best latency, but can mispronounce eg numbers and dates).
+				 *
+				 *     Defaults to None.
+				 *
+				 */
+				optimize_streaming_latency?: number;
+				/** @description Output format of the generated audio. Must be one of:
+				 *     mp3_22050_32 - output format, mp3 with 22.05kHz sample rate at 32kbps.
+				 *     mp3_44100_32 - output format, mp3 with 44.1kHz sample rate at 32kbps.
+				 *     mp3_44100_64 - output format, mp3 with 44.1kHz sample rate at 64kbps.
+				 *     mp3_44100_96 - output format, mp3 with 44.1kHz sample rate at 96kbps.
+				 *     mp3_44100_128 - default output format, mp3 with 44.1kHz sample rate at 128kbps.
+				 *     mp3_44100_192 - output format, mp3 with 44.1kHz sample rate at 192kbps. Requires you to be subscribed to Creator tier or above.
+				 *     pcm_16000 - PCM format (S16LE) with 16kHz sample rate.
+				 *     pcm_22050 - PCM format (S16LE) with 22.05kHz sample rate.
+				 *     pcm_24000 - PCM format (S16LE) with 24kHz sample rate.
+				 *     pcm_44100 - PCM format (S16LE) with 44.1kHz sample rate. Requires you to be subscribed to Pro tier or above.
+				 *     ulaw_8000 - μ-law format (sometimes written mu-law, often approximated as u-law) with 8kHz sample rate. Note that this format is commonly used for Twilio audio inputs.
+				 *      */
+				output_format?: string;
+			};
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				voice_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Text_to_speech_with_timestamps_v1_text_to_speech__voice_id__with_timestamps_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Text_to_speech_streaming_v1_text_to_speech__voice_id__stream_post: {
+		parameters: {
+			query?: {
+				/** @description When enable_logging is set to false full privacy mode will be used for the request. This will mean history features are unavailable for this request, including request stitching. Full privacy mode may only be used by enterprise customers. */
+				enable_logging?: boolean;
+				/**
+				 * @deprecated
+				 * @description You can turn on latency optimizations at some cost of quality. The best possible final latency varies by model. Possible values:
+				 *     0 - default mode (no latency optimizations)
+				 *     1 - normal latency optimizations (about 50% of possible latency improvement of option 3)
+				 *     2 - strong latency optimizations (about 75% of possible latency improvement of option 3)
+				 *     3 - max latency optimizations
+				 *     4 - max latency optimizations, but also with text normalizer turned off for even more latency savings (best latency, but can mispronounce eg numbers and dates).
+				 *
+				 *     Defaults to None.
+				 *
+				 */
+				optimize_streaming_latency?: number;
+				/** @description Output format of the generated audio. Must be one of:
+				 *     mp3_22050_32 - output format, mp3 with 22.05kHz sample rate at 32kbps.
+				 *     mp3_44100_32 - output format, mp3 with 44.1kHz sample rate at 32kbps.
+				 *     mp3_44100_64 - output format, mp3 with 44.1kHz sample rate at 64kbps.
+				 *     mp3_44100_96 - output format, mp3 with 44.1kHz sample rate at 96kbps.
+				 *     mp3_44100_128 - default output format, mp3 with 44.1kHz sample rate at 128kbps.
+				 *     mp3_44100_192 - output format, mp3 with 44.1kHz sample rate at 192kbps. Requires you to be subscribed to Creator tier or above.
+				 *     pcm_16000 - PCM format (S16LE) with 16kHz sample rate.
+				 *     pcm_22050 - PCM format (S16LE) with 22.05kHz sample rate.
+				 *     pcm_24000 - PCM format (S16LE) with 24kHz sample rate.
+				 *     pcm_44100 - PCM format (S16LE) with 44.1kHz sample rate. Requires you to be subscribed to Pro tier or above.
+				 *     ulaw_8000 - μ-law format (sometimes written mu-law, often approximated as u-law) with 8kHz sample rate. Note that this format is commonly used for Twilio audio inputs.
+				 *      */
+				output_format?: string;
+			};
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				voice_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Text_to_speech_streaming_v1_text_to_speech__voice_id__stream_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Text_to_speech_streaming_with_timestamps_v1_text_to_speech__voice_id__stream_with_timestamps_post: {
+		parameters: {
+			query?: {
+				/** @description When enable_logging is set to false full privacy mode will be used for the request. This will mean history features are unavailable for this request, including request stitching. Full privacy mode may only be used by enterprise customers. */
+				enable_logging?: boolean;
+				/**
+				 * @deprecated
+				 * @description You can turn on latency optimizations at some cost of quality. The best possible final latency varies by model. Possible values:
+				 *     0 - default mode (no latency optimizations)
+				 *     1 - normal latency optimizations (about 50% of possible latency improvement of option 3)
+				 *     2 - strong latency optimizations (about 75% of possible latency improvement of option 3)
+				 *     3 - max latency optimizations
+				 *     4 - max latency optimizations, but also with text normalizer turned off for even more latency savings (best latency, but can mispronounce eg numbers and dates).
+				 *
+				 *     Defaults to None.
+				 *
+				 */
+				optimize_streaming_latency?: number;
+				/** @description Output format of the generated audio. Must be one of:
+				 *     mp3_22050_32 - output format, mp3 with 22.05kHz sample rate at 32kbps.
+				 *     mp3_44100_32 - output format, mp3 with 44.1kHz sample rate at 32kbps.
+				 *     mp3_44100_64 - output format, mp3 with 44.1kHz sample rate at 64kbps.
+				 *     mp3_44100_96 - output format, mp3 with 44.1kHz sample rate at 96kbps.
+				 *     mp3_44100_128 - default output format, mp3 with 44.1kHz sample rate at 128kbps.
+				 *     mp3_44100_192 - output format, mp3 with 44.1kHz sample rate at 192kbps. Requires you to be subscribed to Creator tier or above.
+				 *     pcm_16000 - PCM format (S16LE) with 16kHz sample rate.
+				 *     pcm_22050 - PCM format (S16LE) with 22.05kHz sample rate.
+				 *     pcm_24000 - PCM format (S16LE) with 24kHz sample rate.
+				 *     pcm_44100 - PCM format (S16LE) with 44.1kHz sample rate. Requires you to be subscribed to Pro tier or above.
+				 *     ulaw_8000 - μ-law format (sometimes written mu-law, often approximated as u-law) with 8kHz sample rate. Note that this format is commonly used for Twilio audio inputs.
+				 *      */
+				output_format?: string;
+			};
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				voice_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Text_to_speech_streaming_with_timestamps_v1_text_to_speech__voice_id__stream_with_timestamps_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Speech_to_Speech_v1_speech_to_speech__voice_id__post: {
+		parameters: {
+			query?: {
+				/** @description When enable_logging is set to false full privacy mode will be used for the request. This will mean history features are unavailable for this request, including request stitching. Full privacy mode may only be used by enterprise customers. */
+				enable_logging?: boolean;
+				/**
+				 * @deprecated
+				 * @description You can turn on latency optimizations at some cost of quality. The best possible final latency varies by model. Possible values:
+				 *     0 - default mode (no latency optimizations)
+				 *     1 - normal latency optimizations (about 50% of possible latency improvement of option 3)
+				 *     2 - strong latency optimizations (about 75% of possible latency improvement of option 3)
+				 *     3 - max latency optimizations
+				 *     4 - max latency optimizations, but also with text normalizer turned off for even more latency savings (best latency, but can mispronounce eg numbers and dates).
+				 *
+				 *     Defaults to None.
+				 *
+				 */
+				optimize_streaming_latency?: number;
+				/** @description Output format of the generated audio. Must be one of:
+				 *     mp3_22050_32 - output format, mp3 with 22.05kHz sample rate at 32kbps.
+				 *     mp3_44100_32 - output format, mp3 with 44.1kHz sample rate at 32kbps.
+				 *     mp3_44100_64 - output format, mp3 with 44.1kHz sample rate at 64kbps.
+				 *     mp3_44100_96 - output format, mp3 with 44.1kHz sample rate at 96kbps.
+				 *     mp3_44100_128 - default output format, mp3 with 44.1kHz sample rate at 128kbps.
+				 *     mp3_44100_192 - output format, mp3 with 44.1kHz sample rate at 192kbps. Requires you to be subscribed to Creator tier or above.
+				 *     pcm_16000 - PCM format (S16LE) with 16kHz sample rate.
+				 *     pcm_22050 - PCM format (S16LE) with 22.05kHz sample rate.
+				 *     pcm_24000 - PCM format (S16LE) with 24kHz sample rate.
+				 *     pcm_44100 - PCM format (S16LE) with 44.1kHz sample rate. Requires you to be subscribed to Pro tier or above.
+				 *     ulaw_8000 - μ-law format (sometimes written mu-law, often approximated as u-law) with 8kHz sample rate. Note that this format is commonly used for Twilio audio inputs.
+				 *      */
+				output_format?: string;
+			};
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				voice_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'multipart/form-data': components['schemas']['Body_Speech_to_Speech_v1_speech_to_speech__voice_id__post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'audio/mpeg': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Speech_to_Speech_Streaming_v1_speech_to_speech__voice_id__stream_post: {
+		parameters: {
+			query?: {
+				/** @description When enable_logging is set to false full privacy mode will be used for the request. This will mean history features are unavailable for this request, including request stitching. Full privacy mode may only be used by enterprise customers. */
+				enable_logging?: boolean;
+				/**
+				 * @deprecated
+				 * @description You can turn on latency optimizations at some cost of quality. The best possible final latency varies by model. Possible values:
+				 *     0 - default mode (no latency optimizations)
+				 *     1 - normal latency optimizations (about 50% of possible latency improvement of option 3)
+				 *     2 - strong latency optimizations (about 75% of possible latency improvement of option 3)
+				 *     3 - max latency optimizations
+				 *     4 - max latency optimizations, but also with text normalizer turned off for even more latency savings (best latency, but can mispronounce eg numbers and dates).
+				 *
+				 *     Defaults to None.
+				 *
+				 */
+				optimize_streaming_latency?: number;
+				/** @description Output format of the generated audio. Must be one of:
+				 *     mp3_22050_32 - output format, mp3 with 22.05kHz sample rate at 32kbps.
+				 *     mp3_44100_32 - output format, mp3 with 44.1kHz sample rate at 32kbps.
+				 *     mp3_44100_64 - output format, mp3 with 44.1kHz sample rate at 64kbps.
+				 *     mp3_44100_96 - output format, mp3 with 44.1kHz sample rate at 96kbps.
+				 *     mp3_44100_128 - default output format, mp3 with 44.1kHz sample rate at 128kbps.
+				 *     mp3_44100_192 - output format, mp3 with 44.1kHz sample rate at 192kbps. Requires you to be subscribed to Creator tier or above.
+				 *     pcm_16000 - PCM format (S16LE) with 16kHz sample rate.
+				 *     pcm_22050 - PCM format (S16LE) with 22.05kHz sample rate.
+				 *     pcm_24000 - PCM format (S16LE) with 24kHz sample rate.
+				 *     pcm_44100 - PCM format (S16LE) with 44.1kHz sample rate. Requires you to be subscribed to Pro tier or above.
+				 *     ulaw_8000 - μ-law format (sometimes written mu-law, often approximated as u-law) with 8kHz sample rate. Note that this format is commonly used for Twilio audio inputs.
+				 *      */
+				output_format?: string;
+			};
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				voice_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'multipart/form-data': components['schemas']['Body_Speech_to_Speech_Streaming_v1_speech_to_speech__voice_id__stream_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Voice_Generation_Parameters_v1_voice_generation_generate_voice_parameters_get: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['VoiceGenerationParameterResponseModel'];
+				};
+			};
+		};
+	};
+	Generate_a_random_voice_v1_voice_generation_generate_voice_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Generate_a_random_voice_v1_voice_generation_generate_voice_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'audio/mpeg': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Create_a_previously_generated_voice_v1_voice_generation_create_voice_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Create_a_previously_generated_voice_v1_voice_generation_create_voice_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['VoiceResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_user_subscription_info_v1_user_subscription_get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ExtendedSubscriptionResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_user_info_v1_user_get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['UserResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_voices_v1_voices_get: {
+		parameters: {
+			query?: {
+				/**
+				 * @description If set to true, legacy premade voices will be included in responses from /v1/voices
+				 * @example true
+				 */
+				show_legacy?: boolean;
+			};
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetVoicesResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_default_voice_settings__v1_voices_settings_default_get: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['VoiceSettingsResponseModel'];
+				};
+			};
+		};
+	};
+	Get_voice_settings_v1_voices__voice_id__settings_get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				voice_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['VoiceSettingsResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_voice_v1_voices__voice_id__get: {
+		parameters: {
+			query?: {
+				/** @description If set will return settings information corresponding to the voice, requires authorization. */
+				with_settings?: boolean;
+			};
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				voice_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['VoiceResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Delete_voice_v1_voices__voice_id__delete: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				voice_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Edit_voice_settings_v1_voices__voice_id__settings_edit_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				voice_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['VoiceSettingsResponseModel'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Add_voice_v1_voices_add_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'multipart/form-data': components['schemas']['Body_Add_voice_v1_voices_add_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AddVoiceResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Edit_voice_v1_voices__voice_id__edit_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				voice_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'multipart/form-data': components['schemas']['Body_Edit_voice_v1_voices__voice_id__edit_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Add_sharing_voice_v1_voices_add__public_user_id___voice_id__post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description Public user ID used to publicly identify ElevenLabs users.
+				 * @example 63e06b7e7cafdc46be4d2e0b3f045940231ae058d508589653d74d1265a574ca
+				 */
+				public_user_id: string;
+				/**
+				 * @description Voice ID to be used, you can use https://api.elevenlabs.io/v1/voices to list all the available voices.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				voice_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Add_sharing_voice_v1_voices_add__public_user_id___voice_id__post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AddVoiceResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_projects_v1_projects_get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetProjectsResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Add_project_v1_projects_add_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'multipart/form-data': components['schemas']['Body_Add_project_v1_projects_add_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AddProjectResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_project_by_ID_v1_projects__project_id__get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ProjectExtendedResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Edit_basic_project_info_v1_projects__project_id__post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Edit_basic_project_info_v1_projects__project_id__post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['EditProjectResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Delete_project_v1_projects__project_id__delete: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Convert_project_v1_projects__project_id__convert_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_project_snapshots_v1_projects__project_id__snapshots_get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ProjectSnapshotsResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Stream_project_audio_v1_projects__project_id__snapshots__project_snapshot_id__stream_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_id: string;
+				/**
+				 * @description The project_snapshot_id of the project snapshot. You can query GET /v1/projects/{project_id}/snapshots to list all available snapshots for a project.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_snapshot_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: {
+			content: {
+				'application/json': components['schemas']['Body_Stream_project_audio_v1_projects__project_id__snapshots__project_snapshot_id__stream_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Streams_archive_with_project_audio_v1_projects__project_id__snapshots__project_snapshot_id__archive_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_id: string;
+				/**
+				 * @description The project_snapshot_id of the project snapshot. You can query GET /v1/projects/{project_id}/snapshots to list all available snapshots for a project.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_snapshot_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_chapters_v1_projects__project_id__chapters_get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetChaptersResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_chapter_by_ID_v1_projects__project_id__chapters__chapter_id__get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_id: string;
+				/**
+				 * @description The chapter_id of the chapter. You can query GET https://api.elevenlabs.io/v1/projects/{project_id}/chapters to list all available chapters for a project.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				chapter_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ChapterResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Delete_chapter_v1_projects__project_id__chapters__chapter_id__delete: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_id: string;
+				/**
+				 * @description The chapter_id of the chapter. You can query GET https://api.elevenlabs.io/v1/projects/{project_id}/chapters to list all available chapters for a project.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				chapter_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Add_chapter_to_a_project_v1_projects__project_id__chapters_add_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Add_chapter_to_a_project_v1_projects__project_id__chapters_add_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AddChapterResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Convert_chapter_v1_projects__project_id__chapters__chapter_id__convert_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_id: string;
+				/**
+				 * @description The chapter_id of the chapter. You can query GET https://api.elevenlabs.io/v1/projects/{project_id}/chapters to list all available chapters for a project.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				chapter_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_chapter_snapshots_v1_projects__project_id__chapters__chapter_id__snapshots_get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_id: string;
+				/**
+				 * @description The chapter_id of the chapter. You can query GET https://api.elevenlabs.io/v1/projects/{project_id}/chapters to list all available chapters for a project.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				chapter_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ChapterSnapshotsResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Stream_chapter_audio_v1_projects__project_id__chapters__chapter_id__snapshots__chapter_snapshot_id__stream_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_id: string;
+				/**
+				 * @description The chapter_id of the chapter. You can query GET https://api.elevenlabs.io/v1/projects/{project_id}/chapters to list all available chapters for a project.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				chapter_id: string;
+				/**
+				 * @description The chapter_snapshot_id of the chapter snapshot. You can query GET /v1/projects/{project_id}/chapters/{chapter_id}/snapshots to the all available snapshots for a chapter.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				chapter_snapshot_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: {
+			content: {
+				'application/json': components['schemas']['Body_Stream_chapter_audio_v1_projects__project_id__chapters__chapter_id__snapshots__chapter_snapshot_id__stream_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content?: never;
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Update_Pronunciation_Dictionaries_v1_projects__project_id__update_pronunciation_dictionaries_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The project_id of the project, you can query GET https://api.elevenlabs.io/v1/projects to list all available projects.
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				project_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Update_Pronunciation_Dictionaries_v1_projects__project_id__update_pronunciation_dictionaries_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Dub_a_video_or_an_audio_file_v1_dubbing_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: {
+			content: {
+				'multipart/form-data': components['schemas']['Body_Dub_a_video_or_an_audio_file_v1_dubbing_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['DoDubbingResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_dubbing_project_metadata_v1_dubbing__dubbing_id__get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/** @description ID of the dubbing project. */
+				dubbing_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['DubbingMetadataResponse'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Delete_dubbing_project_v1_dubbing__dubbing_id__delete: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/** @description ID of the dubbing project. */
+				dubbing_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_dubbed_file_v1_dubbing__dubbing_id__audio__language_code__get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/** @description ID of the dubbing project. */
+				dubbing_id: string;
+				/** @description ID of the language. */
+				language_code: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/octet-stream': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_transcript_for_dub_v1_dubbing__dubbing_id__transcript__language_code__get: {
+		parameters: {
+			query?: {
+				/** @description Format to use for the subtitle file, either 'srt' or 'webvtt' */
+				format_type?: 'srt' | 'webvtt';
+			};
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/** @description ID of the dubbing project. */
+				dubbing_id: string;
+				/** @description ID of the language. */
+				language_code: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+					'application/text': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	get_sso_provider_admin_admin_n8enylacgd_sso_provider_get: {
+		parameters: {
+			query: {
+				workspace_id: string;
+			};
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['SsoProviderResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_Models_v1_models_get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ModelResponseModel'][];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Creates_AudioNative_enabled_project__v1_audio_native_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'multipart/form-data': components['schemas']['Body_Creates_AudioNative_enabled_project__v1_audio_native_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AudioNativeCreateProjectResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_voices_v1_shared_voices_get: {
+		parameters: {
+			query?: {
+				/** @description How many shared voices to return at maximum. Can not exceed 100, defaults to 30. */
+				page_size?: number;
+				/**
+				 * @description voice category used for filtering
+				 * @example professional
+				 */
+				category?: string;
+				/**
+				 * @description gender used for filtering
+				 * @example male
+				 */
+				gender?: string;
+				/**
+				 * @description age used for filtering
+				 * @example young
+				 */
+				age?: string;
+				/**
+				 * @description accent used for filtering
+				 * @example american
+				 */
+				accent?: string;
+				/**
+				 * @description language used for filtering
+				 * @example en
+				 */
+				language?: string;
+				/**
+				 * @description search term used for filtering
+				 * @example tiktok
+				 */
+				search?: string;
+				/**
+				 * @description use-case used for filtering
+				 * @example audiobook
+				 */
+				use_cases?: string[];
+				/**
+				 * @description search term used for filtering
+				 * @example tiktok
+				 */
+				descriptives?: string[];
+				/**
+				 * @description Filter featured voices
+				 * @example true
+				 */
+				featured?: boolean;
+				/**
+				 * @description Filter voices that are enabled for the reader app
+				 * @example true
+				 */
+				reader_app_enabled?: boolean;
+				/**
+				 * @description Filter voices by public owner ID
+				 * @example 7c9fab611d9a0e1fb2e7448a0c294a8804efc2bcc324b0a366a5d5232b7d1532
+				 */
+				owner_id?: string;
+				/**
+				 * @description sort criteria
+				 * @example created_date
+				 */
+				sort?: string;
+				page?: number;
+			};
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetLibraryVoicesResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_similar_library_voices_v1_similar_voices_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: {
+			content: {
+				'multipart/form-data': components['schemas']['Body_Get_similar_library_voices_v1_similar_voices_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetLibraryVoicesResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_characters_usage_metrics_v1_usage_character_stats_get: {
+		parameters: {
+			query: {
+				/**
+				 * @description UTC Unix timestamp for the start of the usage window, in milliseconds. To include the first day of the window, the timestamp should be at 00:00:00 of that day.
+				 * @example 1685574000
+				 */
+				start_unix: number;
+				/**
+				 * @description UTC Unix timestamp for the end of the usage window, in milliseconds. To include the last day of the window, the timestamp should be at 23:59:59 of that day.
+				 * @example 1688165999
+				 */
+				end_unix: number;
+				/** @description Whether or not to include the statistics of the entire workspace. */
+				include_workspace_metrics?: boolean;
+				/** @description How to break down the information. Cannot be "user" if include_workspace_metrics is False. */
+				breakdown_type?: 'none' | 'voice' | 'user' | 'api_keys' | 'product_type';
+			};
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['UsageCharactersResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Add_a_pronunciation_dictionary_v1_pronunciation_dictionaries_add_from_file_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'multipart/form-data': components['schemas']['Body_Add_a_pronunciation_dictionary_v1_pronunciation_dictionaries_add_from_file_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AddPronunciationDictionaryResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Add_rules_to_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__add_rules_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The id of the pronunciation dictionary
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				pronunciation_dictionary_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Add_rules_to_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__add_rules_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['AddPronunciationDictionaryRulesResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Remove_rules_from_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__remove_rules_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The id of the pronunciation dictionary
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				pronunciation_dictionary_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Remove_rules_from_the_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id__remove_rules_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['RemovePronunciationDictionaryRulesResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_PLS_file_with_a_pronunciation_dictionary_version_rules_v1_pronunciation_dictionaries__dictionary_id___version_id__download_get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The id of the pronunciation dictionary
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				dictionary_id: string;
+				/**
+				 * @description The id of the version of the pronunciation dictionary
+				 * @example BdF0s0aZ3oFoKnDYdTox
+				 */
+				version_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'text/plain': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_metadata_for_a_pronunciation_dictionary_v1_pronunciation_dictionaries__pronunciation_dictionary_id___get: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path: {
+				/**
+				 * @description The id of the pronunciation dictionary
+				 * @example 21m00Tcm4TlvDq8ikWAM
+				 */
+				pronunciation_dictionary_id: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetPronunciationDictionaryMetadataResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_Pronunciation_Dictionaries_v1_pronunciation_dictionaries__get: {
+		parameters: {
+			query?: {
+				/** @description Used for fetching next page. Cursor is returned in the response. */
+				cursor?: string;
+				/** @description How many pronunciation dictionaries to return at maximum. Can not exceed 100, defaults to 30. */
+				page_size?: number;
+			};
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['GetPronunciationDictionariesMetadataResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Invite_user_v1_workspace_invites_add_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Invite_user_v1_workspace_invites_add_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Delete_existing_invitation_v1_workspace_invites_delete: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Delete_existing_invitation_v1_workspace_invites_delete'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Update_member_v1_workspace_members_post: {
+		parameters: {
+			query?: never;
+			header?: {
+				/** @description Your API key. This is required by most endpoints to access our API programatically. You can view your xi-api-key using the 'Profile' tab on the website. */
+				'xi-api-key'?: string;
+			};
+			path?: never;
+			cookie?: never;
+		};
+		requestBody: {
+			content: {
+				'application/json': components['schemas']['Body_Update_member_v1_workspace_members_post'];
+			};
+		};
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	Get_a_profile_page_profile__handle__get: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path: {
+				/**
+				 * @description Handle for a VA's profile page
+				 * @example talexgeorge
+				 */
+				handle: string;
+			};
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['ProfilePageResponseModel'];
+				};
+			};
+			/** @description Validation Error */
+			422: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': components['schemas']['HTTPValidationError'];
+				};
+			};
+		};
+	};
+	redirect_to_mintlify_docs_get: {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		requestBody?: never;
+		responses: {
+			/** @description Successful Response */
+			200: {
+				headers: {
+					[name: string]: unknown;
+				};
+				content: {
+					'application/json': unknown;
+				};
+			};
+		};
+	};
 }

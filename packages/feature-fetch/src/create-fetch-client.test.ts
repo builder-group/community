@@ -1,8 +1,7 @@
+import { unwrapErr } from '@blgc/utils';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
-import { unwrapErr } from '@blgc/utils';
-
 import { createFetchClient } from './create-fetch-client';
 
 const server = setupServer();

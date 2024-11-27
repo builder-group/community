@@ -12,11 +12,11 @@
 		"moduleResolution": "node",
 
 		// Javascript Support
-		"allowJs": true,
+		"allowJs": true
 
 		// Emit
 		// "outDir": "./dist",
 		// "rootDir": "./src",
 	},
 	"include": ["src"]
-} 
+}

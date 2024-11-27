@@ -1,6 +1,3 @@
-import type express from 'express';
-import type * as core from 'express-serve-static-core';
-import { type TValidator } from 'validation-adapter';
 import {
 	type TOperationPathParams,
 	type TOperationQueryParams,
@@ -9,7 +6,9 @@ import {
 	type TRequestBody
 } from '@blgc/types/openapi';
 import { type TFilterKeys } from '@blgc/types/utils';
-
+import type express from 'express';
+import type * as core from 'express-serve-static-core';
+import { type TValidator } from 'validation-adapter';
 import { type TParseParams } from '../utils';
 
 export interface TOpenApiExpressFeature<GPaths extends object> {

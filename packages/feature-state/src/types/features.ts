@@ -1,6 +1,5 @@
 import type { TUnionToIntersection } from '@blgc/types/utils';
 import { type TNestedPath } from '@blgc/utils';
-
 import { type TListenerCallback, type TListenerOptions, type TStateSetOptions } from './state';
 
 export type TFeatures<GValue = unknown> = {

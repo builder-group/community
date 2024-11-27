@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { deepCopy } from './deep-copy';
 
 describe('deepCopy function', () => {

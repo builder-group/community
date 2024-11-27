@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { applyMat3ToPoint } from './apply-mat3-to-point';
 import type { TMat3, TVec2 } from './types';
 

@@ -1,6 +1,3 @@
-import type { Hono } from 'hono';
-import type hono from 'hono/types';
-import { type TValidator } from 'validation-adapter';
 import {
 	type TOperationPathParams,
 	type TOperationQueryParams,
@@ -9,7 +6,9 @@ import {
 	type TRequestBody
 } from '@blgc/types/openapi';
 import { type TFilterKeys } from '@blgc/types/utils';
-
+import type { Hono } from 'hono';
+import type hono from 'hono/types';
+import { type TValidator } from 'validation-adapter';
 import { type TParseParams } from '../utils';
 
 export interface TOpenApiHonoFeature<GPaths extends object> {

@@ -1,5 +1,4 @@
 import chalk from 'chalk';
-
 import { DynCommand } from '../DynCommand';
 import { promisifyFiglet } from '../utils';
 

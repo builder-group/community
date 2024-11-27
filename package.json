@@ -1,58 +1,51 @@
 {
 	"name": "community",
-	"description": "Community libraries maintained by builder.group",
 	"private": true,
-	"scripts": {
-		"build": "pnpm build:cli && turbo run build",
-		"build:cli": "turbo run build --filter=@blgc/cli && pnpm run cli:hello",
-		"packages:version": "changeset version",
-		"packages:publish": "changeset publish",
-		"packages:change": "changeset",
-		"clean": "turbo run clean && shx rm -rf node_modules",
-		"install:clean": "pnpm run clean && pnpm install",
-		"lint": "turbo lint",
-		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
-		"update:latest": "turbo run update:latest",
-		"cli:hello": "chmod +x ./scripts/cli.sh && sh ./scripts/cli.sh hello"
+	"description": "Community libraries maintained by builder.group",
+	"keywords": [],
+	"homepage": "https://builder.group/?source=github",
+	"bugs": {
+		"url": "https://github.com/builder-group/monorepo/issues"
 	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/builder-group/monorepo.git"
 	},
-	"keywords": [],
-	"author": "@bennobuilder",
 	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/builder-group/monorepo/issues"
+	"author": "@bennobuilder",
+	"scripts": {
+		"build": "pnpm build:cli && turbo run build",
+		"build:cli": "turbo run build --filter=@blgc/cli && pnpm run cli:hello",
+		"clean": "turbo run clean && shx rm -rf node_modules",
+		"cli:hello": "chmod +x ./scripts/cli.sh && sh ./scripts/cli.sh hello",
+		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
+		"install:clean": "pnpm run clean && pnpm install",
+		"lint": "turbo lint",
+		"packages:change": "changeset",
+		"packages:publish": "changeset publish",
+		"packages:version": "changeset version",
+		"update:latest": "turbo run update:latest"
 	},
-	"homepage": "https://builder.group/?source=github",
 	"devDependencies": {
 		"@blgc/cli": "workspace:*",
 		"@blgc/config": "workspace:*",
 		"@blgc/style-guide": "workspace:*",
 		"@changesets/changelog-github": "^0.5.0",
-		"@changesets/cli": "^2.27.9",
-		"@ianvs/prettier-plugin-sort-imports": "^4.3.1",
+		"@changesets/cli": "^2.27.10",
+		"@ianvs/prettier-plugin-sort-imports": "^4.4.0",
 		"@size-limit/esbuild": "^11.1.6",
 		"@size-limit/esbuild-why": "^11.1.6",
 		"@size-limit/preset-small-lib": "^11.1.6",
-		"eslint": "^8.57.0",
-		"prettier": "^3.3.3",
-		"prettier-plugin-tailwindcss": "^0.6.8",
+		"eslint": "^9.15.0",
+		"prettier": "^3.4.1",
+		"prettier-plugin-tailwindcss": "^0.6.9",
 		"shx": "^0.3.4",
 		"size-limit": "^11.1.6",
-		"turbo": "^2.2.3",
-		"typescript": "^5.6.3",
-		"vitest": "^2.1.4"
+		"turbo": "^2.3.3",
+		"typescript": "^5.7.2",
+		"vitest": "^2.1.6"
 	},
 	"packageManager": "pnpm@9.2.0",
-	"pnpm": {
-		"updateConfig": {
-			"ignoreDependencies": [
-				"eslint"
-			]
-		}
-	},
 	"engines": {
 		"node": ">=20"
 	}

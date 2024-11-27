@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { defineConfig } from './define-config';
 
 describe('defineConfig function', () => {

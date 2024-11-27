@@ -2,7 +2,6 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
-
 import type { DynCommand } from '../../DynCommand';
 import {
 	execaVerbose,

@@ -1,34 +1,38 @@
 {
 	"name": "feature-logger",
-	"description": "Straightforward, typesafe, and feature-based logging library",
 	"version": "0.0.24",
 	"private": false,
-	"scripts": {
-		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
-		"start:dev": "tsc -w",
-		"lint": "eslint --ext .js,.ts src/",
-		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
-		"install:clean": "pnpm run clean && pnpm install",
-		"test": "vitest run",
-		"update:latest": "pnpm update --latest",
-		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
-		"size": "size-limit --why"
+	"description": "Straightforward, typesafe, and feature-based logging library",
+	"keywords": [],
+	"homepage": "https://builder.group/?source=github",
+	"bugs": {
+		"url": "https://github.com/builder-group/monorepo/issues"
 	},
-	"source": "./src/index.ts",
-	"main": "./dist/cjs/index.js",
-	"module": "./dist/esm/index.js",
-	"types": "./dist/types/index.d.ts",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/builder-group/monorepo.git"
 	},
-	"keywords": [],
-	"author": "@bennobuilder",
 	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/builder-group/monorepo/issues"
+	"author": "@bennobuilder",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"source": "./src/index.ts",
+	"types": "./dist/types/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"scripts": {
+		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"lint": "eslint --ext .js,.ts src/",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"size": "size-limit --why",
+		"start:dev": "tsc -w",
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest"
 	},
-	"homepage": "https://builder.group/?source=github",
 	"dependencies": {
 		"@blgc/types": "workspace:*",
 		"@blgc/utils": "workspace:*"
@@ -37,10 +41,6 @@
 		"@blgc/config": "workspace:*",
 		"@types/node": "^22.9.0"
 	},
-	"files": [
-		"dist",
-		"README.md"
-	],
 	"size-limit": [
 		{
 			"path": "dist/esm/index.js"

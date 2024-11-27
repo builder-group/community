@@ -1,6 +1,5 @@
 import path from 'node:path';
 import * as ts from 'typescript';
-
 import type { DynCommand } from '../DynCommand';
 import {
 	getTsConfigCompilerOptions,

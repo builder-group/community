@@ -1,6 +1,6 @@
+import { getNestedProperty, type TNestedPath, type TNestedProperty } from '@blgc/utils';
 import type { TState } from 'feature-state';
 import React from 'react';
-import { getNestedProperty, type TNestedPath, type TNestedProperty } from '@blgc/utils';
 
 export function useSelector<GValue, GPath extends TNestedPath<GValue>>(
 	state: TState<GValue, ['base', 'selector']>,

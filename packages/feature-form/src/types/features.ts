@@ -1,5 +1,4 @@
 import type { TUnionToIntersection } from '@blgc/types/utils';
-
 import { type TFormData } from './form';
 
 export type TFeatures<GFormData extends TFormData = TFormData> = {

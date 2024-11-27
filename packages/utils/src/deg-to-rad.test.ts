@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { degToRad } from './deg-to-rad';
 
 describe('degToRad function', () => {

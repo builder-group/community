@@ -2,7 +2,6 @@ import { readFile } from 'node:fs/promises';
 import { describe } from 'node:test';
 import * as camaro from 'camaro';
 import { beforeAll, expect, it } from 'vitest';
-
 import { select } from '../selector';
 import { tokenToXml } from '../token-to-xml';
 

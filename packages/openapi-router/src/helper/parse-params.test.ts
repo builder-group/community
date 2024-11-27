@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { parseParams } from './parse-params';
 
 describe('parseRequestQuery function', () => {

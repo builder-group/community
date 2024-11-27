@@ -36,7 +36,7 @@ To use the shared Prettier config, set the following in `package.json`:
 
 ```json
 {
-  "prettier": "@blgc/style-guide/prettier"
+	"prettier": "@blgc/style-guide/prettier"
 }
 ```
 
@@ -66,9 +66,8 @@ To use the shared Typescript config, set the following in `tsconfig.json`:
 >
 > See: https://eslint.org/docs/user-guide/getting-started#installation-and-usage
 
-
 To use the shared ESLint config, set the following in `eslint.config.js`:
-    
+
 ```js
 const styleGuide = require('@blgc/style-guide/eslint/library');
 
@@ -76,7 +75,7 @@ const styleGuide = require('@blgc/style-guide/eslint/library');
  * @type {import('eslint').Linter.Config}
  */
 module.exports = [
-    ...styleGuide,
+	...styleGuide,
 	{
 		// Any additional custom rules
 	}

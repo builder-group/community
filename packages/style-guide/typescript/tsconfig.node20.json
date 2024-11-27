@@ -13,7 +13,7 @@
 		"moduleResolution": "node16",
 
 		// Javascript Support
-		"allowJs": true,
+		"allowJs": true
 
 		// Emit
 		// "outDir": "./dist",

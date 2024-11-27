@@ -1,5 +1,4 @@
 import type { TUnionToIntersection } from '@blgc/types/utils';
-
 import type { TApiFeature } from './api';
 import { type TGraphQLFeature } from './graphql';
 import type { TOpenApiFeature } from './openapi';

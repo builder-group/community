@@ -1,35 +1,35 @@
 {
 	"name": "@blgc/config",
-	"description": "Collection of ESLint, Vite and Typescript configurations",
 	"version": "0.0.25",
 	"private": false,
-	"scripts": {
-		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
-		"install:clean": "pnpm run clean && pnpm install",
-		"update:latest": "pnpm update --latest",
-		"publish:patch": "pnpm version patch && pnpm publish --no-git-checks --access=public"
+	"description": "Collection of ESLint, Vite and Typescript configurations",
+	"keywords": [],
+	"homepage": "https://builder.group/?source=github",
+	"bugs": {
+		"url": "https://github.com/builder-group/monorepo/issues"
 	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/builder-group/monorepo.git"
 	},
-	"keywords": [],
-	"author": "@bennobuilder",
 	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/builder-group/monorepo/issues"
+	"author": "@bennobuilder",
+	"scripts": {
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"publish:patch": "pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"update:latest": "pnpm update --latest"
 	},
-	"homepage": "https://builder.group/?source=github",
 	"dependencies": {
 		"@vercel/style-guide": "^6.0.0",
 		"eslint-config-turbo": "^2.2.3",
 		"vite-tsconfig-paths": "^5.1.0"
 	},
-	"peerDependencies": {
+	"devDependencies": {
 		"@next/eslint-plugin-next": "^14.2.6",
 		"eslint": "^8.57.0"
 	},
-	"devDependencies": {
+	"peerDependencies": {
 		"@next/eslint-plugin-next": "^14.2.6",
 		"eslint": "^8.57.0"
 	}

@@ -3,7 +3,6 @@
 // https://github.com/justkey007/tsc-alias
 
 import type { Plugin } from 'rollup';
-
 import type { DynCommand } from '../../../DynCommand';
 import { resolveTsPathsFactory, type TResolveTsPathsFactoryOptions } from '../../../utils';
 

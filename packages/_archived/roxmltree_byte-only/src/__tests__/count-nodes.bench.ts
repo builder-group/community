@@ -3,7 +3,6 @@ import { describe } from 'node:test';
 import * as sax from 'sax';
 import * as saxen from 'saxen';
 import { beforeAll, bench, expect } from 'vitest';
-
 import { ByteXmlStream, parseXmlStream } from '../index';
 
 void describe('count nodes', () => {

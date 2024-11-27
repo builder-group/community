@@ -1,7 +1,7 @@
 {
 	"name": "feature-fetch-vanilla-open-meteo",
-	"private": true,
 	"version": "0.0.1",
+	"private": true,
 	"type": "module",
 	"scripts": {
 		"dev": "vite",

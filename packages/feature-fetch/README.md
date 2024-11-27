@@ -117,7 +117,6 @@ Enhance `feature-fetch` with [OpenAPI](https://www.openapis.org/) support to cre
 
    ```ts
    import { createOpenApiFetchClient } from 'feature-fetch';
-
    import { paths } from './openapi-paths';
 
    const fetchClient = createOpenApiFetchClient<paths>({
@@ -146,7 +145,6 @@ Enhance `feature-fetch` to create a typesafe `fetch` wrapper specifically for Gr
 
    ```ts
    import { gql, withGraphQL } from 'feature-fetch';
-
    import createFetchClient from './createFetchClient';
 
    const baseFetchClient = createFetchClient({

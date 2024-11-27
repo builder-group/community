@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { inverseMat3 } from './inverse-mat3';
 import type { TMat3 } from './types';
 

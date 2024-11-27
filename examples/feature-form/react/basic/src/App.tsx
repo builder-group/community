@@ -1,3 +1,4 @@
+import { randomHex, shortId } from '@blgc/utils';
 import {
 	bitwiseFlag,
 	createForm,
@@ -11,13 +12,9 @@ import { useGlobalState, withGlobalBind } from 'feature-react/state';
 import React from 'react';
 import * as v from 'valibot';
 import * as z from 'zod';
-import { randomHex, shortId } from '@blgc/utils';
-
 import './App.css';
-
 import { vValidator } from 'validation-adapters/valibot';
 import { zValidator } from 'validation-adapters/zod';
-
 import { StatusMessage } from './components';
 import { isLightColor } from './utils';
 

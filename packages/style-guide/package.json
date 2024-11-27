@@ -1,34 +1,35 @@
 {
 	"name": "@blgc/style-guide",
-	"description": "Builder.Group's engineering style guide",
 	"version": "0.0.1",
 	"private": false,
-	"scripts": {
-		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
-		"install:clean": "pnpm run clean && pnpm install",
-		"update:latest": "pnpm update --latest",
-		"publish:patch": "pnpm version patch && pnpm publish --no-git-checks --access=public"
-	},
-	"exports": {
-		"./eslint/*": "./eslint/*.js",
-		"./vite/*": "./vite/*.js",
-		"./prettier": "./prettier/index.js",
-		"./typescript/base": "./typescript/tsconfig.base.json",
-		"./typescript/next": "./typescript/tsconfig.next.json",
-		"./typescript/node20": "./typescript/tsconfig.node20.json",
-		"./typescript/react-internal": "./typescript/tsconfig.react-internal.json"
+	"description": "Builder.Group's engineering style guide",
+	"keywords": [],
+	"homepage": "https://builder.group/?source=github",
+	"bugs": {
+		"url": "https://github.com/builder-group/monorepo/issues"
 	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/builder-group/monorepo.git"
 	},
-	"keywords": [],
-	"author": "@bennobuilder",
 	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/builder-group/monorepo/issues"
+	"author": "@bennobuilder",
+	"exports": {
+		"./eslint/*": "./eslint/*.js",
+		"./vite/*": "./vite/*.js",
+		"./prettier": "./prettier/index.js",
+		"./typescript/base": "./typescript/tsconfig.base.json",
+		"./typescript/library": "./typescript/tsconfig.library.json",
+		"./typescript/next": "./typescript/tsconfig.next.json",
+		"./typescript/node20": "./typescript/tsconfig.node20.json",
+		"./typescript/react-internal": "./typescript/tsconfig.react-internal.json"
 	},
-	"homepage": "https://builder.group/?source=github",
+	"scripts": {
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"publish:patch": "pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"update:latest": "pnpm update --latest"
+	},
 	"dependencies": {
 		"@ianvs/prettier-plugin-sort-imports": "^4.3.1",
 		"@next/eslint-plugin-next": "^14.2.6",
@@ -44,10 +45,10 @@
 		"typescript-eslint": "^8.16.0",
 		"vite-tsconfig-paths": "^5.1.0"
 	},
-	"peerDependencies": {
+	"devDependencies": {
 		"eslint": "^9.15.0"
 	},
-	"devDependencies": {
+	"peerDependencies": {
 		"eslint": "^9.15.0"
 	}
 }

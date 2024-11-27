@@ -1,5 +1,4 @@
 import { Err, Ok } from '@blgc/utils';
-
 import { FetchError } from './exceptions';
 import {
 	buildUrl,

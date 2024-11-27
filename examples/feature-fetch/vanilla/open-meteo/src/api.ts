@@ -1,5 +1,4 @@
 import { createApiFetchClient } from 'feature-fetch';
-
 import { paths } from './gen/v1';
 
 const apiFetchClient = createApiFetchClient({ prefixUrl: 'https://api.open-meteo.com/' });

@@ -6,7 +6,6 @@ import {
 	type TSubmitOptions
 } from 'feature-form';
 import React from 'react';
-
 import { registerFormField, type TRegisterFormFieldResponse } from '../register-form-field';
 
 export function useForm<GFormData extends TFormData>(

@@ -1,5 +1,4 @@
 import { type TValidationError } from 'validation-adapter';
-
 import { AppError } from './AppError';
 
 export class ValidationError extends AppError {

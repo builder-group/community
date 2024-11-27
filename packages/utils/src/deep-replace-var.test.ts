@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { deepReplaceVar } from './deep-replace-var';
 
 describe('deepReplaceVar function', () => {

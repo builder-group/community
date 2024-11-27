@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { parseXmlStream } from './tokenizer';
 import { type TXMLToken } from './types';
 import { XmlError } from './XmlError';

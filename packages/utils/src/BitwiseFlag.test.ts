@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { BitwiseFlag } from './BitwiseFlag';
 
 export enum TestFlag {

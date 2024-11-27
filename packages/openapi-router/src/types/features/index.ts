@@ -1,5 +1,4 @@
 import { type TUnionToIntersection } from '@blgc/types/utils';
-
 import { type TOpenApiExpressFeature } from './express';
 import { type TOpenApiHonoFeature } from './hono';
 

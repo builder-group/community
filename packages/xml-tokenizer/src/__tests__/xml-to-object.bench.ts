@@ -6,7 +6,6 @@ import * as txml from 'txml';
 import { beforeAll, bench, expect } from 'vitest';
 // import * as xt from 'xml-tokenizer';
 import * as xml2js from 'xml2js';
-
 // @ts-ignore -- Javascript module
 import * as xtDist from '../../dist/esm';
 import { xmlToObject } from '../index';

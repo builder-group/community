@@ -1,5 +1,4 @@
 import { isObject } from '@blgc/utils';
-
 import { RequestError, type TErrorCode } from '../../exceptions';
 
 export async function mapResponseToRequestError(

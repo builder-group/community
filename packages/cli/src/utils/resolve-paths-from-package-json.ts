@@ -1,6 +1,5 @@
 import path from 'node:path';
 import type { PackageJson } from 'type-fest';
-
 import type { TInputOutputPath } from './resolve-paths';
 
 /**
