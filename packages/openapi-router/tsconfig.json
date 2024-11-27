@@ -1,5 +1,5 @@
 {
-	"extends": "@blgc/config/shared-library.tsconfig.json",
+	"extends": "@blgc/style-guide/typescript/library",
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./src",

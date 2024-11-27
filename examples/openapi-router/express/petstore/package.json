@@ -19,7 +19,7 @@
 		"validation-adapters": "workspace:*"
 	},
 	"devDependencies": {
-		"@blgc/config": "workspace:*",
+		"@blgc/style-guide": "workspace:*",
 		"@types/express": "^5.0.0",
 		"@types/node": "^22.8.5",
 		"nodemon": "^3.1.7",

@@ -1,5 +1,5 @@
 {
-	"extends": "@blgc/config/react-library.tsconfig.json",
+	"extends": "@blgc/style-guide/typescript/react-internal",
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./src",

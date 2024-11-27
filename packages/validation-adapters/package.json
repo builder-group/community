@@ -57,7 +57,7 @@
 		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
-		"lint": "eslint --ext .js,.ts src/",
+		"lint": "eslint src/**",
 		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
 		"size": "size-limit --why",
 		"start:dev": "tsc -w",
@@ -65,7 +65,7 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"devDependencies": {
-		"@blgc/config": "workspace:*",
+		"@blgc/style-guide": "workspace:*",
 		"@types/node": "^22.9.0",
 		"valibot": "1.0.0-beta.3",
 		"validation-adapter": "workspace:*",
