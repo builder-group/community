@@ -1,10 +1,10 @@
+import { type BitwiseFlag } from '@blgc/utils';
 import { type TState } from 'feature-state';
 import {
 	type TBaseValidationContext,
 	type TCollectErrorMode,
 	type TValidator
 } from 'validation-adapter';
-import { type BitwiseFlag } from '@blgc/utils';
 
 export type TFormField<GValue> = TState<GValue | undefined, ['base', 'form-field']>;
 
@@ -40,22 +40,22 @@ export interface TFormFieldStateConfig {
 }
 
 export enum FormFieldValidateMode {
-	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member, no-bitwise -- ok here
+	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- ok here
 	OnBlur = 1 << 0, // 1
-	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member, no-bitwise -- ok here
+	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- ok here
 	OnChange = 1 << 1, // 2
-	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member, no-bitwise -- ok here
+	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- ok here
 	OnSubmit = 1 << 2, // 4
-	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member, no-bitwise -- ok here
+	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- ok here
 	OnTouched = 1 << 3 // 8
 }
 
 export enum FormFieldReValidateMode {
-	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member, no-bitwise -- ok here
+	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- ok here
 	OnBlur = 1 << 0, // 1
-	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member, no-bitwise -- ok here
+	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- ok here
 	OnChange = 1 << 1, // 2
-	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member, no-bitwise -- ok here
+	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- ok here
 	OnSubmit = 1 << 2 // 4
 }
 

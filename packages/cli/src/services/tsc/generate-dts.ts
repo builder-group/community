@@ -2,7 +2,6 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
-
 import type { DynCommand } from '../../DynCommand';
 import {
 	execaVerbose,
@@ -119,7 +118,7 @@ function adjustCompilerOptionsForResolvedPaths(
 	compilerOptions: TTsConfigCompilerOptions,
 	relativeDeclarationDirPath: string
 ): TTsConfigCompilerOptions {
-	const basePath = path.resolve(compilerOptions.pathsBasePath?.toString() ?? process.cwd());
+	const basePath = path.resolve(compilerOptions['pathsBasePath']?.toString() ?? process.cwd());
 	const relativeRootDir = path.relative(basePath, compilerOptions.rootDir ?? './src');
 
 	// Update paths to reflect the new relative declaration directory

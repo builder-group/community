@@ -1,31 +1,7 @@
 /**
- * @type {import("@ianvs/prettier-plugin-sort-imports").PrettierConfig}
+ * @see https://prettier.io/docs/en/configuration.html
+ * @type {import("prettier").Config}
  */
 module.exports = {
-	// Standard prettier options
-	useTabs: true,
-	printWidth: 100,
-	singleQuote: true,
-	trailingComma: 'none',
-	bracketSameLine: false,
-	semi: true,
-	quoteProps: 'consistent',
-	plugins: ['@ianvs/prettier-plugin-sort-imports', 'prettier-plugin-tailwindcss'],
-
-	// prettier-plugin-sort-imports options
-	// https://github.com/IanVS/prettier-plugin-sort-imports
-	importOrder: [
-		// External packages
-		'<THIRD_PARTY_MODULES>',
-		// builder.group packages
-		'^@blgc/',
-		// Internal packages
-		'^@/',
-		'',
-		// Relative
-		'^[../]',
-		'^[./]'
-	],
-	importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
-	importOrderTypeScriptVersion: '5.2.2'
+	...require('@blgc/config/prettier')
 };

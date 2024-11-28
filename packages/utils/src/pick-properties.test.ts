@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { pickProperties } from './pick-properties';
 
 describe('pickProperties function', () => {

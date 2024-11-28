@@ -1,6 +1,5 @@
 import chalk from 'chalk';
 import * as ts from 'typescript';
-
 import type { DynCommand } from '../DynCommand';
 import { findNearestTsConfigPath } from './find-nearest-ts-config-path';
 

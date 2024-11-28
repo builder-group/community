@@ -1,5 +1,4 @@
 import { describe, it } from 'vitest';
-
 import { FigmaAppHandler, type TAppCallbackRegistration, type TFromAppMessageEvent } from './app';
 import {
 	FigmaPluginHandler,

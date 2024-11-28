@@ -1,6 +1,5 @@
 import type { TUnionToIntersection } from '@blgc/types/utils';
 import { type TNestedPath } from '@blgc/utils';
-
 import { type TListenerCallback, type TListenerOptions, type TStateSetOptions } from './state';
 
 export type TFeatures<GValue = unknown> = {
@@ -24,7 +23,7 @@ export type TFeatures<GValue = unknown> = {
 } & TThirdPartyFeatures<GValue>;
 
 // Global registry for third party features
-// eslint-disable-next-line @typescript-eslint/no-empty-interface -- Overwritten by third party libraries
+
 export interface TThirdPartyFeatures<GValue> {}
 
 export type TFeatureKeys<GValue = unknown> = keyof TFeatures<GValue>;

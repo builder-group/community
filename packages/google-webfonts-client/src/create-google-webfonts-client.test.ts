@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { createGoogleWebfontsClient } from './create-google-webfonts-client';
 
 describe('createGoogleWebfontsClient function tests', () => {

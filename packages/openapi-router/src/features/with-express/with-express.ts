@@ -1,8 +1,7 @@
+import { type TOperationPathParams, type TOperationQueryParams } from '@blgc/types/openapi';
 import type * as express from 'express';
 import { type ParamsDictionary } from 'express-serve-static-core';
 import { createValidationContext, type TValidationError } from 'validation-adapter';
-import { type TOperationPathParams, type TOperationQueryParams } from '@blgc/types/openapi';
-
 import { ValidationError } from '../../exceptions';
 import { formatPath, parseParams } from '../../helper';
 import {
@@ -102,7 +101,6 @@ function validationMiddleware<GPathOperation>(
 ): express.RequestHandler {
 	const { bodyValidator, pathValidator, queryValidator } = validators;
 
-	// eslint-disable-next-line @typescript-eslint/no-misused-promises -- async callback
 	return async (req, _res, next) => {
 		try {
 			const validationErrors: TValidationError[] = [];
@@ -111,7 +109,7 @@ function validationMiddleware<GPathOperation>(
 				const bodyValidationContext = createValidationContext(req.body);
 				await bodyValidator.validate(bodyValidationContext);
 				for (const error of bodyValidationContext.errors) {
-					error.source = 'body';
+					error['source'] = 'body';
 					validationErrors.push(error);
 				}
 			}
@@ -122,7 +120,7 @@ function validationMiddleware<GPathOperation>(
 				);
 				await pathValidator.validate(pathValidationContext);
 				for (const error of pathValidationContext.errors) {
-					error.source = 'path';
+					error['source'] = 'path';
 					validationErrors.push(error);
 				}
 			}
@@ -133,7 +131,7 @@ function validationMiddleware<GPathOperation>(
 				>(req.query as TOperationQueryParams<GPathOperation>);
 				await queryValidator.validate(queryValidationContext);
 				for (const error of queryValidationContext.errors) {
-					error.source = 'query';
+					error['source'] = 'query';
 					validationErrors.push(error);
 				}
 			}
@@ -150,10 +148,8 @@ function validationMiddleware<GPathOperation>(
 }
 
 function requestHandler(handler: express.RequestHandler): express.RequestHandler {
-	// eslint-disable-next-line @typescript-eslint/no-misused-promises -- async callback
 	return async (req, res, next) => {
 		try {
-			// eslint-disable-next-line @typescript-eslint/await-thenable, @typescript-eslint/no-confusing-void-expression -- RequestHandler can be async
 			await handler(req, res, next);
 		} catch (error) {
 			next(error);

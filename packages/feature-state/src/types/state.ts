@@ -1,5 +1,4 @@
 import { type TNestedPath } from '@blgc/utils';
-
 import type { TFeatureKeys, TSelectFeatures } from './features';
 
 export type TState<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]> = {

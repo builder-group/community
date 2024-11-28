@@ -1,6 +1,5 @@
-import { beforeEach, describe, expect, it } from 'vitest';
 import { sleep } from '@blgc/utils';
-
+import { beforeEach, describe, expect, it } from 'vitest';
 import { createState } from '../create-state';
 import {
 	FAILED_TO_LOAD_FROM_STORAGE_IDENTIFIER,

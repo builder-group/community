@@ -1,5 +1,4 @@
 import { type DocumentNode } from '@0no-co/graphql.web';
-
 import { type TParseAs } from '../fetch';
 import type { TFetchOptions, TFetchResponse } from '../fetch-client';
 

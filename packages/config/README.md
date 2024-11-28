@@ -14,17 +14,42 @@
     </a>
 </p>
 
-`@blgc/config` is a collection of ESLint, Vite and Typescript configurations.
+`@blgc/config` is a collection of configurations for popular linting and styling tools.
+
+The following configs are available, and are designed to be used together.
+
+- [Prettier](#prettier)
+- [ESLint](#eslint)
+- [TypeScript](#typescript)
+- [Vitest](#vitest)
 
 ## 📖 Usage
 
-### [Typescript](https://www.typescriptlang.org/)
+### [Prettier](https://prettier.io/)
 
-`tsconfig.json`
+> Note: Prettier is a peer-dependency of this package, and should be installed
+> at the root of your project.
+>
+> See: https://prettier.io/docs/en/install.html
+
+To use the shared Prettier config, set the following in `package.json`:
 
 ```json
 {
-	"extends": "@blgc/config/react-library.tsconfig.json",
+	"prettier": "@blgc/config/prettier"
+}
+```
+
+### [Typescript](https://www.typescriptlang.org/)
+
+> Note: Typescript is a peer-dependency of this package, and should be installed
+> at the root of your project.
+
+To use the shared Typescript config, set the following in `tsconfig.json`:
+
+```json
+{
+	"extends": "@blgc/config/typescript/library",
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./src",
@@ -36,25 +61,32 @@
 
 ### [ESLint](https://eslint.org/)
 
-`.eslintrc.js`
+> Note: ESLint is a peer-dependency of this package, and should be installed
+> at the root of your project.
+>
+> See: https://eslint.org/docs/user-guide/getting-started#installation-and-usage
+
+To use the shared ESLint config, set the following in `eslint.config.js`:
 
 ```js
 /**
  * @type {import('eslint').Linter.Config}
  */
-module.exports = {
-	root: true,
-	extends: [require.resolve('@blgc/config/eslint/react-internal'), 'plugin:storybook/recommended']
-};
+module.exports = [
+	...require('@blgc/config/eslint/library'),
+	{
+		// Any additional custom rules
+	}
+];
 ```
 
 ### [Vitest](https://vitest.dev/)
 
-`vitest.config.js`
+To use the shared Vitest config, set the following in `vitest.config.js`:
 
 ```js
 const { defineConfig, mergeConfig } = require('vitest/config');
-const { nodeConfig } = require('@blgc/config/vite/node.config');
+const { nodeConfig } = require('@blgc/config/vite/node');
 
 module.exports = mergeConfig(nodeConfig, defineConfig({}));
 ```
@@ -69,20 +101,7 @@ If you are encountering issues or unexpected behavior with ESLint, you can use t
 npx eslint --print-config ./some/file/to/test/on.ts
 ```
 
-## 🔴 Issues
-
-### TypeScript Configurations Location
-
-TypeScript configurations are placed at the root to allow easy referencing from other packages in the monorepo using the `extends` field in `tsconfig.json`, like so:
-
-```json
-{
-	"extends": "@blgc/config/base.json"
-}
-```
-
-Node: Extending nested configuration didn't work.
-
 ## 🌟 Credits
 
-This configuration is based on the [`turbo-basic`](https://github.com/vercel/turbo/tree/main/examples/basic) starter template and will be kept in sync with it as the Vercel team knows better than me what configurations settings are best for NextJs apps and co. Also [`tsconfig/bases`](https://github.com/tsconfig/bases) was a source of inspiration.
+- [`turbo-basic`](https://github.com/vercel/turbo/tree/main/examples/basic) - Base configuration from Vercel's official starter template for optimal Next.js settings
+- [`tsconfig/bases`](https://github.com/tsconfig/bases) - TypeScript configuration best practices and recommendations

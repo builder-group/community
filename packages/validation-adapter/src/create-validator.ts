@@ -1,5 +1,4 @@
 import { deepCopy } from '@blgc/utils';
-
 import { type TValidationChain, type TValidator } from './types';
 
 export function createValidator<GValue>(

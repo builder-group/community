@@ -3,7 +3,6 @@ import { describe } from 'node:test';
 import * as sax from 'sax';
 import * as saxen from 'saxen';
 import { beforeAll, bench, expect } from 'vitest';
-
 import { parseXmlStream, TextXmlStream } from '../tokenizer';
 
 void describe('count nodes', () => {

@@ -4,7 +4,6 @@ import * as fastXmlParser from 'fast-xml-parser';
 import * as txml from 'txml';
 import { beforeAll, bench, expect } from 'vitest';
 import * as xml2js from 'xml2js';
-
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Ok
 // @ts-ignore -- Ok
 import { wasm, xmlToObject, xmlToObjectWasm } from '../../dist/esm';

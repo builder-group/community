@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { hasProperty } from './has-property';
 
 describe('hasProperty function', () => {

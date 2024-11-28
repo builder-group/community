@@ -1,5 +1,4 @@
 import { createState, type TSelectFeatures } from 'feature-state';
-
 import { type TFormFieldStatus, type TFormFieldStatusValue } from '../types';
 
 export function createStatus(initialValue: TFormFieldStatusValue): TFormFieldStatus {

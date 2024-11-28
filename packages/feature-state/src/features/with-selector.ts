@@ -1,5 +1,4 @@
 import { getNestedProperty } from '@blgc/utils';
-
 import {
 	type TEnforceFeatures,
 	type TFeatureKeys,

@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-
 import { mockConsole, restoreConsoleMock, type TConsoleSpies } from '../__tests__/mock-console';
 import { createLogger } from '../create-logger';
 import { withTimestamp } from './with-timestamp';

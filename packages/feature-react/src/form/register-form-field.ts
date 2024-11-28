@@ -1,6 +1,6 @@
+import { hasProperty } from '@blgc/utils';
 import { type TFormField } from 'feature-form';
 import { type ChangeEventHandler, type FocusEventHandler } from 'react';
-import { hasProperty } from '@blgc/utils';
 
 export function registerFormField<GValue, GKey = string>(
 	formField: TFormField<GValue>,

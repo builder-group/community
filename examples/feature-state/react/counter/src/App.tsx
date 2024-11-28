@@ -1,5 +1,4 @@
 import { useGlobalState } from 'feature-react/state';
-
 import { $counter } from './store';
 
 export default function App() {

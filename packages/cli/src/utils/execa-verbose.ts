@@ -1,5 +1,4 @@
 import chalk from 'chalk';
-
 import type { DynCommand } from '../DynCommand';
 
 export async function execaVerbose(

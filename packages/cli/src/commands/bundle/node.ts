@@ -2,7 +2,6 @@ import path from 'node:path';
 import { Flags } from '@oclif/core';
 import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
-
 import { DynCommand } from '../../DynCommand';
 import { bundleAllWithRollup, createNodeRollupConfig, getDynConfig } from '../../services';
 import { doesFileExist, promisifyFiglet, readJsonFile } from '../../utils';

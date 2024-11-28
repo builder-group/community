@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { toFunction } from './json-function';
 
 describe('json-function function', () => {

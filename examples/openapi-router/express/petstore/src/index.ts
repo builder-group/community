@@ -1,5 +1,4 @@
 import express from 'express';
-
 import { errorMiddleware, invalidPathMiddleware } from './middlewares';
 import { router } from './router';
 

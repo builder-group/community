@@ -82,7 +82,6 @@ Initialize and handle events in the `app/ui` (iframe) part.
 
 ```ts
 import { FigmaAppHandler } from 'figma-connect/app';
-
 import { TFromAppMessageEvents, TFromPluginMessageEvents } from './shared';
 
 // Create App Handler and pass global 'parent' instance as first argument
@@ -117,7 +116,6 @@ Initialize and handle events in the `plugin` (sandbox) part.
 
 ```ts
 import { FigmaPluginHandler } from 'figma-connect/plugin';
-
 import { TFromAppMessageEvents, TFromPluginMessageEvents } from './shared';
 
 // Create Plugin Handler and pass global 'figma' instance as first argument
@@ -152,7 +150,6 @@ To use `figma-connect` in a ReactJS application, you can utilize the `useAppCall
 
 ```tsx
 import React, { useState } from 'react';
-
 import { appHandler } from './app';
 import { useAppCallback } from './hooks';
 import { TFromAppMessageEvents, TFromPluginMessageEvents } from './shared';

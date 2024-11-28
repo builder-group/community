@@ -3,7 +3,6 @@ import type {
 	TOperationQueryParams,
 	TRequestBody
 } from '@blgc/types/openapi';
-
 import type { TParserSchema } from './parser';
 
 // =============================================================================

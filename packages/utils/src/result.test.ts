@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { Err, mapErr, mapOk, Ok, unwrapErr, unwrapOk, type TResult } from './result';
 
 describe('Result implementation', () => {

@@ -1,5 +1,4 @@
 import { createOpenApiFetchClient, type TFetchClient } from 'feature-fetch';
-
 import type { paths } from './gen/v1';
 import { withGoogleWebfonts } from './with-google-webfonts';
 
@@ -12,7 +11,7 @@ export function createGoogleWebfontsClient(
 			prefixUrl,
 			beforeRequestMiddlewares: [
 				(data) => {
-					data.queryParams.key = apiKey;
+					data.queryParams['key'] = apiKey;
 				}
 			]
 		})

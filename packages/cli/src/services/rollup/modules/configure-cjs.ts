@@ -1,5 +1,4 @@
 import path from 'node:path';
-
 import type { TConfigureModuleConfig, TConfigureModuleResponse } from '.';
 
 export function configureCJS(config: TConfigureModuleConfig): TConfigureModuleResponse {

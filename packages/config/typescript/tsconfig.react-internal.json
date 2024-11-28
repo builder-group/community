@@ -1,0 +1,24 @@
+// https://github.com/tsconfig/bases/blob/main/bases/vite-react.json
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"display": "Typescript configuration for applications and libraries that use ReactJs",
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		// Language and Environment
+		"target": "es2020",
+		"lib": ["es2020", "dom", "dom.Iterable"],
+		"jsx": "react-jsx",
+
+		// Modules
+		"module": "esnext",
+		"moduleResolution": "bundler",
+
+		// Javascript Support
+		"allowJs": true
+
+		// Emit
+		// "outDir": "./dist",
+		// "rootDir": "./src"
+	},
+	"include": ["src"]
+}

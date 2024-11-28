@@ -1,7 +1,6 @@
 import chalk from 'chalk';
 import { defineConfig as rollupDefineConfig, type RollupOptions } from 'rollup';
 import type { PackageJson } from 'type-fest';
-
 import type { DynCommand } from '../../../../DynCommand';
 import { resolvePaths, toArray, type TInputOutputPath } from '../../../../utils';
 import type { TDynNodeConfig, TDynRollupOptionsCallbackConfig } from '../../../dyn';

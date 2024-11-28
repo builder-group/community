@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { notEmpty } from './not-empty';
 
 describe('notEmpty function', () => {

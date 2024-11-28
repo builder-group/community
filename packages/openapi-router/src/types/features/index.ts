@@ -1,5 +1,4 @@
 import { type TUnionToIntersection } from '@blgc/types/utils';
-
 import { type TOpenApiExpressFeature } from './express';
 import { type TOpenApiHonoFeature } from './hono';
 
@@ -13,7 +12,6 @@ export type TFeatures<GPaths extends object = object> = {
 } & TThirdPartyFeatures<GPaths>;
 
 // Global registry for third party features
-// eslint-disable-next-line @typescript-eslint/no-empty-interface -- Overwritten by third party libraries
 export interface TThirdPartyFeatures<GPaths> {}
 
 export type TFeatureKeys<GPaths extends object = object> = keyof TFeatures<GPaths>;

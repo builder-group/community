@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { shallowMerge } from './shallow-merge';
 
 describe('shallowMerge function', () => {

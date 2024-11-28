@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
-
 import { tokenize, type TXmlToken } from './tokenizer';
 import { tokensToXml } from './tokens-to-xml';
 

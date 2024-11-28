@@ -2,7 +2,6 @@ import path from 'node:path';
 import html from '@rollup/plugin-html';
 import postcss from 'rollup-plugin-postcss';
 import type { PackageJson } from 'type-fest';
-
 import { readHtmlFile } from '../../../../utils';
 import type { TBaseDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../../../dyn';
 

@@ -5,7 +5,6 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import esbuild from 'rollup-plugin-esbuild';
 import license from 'rollup-plugin-license';
 import nodeExternals from 'rollup-plugin-node-externals';
-
 import { getPathDetails, isExternal } from '../../../../utils';
 import type { TBaseDynRollupOptions, TDynRollupOptionsCallbackConfig } from '../../../dyn';
 import { bundleSize, typescriptPaths } from '../../plugins';

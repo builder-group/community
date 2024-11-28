@@ -1,37 +1,53 @@
 {
 	"name": "@blgc/cli",
-	"description": "Straightforward CLI to bundle Typescript libraries with presets, powered by Rollup and Esbuild",
 	"version": "0.0.19",
 	"private": false,
-	"bin": {
-		"blgc": "./bin/run"
+	"description": "Straightforward CLI to bundle Typescript libraries with presets, powered by Rollup and Esbuild",
+	"keywords": [],
+	"homepage": "https://builder.group/?source=package-json",
+	"bugs": {
+		"url": "https://github.com/builder-group/monorepo/issues"
 	},
-	"scripts": {
-		"build": "shx rm -rf dist && tsc",
-		"start:dev": "tsc -w",
-		"lint": "eslint --ext .js,.ts,.jsx,.tsx src/",
-		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
-		"install:clean": "pnpm run clean && pnpm install",
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"update:latest": "pnpm update --latest",
-		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public"
-	},
-	"source": "./src/index.ts",
-	"main": "./dist/index.js",
-	"types": "./dist/index.d.ts",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/builder-group/monorepo.git"
 	},
-	"keywords": [],
-	"author": "@bennobuilder",
 	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/builder-group/monorepo/issues"
+	"author": "@bennobuilder",
+	"main": "./dist/index.js",
+	"source": "./src/index.ts",
+	"types": "./dist/index.d.ts",
+	"bin": {
+		"blgc": "./bin/run"
 	},
-	"homepage": "https://builder.group/?source=package-json",
+	"files": [
+		"dist",
+		"bin",
+		"README.md"
+	],
+	"scripts": {
+		"build": "shx rm -rf dist && tsc",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"lint": "eslint . --fix",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"start:dev": "tsc -w",
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"update:latest": "pnpm update --latest"
+	},
+	"oclif": {
+		"bin": "blgc",
+		"commands": "./dist/commands",
+		"dirname": "blgc",
+		"topicSeparator": " ",
+		"topics": {
+			"bundle": {
+				"description": "Bundle packages"
+			}
+		}
+	},
 	"dependencies": {
-		"@oclif/core": "^4.0.31",
+		"@oclif/core": "^4.0.33",
 		"@rollup/plugin-commonjs": "^28.0.1",
 		"@rollup/plugin-html": "^1.0.4",
 		"@rollup/plugin-json": "^6.1.0",
@@ -43,7 +59,7 @@
 		"figlet": "^1.8.0",
 		"lodash": "^4.17.21",
 		"maxmin": "^4.1.0",
-		"rollup": "^4.24.4",
+		"rollup": "^4.27.4",
 		"rollup-plugin-bundle-size": "^1.0.3",
 		"rollup-plugin-esbuild": "^6.1.1",
 		"rollup-plugin-license": "^3.5.3",
@@ -51,16 +67,12 @@
 		"rollup-plugin-postcss": "^4.0.2"
 	},
 	"devDependencies": {
+		"@blgc/config": "workspace:*",
 		"@types/figlet": "^1.7.0",
 		"@types/lodash": "^4.17.13",
-		"@types/node": "^22.9.0",
-		"type-fest": "^4.26.1"
+		"@types/node": "^22.10.0",
+		"type-fest": "^4.29.0"
 	},
-	"files": [
-		"dist",
-		"bin",
-		"README.md"
-	],
 	"pnpm": {
 		"updateConfig": {
 			"ignoreDependencies": [
@@ -68,17 +80,6 @@
 				"execa",
 				"rollup-plugin-node-externals"
 			]
-		}
-	},
-	"oclif": {
-		"bin": "blgc",
-		"dirname": "blgc",
-		"commands": "./dist/commands",
-		"topicSeparator": " ",
-		"topics": {
-			"bundle": {
-				"description": "Bundle packages"
-			}
 		}
 	}
 }

@@ -40,11 +40,10 @@ Create a typesafe and straightforward wrapper around web framework routers, seam
 ### ExpressJs
 
 ```ts
+import { createExpressOpenApiRouter } from '@blgc/openapi-router';
 import express, { Router } from 'express';
 import * as v from 'valibot';
 import { vValidator } from 'validation-adapters/valibot';
-import { createExpressOpenApiRouter } from '@blgc/openapi-router';
-
 import { paths } from './path/to/openapi/types';
 
 const app = express();
@@ -80,11 +79,10 @@ app.use('/*', router);
 > Hono's TypeScript integration provides type suggestions for `c.json()` based on generically defined response types, but doesn't enforce these types at compile-time. For example, `c.json('')` won't raise a type error even if the expected type is `{someType: string}`. This is due to Hono's internal use of `TypedResponse<T>`, which infers but doesn't strictly enforce the passed generic type. [Hono Discussion](https://github.com/orgs/honojs/discussions/3331)
 
 ```ts
+import { createHonoOpenApiRouter } from '@blgc/openapi-router';
 import { Hono } from 'hono';
 import * as v from 'valibot';
 import { vValidator } from 'validation-adapters/valibot';
-import { createHonoOpenApiRouter } from '@blgc/openapi-router';
-
 import { paths } from './path/to/openapi/types';
 
 export const app = new Hono();
