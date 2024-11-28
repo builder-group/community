@@ -22,9 +22,9 @@ describe('isObject function', () => {
 	});
 
 	it('should return false for functions', () => {
-		// eslint-disable-next-line func-names, @typescript-eslint/no-empty-function -- Test
+		 
 		expect(isObject(function () {})).toBeFalsy();
-		// eslint-disable-next-line @typescript-eslint/no-empty-function -- Test
+		 
 		expect(isObject(() => {})).toBeFalsy();
 	});
 });

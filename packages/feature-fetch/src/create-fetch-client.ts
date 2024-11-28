@@ -99,7 +99,7 @@ export function createFetchClient<GPaths extends object = object>(
 			// Process before request middlewares
 			try {
 				for (const middleware of this._config.beforeRequestMiddlewares) {
-					// eslint-disable-next-line no-await-in-loop -- Needs to be processed in order
+					 
 					await middleware({
 						path,
 						props: middlewareProps,

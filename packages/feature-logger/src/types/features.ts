@@ -8,7 +8,7 @@ export type TFeatures = {
 } & TThirdPartyFeatures;
 
 // Global registry for third party features
-// eslint-disable-next-line @typescript-eslint/no-empty-interface -- Overwritten by third party libraries
+ 
 export interface TThirdPartyFeatures {}
 
 export type TFeatureKeys = keyof TFeatures;

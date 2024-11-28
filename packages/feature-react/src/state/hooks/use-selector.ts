@@ -9,7 +9,7 @@ export function useSelector<GValue, GPath extends TNestedPath<GValue>>(
 	const [, forceRender] = React.useReducer((s: number) => s + 1, 0);
 
 	React.useEffect(() => {
-		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -- Ok
+		 
 		const unbind = state.listenToSelected(
 			[selectedProperty],
 			({ background }) => {

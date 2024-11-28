@@ -40,22 +40,22 @@ export interface TFormFieldStateConfig {
 }
 
 export enum FormFieldValidateMode {
-	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member, no-bitwise -- ok here
+	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- ok here
 	OnBlur = 1 << 0, // 1
-	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member, no-bitwise -- ok here
+	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- ok here
 	OnChange = 1 << 1, // 2
-	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member, no-bitwise -- ok here
+	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- ok here
 	OnSubmit = 1 << 2, // 4
-	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member, no-bitwise -- ok here
+	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- ok here
 	OnTouched = 1 << 3 // 8
 }
 
 export enum FormFieldReValidateMode {
-	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member, no-bitwise -- ok here
+	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- ok here
 	OnBlur = 1 << 0, // 1
-	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member, no-bitwise -- ok here
+	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- ok here
 	OnChange = 1 << 1, // 2
-	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member, no-bitwise -- ok here
+	// eslint-disable-next-line @typescript-eslint/prefer-literal-enum-member -- ok here
 	OnSubmit = 1 << 2 // 4
 }
 

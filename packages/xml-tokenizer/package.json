@@ -28,7 +28,7 @@
 		"build:dev": "shx rm -rf dist && ../../scripts/cli.sh bundle --target=dev",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
-		"lint": "eslint",
+		"lint": "eslint . --fix",
 		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
 		"size": "size-limit --why",
 		"start:dev": "tsc -w",

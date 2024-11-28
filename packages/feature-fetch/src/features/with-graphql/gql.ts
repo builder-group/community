@@ -1,4 +1,4 @@
-/* eslint-disable no-param-reassign -- Ok in reduce function */
+ 
 
 // https://github.com/apollographql/graphql-tag/blob/main/src/index.ts
 export function gql(literals: TemplateStringsArray, ...args: unknown[]): string {

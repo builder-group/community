@@ -1,5 +1,5 @@
 export function toFunction(jsonFunction: TJsonFunction): Function {
-	// eslint-disable-next-line @typescript-eslint/no-implied-eval, no-new-func -- .
+	 
 	return new Function(...jsonFunction.args, jsonFunction.body);
 }
 

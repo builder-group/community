@@ -101,7 +101,7 @@ function validationMiddleware<GPathOperation>(
 ): express.RequestHandler {
 	const { bodyValidator, pathValidator, queryValidator } = validators;
 
-	// eslint-disable-next-line @typescript-eslint/no-misused-promises -- async callback
+	 
 	return async (req, _res, next) => {
 		try {
 			const validationErrors: TValidationError[] = [];
@@ -149,10 +149,10 @@ function validationMiddleware<GPathOperation>(
 }
 
 function requestHandler(handler: express.RequestHandler): express.RequestHandler {
-	// eslint-disable-next-line @typescript-eslint/no-misused-promises -- async callback
+	 
 	return async (req, res, next) => {
 		try {
-			// eslint-disable-next-line @typescript-eslint/await-thenable, @typescript-eslint/no-confusing-void-expression -- RequestHandler can be async
+			 
 			await handler(req, res, next);
 		} catch (error) {
 			next(error);

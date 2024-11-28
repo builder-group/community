@@ -1,5 +1,3 @@
-/* eslint-disable no-bitwise -- Based on bit*/
-
 export class BitwiseFlag<T extends number> {
 	private value: number;
 

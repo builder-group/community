@@ -23,7 +23,7 @@ void describe('xml to object', () => {
 	});
 
 	bench('[xml-tokenizer (dist)]', () => {
-		// eslint-disable-next-line @typescript-eslint/no-confusing-void-expression -- Javascript module
+		 
 		const result = xtDist.xmlToObject(xml);
 		expect(result).not.toBeNull();
 	});

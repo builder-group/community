@@ -6,7 +6,7 @@ export type TFeatures<GFormData extends TFormData = TFormData> = {
 } & TThirdPartyFeatures<GFormData>;
 
 // Global registry for third party features
-// eslint-disable-next-line @typescript-eslint/no-empty-interface -- Overwritten by third party libraries
+ 
 export interface TThirdPartyFeatures<GFormData> {}
 
 export type TFeatureKeys<GFormData extends TFormData = TFormData> = keyof TFeatures<GFormData>;
