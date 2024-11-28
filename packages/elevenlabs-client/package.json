@@ -1,6 +1,6 @@
 {
 	"name": "elevenlabs-client",
-	"version": "0.0.9",
+	"version": "0.0.10",
 	"private": false,
 	"description": "Typesafe and straightforward fetch client for interacting with the ElevenLabs API using feature-fetch",
 	"keywords": [],

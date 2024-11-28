@@ -1,6 +1,6 @@
 {
 	"name": "feature-form",
-	"version": "0.0.30",
+	"version": "0.0.31",
 	"private": false,
 	"description": "Straightforward, typesafe, and feature-based form library for ReactJs",
 	"keywords": [],
