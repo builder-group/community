@@ -31,7 +31,7 @@ export type TValidateCallback<
 
 export interface TBaseValidationContext<GValue> {
 	config: TValidationContextConfig;
-	// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents -- ok here
+
 	value: Readonly<GValue | unknown>;
 	hasError: () => boolean;
 	isValue: (value: unknown) => value is GValue; // NOTE: We have to define a property using explicitly GValue to enforce generic. See: https://stackoverflow.com/questions/78716973/enforcing-same-generic-types-in-typescript/78717389

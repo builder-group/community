@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { xmlToSimplifiedObject } from './xml-to-simplified-object';
 
 describe('xmlToObject function', () => {

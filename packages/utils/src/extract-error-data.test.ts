@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { extractErrorData } from './extract-error-data';
 
 describe('extractErrorData function', () => {

@@ -2,7 +2,6 @@ import { Router } from 'express';
 import * as v from 'valibot';
 import { vValidator } from 'validation-adapters/valibot';
 import { describe, it } from 'vitest';
-
 import { createExpressOpenApiRouter } from '../features';
 import { TOpenApiRouter } from '../types';
 import { paths } from './resources/mock-openapi-types';

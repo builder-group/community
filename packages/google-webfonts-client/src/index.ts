@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/method-signature-style -- Ok here */
 import type { FetchError, TFetchClient, TResult } from 'feature-fetch';
-
 import type { components } from './gen/v1';
 import {
 	type TFontCapability,

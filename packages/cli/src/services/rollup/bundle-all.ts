@@ -1,5 +1,4 @@
 import type { RollupOptions, RollupOutput } from 'rollup';
-
 import type { DynCommand } from '../../DynCommand';
 import { bundleWithRollup } from './bundle';
 

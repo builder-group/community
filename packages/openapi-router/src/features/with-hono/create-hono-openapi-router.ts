@@ -1,5 +1,4 @@
 import { type Hono } from 'hono';
-
 import { createOpenApiRouter } from '../../create-openapi-router';
 import { type TOpenApiRouter } from '../../types';
 import { withHono } from './with-hono';

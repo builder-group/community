@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { formatPath } from './format-path';
 
 describe('formatPath function', () => {

@@ -1,0 +1,23 @@
+// https://github.com/tsconfig/bases/blob/main/bases/node20.json
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"extends": "./tsconfig.base.json",
+	"display": "Typescript configuration for applications and libraries that use Node 20",
+	"compilerOptions": {
+		// Language and Environment
+		"lib": ["es2023"],
+		"target": "es2022",
+
+		// Modules
+		"module": "node16",
+		"moduleResolution": "node16",
+
+		// Javascript Support
+		"allowJs": true
+
+		// Emit
+		// "outDir": "./dist",
+		// "rootDir": "./src"
+	},
+	"include": ["src"]
+}

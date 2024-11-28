@@ -1,5 +1,4 @@
 import { describe, it } from 'vitest';
-
 import { createOpenApiFetchClient } from '../features';
 import { paths } from './resources/mock-openapi-types';
 

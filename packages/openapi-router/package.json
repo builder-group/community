@@ -1,34 +1,38 @@
 {
 	"name": "@blgc/openapi-router",
-	"description": "Thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod",
 	"version": "0.0.21",
 	"private": false,
-	"scripts": {
-		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
-		"start:dev": "tsc -w",
-		"lint": "eslint --ext .js,.ts src/",
-		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
-		"install:clean": "pnpm run clean && pnpm install",
-		"test": "vitest run",
-		"update:latest": "pnpm update --latest",
-		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
-		"size": "size-limit --why"
+	"description": "Thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod",
+	"keywords": [],
+	"homepage": "https://builder.group/?source=package-json",
+	"bugs": {
+		"url": "https://github.com/builder-group/monorepo/issues"
 	},
-	"source": "./src/index.ts",
-	"main": "./dist/cjs/index.js",
-	"module": "./dist/esm/index.js",
-	"types": "./dist/types/index.d.ts",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/builder-group/monorepo.git"
 	},
-	"keywords": [],
-	"author": "@bennobuilder",
 	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/builder-group/monorepo/issues"
+	"author": "@bennobuilder",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"source": "./src/index.ts",
+	"types": "./dist/types/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"scripts": {
+		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"lint": "eslint . --fix",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"size": "size-limit --why",
+		"start:dev": "tsc -w",
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest"
 	},
-	"homepage": "https://builder.group/?source=package-json",
 	"dependencies": {
 		"@blgc/types": "workspace:*",
 		"validation-adapter": "workspace:*"
@@ -36,17 +40,13 @@
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@types/express": "^5.0.0",
-		"@types/express-serve-static-core": "^5.0.1",
-		"@types/node": "^22.9.0",
+		"@types/express-serve-static-core": "^5.0.2",
+		"@types/node": "^22.10.0",
 		"express": "^4.21.1",
-		"hono": "^4.6.9",
-		"valibot": "1.0.0-beta.3",
+		"hono": "^4.6.12",
+		"valibot": "1.0.0-beta.8",
 		"validation-adapters": "workspace:*"
 	},
-	"files": [
-		"dist",
-		"README.md"
-	],
 	"size-limit": [
 		{
 			"path": "dist/esm/index.js"

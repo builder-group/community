@@ -3,7 +3,6 @@ import path from 'node:path';
 import { Flags } from '@oclif/core';
 import chalk from 'chalk';
 import type { PackageJson } from 'type-fest';
-
 import { DynCommand } from '../../DynCommand';
 import { getDynConfig } from '../../services';
 import {

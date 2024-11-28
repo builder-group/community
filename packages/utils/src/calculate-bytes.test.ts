@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { calculateBytes } from './calculate-bytes';
 
 describe('calculateBytes function', () => {

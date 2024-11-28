@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { toHex } from './to-hex';
 
 describe('toHex function', () => {

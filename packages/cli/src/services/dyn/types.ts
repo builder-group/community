@@ -1,6 +1,5 @@
 import type { InputPluginOption, MaybePromise, OutputOptions, RollupOptions } from 'rollup';
 import type { PackageJson } from 'type-fest';
-
 import type { DynCommand } from '../../DynCommand';
 import type { TInputOutputPath } from '../../utils';
 

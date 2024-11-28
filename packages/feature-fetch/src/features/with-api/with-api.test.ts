@@ -1,7 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
-
 import { createFetchClient } from '../../create-fetch-client';
 import { withApi } from './with-api';
 

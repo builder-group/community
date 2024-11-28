@@ -1,40 +1,41 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
-	"display": "Default",
+	"display": "Base Typescript configuration",
 	"compilerOptions": {
 		// Projects
 		"composite": false,
+		"declaration": true,
+		"declarationMap": true,
 
 		// Language and Environment
 		"target": "esnext",
+		"module": "esnext",
 
 		// Modules
-		"module": "esnext",
 		"moduleResolution": "node",
 		"resolveJsonModule": true,
-
-		// Javascript Support
-		// "allowJs": true, // Global tsconfig.json has issues when this is enabled
+		"isolatedModules": true,
 
 		// Emit
-		"declaration": true,
-		"declarationMap": true,
 		"inlineSources": false,
 
 		// Interop Constraints
 		"esModuleInterop": true,
-		"isolatedModules": true,
 		"forceConsistentCasingInFileNames": true,
 
 		// Type Checking
 		"strict": true,
 		"noImplicitAny": true,
-		"strictPropertyInitialization": false,
 		"strictNullChecks": true,
+		"strictPropertyInitialization": false,
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
 		"noUncheckedIndexedAccess": true,
+		"noFallthroughCasesInSwitch": true,
+		"noImplicitReturns": true,
+		"noPropertyAccessFromIndexSignature": true,
 
+		// Performance
 		"skipLibCheck": true,
 		"preserveWatchOutput": true
 	},

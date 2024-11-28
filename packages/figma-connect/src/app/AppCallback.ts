@@ -1,5 +1,4 @@
 import { shortId } from '@blgc/utils';
-
 import type { TAppCallbackRegistration, TFromPluginMessageEvent } from '../types';
 
 export class AppCallback<

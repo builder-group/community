@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { fromHex } from './from-hex';
 
 describe('fromHex function', () => {

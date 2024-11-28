@@ -1,3 +1,4 @@
+import { mapOk, Ok, unwrapOrNull } from '@blgc/utils';
 import {
 	Err,
 	FetchError,
@@ -7,8 +8,6 @@ import {
 	type TFetchClient,
 	type TSelectFeatures
 } from 'feature-fetch';
-import { mapOk, Ok, unwrapOrNull } from '@blgc/utils';
-
 import { type paths } from './gen/v1';
 import { isVoiceId } from './helper';
 

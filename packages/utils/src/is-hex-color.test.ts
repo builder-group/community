@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { isHexColor } from './is-hex-color';
 
 describe('isHexColor function', () => {

@@ -28,7 +28,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"scripts": {
 		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
 		"start:dev": "tsc -w",
-		"lint": "eslint --ext .js,.ts src/",
+		"lint": "eslint . --fix",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"test": "echo \"Error: no test specified\" && exit 1"

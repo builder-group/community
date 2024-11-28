@@ -1,6 +1,5 @@
 import { defineConfig as rollupDefineConfig, type RollupOptions } from 'rollup';
 import type { PackageJson } from 'type-fest';
-
 import type { DynCommand } from '../../../../DynCommand';
 import type { TBaseDynRollupOptions, TDynFigmaConfig } from '../../../dyn';
 import { mergeRollupConfigs } from '../../merge-rollup-configs';

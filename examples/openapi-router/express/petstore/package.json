@@ -2,12 +2,16 @@
 	"name": "openapi-router-express-petstore",
 	"version": "0.0.1",
 	"private": true,
+	"main": "./dist/index.js",
+	"source": "./src/index.ts",
+	"files": [
+		"dist",
+		"README.md"
+	],
 	"scripts": {
 		"dev": "nodemon --config ./nodemon.json",
 		"openapi:generate": "npx openapi-typescript ./resources/openapi-v1.yaml -o ./src/gen/v1.ts"
 	},
-	"source": "./src/index.ts",
-	"main": "./dist/index.js",
 	"dependencies": {
 		"@blgc/openapi-router": "workspace:*",
 		"express": "^4.21.1",
@@ -21,9 +25,5 @@
 		"nodemon": "^3.1.7",
 		"openapi-typescript": "^7.4.2",
 		"ts-node": "^10.9.2"
-	},
-	"files": [
-		"dist",
-		"README.md"
-	]
+	}
 }

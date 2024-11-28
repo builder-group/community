@@ -1,8 +1,7 @@
+import { createExpressOpenApiRouter } from '@blgc/openapi-router';
 import { Router } from 'express';
 import * as v from 'valibot';
 import { vValidator } from 'validation-adapters/valibot';
-import { createExpressOpenApiRouter } from '@blgc/openapi-router';
-
 import { type paths } from './gen/v1';
 import { PetSchema } from './schemas';
 

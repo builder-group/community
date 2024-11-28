@@ -1,5 +1,4 @@
 import { describe, it } from 'vitest';
-
 import { createState } from '../create-state';
 import { withMultiUndo } from './with-multi-undo';
 import { withUndo } from './with-undo';

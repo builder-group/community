@@ -1,36 +1,54 @@
 {
 	"name": "@blgc/config",
-	"description": "Collection of ESLint, Vite and Typescript configurations",
 	"version": "0.0.25",
 	"private": false,
-	"scripts": {
-		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
-		"install:clean": "pnpm run clean && pnpm install",
-		"update:latest": "pnpm update --latest",
-		"publish:patch": "pnpm version patch && pnpm publish --no-git-checks --access=public"
+	"description": "Builder.Group's engineering style guide",
+	"keywords": [],
+	"homepage": "https://builder.group/?source=github",
+	"bugs": {
+		"url": "https://github.com/builder-group/monorepo/issues"
 	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/builder-group/monorepo.git"
 	},
-	"keywords": [],
-	"author": "@bennobuilder",
 	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/builder-group/monorepo/issues"
+	"author": "@bennobuilder",
+	"exports": {
+		"./eslint/*": "./eslint/*.js",
+		"./vite/*": "./vite/*.js",
+		"./prettier": "./prettier/index.js",
+		"./typescript/base": "./typescript/tsconfig.base.json",
+		"./typescript/library": "./typescript/tsconfig.library.json",
+		"./typescript/next": "./typescript/tsconfig.next.json",
+		"./typescript/node20": "./typescript/tsconfig.node20.json",
+		"./typescript/react-internal": "./typescript/tsconfig.react-internal.json"
 	},
-	"homepage": "https://builder.group/?source=github",
+	"scripts": {
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"publish:patch": "pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"update:latest": "pnpm update --latest"
+	},
 	"dependencies": {
-		"@vercel/style-guide": "^6.0.0",
-		"eslint-config-turbo": "^2.2.3",
-		"vite-tsconfig-paths": "^5.1.0"
-	},
-	"peerDependencies": {
-		"@next/eslint-plugin-next": "^14.2.6",
-		"eslint": "^8.57.0"
+		"@ianvs/prettier-plugin-sort-imports": "^4.4.0",
+		"@next/eslint-plugin-next": "^15.0.3",
+		"@typescript-eslint/eslint-plugin": "^8.16.0",
+		"@typescript-eslint/parser": "^8.16.0",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-only-warn": "^1.1.0",
+		"eslint-plugin-react": "^7.37.2",
+		"eslint-plugin-react-hooks": "^5.0.0",
+		"eslint-plugin-turbo": "^2.3.3",
+		"prettier-plugin-packagejson": "^2.5.6",
+		"prettier-plugin-tailwindcss": "^0.6.9",
+		"typescript-eslint": "^8.16.0",
+		"vite-tsconfig-paths": "^5.1.3"
 	},
 	"devDependencies": {
-		"@next/eslint-plugin-next": "^14.2.6",
-		"eslint": "^8.57.0"
+		"eslint": "^9.15.0",
+		"prettier": "^3.4.1",
+		"typescript": "^5.7.2",
+		"vitest": "^2.1.6"
 	}
 }

@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { serializeQueryParams } from './serialize-query-params';
 
 describe('serializeQueryParams function', () => {

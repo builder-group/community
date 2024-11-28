@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { isRgbColor } from './is-rgb-color';
 
 describe('isRgbColor function', () => {

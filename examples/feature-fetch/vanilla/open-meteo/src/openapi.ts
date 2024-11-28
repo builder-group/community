@@ -1,5 +1,4 @@
 import { createOpenApiFetchClient } from 'feature-fetch';
-
 import { type paths } from './gen/v1';
 
 const openApiFetchClient = createOpenApiFetchClient<paths>({

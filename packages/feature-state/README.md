@@ -57,7 +57,6 @@ export function addTask(task: Task) {
 
 ```tsx
 import { useGlobalState } from 'feature-state-react';
-
 import { $tasks } from '../store/tasks';
 
 export const Tasks = () => {

@@ -1,5 +1,5 @@
 {
-	"extends": "@blgc/config/node.tsconfig.json",
+	"extends": "@blgc/config/typescript/node20",
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./src"

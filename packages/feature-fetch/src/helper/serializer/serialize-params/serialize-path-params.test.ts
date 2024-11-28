@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import { serializePathParams } from './serialize-path-params';
 
 describe('serializePathParams function', () => {

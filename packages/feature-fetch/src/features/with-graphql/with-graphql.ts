@@ -1,5 +1,4 @@
 import { Err } from '@blgc/utils';
-
 import type { TEnforceFeatures, TFeatureKeys, TFetchClient, TSelectFeatures } from '../../types';
 import { getQueryString } from './get-query-string';
 

@@ -1,11 +1,11 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
-	"display": "Shared Library",
-	"extends": "./base.tsconfig.json",
+	"display": "Typescript configuration for TypeScript libraries",
+	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
-		// Language and Environmet
-		"target": "esnext",
+		// Language and Environment
 		"lib": ["esnext"],
+		"target": "esnext",
 
 		// Modules
 		"module": "commonjs",
@@ -16,7 +16,7 @@
 
 		// Emit
 		// "outDir": "./dist",
-		// "rootDir": "./src"
+		// "rootDir": "./src",
 	},
 	"include": ["src"]
 }

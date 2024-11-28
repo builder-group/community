@@ -1,5 +1,4 @@
 import type { RollupOptions, RollupWatcher } from 'rollup';
-
 import type { DynCommand } from '../../DynCommand';
 import { watchWithRollup, type TEventWatcher } from './watch';
 

@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from 'vitest';
-
 import { createState } from './create-state';
 
 describe('createState function', () => {

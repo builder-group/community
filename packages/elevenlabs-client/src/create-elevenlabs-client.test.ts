@@ -3,7 +3,6 @@ import path from 'node:path';
 import { pipeline } from 'node:stream';
 import { promisify } from 'node:util';
 import { beforeAll, describe, expect, it } from 'vitest';
-
 import { createElvenLabsClient } from './create-elevenlabs-client';
 
 const pipelineAsync = promisify(pipeline);

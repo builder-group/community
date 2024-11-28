@@ -1,6 +1,5 @@
 import chalk from 'chalk';
 import { rollup, type OutputOptions, type RollupOptions, type RollupOutput } from 'rollup';
-
 import type { DynCommand } from '../../DynCommand';
 import { pluginsToKeys } from './plugins-to-keys';
 

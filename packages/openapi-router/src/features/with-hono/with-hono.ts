@@ -1,8 +1,7 @@
+import { type TOperationPathParams, type TOperationQueryParams } from '@blgc/types/openapi';
 import { type Hono } from 'hono';
 import type * as hono from 'hono/types';
 import { createValidationContext, type TValidationError } from 'validation-adapter';
-import { type TOperationPathParams, type TOperationQueryParams } from '@blgc/types/openapi';
-
 import { ValidationError } from '../../exceptions';
 import { formatPath, parseParams } from '../../helper';
 import {
@@ -112,7 +111,7 @@ function validationMiddleware<GPathOperation>(
 			const bodyValidationContext = createValidationContext(jsonBody);
 			await bodyValidator.validate(bodyValidationContext);
 			for (const error of bodyValidationContext.errors) {
-				error.source = 'body';
+				error['source'] = 'body';
 				validationErrors.push(error);
 			}
 			if (bodyValidationContext.errors.length <= 0) {
@@ -127,7 +126,7 @@ function validationMiddleware<GPathOperation>(
 				createValidationContext<TOperationPathParams<GPathOperation>>(pathParams);
 			await pathValidator.validate(pathValidationContext);
 			for (const error of pathValidationContext.errors) {
-				error.source = 'path';
+				error['source'] = 'path';
 				validationErrors.push(error);
 			}
 			if (pathValidationContext.errors.length <= 0) {
@@ -142,7 +141,7 @@ function validationMiddleware<GPathOperation>(
 				createValidationContext<TOperationQueryParams<GPathOperation>>(queryParams);
 			await queryValidator.validate(queryValidationContext);
 			for (const error of queryValidationContext.errors) {
-				error.source = 'query';
+				error['source'] = 'query';
 				validationErrors.push(error);
 			}
 			if (queryValidationContext.errors.length <= 0) {

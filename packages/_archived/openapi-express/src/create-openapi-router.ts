@@ -1,5 +1,4 @@
 import type express from 'express';
-
 import { OpenApiRouter } from './OpenApiRouter';
 
 export function createOpenApiRouter<GPaths extends object = object>(

@@ -1,6 +1,5 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
-
 import { errorHandler, invalidPathHandler } from './handlers';
 import { router } from './router';
 
