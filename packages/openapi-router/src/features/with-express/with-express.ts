@@ -101,7 +101,6 @@ function validationMiddleware<GPathOperation>(
 ): express.RequestHandler {
 	const { bodyValidator, pathValidator, queryValidator } = validators;
 
-	 
 	return async (req, _res, next) => {
 		try {
 			const validationErrors: TValidationError[] = [];
@@ -149,10 +148,8 @@ function validationMiddleware<GPathOperation>(
 }
 
 function requestHandler(handler: express.RequestHandler): express.RequestHandler {
-	 
 	return async (req, res, next) => {
 		try {
-			 
 			await handler(req, res, next);
 		} catch (error) {
 			next(error);

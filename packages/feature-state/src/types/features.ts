@@ -23,7 +23,7 @@ export type TFeatures<GValue = unknown> = {
 } & TThirdPartyFeatures<GValue>;
 
 // Global registry for third party features
- 
+
 export interface TThirdPartyFeatures<GValue> {}
 
 export type TFeatureKeys<GValue = unknown> = keyof TFeatures<GValue>;

@@ -99,7 +99,6 @@ export function createFetchClient<GPaths extends object = object>(
 			// Process before request middlewares
 			try {
 				for (const middleware of this._config.beforeRequestMiddlewares) {
-					 
 					await middleware({
 						path,
 						props: middlewareProps,

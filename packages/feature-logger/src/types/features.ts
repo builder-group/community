@@ -8,7 +8,7 @@ export type TFeatures = {
 } & TThirdPartyFeatures;
 
 // Global registry for third party features
- 
+
 export interface TThirdPartyFeatures {}
 
 export type TFeatureKeys = keyof TFeatures;

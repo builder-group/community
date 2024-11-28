@@ -1,5 +1,3 @@
- 
-
 // https://github.com/apollographql/graphql-tag/blob/main/src/index.ts
 export function gql(literals: TemplateStringsArray, ...args: unknown[]): string {
 	// If a single string is passed, return it as is

@@ -22,9 +22,8 @@ describe('isObject function', () => {
 	});
 
 	it('should return false for functions', () => {
-		 
 		expect(isObject(function () {})).toBeFalsy();
-		 
+
 		expect(isObject(() => {})).toBeFalsy();
 	});
 });

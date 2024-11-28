@@ -9,7 +9,6 @@ export function useSelector<GValue, GPath extends TNestedPath<GValue>>(
 	const [, forceRender] = React.useReducer((s: number) => s + 1, 0);
 
 	React.useEffect(() => {
-		 
 		const unbind = state.listenToSelected(
 			[selectedProperty],
 			({ background }) => {

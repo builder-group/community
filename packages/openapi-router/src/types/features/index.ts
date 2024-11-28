@@ -12,7 +12,6 @@ export type TFeatures<GPaths extends object = object> = {
 } & TThirdPartyFeatures<GPaths>;
 
 // Global registry for third party features
- 
 export interface TThirdPartyFeatures<GPaths> {}
 
 export type TFeatureKeys<GPaths extends object = object> = keyof TFeatures<GPaths>;

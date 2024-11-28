@@ -1,5 +1,4 @@
 export function toFunction(jsonFunction: TJsonFunction): Function {
-	 
 	return new Function(...jsonFunction.args, jsonFunction.body);
 }
 

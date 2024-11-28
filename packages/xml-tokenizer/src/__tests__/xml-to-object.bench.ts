@@ -23,7 +23,6 @@ void describe('xml to object', () => {
 	});
 
 	bench('[xml-tokenizer (dist)]', () => {
-		 
 		const result = xtDist.xmlToObject(xml);
 		expect(result).not.toBeNull();
 	});

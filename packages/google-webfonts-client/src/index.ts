@@ -1,4 +1,3 @@
- 
 import type { FetchError, TFetchClient, TResult } from 'feature-fetch';
 import type { components } from './gen/v1';
 import {
