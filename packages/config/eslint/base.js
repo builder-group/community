@@ -29,6 +29,6 @@ module.exports = [
 		}
 	},
 	{
-		ignores: ['dist/**']
+		files: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.js', 'src/**/*.jsx']
 	}
 ];
