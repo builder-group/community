@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/style-guide/.github/banner.svg" alt="@blgc/config banner">
+    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/config/.github/banner.svg" alt="@blgc/config banner">
 </h1>
 
 <p align="left">

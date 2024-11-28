@@ -29,6 +29,7 @@ module.exports = [
 		}
 	},
 	{
-		files: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.js', 'src/**/*.jsx']
+		// files: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.js', 'src/**/*.jsx'],
+		ignores: ['dist/', 'node_modules/', '.turbo/', 'eslint.config.js']
 	}
 ];
