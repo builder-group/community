@@ -3,5 +3,5 @@
  * @type {import("prettier").Config}
  */
 module.exports = {
-	...require('@blgc/style-guide/prettier')
+	...require('@blgc/config/prettier')
 };

@@ -65,7 +65,7 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"devDependencies": {
-		"@blgc/style-guide": "workspace:*",
+		"@blgc/config": "workspace:*",
 		"@types/node": "^22.10.0",
 		"valibot": "1.0.0-beta.8",
 		"validation-adapter": "workspace:*",

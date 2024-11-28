@@ -54,7 +54,7 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"devDependencies": {
-		"@blgc/style-guide": "workspace:*",
+		"@blgc/config": "workspace:*",
 		"@blgc/utils": "workspace:*",
 		"@types/node": "^22.10.0",
 		"@types/react": "^18.3.12",

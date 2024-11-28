@@ -7,7 +7,7 @@ const ERROR = 2;
  * @type {import("eslint").Linter.Config}
  */
 module.exports = [
-	...require('@blgc/style-guide/eslint/library'),
+	...require('@blgc/config/eslint/library'),
 	{
 		rules: {
 			'no-bitwise': OFF,

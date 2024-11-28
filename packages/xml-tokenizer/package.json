@@ -36,7 +36,7 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"devDependencies": {
-		"@blgc/style-guide": "workspace:*",
+		"@blgc/config": "workspace:*",
 		"@types/node": "^22.10.0",
 		"@types/sax": "^1.2.7",
 		"@types/xml2js": "^0.4.14",

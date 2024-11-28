@@ -40,7 +40,7 @@
 		"validation-adapter": "workspace:*"
 	},
 	"devDependencies": {
-		"@blgc/style-guide": "workspace:*",
+		"@blgc/config": "workspace:*",
 		"@types/node": "^22.10.0"
 	},
 	"size-limit": [

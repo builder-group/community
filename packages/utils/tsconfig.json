@@ -1,5 +1,5 @@
 {
-	"extends": "@blgc/style-guide/typescript/library",
+	"extends": "@blgc/config/typescript/library",
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./src",

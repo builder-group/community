@@ -54,6 +54,6 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"devDependencies": {
-		"@blgc/style-guide": "workspace:*"
+		"@blgc/config": "workspace:*"
 	}
 }

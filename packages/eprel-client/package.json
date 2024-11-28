@@ -39,7 +39,7 @@
 		"feature-fetch": "workspace:*"
 	},
 	"devDependencies": {
-		"@blgc/style-guide": "workspace:*",
+		"@blgc/config": "workspace:*",
 		"@types/node": "^22.10.0",
 		"dotenv": "^16.4.5",
 		"openapi-typescript": "^7.4.3"

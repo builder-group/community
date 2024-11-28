@@ -1,40 +1,42 @@
-/*
- * This is a custom ESLint configuration for use with
- * Next.js apps.
- *
- * This config extends the Vercel Engineering Style Guide.
- * For more information, see https://github.com/vercel/style-guide
- */
-
-const OFF = 0;
-const WARNING = 1;
-const ERROR = 2;
+const pluginNext = require('@next/eslint-plugin-next');
+const pluginReact = require('eslint-plugin-react');
+const pluginReactHooks = require('eslint-plugin-react-hooks');
+const globals = require('globals');
 
 /**
- * @type {import('eslint').Linter.Config}
+ * ESLint configuration for applications that use Next.js.
+ *
+ * @see https://eslint.org/docs/latest/use/configure/configuration-files
+ * @type {import("eslint").Linter.Config}
  */
-module.exports = {
-	extends: [
-		require.resolve('@vercel/style-guide/eslint/node'),
-		require.resolve('@vercel/style-guide/eslint/browser'),
-		require.resolve('@vercel/style-guide/eslint/react'),
-		require.resolve('@vercel/style-guide/eslint/next'),
-		require.resolve('./_base')
-	],
-	globals: {
-		React: true,
-		JSX: true
-	},
-	rules: {
-		// EsLint
-		'import/no-default-export': OFF,
-
-		// React
-		'react/function-component-definition': [
-			'error',
-			{
-				namedComponents: 'arrow-function'
+module.exports = [
+	...require('./base.js'),
+	{
+		...pluginReact.configs.flat.recommended,
+		languageOptions: {
+			...pluginReact.configs.flat.recommended.languageOptions,
+			globals: {
+				...globals.serviceworker
 			}
-		]
+		}
+	},
+	{
+		plugins: {
+			'@next/next': pluginNext
+		},
+		rules: {
+			...pluginNext.configs.recommended.rules,
+			...pluginNext.configs['core-web-vitals'].rules
+		}
+	},
+	{
+		plugins: {
+			'react-hooks': pluginReactHooks
+		},
+		settings: { react: { version: 'detect' } },
+		rules: {
+			...pluginReactHooks.configs.recommended.rules,
+			'react/react-in-jsx-scope': 'off'
+		}
 	}
-};
+];

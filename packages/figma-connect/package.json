@@ -57,7 +57,7 @@
 		"@blgc/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"@blgc/style-guide": "workspace:*",
+		"@blgc/config": "workspace:*",
 		"@figma/plugin-typings": "^1.103.0",
 		"@types/node": "^22.10.0"
 	},

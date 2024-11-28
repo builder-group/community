@@ -38,7 +38,7 @@
 		"validation-adapter": "workspace:*"
 	},
 	"devDependencies": {
-		"@blgc/style-guide": "workspace:*",
+		"@blgc/config": "workspace:*",
 		"@types/express": "^5.0.0",
 		"@types/express-serve-static-core": "^5.0.2",
 		"@types/node": "^22.10.0",

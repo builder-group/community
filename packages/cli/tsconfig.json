@@ -1,5 +1,5 @@
 {
-	"extends": "@blgc/style-guide/typescript/node20",
+	"extends": "@blgc/config/typescript/node20",
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./src"

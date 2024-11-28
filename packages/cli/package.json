@@ -67,7 +67,7 @@
 		"rollup-plugin-postcss": "^4.0.2"
 	},
 	"devDependencies": {
-		"@blgc/style-guide": "workspace:*",
+		"@blgc/config": "workspace:*",
 		"@types/figlet": "^1.7.0",
 		"@types/lodash": "^4.17.13",
 		"@types/node": "^22.10.0",
