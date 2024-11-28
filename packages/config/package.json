@@ -24,6 +24,13 @@
 		"./typescript/node20": "./typescript/tsconfig.node20.json",
 		"./typescript/react-internal": "./typescript/tsconfig.react-internal.json"
 	},
+	"files": [
+		"eslint",
+		"vite",
+		"prettier",
+		"typescript",
+		"README.md"
+	],
 	"scripts": {
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
