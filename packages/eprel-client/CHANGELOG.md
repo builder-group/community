@@ -1,5 +1,15 @@
 # eprel-client
 
+## 0.0.20
+
+### Patch Changes
+
+- [#81](https://github.com/builder-group/community/pull/81) [`3b84711`](https://github.com/builder-group/community/commit/3b847116033f6c6d0478cefa109d5f1c26312ed5) Thanks [@bennobuilder](https://github.com/bennobuilder)! - Migrated to Eslint 9
+
+- Updated dependencies [[`3b84711`](https://github.com/builder-group/community/commit/3b847116033f6c6d0478cefa109d5f1c26312ed5)]:
+  - feature-fetch@0.0.32
+  - @blgc/utils@0.0.26
+
 ## 0.0.19
 
 ### Patch Changes
