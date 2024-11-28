@@ -1,6 +1,6 @@
 {
 	"name": "@blgc/cli",
-	"version": "0.0.20",
+	"version": "0.0.21",
 	"private": false,
 	"description": "Straightforward CLI to bundle Typescript libraries with presets, powered by Rollup and Esbuild",
 	"keywords": [],
@@ -21,8 +21,8 @@
 		"blgc": "./bin/run"
 	},
 	"files": [
-		"dist",
 		"bin",
+		"dist",
 		"README.md"
 	],
 	"scripts": {
