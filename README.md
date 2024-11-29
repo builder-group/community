@@ -63,3 +63,9 @@ A collection of open source libraries maintained by [builder.group](https://buil
 ### What does `blgc` stand for?
 
 `blgc` stands for **B**ui**L**der.**G**roup **C**ommunity, chosen because similar names like `blg`, `bldr` and `bgc` were already taken.
+
+### Why a Monorepo?
+
+Maintaining all libraries in a single repository keeps things simple and efficient. A monorepo allows for shared tooling, consistent versioning, and streamlined CI/CD workflows, while making cross-library changes easier. This approach simplifies collaboration and reduces overhead, ensuring all libraries remain in sync.
+
+The only disadvantage is that it’s harder to discover individual libraries via SEO since they’re all part of one repo. However, the benefits far outweigh this limitation.
