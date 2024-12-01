@@ -33,24 +33,24 @@ Additionally, I didn't trust existing libraries, as reading environment variable
 ## 📖 Usage
 
 ```ts
-import { validateEnv } from 'validatenv';
 import * as v from 'valibot';
+import { validateEnv } from 'validatenv';
 import { vValidator } from 'validation-adapters/valibot';
 import { zValidator } from 'validation-adapters/zod';
 import * as z from 'zod';
 
-dotenv.config()
+dotenv.config();
 
 const env = validateEnv(process.env, {
 	PORT: {
 		validator: vValidator(v.number()), // Validate with Valibot
 		defaultValue: devDefault(3000), // Only in development
 		middlewares: [numberMiddleware]
-  },
-  DATABASE_URL: {
-    validator: zValidator(z.string()), // Validate with Zod
-    defaultValue: localDefault('postgres://localhost:5432/myapp'), // Only in local env
-  },
+	},
+	DATABASE_URL: {
+		validator: zValidator(z.string()), // Validate with Zod
+		defaultValue: localDefault('postgres://localhost:5432/myapp') // Only in local env
+	},
 	TEST_API_KEY: {
 		validator: createValidator<string>([
 			{
@@ -69,4 +69,3 @@ const env = validateEnv(process.env, {
 	}
 });
 ```
-
