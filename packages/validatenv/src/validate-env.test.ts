@@ -90,9 +90,13 @@ describe('validateEnv function', () => {
 							}
 						}
 					]),
-					middlewares: [numberMiddleware]
+					middlewares: [numberMiddleware],
+					description: 'The port number for the server to listen on',
+					example: '3000, 8080'
 				}
 			})
-		).toThrow('Invalid value for PORT: Must be a number');
+		).toThrow(
+			'Environment validation failed:\n\nInvalid value for PORT\nDescription: The port number for the server to listen on\nExample: 3000, 8080\nError: Must be a number'
+		);
 	});
 });

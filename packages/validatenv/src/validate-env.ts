@@ -8,10 +8,10 @@ export function validateEnv<GEnvData extends TEnvData>(
 	const result: Partial<GEnvData> = {};
 	const errors: string[] = [];
 
-	for (const [key, { validator, defaultValue, middlewares = [] }] of Object.entries(specs) as [
-		keyof GEnvData,
-		TEnvSpec<GEnvData[keyof GEnvData]>
-	][]) {
+	for (const [
+		key,
+		{ validator, defaultValue, middlewares = [], description, example }
+	] of Object.entries(specs) as [keyof GEnvData, TEnvSpec<GEnvData[keyof GEnvData]>][]) {
 		const rawValue = env[key as string];
 		let value: unknown = rawValue;
 
@@ -46,10 +46,14 @@ export function validateEnv<GEnvData extends TEnvData>(
 		validator.validate(validationContext);
 
 		if (validationContext.hasError()) {
+			const finalDescription = description != null ? `\nDescription: ${description}` : '';
+			const finalExample = example != null ? `\nExample: ${example}` : '';
+			const finalErrors = `\nError: ${validationContext.errors
+				.map((e: TValidationError) => e.message)
+				.join(', ')}`;
+
 			errors.push(
-				`Invalid value for ${String(key)}: ${validationContext.errors
-					.map((e: TValidationError) => e.message)
-					.join(', ')}`
+				`Invalid value for ${String(key)}${finalDescription}${finalExample}${finalErrors}`
 			);
 			continue;
 		}
@@ -58,7 +62,7 @@ export function validateEnv<GEnvData extends TEnvData>(
 	}
 
 	if (errors.length > 0) {
-		throw new Error(`Environment validation failed:\n${errors.join('\n')}`);
+		throw new Error(`Environment validation failed:\n\n${errors.join('\n\n')}`);
 	}
 
 	return result as GEnvData;
