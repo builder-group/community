@@ -37,7 +37,7 @@ import * as v from 'valibot';
 import { validateEnv } from 'validatenv';
 import { vValidator } from 'validation-adapters/valibot';
 import { zValidator } from 'validation-adapters/zod';
-import { createValidator } from 'validation-adapters';
+import { createValidator } from 'validation-adapters/adapter';
 import * as z from 'zod';
 
 dotenv.config();

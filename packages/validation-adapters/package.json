@@ -1,6 +1,6 @@
 {
 	"name": "validation-adapters",
-	"version": "0.0.14",
+	"version": "0.0.16",
 	"private": false,
 	"description": "Pre-made validation adapters for the validation-adapter library, including adapters for Zod and Valibot",
 	"keywords": [],
@@ -15,11 +15,11 @@
 	"license": "MIT",
 	"author": "@bennobuilder",
 	"exports": {
-		".": {
-			"source": "./src/index.ts",
-			"require": "./dist/cjs/index.js",
-			"import": "./dist/esm/index.js",
-			"types": "./dist/types/index.d.ts"
+		"./adapter": {
+			"source": "./src/adapter/index.ts",
+			"require": "./dist/adapter/cjs/index.js",
+			"import": "./dist/adapter/esm/index.js",
+			"types": "./dist/types/adapter/index.d.ts"
 		},
 		"./valibot": {
 			"source": "./src/valibot/index.ts",
@@ -39,13 +39,12 @@
 			"import": "./dist/zod/esm/index.js",
 			"types": "./dist/types/zod/index.d.ts"
 		},
-		"./package.json": "./package.json",
-		"./*": "./*"
+		"./package.json": "./package.json"
 	},
 	"typesVersions": {
 		"*": {
-			".": [
-				"./dist/types/index.d.ts"
+			"adapter": [
+				"./dist/types/adapter/index.d.ts"
 			],
 			"valibot": [
 				"./dist/types/valibot/index.d.ts"

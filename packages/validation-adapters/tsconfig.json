@@ -5,5 +5,5 @@
 		"rootDir": "./src",
 		"declarationDir": "./dist/types"
 	},
-	"include": ["src/valibot", "src/yup", "src/zod"]
+	"include": ["src/adapter", "src/valibot", "src/yup", "src/zod"]
 }
