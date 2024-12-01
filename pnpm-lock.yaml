@@ -632,6 +632,19 @@ importers:
         specifier: ^22.10.0
         version: 22.10.0
 
+  packages/validatenv:
+    dependencies:
+      validation-adapter:
+        specifier: workspace:*
+        version: link:../validation-adapter
+    devDependencies:
+      '@blgc/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^22.10.0
+        version: 22.10.0
+
   packages/validation-adapter:
     dependencies:
       '@blgc/utils':

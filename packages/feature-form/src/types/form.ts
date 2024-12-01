@@ -1,11 +1,7 @@
 import { type TState } from 'feature-state';
 import { type TCollectErrorMode } from 'validation-adapter';
 import { type TFeatureKeys, type TSelectFeatures } from './features';
-import {
-	type TFormField,
-	type TFormFieldValidator,
-	type TInvalidFormFieldError
-} from './form-field';
+import { type TFormField, type TInvalidFormFieldError } from './form-field';
 
 // Note: TForm is not itself a state because of type issues mainly because GFormData is the main generic,
 // but the State value was TFormFields<GFormData>. Thus We had to check if GValue extends TFormFields<infer GFormData>,
@@ -31,10 +27,6 @@ export type TForm<GFormData extends TFormData, GSelectedFeatureKeys extends TFea
 
 export type TFormFields<GFormData extends TFormData> = {
 	[Key in keyof GFormData]: TFormField<GFormData[Key]>;
-};
-
-export type TFormValidators<GFormData extends TFormData> = {
-	[Key in keyof GFormData]: TFormFieldValidator<GFormData[Key]>;
 };
 
 export type TFormData = Record<string, any>;
