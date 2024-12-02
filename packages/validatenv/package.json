@@ -1,6 +1,6 @@
 {
 	"name": "validatenv",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"private": false,
 	"description": "Validate environment variables",
 	"keywords": [],
@@ -34,6 +34,7 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
+		"@blgc/utils": "workspace:*",
 		"validation-adapter": "workspace:*"
 	},
 	"devDependencies": {

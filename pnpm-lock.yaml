@@ -634,6 +634,9 @@ importers:
 
   packages/validatenv:
     dependencies:
+      '@blgc/utils':
+        specifier: workspace:*
+        version: link:../utils
       validation-adapter:
         specifier: workspace:*
         version: link:../validation-adapter
@@ -659,6 +662,10 @@ importers:
         version: 22.10.0
 
   packages/validation-adapters:
+    dependencies:
+      validation-adapter:
+        specifier: workspace:*
+        version: link:../validation-adapter
     devDependencies:
       '@blgc/config':
         specifier: workspace:*
@@ -669,9 +676,6 @@ importers:
       valibot:
         specifier: 1.0.0-beta.8
         version: 1.0.0-beta.8(typescript@5.7.2)
-      validation-adapter:
-        specifier: workspace:*
-        version: link:../validation-adapter
       yup:
         specifier: ^1.4.0
         version: 1.4.0
