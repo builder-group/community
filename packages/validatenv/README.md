@@ -77,7 +77,10 @@ const env = validateEnv(process.env, {
     validator: urlValidator,
     description: 'External API endpoint',
     example: 'https://api.example.com/v1'
-  }
+  },
+
+  // Static value
+  staticValue: 'static-value'
 });
 
 // env is now fully typed with all validated values

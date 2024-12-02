@@ -12,61 +12,17 @@ export function validateEnv<GEnvData extends TEnvData>(
 		keyof GEnvData,
 		TEnvSpecValue<GEnvData[keyof GEnvData]>
 	][]) {
-		// Handle full env spec case
-		if (isEnvSpec(spec)) {
-			const { validator, defaultValue, middlewares = [], description, example, envKey } = spec;
-			const rawValue = env[String(envKey ?? recordKey)];
-			let value: unknown = rawValue;
-
-			// Apply middlewares if any
-			if (middlewares.length > 0) {
-				for (const middleware of middlewares) {
-					const transformed = middleware(rawValue);
-					if (transformed !== undefined) {
-						value = transformed;
-						break;
-					}
-				}
-			}
-
-			// Handle undefined values with defaultValue
-			if (value === undefined) {
-				if (typeof defaultValue === 'function') {
-					try {
-						value = (defaultValue as TDefaultValueFn<GEnvData[typeof recordKey]>)(env);
-					} catch (error) {
-						errors.push(`Error evaluating default value for ${String(recordKey)}: ${error}`);
-						continue;
-					}
-				} else if (defaultValue !== undefined) {
-					value = defaultValue;
-				}
-			}
-
-			const validationContext = createValidationContext<GEnvData[typeof recordKey]>(
-				value as GEnvData[typeof recordKey]
-			);
-			validator.validate(validationContext);
-
-			if (validationContext.hasError()) {
-				const finalDescription = description != null ? `\nDescription: ${description}` : '';
-				const finalExample = example != null ? `\nExample: ${example}` : '';
-				const finalErrors = `\nError: ${validationContext.errors
-					.map((e: TValidationError) => e.message)
-					.join(', ')}`;
-
-				errors.push(
-					`Invalid value for ${String(recordKey)}${finalDescription}${finalExample}${finalErrors}`
-				);
-				continue;
-			}
-
-			result[recordKey] = validationContext.value as GEnvData[typeof recordKey];
+		if (!isEnvSpec(spec)) {
+			result[recordKey] = spec as GEnvData[keyof GEnvData];
+			continue;
 		}
-		// Handle plain value case
-		else {
-			result[recordKey] = spec as GEnvData[typeof recordKey];
+
+		const processResult = processEnvValue(env, String(recordKey), spec);
+		if (!processResult.success) {
+			errors.push(processResult.error);
+			continue;
 		}
+		result[recordKey] = processResult.value;
 	}
 
 	if (errors.length > 0) {
@@ -74,6 +30,79 @@ export function validateEnv<GEnvData extends TEnvData>(
 	}
 
 	return result as GEnvData;
+}
+
+export function validateEnvValue<GValue>(
+	env: NodeJS.ProcessEnv,
+	spec: (Omit<TEnvSpec<GValue>, 'envKey'> & { envKey: string }) | GValue
+): GValue {
+	if (!isEnvSpec(spec)) {
+		return spec;
+	}
+
+	const result = processEnvValue(env, spec.envKey, spec);
+	if (!result.success) {
+		throw new Error(`Environment validation failed: ${result.error}`);
+	}
+	return result.value;
+}
+
+function processEnvValue<GValue>(
+	env: NodeJS.ProcessEnv,
+	recordKey: string,
+	spec: TEnvSpec<GValue>
+): { success: true; value: GValue } | { success: false; error: string } {
+	const { validator, defaultValue, middlewares = [], description, example, envKey } = spec;
+	const rawValue = env[String(envKey ?? recordKey)];
+	let value: unknown = rawValue;
+
+	// Apply middlewares if any
+	if (middlewares.length > 0) {
+		for (const middleware of middlewares) {
+			const transformed = middleware(rawValue);
+			if (transformed !== undefined) {
+				value = transformed;
+				break;
+			}
+		}
+	}
+
+	// Handle undefined values with defaultValue
+	if (value === undefined) {
+		if (typeof defaultValue === 'function') {
+			try {
+				value = (defaultValue as TDefaultValueFn<GValue>)(env);
+			} catch (error) {
+				return {
+					success: false,
+					error: `Error evaluating default value for ${String(recordKey)}: ${error}`
+				};
+			}
+		} else if (defaultValue !== undefined) {
+			value = defaultValue;
+		}
+	}
+
+	const validationContext = createValidationContext<GValue>(value as GValue);
+	validator.validate(validationContext);
+
+	if (validationContext.hasError()) {
+		const finalDescription = description != null ? `\nDescription: ${description}` : '';
+		const finalExample = example != null ? `\nExample: ${example}` : '';
+		const finalErrors = `\nError: ${validationContext.errors
+			.map((e: TValidationError) => e.message)
+			.join(', ')}`;
+
+		return {
+			success: false,
+			error: `Invalid value for ${String(recordKey)}${finalDescription}${finalExample}${finalErrors}`
+		};
+	}
+
+	return {
+		success: true,
+		value: validationContext.value as GValue
+	};
 }
 
 function isEnvSpec<GValue>(value: TEnvSpecValue<GValue>): value is TEnvSpec<GValue> {

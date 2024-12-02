@@ -1,7 +1,8 @@
 import { createValidator } from 'validation-adapter';
 import { describe, expect, it } from 'vitest';
 import { booleanMiddleware, numberMiddleware } from './middlewares';
-import { validateEnv } from './validate-env';
+import { validateEnv, validateEnvValue } from './validate-env';
+import { stringValidator } from './validators';
 
 describe('validateEnv function', () => {
 	it('should validate and transform environment variables', () => {
@@ -23,14 +24,14 @@ describe('validateEnv function', () => {
 			API_URL: {
 				validator: createValidator<string>([])
 			},
-			plainValue: 'plain'
+			plainValue: 'static-value'
 		});
 
 		expect(result).toEqual({
 			PORT: 3000,
 			DEBUG: true,
 			API_URL: 'http://api.example.com',
-			plainValue: 'plain'
+			plainValue: 'static-value'
 		});
 	});
 
@@ -123,5 +124,42 @@ describe('validateEnv function', () => {
 			dbUrl: 'postgresql://localhost:5432/mydb',
 			redisUrl: 'redis://localhost:6379'
 		});
+	});
+});
+
+describe('validateEnvValue function', () => {
+	it('should validate a single env value with required envKey', () => {
+		const env = {
+			API_KEY: 'secret-123'
+		};
+
+		const value = validateEnvValue(env, {
+			envKey: 'API_KEY',
+			validator: stringValidator,
+			description: 'API key for authentication',
+			example: 'secret-123'
+		});
+
+		expect(value).toBe('secret-123');
+	});
+
+	it('should throw error for invalid value', () => {
+		const env = {
+			API_KEY: 0 as any
+		};
+
+		expect(() =>
+			validateEnvValue(env, {
+				envKey: 'API_KEY',
+				validator: stringValidator,
+				description: 'API key for authentication',
+				example: 'secret-123'
+			})
+		).toThrow('Environment validation failed: Invalid value for API_KEY');
+	});
+
+	it('should pass through plain values without validation', () => {
+		const value = validateEnvValue(process.env, 'static-value');
+		expect(value).toBe('static-value');
 	});
 });
