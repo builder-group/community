@@ -1,4 +1,4 @@
-import { isIP } from 'net';
+import { isIP } from './is-ip';
 
 // Adapted from https://github.com/validatorjs/validator.js/blob/master/src/lib/isFQDN.js
 export function isFQDN(input: unknown, options: FQDNOptions = {}): boolean {
