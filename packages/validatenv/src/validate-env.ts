@@ -9,10 +9,10 @@ export function validateEnv<GEnvData extends TEnvData>(
 	const errors: string[] = [];
 
 	for (const [
-		key,
-		{ validator, defaultValue, middlewares = [], description, example }
+		recordKey,
+		{ validator, defaultValue, middlewares = [], description, example, key }
 	] of Object.entries(specs) as [keyof GEnvData, TEnvSpec<GEnvData[keyof GEnvData]>][]) {
-		const rawValue = env[key as string];
+		const rawValue = env[String(key ?? recordKey)];
 		let value: unknown = rawValue;
 
 		// Apply middlewares if any
@@ -30,9 +30,9 @@ export function validateEnv<GEnvData extends TEnvData>(
 		if (value === undefined) {
 			if (typeof defaultValue === 'function') {
 				try {
-					value = (defaultValue as TDefaultValueFn<GEnvData[typeof key]>)(env);
+					value = (defaultValue as TDefaultValueFn<GEnvData[typeof recordKey]>)(env);
 				} catch (error) {
-					errors.push(`Error evaluating default value for ${String(key)}: ${error}`);
+					errors.push(`Error evaluating default value for ${String(recordKey)}: ${error}`);
 					continue;
 				}
 			} else if (defaultValue !== undefined) {
@@ -40,8 +40,8 @@ export function validateEnv<GEnvData extends TEnvData>(
 			}
 		}
 
-		const validationContext = createValidationContext<GEnvData[typeof key]>(
-			value as GEnvData[typeof key]
+		const validationContext = createValidationContext<GEnvData[typeof recordKey]>(
+			value as GEnvData[typeof recordKey]
 		);
 		validator.validate(validationContext);
 
@@ -53,12 +53,12 @@ export function validateEnv<GEnvData extends TEnvData>(
 				.join(', ')}`;
 
 			errors.push(
-				`Invalid value for ${String(key)}${finalDescription}${finalExample}${finalErrors}`
+				`Invalid value for ${String(recordKey)}${finalDescription}${finalExample}${finalErrors}`
 			);
 			continue;
 		}
 
-		result[key] = validationContext.value as GEnvData[typeof key];
+		result[recordKey] = validationContext.value as GEnvData[typeof recordKey];
 	}
 
 	if (errors.length > 0) {

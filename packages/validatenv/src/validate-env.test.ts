@@ -99,4 +99,27 @@ describe('validateEnv function', () => {
 			'Environment validation failed:\n\nInvalid value for PORT\nDescription: The port number for the server to listen on\nExample: 3000, 8080\nError: Must be a number'
 		);
 	});
+
+	it('should support custom environment variable keys', () => {
+		const env = {
+			DATABASE_URL: 'postgresql://localhost:5432/mydb',
+			REDIS_CONNECTION: 'redis://localhost:6379'
+		};
+
+		const result = validateEnv(env, {
+			dbUrl: {
+				key: 'DATABASE_URL',
+				validator: createValidator<string>([])
+			},
+			redisUrl: {
+				key: 'REDIS_CONNECTION',
+				validator: createValidator<string>([])
+			}
+		});
+
+		expect(result).toEqual({
+			dbUrl: 'postgresql://localhost:5432/mydb',
+			redisUrl: 'redis://localhost:6379'
+		});
+	});
 });

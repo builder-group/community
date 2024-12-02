@@ -7,6 +7,19 @@ export type TEnvMiddleware<GValue> = (value: string | undefined) => GValue | und
 export type TDefaultValueFn<GValue> = (env: NodeJS.ProcessEnv) => GValue | undefined;
 
 export type TEnvSpec<GValue> = {
+	/**
+	 * Optional custom environment variable key to look up in process.env
+	 * If not provided, the object property name will be used
+	 * @example
+	 * ```ts
+	 * // Will look for process.env.DATABASE_URL instead of process.env.dbUrl
+	 * dbUrl: {
+	 *   key: 'DATABASE_URL',
+	 * }
+	 * ```
+	 */
+	key?: string;
+
 	/** The validator function to validate the environment variable */
 	validator: TValidator<GValue, TBaseValidationContext<GValue>>;
 
