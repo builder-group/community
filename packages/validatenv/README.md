@@ -33,40 +33,55 @@ Additionally, I didn't trust existing libraries, as reading environment variable
 ## 📖 Usage
 
 ```ts
+import { validateEnv, portValidator, urlValidator, booleanMiddleware, devDefault, localDefault } from 'validatenv';
+// Third-party validators
+import * as z from 'zod';
 import * as v from 'valibot';
-import { validateEnv } from 'validatenv';
 import { vValidator } from 'validation-adapters/valibot';
 import { zValidator } from 'validation-adapters/zod';
-import { createValidator } from 'validation-adapters/adapter';
-import * as z from 'zod';
 
-dotenv.config();
+// Load environment variables
+import 'dotenv/config';
 
 const env = validateEnv(process.env, {
-	PORT: {
-		validator: vValidator(v.number()), // Validate with Valibot
-		defaultValue: devDefault(3000), // Only in development
-		middlewares: [numberMiddleware]
-	},
-	DATABASE_URL: {
-		validator: zValidator(z.string()), // Validate with Zod
-		defaultValue: localDefault('postgres://localhost:5432/myapp') // Only in local env
-	},
-	TEST_API_KEY: {
-		validator: createValidator<string>([
-			{
-				key: 'string',
-				validate: (cx) => {
-					if (typeof cx.value !== 'string') {
-						cx.registerError({
-							code: 'invalid_type',
-							message: 'Must be a string'
-						});
-					}
-				}
-			}
-		]), // Validate with custom validator
-		defaultValue: testDefault('test-key-123') // Only in test env
-	}
+  // Built-in validator with custom env key
+  port: {
+    envKey: 'SERVER_PORT', // Read from SERVER_PORT instead of port
+    validator: portValidator,
+    defaultValue: devDefault(3000),
+    description: 'Server port number',
+    example: '8080'
+  },
+
+  // Valibot validation
+  API_KEY: {
+    validator: vValidator(v.string([v.minLength(10)])),
+    description: 'API authentication key'
+  },
+
+  // Zod validation with local development default
+  DATABASE_URL: {
+    validator: zValidator(z.string().url()),
+    defaultValue: devDefault('postgres://localhost:5432/myapp')
+  },
+
+  // Boolean with middleware for type conversion
+  DEBUG: {
+    validator: zValidator(z.boolean()),
+    middlewares: [booleanMiddleware], // Converts 'true', 'yes', '1', etc.
+    defaultValue: false
+  },
+
+  // URL validation with built-in validator
+  API_URL: {
+    validator: urlValidator,
+    description: 'External API endpoint',
+    example: 'https://api.example.com/v1'
+  }
 });
+
+// env is now fully typed with all validated values
+console.log(env.PORT); // number
+console.log(env.API_URL); // string
+console.log(env.DEBUG); // boolean
 ```

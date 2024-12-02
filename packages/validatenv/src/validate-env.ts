@@ -10,9 +10,9 @@ export function validateEnv<GEnvData extends TEnvData>(
 
 	for (const [
 		recordKey,
-		{ validator, defaultValue, middlewares = [], description, example, key }
+		{ validator, defaultValue, middlewares = [], description, example, envKey }
 	] of Object.entries(specs) as [keyof GEnvData, TEnvSpec<GEnvData[keyof GEnvData]>][]) {
-		const rawValue = env[String(key ?? recordKey)];
+		const rawValue = env[String(envKey ?? recordKey)];
 		let value: unknown = rawValue;
 
 		// Apply middlewares if any

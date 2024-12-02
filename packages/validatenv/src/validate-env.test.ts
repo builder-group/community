@@ -108,11 +108,11 @@ describe('validateEnv function', () => {
 
 		const result = validateEnv(env, {
 			dbUrl: {
-				key: 'DATABASE_URL',
+				envKey: 'DATABASE_URL',
 				validator: createValidator<string>([])
 			},
 			redisUrl: {
-				key: 'REDIS_CONNECTION',
+				envKey: 'REDIS_CONNECTION',
 				validator: createValidator<string>([])
 			}
 		});

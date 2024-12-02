@@ -14,11 +14,11 @@ export type TEnvSpec<GValue> = {
 	 * ```ts
 	 * // Will look for process.env.DATABASE_URL instead of process.env.dbUrl
 	 * dbUrl: {
-	 *   key: 'DATABASE_URL',
+	 *   envKey: 'DATABASE_URL',
 	 * }
 	 * ```
 	 */
-	key?: string;
+	envKey?: string;
 
 	/** The validator function to validate the environment variable */
 	validator: TValidator<GValue, TBaseValidationContext<GValue>>;
