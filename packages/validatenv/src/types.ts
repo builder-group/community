@@ -63,6 +63,11 @@ export type TEnvSpec<GValue> = {
 	example?: string;
 };
 
+export type TEnvSpecValue<GValue> =
+	| TEnvSpec<GValue>
+	// | TValidator<GValue, TBaseValidationContext<GValue>>
+	| GValue;
+
 export type TEnvSpecs<GEnvData extends TEnvData> = {
-	[Key in keyof GEnvData]: TEnvSpec<GEnvData[Key]>;
+	[Key in keyof GEnvData]: TEnvSpecValue<GEnvData[Key]>;
 };

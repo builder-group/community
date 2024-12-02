@@ -22,13 +22,15 @@ describe('validateEnv function', () => {
 			},
 			API_URL: {
 				validator: createValidator<string>([])
-			}
+			},
+			plainValue: 'plain'
 		});
 
 		expect(result).toEqual({
 			PORT: 3000,
 			DEBUG: true,
-			API_URL: 'http://api.example.com'
+			API_URL: 'http://api.example.com',
+			plainValue: 'plain'
 		});
 	});
 
