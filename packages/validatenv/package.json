@@ -1,6 +1,6 @@
 {
 	"name": "validatenv",
-	"version": "0.0.15",
+	"version": "0.0.16",
 	"private": false,
 	"description": "Validate environment variables",
 	"keywords": [],

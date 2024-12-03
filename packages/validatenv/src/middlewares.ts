@@ -30,7 +30,7 @@ export const numberMiddleware: TEnvMiddleware<number> = (input) => {
 	return Number.isNaN(num) ? undefined : num;
 };
 
-export const nonEmptyMiddleware: TEnvMiddleware<string> = (input) => {
+export const nonEmptyStringMiddleware: TEnvMiddleware<string> = (input) => {
 	if (input === undefined) {
 		return undefined;
 	}

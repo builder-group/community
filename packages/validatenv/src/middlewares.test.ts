@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { booleanMiddleware, nonEmptyMiddleware, numberMiddleware } from './middlewares';
+import { booleanMiddleware, nonEmptyStringMiddleware, numberMiddleware } from './middlewares';
 
 describe('middleware functions', () => {
 	describe('booleanMiddleware', () => {
@@ -48,25 +48,25 @@ describe('middleware functions', () => {
 		});
 	});
 
-	describe('nonEmptyMiddleware', () => {
+	describe('nonEmptyStringMiddleware', () => {
 		it('should return undefined for undefined input', () => {
-			expect(nonEmptyMiddleware(undefined)).toBe(undefined);
+			expect(nonEmptyStringMiddleware(undefined)).toBe(undefined);
 		});
 
 		it('should return undefined for empty string', () => {
-			expect(nonEmptyMiddleware('')).toBe(undefined);
+			expect(nonEmptyStringMiddleware('')).toBe(undefined);
 		});
 
 		it('should return undefined for whitespace-only string', () => {
-			expect(nonEmptyMiddleware('   ')).toBe(undefined);
-			expect(nonEmptyMiddleware('\t')).toBe(undefined);
-			expect(nonEmptyMiddleware('\n')).toBe(undefined);
+			expect(nonEmptyStringMiddleware('   ')).toBe(undefined);
+			expect(nonEmptyStringMiddleware('\t')).toBe(undefined);
+			expect(nonEmptyStringMiddleware('\n')).toBe(undefined);
 		});
 
 		it('should return the original string for non-empty input', () => {
-			expect(nonEmptyMiddleware('hello')).toBe('hello');
-			expect(nonEmptyMiddleware('  hello  ')).toBe('  hello  ');
-			expect(nonEmptyMiddleware('123')).toBe('123');
+			expect(nonEmptyStringMiddleware('hello')).toBe('hello');
+			expect(nonEmptyStringMiddleware('  hello  ')).toBe('  hello  ');
+			expect(nonEmptyStringMiddleware('123')).toBe('123');
 		});
 	});
 });
