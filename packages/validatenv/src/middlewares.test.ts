@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { booleanMiddleware, numberMiddleware } from './middlewares';
+import { booleanMiddleware, nonEmptyMiddleware, numberMiddleware } from './middlewares';
 
 describe('middleware functions', () => {
 	describe('booleanMiddleware', () => {
@@ -45,6 +45,28 @@ describe('middleware functions', () => {
 		it('should return undefined for invalid numbers', () => {
 			expect(numberMiddleware('not-a-number')).toBeUndefined();
 			expect(numberMiddleware('')).toBeUndefined();
+		});
+	});
+
+	describe('nonEmptyMiddleware', () => {
+		it('should return undefined for undefined input', () => {
+			expect(nonEmptyMiddleware(undefined)).toBe(undefined);
+		});
+
+		it('should return undefined for empty string', () => {
+			expect(nonEmptyMiddleware('')).toBe(undefined);
+		});
+
+		it('should return undefined for whitespace-only string', () => {
+			expect(nonEmptyMiddleware('   ')).toBe(undefined);
+			expect(nonEmptyMiddleware('\t')).toBe(undefined);
+			expect(nonEmptyMiddleware('\n')).toBe(undefined);
+		});
+
+		it('should return the original string for non-empty input', () => {
+			expect(nonEmptyMiddleware('hello')).toBe('hello');
+			expect(nonEmptyMiddleware('  hello  ')).toBe('  hello  ');
+			expect(nonEmptyMiddleware('123')).toBe('123');
 		});
 	});
 });

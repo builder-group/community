@@ -29,3 +29,10 @@ export const numberMiddleware: TEnvMiddleware<number> = (input) => {
 	const num = parseFloat(input);
 	return Number.isNaN(num) ? undefined : num;
 };
+
+export const nonEmptyMiddleware: TEnvMiddleware<string> = (input) => {
+	if (input === undefined) {
+		return undefined;
+	}
+	return input.trim() === '' ? undefined : input;
+};
