@@ -59,11 +59,7 @@ function processEnvValue<GValue>(
 	// Apply middlewares if any
 	if (middlewares.length > 0) {
 		for (const middleware of middlewares) {
-			const transformed = middleware(rawValue);
-			if (transformed !== undefined) {
-				value = transformed;
-				break;
-			}
+			value = middleware(value as string);
 		}
 	}
 
