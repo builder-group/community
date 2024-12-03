@@ -33,58 +33,43 @@ Additionally, I didn't trust existing libraries, as reading environment variable
 ## 📖 Usage
 
 ```ts
-import { validateEnv, portValidator, urlValidator, booleanMiddleware, devDefault, localDefault } from 'validatenv';
-// Third-party validators
-import * as z from 'zod';
-import * as v from 'valibot';
-import { vValidator } from 'validation-adapters/valibot';
+import { validateEnv, validateEnvValue, portValidator, numberMiddleware, devDefault } from 'validatenv';
 import { zValidator } from 'validation-adapters/zod';
+import * as z from 'zod';
 
 // Load environment variables
 import 'dotenv/config';
 
+// Validate multiple environment variables
 const env = validateEnv(process.env, {
-  // Built-in validator with custom env key
+  // Built-in validator
   port: {
     envKey: 'SERVER_PORT', // Read from SERVER_PORT instead of port
     validator: portValidator,
-    defaultValue: devDefault(3000),
-    description: 'Server port number',
-    example: '8080'
+    defaultValue: devDefault(3000), // Uses default only in development environment
   },
-
-  // Valibot validation
-  API_KEY: {
-    validator: vValidator(v.string([v.minLength(10)])),
-    description: 'API authentication key'
-  },
-
-  // Zod validation with local development default
-  DATABASE_URL: {
-    validator: zValidator(z.string().url()),
-    defaultValue: devDefault('postgres://localhost:5432/myapp')
-  },
-
-  // Boolean with middleware for type conversion
-  DEBUG: {
-    validator: zValidator(z.boolean()),
-    middlewares: [booleanMiddleware], // Converts 'true', 'yes', '1', etc.
-    defaultValue: false
-  },
-
-  // URL validation with built-in validator
-  API_URL: {
-    validator: urlValidator,
-    description: 'External API endpoint',
-    example: 'https://api.example.com/v1'
+  
+  // Zod validator with middleware
+  MAX_CONNECTIONS: {
+    validator: zValidator(z.number().min(1).max(100)),
+    middlewares: [numberMiddleware], // Converts string input to number
+    defaultValue: 10
   },
 
   // Static value
-  staticValue: 'static-value'
+  NODE_ENV: 'development'
 });
 
-// env is now fully typed with all validated values
-console.log(env.PORT); // number
-console.log(env.API_URL); // string
-console.log(env.DEBUG); // boolean
+// Validate single environment variable
+const apiKey = validateEnvValue(process.env, {
+  envKey: 'API_KEY',
+  validator: zValidator(z.string().min(10)),
+  description: 'API authentication key', // Shown in validation error messages for better debugging
+  example: 'abc123xyz789' // Provides usage example in error messages
+});
+
+// Type-safe access
+console.log(env.port); // number
+console.log(env.MAX_CONNECTIONS); // number
+console.log(apiKey); // string
 ```
