@@ -58,8 +58,8 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@figma/plugin-typings": "^1.103.0",
-		"@types/node": "^22.10.0"
+		"@figma/plugin-typings": "^1.104.0",
+		"@types/node": "^22.10.1"
 	},
 	"size-limit": [
 		{

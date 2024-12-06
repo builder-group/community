@@ -39,7 +39,7 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.10.0"
+		"@types/node": "^22.10.1"
 	},
 	"size-limit": [
 		{

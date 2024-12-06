@@ -40,9 +40,9 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.10.0",
+		"@types/node": "^22.10.1",
 		"@types/url-parse": "^1.4.11",
-		"msw": "^2.6.6"
+		"msw": "^2.6.7"
 	},
 	"size-limit": [
 		{

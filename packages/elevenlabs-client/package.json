@@ -40,9 +40,9 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.10.0",
-		"dotenv": "^16.4.5",
-		"openapi-typescript": "^7.4.3"
+		"@types/node": "^22.10.1",
+		"dotenv": "^16.4.7",
+		"openapi-typescript": "^7.4.4"
 	},
 	"size-limit": [
 		{
