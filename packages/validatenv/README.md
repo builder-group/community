@@ -33,39 +33,44 @@ Additionally, I didn't trust existing libraries, as reading environment variable
 ## 📖 Usage
 
 ```ts
-import { validateEnv, validateEnvValue, portValidator, numberMiddleware, devDefault } from 'validatenv';
+import {
+	devDefault,
+	numberMiddleware,
+	portValidator,
+	validateEnv,
+	validateEnvValue
+} from 'validatenv';
 import { zValidator } from 'validation-adapters/zod';
 import * as z from 'zod';
-
 // Load environment variables
 import 'dotenv/config';
 
 // Validate multiple environment variables
 const env = validateEnv(process.env, {
-  // Built-in validator
-  port: {
-    envKey: 'SERVER_PORT', // Read from SERVER_PORT instead of port
-    validator: portValidator,
-    defaultValue: devDefault(3000), // Uses default only in development environment
-  },
-  
-  // Zod validator with middleware
-  MAX_CONNECTIONS: {
-    validator: zValidator(z.number().min(1).max(100)),
-    middlewares: [numberMiddleware], // Converts string input to number
-    defaultValue: 10
-  },
+	// Built-in validator
+	port: {
+		envKey: 'SERVER_PORT', // Read from SERVER_PORT instead of port
+		validator: portValidator,
+		defaultValue: devDefault(3000) // Uses default only in development environment
+	},
 
-  // Static value
-  NODE_ENV: 'development'
+	// Zod validator with middleware
+	MAX_CONNECTIONS: {
+		validator: zValidator(z.number().min(1).max(100)),
+		middlewares: [numberMiddleware], // Converts string input to number
+		defaultValue: 10
+	},
+
+	// Static value
+	NODE_ENV: 'development'
 });
 
 // Validate single environment variable
 const apiKey = validateEnvValue(process.env, {
-  envKey: 'API_KEY',
-  validator: zValidator(z.string().min(10)),
-  description: 'API authentication key', // Shown in validation error messages for better debugging
-  example: 'abc123xyz789' // Provides usage example in error messages
+	envKey: 'API_KEY',
+	validator: zValidator(z.string().min(10)),
+	description: 'API authentication key', // Shown in validation error messages for better debugging
+	example: 'abc123xyz789' // Provides usage example in error messages
 });
 
 // Type-safe access

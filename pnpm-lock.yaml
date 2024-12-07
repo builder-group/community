@@ -55,7 +55,7 @@ importers:
         version: 5.7.2
       vitest:
         specifier: ^2.1.8
-        version: 2.1.8(@types/node@22.10.1)(msw@2.6.7(@types/node@22.10.1)(typescript@5.7.2))
+        version: 2.1.8(@types/node@22.10.1)(msw@2.6.8(@types/node@22.10.1)(typescript@5.7.2))
 
   examples/feature-fetch/vanilla/open-meteo:
     dependencies:
@@ -396,7 +396,7 @@ importers:
         version: 5.7.2
       vitest:
         specifier: ^2.1.8
-        version: 2.1.8(@types/node@22.10.1)(msw@2.6.7(@types/node@22.10.1)(typescript@5.7.2))
+        version: 2.1.8(@types/node@22.10.1)(msw@2.6.8(@types/node@22.10.1)(typescript@5.7.2))
 
   packages/elevenlabs-client:
     dependencies:
@@ -1468,8 +1468,18 @@ packages:
     peerDependencies:
       '@types/node': '>=18'
 
+  '@inquirer/confirm@5.1.0':
+    resolution: {integrity: sha512-osaBbIMEqVFjTX5exoqPXs6PilWQdjaLhGtMDXMXg/yxkHXNq43GlxGyTA35lK2HpzUgDN+Cjh/2AmqCN0QJpw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@types/node': '>=18'
+
   '@inquirer/core@10.1.0':
     resolution: {integrity: sha512-I+ETk2AL+yAVbvuKx5AJpQmoaWhpiTFOg/UJb7ZkMAK4blmtG8ATh5ct+T/8xNld0CZG/2UhtkdMwpgvld92XQ==}
+    engines: {node: '>=18'}
+
+  '@inquirer/core@10.1.1':
+    resolution: {integrity: sha512-rmZVXy9iZvO3ZStEe/ayuuwIJ23LSF13aPMlLMTQARX6lGUBDHGV8UB5i9MRrfy0+mZwt5/9bdy8llszSD3NQA==}
     engines: {node: '>=18'}
 
   '@inquirer/figures@1.0.8':
@@ -3588,6 +3598,16 @@ packages:
 
   msw@2.6.7:
     resolution: {integrity: sha512-jqimU18eVoVX8EdDipzgO5C7q2LnEuxe5fQcAhoa5nNy3/YBni70mIwUCO52kL72ZHYLMemdqJSj7e0QP4ltGw==}
+    engines: {node: '>=18'}
+    hasBin: true
+    peerDependencies:
+      typescript: '>= 4.8.x'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  msw@2.6.8:
+    resolution: {integrity: sha512-nxXxnH6WALZ9a7rsQp4HU2AaD4iGAiouMmE/MY4al7pXTibgA6OZOuKhmN2WBIM6w9qMKwRtX8p2iOb45B2M/Q==}
     engines: {node: '>=18'}
     hasBin: true
     peerDependencies:
@@ -5853,6 +5873,13 @@ snapshots:
       '@inquirer/type': 3.0.1(@types/node@22.10.1)
       '@types/node': 22.10.1
 
+  '@inquirer/confirm@5.1.0(@types/node@22.10.1)':
+    dependencies:
+      '@inquirer/core': 10.1.1(@types/node@22.10.1)
+      '@inquirer/type': 3.0.1(@types/node@22.10.1)
+      '@types/node': 22.10.1
+    optional: true
+
   '@inquirer/core@10.1.0(@types/node@22.10.1)':
     dependencies:
       '@inquirer/figures': 1.0.8
@@ -5866,6 +5893,21 @@ snapshots:
       yoctocolors-cjs: 2.1.2
     transitivePeerDependencies:
       - '@types/node'
+
+  '@inquirer/core@10.1.1(@types/node@22.10.1)':
+    dependencies:
+      '@inquirer/figures': 1.0.8
+      '@inquirer/type': 3.0.1(@types/node@22.10.1)
+      ansi-escapes: 4.3.2
+      cli-width: 4.1.0
+      mute-stream: 2.0.0
+      signal-exit: 4.1.0
+      strip-ansi: 6.0.1
+      wrap-ansi: 6.2.0
+      yoctocolors-cjs: 2.1.2
+    transitivePeerDependencies:
+      - '@types/node'
+    optional: true
 
   '@inquirer/figures@1.0.8': {}
 
@@ -6573,13 +6615,13 @@ snapshots:
       chai: 5.1.2
       tinyrainbow: 1.2.0
 
-  '@vitest/mocker@2.1.8(msw@2.6.7(@types/node@22.10.1)(typescript@5.7.2))(vite@5.4.11(@types/node@22.10.1))':
+  '@vitest/mocker@2.1.8(msw@2.6.8(@types/node@22.10.1)(typescript@5.7.2))(vite@5.4.11(@types/node@22.10.1))':
     dependencies:
       '@vitest/spy': 2.1.8
       estree-walker: 3.0.3
       magic-string: 0.30.14
     optionalDependencies:
-      msw: 2.6.7(@types/node@22.10.1)(typescript@5.7.2)
+      msw: 2.6.8(@types/node@22.10.1)(typescript@5.7.2)
       vite: 5.4.11(@types/node@22.10.1)
 
   '@vitest/pretty-format@2.1.8':
@@ -8354,6 +8396,32 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
+  msw@2.6.8(@types/node@22.10.1)(typescript@5.7.2):
+    dependencies:
+      '@bundled-es-modules/cookie': 2.0.1
+      '@bundled-es-modules/statuses': 1.0.1
+      '@bundled-es-modules/tough-cookie': 0.1.6
+      '@inquirer/confirm': 5.1.0(@types/node@22.10.1)
+      '@mswjs/interceptors': 0.37.3
+      '@open-draft/deferred-promise': 2.2.0
+      '@open-draft/until': 2.1.0
+      '@types/cookie': 0.6.0
+      '@types/statuses': 2.0.5
+      chalk: 4.1.2
+      graphql: 16.9.0
+      headers-polyfill: 4.0.3
+      is-node-process: 1.2.0
+      outvariant: 1.4.3
+      path-to-regexp: 6.3.0
+      strict-event-emitter: 0.5.1
+      type-fest: 4.30.0
+      yargs: 17.7.2
+    optionalDependencies:
+      typescript: 5.7.2
+    transitivePeerDependencies:
+      - '@types/node'
+    optional: true
+
   mute-stream@2.0.0: {}
 
   nanoid@3.3.8: {}
@@ -9707,10 +9775,10 @@ snapshots:
       '@types/node': 22.10.1
       fsevents: 2.3.3
 
-  vitest@2.1.8(@types/node@22.10.1)(msw@2.6.7(@types/node@22.10.1)(typescript@5.7.2)):
+  vitest@2.1.8(@types/node@22.10.1)(msw@2.6.8(@types/node@22.10.1)(typescript@5.7.2)):
     dependencies:
       '@vitest/expect': 2.1.8
-      '@vitest/mocker': 2.1.8(msw@2.6.7(@types/node@22.10.1)(typescript@5.7.2))(vite@5.4.11(@types/node@22.10.1))
+      '@vitest/mocker': 2.1.8(msw@2.6.8(@types/node@22.10.1)(typescript@5.7.2))(vite@5.4.11(@types/node@22.10.1))
       '@vitest/pretty-format': 2.1.8
       '@vitest/runner': 2.1.8
       '@vitest/snapshot': 2.1.8
