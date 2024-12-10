@@ -38,7 +38,7 @@ import {
 	numberMiddleware,
 	portValidator,
 	validateEnv,
-	validateEnvValue
+	validateEnvVar
 } from 'validatenv';
 import { zValidator } from 'validation-adapters/zod';
 import * as z from 'zod';
