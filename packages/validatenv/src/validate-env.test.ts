@@ -163,8 +163,4 @@ describe('validateEnvVar function', () => {
 			)
 		).toThrow('Environment validation failed: Invalid value for API_KEY');
 	});
-
-	it('should throw error for invalid spec', () => {
-		expect(() => validateEnvVar('not-a-valid-spec' as any)).toThrow('Invalid spec for unknown');
-	});
 });

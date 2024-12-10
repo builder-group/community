@@ -63,6 +63,8 @@ export type TEnvSpec<GValue> = {
 	example?: string;
 };
 
+export type TEnvSpecWithEnvKey<GValue> = Omit<TEnvSpec<GValue>, 'envKey'> & { envKey: string };
+
 export type TEnvSpecValue<GValue> =
 	| TEnvSpec<GValue>
 	// | TValidator<GValue, TBaseValidationContext<GValue>>

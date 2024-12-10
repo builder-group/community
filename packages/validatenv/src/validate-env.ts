@@ -1,5 +1,12 @@
 import { createValidationContext, TValidationError } from 'validation-adapter';
-import { TDefaultValueFn, TEnvData, TEnvSpec, TEnvSpecs, TEnvSpecValue } from './types';
+import {
+	TDefaultValueFn,
+	TEnvData,
+	TEnvSpec,
+	TEnvSpecs,
+	TEnvSpecValue,
+	TEnvSpecWithEnvKey
+} from './types';
 
 export function validateEnv<GEnvData extends TEnvData>(
 	env: NodeJS.ProcessEnv,
@@ -17,7 +24,7 @@ export function validateEnv<GEnvData extends TEnvData>(
 			continue;
 		}
 
-		const processResult = processEnvValue(env, String(recordKey), spec);
+		const processResult = processEnvVar({ ...spec, envKey: spec.envKey ?? String(recordKey) }, env);
 		if (!processResult.success) {
 			errors.push(processResult.error);
 			continue;
@@ -33,27 +40,22 @@ export function validateEnv<GEnvData extends TEnvData>(
 }
 
 export function validateEnvVar<GValue>(
-	spec: Omit<TEnvSpec<GValue>, 'envKey'> & { envKey: string },
+	spec: TEnvSpecWithEnvKey<GValue>,
 	env: NodeJS.ProcessEnv = process.env
 ): GValue {
-	if (!isEnvSpec(spec)) {
-		throw new Error(`Invalid spec for ${spec['envKey'] ?? 'unknown'}`);
-	}
-
-	const result = processEnvValue(env, spec.envKey, spec);
+	const result = processEnvVar(spec, env);
 	if (!result.success) {
 		throw new Error(`Environment validation failed: ${result.error}`);
 	}
 	return result.value;
 }
 
-function processEnvValue<GValue>(
-	env: NodeJS.ProcessEnv,
-	recordKey: string,
-	spec: TEnvSpec<GValue>
+function processEnvVar<GValue>(
+	spec: TEnvSpecWithEnvKey<GValue>,
+	env: NodeJS.ProcessEnv
 ): { success: true; value: GValue } | { success: false; error: string } {
 	const { validator, defaultValue, middlewares = [], description, example, envKey } = spec;
-	const rawValue = env[String(envKey ?? recordKey)];
+	const rawValue = env[String(envKey)];
 	let value: unknown = rawValue;
 
 	// Apply middlewares if any
@@ -71,7 +73,7 @@ function processEnvValue<GValue>(
 			} catch (error) {
 				return {
 					success: false,
-					error: `Error evaluating default value for ${String(recordKey)}: ${error}`
+					error: `Error evaluating default value for ${String(envKey)}: ${error}`
 				};
 			}
 		} else if (defaultValue !== undefined) {
@@ -91,7 +93,7 @@ function processEnvValue<GValue>(
 
 		return {
 			success: false,
-			error: `Invalid value for ${String(recordKey)}${finalDescription}${finalExample}${finalErrors}`
+			error: `Invalid value for ${String(envKey)}${finalDescription}${finalExample}${finalErrors}`
 		};
 	}
 
