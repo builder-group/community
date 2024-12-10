@@ -66,12 +66,11 @@ const env = validateEnv(process.env, {
 });
 
 // Validate single environment variable
-const apiKey = validateEnvValue(process.env, {
-	envKey: 'API_KEY',
+const apiKey = validateEnvVar('API_KEY', {
 	validator: zValidator(z.string().min(10)),
 	description: 'API authentication key', // Shown in validation error messages for better debugging
 	example: 'abc123xyz789' // Provides usage example in error messages
-});
+}, process.env);
 
 // Type-safe access
 console.log(env.port); // number

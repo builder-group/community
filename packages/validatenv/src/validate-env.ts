@@ -32,12 +32,12 @@ export function validateEnv<GEnvData extends TEnvData>(
 	return result as GEnvData;
 }
 
-export function validateEnvValue<GValue>(
-	env: NodeJS.ProcessEnv,
-	spec: (Omit<TEnvSpec<GValue>, 'envKey'> & { envKey: string }) | GValue
+export function validateEnvVar<GValue>(
+	spec: Omit<TEnvSpec<GValue>, 'envKey'> & { envKey: string },
+	env: NodeJS.ProcessEnv = process.env
 ): GValue {
 	if (!isEnvSpec(spec)) {
-		return spec;
+		throw new Error(`Invalid spec for ${spec['envKey'] ?? 'unknown'}`);
 	}
 
 	const result = processEnvValue(env, spec.envKey, spec);

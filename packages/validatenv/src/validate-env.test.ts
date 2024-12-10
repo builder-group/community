@@ -1,7 +1,7 @@
 import { createValidator } from 'validation-adapter';
 import { describe, expect, it } from 'vitest';
 import { booleanMiddleware, numberMiddleware } from './middlewares';
-import { validateEnv, validateEnvValue } from './validate-env';
+import { validateEnv, validateEnvVar } from './validate-env';
 import { stringValidator } from './validators';
 
 describe('validateEnv function', () => {
@@ -127,18 +127,21 @@ describe('validateEnv function', () => {
 	});
 });
 
-describe('validateEnvValue function', () => {
-	it('should validate a single env value with required envKey', () => {
+describe('validateEnvVar function', () => {
+	it('should validate a single env value', () => {
 		const env = {
 			API_KEY: 'secret-123'
 		};
 
-		const value = validateEnvValue(env, {
-			envKey: 'API_KEY',
-			validator: stringValidator,
-			description: 'API key for authentication',
-			example: 'secret-123'
-		});
+		const value = validateEnvVar(
+			{
+				envKey: 'API_KEY',
+				validator: stringValidator,
+				description: 'API key for authentication',
+				example: 'secret-123'
+			},
+			env
+		);
 
 		expect(value).toBe('secret-123');
 	});
@@ -149,17 +152,19 @@ describe('validateEnvValue function', () => {
 		};
 
 		expect(() =>
-			validateEnvValue(env, {
-				envKey: 'API_KEY',
-				validator: stringValidator,
-				description: 'API key for authentication',
-				example: 'secret-123'
-			})
+			validateEnvVar(
+				{
+					envKey: 'API_KEY',
+					validator: stringValidator,
+					description: 'API key for authentication',
+					example: 'secret-123'
+				},
+				env
+			)
 		).toThrow('Environment validation failed: Invalid value for API_KEY');
 	});
 
-	it('should pass through plain values without validation', () => {
-		const value = validateEnvValue(process.env, 'static-value');
-		expect(value).toBe('static-value');
+	it('should throw error for invalid spec', () => {
+		expect(() => validateEnvVar('not-a-valid-spec' as any)).toThrow('Invalid spec for unknown');
 	});
 });
