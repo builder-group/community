@@ -17,6 +17,7 @@ export interface TOpenApiHonoFeature<GPaths extends object> {
 	put: TOpenApiHonoPut<GPaths>;
 	post: TOpenApiHonoPost<GPaths>;
 	del: TOpenApiHonoDelete<GPaths>;
+	patch: TOpenApiHonoPatch<GPaths>;
 }
 
 export type TOpenApiHonoGet<GPaths extends object> = <
@@ -49,6 +50,14 @@ export type TOpenApiHonoDelete<GPaths extends object> = <
 >(
 	path: GDeletePath | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
 	config: TOpenApiHonoRouteConfig<GDeletePath, GPathOperation>
+) => void;
+
+export type TOpenApiHonoPatch<GPaths extends object> = <
+	GPatchPath extends TPathsWithMethod<GPaths, 'patch'>,
+	GPathOperation extends TFilterKeys<GPaths[GPatchPath], 'patch'>
+>(
+	path: GPatchPath | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
+	config: TOpenApiHonoRouteConfig<GPatchPath, GPathOperation>
 ) => void;
 
 // =============================================================================
