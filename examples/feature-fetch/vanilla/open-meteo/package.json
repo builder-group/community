@@ -11,8 +11,8 @@
 		"feature-fetch": "workspace:*"
 	},
 	"devDependencies": {
-		"openapi-typescript": "^7.0.2",
-		"typescript": "^5.2.2",
-		"vite": "^5.3.4"
+		"openapi-typescript": "^7.4.4",
+		"typescript": "^5.7.2",
+		"vite": "^6.0.5"
 	}
 }

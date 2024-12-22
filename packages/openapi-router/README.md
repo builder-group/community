@@ -37,77 +37,89 @@ Create a typesafe and straightforward wrapper around web framework routers, seam
 
 ## 📖 Usage
 
-### ExpressJs
+### [ExpressJs](https://expressjs.com/)
+
+[`@blgc/openapi-router`](https://github.com/builder-group/community/tree/develop/packages/openapi-router) wraps around the [Express router](https://expressjs.com/en/5x/api.html#router) to deliver full typesafety and enforce your OpenAPI-Schema with validators. 
+
+> While TypeScript types ensure compile-time safety, they don't enforce runtime schema validation. For runtime compliance, you need to integrate with validation libraries like Zod or Valibot. Although you must define the validation rules manually, they are type-safe to ensure these rules are correctly defined.
 
 ```ts
 import { createExpressOpenApiRouter } from '@blgc/openapi-router';
-import express, { Router } from 'express';
+import { Router } from 'express';
 import * as v from 'valibot';
 import { vValidator } from 'validation-adapters/valibot';
-import { paths } from './path/to/openapi/types';
 
-const app = express();
+import { paths } from './gen/v1'; // OpenAPI-generated types
+import { PetSchema } from './schemas'; // Custom reusable Zod schema for validation
 
-app.use(express.json());
+export const router: Router = Router();
+export const openApiRouter = createExpressOpenApiRouter<paths>(router);
 
-const router = Router();
-const openapiRouter = createExpressOpenApiRouter<paths>(router);
-
-openapiRouter.get('/pet/{petId}', {
-	pathValidator: vValidator(
-		v.object({
-			petId: v.number()
-		})
-	),
-	handler: async (req, res, next) => {}
+// GET /pet/{petId}
+openApiRouter.get('/pet/{petId}', {
+  pathValidator: vValidator(
+    v.object({
+      petId: v.number() // Validate that petId is a number
+    })
+  ),
+  handler: (req, res) => {
+    const { petId } = req.params; // Access validated params
+    res.send({ name: 'Falko', photoUrls: [] }); 
+  }
 });
 
-openapiRouter.get('/pet/findByTags', {
-	queryValidator: vValidator(
-		v.object({
-			tags: v.optional(v.array(v.string()))
-		})
-	),
-	handler: (req, res, next) => {}
+// POST /pet
+openApiRouter.post('/pet', {
+  bodyValidator: vValidator(PetSchema), // Validate request body using PetSchema
+  handler: (req, res) => {
+    const { name, photoUrls } = req.body; // Access validated body data
+    res.send({ name, photoUrls }); 
+  }
 });
-
-app.use('/*', router);
 ```
+[Full example](https://github.com/builder-group/community/tree/develop/examples/openapi-router/express/petstore)
 
-### Hono
+
+### [Hono](https://hono.dev/)
+
+[`@blgc/openapi-router`](https://github.com/builder-group/community/tree/develop/packages/openapi-router) wraps around the [Hono router](https://hono.dev/docs/api/routing) to deliver full typesafety and enforce your OpenAPI-Schema with validators. 
+
+> While TypeScript types ensure compile-time safety, they don't enforce runtime schema validation. For runtime compliance, you need to integrate with validation libraries like Zod or Valibot. Although you must define the validation rules manually, they are type-safe to ensure these rules are correctly defined.
 
 > Hono's TypeScript integration provides type suggestions for `c.json()` based on generically defined response types, but doesn't enforce these types at compile-time. For example, `c.json('')` won't raise a type error even if the expected type is `{someType: string}`. This is due to Hono's internal use of `TypedResponse<T>`, which infers but doesn't strictly enforce the passed generic type. [Hono Discussion](https://github.com/orgs/honojs/discussions/3331)
 
 ```ts
 import { createHonoOpenApiRouter } from '@blgc/openapi-router';
 import { Hono } from 'hono';
-import * as v from 'valibot';
-import { vValidator } from 'validation-adapters/valibot';
-import { paths } from './path/to/openapi/types';
+import { zValidator } from 'validation-adapters/zod';
+import * as z from 'zod';
 
-export const app = new Hono();
+import { paths } from './gen/v1'; // OpenAPI-generated types
+import { PetSchema } from './schemas'; // Custom reusable Zod schema for validation
 
-const router = new Hono();
-const openapiRouter = createHonoOpenApiRouter<paths>(router);
+export const router = new Hono();
+export const openApiRouter = createHonoOpenApiRouter<paths>(router);
 
-openapiRouter.get('/pet/{petId}', {
-	pathValidator: vValidator(
-		v.object({
-			petId: v.number()
-		})
-	),
-	handler: async (c) => {}
+// GET /pet/{petId}
+openApiRouter.get('/pet/{petId}', {
+  pathValidator: zValidator(
+    z.object({
+      petId: z.number() // Validate that petId is a number
+    })
+  ),
+  handler: (c) => {
+    const { petId } = c.req.valid('param'); // Access validated params
+    return c.json({ name: 'Falko', photoUrls: [] }); 
+  }
 });
 
-openapiRouter.get('/pet/findByTags', {
-	queryValidator: vValidator(
-		v.object({
-			tags: v.optional(v.array(v.string()))
-		})
-	),
-	handler: (c) => {}
+// POST /pet
+openApiRouter.post('/pet', {
+  bodyValidator: zValidator(PetSchema), // Validate request body using PetSchema
+  handler: (c) => {
+    const { name, photoUrls } = c.req.valid('json'); // Access validated body data
+    return c.json({ name, photoUrls }); 
+  }
 });
-
-// Application endpoint
-app.route('/', router);
 ```
+[Full example](https://github.com/builder-group/community/tree/develop/examples/openapi-router/hono/petstore)

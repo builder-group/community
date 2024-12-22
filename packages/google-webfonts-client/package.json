@@ -40,7 +40,7 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.10.1",
+		"@types/node": "^22.10.2",
 		"dotenv": "^16.4.7",
 		"openapi-typescript": "^7.4.4"
 	},

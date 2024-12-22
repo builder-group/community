@@ -1,6 +1,6 @@
 {
 	"name": "@blgc/openapi-router",
-	"version": "0.0.22",
+	"version": "0.0.23",
 	"private": false,
 	"description": "Thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod",
 	"keywords": [],
@@ -41,9 +41,9 @@
 		"@blgc/config": "workspace:*",
 		"@types/express": "^5.0.0",
 		"@types/express-serve-static-core": "^5.0.2",
-		"@types/node": "^22.10.1",
+		"@types/node": "^22.10.2",
 		"express": "^4.21.2",
-		"hono": "^4.6.13",
+		"hono": "^4.6.14",
 		"valibot": "1.0.0-beta.9",
 		"validation-adapters": "workspace:*"
 	},
