@@ -27,11 +27,15 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"private": true, // Or false if package should be published to NPM
 	"scripts": {
 		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
-		"start:dev": "tsc -w",
-		"lint": "eslint . --fix",
+		"build:prod": "pnpm build -t prod",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"lint": "eslint . --fix",
+		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"size": "size-limit --why",
+		"start:dev": "tsc -w",
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest"
 	},
 	"repository": {
 		"type": "git",
