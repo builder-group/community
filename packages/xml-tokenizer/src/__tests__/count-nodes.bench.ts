@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { describe } from 'node:test';
 import * as sax from 'sax';
-// @ts-expect-error -- Javascript module
 import * as saxen from 'saxen';
 import { beforeAll, bench, expect } from 'vitest';
 // import * as xt from 'xml-tokenizer';

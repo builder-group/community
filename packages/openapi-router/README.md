@@ -39,7 +39,7 @@ Create a typesafe and straightforward wrapper around web framework routers, seam
 
 ### [ExpressJs](https://expressjs.com/)
 
-[`@blgc/openapi-router`](https://github.com/builder-group/community/tree/develop/packages/openapi-router) wraps around the [Express router](https://expressjs.com/en/5x/api.html#router) to deliver full typesafety and enforce your OpenAPI-Schema with validators. 
+[`@blgc/openapi-router`](https://github.com/builder-group/community/tree/develop/packages/openapi-router) wraps around the [Express router](https://expressjs.com/en/5x/api.html#router) to deliver full typesafety and enforce your OpenAPI-Schema with validators.
 
 > While TypeScript types ensure compile-time safety, they don't enforce runtime schema validation. For runtime compliance, you need to integrate with validation libraries like Zod or Valibot. Although you must define the validation rules manually, they are type-safe to ensure these rules are correctly defined.
 
@@ -48,7 +48,6 @@ import { createExpressOpenApiRouter } from '@blgc/openapi-router';
 import { Router } from 'express';
 import * as v from 'valibot';
 import { vValidator } from 'validation-adapters/valibot';
-
 import { paths } from './gen/v1'; // OpenAPI-generated types
 import { PetSchema } from './schemas'; // Custom reusable Zod schema for validation
 
@@ -57,32 +56,32 @@ export const openApiRouter = createExpressOpenApiRouter<paths>(router);
 
 // GET /pet/{petId}
 openApiRouter.get('/pet/{petId}', {
-  pathValidator: vValidator(
-    v.object({
-      petId: v.number() // Validate that petId is a number
-    })
-  ),
-  handler: (req, res) => {
-    const { petId } = req.params; // Access validated params
-    res.send({ name: 'Falko', photoUrls: [] }); 
-  }
+	pathValidator: vValidator(
+		v.object({
+			petId: v.number() // Validate that petId is a number
+		})
+	),
+	handler: (req, res) => {
+		const { petId } = req.params; // Access validated params
+		res.send({ name: 'Falko', photoUrls: [] });
+	}
 });
 
 // POST /pet
 openApiRouter.post('/pet', {
-  bodyValidator: vValidator(PetSchema), // Validate request body using PetSchema
-  handler: (req, res) => {
-    const { name, photoUrls } = req.body; // Access validated body data
-    res.send({ name, photoUrls }); 
-  }
+	bodyValidator: vValidator(PetSchema), // Validate request body using PetSchema
+	handler: (req, res) => {
+		const { name, photoUrls } = req.body; // Access validated body data
+		res.send({ name, photoUrls });
+	}
 });
 ```
-[Full example](https://github.com/builder-group/community/tree/develop/examples/openapi-router/express/petstore)
 
+[Full example](https://github.com/builder-group/community/tree/develop/examples/openapi-router/express/petstore)
 
 ### [Hono](https://hono.dev/)
 
-[`@blgc/openapi-router`](https://github.com/builder-group/community/tree/develop/packages/openapi-router) wraps around the [Hono router](https://hono.dev/docs/api/routing) to deliver full typesafety and enforce your OpenAPI-Schema with validators. 
+[`@blgc/openapi-router`](https://github.com/builder-group/community/tree/develop/packages/openapi-router) wraps around the [Hono router](https://hono.dev/docs/api/routing) to deliver full typesafety and enforce your OpenAPI-Schema with validators.
 
 > While TypeScript types ensure compile-time safety, they don't enforce runtime schema validation. For runtime compliance, you need to integrate with validation libraries like Zod or Valibot. Although you must define the validation rules manually, they are type-safe to ensure these rules are correctly defined.
 
@@ -93,7 +92,6 @@ import { createHonoOpenApiRouter } from '@blgc/openapi-router';
 import { Hono } from 'hono';
 import { zValidator } from 'validation-adapters/zod';
 import * as z from 'zod';
-
 import { paths } from './gen/v1'; // OpenAPI-generated types
 import { PetSchema } from './schemas'; // Custom reusable Zod schema for validation
 
@@ -102,24 +100,25 @@ export const openApiRouter = createHonoOpenApiRouter<paths>(router);
 
 // GET /pet/{petId}
 openApiRouter.get('/pet/{petId}', {
-  pathValidator: zValidator(
-    z.object({
-      petId: z.number() // Validate that petId is a number
-    })
-  ),
-  handler: (c) => {
-    const { petId } = c.req.valid('param'); // Access validated params
-    return c.json({ name: 'Falko', photoUrls: [] }); 
-  }
+	pathValidator: zValidator(
+		z.object({
+			petId: z.number() // Validate that petId is a number
+		})
+	),
+	handler: (c) => {
+		const { petId } = c.req.valid('param'); // Access validated params
+		return c.json({ name: 'Falko', photoUrls: [] });
+	}
 });
 
 // POST /pet
 openApiRouter.post('/pet', {
-  bodyValidator: zValidator(PetSchema), // Validate request body using PetSchema
-  handler: (c) => {
-    const { name, photoUrls } = c.req.valid('json'); // Access validated body data
-    return c.json({ name, photoUrls }); 
-  }
+	bodyValidator: zValidator(PetSchema), // Validate request body using PetSchema
+	handler: (c) => {
+		const { name, photoUrls } = c.req.valid('json'); // Access validated body data
+		return c.json({ name, photoUrls });
+	}
 });
 ```
+
 [Full example](https://github.com/builder-group/community/tree/develop/examples/openapi-router/hono/petstore)

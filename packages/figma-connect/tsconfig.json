@@ -7,5 +7,6 @@
 		"lib": ["dom"],
 		"typeRoots": ["./node_modules/@types", "./node_modules/@figma"]
 	},
-	"include": ["src"]
+	"include": ["src"],
+	"exclude": ["**/__tests__/*", "**/*.test.ts"]
 }

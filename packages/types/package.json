@@ -47,10 +47,11 @@
 	],
 	"scripts": {
 		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle -b typesonly",
+		"build:prod": "pnpm build -t prod",
 		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint . --fix",
-		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
 		"update:latest": "pnpm update --latest"
 	},
 	"devDependencies": {

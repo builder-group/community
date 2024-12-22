@@ -16,6 +16,7 @@
 	"scripts": {
 		"build": "pnpm build:cli && turbo run build",
 		"build:cli": "turbo run build --filter=@blgc/cli && pnpm run cli:hello",
+		"build:prod": "pnpm build:cli && turbo run build:prod",
 		"clean": "turbo run clean && shx rm -rf node_modules",
 		"cli:hello": "chmod +x ./scripts/cli.sh && sh ./scripts/cli.sh hello",
 		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",

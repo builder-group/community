@@ -70,4 +70,20 @@ A collection of open source libraries maintained by [builder.group](https://buil
 
 Maintaining all libraries in a single repository keeps things simple and efficient. A monorepo allows for shared tooling, consistent versioning, and streamlined CI/CD workflows, while making cross-library changes easier. This approach simplifies collaboration and reduces overhead, ensuring all libraries remain in sync.
 
-The only disadvantage is that it’s harder to discover individual libraries via SEO since they’re all part of one repo. However, the benefits far outweigh this limitation.
+The only disadvantage is that it's harder to discover individual libraries via SEO since they're all part of one repo. However, the benefits far outweigh this limitation.
+
+### Why two build modes (`build` vs `build:prod`)?
+
+Development builds (`pnpm build`):
+- Includes TypeScript declaration maps (IDE navigation goes directly to source files instead of compiled definitions)
+- Easier debugging (no code minification and optimizations)
+
+Production builds (`pnpm build:prod`):
+- Smaller package size
+- No development artifacts in published packages
+- Code minification and optimizations enabled
+- Prevents npm errors with declaration maps (e.g., EINVALIDTAGNAME in GitHub CLI)
+
+To switch between modes:
+- Development: `pnpm build` (includes declaration maps)
+- Production: `pnpm build:prod` (excludes declaration maps)

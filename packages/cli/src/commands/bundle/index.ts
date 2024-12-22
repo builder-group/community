@@ -22,7 +22,7 @@ export default class Bundle extends DynCommand {
 			char: 't',
 			description: 'Bundle target',
 			required: false,
-			default: 'prod',
+			default: 'dev',
 			options: ['prod', 'dev']
 		}),
 		bundleStrategy: Flags.string({

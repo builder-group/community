@@ -73,34 +73,7 @@ jobs:
       - name: 🏗️ Build
         id: build-monorepo
         shell: bash
-        run: pnpm build
-
-      # Debug steps
-      - name: 📝 List dist contents
-        shell: bash
-        run: |
-          echo "=== Listing dist contents for each package ==="
-          for pkg in packages/*/; do
-            if [ -d "$pkg/dist" ]; then
-              echo "📦 Contents of $pkg/dist:"
-              ls -la "$pkg/dist"
-              echo "=== Recursive listing ==="
-              find "$pkg/dist" -type f
-            fi
-          done
-
-      - name: 🔍 Debug package contents
-        shell: bash
-        run: |
-          echo "=== Checking what would be published ==="
-          for pkg in packages/*/; do
-            if [ -f "$pkg/package.json" ]; then
-              echo "📦 Dry run npm pack for $pkg:"
-              cd "$pkg"
-              npm pack --dry-run
-              cd -
-            fi
-          done
+        run: pnpm build:prod
 
       # Publish
       # https://github.com/changesets/action?tab=readme-ov-file#with-publishing
