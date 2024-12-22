@@ -17,6 +17,7 @@ export interface TOpenApiExpressFeature<GPaths extends object> {
 	put: TOpenApiExpressPut<GPaths>;
 	post: TOpenApiExpressPost<GPaths>;
 	del: TOpenApiExpressDelete<GPaths>;
+	patch: TOpenApiExpressPatch<GPaths>;
 }
 
 export type TOpenApiExpressGet<GPaths extends object> = <
@@ -48,6 +49,14 @@ export type TOpenApiExpressDelete<GPaths extends object> = <
 	GPathOperation extends TFilterKeys<GPaths[GDeletePath], 'delete'>
 >(
 	path: GDeletePath | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
+	config: TOpenApiExpressRouteConfig<GPathOperation>
+) => void;
+
+export type TOpenApiExpressPatch<GPaths extends object> = <
+	GPatchPath extends TPathsWithMethod<GPaths, 'patch'>,
+	GPathOperation extends TFilterKeys<GPaths[GPatchPath], 'patch'>
+>(
+	path: GPatchPath | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
 	config: TOpenApiExpressRouteConfig<GPathOperation>
 ) => void;
 
