@@ -16,7 +16,7 @@
 	"author": "@bennobuilder",
 	"exports": {
 		"./eslint/*": "./eslint/*.js",
-		"./vite/*": "./vite/*.js",
+		"./vite/*": "./vite/*.mjs",
 		"./prettier": "./prettier/index.js",
 		"./typescript/base": "./typescript/tsconfig.base.json",
 		"./typescript/library": "./typescript/tsconfig.library.json",
