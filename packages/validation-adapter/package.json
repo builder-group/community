@@ -1,6 +1,6 @@
 {
 	"name": "validation-adapter",
-	"version": "0.0.14",
+	"version": "0.0.15",
 	"private": false,
 	"description": "Universal validation adapter that integrates various validation libraries like Zod, Valibot, and Yup",
 	"keywords": [],

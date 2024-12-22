@@ -1,6 +1,6 @@
 {
 	"name": "eprel-client",
-	"version": "0.0.20",
+	"version": "0.0.21",
 	"private": false,
 	"description": "Typesafe and straightforward fetch client for interacting with the European Product Registry for Energy Labelling (EPREL) API using feature-fetch",
 	"keywords": [],

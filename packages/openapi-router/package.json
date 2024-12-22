@@ -1,6 +1,6 @@
 {
 	"name": "@blgc/openapi-router",
-	"version": "0.0.23",
+	"version": "0.1.0",
 	"private": false,
 	"description": "Thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod",
 	"keywords": [],
