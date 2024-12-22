@@ -53,6 +53,14 @@ export function withHono<
 				validationMiddleware(config),
 				config.handler
 			);
+		},
+		patch(this: TOpenApiRouter<['base', 'hono'], GPaths>, path, config) {
+			this._hono.patch(
+				formatPath(path),
+				parseParamsMiddleware(config),
+				validationMiddleware(config),
+				config.handler
+			);
 		}
 	};
 

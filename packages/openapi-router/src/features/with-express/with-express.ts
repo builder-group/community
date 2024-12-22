@@ -54,6 +54,14 @@ export function withExpress<
 				validationMiddleware(config),
 				requestHandler(config.handler as express.RequestHandler)
 			);
+		},
+		patch(this: TOpenApiRouter<['base', 'express'], GPaths>, path, config) {
+			this._router.patch(
+				formatPath(path),
+				parseParamsMiddleware(config),
+				validationMiddleware(config),
+				requestHandler(config.handler as express.RequestHandler)
+			);
 		}
 	};
 

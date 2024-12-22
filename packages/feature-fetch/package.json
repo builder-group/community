@@ -34,15 +34,15 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@0no-co/graphql.web": "^1.0.11",
+		"@0no-co/graphql.web": "^1.0.12",
 		"@blgc/types": "workspace:*",
 		"@blgc/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.10.0",
+		"@types/node": "^22.10.2",
 		"@types/url-parse": "^1.4.11",
-		"msw": "^2.6.6"
+		"msw": "^2.7.0"
 	},
 	"size-limit": [
 		{
