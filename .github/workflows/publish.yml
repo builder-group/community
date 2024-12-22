@@ -75,6 +75,33 @@ jobs:
         shell: bash
         run: pnpm build
 
+      # Debug steps
+      - name: 📝 List dist contents
+        shell: bash
+        run: |
+          echo "=== Listing dist contents for each package ==="
+          for pkg in packages/*/; do
+            if [ -d "$pkg/dist" ]; then
+              echo "📦 Contents of $pkg/dist:"
+              ls -la "$pkg/dist"
+              echo "=== Recursive listing ==="
+              find "$pkg/dist" -type f
+            fi
+          done
+
+      - name: 🔍 Debug package contents
+        shell: bash
+        run: |
+          echo "=== Checking what would be published ==="
+          for pkg in packages/*/; do
+            if [ -f "$pkg/package.json" ]; then
+              echo "📦 Dry run npm pack for $pkg:"
+              cd "$pkg"
+              npm pack --dry-run
+              cd -
+            fi
+          done
+
       # Publish
       # https://github.com/changesets/action?tab=readme-ov-file#with-publishing
 
@@ -90,11 +117,11 @@ jobs:
         id: changesets
         uses: changesets/action@v1.4.7
         with:
-          title: "[ci] version packages 🦋"
+          title: '[ci] version packages 🦋'
           publish: pnpm packages:publish
           version: pnpm packages:version
-          commit: "[ci] version packages 🦋 [skip ci]"
-          branch: "main"
+          commit: '[ci] version packages 🦋 [skip ci]'
+          branch: 'main'
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ env.NPM_TOKEN }}
@@ -106,7 +133,7 @@ jobs:
         uses: tsickert/discord-webhook@v6.0.0
         with:
           webhook-url: ${{ env.DISCORD_WEBHOOK_URL }}
-          content: "New versions of @blgc were published!"
+          content: 'New versions of @blgc were published!'
 
       - name: 🔄 Merge main into develop
         if: steps.changesets.outputs.published == 'true'
