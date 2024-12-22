@@ -1,5 +1,19 @@
 # @blgc/openapi-router
 
+## 0.1.0
+
+### Minor Changes
+
+- [#85](https://github.com/builder-group/community/pull/85) [`f952ca8`](https://github.com/builder-group/community/commit/f952ca8db768894b11446384f6af1af9d1178dd1) Thanks [@seddonm1](https://github.com/seddonm1)! - add support for `patch` method
+
+### Patch Changes
+
+- [#86](https://github.com/builder-group/community/pull/86) [`bee2ad4`](https://github.com/builder-group/community/commit/bee2ad467764493fd8737e8c46bc54d2af1f2cda) Thanks [@github-actions](https://github.com/apps/github-actions)! - updated deps
+
+- Updated dependencies [[`bee2ad4`](https://github.com/builder-group/community/commit/bee2ad467764493fd8737e8c46bc54d2af1f2cda)]:
+  - validation-adapter@0.0.15
+  - @blgc/types@0.0.8
+
 ## 0.0.22
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # feature-react
 
+## 0.0.32
+
+### Patch Changes
+
+- [#86](https://github.com/builder-group/community/pull/86) [`bee2ad4`](https://github.com/builder-group/community/commit/bee2ad467764493fd8737e8c46bc54d2af1f2cda) Thanks [@github-actions](https://github.com/apps/github-actions)! - updated deps
+
 ## 0.0.31
 
 ### Patch Changes
