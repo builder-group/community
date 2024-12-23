@@ -1,5 +1,67 @@
 import { TUnionToIntersection } from '@blgc/types/utils';
 
+type TFeatureKey<GFeatures extends Record<string, any>> =
+	| keyof GFeatures
+	| [keyof GFeatures, ...unknown[]];
+
+type TSelectFeatures<
+	GFeatures extends Record<string, any>,
+	GFeatureKeys extends TFeatureKey<GFeatures>[]
+> = TUnionToIntersection<
+	GFeatureKeys[number] extends infer GFeature
+		? GFeature extends string
+			? GFeature extends keyof GFeatures
+				? GFeatures[GFeature]
+				: never
+			: GFeature extends [infer GKey, ...infer GArgs]
+				? GKey extends keyof GFeatures
+					? GFeatures[GKey] extends TSingleGenericFeature<any>
+						? TSingleGenericFeature<GArgs[0]>
+						: GFeatures[GKey] extends TDoubleGenericFeature<any, any>
+							? TDoubleGenericFeature<GArgs[0], GArgs[1]>
+							: GFeatures[GKey] extends TTripleGenericFeature<any, any, any>
+								? TTripleGenericFeature<GArgs[0], GArgs[1], GArgs[2]>
+								: GFeatures[GKey]
+					: never
+				: never
+		: never
+>;
+
+type TMissingFeatures<
+	GFeatures extends Record<string, any>,
+	GFeatureKeys extends TFeatureKey<GFeatures>[],
+	GRequiredKeys extends (keyof GFeatures)[]
+> = GRequiredKeys[number] extends infer K
+	? K extends keyof GFeatures
+		? Extract<GFeatureKeys[number], K | [K, ...unknown[]]> extends never
+			? K
+			: never
+		: never
+	: never;
+
+type THasFeatures<
+	GFeatures extends Record<string, any>,
+	GFeatureKeys extends TFeatureKey<GFeatures>[],
+	GRequiredKeys extends (keyof GFeatures)[]
+> = TMissingFeatures<GFeatures, GFeatureKeys, GRequiredKeys> extends never ? true : false;
+
+type TEnforceFeatureConstraint<
+	GSuccess,
+	GFeatures extends Record<string, any>,
+	GFeatureKeys extends TFeatureKey<GFeatures>[],
+	GRequiredKeys extends (keyof GFeatures)[]
+> =
+	TMissingFeatures<GFeatures, GFeatureKeys, GRequiredKeys> extends never
+		? GSuccess
+		: {
+				error: `Missing required features`;
+				missing: TMissingFeatures<GFeatures, GFeatureKeys, GRequiredKeys>;
+			};
+
+// ===================================================================
+// Type tests
+// ===================================================================
+
 type TSimpleFeature = {
 	doSomething: () => void;
 };
@@ -16,47 +78,26 @@ type TTripleGenericFeature<T1, T2, T3> = {
 	withThree: (config1: T1, config2: T2, config3: T3) => void;
 };
 
-type TFeatures<GValue> = {
-	base: { _: null };
+type TFeatures = {
+	base: { _features: keyof TFeatures[] };
 	simple: TSimpleFeature;
 	single: TSingleGenericFeature<any>;
 	double: TDoubleGenericFeature<any, any>;
 	triple: TTripleGenericFeature<any, any, any>;
 };
 
-type TSelectFeatures<
-	GValue,
-	GFeatures extends (string | [string, ...unknown[]])[]
-> = TUnionToIntersection<
-	GFeatures[number] extends infer GFeature
-		? GFeature extends string
-			? GFeature extends keyof TFeatures<GValue>
-				? TFeatures<GValue>[GFeature]
-				: never
-			: GFeature extends [infer GKey, ...infer GArgs]
-				? GKey extends keyof TFeatures<GValue>
-					? TFeatures<GValue>[GKey] extends TSingleGenericFeature<any>
-						? TSingleGenericFeature<GArgs[0]>
-						: TFeatures<GValue>[GKey] extends TDoubleGenericFeature<any, any>
-							? TDoubleGenericFeature<GArgs[0], GArgs[1]>
-							: TFeatures<GValue>[GKey] extends TTripleGenericFeature<any, any, any>
-								? TTripleGenericFeature<GArgs[0], GArgs[1], GArgs[2]>
-								: TFeatures<GValue>[GKey]
-					: never
-				: never
-		: never
->;
+type TFeatureKeys = TFeatureKey<TFeatures>[];
 
 // ===================================================================
-// Type tests
+// Test 1
 // ===================================================================
 
-type TTest1 = TSelectFeatures<number[], ['simple']>;
-type TTest2 = TSelectFeatures<number[], [['single', string]]>;
-type TTest3 = TSelectFeatures<number[], [['double', string, number]]>;
-type TTest4 = TSelectFeatures<number[], [['triple', string, number, boolean]]>;
+type TTest1 = TSelectFeatures<TFeatures, ['simple']>;
+type TTest2 = TSelectFeatures<TFeatures, [['single', string]]>;
+type TTest3 = TSelectFeatures<TFeatures, [['double', string, number]]>;
+type TTest4 = TSelectFeatures<TFeatures, [['triple', string, number, boolean]]>;
 type TTest5 = TSelectFeatures<
-	number[],
+	TFeatures,
 	['simple', ['single', string], ['double', string, number], ['triple', string, number, boolean]]
 >;
 
@@ -77,3 +118,49 @@ test5.doSomething(); // SimpleFeature
 test5.withOne('test'); // SingleGenericFeature<string>
 test5.withTwo('test', 123); // DoubleGenericFeature<string, number>
 test5.withThree('test', 123, true); // TripleGenericFeature<string, number, boolean>
+
+// ===================================================================
+// Test 2
+// ===================================================================
+
+type THasFeaturesTest = THasFeatures<
+	TFeatures,
+	['base', 'single', ['double', string]],
+	['single', 'double', 'base']
+>;
+type TMissingFeaturesTest = TMissingFeatures<
+	TFeatures,
+	['single', ['double', string]],
+	['single', 'double', 'base', 'triple']
+>;
+
+type TTest<GSelectedFeatureKeys extends TFeatureKeys = TFeatureKeys> = {
+	test: () => void;
+} & TSelectFeatures<TFeatures, GSelectedFeatureKeys>;
+
+export function withSingle<GValue, GSelectedFeatureKeys extends TFeatureKeys>(
+	test: TEnforceFeatureConstraint<TTest<GSelectedFeatureKeys>, TFeatures, GSelectedFeatureKeys, []>,
+	value: GValue
+): TTest<[['single', GValue], ...GSelectedFeatureKeys]> {
+	return test;
+}
+
+const test6: TTest<['base']> = null as any;
+const test6WithSingle = withSingle(test6, 10);
+test6WithSingle.withOne(5);
+
+export function withDouble<GValue1, GValue2, GSelectedFeatureKeys extends TFeatureKeys>(
+	test: TEnforceFeatureConstraint<
+		TTest<GSelectedFeatureKeys>,
+		TFeatures,
+		GSelectedFeatureKeys,
+		['single']
+	>,
+	value1: GValue1,
+	value2: GValue2
+): TTest<[['double', GValue1, GValue2], ...GSelectedFeatureKeys]> {
+	return test as TTest<[['double', GValue1, GValue2], ...GSelectedFeatureKeys]>;
+}
+
+const test6WithDouble = withDouble(test6WithSingle, 10, 20);
+test6WithDouble.withTwo(5, 10);
