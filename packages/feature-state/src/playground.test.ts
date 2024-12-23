@@ -4,6 +4,7 @@ type TFeatureKey<GFeatures extends Record<string, any>> =
 	| keyof GFeatures
 	| [keyof GFeatures, ...unknown[]];
 
+// TODO: Figure out a way to pass generics to properties of an object without hard coding the types..
 type TSelectFeatures<
 	GFeatures extends Record<string, any>,
 	GFeatureKeys extends TFeatureKey<GFeatures>[]
@@ -84,6 +85,7 @@ type TFeatures = {
 	single: TSingleGenericFeature<any>;
 	double: TDoubleGenericFeature<any, any>;
 	triple: TTripleGenericFeature<any, any, any>;
+	singleFunction: <T>() => TSingleGenericFeature<T>;
 };
 
 type TFeatureKeys = TFeatureKey<TFeatures>[];
