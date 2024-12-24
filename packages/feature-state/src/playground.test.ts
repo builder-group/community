@@ -5,6 +5,7 @@ type TFeatureKey<GFeatures extends Record<string, any>> =
 	| [keyof GFeatures, ...unknown[]];
 
 // TODO: Figure out a way to pass generics to properties of an object without hard coding the types..
+// https://www.reddit.com/r/typescript/comments/1hkwpp2/how_to_define_object_properties_with_generics_for/
 type TSelectFeatures<
 	GFeatures extends Record<string, any>,
 	GFeatureKeys extends TFeatureKey<GFeatures>[]
