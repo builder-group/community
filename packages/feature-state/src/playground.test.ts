@@ -1,5 +1,9 @@
 import { TUnionToIntersection } from '@blgc/types/utils';
 
+// ===================================================================
+// Type-Map Approach
+// ===================================================================
+
 type TFeatureKey<GFeatures extends Record<string, any>> =
 	| keyof GFeatures
 	| [keyof GFeatures, ...unknown[]];
@@ -60,10 +64,6 @@ type TEnforceFeatureConstraint<
 				missing: TMissingFeatures<GFeatures, GFeatureKeys, GRequiredKeys>;
 			};
 
-// ===================================================================
-// Type tests
-// ===================================================================
-
 type TSimpleFeature = {
 	doSomething: () => void;
 };
@@ -91,40 +91,31 @@ type TFeatures = {
 
 type TFeatureKeys = TFeatureKey<TFeatures>[];
 
-// ===================================================================
-// Test 1
-// ===================================================================
-
 type TTest1 = TSelectFeatures<TFeatures, ['simple']>;
+const test1: TTest1 = null as any;
+test1.doSomething();
+
 type TTest2 = TSelectFeatures<TFeatures, [['single', string]]>;
+const test2: TTest2 = null as any;
+test2.withOne('test');
+
 type TTest3 = TSelectFeatures<TFeatures, [['double', string, number]]>;
+const test3: TTest3 = null as any;
+test3.withTwo('test', 123);
+
 type TTest4 = TSelectFeatures<TFeatures, [['triple', string, number, boolean]]>;
+const test4: TTest4 = null as any;
+test4.withThree('test', 123, true);
+
 type TTest5 = TSelectFeatures<
 	TFeatures,
 	['simple', ['single', string], ['double', string, number], ['triple', string, number, boolean]]
 >;
-
-const test1: TTest1 = null as any;
-test1.doSomething();
-
-const test2: TTest2 = null as any;
-test2.withOne('test');
-
-const test3: TTest3 = null as any;
-test3.withTwo('test', 123);
-
-const test4: TTest4 = null as any;
-test4.withThree('test', 123, true);
-
 const test5: TTest5 = null as any;
-test5.doSomething(); // SimpleFeature
-test5.withOne('test'); // SingleGenericFeature<string>
-test5.withTwo('test', 123); // DoubleGenericFeature<string, number>
-test5.withThree('test', 123, true); // TripleGenericFeature<string, number, boolean>
-
-// ===================================================================
-// Test 2
-// ===================================================================
+test5.doSomething();
+test5.withOne('test');
+test5.withTwo('test', 123);
+test5.withThree('test', 123, true);
 
 type THasFeaturesTest = THasFeatures<
 	TFeatures,
@@ -167,3 +158,34 @@ export function withDouble<GValue1, GValue2, GSelectedFeatureKeys extends TFeatu
 
 const test6WithDouble = withDouble(test6WithSingle, 10, 20);
 test6WithDouble.withTwo(5, 10);
+
+// ===================================================================
+// Higher-Kinded Types Approach
+// ===================================================================
+
+// Overkill and not really fitting for this use case?
+
+// ===================================================================
+// Feature Composition Approach
+// ===================================================================
+
+type TComposable<TFeatures extends any[]> = TFeatures extends [
+	infer GFirst,
+	...infer GRest extends any[]
+]
+	? GFirst & TComposable<GRest>
+	: {};
+
+// Type tests
+type TComposableTest1 = TComposable<[]>;
+type TComposableTest2 = TComposable<[TSimpleFeature]>;
+type TComposableTest3 = TComposable<[TSingleGenericFeature<string>, TSimpleFeature]>;
+type TComposableTest4 = TComposable<
+	[TDoubleGenericFeature<string, number>, TSingleGenericFeature<string>, TSimpleFeature]
+>;
+
+function withComposableSimple<GFeatures extends any[]>(
+	base: TComposable<GFeatures>
+): TComposable<[TSimpleFeature, ...GFeatures]> {
+	return null as any;
+}
