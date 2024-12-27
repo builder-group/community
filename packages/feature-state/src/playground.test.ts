@@ -177,7 +177,10 @@ import { TUnionToIntersection } from '@blgc/types/utils';
 // ===================================================================
 
 (() => {
-	type TFeatureTuple = [string, Record<string, any>];
+	type TFeatureDefinition = {
+		key: string;
+		api: Record<string, any>;
+	};
 
 	type TIntersectAll<GTypes extends any[]> = GTypes extends [
 		infer GFirst,
@@ -186,14 +189,14 @@ import { TUnionToIntersection } from '@blgc/types/utils';
 		? GFirst & TIntersectAll<GRest>
 		: {};
 
-	type TFeatureNames<GFeatures extends TFeatureTuple[]> = GFeatures[number][0];
-	type TFeatureAPIs<GFeatures extends TFeatureTuple[]> = {
-		[K in keyof GFeatures]: GFeatures[K][1];
+	type TFeatureNames<GFeatures extends TFeatureDefinition[]> = GFeatures[number]['key'];
+	type TFeatureAPIs<GFeatures extends TFeatureDefinition[]> = {
+		[K in keyof GFeatures]: GFeatures[K]['api'];
 	};
 
 	type TMergeFeatures<
 		GBase extends Record<string, any>,
-		GFeatures extends TFeatureTuple[]
+		GFeatures extends TFeatureDefinition[]
 	> = GBase & {
 		_features: TFeatureNames<GFeatures>[];
 	} & TIntersectAll<TFeatureAPIs<GFeatures>>;
@@ -230,33 +233,33 @@ import { TUnionToIntersection } from '@blgc/types/utils';
 				};
 
 	// Example feature definitions
-	type TSimpleFeature = [
-		'simple',
-		{
+	type TSimpleFeature = {
+		key: 'simple';
+		api: {
 			doSomething: () => void;
-		}
-	];
+		};
+	};
 
-	type TSingleFeature<GValue> = [
-		'single',
-		{
+	type TSingleFeature<GValue> = {
+		key: 'single';
+		api: {
 			withOne: (value: GValue) => void;
-		}
-	];
+		};
+	};
 
-	type TDoubleFeature<GFirst, GSecond> = [
-		'double',
-		{
+	type TDoubleFeature<GFirst, GSecond> = {
+		key: 'double';
+		api: {
 			withTwo: (first: GFirst, second: GSecond) => void;
-		}
-	];
+		};
+	};
 
-	type TTripleFeature<GFirst, GSecond, GThird> = [
-		'triple',
-		{
+	type TTripleFeature<GFirst, GSecond, GThird> = {
+		key: 'triple';
+		api: {
 			withThree: (first: GFirst, second: GSecond, third: GThird) => void;
-		}
-	];
+		};
+	};
 
 	type TBase = {
 		_features: string[];
@@ -298,7 +301,7 @@ import { TUnionToIntersection } from '@blgc/types/utils';
 	type TMissingFeaturesTest = TMissingFeatures<TTest5, ['simple', 'unknown', 'jeff']>;
 	type THasFeaturesTest = THasFeatures<TTest5, ['simple']>;
 
-	type TTest<GFeatures extends TFeatureTuple[]> = TMergeFeatures<
+	type TTest<GFeatures extends TFeatureDefinition[]> = TMergeFeatures<
 		{
 			test: () => void;
 		},
