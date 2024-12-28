@@ -8,5 +8,6 @@ describe('withMultiUndo function', () => {
 		const state = createState('Jeff');
 		const stateWithUndo = withUndo(state);
 		const stateWithMultiUndo = withMultiUndo(stateWithUndo);
+		// const stateWithMultiUndo2 = withMultiUndo(state);
 	});
 });

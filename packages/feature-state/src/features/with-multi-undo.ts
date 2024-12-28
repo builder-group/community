@@ -1,12 +1,13 @@
+import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
 import { hasFeatures } from '../has-features';
-import type { TEnforceFeatures, TFeatureKeys, TSelectFeatures, TState } from '../types';
+import type { TMultiUndoFeature, TState, TUndoFeature } from '../types';
 
-export function withMultiUndo<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]>(
-	state: TState<GValue, TEnforceFeatures<GSelectedFeatureKeys, ['base', 'undo']>>
-): TState<GValue, ['multiundo', ...GSelectedFeatureKeys]> {
-	if (hasFeatures(state, ['undo'])) {
-		const multiUndoFeature: TSelectFeatures<GValue, ['multiundo']> = {
-			multiUndo(this: TState<GValue, ['multiundo', 'undo']>, count: number) {
+export function withMultiUndo<GValue, GFeatures extends TFeatureDefinition[]>(
+	state: TEnforceFeatureConstraint<TState<GValue, GFeatures>, TState<GValue, GFeatures>, ['undo']>
+): TState<GValue, [TMultiUndoFeature, ...GFeatures]> {
+	if (hasFeatures<GValue, [TUndoFeature<GValue>]>(state, ['undo'])) {
+		const multiUndoFeature: TMultiUndoFeature['api'] = {
+			multiUndo(this: TState<GValue, [TUndoFeature<GValue>, TMultiUndoFeature]>, count: number) {
 				for (let i = 0; i < count; i++) {
 					this.undo();
 				}
@@ -14,13 +15,13 @@ export function withMultiUndo<GValue, GSelectedFeatureKeys extends TFeatureKeys<
 		};
 
 		// Merge existing features from the state with the new multiundo feature
-		const _state = Object.assign(state, multiUndoFeature) as TState<
+		const _state = Object.assign(state, multiUndoFeature) as unknown as TState<
 			GValue,
-			['multiundo', ...GSelectedFeatureKeys]
+			[TMultiUndoFeature]
 		>;
 		_state._features.push('multiundo');
 
-		return _state;
+		return _state as unknown as TState<GValue, [TMultiUndoFeature, ...GFeatures]>;
 	}
 
 	throw Error('State must have "undo" feature to use withMultiUndo');
