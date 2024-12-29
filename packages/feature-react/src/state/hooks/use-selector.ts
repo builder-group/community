@@ -1,6 +1,6 @@
 import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
 import { getNestedProperty, type TNestedPath, type TNestedProperty } from '@blgc/utils';
-import { hasFeatures, TSelectorFeature, TState } from 'feature-state';
+import { isStateWithFeatures, TSelectorFeature, TState } from 'feature-state';
 import React from 'react';
 
 export function useSelector<
@@ -20,7 +20,7 @@ export function useSelector<
 	React.useEffect(() => {
 		let unbind: () => void | undefined;
 
-		if (hasFeatures<GValue, [TSelectorFeature<GValue>]>(state, ['selector'])) {
+		if (isStateWithFeatures<GValue, [TSelectorFeature<GValue>]>(state, ['selector'])) {
 			unbind = state.listenToSelected(
 				[selectedProperty],
 				({ background }) => {
@@ -37,7 +37,7 @@ export function useSelector<
 		};
 	}, [state]);
 
-	if (!hasFeatures<GValue, [TSelectorFeature<GValue>]>(state, ['selector'])) {
+	if (!isStateWithFeatures<GValue, [TSelectorFeature<GValue>]>(state, ['selector'])) {
 		throw Error('State must have "selector" feature to use useSelector');
 	}
 

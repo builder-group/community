@@ -1,11 +1,11 @@
 import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
-import { hasFeatures } from '../has-features';
+import { isStateWithFeatures } from '../is-state-with-features';
 import type { TMultiUndoFeature, TState, TUndoFeature } from '../types';
 
 export function withMultiUndo<GValue, GFeatures extends TFeatureDefinition[]>(
 	state: TEnforceFeatureConstraint<TState<GValue, GFeatures>, TState<GValue, GFeatures>, ['undo']>
 ): TState<GValue, [TMultiUndoFeature, ...GFeatures]> {
-	if (hasFeatures<GValue, [TUndoFeature<GValue>]>(state, ['undo'])) {
+	if (isStateWithFeatures<GValue, [TUndoFeature<GValue>]>(state, ['undo'])) {
 		const multiUndoFeature: TMultiUndoFeature['api'] = {
 			multiUndo(this: TState<GValue, [TUndoFeature<GValue>, TMultiUndoFeature]>, count: number) {
 				for (let i = 0; i < count; i++) {
