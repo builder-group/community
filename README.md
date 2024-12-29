@@ -75,15 +75,18 @@ The only disadvantage is that it's harder to discover individual libraries via S
 ### Why two build modes (`build` vs `build:prod`)?
 
 Development builds (`pnpm build`):
+
 - Includes TypeScript declaration maps (IDE navigation goes directly to source files instead of compiled definitions)
 - Easier debugging (no code minification and optimizations)
 
 Production builds (`pnpm build:prod`):
+
 - Smaller package size
 - No development artifacts in published packages
 - Code minification and optimizations enabled
 - Prevents npm errors with declaration maps (e.g., EINVALIDTAGNAME in GitHub CLI)
 
 To switch between modes:
+
 - Development: `pnpm build` (includes declaration maps)
 - Production: `pnpm build:prod` (excludes declaration maps)

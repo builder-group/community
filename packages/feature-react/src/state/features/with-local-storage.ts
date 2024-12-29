@@ -1,8 +1,8 @@
+import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
 import {
 	FAILED_TO_LOAD_FROM_STORAGE_IDENTIFIER,
+	TPersistFeature,
 	withStorage,
-	type TEnforceFeatures,
-	type TFeatureKeys,
 	type TState,
 	type TStorageInterface
 } from 'feature-state';
@@ -24,9 +24,9 @@ class LocalStorageInterface<GStorageValue> implements TStorageInterface<GStorage
 	}
 }
 
-export function withLocalStorage<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]>(
-	state: TState<GValue, TEnforceFeatures<GSelectedFeatureKeys, ['base']>>,
+export function withLocalStorage<GValue, GFeatures extends TFeatureDefinition[]>(
+	state: TEnforceFeatureConstraint<TState<GValue, GFeatures>, TState<GValue, GFeatures>, []>,
 	key: string
-): TState<GValue, [...GSelectedFeatureKeys, 'persist']> {
+): TState<GValue, [TPersistFeature, ...GFeatures]> {
 	return withStorage(state, new LocalStorageInterface<GValue>(), key);
 }

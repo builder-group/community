@@ -1,12 +1,15 @@
-import type { TFeatureKeys, TForm, TFormData } from './types';
+import { TFeatureDefinition, TLooseFeatureNames } from '@blgc/types/features';
+import { TForm, TFormData } from './types';
 
 export function hasFeatures<
 	GFormData extends TFormData,
-	GFeatureKeys extends TFeatureKeys[],
-	GHasFeatureKeys extends TFeatureKeys[]
->(
-	form: TForm<GFormData, GFeatureKeys>,
-	features: GHasFeatureKeys
-): form is TForm<GFormData, (GFeatureKeys[number] | GHasFeatureKeys[number])[]> {
-	return features.every((feature) => form._features.includes(feature));
+	GFeatures extends TFeatureDefinition[] = []
+>(form: unknown, features: TLooseFeatureNames<GFeatures>[]): form is TForm<GFormData, GFeatures> {
+	return (
+		typeof form === 'object' &&
+		form != null &&
+		'_features' in form &&
+		Array.isArray(form._features) &&
+		features.every((feature) => (form._features as string[]).includes(feature))
+	);
 }

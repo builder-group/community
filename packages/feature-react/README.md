@@ -28,25 +28,27 @@
 
 ## 📖 Usage
 
-### `useGlobalState()`
+### `useFeatureState()`
 
 A hook to bind a `feature-state` state to a React component, causing the component to re-render whenever the state changes.
 
 ```ts
 import { createState } from 'feature-state';
-import { useGlobalState } from 'feature-react/state';
+import { useFeatureState } from 'feature-react/state';
 
 const $tasks = createState<Task[]>([]);
 
 export const Tasks = () => {
-    const tasks = useGlobalState($tasks);
+	const tasks = useFeatureState($tasks);
 
-    return (
-        <ul>
-            {tasks.map(task => <li key={task.id}>{task.title}</li>)}
-        </ul>
-    );
-}
+	return (
+		<ul>
+			{tasks.map((task) => (
+				<li>{task.title}</li>
+			))}
+		</ul>
+	);
+};
 ```
 
 ## 📙 Features

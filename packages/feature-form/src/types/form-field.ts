@@ -6,22 +6,25 @@ import {
 	type TValidator
 } from 'validation-adapter';
 
-export type TFormField<GValue> = TState<GValue | undefined, ['base', 'form-field']>;
+export type TFormField<GValue> = TState<GValue | undefined, [TFormFieldStateFeature<GValue>]>;
 
 export interface TFormFieldStateFeature<GValue> {
-	_config: TFormFieldStateConfig;
-	_intialValue: GValue | undefined;
-	_validator: TFormFieldValidator<GValue>;
-	key: string;
-	isTouched: boolean;
-	isSubmitted: boolean;
-	isSubmitting: boolean;
-	isValidating: boolean;
-	status: TFormFieldStatus;
-	validate: () => Promise<boolean>;
-	isValid: () => boolean;
-	blur: () => void;
-	reset: () => void;
+	key: 'form-field';
+	api: {
+		_config: TFormFieldStateConfig;
+		_intialValue: GValue | undefined;
+		_validator: TFormFieldValidator<GValue>;
+		key: string;
+		isTouched: boolean;
+		isSubmitted: boolean;
+		isSubmitting: boolean;
+		isValidating: boolean;
+		status: TFormFieldStatus;
+		validate: () => Promise<boolean>;
+		isValid: () => boolean;
+		blur: () => void;
+		reset: () => void;
+	};
 }
 
 export interface TFormFieldStateConfig {
@@ -59,11 +62,14 @@ export enum FormFieldReValidateMode {
 	OnSubmit = 1 << 2 // 4
 }
 
-export type TFormFieldStatus = TState<TFormFieldStatusValue, ['base', 'form-field-status']>;
+export type TFormFieldStatus = TState<TFormFieldStatusValue, [TFormFielStatusStateFeature]>;
 
 export interface TFormFielStatusStateFeature {
-	_nextValue?: TFormFieldStatusValue;
-	registerNextError: (error: TInvalidFormFieldError) => void;
+	key: 'form-field-status';
+	api: {
+		_nextValue?: TFormFieldStatusValue;
+		registerNextError: (error: TInvalidFormFieldError) => void;
+	};
 }
 
 export type TFormFieldStatusValue =

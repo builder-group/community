@@ -1,10 +1,14 @@
-import { createState, type TSelectFeatures } from 'feature-state';
-import { type TFormFieldStatus, type TFormFieldStatusValue } from '../types';
+import { createState } from 'feature-state';
+import {
+	TFormFielStatusStateFeature,
+	type TFormFieldStatus,
+	type TFormFieldStatusValue
+} from '../types';
 
 export function createStatus(initialValue: TFormFieldStatusValue): TFormFieldStatus {
 	const formFieldStatusState = createState(initialValue, { deferred: false });
 
-	const formFieldStatusFeature: TSelectFeatures<TFormFieldStatusValue, ['form-field-status']> = {
+	const formFieldStatusFeature: TFormFielStatusStateFeature['api'] = {
 		_nextValue: undefined,
 		registerNextError(this: TFormFieldStatus, error) {
 			if (this._nextValue?.type === 'INVALID') {
@@ -19,7 +23,7 @@ export function createStatus(initialValue: TFormFieldStatusValue): TFormFieldSta
 	const _formFieldStatus = Object.assign(
 		formFieldStatusState,
 		formFieldStatusFeature
-	) as unknown as TFormFieldStatus;
+	) as TFormFieldStatus;
 	_formFieldStatus._features.push('form-field-status');
 
 	return _formFieldStatus;

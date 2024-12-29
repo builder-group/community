@@ -1,7 +1,10 @@
+import { TFeatureDefinition } from '@blgc/types/features';
 import type { TState } from 'feature-state';
 import React from 'react';
 
-export function useGlobalState<GValue>(state: TState<GValue, ['base']>): Readonly<GValue> {
+export function useFeatureState<GValue, GFeatures extends TFeatureDefinition[]>(
+	state: TState<GValue, GFeatures>
+): Readonly<GValue> {
 	const [, forceRender] = React.useReducer((s: number) => s + 1, 0);
 
 	React.useEffect(() => {

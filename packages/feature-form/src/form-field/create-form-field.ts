@@ -39,7 +39,7 @@ export function createFormField<GValue>(
 		);
 	}
 
-	const formFieldFeature: TFormFieldStateFeature<GValue> = {
+	const formFieldFeature: TFormFieldStateFeature<GValue>['api'] = {
 		_config: {
 			editable,
 			validateMode,
@@ -97,10 +97,7 @@ export function createFormField<GValue>(
 	};
 
 	// Merge existing features from the state with the new form field feature
-	const _formField = Object.assign(
-		formFieldState,
-		formFieldFeature
-	) as unknown as TFormField<GValue>;
+	const _formField = Object.assign(formFieldState, formFieldFeature) as TFormField<GValue>;
 	_formField._features.push('form-field');
 
 	return _formField;

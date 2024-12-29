@@ -56,11 +56,11 @@ export function addTask(task: Task) {
 `components/Tasks.tsx`
 
 ```tsx
-import { useGlobalState } from 'feature-state-react';
+import { useFeatureState } from 'feature-state-react';
 import { $tasks } from '../store/tasks';
 
 export const Tasks = () => {
-	const tasks = useGlobalState($tasks);
+	const tasks = useFeatureState($tasks);
 
 	return (
 		<ul>
@@ -100,7 +100,7 @@ $temperature.set($temperature.get() + 5);
 
 ### Subscribing to State Changes
 
-You can subscribe to state changes using `$state.subscribe(callback)`, which works in vanilla JS. For React, special hooks like [`useGlobalState($state)`](https://github.com/builder-group/monorepo/tree/develop/packages/feature-state-react) are available to re-render components on state changes.
+You can subscribe to state changes using `$state.subscribe(callback)`, which works in vanilla JS. For React, special hooks like [`useFeatureState($state)`](https://github.com/builder-group/monorepo/tree/develop/packages/feature-state-react) are available to re-render components on state changes.
 
 Listener callbacks will receive the new value as the first argument.
 
