@@ -3,7 +3,10 @@ import { type TParseAs } from '../fetch';
 import type { TFetchOptions, TFetchResponse } from '../fetch-client';
 
 export interface TGraphQLFeature {
-	query: TGraphQLQuery;
+	key: 'graphql';
+	api: {
+		query: TGraphQLQuery;
+	};
 }
 
 export type TGraphQLQuery = <

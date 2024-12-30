@@ -19,10 +19,7 @@ export function withUndo<GValue, GFeatures extends TFeatureDefinition[]>(
 	};
 
 	// Merge existing features from the state with the new undo feature
-	const _state = Object.assign(state, undoFeature) as unknown as TState<
-		GValue,
-		[TUndoFeature<GValue>]
-	>;
+	const _state = Object.assign(state, undoFeature) as TState<GValue, [TUndoFeature<GValue>]>;
 	_state._features.push('undo');
 
 	_state.listen(

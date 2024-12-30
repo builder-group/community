@@ -1,18 +1,14 @@
-import {
-	type TEnforceFeatures,
-	type TFeatureKeys,
-	type TFetchClient,
-	type TRequestMiddleware
-} from '../../types';
+import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
+import { TCacheFeature, type TFetchClient, type TRequestMiddleware } from '../../types';
 import { Cache, type TCacheOptions, type TGetCacheKey, type TShouldCache } from './Cache';
 
-export function withCache<GSelectedFeatureKeys extends TFeatureKeys[]>(
-	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base']>>,
+export function withCache<GFeatures extends TFeatureDefinition[]>(
+	fetchClient: TEnforceFeatureConstraint<TFetchClient<GFeatures>, TFetchClient<GFeatures>, []>,
 	options: TCacheOptions = {}
-): TFetchClient<['cache', ...GSelectedFeatureKeys]> {
-	fetchClient._features.push('cache');
+): TFetchClient<[TCacheFeature, ...GFeatures]> {
+	(fetchClient as TFetchClient<[TCacheFeature]>)._features.push('cache');
 	fetchClient._config.requestMiddlewares.push(createCacheMiddleware(options));
-	return fetchClient as TFetchClient<['cache', ...GSelectedFeatureKeys]>;
+	return fetchClient as TFetchClient<[TCacheFeature, ...GFeatures]>;
 }
 
 function createCacheMiddleware(options: TCacheOptions = {}): TRequestMiddleware {

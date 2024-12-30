@@ -1,5 +1,5 @@
-import { describe, it } from 'vitest';
-import { createOpenApiFetchClient } from '../features';
+import { describe, expect, it } from 'vitest';
+import { createGraphQLFetchClient, createOpenApiFetchClient, withGraphQLCache } from '../features';
 import { paths } from './resources/mock-openapi-types';
 
 describe('playground', () => {
@@ -30,5 +30,9 @@ describe('playground', () => {
 		});
 
 		postPet.unwrap().data;
+
+		const graphqlClient = createGraphQLFetchClient();
+		const graphqlClientWithCache = withGraphQLCache(graphqlClient);
+		expect(graphqlClientWithCache._features).toStrictEqual(['graphql', 'graphqlCache']);
 	});
 });

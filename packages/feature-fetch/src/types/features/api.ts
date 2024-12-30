@@ -2,10 +2,13 @@ import { type TParseAs } from '../fetch';
 import type { TFetchOptions, TFetchResponse, TUnserializedBody } from '../fetch-client';
 
 export interface TApiFeature {
-	get: TApiGet;
-	put: TApiPut;
-	post: TApiPost;
-	del: TApiDelete;
+	key: 'api';
+	api: {
+		get: TApiGet;
+		put: TApiPut;
+		post: TApiPost;
+		del: TApiDelete;
+	};
 }
 
 export type TApiGet = <

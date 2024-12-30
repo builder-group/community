@@ -43,7 +43,7 @@ export function withSelector<GValue, GFeatures extends TFeatureDefinition[]>(
 	};
 
 	// Merge existing features from the state with the new selector feature
-	const _state = Object.assign(state, selectorFeature) as unknown as TState<
+	const _state = Object.assign(state, selectorFeature) as TState<
 		GValue,
 		[TSelectorFeature<GValue>]
 	>;

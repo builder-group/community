@@ -15,10 +15,7 @@ export function withMultiUndo<GValue, GFeatures extends TFeatureDefinition[]>(
 		};
 
 		// Merge existing features from the state with the new multiundo feature
-		const _state = Object.assign(state, multiUndoFeature) as unknown as TState<
-			GValue,
-			[TMultiUndoFeature]
-		>;
+		const _state = Object.assign(state, multiUndoFeature) as TState<GValue, [TMultiUndoFeature]>;
 		_state._features.push('multiundo');
 
 		return _state as unknown as TState<GValue, [TMultiUndoFeature, ...GFeatures]>;

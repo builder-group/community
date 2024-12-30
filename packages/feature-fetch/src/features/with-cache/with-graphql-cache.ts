@@ -1,17 +1,28 @@
+import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
+import { isFetchClientWithFeatures } from '../../helper';
 import {
-	type TEnforceFeatures,
-	type TFeatureKeys,
+	TGraphQLCacheFeature,
+	TGraphQLFeature,
 	type TFetchClient,
 	type TRequestMiddleware
 } from '../../types';
 import { Cache } from './Cache';
 
-export function withGraphQLCache<GSelectedFeatureKeys extends TFeatureKeys[]>(
-	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base', 'graphql']>>
-): TFetchClient<['graphqlCache', ...GSelectedFeatureKeys]> {
-	fetchClient._features.push('graphqlCache');
-	fetchClient._config.requestMiddlewares.push(createGraphQLCacheMiddleware());
-	return fetchClient as TFetchClient<['graphqlCache', ...GSelectedFeatureKeys]>;
+export function withGraphQLCache<GFeatures extends TFeatureDefinition[]>(
+	fetchClient: TEnforceFeatureConstraint<
+		TFetchClient<GFeatures>,
+		TFetchClient<GFeatures>,
+		['graphql']
+	>
+): TFetchClient<[TGraphQLCacheFeature, ...GFeatures]> {
+	if (isFetchClientWithFeatures<[TGraphQLFeature]>(fetchClient, ['graphql'])) {
+		(fetchClient as TFetchClient<[TGraphQLFeature, TGraphQLCacheFeature]>)._features.push(
+			'graphqlCache'
+		);
+		fetchClient._config.requestMiddlewares.push(createGraphQLCacheMiddleware());
+		return fetchClient as TFetchClient<[TGraphQLCacheFeature, ...GFeatures]>;
+	}
+	throw Error('Fetch Client must have "graphql" feature to use withGraphQLCache');
 }
 
 function createGraphQLCacheMiddleware(): TRequestMiddleware {
