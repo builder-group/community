@@ -7,7 +7,9 @@ export function withDelay<GFeatures extends TFeatureDefinition[]>(
 	delayInMs: number
 ): TFetchClient<[TDelayFeature, ...GFeatures]> {
 	(fetchClient as TFetchClient<[TDelayFeature]>)._features.push('delay');
+
 	fetchClient._config.requestMiddlewares.push(createDelayMiddleware(delayInMs));
+
 	return fetchClient as TFetchClient<[TDelayFeature, ...GFeatures]>;
 }
 

@@ -7,7 +7,9 @@ export function withRetry<GFeatures extends TFeatureDefinition[]>(
 	options: TRetryMiddlewareOptions = {}
 ): TFetchClient<[TRetryFeature, ...GFeatures]> {
 	(fetchClient as TFetchClient<[TRetryFeature]>)._features.push('retry');
+
 	fetchClient._config.requestMiddlewares.push(createRetryMiddleware(options));
+
 	return fetchClient as TFetchClient<[TRetryFeature, ...GFeatures]>;
 }
 

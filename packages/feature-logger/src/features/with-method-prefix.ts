@@ -1,11 +1,12 @@
-import { hasFeatures } from '../has-features';
-import { type TEnforceFeatures, type TFeatureKeys, type TLogger } from '../types';
+import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
+import { isLoggerWithFeatures } from '../is-logger-with-features';
+import { TMethodPrefixFeature, type TLogger } from '../types';
 
-export function withMethodPrefix<GSelectedFeatureKeys extends TFeatureKeys[]>(
-	logger: TLogger<TEnforceFeatures<GSelectedFeatureKeys, ['base']>>
-): TLogger<['methodPrefix', ...GSelectedFeatureKeys]> {
-	logger._features.push('methodPrefix');
-	const withTimestamp = hasFeatures(logger, ['timestamp']);
+export function withMethodPrefix<GFeatures extends TFeatureDefinition[]>(
+	logger: TEnforceFeatureConstraint<TLogger<GFeatures>, TLogger<GFeatures>, []>
+): TLogger<[TMethodPrefixFeature, ...GFeatures]> {
+	(logger as TLogger<[TMethodPrefixFeature]>)._features.push('methodPrefix');
+	const withTimestamp = isLoggerWithFeatures(logger, ['timestamp']);
 
 	logger._config.middlewares.push((next) => {
 		return (logMethod, data) => {
@@ -18,5 +19,5 @@ export function withMethodPrefix<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		};
 	});
 
-	return logger;
+	return logger as TLogger<[TMethodPrefixFeature, ...GFeatures]>;
 }

@@ -497,9 +497,6 @@ importers:
 
   packages/feature-logger:
     dependencies:
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
@@ -507,6 +504,9 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
+      '@blgc/types':
+        specifier: workspace:*
+        version: link:../types
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.2

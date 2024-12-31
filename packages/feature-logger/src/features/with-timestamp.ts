@@ -1,9 +1,10 @@
-import { type TEnforceFeatures, type TFeatureKeys, type TLogger } from '../types';
+import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
+import { TTimestampFeature, type TLogger } from '../types';
 
-export function withTimestamp<GSelectedFeatureKeys extends TFeatureKeys[]>(
-	logger: TLogger<TEnforceFeatures<GSelectedFeatureKeys, ['base']>>
-): TLogger<['timestamp', ...GSelectedFeatureKeys]> {
-	logger._features.push('timestamp');
+export function withTimestamp<GFeatures extends TFeatureDefinition[]>(
+	logger: TEnforceFeatureConstraint<TLogger<GFeatures>, TLogger<GFeatures>, []>
+): TLogger<[TTimestampFeature, ...GFeatures]> {
+	(logger as TLogger<[TTimestampFeature]>)._features.push('timestamp');
 
 	logger._config.middlewares.push((next) => {
 		return (logMethod, data) => {
@@ -11,5 +12,5 @@ export function withTimestamp<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		};
 	});
 
-	return logger;
+	return logger as TLogger<[TTimestampFeature, ...GFeatures]>;
 }
