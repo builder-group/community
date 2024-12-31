@@ -15,14 +15,16 @@ export function withGraphQLCache<GFeatures extends TFeatureDefinition[]>(
 		['graphql']
 	>
 ): TFetchClient<[TGraphQLCacheFeature, ...GFeatures]> {
-	if (isFetchClientWithFeatures<[TGraphQLFeature]>(fetchClient, ['graphql'])) {
-		(fetchClient as TFetchClient<[TGraphQLFeature, TGraphQLCacheFeature]>)._features.push(
-			'graphqlCache'
-		);
-		fetchClient._config.requestMiddlewares.push(createGraphQLCacheMiddleware());
-		return fetchClient as TFetchClient<[TGraphQLCacheFeature, ...GFeatures]>;
+	if (!isFetchClientWithFeatures<[TGraphQLFeature]>(fetchClient, ['graphql'])) {
+		throw Error('FetchClient must have "graphql" feature to use withGraphQLCache');
 	}
-	throw Error('Fetch Client must have "graphql" feature to use withGraphQLCache');
+
+	(fetchClient as TFetchClient<[TGraphQLFeature, TGraphQLCacheFeature]>)._features.push(
+		'graphqlCache'
+	);
+	fetchClient._config.requestMiddlewares.push(createGraphQLCacheMiddleware());
+
+	return fetchClient as TFetchClient<[TGraphQLCacheFeature, ...GFeatures]>;
 }
 
 function createGraphQLCacheMiddleware(): TRequestMiddleware {
