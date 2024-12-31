@@ -1,33 +1,36 @@
+import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
 import { mapOk, Ok, unwrapOrNull } from '@blgc/utils';
 import {
 	Err,
 	FetchError,
-	hasFeatures,
-	type TEnforceFeatures,
-	type TFeatureKeys,
-	type TFetchClient,
-	type TSelectFeatures
+	isFetchClientWithFeatures,
+	TFetchClient,
+	TOpenApiFeature
 } from 'feature-fetch';
 import { type paths } from './gen/v1';
 import { isVoiceId } from './helper';
+import { TElevenLabsFeature } from './types';
 
-export function withElevenLabs<GSelectedFeatureKeys extends TFeatureKeys[]>(
-	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base', 'openapi']>>
-): TFetchClient<['elevenlabs', ...GSelectedFeatureKeys], paths> {
-	if (!hasFeatures(fetchClient, ['openapi'])) {
+export function withElevenLabs<GFeatures extends TFeatureDefinition[]>(
+	fetchClient: TEnforceFeatureConstraint<
+		TFetchClient<GFeatures>,
+		TFetchClient<GFeatures>,
+		['openapi']
+	>
+): TFetchClient<[TElevenLabsFeature, ...GFeatures]> {
+	if (!isFetchClientWithFeatures<[TOpenApiFeature<paths>]>(fetchClient, ['openapi'])) {
 		throw Error('FetchClient must have "openapi" feature to use withElevenLabs');
 	}
-	fetchClient._features.push('elevenlabs');
 
-	const elevenLabsFeatures: TSelectFeatures<['elevenlabs']> = {
-		async getVoices(this: TFetchClient<['base', 'openapi', 'elevenlabs'], paths>) {
+	const elevenLabsFeatures: TElevenLabsFeature['api'] = {
+		async getVoices(this: TFetchClient<[TOpenApiFeature<paths>, TElevenLabsFeature]>) {
 			return mapOk(
 				await this.get('/v1/voices', { queryParams: { show_legacy: true } }),
 				(ok) => ok.data
 			);
 		},
 		async generateTextToSpeach(
-			this: TFetchClient<['base', 'openapi', 'elevenlabs'], paths>,
+			this: TFetchClient<[TOpenApiFeature<paths>, TElevenLabsFeature]>,
 			config
 		) {
 			const {
@@ -115,8 +118,11 @@ export function withElevenLabs<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		}
 	};
 
-	// Merge existing features from the state with the new api feature
-	const _fetchClient = Object.assign(fetchClient, elevenLabsFeatures);
+	// Merge existing features from the fetch client with the new elevenlabs feature
+	const _fetchClient = Object.assign(fetchClient, elevenLabsFeatures) as TFetchClient<
+		[TElevenLabsFeature]
+	>;
+	_fetchClient._features.push('elevenlabs');
 
-	return _fetchClient as TFetchClient<['elevenlabs', ...GSelectedFeatureKeys], paths>;
+	return _fetchClient as unknown as TFetchClient<[TElevenLabsFeature, ...GFeatures]>;
 }

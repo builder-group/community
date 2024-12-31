@@ -282,7 +282,7 @@ export function withEPREL<GFeatures extends TFeatureDefinition[]>(
 		}
 	};
 
-	// Merge existing features from the state with the new api feature
+	// Merge existing features from the fetch client with the new eprel feature
 	const _fetchClient = Object.assign(fetchClient, eprelFeature) as TFetchClient<[TEPRELFeature]>;
 	_fetchClient._features.push('eprel');
 
