@@ -1,10 +1,10 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/openapi-ts-router/.github/banner.svg" alt="openapi-ts-router banner">
+    <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/openapi-ts-router/.github/banner.svg" alt="openapi-ts-router banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/community/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/community.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/openapi-ts-router">
         <img src="https://img.shields.io/bundlephobia/minzip/openapi-ts-router.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
@@ -30,12 +30,8 @@
 
 ### 📚 Examples
 
-- [Express Petstore](https://github.com/builder-group/monorepo/tree/develop/examples/openapi-ts-router/express/petstore)
-- [Hono Petstore](https://github.com/builder-group/monorepo/tree/develop/examples/openapi-ts-router/hono/petstore)
-
-### 🌟 Motivation
-
-Create a typesafe and straightforward wrapper around web framework routers, seamlessly integrating with OpenAPI schemas using `openapi-typescript` and ensuring type validation with libraries like Zod and Valibot.
+- [Express Petstore](https://github.com/builder-group/community/tree/develop/examples/openapi-ts-router/express/petstore)
+- [Hono Petstore](https://github.com/builder-group/community/tree/develop/examples/openapi-ts-router/hono/petstore)
 
 ## 📖 Usage
 

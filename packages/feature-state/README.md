@@ -1,10 +1,10 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/feature-state/.github/banner.svg" alt="feature-state banner">
+    <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/feature-state/.github/banner.svg" alt="feature-state banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/community/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/community.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/feature-state">
         <img src="https://img.shields.io/bundlephobia/minzip/feature-state.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
@@ -27,7 +27,7 @@
 
 ### 📚 Examples
 
-- [ReactJs Counter](https://github.com/builder-group/monorepo/tree/develop/examples/feature-state/react/counter) ([Code Sandbox](https://codesandbox.io/p/sandbox/counter-k74k9k))
+- [ReactJs Counter](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/counter) ([Code Sandbox](https://codesandbox.io/p/sandbox/counter-k74k9k))
 
 ### 🌟 Motivation
 
@@ -100,7 +100,7 @@ $temperature.set($temperature.get() + 5);
 
 ### Subscribing to State Changes
 
-You can subscribe to state changes using `$state.subscribe(callback)`, which works in vanilla JS. For React, special hooks like [`useFeatureState($state)`](https://github.com/builder-group/monorepo/tree/develop/packages/feature-state-react) are available to re-render components on state changes.
+You can subscribe to state changes using `$state.subscribe(callback)`, which works in vanilla JS. For React, special hooks like [`useFeatureState($state)`](https://github.com/builder-group/community/tree/develop/packages/feature-state-react) are available to re-render components on state changes.
 
 Listener callbacks will receive the new value as the first argument.
 
