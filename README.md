@@ -28,7 +28,7 @@ A collection of open source libraries maintained by [builder.group](https://buil
 | [feature-state](https://github.com/builder-group/monorepo/blob/develop/packages/feature-state)                   | Straightforward, typesafe, and feature-based state management library for ReactJs                                                                                              | [`feature-state`](https://www.npmjs.com/package/feature-state)                   |
 | [figma-connect](https://github.com/builder-group/monorepo/blob/develop/packages/figma-connect)                   | Straightforward and typesafe wrapper around the communication between the app/ui (iframe) and plugin (sandbox) part of a Figma Plugin                                          | [`figma-connect`](https://www.npmjs.com/package/figma-connect)                   |
 | [google-webfonts-client](https://github.com/builder-group/monorepo/blob/develop/packages/google-webfonts-client) | Typesafe and straightforward fetch client for interacting with the Google Web Fonts API using feature-fetch                                                                    | [`google-webfonts-client`](https://www.npmjs.com/package/google-webfonts-client) |
-| [openapi-router](https://github.com/builder-group/monorepo/blob/develop/packages/openapi-router)                 | Thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod | [`@blgc/openapi-router`](https://www.npmjs.com/package/@blgc/openapi-router)     |
+| [openapi-ts-router](https://github.com/builder-group/monorepo/blob/develop/packages/openapi-ts-router)                 | Thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod | [`openapi-ts-router`](https://www.npmjs.com/package/openapi-ts-router)     |
 | [utils](https://github.com/builder-group/monorepo/blob/develop/packages/utils)                                   | Straightforward, typesafe, and tree-shakable collection of utility functions                                                                                                   | [`@blgc/utils`](https://www.npmjs.com/package/@blgc/utils)                       |
 | [validatenv](https://github.com/builder-group/monorepo/blob/develop/packages/validatenv)                         | Type-safe, straightforward, and lightweight library for validating environment variables using existing validation libraries like Zod, Valibot, and Yup.                       | [`validatenv`](https://www.npmjs.com/package/validatenv)                         |
 | [validation-adapter](https://github.com/builder-group/monorepo/blob/develop/packages/validation-adapter)         | Universal validation adapter that integrates various validation libraries like Zod, Valibot, and Yup                                                                           | [`validation-adapter`](https://www.npmjs.com/package/validation-adapter)         |
@@ -51,10 +51,10 @@ A collection of open source libraries maintained by [builder.group](https://buil
 
 - [`feature-state/react/counter`](https://github.com/builder-group/monorepo/tree/develop/examples/feature-state/react/counter)
 
-### `openapi-router`
+### `openapi-ts-router`
 
-- [`openapi-router/hono/petstore`](https://github.com/builder-group/monorepo/tree/develop/examples/openapi-router/hono/petstore)
-- [`openapi-router/express/petstore`](https://github.com/builder-group/monorepo/tree/develop/examples/openapi-router/express/petstore)
+- [`openapi-ts-router/hono/petstore`](https://github.com/builder-group/monorepo/tree/develop/examples/openapi-ts-router/hono/petstore)
+- [`openapi-ts-router/express/petstore`](https://github.com/builder-group/monorepo/tree/develop/examples/openapi-ts-router/express/petstore)
 
 ### `xml-tokenizer`
 

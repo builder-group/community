@@ -1,0 +1,20 @@
+{
+	"name": "openapi-ts-router-hono-petstore",
+	"version": "0.0.1",
+	"scripts": {
+		"dev": "tsx watch src/index.ts",
+		"openapi:generate": "npx openapi-typescript ./resources/openapi-v1.yaml -o ./src/gen/v1.ts"
+	},
+	"dependencies": {
+		"@hono/node-server": "^1.13.7",
+		"@hono/zod-validator": "^0.4.2",
+		"hono": "^4.6.14",
+		"openapi-ts-router": "workspace:*",
+		"validation-adapters": "workspace:*",
+		"zod": "^3.24.1"
+	},
+	"devDependencies": {
+		"@types/node": "^22.10.2",
+		"tsx": "^4.19.2"
+	}
+}

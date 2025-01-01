@@ -11,8 +11,8 @@
 		"feature-fetch-vanilla-open-meteo",
 		"feature-form-react-basic",
 		"feature-state-react-counter",
-		"openapi-router-express-petstore",
-		"openapi-router-hono-petstore",
+		"openapi-ts-router-express-petstore",
+		"openapi-ts-router-hono-petstore",
 		"xml-tokenizer-vanilla-playground"
 	]
 }

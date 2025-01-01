@@ -1,0 +1,29 @@
+{
+	"name": "openapi-ts-router-express-petstore",
+	"version": "0.0.1",
+	"private": true,
+	"main": "./dist/index.js",
+	"source": "./src/index.ts",
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"scripts": {
+		"dev": "nodemon --config ./nodemon.json",
+		"openapi:generate": "npx openapi-typescript ./resources/openapi-v1.yaml -o ./src/gen/v1.ts"
+	},
+	"dependencies": {
+		"express": "^4.21.2",
+		"openapi-ts-router": "workspace:*",
+		"valibot": "1.0.0-beta.9",
+		"validation-adapters": "workspace:*"
+	},
+	"devDependencies": {
+		"@blgc/config": "workspace:*",
+		"@types/express": "^5.0.0",
+		"@types/node": "^22.10.2",
+		"nodemon": "^3.1.9",
+		"openapi-typescript": "^7.4.4",
+		"ts-node": "^10.9.2"
+	}
+}
