@@ -8,13 +8,13 @@
 	"dependencies": {
 		"@hono/node-server": "^1.13.7",
 		"@hono/zod-validator": "^0.4.2",
-		"hono": "^4.6.14",
+		"hono": "^4.6.15",
 		"openapi-ts-router": "workspace:*",
 		"validation-adapters": "workspace:*",
 		"zod": "^3.24.1"
 	},
 	"devDependencies": {
-		"@types/node": "^22.10.2",
+		"@types/node": "^22.10.3",
 		"tsx": "^4.19.2"
 	}
 }
