@@ -47,8 +47,8 @@
 ```ts
 import { Router } from 'express';
 import { createExpressOpenApiRouter } from 'openapi-ts-router';
-import * as z from 'zod';
 import { zValidator } from 'validation-adapters/zod';
+import * as z from 'zod';
 import { paths } from './gen/v1'; // OpenAPI-generated types
 import { PetSchema } from './schemas'; // Custom reusable schema for validation
 
