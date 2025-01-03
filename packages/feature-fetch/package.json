@@ -6,11 +6,11 @@
 	"keywords": [],
 	"homepage": "https://builder.group/?source=package-json",
 	"bugs": {
-		"url": "https://github.com/builder-group/monorepo/issues"
+		"url": "https://github.com/builder-group/community/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/builder-group/monorepo.git"
+		"url": "https://github.com/builder-group/community.git"
 	},
 	"license": "MIT",
 	"author": "@bennobuilder",
@@ -36,11 +36,11 @@
 	},
 	"dependencies": {
 		"@0no-co/graphql.web": "^1.0.12",
-		"@blgc/types": "workspace:*",
 		"@blgc/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
+		"@blgc/types": "workspace:*",
 		"@types/node": "^22.10.2",
 		"@types/url-parse": "^1.4.11",
 		"msw": "^2.7.0"

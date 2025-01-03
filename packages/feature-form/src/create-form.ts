@@ -20,7 +20,7 @@ import {
 
 export function createForm<GFormData extends TFormData>(
 	config: TCreateFormConfig<GFormData>
-): TForm<GFormData, ['base']> {
+): TForm<GFormData, []> {
 	const {
 		fields,
 		collectErrorMode = 'firstError',
@@ -32,9 +32,8 @@ export function createForm<GFormData extends TFormData>(
 		notifyOnStatusChange = true
 	} = config;
 
-	const form: TForm<GFormData, ['base']> = {
-		_: null,
-		_features: ['base'],
+	const form: TForm<GFormData, []> = {
+		_features: [],
 		_config: {
 			collectErrorMode,
 			disabled
@@ -61,7 +60,7 @@ export function createForm<GFormData extends TFormData>(
 		isValidating: createState(false),
 		isSubmitted: createState(false),
 		isSubmitting: createState(false),
-		async _revalidate(this: TForm<GFormData, ['base']>, cached = false) {
+		async _revalidate(this: TForm<GFormData, []>, cached = false) {
 			const formFields = Object.values(this.fields) as TFormFields<GFormData>[keyof GFormData][];
 
 			if (!cached) {
@@ -73,7 +72,7 @@ export function createForm<GFormData extends TFormData>(
 			this.isValid.set(formFields.every((formField) => formField.isValid()));
 			return this.isValid.get();
 		},
-		async submit(this: TForm<GFormData, ['base']>, options = {}) {
+		async submit(this: TForm<GFormData, []>, options = {}) {
 			const {
 				additionalData,
 				assignToInitial = false,
@@ -151,13 +150,13 @@ export function createForm<GFormData extends TFormData>(
 			postSubmitCallback?.(this, submitCallbackData ?? {});
 			return this.isValid.get();
 		},
-		async validate(this: TForm<GFormData, ['base']>) {
+		async validate(this: TForm<GFormData, []>) {
 			return this._revalidate(false);
 		},
-		getField(this: TForm<GFormData, ['base']>, fieldKey) {
+		getField(this: TForm<GFormData, []>, fieldKey) {
 			return this.fields[fieldKey];
 		},
-		getValidData(this: TForm<GFormData, ['base']>) {
+		getValidData(this: TForm<GFormData, []>) {
 			if (!this.isValid.get()) {
 				return null;
 			}
@@ -174,7 +173,7 @@ export function createForm<GFormData extends TFormData>(
 
 			return preparedData;
 		},
-		getErrors(this: TForm<GFormData, ['base']>) {
+		getErrors(this: TForm<GFormData, []>) {
 			const errors: TInvalidFormFieldErrors<GFormData> = {};
 
 			for (const [fieldKey, formField] of Object.entries(this.fields) as TEntries<
@@ -199,7 +198,7 @@ export function createForm<GFormData extends TFormData>(
 
 			return errors;
 		},
-		reset(this: TForm<GFormData, ['base']>) {
+		reset(this: TForm<GFormData, []>) {
 			for (const formField of Object.values(
 				this.fields
 			) as TFormFields<GFormData>[keyof GFormData][]) {

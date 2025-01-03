@@ -1,10 +1,10 @@
 <h1 align="center">
-  <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/eprel-client/.github/banner.svg" alt="eprel-client banner">
+  <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/eprel-client/.github/banner.svg" alt="eprel-client banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/community/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/community.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/eprel-client">
         <img src="https://img.shields.io/bundlephobia/minzip/eprel-client.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
@@ -19,7 +19,7 @@
 
 > Status: Experimental
 
-`eprel-client` is a typesafe and straightforward fetch client for interacting with the European Product Registry for Energy Labelling (EPREL) API using [`feature-fetch`](https://github.com/builder-group/monorepo/tree/develop/packages/feature-fetch).
+`eprel-client` is a typesafe and straightforward fetch client for interacting with the European Product Registry for Energy Labelling (EPREL) API using [`feature-fetch`](https://github.com/builder-group/community/tree/develop/packages/feature-fetch).
 
 - [EPREL API Docs](https://webgate.ec.europa.eu/fpfis/wikis/display/EPREL/EPREL+Public+site+-+API)
 

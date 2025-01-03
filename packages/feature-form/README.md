@@ -1,10 +1,10 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/feature-form/.github/banner.svg" alt="feature-form banner">
+    <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/feature-form/.github/banner.svg" alt="feature-form banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/community/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/community.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/feature-form">
         <img src="https://img.shields.io/bundlephobia/minzip/feature-form.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
@@ -29,7 +29,7 @@
 
 ### 📚 Examples
 
-- [ReactJs Basic](https://github.com/builder-group/monorepo/tree/develop/examples/feature-form/react/basic) ([Code Sandbox](https://codesandbox.io/p/sandbox/basic-c4gd3t))
+- [ReactJs Basic](https://github.com/builder-group/community/tree/develop/examples/feature-form/react/basic) ([Code Sandbox](https://codesandbox.io/p/sandbox/basic-c4gd3t))
 
 ### 🌟 Motivation
 
@@ -90,7 +90,7 @@ export const MyFormComponent: React.FC = () => {
 };
 ```
 
-### Validators ([`validation-adapters`](https://github.com/builder-group/monorepo/tree/develop/packages/validation-adapters))
+### Validators ([`validation-adapters`](https://github.com/builder-group/community/tree/develop/packages/validation-adapters))
 
 `feature-form` supports various validators such as [Zod](https://github.com/colinhacks/zod), [Yup](https://github.com/jquense/yup), [Valibot](https://github.com/fabian-hiller/valibot) and more.
 

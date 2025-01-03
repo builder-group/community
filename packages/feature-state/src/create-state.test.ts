@@ -1,7 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createState } from './create-state';
+import { withMultiUndo, withSelector, withUndo } from './features';
 
 describe('createState function', () => {
+	it('should have correct types', () => {
+		const state = createState('Jeff');
+		const stateWithUndo = withUndo(state);
+		const stateWithMultiUndo = withMultiUndo(stateWithUndo);
+		const stateWithSelector = withSelector(stateWithMultiUndo);
+	});
+
 	it('should initialize with the provided value', () => {
 		// Prepare
 		const initialState = 10;

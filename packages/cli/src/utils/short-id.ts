@@ -1,4 +1,4 @@
-// https://github.com/builder-group/monorepo/blob/develop/packages/utils/src/short-id.ts
+// https://github.com/builder-group/community/blob/develop/packages/utils/src/short-id.ts
 
 /**
  * Generates a 16-character unique identifier.

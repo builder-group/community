@@ -1,12 +1,13 @@
+import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
 import { Err } from '@blgc/utils';
-import type { TEnforceFeatures, TFeatureKeys, TFetchClient, TSelectFeatures } from '../../types';
+import type { TFetchClient, TGraphQLFeature } from '../../types';
 import { getQueryString } from './get-query-string';
 
-export function withGraphQL<GSelectedFeatureKeys extends TFeatureKeys[]>(
-	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base']>>
-): TFetchClient<['graphql', ...GSelectedFeatureKeys]> {
-	const graphqlFeature: TSelectFeatures<['graphql']> = {
-		async query(this: TFetchClient<['base']>, query, options = {}) {
+export function withGraphQL<GFeatures extends TFeatureDefinition[]>(
+	fetchClient: TEnforceFeatureConstraint<TFetchClient<GFeatures>, TFetchClient<GFeatures>, []>
+): TFetchClient<[TGraphQLFeature, ...GFeatures]> {
+	const graphqlFeature: TGraphQLFeature['api'] = {
+		async query(this: TFetchClient<[]>, query, options = {}) {
 			const maybeQueryString = await getQueryString(query);
 			if (maybeQueryString.isErr()) {
 				return Err(maybeQueryString.error);
@@ -24,9 +25,9 @@ export function withGraphQL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 
 	// Merge existing features from the fetch client with the new graphql feature
 	const _fetchClient = Object.assign(fetchClient, graphqlFeature) as TFetchClient<
-		['graphql', ...GSelectedFeatureKeys]
+		[TGraphQLFeature]
 	>;
 	_fetchClient._features.push('graphql');
 
-	return _fetchClient;
+	return _fetchClient as unknown as TFetchClient<[TGraphQLFeature, ...GFeatures]>;
 }

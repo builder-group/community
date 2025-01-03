@@ -1,10 +1,10 @@
 <h1 align="center">
-  <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/elevenlabs-client/.github/banner.svg" alt="elevenlabs-client banner">
+  <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/elevenlabs-client/.github/banner.svg" alt="elevenlabs-client banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/community/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/community.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/elevenlabs-client">
         <img src="https://img.shields.io/bundlephobia/minzip/elevenlabs-client.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
@@ -19,7 +19,7 @@
 
 > Status: Experimental
 
-`elevenlabs-client` is a typesafe and straightforward fetch client for interacting with the ElevenLabs API using [`feature-fetch`](https://github.com/builder-group/monorepo/tree/develop/packages/feature-fetch).
+`elevenlabs-client` is a typesafe and straightforward fetch client for interacting with the ElevenLabs API using [`feature-fetch`](https://github.com/builder-group/community/tree/develop/packages/feature-fetch).
 
 - [ElevenLabs API Docs](https://elevenlabs.io/docs/introduction)
 - [OpenAPI](https://github.com/elevenlabs/elevenlabs-docs/blob/main/openapi.json)

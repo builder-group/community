@@ -1,10 +1,10 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/feature-react/.github/banner.svg" alt="feature-react banner">
+    <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/feature-react/.github/banner.svg" alt="feature-react banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/community/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/community.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/feature-react">
         <img src="https://img.shields.io/bundlephobia/minzip/feature-react.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
@@ -24,29 +24,31 @@
 - **Seamless Integration**: Designed to work effortlessly with `feature-state`
 - **Typesafe**: Build with TypeScript for strong type safety
 
-# [`feature-state`](https://github.com/builder-group/monorepo/tree/develop/packages/feature-state)
+# [`feature-state`](https://github.com/builder-group/community/tree/develop/packages/feature-state)
 
 ## 📖 Usage
 
-### `useGlobalState()`
+### `useFeatureState()`
 
 A hook to bind a `feature-state` state to a React component, causing the component to re-render whenever the state changes.
 
 ```ts
 import { createState } from 'feature-state';
-import { useGlobalState } from 'feature-react/state';
+import { useFeatureState } from 'feature-react/state';
 
 const $tasks = createState<Task[]>([]);
 
 export const Tasks = () => {
-    const tasks = useGlobalState($tasks);
+	const tasks = useFeatureState($tasks);
 
-    return (
-        <ul>
-            {tasks.map(task => <li key={task.id}>{task.title}</li>)}
-        </ul>
-    );
-}
+	return (
+		<ul>
+			{tasks.map((task) => (
+				<li>{task.title}</li>
+			))}
+		</ul>
+	);
+};
 ```
 
 ## 📙 Features
@@ -88,7 +90,7 @@ console.log(globalThis._state); // { /* $state */ }
 - **`key`**: The key used to identify the value in the global scope.
 - **`value`**: The value to be bound to the global scope.
 
-# [`feature-form`](https://github.com/builder-group/monorepo/tree/develop/packages/feature-form)
+# [`feature-form`](https://github.com/builder-group/community/tree/develop/packages/feature-form)
 
 ## 📖 Usage
 

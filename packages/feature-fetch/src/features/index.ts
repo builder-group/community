@@ -1,4 +1,5 @@
 export * from './with-api';
+export * from './with-cache';
 export * from './with-delay';
 export * from './with-graphql';
 export * from './with-openapi';

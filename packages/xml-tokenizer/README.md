@@ -1,10 +1,10 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/xml-tokenizer/.github/banner.svg" alt="xml-tokenizer banner">
+    <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/xml-tokenizer/.github/banner.svg" alt="xml-tokenizer banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/community/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/community.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/xml-tokenizer">
         <img src="https://img.shields.io/bundlephobia/minzip/xml-tokenizer.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
@@ -29,7 +29,7 @@ The implementation is based on the [roxmltree](https://github.com/RazrFalcon/rox
 
 ### 📚 Examples
 
-- [Vanilla Profiler](https://github.com/builder-group/monorepo/tree/develop/examples/xml-tokenizer/vanilla/playground)
+- [Vanilla Profiler](https://github.com/builder-group/community/tree/develop/examples/xml-tokenizer/vanilla/playground)
 
 ### 🌟 Motivation
 
@@ -194,7 +194,7 @@ See [Generator vs Iterator vs Callback](https://observablehq.com/@domoritz/yield
 [fast-xml-parser] Total Time: 1308.0000 ms | Average Time per Run: 13.0800 ms | Median Time: 13.0000 ms | Runs: 100
 ```
 
-[Benchmark implementation in Vanilla Profiler](https://github.com/builder-group/monorepo/tree/develop/examples/xml-tokenizer/vanilla/playground)
+[Benchmark implementation in Vanilla Profiler](https://github.com/builder-group/community/tree/develop/examples/xml-tokenizer/vanilla/playground)
 
 ## 💡 Resources
 

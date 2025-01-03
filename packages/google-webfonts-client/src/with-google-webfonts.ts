@@ -1,32 +1,34 @@
+import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
 import { mapOk } from '@blgc/utils';
 import {
 	createApiFetchClient,
 	Err,
-	hasFeatures,
+	isFetchClientWithFeatures,
 	isStatusCode,
 	Ok,
-	type TEnforceFeatures,
-	type TFeatureKeys,
-	type TFetchClient,
-	type TSelectFeatures
+	TOpenApiFeature,
+	type TFetchClient
 } from 'feature-fetch';
 import type { paths } from './gen/v1';
-import { type TFontStyle } from './types';
+import { TGoogleWebfontsFeature, type TFontStyle } from './types';
 
 const REGULAR_FONT_WEIGHT = 400;
 
-export function withGoogleWebfonts<GSelectedFeatureKeys extends TFeatureKeys[]>(
-	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base', 'openapi']>>
-): TFetchClient<['google-webfonts', ...GSelectedFeatureKeys], paths> {
-	if (!hasFeatures(fetchClient, ['openapi'])) {
+export function withGoogleWebfonts<GFeatures extends TFeatureDefinition[]>(
+	fetchClient: TEnforceFeatureConstraint<
+		TFetchClient<GFeatures>,
+		TFetchClient<GFeatures>,
+		['openapi']
+	>
+): TFetchClient<[TGoogleWebfontsFeature, ...GFeatures]> {
+	if (!isFetchClientWithFeatures<[TOpenApiFeature<paths>]>(fetchClient, ['openapi'])) {
 		throw Error('FetchClient must have "openapi" feature to use withGoogleWebfonts');
 	}
-	fetchClient._features.push('google-webfonts');
 
-	const googleWebfontsFeature: TSelectFeatures<['google-webfonts']> = {
+	const googleWebfontsFeature: TGoogleWebfontsFeature['api'] = {
 		_apiFetchClient: createApiFetchClient(),
 		async getWebFonts(
-			this: TFetchClient<['base', 'openapi', 'google-webfonts'], paths>,
+			this: TFetchClient<[TOpenApiFeature<paths>, TGoogleWebfontsFeature]>,
 			options = {}
 		) {
 			const { capability, family, sort, subset } = options;
@@ -36,7 +38,7 @@ export function withGoogleWebfonts<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			return mapOk(reuslt, (ok) => ok.data);
 		},
 		async getFontFileUrl(
-			this: TFetchClient<['base', 'openapi', 'google-webfonts'], paths>,
+			this: TFetchClient<[TOpenApiFeature<paths>, TGoogleWebfontsFeature]>,
 			family,
 			options = {}
 		) {
@@ -72,7 +74,7 @@ export function withGoogleWebfonts<GSelectedFeatureKeys extends TFeatureKeys[]>(
 			return Ok(null);
 		},
 		async downloadFontFile(
-			this: TFetchClient<['base', 'openapi', 'google-webfonts'], paths>,
+			this: TFetchClient<[TOpenApiFeature<paths>, TGoogleWebfontsFeature]>,
 			family,
 			options = {}
 		) {
@@ -99,10 +101,13 @@ export function withGoogleWebfonts<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		}
 	};
 
-	// Merge existing features from the state with the new api feature
-	const _fetchClient = Object.assign(fetchClient, googleWebfontsFeature);
+	// Merge existing features from the fetch client with the new google webfonts feature
+	const _fetchClient = Object.assign(fetchClient, googleWebfontsFeature) as TFetchClient<
+		[TGoogleWebfontsFeature]
+	>;
+	_fetchClient._features.push('google-webfonts');
 
-	return _fetchClient as TFetchClient<['google-webfonts', ...GSelectedFeatureKeys], paths>;
+	return _fetchClient as unknown as TFetchClient<[TGoogleWebfontsFeature, ...GFeatures]>;
 }
 
 // Find closest font variant identifier key

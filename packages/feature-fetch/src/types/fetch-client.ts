@@ -1,7 +1,7 @@
+import { TWithFeatures, type TFeatureDefinition } from '@blgc/types/features';
 import { type TResult } from '@blgc/utils';
 import type { FetchError, NetworkError, RequestError } from '../exceptions';
 import type { FetchHeaders } from '../helper';
-import type { TFeatureKeys, TSelectFeatures } from './features';
 import {
 	type TParseAs,
 	type TParseAsResponse,
@@ -9,23 +9,22 @@ import {
 	type TRequestMethod
 } from './fetch';
 
-export type TFetchClient<
-	GSelectedFeatureKeys extends TFeatureKeys[],
-	GPaths extends object = object
-> = {
-	_features: string[];
-	_config: TFetchClientConfig;
-	_fetchLike: TFetchLike;
-	_baseFetch: <
-		GSuccessResponseBody = unknown,
-		GErrorResponseBody = unknown,
-		GParseAs extends TParseAs = 'json'
-	>(
-		path: string,
-		method: TRequestMethod,
-		options: TFetchOptionsWithBody<GParseAs>
-	) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
-} & TSelectFeatures<GSelectedFeatureKeys, GPaths>;
+export type TFetchClient<GFeatures extends TFeatureDefinition[]> = TWithFeatures<
+	{
+		_config: TFetchClientConfig;
+		_fetchLike: TFetchLike;
+		_baseFetch: <
+			GSuccessResponseBody = unknown,
+			GErrorResponseBody = unknown,
+			GParseAs extends TParseAs = 'json'
+		>(
+			path: string,
+			method: TRequestMethod,
+			options: TFetchOptionsWithBody<GParseAs>
+		) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
+	},
+	GFeatures
+>;
 
 // =============================================================================
 // Fetch Client Options & Config

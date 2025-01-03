@@ -2,19 +2,19 @@ import { randomHex, shortId } from '@blgc/utils';
 import {
 	bitwiseFlag,
 	createForm,
-	createValidator,
 	FormFieldReValidateMode,
 	FormFieldValidateMode,
 	TFormFieldValidator
 } from 'feature-form';
 import { useForm } from 'feature-react/form';
-import { useGlobalState, withGlobalBind } from 'feature-react/state';
+import { useFeatureState, withGlobalBind } from 'feature-react/state';
 import React from 'react';
 import * as v from 'valibot';
-import * as z from 'zod';
-import './App.css';
+import { createValidator } from 'validation-adapters/adapter';
 import { vValidator } from 'validation-adapters/valibot';
 import { zValidator } from 'validation-adapters/zod';
+import * as z from 'zod';
+import './App.css';
 import { StatusMessage } from './components';
 import { isLightColor } from './utils';
 
@@ -124,14 +124,16 @@ let renderCount = 0;
 function App() {
 	const { handleSubmit, status, field, register } = useForm($form);
 	const [data, setData] = React.useState('');
-	const isValid = useGlobalState($form.isValid);
+	const isValid = useFeatureState($form.isValid);
 
 	renderCount++;
 
 	return (
 		<form
 			onSubmit={handleSubmit({
-				onValidSubmit: (data) => setData(JSON.stringify(data)),
+				onValidSubmit: (data) => {
+					setData(JSON.stringify(data));
+				},
 				preventDefault: true,
 				postSubmitCallback: (form, data) => {
 					console.log('postSubmit', { form, data });

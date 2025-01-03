@@ -19,9 +19,7 @@ import type {
 } from './types';
 import { type TRequestInitWithHeadersObject } from './types/fetch';
 
-export function createFetchClient<GPaths extends object = object>(
-	options: TFetchClientOptions = {}
-): TFetchClient<['base'], GPaths> {
+export function createFetchClient(options: TFetchClientOptions = {}): TFetchClient<[]> {
 	const config: TFetchClientConfig = {
 		prefixUrl: options.prefixUrl ?? '',
 		fetchProps: options.fetchProps ?? {},
@@ -50,11 +48,10 @@ export function createFetchClient<GPaths extends object = object>(
 	}
 
 	return {
-		_: null,
-		_features: ['base'],
+		_features: [],
 		_fetchLike: fetchLike,
 		_config: config,
-		async _baseFetch(this: TFetchClient<['base']>, path, method, baseFetchOptions = {}) {
+		async _baseFetch(this: TFetchClient<[]>, path, method, baseFetchOptions = {}) {
 			const {
 				parseAs = 'json',
 				pathSerializer = this._config.pathSerializer,

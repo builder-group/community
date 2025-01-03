@@ -6,11 +6,11 @@
 	"keywords": [],
 	"homepage": "https://builder.group/?source=package-json",
 	"bugs": {
-		"url": "https://github.com/builder-group/monorepo/issues"
+		"url": "https://github.com/builder-group/community/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/builder-group/monorepo.git"
+		"url": "https://github.com/builder-group/community.git"
 	},
 	"license": "MIT",
 	"author": "@bennobuilder",
@@ -56,6 +56,7 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
+		"@blgc/types": "workspace:*",
 		"@blgc/utils": "workspace:*",
 		"@types/node": "^22.10.2",
 		"@types/react": "^19.0.2",

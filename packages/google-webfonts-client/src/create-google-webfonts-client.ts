@@ -1,10 +1,11 @@
-import { createOpenApiFetchClient, type TFetchClient } from 'feature-fetch';
+import { createOpenApiFetchClient, TOpenApiFeature, type TFetchClient } from 'feature-fetch';
 import type { paths } from './gen/v1';
+import { TGoogleWebfontsFeature } from './types';
 import { withGoogleWebfonts } from './with-google-webfonts';
 
 export function createGoogleWebfontsClient(
 	config: TGoogleWebfontsClientConfig
-): TFetchClient<['base', 'openapi', 'google-webfonts'], paths> {
+): TFetchClient<[TOpenApiFeature<paths>, TGoogleWebfontsFeature]> {
 	const { prefixUrl = 'https://www.googleapis.com/webfonts/v1', apiKey } = config;
 	return withGoogleWebfonts(
 		createOpenApiFetchClient<paths>({

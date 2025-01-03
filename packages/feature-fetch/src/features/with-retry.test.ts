@@ -1,3 +1,4 @@
+import { unwrapErr } from '@blgc/utils';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
@@ -86,7 +87,7 @@ describe('withRetry function', () => {
 		const result = await client._baseFetch('/test', 'GET', {});
 
 		expect(result.isErr()).toBe(true);
-		const error = result.unwrapErr();
+		const error = unwrapErr(result);
 		expect(error instanceof RequestError).toBe(true);
 		expect((error as RequestError).data).toEqual({ message: 'Internal Server Error' });
 	});
