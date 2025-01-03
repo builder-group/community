@@ -35,13 +35,13 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@blgc/types": "workspace:*",
 		"@blgc/utils": "workspace:*",
 		"feature-state": "workspace:*",
 		"validation-adapter": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
+		"@blgc/types": "workspace:*",
 		"@types/node": "^22.10.2"
 	},
 	"size-limit": [

@@ -386,7 +386,7 @@ importers:
         version: 8.18.1(eslint@9.17.0(jiti@2.4.2))(typescript@5.7.2)
       vite-tsconfig-paths:
         specifier: ^5.1.4
-        version: 5.1.4(typescript@5.7.2)(vite@6.0.6(@types/node@22.10.3)(jiti@2.4.2))
+        version: 5.1.4(typescript@5.7.2)(vite@5.4.11(@types/node@22.10.3))
     devDependencies:
       eslint:
         specifier: ^9.17.0
@@ -456,9 +456,6 @@ importers:
       '@0no-co/graphql.web':
         specifier: ^1.0.12
         version: 1.0.12(graphql@16.10.0)
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
@@ -466,6 +463,9 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
+      '@blgc/types':
+        specifier: workspace:*
+        version: link:../types
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.2
@@ -478,9 +478,6 @@ importers:
 
   packages/feature-form:
     dependencies:
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
@@ -494,6 +491,9 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
+      '@blgc/types':
+        specifier: workspace:*
+        version: link:../types
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.2
@@ -543,9 +543,6 @@ importers:
 
   packages/feature-state:
     dependencies:
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
@@ -553,6 +550,9 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
+      '@blgc/types':
+        specifier: workspace:*
+        version: link:../types
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.2
@@ -600,9 +600,6 @@ importers:
 
   packages/openapi-ts-router:
     dependencies:
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
       validation-adapter:
         specifier: workspace:*
         version: link:../validation-adapter
@@ -610,6 +607,9 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
+      '@blgc/types':
+        specifier: workspace:*
+        version: link:../types
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.0
@@ -4820,46 +4820,6 @@ packages:
 
   vite@6.0.5:
     resolution: {integrity: sha512-akD5IAH/ID5imgue2DYhzsEwCi0/4VKY31uhMLEYJwPP4TiUp8pL5PIK+Wo7H8qT8JY9i+pVfPydcFPYD1EL7g==}
-    engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': ^18.0.0 || ^20.0.0 || >=22.0.0
-      jiti: '>=1.21.0'
-      less: '*'
-      lightningcss: ^1.21.0
-      sass: '*'
-      sass-embedded: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.16.0
-      tsx: ^4.8.1
-      yaml: ^2.4.2
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      jiti:
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      sass:
-        optional: true
-      sass-embedded:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-      tsx:
-        optional: true
-      yaml:
-        optional: true
-
-  vite@6.0.6:
-    resolution: {integrity: sha512-NSjmUuckPmDU18bHz7QZ+bTYhRR0iA72cs2QAxCqDpafJ0S6qetco0LB3WW2OxlMHS0JmAv+yZ/R3uPmMyGTjQ==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
     peerDependencies:
@@ -9179,13 +9139,13 @@ snapshots:
       - supports-color
       - terser
 
-  vite-tsconfig-paths@5.1.4(typescript@5.7.2)(vite@6.0.6(@types/node@22.10.3)(jiti@2.4.2)):
+  vite-tsconfig-paths@5.1.4(typescript@5.7.2)(vite@5.4.11(@types/node@22.10.3)):
     dependencies:
       debug: 4.4.0
       globrex: 0.1.2
       tsconfck: 3.1.4(typescript@5.7.2)
     optionalDependencies:
-      vite: 6.0.6(@types/node@22.10.3)(jiti@2.4.2)
+      vite: 5.4.11(@types/node@22.10.3)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -9218,17 +9178,6 @@ snapshots:
       fsevents: 2.3.3
       jiti: 2.4.2
       tsx: 4.19.2
-
-  vite@6.0.6(@types/node@22.10.3)(jiti@2.4.2):
-    dependencies:
-      esbuild: 0.24.2
-      postcss: 8.4.49
-      rollup: 4.29.1
-    optionalDependencies:
-      '@types/node': 22.10.3
-      fsevents: 2.3.3
-      jiti: 2.4.2
-    optional: true
 
   vitest@2.1.8(@types/node@22.10.3)(msw@2.7.0(@types/node@22.10.3)(typescript@5.7.2)):
     dependencies:

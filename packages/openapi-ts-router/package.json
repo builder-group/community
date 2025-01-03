@@ -35,11 +35,11 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@blgc/types": "workspace:*",
 		"validation-adapter": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
+		"@blgc/types": "workspace:*",
 		"@types/express": "^5.0.0",
 		"@types/express-serve-static-core": "^5.0.2",
 		"@types/node": "^22.10.2",
