@@ -1,5 +1,14 @@
 # validation-adapters
 
+## 0.0.18
+
+### Patch Changes
+
+- [#89](https://github.com/builder-group/community/pull/89) [`84e9afc`](https://github.com/builder-group/community/commit/84e9afc88d030ee06c65d8bfc710375e9da7017c) Thanks [@bennobuilder](https://github.com/bennobuilder)! - Fixed typos and imporved types
+
+- Updated dependencies [[`84e9afc`](https://github.com/builder-group/community/commit/84e9afc88d030ee06c65d8bfc710375e9da7017c)]:
+  - validation-adapter@0.0.16
+
 ## 0.0.17
 
 ### Patch Changes

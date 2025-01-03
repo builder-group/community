@@ -1,6 +1,6 @@
 {
 	"name": "figma-connect",
-	"version": "0.0.19",
+	"version": "0.0.20",
 	"private": false,
 	"description": "Straightforward and typesafe wrapper around the communication between the app/ui (iframe) and plugin (sandbox) part of a Figma Plugin",
 	"keywords": [],
