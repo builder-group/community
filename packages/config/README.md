@@ -1,10 +1,10 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/config/.github/banner.svg" alt="@blgc/config banner">
+    <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/config/.github/banner.svg" alt="@blgc/config banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/community/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/community.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/@blgc/config">
         <img src="https://img.shields.io/npm/dt/@blgc/config.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>

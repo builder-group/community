@@ -18,10 +18,13 @@ import type {
 } from '../fetch-client';
 
 export interface TOpenApiFeature<GPaths extends object> {
-	get: TOpenApiGet<GPaths>;
-	put: TOpenApiPut<GPaths>;
-	post: TOpenApiPost<GPaths>;
-	del: TOpenApiDelete<GPaths>;
+	key: 'openapi';
+	api: {
+		get: TOpenApiGet<GPaths>;
+		put: TOpenApiPut<GPaths>;
+		post: TOpenApiPost<GPaths>;
+		del: TOpenApiDelete<GPaths>;
+	};
 }
 
 export type TOpenApiGet<GPaths extends object> = <

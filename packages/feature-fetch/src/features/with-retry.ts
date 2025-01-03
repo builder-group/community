@@ -1,19 +1,16 @@
+import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
 import { sleep } from '@blgc/utils';
-import type {
-	TEnforceFeatures,
-	TFeatureKeys,
-	TFetchClient,
-	TFetchLike,
-	TRequestMiddleware
-} from '../types';
+import type { TFetchClient, TFetchLike, TRequestMiddleware, TRetryFeature } from '../types';
 
-export function withRetry<GSelectedFeatureKeys extends TFeatureKeys[]>(
-	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base']>>,
+export function withRetry<GFeatures extends TFeatureDefinition[]>(
+	fetchClient: TEnforceFeatureConstraint<TFetchClient<GFeatures>, TFetchClient<GFeatures>, []>,
 	options: TRetryMiddlewareOptions = {}
-): TFetchClient<['retry', ...GSelectedFeatureKeys]> {
-	fetchClient._features.push('retry');
+): TFetchClient<[TRetryFeature, ...GFeatures]> {
+	(fetchClient as TFetchClient<[TRetryFeature]>)._features.push('retry');
+
 	fetchClient._config.requestMiddlewares.push(createRetryMiddleware(options));
-	return fetchClient as TFetchClient<['retry', ...GSelectedFeatureKeys]>;
+
+	return fetchClient as TFetchClient<[TRetryFeature, ...GFeatures]>;
 }
 
 export function createRetryMiddleware(options: TRetryMiddlewareOptions = {}): TRequestMiddleware {

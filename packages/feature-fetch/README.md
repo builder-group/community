@@ -1,10 +1,10 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/feature-fetch/.github/banner.svg" alt="feature-fetch banner">
+    <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/feature-fetch/.github/banner.svg" alt="feature-fetch banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/community/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/community.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/feature-fetch">
         <img src="https://img.shields.io/bundlephobia/minzip/feature-fetch.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
@@ -29,11 +29,11 @@
 
 ### 📚 Examples
 
-- [Vanilla Open-Meteo](https://github.com/builder-group/monorepo/tree/develop/examples/feature-fetch/vanilla/open-meteo)
+- [Vanilla Open-Meteo](https://github.com/builder-group/community/tree/develop/examples/feature-fetch/vanilla/open-meteo)
 
 ### 🌟 Motivation
 
-Create a typesafe, straightforward, and lightweight `fetch` wrapper that seamlessly integrates with OpenAPI schemas using `openapi-typescript`. It aims to simplify error handling by returning results in a predictable manner with [`ts-results-es`](https://github.com/lune-climate/ts-results-es#readme). Additionally, it is designed to be modular & extendable, enabling the creation of straightforward API wrappers, such as for the Google Web Fonts API (see [`google-webfonts-client`](https://github.com/builder-group/monorepo/tree/develop/packages/google-webfonts-client)). `feature-fetch` only depends on `fetch`, making it usable in most sandboxed environments like Figma plugins.
+Create a typesafe, straightforward, and lightweight `fetch` wrapper that seamlessly integrates with OpenAPI schemas using `openapi-typescript`. It aims to simplify error handling by returning results in a predictable manner with [`ts-results-es`](https://github.com/lune-climate/ts-results-es#readme). Additionally, it is designed to be modular & extendable, enabling the creation of straightforward API wrappers, such as for the Google Web Fonts API (see [`google-webfonts-client`](https://github.com/builder-group/community/tree/develop/packages/google-webfonts-client)). `feature-fetch` only depends on `fetch`, making it usable in most sandboxed environments like Figma plugins.
 
 ### ⚖️ Alternatives
 

@@ -1,28 +1,27 @@
-import type { TEnforceFeatures, TFeatureKeys, TFetchClient, TSelectFeatures } from '../../types';
+import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
+import type { TApiFeature, TFetchClient } from '../../types';
 
-export function withApi<GSelectedFeatureKeys extends TFeatureKeys[]>(
-	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base']>>
-): TFetchClient<['api', ...GSelectedFeatureKeys]> {
-	const apiFeature: TSelectFeatures<['api']> = {
-		get(this: TFetchClient<['base']>, path, options = {}) {
+export function withApi<GFeatures extends TFeatureDefinition[]>(
+	fetchClient: TEnforceFeatureConstraint<TFetchClient<GFeatures>, TFetchClient<GFeatures>, []>
+): TFetchClient<[TApiFeature, ...GFeatures]> {
+	const apiFeature: TApiFeature['api'] = {
+		get(this: TFetchClient<[]>, path, options = {}) {
 			return this._baseFetch(path, 'GET', options);
 		},
-		post(this: TFetchClient<['base']>, path, body, options = {}) {
+		post(this: TFetchClient<[]>, path, body, options = {}) {
 			return this._baseFetch(path, 'POST', { ...options, body });
 		},
-		put(this: TFetchClient<['base']>, path, body, options = {}) {
+		put(this: TFetchClient<[]>, path, body, options = {}) {
 			return this._baseFetch(path, 'PUT', { ...options, body });
 		},
-		del(this: TFetchClient<['base']>, path, options = {}) {
+		del(this: TFetchClient<[]>, path, options = {}) {
 			return this._baseFetch(path, 'DELETE', options);
 		}
 	};
 
 	// Merge existing features from the fetch client with the new api feature
-	const _fetchClient = Object.assign(fetchClient, apiFeature) as TFetchClient<
-		['api', ...GSelectedFeatureKeys]
-	>;
+	const _fetchClient = Object.assign(fetchClient, apiFeature) as TFetchClient<[TApiFeature]>;
 	_fetchClient._features.push('api');
 
-	return _fetchClient;
+	return _fetchClient as unknown as TFetchClient<[TApiFeature, ...GFeatures]>;
 }

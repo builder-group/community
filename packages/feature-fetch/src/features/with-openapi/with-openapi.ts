@@ -1,38 +1,35 @@
-import type { TEnforceFeatures, TFeatureKeys, TFetchClient, TSelectFeatures } from '../../types';
+import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
+import type { TFetchClient, TOpenApiFeature } from '../../types';
 
-export function withOpenApi<
-	GPaths extends object,
-	GSelectedFeatureKeys extends TFeatureKeys[] = ['base']
->(
-	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base']>, GPaths>
-): TFetchClient<['openapi', ...GSelectedFeatureKeys], GPaths> {
-	const openApiFeature: TSelectFeatures<['openapi'], GPaths> = {
-		get(this: TFetchClient<['base'], GPaths>, path, options) {
+export function withOpenApi<GPaths extends object, GFeatures extends TFeatureDefinition[]>(
+	fetchClient: TEnforceFeatureConstraint<TFetchClient<GFeatures>, TFetchClient<GFeatures>, []>
+): TFetchClient<[TOpenApiFeature<GPaths>, ...GFeatures]> {
+	const openApiFeature: TOpenApiFeature<GPaths>['api'] = {
+		get(this: TFetchClient<[]>, path, options) {
 			return this._baseFetch(path as string, 'GET', options as any);
 		},
-		post(this: TFetchClient<['base'], GPaths>, path, body, options) {
+		post(this: TFetchClient<[]>, path, body, options) {
 			return this._baseFetch(path as string, 'POST', {
 				...(options as any),
 				body
 			});
 		},
-		put(this: TFetchClient<['base'], GPaths>, path, body, options) {
+		put(this: TFetchClient<[]>, path, body, options) {
 			return this._baseFetch(path as string, 'PUT', {
 				...(options as any),
 				body
 			});
 		},
-		del(this: TFetchClient<['base'], GPaths>, path, options) {
+		del(this: TFetchClient<[]>, path, options) {
 			return this._baseFetch(path as string, 'DELETE', options as any);
 		}
 	};
 
 	// Merge existing features from the fetch client with the new openapi feature
 	const _fetchClient = Object.assign(fetchClient, openApiFeature) as TFetchClient<
-		['openapi', ...GSelectedFeatureKeys],
-		GPaths
+		[TOpenApiFeature<GPaths>]
 	>;
 	_fetchClient._features.push('openapi');
 
-	return _fetchClient;
+	return _fetchClient as unknown as TFetchClient<[TOpenApiFeature<GPaths>, ...GFeatures]>;
 }

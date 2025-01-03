@@ -1,16 +1,17 @@
+import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
 import { getNestedProperty } from '@blgc/utils';
-import {
-	type TEnforceFeatures,
-	type TFeatureKeys,
-	type TSelectFeatures,
-	type TState
-} from '../types';
+import { TSelectorFeature, type TState } from '../types';
 
-export function withSelector<GValue, GSelectedFeatureKeys extends TFeatureKeys<GValue>[]>(
-	state: TState<GValue, TEnforceFeatures<GSelectedFeatureKeys, ['base']>>
-): TState<GValue, ['selector', ...GSelectedFeatureKeys]> {
-	const selectorFeature: TSelectFeatures<GValue, ['selector']> = {
-		listenToSelected(this: TState<GValue, ['selector']>, callIf, callback, listenOptions = {}) {
+export function withSelector<GValue, GFeatures extends TFeatureDefinition[]>(
+	state: TEnforceFeatureConstraint<TState<GValue, GFeatures>, TState<GValue, GFeatures>, []>
+): TState<GValue, [TSelectorFeature<GValue>, ...GFeatures]> {
+	const selectorFeature: TSelectorFeature<GValue>['api'] = {
+		listenToSelected(
+			this: TState<GValue, [TSelectorFeature<GValue>]>,
+			callIf,
+			callback,
+			listenOptions = {}
+		) {
 			return this.listen(callback, {
 				...listenOptions,
 				callIf: ({ newValue, prevValue, additionalData }) => {
@@ -42,11 +43,11 @@ export function withSelector<GValue, GSelectedFeatureKeys extends TFeatureKeys<G
 	};
 
 	// Merge existing features from the state with the new selector feature
-	const _state = Object.assign(state, selectorFeature) as unknown as TState<
+	const _state = Object.assign(state, selectorFeature) as TState<
 		GValue,
-		['selector', 'base']
+		[TSelectorFeature<GValue>]
 	>;
 	_state._features.push('selector');
 
-	return _state as unknown as TState<GValue, ['selector', ...GSelectedFeatureKeys]>;
+	return _state as unknown as TState<GValue, [TSelectorFeature<GValue>, ...GFeatures]>;
 }

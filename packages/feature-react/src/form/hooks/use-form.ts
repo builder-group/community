@@ -1,3 +1,4 @@
+import { TFeatureDefinition } from '@blgc/types/features';
 import {
 	type TForm,
 	type TFormData,
@@ -8,9 +9,9 @@ import {
 import React from 'react';
 import { registerFormField, type TRegisterFormFieldResponse } from '../register-form-field';
 
-export function useForm<GFormData extends TFormData>(
-	form: TForm<GFormData, ['base']>
-): TUseFormResponse<GFormData> {
+export function useForm<GFormData extends TFormData, GFeatures extends TFeatureDefinition[]>(
+	form: TForm<GFormData, GFeatures>
+): TUseFormResponse<GFormData, GFeatures> {
 	const [, forceRender] = React.useReducer((s: number) => s + 1, 0);
 
 	React.useEffect(() => {
@@ -62,9 +63,12 @@ export function useForm<GFormData extends TFormData>(
 	};
 }
 
-export interface TUseFormResponse<GFormData extends TFormData> {
+export interface TUseFormResponse<
+	GFormData extends TFormData,
+	GFeatures extends TFeatureDefinition[]
+> {
 	handleSubmit: (
-		options?: THandleSubmitOptions<GFormData>
+		options?: THandleSubmitOptions<GFormData, GFeatures>
 	) => (event?: React.BaseSyntheticEvent) => Promise<boolean>;
 	register: <GKey extends keyof GFormData>(
 		formFieldKey: GKey,
@@ -74,6 +78,7 @@ export interface TUseFormResponse<GFormData extends TFormData> {
 	status: <GKey extends keyof GFormData>(formFieldKey: GKey) => TFormFieldStatus;
 }
 
-interface THandleSubmitOptions<GFormData extends TFormData> extends TSubmitOptions<GFormData> {
+interface THandleSubmitOptions<GFormData extends TFormData, GFeatures extends TFeatureDefinition[]>
+	extends TSubmitOptions<GFormData, GFeatures> {
 	preventDefault?: boolean;
 }

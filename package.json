@@ -5,11 +5,11 @@
 	"keywords": [],
 	"homepage": "https://builder.group/?source=github",
 	"bugs": {
-		"url": "https://github.com/builder-group/monorepo/issues"
+		"url": "https://github.com/builder-group/community/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/builder-group/monorepo.git"
+		"url": "https://github.com/builder-group/community.git"
 	},
 	"license": "MIT",
 	"author": "@bennobuilder",

@@ -1,18 +1,18 @@
+import type { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
 import { mapOk } from '@blgc/utils';
 import {
 	Err,
 	FetchError,
-	hasFeatures,
+	isFetchClientWithFeatures,
 	isStatusCode,
 	Ok,
-	type TEnforceFeatures,
-	type TFeatureKeys,
-	type TFetchClient,
-	type TSelectFeatures
+	TOpenApiFeature,
+	type TFetchClient
 } from 'feature-fetch';
 import type { paths } from './gen/v1';
 import { getLabelUrl, getLanguageSet, getSheetUrl } from './helper';
 import {
+	TEPRELFeature,
 	type TFileAddress,
 	type TLabelFormat,
 	type TLabelType,
@@ -22,18 +22,21 @@ import {
 	type TSortOption
 } from './types';
 
-export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
-	fetchClient: TFetchClient<TEnforceFeatures<GSelectedFeatureKeys, ['base', 'openapi']>>
-): TFetchClient<['eprel', ...GSelectedFeatureKeys], paths> {
-	if (!hasFeatures(fetchClient, ['openapi'])) {
+export function withEPREL<GFeatures extends TFeatureDefinition[]>(
+	fetchClient: TEnforceFeatureConstraint<
+		TFetchClient<GFeatures>,
+		TFetchClient<GFeatures>,
+		['openapi']
+	>
+): TFetchClient<[TEPRELFeature, ...GFeatures]> {
+	if (!isFetchClientWithFeatures<[TOpenApiFeature<paths>]>(fetchClient, ['openapi'])) {
 		throw Error('FetchClient must have "openapi" feature to use withEPREL');
 	}
-	fetchClient._features.push('eprel');
 
-	const eprelFeature: TSelectFeatures<['eprel']> = {
+	const eprelFeature: TEPRELFeature['api'] = {
 		// Open, thus no API Key required
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100941
-		async getProductGroups(this: TFetchClient<['base', 'openapi', 'eprel'], paths>) {
+		async getProductGroups(this: TFetchClient<[TOpenApiFeature<paths>, TEPRELFeature]>) {
 			const result = await this.get('/product-groups');
 			return mapOk(result, (ok) => ok.data);
 		},
@@ -41,7 +44,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		// API Key required
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100855
 		async getModelsInProductGroup(
-			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
+			this: TFetchClient<[TOpenApiFeature<paths>, TEPRELFeature]>,
 			productGroup: TProductGroup,
 			options: {
 				page?: number;
@@ -81,7 +84,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		// Open, thus no API Key required
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100856
 		async getProductByRegistrationNumber(
-			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
+			this: TFetchClient<[TOpenApiFeature<paths>, TEPRELFeature]>,
 			registrationNumber: TRegistrationNumber
 		) {
 			const result = await this.get('/product/{registrationNumber}', {
@@ -100,7 +103,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		// Open, thus no API Key required
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100857
 		async getProductSheets(
-			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
+			this: TFetchClient<[TOpenApiFeature<paths>, TEPRELFeature]>,
 			registrationNumber: TRegistrationNumber,
 			options: {
 				noRedirect?: boolean;
@@ -127,7 +130,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 
 		// Open, thus no API Key required
 		async getProductSheetUrls(
-			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
+			this: TFetchClient<[TOpenApiFeature<paths>, TEPRELFeature]>,
 			registrationNumber: TRegistrationNumber
 		) {
 			const result = await this.getProductByRegistrationNumber(registrationNumber);
@@ -154,9 +157,9 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 
 		// Open, thus no API Key required
 		async getProductSheetUrl(
-			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
-			registrationNumber,
-			language
+			this: TFetchClient<[TOpenApiFeature<paths>, TEPRELFeature]>,
+			registrationNumber: TRegistrationNumber,
+			language: TSheetLanguage
 		) {
 			const result = await this.getProductByRegistrationNumber(registrationNumber);
 			if (result.isErr()) {
@@ -182,7 +185,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		// Open, thus no API Key required
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100858
 		async getProductLabels(
-			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
+			this: TFetchClient<[TOpenApiFeature<paths>, TEPRELFeature]>,
 			registrationNumber: TRegistrationNumber,
 			options: {
 				noRedirect?: boolean;
@@ -218,9 +221,9 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 
 		// Open, thus no API Key required
 		async getProductLabelUrl(
-			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
-			registrationNumber,
-			format
+			this: TFetchClient<[TOpenApiFeature<paths>, TEPRELFeature]>,
+			registrationNumber: TRegistrationNumber,
+			format: TLabelFormat
 		) {
 			const result = await this.getProductByRegistrationNumber(registrationNumber);
 			if (result.isErr()) {
@@ -241,7 +244,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		// Open, thus no API Key required
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100859
 		async getNestedLabel(
-			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
+			this: TFetchClient<[TOpenApiFeature<paths>, TEPRELFeature]>,
 			registrationNumber: TRegistrationNumber
 		) {
 			const result = await this.get('/product/{registrationNumber}/nested-label', {
@@ -261,7 +264,7 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		// API Key required
 		// https://webgate.ec.europa.eu/fpfis/wikis/pages/viewpage.action?pageId=1847100908
 		async exportProductGroupModels(
-			this: TFetchClient<['base', 'openapi', 'eprel'], paths>,
+			this: TFetchClient<[TOpenApiFeature<paths>, TEPRELFeature]>,
 			productGroup: TProductGroup
 		) {
 			const result = await this.get('/exportProducts/{productGroup}', {
@@ -279,8 +282,9 @@ export function withEPREL<GSelectedFeatureKeys extends TFeatureKeys[]>(
 		}
 	};
 
-	// Merge existing features from the state with the new api feature
-	const _fetchClient = Object.assign(fetchClient, eprelFeature);
+	// Merge existing features from the fetch client with the new eprel feature
+	const _fetchClient = Object.assign(fetchClient, eprelFeature) as TFetchClient<[TEPRELFeature]>;
+	_fetchClient._features.push('eprel');
 
-	return _fetchClient as TFetchClient<['eprel', ...GSelectedFeatureKeys], paths>;
+	return _fetchClient as unknown as TFetchClient<[TEPRELFeature, ...GFeatures]>;
 }

@@ -1,10 +1,10 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/builder-group/monorepo/develop/packages/validation-adapters/.github/banner.svg" alt="validation-adapters banner">
+    <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/validation-adapters/.github/banner.svg" alt="validation-adapters banner">
 </h1>
 
 <p align="left">
-    <a href="https://github.com/builder-group/monorepo/blob/develop/LICENSE">
-        <img src="https://img.shields.io/github/license/builder-group/monorepo.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
+    <a href="https://github.com/builder-group/community/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/community.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
     <a href="https://www.npmjs.com/package/validation-adapters">
         <img src="https://img.shields.io/bundlephobia/minzip/validation-adapters.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
@@ -19,7 +19,7 @@
 
 > Status: Experimental
 
-`validation-adapters` is a collection of pre-made adapters for popular validation libraries like Zod and Valibot, allowing for easy integration with the [`validation-adapter`](https://github.com/builder-group/monorepo/tree/develop/packages/validation-adapter) library.
+`validation-adapters` is a collection of pre-made adapters for popular validation libraries like Zod and Valibot, allowing for easy integration with the [`validation-adapter`](https://github.com/builder-group/community/tree/develop/packages/validation-adapter) library.
 
 ## 📖 Usage
 

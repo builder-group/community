@@ -1,0 +1,56 @@
+{
+	"name": "openapi-ts-router",
+	"version": "0.1.1",
+	"private": false,
+	"description": "Thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod",
+	"keywords": [],
+	"homepage": "https://builder.group/?source=package-json",
+	"bugs": {
+		"url": "https://github.com/builder-group/community/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/builder-group/community.git"
+	},
+	"license": "MIT",
+	"author": "@bennobuilder",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"source": "./src/index.ts",
+	"types": "./dist/types/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"scripts": {
+		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
+		"build:prod": "pnpm build -t prod",
+		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"install:clean": "pnpm run clean && pnpm install",
+		"lint": "eslint . --fix",
+		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"size": "size-limit --why",
+		"start:dev": "tsc -w",
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest"
+	},
+	"dependencies": {
+		"@blgc/types": "workspace:*",
+		"validation-adapter": "workspace:*"
+	},
+	"devDependencies": {
+		"@blgc/config": "workspace:*",
+		"@types/express": "^5.0.0",
+		"@types/express-serve-static-core": "^5.0.2",
+		"@types/node": "^22.10.2",
+		"express": "^4.21.2",
+		"hono": "^4.6.14",
+		"valibot": "1.0.0-beta.9",
+		"validation-adapters": "workspace:*"
+	},
+	"size-limit": [
+		{
+			"path": "dist/esm/index.js"
+		}
+	]
+}

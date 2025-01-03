@@ -39,13 +39,13 @@ The structure of the `package.json` file in this project should adhere to a spec
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/builder-group/monorepo.git"
+		"url": "https://github.com/builder-group/community.git"
 	},
 	"keywords": [],
 	"author": "@bennobuilder",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/builder-group/monorepo/issues"
+		"url": "https://github.com/builder-group/community/issues"
 	},
 	"homepage": "https://Builder.Group Community/?source=github",
 	"dependencies": {

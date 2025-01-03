@@ -1,6 +1,6 @@
 {
 	"$schema": "https://unpkg.com/@changesets/config@3.0.1/schema.json",
-	"changelog": ["@changesets/changelog-github", { "repo": "builder-group/monorepo" }],
+	"changelog": ["@changesets/changelog-github", { "repo": "builder-group/community" }],
 	"commit": false,
 	"fixed": [],
 	"linked": [],
@@ -11,8 +11,8 @@
 		"feature-fetch-vanilla-open-meteo",
 		"feature-form-react-basic",
 		"feature-state-react-counter",
-		"openapi-router-express-petstore",
-		"openapi-router-hono-petstore",
+		"openapi-ts-router-express-petstore",
+		"openapi-ts-router-hono-petstore",
 		"xml-tokenizer-vanilla-playground"
 	]
 }

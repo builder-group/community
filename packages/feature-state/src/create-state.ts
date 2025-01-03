@@ -6,12 +6,11 @@ export const SET_SOURCE_KEY = 'set';
 export function createState<GValue>(
 	initialValue: GValue,
 	options: TCreateStateOptions = {}
-): TState<GValue, ['base']> {
+): TState<GValue, []> {
 	const { deferred = false } = options;
 
 	return {
-		_: null,
-		_features: ['base'],
+		_features: [],
 		_listeners: [],
 		_v: initialValue,
 		_notify(notifyOptions = {}) {
