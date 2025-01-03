@@ -1,6 +1,6 @@
 {
 	"name": "google-webfonts-client",
-	"version": "0.0.24",
+	"version": "0.0.25",
 	"private": false,
 	"description": "Typesafe and straightforward fetch client for interacting with the Google Web Fonts API using feature-fetch",
 	"keywords": [],
