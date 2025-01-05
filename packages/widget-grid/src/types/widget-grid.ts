@@ -1,24 +1,21 @@
 import { TFeatureDefinition, TWithFeatures } from '@blgc/types/features';
 
-export type TWidgetGrid<GFeatures extends TFeatureDefinition[]> = TWithFeatures<
+export type TWidgetGrid<
+	GItem extends TWidgetGridBaseItem,
+	GFeatures extends TFeatureDefinition[]
+> = TWithFeatures<
 	{
-		_data: TWidgetGridData;
-		getDimensions: () => { width: number; height: number };
-		getWidgetAt: (row: number, col: number) => TWidgetData | null;
-		getWidgetById: (id: string) => TWidgetData | null;
+		_items: Record<TWidgetGridItemId, GItem>;
+		_grid: string[][];
+		getGridSize: () => { rows: number; columns: number };
+		getWidgetAt: (row: number, col: number) => GItem | null;
+		getWidgetById: (id: string) => GItem | null;
 	},
 	GFeatures
 >;
 
-export type TWidgetData = {
-	id: string;
-	type: string;
-	config?: Record<string, unknown>;
-};
+export type TWidgetGridItemId = string;
 
-export type TWidgetGridData = {
-	grid: string[][]; // 2D array storing widget IDs
-	widgets: Record<string, TWidgetData>; // Map of widget ID to widget data
-	columns: number;
-	rows: number;
-};
+export interface TWidgetGridBaseItem {
+	id: TWidgetGridItemId;
+}

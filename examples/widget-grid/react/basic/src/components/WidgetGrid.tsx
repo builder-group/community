@@ -3,26 +3,26 @@ import { TWidgetGrid } from 'widget-grid';
 
 export const WidgetGrid: React.FC<TWidgetGridProps> = (props) => {
 	const { widgetGrid } = props;
-	const { width, height } = widgetGrid.getDimensions();
+	const { rows, columns } = widgetGrid.getGridSize();
 
 	return (
 		<div
 			style={{
-				width,
-				height,
+				width: columns * 96,
+				height: rows * 96,
 				display: 'grid',
-				gridTemplateColumns: `repeat(${widgetGrid._data.columns}, 96px)`,
-				gridTemplateRows: `repeat(${widgetGrid._data.rows}, 96px)`,
+				gridTemplateColumns: `repeat(${columns}, 96px)`,
+				gridTemplateRows: `repeat(${rows}, 96px)`,
 				gap: '0px'
 			}}
 		>
-			{widgetGrid._data.grid.map((row, rowIndex) =>
+			{widgetGrid._grid.map((row, rowIndex) =>
 				row.map((widgetId, colIndex) => {
 					const widget = widgetGrid.getWidgetById(widgetId);
 					return (
 						<div key={`${rowIndex}-${colIndex}`}>
 							{/* Render widget based on type */}
-							{widget?.type}
+							{widget?.id}
 						</div>
 					);
 				})
@@ -32,5 +32,5 @@ export const WidgetGrid: React.FC<TWidgetGridProps> = (props) => {
 };
 
 interface TWidgetGridProps {
-	widgetGrid: TWidgetGrid<[]>;
+	widgetGrid: TWidgetGrid<any, []>;
 }

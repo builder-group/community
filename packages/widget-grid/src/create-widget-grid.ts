@@ -1,21 +1,29 @@
-import { type TWidgetData, type TWidgetGrid, type TWidgetGridData } from './types';
+import { TWidgetGridBaseItem, TWidgetGridItemId, type TWidgetGrid } from './types';
 
-export function createWidgetGrid(data: TWidgetGridData): TWidgetGrid<[]> {
+export function createWidgetGrid<GItem extends TWidgetGridBaseItem>(
+	config: TCreateWidgetGridConfig<GItem>
+): TWidgetGrid<GItem, []> {
 	return {
 		_features: [],
-		_data: data,
-		getDimensions() {
+		_grid: config.grid,
+		_items: config.items,
+		getGridSize() {
 			return {
-				width: this._data.columns * 96,
-				height: this._data.rows * 96
+				rows: this._grid.length,
+				columns: this._grid[0]?.length ?? 0
 			};
 		},
-		getWidgetAt(row: number, col: number): TWidgetData | null {
-			const widgetId = this._data.grid[row]?.[col];
-			return widgetId ? (this._data.widgets[widgetId] as TWidgetData) : null;
+		getWidgetAt(row: number, col: number): GItem | null {
+			const widgetId = this._grid[row]?.[col];
+			return widgetId != null ? (this._items[widgetId] ?? null) : null;
 		},
-		getWidgetById(id: string): TWidgetData | null {
-			return this._data.widgets[id] as TWidgetData | null;
+		getWidgetById(id: TWidgetGridItemId): GItem | null {
+			return this._items[id] ?? null;
 		}
 	};
+}
+
+export interface TCreateWidgetGridConfig<GItem extends TWidgetGridBaseItem> {
+	grid: string[][];
+	items: Record<TWidgetGridItemId, GItem>;
 }
