@@ -1,5 +1,14 @@
 # elevenlabs-client
 
+## 0.0.13
+
+### Patch Changes
+
+- fixed types
+
+- Updated dependencies []:
+  - feature-fetch@0.0.35
+
 ## 0.0.12
 
 ### Patch Changes

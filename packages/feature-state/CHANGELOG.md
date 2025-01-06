@@ -1,5 +1,11 @@
 # feature-state
 
+## 0.0.40
+
+### Patch Changes
+
+- fixed types
+
 ## 0.0.38
 
 ### Patch Changes

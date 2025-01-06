@@ -1,5 +1,14 @@
 # eprel-client
 
+## 0.0.23
+
+### Patch Changes
+
+- fixed types
+
+- Updated dependencies []:
+  - feature-fetch@0.0.35
+
 ## 0.0.22
 
 ### Patch Changes

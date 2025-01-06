@@ -1,5 +1,11 @@
 # openapi-ts-router
 
+## 0.1.3
+
+### Patch Changes
+
+- fixed types
+
 ## 0.1.2
 
 ### Patch Changes

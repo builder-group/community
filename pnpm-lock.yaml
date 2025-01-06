@@ -403,6 +403,9 @@ importers:
 
   packages/elevenlabs-client:
     dependencies:
+      '@blgc/types':
+        specifier: workspace:*
+        version: link:../types
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
@@ -413,9 +416,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.2
@@ -428,6 +428,9 @@ importers:
 
   packages/eprel-client:
     dependencies:
+      '@blgc/types':
+        specifier: workspace:*
+        version: link:../types
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
@@ -438,9 +441,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.2
@@ -456,6 +456,9 @@ importers:
       '@0no-co/graphql.web':
         specifier: ^1.0.12
         version: 1.0.12(graphql@16.10.0)
+      '@blgc/types':
+        specifier: workspace:*
+        version: link:../types
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
@@ -463,9 +466,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.2
@@ -478,6 +478,9 @@ importers:
 
   packages/feature-form:
     dependencies:
+      '@blgc/types':
+        specifier: workspace:*
+        version: link:../types
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
@@ -491,15 +494,15 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.2
 
   packages/feature-logger:
     dependencies:
+      '@blgc/types':
+        specifier: workspace:*
+        version: link:../types
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
@@ -507,24 +510,22 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.2
 
   packages/feature-react:
-    devDependencies:
-      '@blgc/config':
-        specifier: workspace:*
-        version: link:../config
+    dependencies:
       '@blgc/types':
         specifier: workspace:*
         version: link:../types
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
+    devDependencies:
+      '@blgc/config':
+        specifier: workspace:*
+        version: link:../config
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.2
@@ -543,6 +544,9 @@ importers:
 
   packages/feature-state:
     dependencies:
+      '@blgc/types':
+        specifier: workspace:*
+        version: link:../types
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
@@ -550,9 +554,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.2
@@ -575,6 +576,9 @@ importers:
 
   packages/google-webfonts-client:
     dependencies:
+      '@blgc/types':
+        specifier: workspace:*
+        version: link:../types
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
@@ -585,9 +589,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.2
@@ -600,6 +601,9 @@ importers:
 
   packages/openapi-ts-router:
     dependencies:
+      '@blgc/types':
+        specifier: workspace:*
+        version: link:../types
       validation-adapter:
         specifier: workspace:*
         version: link:../validation-adapter
@@ -607,9 +611,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
       '@types/express':
         specifier: ^5.0.0
         version: 5.0.0

@@ -1,6 +1,6 @@
 {
 	"name": "feature-logger",
-	"version": "0.0.27",
+	"version": "0.0.28",
 	"private": false,
 	"description": "Straightforward, typesafe, and feature-based logging library",
 	"keywords": [],
@@ -35,11 +35,11 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
+		"@blgc/types": "workspace:*",
 		"@blgc/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@blgc/types": "workspace:*",
 		"@types/node": "^22.10.2"
 	},
 	"size-limit": [

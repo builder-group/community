@@ -1,5 +1,14 @@
 # google-webfonts-client
 
+## 0.0.26
+
+### Patch Changes
+
+- fixed types
+
+- Updated dependencies []:
+  - feature-fetch@0.0.35
+
 ## 0.0.25
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
 	"name": "eprel-client",
-	"version": "0.0.22",
+	"version": "0.0.23",
 	"private": false,
 	"description": "Typesafe and straightforward fetch client for interacting with the European Product Registry for Energy Labelling (EPREL) API using feature-fetch",
 	"keywords": [],
@@ -36,12 +36,12 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
+		"@blgc/types": "workspace:*",
 		"@blgc/utils": "workspace:*",
 		"feature-fetch": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@blgc/types": "workspace:*",
 		"@types/node": "^22.10.2",
 		"dotenv": "^16.4.7",
 		"openapi-typescript": "^7.4.4"

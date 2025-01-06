@@ -90,3 +90,7 @@ To switch between modes:
 
 - Development: `pnpm build` (includes declaration maps)
 - Production: `pnpm build:prod` (excludes declaration maps)
+
+### Why is `@blgc/types` listed as a dependency instead of a devDependency?
+
+The `@blgc/types` package provides crucial TypeScript type definitions to ensure full type safety for feature-based libraries. When listed as a `devDependency`, these types are excluded from the final NPM package, resulting in broken type checks and missing autocompletions in projects consuming these libraries. By adding it as a `dependency`, we ensure that the type definitions are bundled and accessible to downstream projects, maintaining a seamless developer experience.
