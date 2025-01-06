@@ -7,6 +7,9 @@ export function createWidgetGrid<GItem extends TWidgetGridBaseItem>(
 		_features: [],
 		_grid: config.grid,
 		_items: config.items,
+		_interactionMode: {
+			mode: 'none'
+		},
 		getGridSize() {
 			return {
 				rows: this._grid.length,
