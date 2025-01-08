@@ -15,8 +15,8 @@ A collection of open source libraries maintained by [builder.group](https://buil
 
 ## 📦 Packages
 
-| Package                                                                                                          | Description                                                                                                                                                                    | NPM Package                                                                      |
-| ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| Package                                                                                                           | Description                                                                                                                                                                    | NPM Package                                                                      |
+| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
 | [cli](https://github.com/builder-group/community/blob/develop/packages/cli)                                       | Straightforward CLI to bundle Typescript libraries with presets, powered by Rollup and Esbuild                                                                                 | [`@blgc/cli`](https://www.npmjs.com/package/@blgc/cli)                           |
 | [config](https://github.com/builder-group/community/blob/develop/packages/config)                                 | Collection of ESLint, Vite, and Typescript configurations                                                                                                                      | [`@blgc/config`](https://www.npmjs.com/package/@blgc/config)                     |
 | [elevenlabs-client](https://github.com/builder-group/community/blob/develop/packages/elevenlabs-client)           | Typesafe and straightforward fetch client for interacting with the ElevenLabs API using feature-fetch                                                                          | [`elevenlabs-client`](https://www.npmjs.com/package/elevenlabs-client)           |
@@ -98,11 +98,12 @@ The `@blgc/types` package provides crucial TypeScript type definitions to ensure
 ### Why we use the "wrapper pattern" `withLogger(withStorage(withUndo(createState(0))))` instead of a declarative API?
 
 While a more declarative API like this has [indeed a better DX](https://www.reddit.com/r/reactjs/comments/1huxvci/i_built_a_bloated_state_manager_then_i_fixed_it/):
+
 ```ts
 createState({
-  defaultValue: 0,
-  features: [withUndo(), withStorage(), withLogger()]
-})
+	defaultValue: 0,
+	features: [withUndo(), withStorage(), withLogger()]
+});
 ```
 
 Currently, we use the "wrapper pattern" because it provides better TypeScript type inference. Each wrapper function transforms the state's type, and these transformations need to build on top of each other in a specific order. While theoretically possible with a features array, maintaining proper type inference becomes complex.
