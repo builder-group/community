@@ -56,8 +56,21 @@ export interface TInteractionModeEditing {
 
 export interface TWidgetRegion {
 	widgetId: TWidgetGridItemId;
-	startRow: number;
-	startCol: number;
+	start: TGridPosition;
+	dimension: TGridDimension;
+}
+
+export interface TGridRange {
+	start: TGridPosition;
+	end: TGridPosition;
+}
+
+export interface TGridPosition {
+	row: number;
+	col: number;
+}
+
+export interface TGridDimension {
 	width: number;
 	height: number;
 }

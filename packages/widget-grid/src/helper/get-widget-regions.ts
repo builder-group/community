@@ -1,17 +1,25 @@
-import { TWidgetRegion } from '../types';
+import { TGridRange, TWidgetRegion } from '../types';
 
-export function getWidgetRegions(grid: string[][]): TWidgetRegion[] {
+// TODO: Should the specified range be strictly followed or should it consider "overhanging" widgets?
+export function getWidgetRegions(grid: string[][], range?: TGridRange): TWidgetRegion[] {
 	const rows = grid.length;
 	const columns = grid[0]?.length ?? 0;
 	if (rows === 0 || columns === 0) {
 		return [];
 	}
 
+	// Use provided range or full grid
+	const computeRange = range ?? {
+		start: { row: 0, col: 0 },
+		end: { row: rows, col: columns }
+	};
+
 	const visitedCells = new Set<string>();
 	const regions: TWidgetRegion[] = [];
 
-	for (let row = 0; row < rows; row++) {
-		for (let col = 0; col < columns; col++) {
+	// Only compute regions within the specified range
+	for (let row = computeRange.start.row; row < computeRange.end.row; row++) {
+		for (let col = computeRange.start.col; col < computeRange.end.col; col++) {
 			const cellKey = `${row}-${col}`;
 			if (visitedCells.has(cellKey)) {
 				continue;
@@ -23,20 +31,13 @@ export function getWidgetRegions(grid: string[][]): TWidgetRegion[] {
 				continue;
 			}
 
-			// Find maximum possible dimensions
-			const maxWidth = findMaxWidth(grid, row, col, widgetId, columns, visitedCells);
-			const maxHeight = findMaxHeight(grid, row, col, maxWidth, widgetId, rows, visitedCells);
+			// Find dimensions within the range
+			const width = findMaxWidth(grid, row, col, widgetId, computeRange, visitedCells);
+			const height = findMaxHeight(grid, row, col, width, widgetId, computeRange, visitedCells);
 
-			// Mark region as visited
-			markRegionAsVisited(visitedCells, row, col, maxWidth, maxHeight);
+			markRegionAsVisited(visitedCells, row, col, width, height);
 
-			regions.push({
-				widgetId,
-				startRow: row,
-				startCol: col,
-				width: maxWidth,
-				height: maxHeight
-			});
+			regions.push({ widgetId, start: { row, col }, dimension: { width, height } });
 		}
 	}
 
@@ -48,12 +49,12 @@ function findMaxWidth(
 	row: number,
 	startCol: number,
 	widgetId: string,
-	maxColumns: number,
+	range: TGridRange,
 	visitedCells: Set<string>
 ): number {
 	let width = 1;
 	while (
-		startCol + width < maxColumns &&
+		startCol + width < range.end.col &&
 		grid[row]?.[startCol + width] === widgetId &&
 		!visitedCells.has(`${row}-${startCol + width}`)
 	) {
@@ -68,11 +69,11 @@ function findMaxHeight(
 	startCol: number,
 	width: number,
 	widgetId: string,
-	maxRows: number,
+	range: TGridRange,
 	visitedCells: Set<string>
 ): number {
 	let height = 1;
-	rowLoop: for (let r = startRow + 1; r < maxRows; r++) {
+	rowLoop: for (let r = startRow + 1; r < range.end.row; r++) {
 		for (let c = startCol; c < startCol + width; c++) {
 			if (grid[r]?.[c] !== widgetId || visitedCells.has(`${r}-${c}`)) {
 				break rowLoop;

@@ -7,21 +7,24 @@ const App: React.FC = () => {
 			<WidgetGrid<TItem>
 				widgetGrid={widgetGrid}
 				cellSize={96}
-				renderItem={(item) => (
-					<div
-						style={{
-							backgroundColor: 'red',
-							width: '100%',
-							height: '100%',
-							display: 'flex',
-							justifyContent: 'center',
-							alignItems: 'center',
-							border: '1px solid black'
-						}}
-					>
-						{item.id}
-					</div>
-				)}
+				renderItem={(item) => {
+					console.log({ item });
+					return (
+						<div
+							style={{
+								backgroundColor: 'red',
+								width: '100%',
+								height: '100%',
+								display: 'flex',
+								justifyContent: 'center',
+								alignItems: 'center',
+								border: '1px solid black'
+							}}
+						>
+							{item.id}
+						</div>
+					);
+				}}
 			/>
 		</div>
 	);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { TWidgetGrid, TWidgetGridBaseItem } from 'widget-grid';
+import { TGridDimension, TGridPosition, TWidgetGrid, TWidgetGridBaseItem } from 'widget-grid';
 
 export const WidgetGrid = <GItem extends TWidgetGridBaseItem>(props: TWidgetGridProps<GItem>) => {
 	const { widgetGrid, renderItem, cellSize = 96 } = props;
@@ -17,7 +17,7 @@ export const WidgetGrid = <GItem extends TWidgetGridBaseItem>(props: TWidgetGrid
 				gap: '0px'
 			}}
 		>
-			{regions.map(({ widgetId, startRow, startCol, width, height }, index) => {
+			{regions.map(({ widgetId, start, dimension }, index) => {
 				const widget = widgetGrid.getWidgetById(widgetId);
 				if (!widget) return null;
 
@@ -25,11 +25,11 @@ export const WidgetGrid = <GItem extends TWidgetGridBaseItem>(props: TWidgetGrid
 					<div
 						key={`${widgetId}-${index}`}
 						style={{
-							gridArea: `${startRow + 1} / ${startCol + 1} / span ${height} / span ${width}`,
+							gridArea: `${start.row + 1} / ${start.col + 1} / span ${dimension.height} / span ${dimension.width}`,
 							transition: 'grid-area 0.3s ease-in-out'
 						}}
 					>
-						{renderItem({ ...widget, width, height })}
+						{renderItem({ ...widget, dimension, start })}
 					</div>
 				);
 			})}
@@ -39,6 +39,8 @@ export const WidgetGrid = <GItem extends TWidgetGridBaseItem>(props: TWidgetGrid
 
 interface TWidgetGridProps<GItem extends TWidgetGridBaseItem> {
 	widgetGrid: TWidgetGrid<GItem, []>;
-	renderItem: (item: GItem & { width: number; height: number }) => React.ReactNode;
+	renderItem: (
+		item: GItem & { dimension: TGridDimension; start: TGridPosition }
+	) => React.ReactNode;
 	cellSize?: number;
 }
