@@ -1,31 +1,29 @@
 import { TFeatureDefinition, TWithFeatures } from '@blgc/types/features';
+import { TGridPosition, TWidget, TWidgetId, TWidgetRegion } from './widget';
 
-export type TWidgetGrid<
-	GItem extends TWidgetGridBaseItem,
-	GFeatures extends TFeatureDefinition[]
-> = TWithFeatures<
+export type TWidgetGrid<GContent, GFeatures extends TFeatureDefinition[]> = TWithFeatures<
 	{
-		_items: Record<TWidgetGridItemId, GItem>;
 		_grid: string[][];
-		_interactionMode: TInteractionMode;
-		getGridSize: () => { rows: number; columns: number };
-		getWidgetAt: (row: number, col: number) => GItem | null;
-		getWidgetById: (id: string) => GItem | null;
+		_widgets: Record<TWidgetId, TWidget<GContent>>;
+		_selected: TWidgetId[]; // TODO: State?
+		interactionMode: TInteractionMode; // TODO: State?
+		getSize: () => { rows: number; columns: number };
+		getWidgetAt: (row: number, col: number) => TWidget<GContent> | null;
+		getWidgetById: (id: string) => TWidget<GContent> | null;
 		getWidgetRegions: () => TWidgetRegion[];
+		select: (widgetIds: string[]) => void;
+		unselect: () => void;
+		startTranslating: (widgetId: string, originPosition: { x: number; y: number }) => void;
+		updateTranslatePosition: (x: number, y: number) => void;
+		endTranslating: () => void;
 	},
 	GFeatures
 >;
 
-export type TWidgetGridItemId = string;
-
-export interface TWidgetGridBaseItem {
-	id: TWidgetGridItemId;
-}
-
 export type TInteractionMode =
 	| TInteractionModeNone
 	| TInteractionModeInserting
-	| TInteractionModeDragging
+	| TInteractionModeTranslating
 	| TInteractionModeResizing
 	| TInteractionModeEditing;
 
@@ -35,42 +33,27 @@ export interface TInteractionModeNone {
 
 export interface TInteractionModeInserting {
 	mode: 'inserting';
-	widgetId: TWidgetGridItemId;
+	widgetId: TWidgetId;
 }
 
-export interface TInteractionModeDragging {
-	mode: 'dragging';
-	widgetId: TWidgetGridItemId;
+export interface TInteractionModeTranslating {
+	mode: 'translating';
+	// gridOrigin: TGridPosition;
+	// gridCurrent: TGridPosition;
+	originPosition: { x: number; y: number };
+	currentPosition: { x: number; y: number };
 }
 
 export interface TInteractionModeResizing {
 	mode: 'resizing';
-	widgetId: TWidgetGridItemId;
 	handle: 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
 }
 
 export interface TInteractionModeEditing {
 	mode: 'editing';
-	widgetId: TWidgetGridItemId;
-}
-
-export interface TWidgetRegion {
-	widgetId: TWidgetGridItemId;
-	start: TGridPosition;
-	dimension: TGridDimension;
 }
 
 export interface TGridRange {
 	start: TGridPosition;
 	end: TGridPosition;
-}
-
-export interface TGridPosition {
-	row: number;
-	col: number;
-}
-
-export interface TGridDimension {
-	width: number;
-	height: number;
 }

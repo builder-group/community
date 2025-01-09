@@ -1,36 +1,92 @@
 import { getWidgetRegions } from './helper';
-import { TWidgetGridBaseItem, TWidgetGridItemId, TWidgetRegion, type TWidgetGrid } from './types';
+import { TWidget, TWidgetId, TWidgetRegion, type TWidgetGrid } from './types';
 
-export function createWidgetGrid<GItem extends TWidgetGridBaseItem>(
-	config: TCreateWidgetGridConfig<GItem>
-): TWidgetGrid<GItem, []> {
+export function createWidgetGrid<GContent>(
+	config: TCreateWidgetGridConfig<GContent>
+): TWidgetGrid<GContent, []> {
+	const { widgets: baseWidgets, grid } = config;
+
+	// Create a map for O(1) lookup of regions by widget ID
+	const regions = getWidgetRegions(grid);
+	const regionsByWidgetId = regions.reduce(
+		(acc, region) => {
+			acc[region.widgetId] = {
+				start: region.start,
+				dimension: region.dimension
+			};
+			return acc;
+		},
+		{} as Record<TWidgetId, TWidgetRegion>
+	);
+
+	// Convert base widgets to full widgets with regions in one pass
+	const widgets = baseWidgets.reduce(
+		(acc, baseWidget) => {
+			acc[baseWidget.id] = {
+				id: baseWidget.id,
+				content: baseWidget.content,
+				region: regionsByWidgetId[baseWidget.id]
+			};
+			return acc;
+		},
+		{} as Record<TWidgetId, TWidget<GContent>>
+	);
+
 	return {
 		_features: [],
 		_grid: config.grid,
-		_items: config.items,
-		_interactionMode: {
+		_widgets: widgets,
+		_selected: [],
+		interactionMode: {
 			mode: 'none'
 		},
-		getGridSize() {
+		getSize() {
 			return {
 				rows: this._grid.length,
 				columns: this._grid[0]?.length ?? 0
 			};
 		},
-		getWidgetAt(row: number, col: number): GItem | null {
+		getWidgetAt(row: number, col: number): TWidget<GContent> | null {
 			const widgetId = this._grid[row]?.[col];
-			return widgetId != null ? (this._items[widgetId] ?? null) : null;
+			return widgetId != null ? (this._widgets[widgetId] ?? null) : null;
 		},
-		getWidgetById(id: TWidgetGridItemId): GItem | null {
-			return this._items[id] ?? null;
+		getWidgetById(id: TWidgetId): TWidget<GContent> | null {
+			return this._widgets[id] ?? null;
 		},
 		getWidgetRegions(): TWidgetRegion[] {
 			return getWidgetRegions(this._grid);
+		},
+		select(widgetIds) {
+			this._selected = widgetIds;
+		},
+		unselect() {
+			this._selected = [];
+		},
+		startTranslating(widgetId, originPosition) {
+			this.interactionMode = {
+				mode: 'translating',
+				originPosition,
+				currentPosition: originPosition
+			};
+			console.log('startTranslating', { ...this.interactionMode }); // TODO: REMOVE
+		},
+		updateTranslatePosition(x, y) {
+			if (this.interactionMode.mode !== 'translating') {
+				return;
+			}
+			this.interactionMode.currentPosition = { x, y };
+			// TODO: Compute current widget position in grid
+			console.log('updateDragPosition', { ...this.interactionMode }); // TODO: REMOVE
+		},
+		endTranslating() {
+			// TODO: Update grid with new widget position
+			this.interactionMode = { mode: 'none' };
+			console.log('endDragging', { ...this.interactionMode }); // TODO: REMOVE
 		}
 	};
 }
 
-export interface TCreateWidgetGridConfig<GItem extends TWidgetGridBaseItem> {
+export interface TCreateWidgetGridConfig<GContent> {
 	grid: string[][];
-	items: Record<TWidgetGridItemId, GItem>;
+	widgets: TWidget<GContent>[];
 }

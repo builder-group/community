@@ -1,10 +1,10 @@
 import { WidgetGrid } from './components';
-import { TItem, widgetGrid } from './widget-grid';
+import { TWidgetContent, widgetGrid } from './widget-grid';
 
 const App: React.FC = () => {
 	return (
 		<div>
-			<WidgetGrid<TItem>
+			<WidgetGrid<TWidgetContent>
 				widgetGrid={widgetGrid}
 				cellSize={96}
 				renderItem={(item) => {

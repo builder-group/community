@@ -1,7 +1,7 @@
-import { TGridRange, TWidgetRegion } from '../types';
+import { TGridRange, TWidgetRegionWithId } from '../types';
 
 // TODO: Should the specified range be strictly followed or should it consider "overhanging" widgets?
-export function getWidgetRegions(grid: string[][], range?: TGridRange): TWidgetRegion[] {
+export function getWidgetRegions(grid: string[][], range?: TGridRange): TWidgetRegionWithId[] {
 	const rows = grid.length;
 	const columns = grid[0]?.length ?? 0;
 	if (rows === 0 || columns === 0) {
@@ -15,7 +15,7 @@ export function getWidgetRegions(grid: string[][], range?: TGridRange): TWidgetR
 	};
 
 	const visitedCells = new Set<string>();
-	const regions: TWidgetRegion[] = [];
+	const regions: TWidgetRegionWithId[] = [];
 
 	// Only compute regions within the specified range
 	for (let row = computeRange.start.row; row < computeRange.end.row; row++) {

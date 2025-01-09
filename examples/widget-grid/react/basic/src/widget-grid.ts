@@ -1,30 +1,30 @@
-import { createWidgetGrid, TWidgetGridBaseItem } from 'widget-grid';
+import { createWidgetGrid } from 'widget-grid';
 
-export const widgetGrid = createWidgetGrid<TItem>({
+export const widgetGrid = createWidgetGrid<TWidgetContent>({
 	grid: [
 		['1', '1', '2', '3'],
 		['1', '1', '2', '3'],
-		['-', '5', '4', '2']
+		['-', '5', '4', '4']
 	],
-	items: {
-		'1': { id: '1', type: 'item1' },
-		'2': { id: '2', type: 'item2' },
-		'3': { id: '3', type: 'item3' },
-		'4': { id: '4', type: 'item2' },
-		'5': { id: '5', type: 'item1' }
-	}
+	widgets: [
+		{ id: '1', content: { type: 'item1' } },
+		{ id: '2', content: { type: 'item2' } },
+		{ id: '3', content: { type: 'item3' } },
+		{ id: '4', content: { type: 'item2' } },
+		{ id: '5', content: { type: 'item1' } }
+	]
 });
 
-export type TItem = TItem1 | TItem2 | TItem3;
+export type TWidgetContent = TWidgetContent1 | TWidgetContent2 | TWidgetContent3;
 
-interface TItem1 extends TWidgetGridBaseItem {
+interface TWidgetContent1 {
 	type: 'item1';
 }
 
-interface TItem2 extends TWidgetGridBaseItem {
+interface TWidgetContent2 {
 	type: 'item2';
 }
 
-interface TItem3 extends TWidgetGridBaseItem {
+interface TWidgetContent3 {
 	type: 'item3';
 }

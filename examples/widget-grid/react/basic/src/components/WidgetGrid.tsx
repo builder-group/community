@@ -1,10 +1,8 @@
-import React from 'react';
-import { TGridDimension, TGridPosition, TWidgetGrid, TWidgetGridBaseItem } from 'widget-grid';
+import { TWidget, TWidgetGrid } from 'widget-grid';
 
-export const WidgetGrid = <GItem extends TWidgetGridBaseItem>(props: TWidgetGridProps<GItem>) => {
+export const WidgetGrid = <GContent extends any>(props: TWidgetGridProps<GContent>) => {
 	const { widgetGrid, renderItem, cellSize = 96 } = props;
-	const { rows, columns } = widgetGrid.getGridSize();
-	const regions = widgetGrid.getWidgetRegions();
+	const { rows, columns } = widgetGrid.getSize();
 
 	return (
 		<div
@@ -17,19 +15,20 @@ export const WidgetGrid = <GItem extends TWidgetGridBaseItem>(props: TWidgetGrid
 				gap: '0px'
 			}}
 		>
-			{regions.map(({ widgetId, start, dimension }, index) => {
-				const widget = widgetGrid.getWidgetById(widgetId);
-				if (!widget) return null;
+			{Object.values(widgetGrid._widgets).map((widget, index) => {
+				if (widget.region == null) {
+					return null;
+				}
 
 				return (
 					<div
-						key={`${widgetId}-${index}`}
+						key={`${widget.id}-${index}`}
 						style={{
-							gridArea: `${start.row + 1} / ${start.col + 1} / span ${dimension.height} / span ${dimension.width}`,
+							gridArea: `${widget.region.start.row + 1} / ${widget.region.start.col + 1} / span ${widget.region.dimension.height} / span ${widget.region.dimension.width}`,
 							transition: 'grid-area 0.3s ease-in-out'
 						}}
 					>
-						{renderItem({ ...widget, dimension, start })}
+						{renderItem(widget)}
 					</div>
 				);
 			})}
@@ -37,10 +36,8 @@ export const WidgetGrid = <GItem extends TWidgetGridBaseItem>(props: TWidgetGrid
 	);
 };
 
-interface TWidgetGridProps<GItem extends TWidgetGridBaseItem> {
-	widgetGrid: TWidgetGrid<GItem, []>;
-	renderItem: (
-		item: GItem & { dimension: TGridDimension; start: TGridPosition }
-	) => React.ReactNode;
+interface TWidgetGridProps<GContent> {
+	widgetGrid: TWidgetGrid<GContent, []>;
+	renderItem: (widget: TWidget<GContent>) => React.ReactNode;
 	cellSize?: number;
 }
