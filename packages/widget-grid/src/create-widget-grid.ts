@@ -1,4 +1,5 @@
-import { TWidgetGridBaseItem, TWidgetGridItemId, type TWidgetGrid } from './types';
+import { getWidgetRegions } from './helper';
+import { TWidgetGridBaseItem, TWidgetGridItemId, TWidgetRegion, type TWidgetGrid } from './types';
 
 export function createWidgetGrid<GItem extends TWidgetGridBaseItem>(
 	config: TCreateWidgetGridConfig<GItem>
@@ -22,6 +23,9 @@ export function createWidgetGrid<GItem extends TWidgetGridBaseItem>(
 		},
 		getWidgetById(id: TWidgetGridItemId): GItem | null {
 			return this._items[id] ?? null;
+		},
+		getWidgetRegions(): TWidgetRegion[] {
+			return getWidgetRegions(this._grid);
 		}
 	};
 }

@@ -11,6 +11,7 @@ export type TWidgetGrid<
 		getGridSize: () => { rows: number; columns: number };
 		getWidgetAt: (row: number, col: number) => GItem | null;
 		getWidgetById: (id: string) => GItem | null;
+		getWidgetRegions: () => TWidgetRegion[];
 	},
 	GFeatures
 >;
@@ -51,4 +52,12 @@ export interface TInteractionModeResizing {
 export interface TInteractionModeEditing {
 	mode: 'editing';
 	widgetId: TWidgetGridItemId;
+}
+
+export interface TWidgetRegion {
+	widgetId: TWidgetGridItemId;
+	startRow: number;
+	startCol: number;
+	width: number;
+	height: number;
 }
