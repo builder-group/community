@@ -64,3 +64,106 @@ return (
 - [Swapy](https://swapy.tahazsh.com/)
 - [Moving Bento Grid](https://github.com/manish-basargekar/moving-bento-grid)
 - [A New Drag And Drop Library For EVERY Framework](https://www.youtube.com/watch?v=gaNLnuwoFRI)
+
+## ❓ FAQ
+
+### Why use a grid-based layout instead of item-based positioning?
+
+We opted for a **grid-based layout** over an **item-based positioning** approach due to its simplicity, performance, and ease of maintenance.
+
+#### **Grid-Based Layout** (Current Approach):
+```ts
+{
+    grid: [
+        ['1', '1', '2'],
+        ['1', '1', '2']
+    ],
+    items: {
+        '1': { id: '1' },
+        '2': { id: '2' }
+    }
+}
+```
+
+#### **Item-Based Positioning** (Alternative Approach):
+```ts
+{
+    items: {
+        '1': { id: '1', x: 0, y: 0, width: 2, height: 2 },
+        '2': { id: '2', x: 2, y: 0, width: 1, height: 2 }
+    }
+}
+```
+
+#### Key Advantages of the Grid-Based Layout
+
+#### 1. **Performance**
+- **Grid-based**: Operations are O(n), where **n** is the number of cells in the affected region
+- **Item-based**: Operations are O(m), where **m** is the number of widgets, due to collision checks
+- Grid layouts efficiently compute regions and re-render only the affected areas
+
+#### 2. **Safety**
+- Invalid states (e.g., overlapping widgets) are **impossible by design** in a grid-based layout
+- The grid ensures integrity, making moves and resizes straightforward and safe
+
+#### 3. **Operational Simplicity**
+- **Grid-based**:
+  - Drag: Simple cell swapping
+  - Resize: Direct cell updates in the grid
+  - Insert: Clear allocation of cells
+  - No need for complex collision resolution
+- **Item-based**:
+  - Requires collision detection and resolution logic, increasing complexity
+
+#### 4. **Maintainability**
+- The grid serves as a **single source of truth**
+- Predictable state management ensures debugging is straightforward
+
+#### Common Operations Comparison
+
+#### **Grid-Based Layout**
+```ts
+function handleDrag(fromPos, toPos) {
+    // 1. Get affected region
+    const range = getAffectedRange(fromPos, toPos);
+    
+    // 2. Get current layout in that region
+    const regions = getWidgetRegions(grid, range);
+    
+    // 3. Calculate new positions
+    moveWidget(grid, fromPos, toPos);
+    
+    // 4. Only re-render affected area
+    updateRegion(range);
+}
+```
+
+#### **Item-Based Positioning**
+```ts
+function handleDrag(widgetId, newPos) {
+    // 1. Find all affected widgets
+    const affectedWidgets = findCollisions(items[widgetId], newPos);
+    
+    // 2. Calculate new positions for all affected widgets
+    const movements = calculateMovements(affectedWidgets, newPos);
+    
+    // 3. Validate final positions
+    if (!isValidLayout(movements)) return;
+    
+    // 4. Update positions and re-render affected widgets
+    applyMovements(movements);
+}
+```
+
+#### When to Consider Item-Based Positioning?
+
+While the grid-based approach is ideal for strict layouts and predictable behaviors, the item-based positioning approach is better suited for:
+- **Free-form layouts**: Where widgets can be placed freely without a strict grid structure
+- **Advanced features**: Such as rotation or non-rectangular shapes
+
+#### Why We Lean Towards the Grid-Based Layout
+
+The grid-based layout excels in scenarios where performance, simplicity, and maintainability are priorities. It provides:
+- **Consistent behavior** for core features (drag, resize, insert)
+- **High efficiency** with minimal computational overhead
+- **A safer structure** that avoids invalid states and complex validation logic
