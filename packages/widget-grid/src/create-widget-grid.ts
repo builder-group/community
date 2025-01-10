@@ -1,10 +1,19 @@
-import { getWidgetRegions } from './helper';
-import { TWidget, TWidgetId, TWidgetRegion, type TWidgetGrid } from './types';
+import { createState } from 'feature-state';
+import { getWidgetRegions, pointerEventToViewportPoint } from './helper';
+import {
+	TBoundingRect,
+	TDimensions,
+	TInteractionMode,
+	TWidget,
+	TWidgetId,
+	TWidgetRegion,
+	type TWidgetGrid
+} from './types';
 
 export function createWidgetGrid<GContent>(
 	config: TCreateWidgetGridConfig<GContent>
 ): TWidgetGrid<GContent, []> {
-	const { widgets: baseWidgets, grid } = config;
+	const { widgets: baseWidgets, grid, cellSize } = config;
 
 	// Create a map for O(1) lookup of regions by widget ID
 	const regions = getWidgetRegions(grid);
@@ -36,10 +45,10 @@ export function createWidgetGrid<GContent>(
 		_features: [],
 		_grid: config.grid,
 		_widgets: widgets,
-		_selected: [],
-		interactionMode: {
-			mode: 'none'
-		},
+		_selected: createState<TWidgetId[]>([]),
+		interactionMode: createState<TInteractionMode>({ mode: 'none' }),
+		cellSize: createState(cellSize),
+		boundingRect: createState<TBoundingRect>({ left: 0, top: 0 }),
 		getSize() {
 			return {
 				rows: this._grid.length,
@@ -57,31 +66,13 @@ export function createWidgetGrid<GContent>(
 			return getWidgetRegions(this._grid);
 		},
 		select(widgetIds) {
-			this._selected = widgetIds;
+			this._selected.set(widgetIds);
 		},
 		unselect() {
-			this._selected = [];
+			this._selected.set([]);
 		},
-		startTranslating(widgetId, originPosition) {
-			this.interactionMode = {
-				mode: 'translating',
-				originPosition,
-				currentPosition: originPosition
-			};
-			console.log('startTranslating', { ...this.interactionMode }); // TODO: REMOVE
-		},
-		updateTranslatePosition(x, y) {
-			if (this.interactionMode.mode !== 'translating') {
-				return;
-			}
-			this.interactionMode.currentPosition = { x, y };
-			// TODO: Compute current widget position in grid
-			console.log('updateDragPosition', { ...this.interactionMode }); // TODO: REMOVE
-		},
-		endTranslating() {
-			// TODO: Update grid with new widget position
-			this.interactionMode = { mode: 'none' };
-			console.log('endDragging', { ...this.interactionMode }); // TODO: REMOVE
+		pointerEventToViewportPoint(pointerEvent) {
+			return pointerEventToViewportPoint(pointerEvent, this.boundingRect._v);
 		}
 	};
 }
@@ -89,4 +80,5 @@ export function createWidgetGrid<GContent>(
 export interface TCreateWidgetGridConfig<GContent> {
 	grid: string[][];
 	widgets: TWidget<GContent>[];
+	cellSize: TDimensions;
 }

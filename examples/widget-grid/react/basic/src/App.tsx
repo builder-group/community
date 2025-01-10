@@ -1,14 +1,13 @@
 import { WidgetGrid } from './components';
+import './index.css';
 import { TWidgetContent, widgetGrid } from './widget-grid';
 
 const App: React.FC = () => {
 	return (
-		<div>
+		<div style={{ width: '100%', height: '100vh', backgroundColor: 'blue', padding: '48px' }}>
 			<WidgetGrid<TWidgetContent>
 				widgetGrid={widgetGrid}
-				cellSize={96}
 				renderItem={(item) => {
-					console.log({ item });
 					return (
 						<div
 							style={{

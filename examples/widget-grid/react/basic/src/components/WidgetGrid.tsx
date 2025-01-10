@@ -1,43 +1,45 @@
-import { TWidget, TWidgetGrid } from 'widget-grid';
+import { useFeatureState } from 'feature-react/state';
+import React from 'react';
+import { TWidgetGrid } from 'widget-grid';
+import { useBoundingRectObserver } from '../hooks';
+import { TWidgetWrapperProps, WidgetWrapper } from './WidgetWrapper';
 
 export const WidgetGrid = <GContent extends any>(props: TWidgetGridProps<GContent>) => {
-	const { widgetGrid, renderItem, cellSize = 96 } = props;
+	const { widgetGrid, renderItem } = props;
 	const { rows, columns } = widgetGrid.getSize();
+	const { width: cellWidth, height: cellHeight } = useFeatureState(widgetGrid.cellSize);
+	const widgetGridRef = React.useRef<HTMLDivElement>(null);
+
+	useBoundingRectObserver(widgetGridRef, widgetGrid.boundingRect);
 
 	return (
 		<div
+			id="widget-grid"
+			ref={widgetGridRef}
 			style={{
-				width: columns * cellSize,
-				height: rows * cellSize,
+				position: 'relative',
+				width: columns * cellWidth,
+				height: rows * cellHeight,
 				display: 'grid',
-				gridTemplateColumns: `repeat(${columns}, ${cellSize}px)`,
-				gridTemplateRows: `repeat(${rows}, ${cellSize}px)`,
+				gridTemplateColumns: `repeat(${columns}, ${cellWidth}px)`,
+				gridTemplateRows: `repeat(${rows}, ${cellHeight}px)`,
 				gap: '0px'
 			}}
 		>
-			{Object.values(widgetGrid._widgets).map((widget, index) => {
-				if (widget.region == null) {
-					return null;
-				}
-
-				return (
-					<div
-						key={`${widget.id}-${index}`}
-						style={{
-							gridArea: `${widget.region.start.row + 1} / ${widget.region.start.col + 1} / span ${widget.region.dimension.height} / span ${widget.region.dimension.width}`,
-							transition: 'grid-area 0.3s ease-in-out'
-						}}
-					>
-						{renderItem(widget)}
-					</div>
-				);
-			})}
+			{Object.values(widgetGrid._widgets).map((widget, index) => (
+				<WidgetWrapper
+					key={widget.id}
+					index={index}
+					widget={widget}
+					renderItem={renderItem}
+					widgetGrid={widgetGrid}
+				/>
+			))}
 		</div>
 	);
 };
 
 interface TWidgetGridProps<GContent> {
 	widgetGrid: TWidgetGrid<GContent, []>;
-	renderItem: (widget: TWidget<GContent>) => React.ReactNode;
-	cellSize?: number;
+	renderItem: TWidgetWrapperProps<GContent>['renderItem'];
 }

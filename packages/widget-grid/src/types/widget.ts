@@ -1,3 +1,5 @@
+import { TDimensions } from './utils';
+
 export interface TWidget<GContent> {
 	id: TWidgetId;
 	region?: TWidgetRegion; // TODO: State
@@ -17,7 +19,7 @@ export type TWidgetId = string;
 
 export interface TWidgetRegion {
 	start: TGridPosition;
-	dimension: TGridDimension;
+	dimension: TDimensions;
 }
 
 export interface TWidgetRegionWithId extends TWidgetRegion {
@@ -27,9 +29,4 @@ export interface TWidgetRegionWithId extends TWidgetRegion {
 export interface TGridPosition {
 	row: number;
 	col: number;
-}
-
-export interface TGridDimension {
-	width: number;
-	height: number;
 }

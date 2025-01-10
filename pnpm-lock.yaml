@@ -244,6 +244,12 @@ importers:
 
   examples/widget-grid/react/basic:
     dependencies:
+      feature-react:
+        specifier: workspace:*
+        version: link:../../../../packages/feature-react
+      feature-state:
+        specifier: workspace:*
+        version: link:../../../../packages/feature-state
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -745,13 +751,14 @@ importers:
         version: 3.24.1
 
   packages/widget-grid:
+    dependencies:
+      feature-state:
+        specifier: workspace:*
+        version: link:../feature-state
     devDependencies:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
       '@types/node':
         specifier: ^22.10.2
         version: 22.10.3

@@ -12,7 +12,8 @@ export const widgetGrid = createWidgetGrid<TWidgetContent>({
 		{ id: '3', content: { type: 'item3' } },
 		{ id: '4', content: { type: 'item2' } },
 		{ id: '5', content: { type: 'item1' } }
-	]
+	],
+	cellSize: { width: 96, height: 96 }
 });
 
 export type TWidgetContent = TWidgetContent1 | TWidgetContent2 | TWidgetContent3;

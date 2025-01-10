@@ -1,21 +1,32 @@
 import { TFeatureDefinition, TWithFeatures } from '@blgc/types/features';
+import { TState } from 'feature-state';
+import { TBoundingRect, TDimensions, TXYPosition } from './utils';
 import { TGridPosition, TWidget, TWidgetId, TWidgetRegion } from './widget';
 
 export type TWidgetGrid<GContent, GFeatures extends TFeatureDefinition[]> = TWithFeatures<
 	{
+		// 2D array representing the grid layout
 		_grid: string[][];
+		// Stores the widgets within the grid, each identified by a unique ID
 		_widgets: Record<TWidgetId, TWidget<GContent>>;
-		_selected: TWidgetId[]; // TODO: State?
-		interactionMode: TInteractionMode; // TODO: State?
+		// List of currently selected widget IDs
+		_selected: TState<TWidgetId[], []>;
+		// Mode for user interaction (e.g. Translating, Pressing, etc.)
+		interactionMode: TState<TInteractionMode, []>;
+		// Size of each cell in the grid
+		cellSize: TState<TDimensions, []>;
+		// Offset of the viewport relative to the window
+		boundingRect: TState<TBoundingRect, []>;
 		getSize: () => { rows: number; columns: number };
 		getWidgetAt: (row: number, col: number) => TWidget<GContent> | null;
 		getWidgetById: (id: string) => TWidget<GContent> | null;
 		getWidgetRegions: () => TWidgetRegion[];
 		select: (widgetIds: string[]) => void;
 		unselect: () => void;
-		startTranslating: (widgetId: string, originPosition: { x: number; y: number }) => void;
-		updateTranslatePosition: (x: number, y: number) => void;
-		endTranslating: () => void;
+		pointerEventToViewportPoint: (pointerEvent: {
+			clientX: number;
+			clientY: number;
+		}) => TXYPosition;
 	},
 	GFeatures
 >;
