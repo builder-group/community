@@ -1,8 +1,10 @@
 import { useFeatureState } from 'feature-react/state';
 import React, { useRef } from 'react';
-import { getRegionPixels, TWidget, TWidgetGrid } from 'widget-grid';
+import { getRegionPixels, TWidget, TWidgetBaseContent, TWidgetGrid } from 'widget-grid';
 
-export const WidgetWrapper = <GContent extends any>(props: TWidgetWrapperProps<GContent>) => {
+export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
+	props: TWidgetWrapperProps<GContent>
+) => {
 	const { renderItem, index, widget, widgetGrid } = props;
 	const cellSize = useFeatureState(widgetGrid.cellSize);
 

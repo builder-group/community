@@ -1,10 +1,12 @@
 import { useFeatureState } from 'feature-react/state';
 import React from 'react';
-import { TWidgetGrid } from 'widget-grid';
+import { TWidgetBaseContent, TWidgetGrid } from 'widget-grid';
 import { useBoundingRectObserver } from '../hooks';
 import { TWidgetWrapperProps, WidgetWrapper } from './WidgetWrapper';
 
-export const WidgetGrid = <GContent extends any>(props: TWidgetGridProps<GContent>) => {
+export const WidgetGrid = <GContent extends TWidgetBaseContent>(
+	props: TWidgetGridProps<GContent>
+) => {
 	const { widgetGrid, renderItem } = props;
 	const { rows, columns } = widgetGrid.getSize();
 	const { width: cellWidth, height: cellHeight } = useFeatureState(widgetGrid.cellSize);

@@ -6,12 +6,13 @@ import {
 	TDimensions,
 	TInteractionMode,
 	TWidget,
+	TWidgetBaseContent,
 	TWidgetId,
 	TWidgetRegion,
 	type TWidgetGrid
 } from './types';
 
-export function createWidgetGrid<GContent>(
+export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 	config: TCreateWidgetGridConfig<GContent>
 ): TWidgetGrid<GContent, []> {
 	const { widgets: baseWidgets, grid, cellSize } = config;
@@ -94,7 +95,7 @@ export function createWidgetGrid<GContent>(
 	return widgetGrid;
 }
 
-export interface TCreateWidgetGridConfig<GContent> {
+export interface TCreateWidgetGridConfig<GContent extends TWidgetBaseContent> {
 	grid: string[][];
 	widgets: TBaseWidget<GContent>[];
 	cellSize: TDimensions;

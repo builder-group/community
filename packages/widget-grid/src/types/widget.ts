@@ -1,7 +1,7 @@
 import { TState } from 'feature-state';
 import { TDimensions } from './utils';
 
-export interface TWidget<GContent> {
+export interface TWidget<GContent extends TWidgetBaseContent> {
 	id: TWidgetId;
 	region: TState<TWidgetRegion | null, []>; // TODO: State
 	content: TState<GContent, []>; // TODO: State
@@ -9,7 +9,7 @@ export interface TWidget<GContent> {
 	// isLocked: boolean; // TODO: State
 }
 
-export interface TBaseWidget<GContent> {
+export interface TBaseWidget<GContent extends TWidgetBaseContent> {
 	id: TWidgetId;
 	content: GContent;
 	// selected?: boolean;
@@ -17,6 +17,8 @@ export interface TBaseWidget<GContent> {
 }
 
 export type TWidgetId = string;
+
+export type TWidgetBaseContent = any;
 
 export interface TWidgetRegion {
 	start: TGridPosition;

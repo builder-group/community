@@ -1,9 +1,12 @@
 import { TFeatureDefinition, TWithFeatures } from '@blgc/types/features';
 import { TState } from 'feature-state';
 import { TBoundingRect, TDimensions, TXYPosition } from './utils';
-import { TGridPosition, TWidget, TWidgetId, TWidgetRegion } from './widget';
+import { TGridPosition, TWidget, TWidgetBaseContent, TWidgetId, TWidgetRegion } from './widget';
 
-export type TWidgetGrid<GContent, GFeatures extends TFeatureDefinition[]> = TWithFeatures<
+export type TWidgetGrid<
+	GContent extends TWidgetBaseContent,
+	GFeatures extends TFeatureDefinition[]
+> = TWithFeatures<
 	{
 		// Stores the widgets within the grid, each identified by a unique ID
 		_widgets: Record<TWidgetId, TWidget<GContent>>;
