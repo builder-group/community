@@ -1,13 +1,15 @@
 import { createWidgetGrid, TBaseWidget, TWidgetBaseContent, TWidgetGrid } from 'widget-grid';
 
 const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
+	const initalGrid = [
+		['1', '1', '2', '3'],
+		['1', '1', '2', '3'],
+		['-', '5', '4', '4']
+	];
+
 	return {
 		grid: createWidgetGrid<TPlaygroundContent>({
-			grid: [
-				['1', '1', '2', '3'],
-				['1', '1', '2', '3'],
-				['-', '5', '4', '4']
-			],
+			grid: initalGrid,
 			widgets: [
 				{ id: '1', content: { type: 'item1' } },
 				{ id: '2', content: { type: 'item2' } },
@@ -31,11 +33,7 @@ const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
 			{
 				label: 'Reset',
 				action: (widgetGrid) => {
-					widgetGrid.grid.set([
-						['1', '1', '2', '3'],
-						['1', '1', '2', '3'],
-						['-', '5', '4', '4']
-					]);
+					widgetGrid.grid.set(initalGrid);
 				}
 			}
 		]
@@ -129,7 +127,7 @@ const createPerformancePreset = (cols = 50, rows = 50): TWidgetGridPreset<TPerfo
 // Create presets
 export const widgetGridPresets = {
 	playground: createPlaygroundPreset(),
-	performance: createPerformancePreset(25, 25)
+	performance: createPerformancePreset(20, 20)
 } as const;
 
 export type TWidgetGridPresetKey = keyof typeof widgetGridPresets;

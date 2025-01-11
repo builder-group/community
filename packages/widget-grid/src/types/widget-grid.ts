@@ -14,13 +14,13 @@ export type TWidgetGrid<
 		_selected: TState<TWidgetId[], []>;
 		// 2D array representing the grid layout
 		grid: TState<string[][], []>;
+		size: TState<TGridSize, []>;
 		// Mode for user interaction (e.g. Translating, Pressing, etc.)
 		interactionMode: TState<TInteractionMode, []>;
 		// Size of each cell in the grid
 		cellSize: TState<TDimensions, []>;
 		// Offset of the viewport relative to the window
 		boundingRect: TState<TBoundingRect, []>;
-		getSize: () => { rows: number; columns: number };
 		getWidgetAt: (row: number, col: number) => TWidget<GContent> | null;
 		getWidgetById: (id: string) => TWidget<GContent> | null;
 		getWidgetRegions: () => TWidgetRegion[];
@@ -70,4 +70,9 @@ export interface TInteractionModeEditing {
 export interface TGridRange {
 	start: TGridPosition;
 	end: TGridPosition;
+}
+
+export interface TGridSize {
+	rows: number;
+	columns: number;
 }

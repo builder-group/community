@@ -27,7 +27,7 @@ const App: React.FC = () => {
 				{preset.actions.map((action, index) => (
 					<button
 						key={index}
-						onClick={() => action.action(preset.grid)}
+						onClick={() => action.action(preset.grid as any)}
 						style={{ marginRight: '10px' }}
 					>
 						{action.label}
@@ -36,7 +36,7 @@ const App: React.FC = () => {
 			</div>
 
 			<WidgetGrid
-				widgetGrid={preset.grid}
+				widgetGrid={preset.grid as any}
 				renderItem={(item) => {
 					return (
 						<div

@@ -1,5 +1,5 @@
 import { createState } from 'feature-state';
-import { getWidgetRegions, pointerEventToViewportPoint } from './helper';
+import { getGridSize, getWidgetRegions, pointerEventToViewportPoint } from './helper';
 import {
 	TBaseWidget,
 	TBoundingRect,
@@ -45,18 +45,13 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 
 	const widgetGrid: TWidgetGrid<GContent, []> = {
 		_features: [],
-		grid: createState(config.grid),
 		_widgets: widgets,
 		_selected: createState<TWidgetId[]>([]),
+		grid: createState(config.grid),
+		size: createState(getGridSize(config.grid)),
 		interactionMode: createState<TInteractionMode>({ mode: 'none' }),
 		cellSize: createState(cellSize),
 		boundingRect: createState<TBoundingRect>({ left: 0, top: 0 }),
-		getSize() {
-			return {
-				rows: this.grid._v.length,
-				columns: this.grid._v[0]?.length ?? 0
-			};
-		},
 		getWidgetAt(row: number, col: number): TWidget<GContent> | null {
 			const widgetId = this.grid._v[row]?.[col];
 			return widgetId != null ? (this._widgets[widgetId] ?? null) : null;
@@ -78,19 +73,44 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		}
 	};
 
-	widgetGrid.grid.listen(({ value }) => {
-		const newRegions = getWidgetRegions(value as string[][]);
+	widgetGrid.grid.listen(
+		({ value, ...additionalData }) => {
+			const newRegions = getWidgetRegions(value as string[][]);
 
-		newRegions.forEach((region) => {
-			const widget = widgetGrid._widgets[region.widgetId];
-			if (widget) {
-				widget.region.set({
-					start: region.start,
-					dimension: region.dimension
-				});
+			newRegions.forEach((region) => {
+				const widget = widgetGrid._widgets[region.widgetId];
+				if (
+					widget != null &&
+					(widget.region._v?.start.row !== region.start.row ||
+						widget.region._v?.start.col !== region.start.col ||
+						widget.region._v?.dimension.width !== region.dimension.width ||
+						widget.region._v?.dimension.height !== region.dimension.height)
+				) {
+					widget.region.set(
+						{
+							start: region.start,
+							dimension: region.dimension
+						},
+						{ additionalData }
+					);
+				}
+			});
+		},
+		{ key: 'update-widget-regions' }
+	);
+
+	widgetGrid.grid.listen(
+		({ value }) => {
+			const newSize = getGridSize(value as string[][]);
+			if (
+				newSize.rows !== widgetGrid.size._v.rows ||
+				newSize.columns !== widgetGrid.size._v.columns
+			) {
+				widgetGrid.size.set(newSize);
 			}
-		});
-	});
+		},
+		{ key: 'update-grid-size' }
+	);
 
 	return widgetGrid;
 }

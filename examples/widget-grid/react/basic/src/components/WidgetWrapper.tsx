@@ -1,6 +1,7 @@
 import { useFeatureState } from 'feature-react/state';
 import React, { useRef } from 'react';
 import { getRegionPixels, TWidget, TWidgetBaseContent, TWidgetGrid } from 'widget-grid';
+import { useRenderCount } from '../hooks';
 
 export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 	props: TWidgetWrapperProps<GContent>
@@ -14,6 +15,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 		() => (currentRegion != null ? getRegionPixels(currentRegion, cellSize) : null),
 		[currentRegion, cellSize]
 	);
+	const count = useRenderCount();
 
 	const elementRef = useRef<HTMLDivElement>(null);
 
@@ -33,17 +35,25 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 	}, []);
 
 	React.useEffect(() => {
-		if (nextRegion == null || elementRef.current == null) {
+		if (nextRegion == null) {
+			setCurrentRegion(null);
 			return;
 		}
 
-		const element = elementRef.current;
+		// If the grid is too big, we don't animate the widget transition
+		if (widgetGrid.size._v.columns * widgetGrid.size._v.rows > 500) {
+			setCurrentRegion(nextRegion);
+			return;
+		}
 
+		// Animate widget transition
+		const element = elementRef.current;
 		if (
-			currentRegion?.start.row !== nextRegion.start.row ||
-			currentRegion?.start.col !== nextRegion.start.col ||
-			currentRegion?.dimension.width !== nextRegion.dimension.width ||
-			currentRegion?.dimension.height !== nextRegion.dimension.height
+			element != null &&
+			(currentRegion?.start.row !== nextRegion.start.row ||
+				currentRegion?.start.col !== nextRegion.start.col ||
+				currentRegion?.dimension.width !== nextRegion.dimension.width ||
+				currentRegion?.dimension.height !== nextRegion.dimension.height)
 		) {
 			// Get the current position and size
 			const currentRect = element.getBoundingClientRect();
@@ -99,6 +109,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 				handlePointerUp(event);
 			}}
 		>
+			<div style={{ position: 'absolute', top: 0, left: 0 }}>{count}</div>
 			{renderItem(widget)}
 		</div>
 	);

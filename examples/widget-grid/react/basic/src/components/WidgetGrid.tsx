@@ -8,7 +8,7 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 	props: TWidgetGridProps<GContent>
 ) => {
 	const { widgetGrid, renderItem } = props;
-	const { rows, columns } = widgetGrid.getSize();
+	const { rows, columns } = useFeatureState(widgetGrid.size);
 	const { width: cellWidth, height: cellHeight } = useFeatureState(widgetGrid.cellSize);
 	const widgetGridRef = React.useRef<HTMLDivElement>(null);
 
