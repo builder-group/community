@@ -27,67 +27,73 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 	// Events
 	// =========================================================================
 
-	const handlePointerDown = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-		event.preventDefault();
+	const handlePointerDown = React.useCallback(
+		(event: React.PointerEvent<HTMLDivElement>) => {
+			event.preventDefault();
 
-		if (widget.isLocked._v) {
-			return;
-		}
-
-		switch (event.button) {
-			case 0: {
-				// Prevent event bubbling to Board listener (may be needed later for nested selection support)
-				event.stopPropagation();
-
-				// Add to selection if Shift key is pressed
-				if (event.shiftKey) {
-					widgetGrid.select([widget.id], true);
-				}
-				// Set as only selection if no other nodes are selected
-				else if (widgetGrid._selected._v.length <= 1) {
-					widgetGrid.select([widget.id], false);
-				}
-
-				const origin = widgetGrid.pointerEventToViewportPoint(event);
-				widgetGrid.interactionMode.set({
-					type: 'Translating',
-					originPosition: origin,
-					currentPosition: origin
-				});
-				break;
+			if (widget.isLocked._v) {
+				return;
 			}
-			default:
-			// do nothing
-		}
-	}, []);
 
-	const handlePointerUp = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-		event.preventDefault();
+			switch (event.button) {
+				case 0: {
+					// Prevent event bubbling to Board listener (may be needed later for nested selection support)
+					event.stopPropagation();
 
-		if (widget.isLocked._v) {
-			return;
-		}
+					// Add to selection if Shift key is pressed
+					if (event.shiftKey) {
+						widgetGrid.select([widget.id], true);
+					}
+					// Set as only selection if no other nodes are selected
+					else if (widgetGrid._selected._v.length <= 1) {
+						widgetGrid.select([widget.id], false);
+					}
 
-		switch (event.button) {
-			case 0: {
-				// If not holding Shift, in 'Translating' mode,
-				// and the pointer hasn't moved, select only the current node
-				if (
-					!event.shiftKey &&
-					widgetGrid.interactionMode._v.type === 'Translating' &&
-					widgetGrid.interactionMode._v.originPosition.x ===
-						widgetGrid.interactionMode._v.currentPosition.x &&
-					widgetGrid.interactionMode._v.originPosition.y ===
-						widgetGrid.interactionMode._v.currentPosition.y
-				) {
-					widgetGrid.select([widget.id], false);
+					const origin = widgetGrid.pointerEventToViewportPoint(event);
+					widgetGrid.interactionMode.set({
+						type: 'Translating',
+						originPosition: origin,
+						currentPosition: origin
+					});
+					break;
 				}
-				break;
+				default:
+				// do nothing
 			}
-			default:
-			// do nothing
-		}
-	}, []);
+		},
+		[widgetGrid, widget]
+	);
+
+	const handlePointerUp = React.useCallback(
+		(event: React.PointerEvent<HTMLDivElement>) => {
+			event.preventDefault();
+
+			if (widget.isLocked._v) {
+				return;
+			}
+
+			switch (event.button) {
+				case 0: {
+					// If not holding Shift, in 'Translating' mode,
+					// and the pointer hasn't moved, select only the current node
+					if (
+						!event.shiftKey &&
+						widgetGrid.interactionMode._v.type === 'Translating' &&
+						widgetGrid.interactionMode._v.originPosition.x ===
+							widgetGrid.interactionMode._v.currentPosition.x &&
+						widgetGrid.interactionMode._v.originPosition.y ===
+							widgetGrid.interactionMode._v.currentPosition.y
+					) {
+						widgetGrid.select([widget.id], false);
+					}
+					break;
+				}
+				default:
+				// do nothing
+			}
+		},
+		[widgetGrid, widget]
+	);
 
 	// =========================================================================
 	// Effefcts
