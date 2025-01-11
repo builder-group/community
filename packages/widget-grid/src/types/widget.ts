@@ -1,9 +1,10 @@
+import { TState } from 'feature-state';
 import { TDimensions } from './utils';
 
 export interface TWidget<GContent> {
 	id: TWidgetId;
-	region?: TWidgetRegion; // TODO: State
-	content: GContent; // TODO: State
+	region: TState<TWidgetRegion | null, []>; // TODO: State
+	content: TState<GContent, []>; // TODO: State
 	// isSelected: boolean; // TODO: State
 	// isLocked: boolean; // TODO: State
 }

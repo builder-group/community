@@ -1,18 +1,19 @@
 import { useFeatureState } from 'feature-react/state';
 import React, { useRef } from 'react';
-import { getRegionPixels, TRegionPixels, TWidget, TWidgetGrid } from 'widget-grid';
+import { getRegionPixels, TWidget, TWidgetGrid } from 'widget-grid';
 
 export const WidgetWrapper = <GContent extends any>(props: TWidgetWrapperProps<GContent>) => {
 	const { renderItem, index, widget, widgetGrid } = props;
 	const cellSize = useFeatureState(widgetGrid.cellSize);
 
-	const elementRef = useRef<HTMLDivElement>(null);
-	const [region, setRegion] = React.useState(widget.region);
-
-	const [isAnimating, setIsAnimating] = React.useState(false);
-	const [regionPixels, setRegionPixels] = React.useState<TRegionPixels | undefined>(
-		region != null ? getRegionPixels(region, cellSize) : undefined
+	const nextRegion = useFeatureState(widget.region);
+	const [currentRegion, setCurrentRegion] = React.useState(nextRegion);
+	const currentRegionPixels = React.useMemo(
+		() => (currentRegion != null ? getRegionPixels(currentRegion, cellSize) : null),
+		[currentRegion, cellSize]
 	);
+
+	const elementRef = useRef<HTMLDivElement>(null);
 
 	const handlePointerDown = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
 		event.preventDefault();
@@ -20,62 +21,61 @@ export const WidgetWrapper = <GContent extends any>(props: TWidgetWrapperProps<G
 		const origin = widgetGrid.pointerEventToViewportPoint(event);
 		console.log({ origin });
 
-		startAnimation();
-
-		// TODO
+		// TODO:
 	}, []);
 
 	const handlePointerUp = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
 		event.preventDefault();
 
-		// TODO
+		// TODO:
 	}, []);
 
-	const startAnimation = () => {
+	React.useEffect(() => {
+		if (nextRegion == null || elementRef.current == null) {
+			return;
+		}
+
 		const element = elementRef.current;
-		if (!element || !region) return;
 
-		// Get the current position
-		const currentRect = element.getBoundingClientRect();
-		const { x: left, y: top } = widgetGrid.pointerEventToViewportPoint({
-			clientX: currentRect.left,
-			clientY: currentRect.top
-		});
-		const initialPosition = {
-			left,
-			top,
-			width: currentRect.width,
-			height: currentRect.height
-		};
+		if (
+			currentRegion?.start.row !== nextRegion.start.row ||
+			currentRegion?.start.col !== nextRegion.start.col ||
+			currentRegion?.dimension.width !== nextRegion.dimension.width ||
+			currentRegion?.dimension.height !== nextRegion.dimension.height
+		) {
+			// Get the current position and size
+			const currentRect = element.getBoundingClientRect();
+			const { x: left, y: top } = widgetGrid.pointerEventToViewportPoint({
+				clientX: currentRect.left,
+				clientY: currentRect.top
+			});
 
-		// Calculate target position
-		const targetRegion = {
-			start: { row: 0, col: 0 },
-			dimension: { height: 1, width: 1 }
-		};
-		const targetPixels = getRegionPixels(targetRegion, cellSize);
-		console.log({ targetPixels });
+			const nextRegionPixels = getRegionPixels(nextRegion, cellSize);
 
-		setIsAnimating(true);
-		setRegionPixels(targetPixels);
+			// Apply the animation
+			Object.assign(element.style, {
+				position: 'absolute',
+				width: `${nextRegionPixels.width}px`,
+				height: `${nextRegionPixels.height}px`,
+				transform: `translate(${nextRegionPixels.x - left}px, ${nextRegionPixels.y - top}px)`,
+				transition: 'transform 0.5s ease-in-out, width 0.5s ease-in-out, height 0.5s ease-in-out'
+			});
 
-		// Apply the animation
-		Object.assign(element.style, {
-			transform: `translate(${targetPixels.x - initialPosition.left}px, ${targetPixels.y - initialPosition.top}px)`
-		});
+			// Switch back to grid positioning after animation
+			const onTransitionEnd = () => {
+				element.style.position = 'relative';
+				element.style.transform = '';
+				element.style.transition = '';
+				element.style.gridArea = `${nextRegion.start.row + 1} / ${nextRegion.start.col + 1} / span ${nextRegion.dimension.height} / span ${nextRegion.dimension.width}`;
+				setCurrentRegion(nextRegion);
+				element.removeEventListener('transitionend', onTransitionEnd);
+			};
 
-		// Switch back to grid positioning after animation
-		const onTransitionEnd = () => {
-			element.style.transform = '';
-			setIsAnimating(false);
-			setRegion(targetRegion);
-			element.removeEventListener('transitionend', onTransitionEnd);
-		};
+			element.addEventListener('transitionend', onTransitionEnd);
+		}
+	}, [currentRegion, nextRegion, cellSize, widgetGrid]);
 
-		element.addEventListener('transitionend', onTransitionEnd);
-	};
-
-	if (region == null) {
+	if (currentRegion == null) {
 		return null;
 	}
 
@@ -83,23 +83,13 @@ export const WidgetWrapper = <GContent extends any>(props: TWidgetWrapperProps<G
 		<div
 			ref={elementRef}
 			key={`${widget.id}-${index}`}
-			style={
-				isAnimating
-					? {
-							position: 'absolute',
-							gridArea: `${region.start.row + 1} / ${region.start.col + 1} / span ${region.dimension.height} / span ${region.dimension.width}`,
-							width: regionPixels?.width,
-							height: regionPixels?.height,
-							transition:
-								'transform 0.5s ease-in-out, width 0.5s ease-in-out, height 0.5s ease-in-out'
-						}
-					: {
-							position: 'relative',
-							width: regionPixels?.width,
-							height: regionPixels?.height,
-							gridArea: `${region.start.row + 1} / ${region.start.col + 1} / span ${region.dimension.height} / span ${region.dimension.width}`
-						}
-			}
+			style={{
+				position: 'relative',
+				gridArea: `${currentRegion.start.row + 1} / ${currentRegion.start.col + 1} / span ${currentRegion.dimension.height} / span ${currentRegion.dimension.width}`,
+				// Required for the transition animation to work
+				width: currentRegionPixels?.width,
+				height: currentRegionPixels?.height
+			}}
 			onPointerDown={(event) => {
 				handlePointerDown(event);
 			}}

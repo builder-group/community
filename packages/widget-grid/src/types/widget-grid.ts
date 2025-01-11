@@ -5,12 +5,12 @@ import { TGridPosition, TWidget, TWidgetId, TWidgetRegion } from './widget';
 
 export type TWidgetGrid<GContent, GFeatures extends TFeatureDefinition[]> = TWithFeatures<
 	{
-		// 2D array representing the grid layout
-		_grid: string[][];
 		// Stores the widgets within the grid, each identified by a unique ID
 		_widgets: Record<TWidgetId, TWidget<GContent>>;
 		// List of currently selected widget IDs
 		_selected: TState<TWidgetId[], []>;
+		// 2D array representing the grid layout
+		grid: TState<string[][], []>;
 		// Mode for user interaction (e.g. Translating, Pressing, etc.)
 		interactionMode: TState<TInteractionMode, []>;
 		// Size of each cell in the grid

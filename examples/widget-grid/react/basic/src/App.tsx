@@ -25,6 +25,17 @@ const App: React.FC = () => {
 					);
 				}}
 			/>
+			<button
+				onClick={() => {
+					widgetGrid.grid.set([
+						['3', '3', '5', '1'],
+						['3', '3', '5', '1'],
+						['2', '2', '4', '4']
+					]);
+				}}
+			>
+				Reshuffle
+			</button>
 		</div>
 	);
 };
