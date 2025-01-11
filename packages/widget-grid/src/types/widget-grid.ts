@@ -24,7 +24,7 @@ export type TWidgetGrid<
 		getWidgetAt: (row: number, col: number) => TWidget<GContent> | null;
 		getWidgetById: (id: string) => TWidget<GContent> | null;
 		getWidgetRegions: () => TWidgetRegion[];
-		select: (widgetIds: string[]) => void;
+		select: (widgetIds: string[], toggle?: boolean) => void;
 		unselect: () => void;
 		pointerEventToViewportPoint: (pointerEvent: {
 			clientX: number;
@@ -42,16 +42,16 @@ export type TInteractionMode =
 	| TInteractionModeEditing;
 
 export interface TInteractionModeNone {
-	mode: 'none';
+	type: 'None';
 }
 
 export interface TInteractionModeInserting {
-	mode: 'inserting';
+	type: 'Inserting';
 	widgetId: TWidgetId;
 }
 
 export interface TInteractionModeTranslating {
-	mode: 'translating';
+	type: 'Translating';
 	// gridOrigin: TGridPosition;
 	// gridCurrent: TGridPosition;
 	originPosition: { x: number; y: number };
@@ -59,12 +59,12 @@ export interface TInteractionModeTranslating {
 }
 
 export interface TInteractionModeResizing {
-	mode: 'resizing';
+	type: 'Resizing';
 	handle: 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
 }
 
 export interface TInteractionModeEditing {
-	mode: 'editing';
+	type: 'Editing';
 }
 
 export interface TGridRange {

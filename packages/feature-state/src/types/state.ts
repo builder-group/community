@@ -75,6 +75,7 @@ export type TListenerCallback<GValue> = (
 // https://stackoverflow.com/questions/78645591/best-practices-for-managing-object-references-in-callbacks-javascript
 export interface TListenerCallbackData<GValue> extends TAdditionalListenerCallbackData<GValue> {
 	value: Readonly<GValue>;
+	prevValue?: Readonly<GValue>;
 }
 
 export interface TAdditionalListenerCallbackData<GValue> {
@@ -88,11 +89,7 @@ export interface TListener<GValue> {
 	key?: string;
 	level: number;
 	callback: TListenerCallback<GValue>;
-	callIf?: (data: {
-		newValue: GValue;
-		prevValue?: GValue;
-		additionalData?: TAdditionalListenerCallbackData<GValue>;
-	}) => boolean;
+	callIf?: (data: TListenerCallbackData<GValue>) => boolean;
 }
 
 export type TListenerOptions<GValue> = Partial<Omit<TListener<GValue>, 'callback'>>;

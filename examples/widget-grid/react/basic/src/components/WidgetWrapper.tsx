@@ -11,6 +11,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 	const isLargeGrid = React.useMemo(() => {
 		return widgetGrid.size._v.columns * widgetGrid.size._v.rows > 500;
 	}, [widgetGrid.size]);
+	const isSelected = useFeatureState(widget.isSelected);
 
 	const nextRegion = useFeatureState(widget.region);
 	const [currentRegion, setCurrentRegion] = React.useState(nextRegion);
@@ -22,20 +23,75 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 	const count = useRenderCount();
 	const elementRef = React.useRef<HTMLDivElement>(null);
 
+	// =========================================================================
+	// Events
+	// =========================================================================
+
 	const handlePointerDown = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
 		event.preventDefault();
 
-		const origin = widgetGrid.pointerEventToViewportPoint(event);
-		console.log({ origin });
+		if (widget.isLocked._v) {
+			return;
+		}
 
-		// TODO:
+		switch (event.button) {
+			case 0: {
+				// Prevent event bubbling to Board listener (may be needed later for nested selection support)
+				event.stopPropagation();
+
+				// Add to selection if Shift key is pressed
+				if (event.shiftKey) {
+					widgetGrid.select([widget.id], true);
+				}
+				// Set as only selection if no other nodes are selected
+				else if (widgetGrid._selected._v.length <= 1) {
+					widgetGrid.select([widget.id], false);
+				}
+
+				const origin = widgetGrid.pointerEventToViewportPoint(event);
+				widgetGrid.interactionMode.set({
+					type: 'Translating',
+					originPosition: origin,
+					currentPosition: origin
+				});
+				break;
+			}
+			default:
+			// do nothing
+		}
 	}, []);
 
 	const handlePointerUp = React.useCallback((event: React.PointerEvent<HTMLDivElement>) => {
 		event.preventDefault();
 
-		// TODO:
+		if (widget.isLocked._v) {
+			return;
+		}
+
+		switch (event.button) {
+			case 0: {
+				// If not holding Shift, in 'Translating' mode,
+				// and the pointer hasn't moved, select only the current node
+				if (
+					!event.shiftKey &&
+					widgetGrid.interactionMode._v.type === 'Translating' &&
+					widgetGrid.interactionMode._v.originPosition.x ===
+						widgetGrid.interactionMode._v.currentPosition.x &&
+					widgetGrid.interactionMode._v.originPosition.y ===
+						widgetGrid.interactionMode._v.currentPosition.y
+				) {
+					widgetGrid.select([widget.id], false);
+				}
+				break;
+			}
+			default:
+			// do nothing
+		}
 	}, []);
+
+	// =========================================================================
+	// Effefcts
+	// =========================================================================
 
 	// Animate the transition between current and next region
 	React.useEffect(() => {
@@ -72,7 +128,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 			element.style.position = 'relative';
 			element.style.transform = '';
 			element.style.transition = '';
-			element.style.gridArea = `${nextRegion.start.row + 1} / ${nextRegion.start.col + 1} / span ${nextRegion.dimension.height} / span ${nextRegion.dimension.width}`;
+			element.style.gridArea = `${nextRegion.start.row + 1} / ${nextRegion.start.col + 1} / span ${nextRegion.dimension.height} / span ${nextRegion.dimension.width}`; // To avoid flickering to current region
 			setCurrentRegion(nextRegion); // Update current region after animation
 			element.removeEventListener('transitionend', handleTransitionEnd);
 		};
@@ -84,6 +140,10 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 	if (currentRegion == null) {
 		return null;
 	}
+
+	// =========================================================================
+	// Render
+	// =========================================================================
 
 	return (
 		<div
@@ -103,7 +163,16 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 				handlePointerUp(event);
 			}}
 		>
-			<div style={{ position: 'absolute', top: 0, left: 0 }}>{count}</div>
+			<div
+				style={{
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					backgroundColor: isSelected ? 'green' : 'white'
+				}}
+			>
+				{count}
+			</div>
 			{renderItem(widget)}
 		</div>
 	);

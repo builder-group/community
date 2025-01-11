@@ -3,17 +3,17 @@ import { TDimensions } from './utils';
 
 export interface TWidget<GContent extends TWidgetBaseContent> {
 	id: TWidgetId;
-	region: TState<TWidgetRegion | null, []>; // TODO: State
-	content: TState<GContent, []>; // TODO: State
-	// isSelected: boolean; // TODO: State
-	// isLocked: boolean; // TODO: State
+	region: TState<TWidgetRegion | null, []>;
+	content: TState<GContent, []>;
+	isSelected: TState<boolean, []>;
+	isLocked: TState<boolean, []>;
 }
 
 export interface TBaseWidget<GContent extends TWidgetBaseContent> {
 	id: TWidgetId;
 	content: GContent;
-	// selected?: boolean;
-	// locked?: boolean;
+	selected?: boolean;
+	locked?: boolean;
 }
 
 export type TWidgetId = string;

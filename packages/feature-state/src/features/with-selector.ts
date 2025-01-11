@@ -14,16 +14,16 @@ export function withSelector<GValue, GFeatures extends TFeatureDefinition[]>(
 		) {
 			return this.listen(callback, {
 				...listenOptions,
-				callIf: ({ newValue, prevValue, additionalData }) => {
+				callIf: ({ value, prevValue, changedProperties }) => {
 					return (
 						// Notify if we can't verify what changed (assume everything changed)
-						(prevValue == null && additionalData?.changedProperties == null) ||
+						(prevValue == null && changedProperties == null) ||
 						// Notify if any changed property matches or is a parent of any selected property
-						(additionalData?.changedProperties != null &&
-							Array.isArray(additionalData.changedProperties) &&
+						(changedProperties != null &&
+							Array.isArray(changedProperties) &&
 							Array.isArray(callIf) &&
 							callIf.some((selectedProp) =>
-								additionalData.changedProperties?.some((changedProp) =>
+								changedProperties?.some((changedProp) =>
 									selectedProp.toString().startsWith(changedProp.toString())
 								)
 							)) ||
@@ -32,10 +32,10 @@ export function withSelector<GValue, GFeatures extends TFeatureDefinition[]>(
 							((Array.isArray(callIf) &&
 								callIf.some(
 									(selectedProp) =>
-										getNestedProperty(newValue, selectedProp) !==
+										getNestedProperty(value, selectedProp) !==
 										getNestedProperty(prevValue as GValue, selectedProp)
 								)) ||
-								(typeof callIf === 'function' && callIf(newValue) !== callIf(prevValue as GValue))))
+								(typeof callIf === 'function' && callIf(value) !== callIf(prevValue as GValue))))
 					);
 				}
 			});

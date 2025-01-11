@@ -36,7 +36,9 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 			acc[baseWidget.id] = {
 				id: baseWidget.id,
 				content: createState(baseWidget.content as GContent),
-				region: createState(regionsByWidgetId[baseWidget.id] ?? null)
+				region: createState(regionsByWidgetId[baseWidget.id] ?? null),
+				isSelected: createState(baseWidget.selected ?? false),
+				isLocked: createState(baseWidget.locked ?? false)
 			};
 			return acc;
 		},
@@ -49,21 +51,41 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		_selected: createState<TWidgetId[]>([]),
 		grid: createState(config.grid),
 		size: createState(getGridSize(config.grid)),
-		interactionMode: createState<TInteractionMode>({ mode: 'none' }),
+		interactionMode: createState<TInteractionMode>({ type: 'None' }),
 		cellSize: createState(cellSize),
 		boundingRect: createState<TBoundingRect>({ left: 0, top: 0 }),
-		getWidgetAt(row: number, col: number): TWidget<GContent> | null {
+		getWidgetAt(row, col) {
 			const widgetId = this.grid._v[row]?.[col];
 			return widgetId != null ? (this._widgets[widgetId] ?? null) : null;
 		},
-		getWidgetById(id: TWidgetId): TWidget<GContent> | null {
+		getWidgetById(id) {
 			return this._widgets[id] ?? null;
 		},
-		getWidgetRegions(): TWidgetRegion[] {
+		getWidgetRegions() {
 			return getWidgetRegions(this.grid._v);
 		},
-		select(widgetIds) {
-			this._selected.set(widgetIds);
+		select(widgetIds: TWidgetId[], toggle = false) {
+			if (!toggle) {
+				this._selected.set(widgetIds);
+				return;
+			}
+
+			// In toggle mode, compute the new selection state
+			const newSelection = [...this._selected._v];
+
+			widgetIds.forEach((id) => {
+				const currentIndex = newSelection.indexOf(id);
+				// Add if not already selected
+				if (currentIndex === -1) {
+					newSelection.push(id);
+				}
+				// Remove if already selected
+				else {
+					newSelection.splice(currentIndex, 1);
+				}
+			});
+
+			this._selected.set(newSelection);
 		},
 		unselect() {
 			this._selected.set([]);
@@ -76,7 +98,6 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 	widgetGrid.grid.listen(
 		({ value, ...additionalData }) => {
 			const newRegions = getWidgetRegions(value as string[][]);
-
 			newRegions.forEach((region) => {
 				const widget = widgetGrid._widgets[region.widgetId];
 				if (
@@ -91,7 +112,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 							start: region.start,
 							dimension: region.dimension
 						},
-						{ additionalData }
+						{ additionalData: { ...additionalData, source: 'update-widget-regions' } }
 					);
 				}
 			});
@@ -106,10 +127,41 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 				newSize.rows !== widgetGrid.size._v.rows ||
 				newSize.columns !== widgetGrid.size._v.columns
 			) {
-				widgetGrid.size.set(newSize);
+				widgetGrid.size.set(newSize, { additionalData: { source: 'update-grid-size' } });
 			}
 		},
 		{ key: 'update-grid-size' }
+	);
+
+	widgetGrid._selected.listen(
+		({ value, prevValue }) => {
+			// Unselect widgets that were removed from selection
+			prevValue?.forEach((widgetId) => {
+				if (!value.includes(widgetId)) {
+					const widget = widgetGrid._widgets[widgetId];
+					if (widget != null) {
+						widget.isSelected.set(false, {
+							additionalData: { source: 'update-selected-widgets' }
+						});
+					}
+				}
+			});
+
+			// Select newly added widgets
+			value.forEach((widgetId) => {
+				if (!prevValue?.includes(widgetId)) {
+					const widget = widgetGrid._widgets[widgetId];
+					if (widget != null) {
+						widget.isSelected.set(true, {
+							additionalData: { source: 'update-selected-widgets' }
+						});
+					}
+				}
+			});
+		},
+		{
+			key: 'update-selected-widgets'
+		}
 	);
 
 	return widgetGrid;
