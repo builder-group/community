@@ -1,12 +1,42 @@
+import React, { useState } from 'react';
 import { WidgetGrid } from './components';
 import './index.css';
-import { TWidgetContent, widgetGrid } from './widget-grid';
+import { TWidgetGridPresetKey, widgetGridPresets } from './widget-grid';
 
 const App: React.FC = () => {
+	const [currentWidgetGridPresetKey, setWidgetGridPresetKey] =
+		useState<TWidgetGridPresetKey>('playground');
+
+	const preset = React.useMemo(
+		() => widgetGridPresets[currentWidgetGridPresetKey],
+		[currentWidgetGridPresetKey]
+	);
+
 	return (
 		<div style={{ width: '100%', height: '100vh', backgroundColor: 'blue', padding: '48px' }}>
-			<WidgetGrid<TWidgetContent>
-				widgetGrid={widgetGrid}
+			<div style={{ marginBottom: '20px' }}>
+				<select
+					value={currentWidgetGridPresetKey}
+					onChange={(e) => setWidgetGridPresetKey(e.target.value as TWidgetGridPresetKey)}
+					style={{ marginRight: '10px' }}
+				>
+					<option value="playground">Playground</option>
+					<option value="performance">Performance Test</option>
+				</select>
+
+				{preset.actions.map((action, index) => (
+					<button
+						key={index}
+						onClick={() => action.action(preset.grid)}
+						style={{ marginRight: '10px' }}
+					>
+						{action.label}
+					</button>
+				))}
+			</div>
+
+			<WidgetGrid
+				widgetGrid={preset.grid}
 				renderItem={(item) => {
 					return (
 						<div
@@ -25,17 +55,6 @@ const App: React.FC = () => {
 					);
 				}}
 			/>
-			<button
-				onClick={() => {
-					widgetGrid.grid.set([
-						['3', '3', '5', '1'],
-						['3', '3', '5', '1'],
-						['2', '2', '4', '4']
-					]);
-				}}
-			>
-				Reshuffle
-			</button>
 		</div>
 	);
 };
