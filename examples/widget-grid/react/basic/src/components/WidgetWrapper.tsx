@@ -13,12 +13,9 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 	}, [widgetGrid.size]);
 	const isSelected = useFeatureState(widget.isSelected);
 
-	const nextRegion = useFeatureState(widget.region);
-	const [currentRegion, setCurrentRegion] = React.useState(nextRegion);
-	const currentRegionPixels = React.useMemo(
-		() => (currentRegion != null ? getRegionPixels(currentRegion, cellSize) : null),
-		[currentRegion, cellSize]
-	);
+	const [region, setRegion] = React.useState(widget.region._v);
+
+	// const [layoutMode, setLayoutMode] = React.useState<'Grid' | 'Absolute'>('Grid');
 
 	const count = useRenderCount();
 	const elementRef = React.useRef<HTMLDivElement>(null);
@@ -101,49 +98,65 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 
 	// Animate the transition between current and next region
 	React.useEffect(() => {
-		if (nextRegion == null || isLargeGrid) {
-			setCurrentRegion(nextRegion);
-			return;
-		}
+		const unbind = widget.region.listen(
+			({ value: nextRegion }) => {
+				if (isLargeGrid || nextRegion == null) {
+					setRegion(nextRegion);
+					return;
+				}
 
-		const element = elementRef.current;
-		if (element == null) {
-			return;
-		}
+				const element = elementRef.current;
+				if (element == null) {
+					return;
+				}
 
-		// Calculate current position and offset
-		const currentRect = element.getBoundingClientRect();
-		const { x: currentX, y: currentY } = widgetGrid.pointerEventToViewportPoint({
-			clientX: currentRect.left,
-			clientY: currentRect.top
-		});
+				// Apply initial position based on prev region
+				const regionPixels = region != null ? getRegionPixels(region, cellSize) : null;
+				Object.assign(element.style, {
+					position: 'absolute',
+					width: `${regionPixels?.width}px`,
+					height: `${regionPixels?.height}px`,
+					transform: `translate(${regionPixels?.x}px, ${regionPixels?.y}px)`,
+					gridArea: ''
+				});
 
-		const nextRegionPixels = getRegionPixels(nextRegion, cellSize);
+				//  Force a reflow to ensure the initial position is applied
+				element.offsetHeight;
 
-		// Apply animation styles
-		Object.assign(element.style, {
-			position: 'absolute',
-			width: `${nextRegionPixels.width}px`,
-			height: `${nextRegionPixels.height}px`,
-			transform: `translate(${nextRegionPixels.x - currentX}px, ${nextRegionPixels.y - currentY}px)`,
-			transition: 'transform 0.5s ease-in-out, width 0.5s ease-in-out, height 0.5s ease-in-out'
-		});
+				// Enable transition and move to new position
+				const nextRegionPixels = getRegionPixels(nextRegion, cellSize);
+				Object.assign(element.style, {
+					position: 'absolute',
+					width: `${nextRegionPixels.width}px`,
+					height: `${nextRegionPixels.height}px`,
+					transform: `translate(${nextRegionPixels.x}px, ${nextRegionPixels.y}px)`,
+					transition: 'transform 0.5s ease-in-out, width 0.5s ease-in-out, height 0.5s ease-in-out'
+				});
 
-		// Handle transition end
-		const handleTransitionEnd = () => {
-			element.style.position = 'relative';
-			element.style.transform = '';
-			element.style.transition = '';
-			element.style.gridArea = `${nextRegion.start.row + 1} / ${nextRegion.start.col + 1} / span ${nextRegion.dimension.height} / span ${nextRegion.dimension.width}`; // To avoid flickering to current region
-			setCurrentRegion(nextRegion); // Update current region after animation
-			element.removeEventListener('transitionend', handleTransitionEnd);
+				// Handle transition end
+				const handleTransitionEnd = () => {
+					element.style.position = 'relative';
+					element.style.width = '';
+					element.style.height = '';
+					element.style.transform = '';
+					element.style.transition = '';
+					element.style.gridArea = `${nextRegion.start.row + 1} / ${nextRegion.start.col + 1} / span ${nextRegion.dimension.height} / span ${nextRegion.dimension.width}`; // To avoid flickering to current region
+					setRegion(nextRegion); // Update region after animation
+					element.removeEventListener('transitionend', handleTransitionEnd);
+				};
+
+				element.addEventListener('transitionend', handleTransitionEnd);
+			},
+			{ key: 'update-region_WidgetWrapper' }
+		);
+
+		return () => {
+			unbind();
 		};
-
-		element.addEventListener('transitionend', handleTransitionEnd);
-	}, [currentRegion, nextRegion, widgetGrid, cellSize, isLargeGrid]);
+	}, [cellSize, isLargeGrid, region, widget.region, widgetGrid]);
 
 	// Hide widget if no region is available
-	if (currentRegion == null) {
+	if (region == null) {
 		return null;
 	}
 
@@ -157,10 +170,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 			key={`${widget.id}-${index}`}
 			style={{
 				position: 'relative',
-				gridArea: `${currentRegion.start.row + 1} / ${currentRegion.start.col + 1} / span ${currentRegion.dimension.height} / span ${currentRegion.dimension.width}`,
-				// Required for the transition animation to work
-				width: currentRegionPixels?.width,
-				height: currentRegionPixels?.height
+				gridArea: `${region.start.row + 1} / ${region.start.col + 1} / span ${region.dimension.height} / span ${region.dimension.width}`
 			}}
 			onPointerDown={handlePointerDown}
 			onPointerUp={handlePointerUp}

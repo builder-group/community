@@ -22,10 +22,6 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 		(event: React.PointerEvent<HTMLDivElement>): void => {
 			event.preventDefault();
 
-			const cursorPosition = widgetGrid.pointerEventToViewportPoint(event);
-
-			console.log('pointer move', { cursorPosition });
-
 			switch (widgetGrid.interactionMode._v.type) {
 				case 'Translating': {
 					const { currentPosition } = widgetGrid.interactionMode._v;
