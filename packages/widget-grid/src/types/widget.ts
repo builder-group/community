@@ -5,11 +5,18 @@ export interface TWidget<GContent extends TWidgetBaseContent> {
 	// _widgetGrid: TWidgetGrid<GContent, []>;
 	id: TWidgetId;
 	layoutMode: TState<'Grid' | 'Absolute', []>;
-	region: TState<TWidgetRegion | null, []>; // TODO: Make Readonly, is synced from parent
-	position: TState<TXYPosition | null, []>; // TODO: Only set if layoutMode is Absolute?
-	size: TState<TDimensions | null, []>; // TODO: Only set if layoutMode is Absolute?
+	// nextRegion: TState<TWidgetRegion | null, []>;
+	// Widget grid position (region) synced from parent grid, applied when layoutMode is Grid
+	region: TState<TWidgetRegion | null, []>;
+	// Absolute position of Widget, applied when layoutMode is Absolute
+	position: TState<TXYPosition | null, []>;
+	// Absolute size of Widget, applied when layoutMode is Absolute
+	size: TState<TDimensions | null, []>;
+	// Widget content
 	content: TState<GContent, []>;
-	isSelected: TState<boolean, []>; // TODO: Make Readonly, is synced from parent
+	// Whether the widget is selected, synced from parent selected array
+	isSelected: TState<boolean, []>;
+	// Whether the widget is locked
 	isLocked: TState<boolean, []>;
 }
 

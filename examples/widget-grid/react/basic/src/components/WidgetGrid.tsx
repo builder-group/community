@@ -35,6 +35,21 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 							x: (n?.x ?? 0) + deltaX,
 							y: (n?.y ?? 0) + deltaY
 						}));
+
+						const pos = widget.position._v;
+						const region = widget.region._v;
+						if (pos == null || region == null) {
+							continue;
+						}
+
+						const newCol = Math.round(pos.x / cellWidth);
+						const newRow = Math.round(pos.y / cellHeight);
+						if (newCol !== region.start.col || newRow !== region.start.row) {
+							region.start = {
+								col: newCol,
+								row: newRow
+							};
+						}
 					}
 
 					widgetGrid.interactionMode._v.currentPosition = cursorPosition;
@@ -44,7 +59,7 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 				// do nothing
 			}
 		},
-		[widgetGrid]
+		[widgetGrid, cellWidth, cellHeight]
 	);
 
 	const handlePointerUp = React.useCallback(

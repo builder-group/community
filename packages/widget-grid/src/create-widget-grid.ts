@@ -125,6 +125,8 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		}
 	};
 
+	// TODO: Should I work with side effects? Or update e.g. region, position, size, etc. more directly?
+
 	widgetGrid.grid.listen(
 		({ value, ...additionalData }) => {
 			const newRegions = getWidgetRegions(value as string[][]);

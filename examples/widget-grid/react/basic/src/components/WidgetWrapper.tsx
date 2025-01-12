@@ -8,9 +8,6 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 ) => {
 	const { renderItem, index, widget, widgetGrid } = props;
 	const cellSize = useFeatureState(widgetGrid.cellSize);
-	const isLargeGrid = React.useMemo(() => {
-		return widgetGrid.size._v.columns * widgetGrid.size._v.rows > 500;
-	}, [widgetGrid.size]);
 	const isSelected = useFeatureState(widget.isSelected);
 
 	const [region, setRegion] = React.useState(widget.region._v);
@@ -103,6 +100,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 	React.useEffect(() => {
 		const unbind = widget.region.listen(
 			({ value: nextRegion }) => {
+				const isLargeGrid = widgetGrid.size._v.columns * widgetGrid.size._v.rows > 500;
 				if (isLargeGrid || nextRegion == null) {
 					setRegion(nextRegion);
 					return;
@@ -156,7 +154,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 		return () => {
 			unbind();
 		};
-	}, [cellSize, isLargeGrid, region, widget.region, widgetGrid]);
+	}, [cellSize, region, widget.region, widgetGrid]);
 
 	// Hide widget if no region is available
 	if (region == null) {
