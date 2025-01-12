@@ -31,7 +31,10 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 					const deltaY = cursorPosition.y - currentPosition.y;
 
 					for (const widget of widgetGrid.getSelectedWidgets()) {
-						// TODO:
+						widget.position.set((n) => ({
+							x: (n?.x ?? 0) + deltaX,
+							y: (n?.y ?? 0) + deltaY
+						}));
 					}
 
 					widgetGrid.interactionMode._v.currentPosition = cursorPosition;
@@ -40,6 +43,15 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 				default:
 				// do nothing
 			}
+		},
+		[widgetGrid]
+	);
+
+	const handlePointerUp = React.useCallback(
+		(event: React.PointerEvent<HTMLDivElement>): void => {
+			event.preventDefault();
+
+			widgetGrid.interactionMode.set({ type: 'None' });
 		},
 		[widgetGrid]
 	);
@@ -62,6 +74,7 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 				gap: '0px'
 			}}
 			onPointerMove={handlePointerMove}
+			onPointerUp={handlePointerUp}
 		>
 			{Object.values(widgetGrid._widgets).map((widget, index) => (
 				<WidgetWrapper

@@ -1,11 +1,15 @@
 import { TState } from 'feature-state';
-import { TDimensions } from './utils';
+import { TDimensions, TXYPosition } from './utils';
 
 export interface TWidget<GContent extends TWidgetBaseContent> {
+	// _widgetGrid: TWidgetGrid<GContent, []>;
 	id: TWidgetId;
-	region: TState<TWidgetRegion | null, []>; // TODO: Make Readonly, is synced by parent
+	layoutMode: TState<'Grid' | 'Absolute', []>;
+	region: TState<TWidgetRegion | null, []>; // TODO: Make Readonly, is synced from parent
+	position: TState<TXYPosition | null, []>; // TODO: Only set if layoutMode is Absolute?
+	size: TState<TDimensions | null, []>; // TODO: Only set if layoutMode is Absolute?
 	content: TState<GContent, []>;
-	isSelected: TState<boolean, []>; // TODO: Make Readonly, is synced by parent
+	isSelected: TState<boolean, []>; // TODO: Make Readonly, is synced from parent
 	isLocked: TState<boolean, []>;
 }
 
@@ -32,4 +36,11 @@ export interface TWidgetRegionWithId extends TWidgetRegion {
 export interface TGridPosition {
 	row: number;
 	col: number;
+}
+
+export interface TWidgetRegionPixels {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
 }

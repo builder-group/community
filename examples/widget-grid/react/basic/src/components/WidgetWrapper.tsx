@@ -1,6 +1,6 @@
 import { useFeatureState } from 'feature-react/state';
 import React from 'react';
-import { getRegionPixels, TWidget, TWidgetBaseContent, TWidgetGrid } from 'widget-grid';
+import { getWidgetRegionPixels, TWidget, TWidgetBaseContent, TWidgetGrid } from 'widget-grid';
 import { useRenderCount } from '../hooks';
 
 export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
@@ -15,7 +15,10 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 
 	const [region, setRegion] = React.useState(widget.region._v);
 
-	// const [layoutMode, setLayoutMode] = React.useState<'Grid' | 'Absolute'>('Grid');
+	// TODO: Only update element via ref? So we don't re-render all the time?
+	const layoutMode = useFeatureState(widget.layoutMode);
+	const position = useFeatureState(widget.position);
+	const size = useFeatureState(widget.size);
 
 	const count = useRenderCount();
 	const elementRef = React.useRef<HTMLDivElement>(null);
@@ -111,7 +114,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 				}
 
 				// Apply initial position based on prev region
-				const regionPixels = region != null ? getRegionPixels(region, cellSize) : null;
+				const regionPixels = region != null ? getWidgetRegionPixels(region, cellSize) : null;
 				Object.assign(element.style, {
 					position: 'absolute',
 					width: `${regionPixels?.width}px`,
@@ -124,7 +127,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 				element.offsetHeight;
 
 				// Enable transition and move to new position
-				const nextRegionPixels = getRegionPixels(nextRegion, cellSize);
+				const nextRegionPixels = getWidgetRegionPixels(nextRegion, cellSize);
 				Object.assign(element.style, {
 					position: 'absolute',
 					width: `${nextRegionPixels.width}px`,
@@ -168,10 +171,20 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 		<div
 			ref={elementRef}
 			key={`${widget.id}-${index}`}
-			style={{
-				position: 'relative',
-				gridArea: `${region.start.row + 1} / ${region.start.col + 1} / span ${region.dimension.height} / span ${region.dimension.width}`
-			}}
+			style={
+				layoutMode === 'Grid'
+					? {
+							position: 'relative',
+							gridArea: `${region.start.row + 1} / ${region.start.col + 1} / span ${region.dimension.height} / span ${region.dimension.width}`
+						}
+					: {
+							position: 'absolute',
+							width: size?.width,
+							height: size?.height,
+							transform: `translate(${position?.x}px, ${position?.y}px)`,
+							zIndex: 99
+						}
+			}
 			onPointerDown={handlePointerDown}
 			onPointerUp={handlePointerUp}
 		>

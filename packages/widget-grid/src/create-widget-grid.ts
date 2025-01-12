@@ -1,6 +1,11 @@
 import { notEmpty } from '@blgc/utils';
 import { createState } from 'feature-state';
-import { getGridSize, getWidgetRegions, pointerEventToViewportPoint } from './helper';
+import {
+	getGridSize,
+	getWidgetRegionPixels,
+	getWidgetRegions,
+	pointerEventToViewportPoint
+} from './helper';
 import {
 	TBaseWidget,
 	TBoundingRect,
@@ -10,6 +15,7 @@ import {
 	TWidgetBaseContent,
 	TWidgetId,
 	TWidgetRegion,
+	TXYPosition,
 	type TWidgetGrid
 } from './types';
 
@@ -34,13 +40,33 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 	// Convert base widgets to full widgets with regions in one pass
 	const widgets = baseWidgets.reduce(
 		(acc, baseWidget) => {
-			acc[baseWidget.id] = {
+			const region = regionsByWidgetId[baseWidget.id] ?? null;
+			const regionPixels = region != null ? getWidgetRegionPixels(region, cellSize) : null;
+			const widget = {
 				id: baseWidget.id,
 				content: createState(baseWidget.content as GContent),
-				region: createState(regionsByWidgetId[baseWidget.id] ?? null),
+				region: createState(region),
+				layoutMode: createState<'Grid' | 'Absolute'>('Grid'),
+				position: createState<TXYPosition | null>(
+					regionPixels != null ? { x: regionPixels.x, y: regionPixels.y } : null
+				),
+				size: createState<TDimensions | null>(
+					regionPixels != null ? { width: regionPixels.width, height: regionPixels.height } : null
+				),
 				isSelected: createState(baseWidget.selected ?? false),
 				isLocked: createState(baseWidget.locked ?? false)
 			};
+
+			widget.isSelected.listen(({ value }) => {
+				if (value) {
+					widget.layoutMode.set('Absolute', { additionalData: { source: 'is-selected' } });
+				} else {
+					widget.layoutMode.set('Grid', { additionalData: { source: 'is-selected' } });
+				}
+			});
+
+			acc[baseWidget.id] = widget;
+
 			return acc;
 		},
 		{} as Record<TWidgetId, TWidget<GContent>>
@@ -118,6 +144,15 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 						},
 						{ additionalData: { ...additionalData, source: 'update-widget-regions' } }
 					);
+					const regionPixels = getWidgetRegionPixels(region, cellSize);
+					widget.position.set(
+						{ x: regionPixels.x, y: regionPixels.y },
+						{ additionalData: { ...additionalData, source: 'update-widget-regions' } }
+					);
+					widget.size.set(
+						{ width: regionPixels.width, height: regionPixels.height },
+						{ additionalData: { ...additionalData, source: 'update-widget-regions' } }
+					);
 				}
 			});
 		},
@@ -166,6 +201,24 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		{
 			key: 'update-selected-widgets'
 		}
+	);
+
+	widgetGrid.interactionMode.listen(
+		({ value }) => {
+			if (value.type === 'None') {
+				for (const widget of widgetGrid.getSelectedWidgets()) {
+					const region = widget.region._v;
+					if (region != null) {
+						const regionPixels = getWidgetRegionPixels(region, cellSize);
+						widget.position.set({
+							x: regionPixels.x,
+							y: regionPixels.y
+						});
+					}
+				}
+			}
+		},
+		{ key: 'interaction-mode' }
 	);
 
 	return widgetGrid;

@@ -1,3 +1,4 @@
+import { withGlobalBind } from 'feature-react/state';
 import React, { useState } from 'react';
 import { WidgetGrid } from './components';
 import './index.css';
@@ -8,7 +9,7 @@ const App: React.FC = () => {
 		useState<TWidgetGridPresetKey>('playground');
 
 	const preset = React.useMemo(
-		() => widgetGridPresets[currentWidgetGridPresetKey],
+		() => withGlobalBind('__widgetGrid', widgetGridPresets[currentWidgetGridPresetKey]),
 		[currentWidgetGridPresetKey]
 	);
 
