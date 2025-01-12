@@ -3,9 +3,9 @@ import { TDimensions } from './utils';
 
 export interface TWidget<GContent extends TWidgetBaseContent> {
 	id: TWidgetId;
-	region: TState<TWidgetRegion | null, []>;
+	region: TState<TWidgetRegion | null, []>; // TODO: Make Readonly, is synced by parent
 	content: TState<GContent, []>;
-	isSelected: TState<boolean, []>;
+	isSelected: TState<boolean, []>; // TODO: Make Readonly, is synced by parent
 	isLocked: TState<boolean, []>;
 }
 

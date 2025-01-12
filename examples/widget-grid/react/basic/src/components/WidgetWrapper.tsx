@@ -162,12 +162,8 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 				width: currentRegionPixels?.width,
 				height: currentRegionPixels?.height
 			}}
-			onPointerDown={(event) => {
-				handlePointerDown(event);
-			}}
-			onPointerUp={(event) => {
-				handlePointerUp(event);
-			}}
+			onPointerDown={handlePointerDown}
+			onPointerUp={handlePointerUp}
 		>
 			<div
 				style={{

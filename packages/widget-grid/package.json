@@ -35,6 +35,7 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
+		"@blgc/utils": "workspace:*",
 		"feature-state": "workspace:*"
 	},
 	"devDependencies": {

@@ -23,6 +23,7 @@ export type TWidgetGrid<
 		boundingRect: TState<TBoundingRect, []>;
 		getWidgetAt: (row: number, col: number) => TWidget<GContent> | null;
 		getWidgetById: (id: string) => TWidget<GContent> | null;
+		getSelectedWidgets: () => TWidget<GContent>[];
 		getWidgetRegions: () => TWidgetRegion[];
 		select: (widgetIds: string[], toggle?: boolean) => void;
 		unselect: () => void;

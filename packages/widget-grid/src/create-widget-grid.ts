@@ -1,3 +1,4 @@
+import { notEmpty } from '@blgc/utils';
 import { createState } from 'feature-state';
 import { getGridSize, getWidgetRegions, pointerEventToViewportPoint } from './helper';
 import {
@@ -60,6 +61,9 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		},
 		getWidgetById(id) {
 			return this._widgets[id] ?? null;
+		},
+		getSelectedWidgets() {
+			return this._selected._v.map((id) => this._widgets[id]).filter(notEmpty);
 		},
 		getWidgetRegions() {
 			return getWidgetRegions(this.grid._v);

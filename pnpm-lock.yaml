@@ -752,6 +752,9 @@ importers:
 
   packages/widget-grid:
     dependencies:
+      '@blgc/utils':
+        specifier: workspace:*
+        version: link:../utils
       feature-state:
         specifier: workspace:*
         version: link:../feature-state

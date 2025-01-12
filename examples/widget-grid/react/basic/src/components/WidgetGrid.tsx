@@ -14,6 +14,44 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 
 	useBoundingRectObserver(widgetGridRef, widgetGrid.boundingRect);
 
+	// =========================================================================
+	// Effects
+	// =========================================================================
+
+	const handlePointerMove = React.useCallback(
+		(event: React.PointerEvent<HTMLDivElement>): void => {
+			event.preventDefault();
+
+			const cursorPosition = widgetGrid.pointerEventToViewportPoint(event);
+
+			console.log('pointer move', { cursorPosition });
+
+			switch (widgetGrid.interactionMode._v.type) {
+				case 'Translating': {
+					const { currentPosition } = widgetGrid.interactionMode._v;
+					const cursorPosition = widgetGrid.pointerEventToViewportPoint(event);
+
+					const deltaX = cursorPosition.x - currentPosition.x;
+					const deltaY = cursorPosition.y - currentPosition.y;
+
+					for (const widget of widgetGrid.getSelectedWidgets()) {
+						// TODO:
+					}
+
+					widgetGrid.interactionMode._v.currentPosition = cursorPosition;
+					break;
+				}
+				default:
+				// do nothing
+			}
+		},
+		[widgetGrid]
+	);
+
+	// =========================================================================
+	// Render
+	// =========================================================================
+
 	return (
 		<div
 			id="widget-grid"
@@ -27,6 +65,7 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 				gridTemplateRows: `repeat(${rows}, ${cellHeight}px)`,
 				gap: '0px'
 			}}
+			onPointerMove={handlePointerMove}
 		>
 			{Object.values(widgetGrid._widgets).map((widget, index) => (
 				<WidgetWrapper
