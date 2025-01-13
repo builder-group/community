@@ -21,29 +21,29 @@ describe('Grid class', () => {
 		});
 	});
 
-	describe('dimensions getter', () => {
-		it('should return correct dimensions for empty grid', () => {
+	describe('size getter', () => {
+		it('should return correct size for empty grid', () => {
 			const grid = new Grid();
-			expect(grid.dimensions).toEqual({ rows: 1, columns: 0 });
+			expect(grid.size).toEqual({ rows: 1, columns: 0 });
 		});
 
-		it('should return correct dimensions for non-empty grid', () => {
+		it('should return correct size for non-empty grid', () => {
 			const initialGrid = [
 				['1', '2', '3'],
 				['4', '5', '6']
 			];
 			const grid = new Grid(initialGrid);
-			expect(grid.dimensions).toEqual({ rows: 2, columns: 3 });
+			expect(grid.size).toEqual({ rows: 2, columns: 3 });
 		});
 
 		it('should handle single-row grid', () => {
 			const grid = new Grid([['1', '2', '3']]);
-			expect(grid.dimensions).toEqual({ rows: 1, columns: 3 });
+			expect(grid.size).toEqual({ rows: 1, columns: 3 });
 		});
 
 		it('should handle single-column grid', () => {
 			const grid = new Grid([['1'], ['2'], ['3']]);
-			expect(grid.dimensions).toEqual({ rows: 3, columns: 1 });
+			expect(grid.size).toEqual({ rows: 3, columns: 1 });
 		});
 	});
 
@@ -117,9 +117,9 @@ describe('Grid class', () => {
 					['B', 'B']
 				]);
 
-				grid.expandGrid({ strategy: 'set', rows: 3, columns: 4 });
+				grid.expandGrid({ strategy: 'Set', rows: 3, columns: 4 });
 
-				expect(grid.dimensions).toEqual({ rows: 3, columns: 4 });
+				expect(grid.size).toEqual({ rows: 3, columns: 4 });
 				expect(grid.cells).toEqual([
 					['A', 'A', null, null],
 					['B', 'B', null, null],
@@ -133,9 +133,9 @@ describe('Grid class', () => {
 					['B', 'B', 'B']
 				]);
 
-				grid.expandGrid({ strategy: 'set', rows: 1, columns: 2 });
+				grid.expandGrid({ strategy: 'Set', rows: 1, columns: 2 });
 
-				expect(grid.dimensions).toEqual({ rows: 2, columns: 3 });
+				expect(grid.size).toEqual({ rows: 2, columns: 3 });
 				expect(grid.cells).toEqual([
 					['A', 'A', 'A'],
 					['B', 'B', 'B']
@@ -150,9 +150,9 @@ describe('Grid class', () => {
 					['B', 'B']
 				]);
 
-				grid.expandGrid({ strategy: 'add', rows: 1, columns: 2 });
+				grid.expandGrid({ strategy: 'Add', rows: 1, columns: 2 });
 
-				expect(grid.dimensions).toEqual({ rows: 3, columns: 4 });
+				expect(grid.size).toEqual({ rows: 3, columns: 4 });
 				expect(grid.cells).toEqual([
 					['A', 'A', null, null],
 					['B', 'B', null, null],
@@ -166,9 +166,9 @@ describe('Grid class', () => {
 					['B', 'B']
 				]);
 
-				grid.expandGrid({ strategy: 'add', rows: 0, columns: 0 });
+				grid.expandGrid({ strategy: 'Add', rows: 0, columns: 0 });
 
-				expect(grid.dimensions).toEqual({ rows: 2, columns: 2 });
+				expect(grid.size).toEqual({ rows: 2, columns: 2 });
 				expect(grid.cells).toEqual([
 					['A', 'A'],
 					['B', 'B']
@@ -322,7 +322,7 @@ describe('Grid class', () => {
 						start: { row: 1, col: 0 },
 						dimension: { width: 2, height: 1 }
 					},
-					{ strategy: 'rearrange' }
+					{ strategy: 'Rearrange' }
 				);
 
 				expect(result).toBe(true);
@@ -349,7 +349,7 @@ describe('Grid class', () => {
 						start: { row: 1, col: 0 },
 						dimension: { width: 2, height: 1 }
 					},
-					{ strategy: 'rearrange' }
+					{ strategy: 'Rearrange' }
 				);
 
 				expect(result).toBe(true);
@@ -376,7 +376,7 @@ describe('Grid class', () => {
 			// 			start: { row: 1, col: 0 },
 			// 			dimension: { width: 2, height: 1 }
 			// 		},
-			// 		{ strategy: 'rearrange' }
+			// 		{ strategy: 'Rearrange' }
 			// 	);
 
 			// 	expect(result).toBe(true);
@@ -404,7 +404,7 @@ describe('Grid class', () => {
 							dimension: { width: 2, height: 1 }
 						},
 						{
-							strategy: 'rearrange',
+							strategy: 'Rearrange',
 							expansion: { south: true }
 						}
 					);
@@ -433,7 +433,7 @@ describe('Grid class', () => {
 							dimension: { width: 2, height: 1 }
 						},
 						{
-							strategy: 'rearrange',
+							strategy: 'Rearrange',
 							expansion: { east: true }
 						}
 					);
@@ -461,7 +461,7 @@ describe('Grid class', () => {
 							dimension: { width: 2, height: 1 }
 						},
 						{
-							strategy: 'rearrange',
+							strategy: 'Rearrange',
 							expansion: { south: true, east: true }
 						}
 					);
@@ -489,7 +489,7 @@ describe('Grid class', () => {
 							start: { row: 2, col: 0 },
 							dimension: { width: 2, height: 1 }
 						},
-						{ strategy: 'rearrange' }
+						{ strategy: 'Rearrange' }
 					);
 
 					expect(result).toBe(false);
@@ -540,28 +540,42 @@ describe('Grid class', () => {
 			expect(grid2.getRegions()).toEqual([]);
 		});
 
-		it('should detect single cell regions', () => {
+		it('should detect single cell regions with their ids', () => {
 			const grid = new Grid([
 				['1', '2'],
 				['3', '4']
 			]);
 
 			expect(grid.getRegions()).toEqual([
-				{ content: '1', start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ content: '2', start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } },
-				{ content: '3', start: { row: 1, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ content: '4', start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } }
+				{ id: '1', start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ id: '2', start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } },
+				{ id: '3', start: { row: 1, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ id: '4', start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } }
 			]);
 		});
 
-		it('should detect rectangular regions', () => {
+		it('should detect rectangular regions with same id', () => {
 			const grid = new Grid([
 				['1', '1'],
 				['1', '1']
 			]);
 
 			expect(grid.getRegions()).toEqual([
-				{ content: '1', start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } }
+				{ id: '1', start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } }
+			]);
+		});
+
+		it('should detect multiple rectangular regions with different ids', () => {
+			const grid = new Grid([
+				['1', '1', '2'],
+				['1', '1', '2'],
+				['3', '3', '2']
+			]);
+
+			expect(grid.getRegions()).toEqual([
+				{ id: '1', start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } },
+				{ id: '2', start: { row: 0, col: 2 }, dimension: { width: 1, height: 3 } },
+				{ id: '3', start: { row: 2, col: 0 }, dimension: { width: 2, height: 1 } }
 			]);
 		});
 
@@ -572,22 +586,8 @@ describe('Grid class', () => {
 			]);
 
 			expect(grid.getRegions()).toEqual([
-				{ content: '1', start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ content: '2', start: { row: 1, col: 0 }, dimension: { width: 2, height: 1 } }
-			]);
-		});
-
-		it('should detect multiple rectangular regions', () => {
-			const grid = new Grid([
-				['1', '1', '2'],
-				['1', '1', '2'],
-				['3', '3', '2']
-			]);
-
-			expect(grid.getRegions()).toEqual([
-				{ content: '1', start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } },
-				{ content: '2', start: { row: 0, col: 2 }, dimension: { width: 1, height: 3 } },
-				{ content: '3', start: { row: 2, col: 0 }, dimension: { width: 2, height: 1 } }
+				{ id: '1', start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ id: '2', start: { row: 1, col: 0 }, dimension: { width: 2, height: 1 } }
 			]);
 		});
 
@@ -599,11 +599,11 @@ describe('Grid class', () => {
 			]);
 
 			expect(grid.getRegions()).toEqual([
-				{ content: '1', start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } },
-				{ content: '2', start: { row: 0, col: 2 }, dimension: { width: 1, height: 2 } },
-				{ content: '1', start: { row: 1, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ content: '2', start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } },
-				{ content: '3', start: { row: 2, col: 0 }, dimension: { width: 3, height: 1 } }
+				{ id: '1', start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } },
+				{ id: '2', start: { row: 0, col: 2 }, dimension: { width: 1, height: 2 } },
+				{ id: '1', start: { row: 1, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ id: '2', start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } },
+				{ id: '3', start: { row: 2, col: 0 }, dimension: { width: 3, height: 1 } }
 			]);
 		});
 
@@ -620,8 +620,8 @@ describe('Grid class', () => {
 			};
 
 			expect(grid.getRegions(range)).toEqual([
-				{ content: '2', start: { row: 0, col: 2 }, dimension: { width: 1, height: 2 } },
-				{ content: '4', start: { row: 0, col: 3 }, dimension: { width: 1, height: 2 } }
+				{ id: '2', start: { row: 0, col: 2 }, dimension: { width: 1, height: 2 } },
+				{ id: '4', start: { row: 0, col: 3 }, dimension: { width: 1, height: 2 } }
 			]);
 		});
 
@@ -638,13 +638,13 @@ describe('Grid class', () => {
 			};
 
 			expect(grid.getRegions(range)).toEqual([
-				{ content: '3', start: { row: 2, col: 0 }, dimension: { width: 2, height: 1 } }
+				{ id: '3', start: { row: 2, col: 0 }, dimension: { width: 2, height: 1 } }
 			]);
 		});
 	});
 
 	describe('findRegion', () => {
-		it('should use default isValidCell to match content at position', () => {
+		it('should use default isValidCell to match id at position', () => {
 			const grid = new Grid([
 				['A', 'A', 'B'],
 				['A', 'A', 'B'],

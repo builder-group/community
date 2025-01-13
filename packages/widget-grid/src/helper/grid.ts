@@ -1,14 +1,14 @@
-export class Grid<GGridCellContent extends TGridCellContent = string> {
-	private _cells: (GGridCellContent | null)[][];
+export class Grid<GGridCellId extends TGridCellId = string> {
+	private _cells: (GGridCellId | null)[][];
 	private _config: TGridConfig;
 
 	/**
-	 * Creates a new Grid with optional initial content and configuration
+	 * Creates a new Grid with optional initial cell ids and configuration
 	 * @example
 	 * const grid = new Grid([['A', 'B'], ['C', 'D']])
 	 * const expandableGrid = new Grid([], { expansion: { south: true, east: true } })
 	 */
-	constructor(grid: (GGridCellContent | TEmptyGridCell)[][] = [[]], options: TGridOptions = {}) {
+	constructor(grid: (GGridCellId | TEmptyGridCell)[][] = [[]], options: TGridOptions = {}) {
 		this._config = {
 			expansion: {
 				south: false,
@@ -22,9 +22,9 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	/**
 	 * Current dimensions of the grid
 	 * @example
-	 * const { rows, columns } = grid.dimensions // { rows: 2, columns: 3 }
+	 * const { rows, columns } = grid.size // { rows: 2, columns: 3 }
 	 */
-	public get dimensions(): { rows: number; columns: number } {
+	public get size(): TGridSize {
 		return {
 			rows: this._cells.length,
 			columns: this._cells[0]?.length ?? 0
@@ -32,11 +32,11 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	}
 
 	/**
-	 * Read-only access to grid content
+	 * Read-only access to grid cells
 	 * @example
 	 * const cells = grid.cells // [['A', 'B'], ['C', null]]
 	 */
-	public get cells(): ReadonlyArray<ReadonlyArray<GGridCellContent | TEmptyGridCell>> {
+	public get cells(): ReadonlyArray<ReadonlyArray<GGridCellId | TEmptyGridCell>> {
 		return this._cells; // .map((row) => [...row]);
 	}
 
@@ -57,25 +57,25 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	 * grid.expandGrid({ strategy: 'add', rows: 2, columns: 1 })
 	 */
 	public expandGrid(options: TExpandGridMethodOptions = {}): void {
-		const { strategy = 'set', rows = 0, columns = 0 } = options;
+		const { strategy = 'Set', rows = 0, columns = 0 } = options;
 
 		let targetRows: number;
 		let targetColumns: number;
 
 		switch (strategy) {
-			case 'add':
-				targetRows = this.dimensions.rows + rows;
-				targetColumns = this.dimensions.columns + columns;
+			case 'Add':
+				targetRows = this.size.rows + rows;
+				targetColumns = this.size.columns + columns;
 				break;
-			case 'set':
+			case 'Set':
 			default:
-				targetRows = Math.max(this.dimensions.rows, rows);
-				targetColumns = Math.max(this.dimensions.columns, columns);
+				targetRows = Math.max(this.size.rows, rows);
+				targetColumns = Math.max(this.size.columns, columns);
 		}
 
 		// Add rows
 		while (this._cells.length < targetRows) {
-			this._cells.push(new Array(this.dimensions.columns).fill(null));
+			this._cells.push(new Array(this.size.columns).fill(null));
 		}
 
 		// Add columns
@@ -95,15 +95,15 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	 *   ['C', 'C', 'B']
 	 * ])
 	 * grid.getRegions()
-	 * // Returns:
+	 * // Returns regions with their IDs:
 	 * // [
-	 * //   { content: 'A', start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } },
-	 * //   { content: 'B', start: { row: 0, col: 2 }, dimension: { width: 1, height: 3 } },
-	 * //   { content: 'C', start: { row: 2, col: 0 }, dimension: { width: 2, height: 1 } }
+	 *   { id: 'A', start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } },
+	 *   { id: 'B', start: { row: 0, col: 2 }, dimension: { width: 1, height: 3 } },
+	 *   { id: 'C', start: { row: 2, col: 0 }, dimension: { width: 2, height: 1 } }
 	 * // ]
 	 */
-	public getRegions(range?: TGridRange): TGridRegionWithContent<GGridCellContent>[] {
-		const { rows, columns } = this.dimensions;
+	public getRegions(range?: TGridRange): TGridRegionWithId<GGridCellId>[] {
+		const { rows, columns } = this.size;
 		if (rows === 0 || columns === 0) {
 			return [];
 		}
@@ -115,7 +115,7 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 		};
 
 		const visitedCells = new Set<string>();
-		const regions: TGridRegionWithContent<GGridCellContent>[] = [];
+		const regions: TGridRegionWithId<GGridCellId>[] = [];
 
 		// Only compute regions within the specified range
 		this.iterateRange(computeRange, (row, col) => {
@@ -124,8 +124,8 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 				return;
 			}
 
-			const content = this._cells[row]?.[col];
-			if (content == null) {
+			const id = this._cells[row]?.[col];
+			if (id == null) {
 				visitedCells.add(cellKey);
 				return;
 			}
@@ -148,8 +148,8 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 							return false;
 						}
 
-						// Check content and not visited
-						return this._cells[r]?.[c] === content && !visitedCells.has(this.getCellKey(r, c));
+						// Check id and not visited
+						return this._cells[r]?.[c] === id && !visitedCells.has(this.getCellKey(r, c));
 					}
 				}
 			);
@@ -159,7 +159,7 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 			});
 
 			regions.push({
-				content,
+				id,
 				...region
 			});
 		});
@@ -212,7 +212,7 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 		// Expand right until invalid or grid boundary
 		if (rightDirection) {
 			while (
-				position.col + right + 1 < this.dimensions.columns &&
+				position.col + right + 1 < this.size.columns &&
 				isValidCell(position.row, position.col + right + 1)
 			) {
 				right++;
@@ -236,7 +236,7 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 
 		// Expand down until invalid or grid boundary
 		if (downDirection) {
-			while (position.row + down + 1 < this.dimensions.rows) {
+			while (position.row + down + 1 < this.size.rows) {
 				let isRowValid = true;
 				for (let col = position.col - left; col <= position.col + right; col++) {
 					if (!isValidCell(position.row + down + 1, col)) {
@@ -262,7 +262,7 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	}
 
 	/**
-	 * Moves content from one region to another using the specified strategy
+	 * Moves id from one region to another using the specified strategy
 	 * @example
 	 * // Override strategy (default)
 	 * grid.moveRegion(
@@ -274,7 +274,7 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	 * grid.moveRegion(
 	 *   { start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } },
 	 *   { start: { row: 1, col: 0 }, dimension: { width: 2, height: 1 } },
-	 *   { strategy: 'rearrange', expansion: { south: true, east: true } }
+	 *   { strategy: 'Rearrange', expansion: { south: true, east: true } }
 	 * )
 	 */
 	public moveRegion(
@@ -282,12 +282,12 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 		targetRegion: TGridRegion,
 		options: TMoveRegionMethodOptions = {}
 	): boolean {
-		const { strategy = 'override', expansion = {} } = options;
+		const { strategy = 'Override', expansion = {} } = options;
 
 		switch (strategy) {
-			case 'override':
+			case 'Override':
 				return this.moveRegionByOverride(currentRegion, targetRegion);
-			case 'rearrange':
+			case 'Rearrange':
 				return this.moveRegionByRearrange(currentRegion, targetRegion, expansion);
 			default:
 				return false;
@@ -295,17 +295,17 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	}
 
 	/**
-	 * Moves region by overriding target content
+	 * Moves region by overriding target region's cells
 	 */
 	private moveRegionByOverride(currentRegion: TGridRegion, targetRegion: TGridRegion): boolean {
-		const content = this._cells[currentRegion.start.row]?.[currentRegion.start.col] ?? null;
+		const id = this._cells[currentRegion.start.row]?.[currentRegion.start.col] ?? null;
 		this.clearRegion(currentRegion);
-		this.fillRegion(targetRegion, content);
+		this.fillRegion(targetRegion, id);
 		return true;
 	}
 
 	/**
-	 * Moves region by rearranging existing content
+	 * Moves region by rearranging regions, swapping with any existing region
 	 */
 	private moveRegionByRearrange(
 		currentRegion: TGridRegion,
@@ -313,11 +313,11 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 		expansion: { south?: boolean; east?: boolean } = {}
 	): boolean {
 		const { south = false, east = false } = expansion;
-		const content = this._cells[currentRegion.start.row]?.[currentRegion.start.col] ?? null;
+		const id = this._cells[currentRegion.start.row]?.[currentRegion.start.col] ?? null;
 
 		// Check bounds
-		const maxRow = expansion.south ? Infinity : this.dimensions.rows;
-		const maxCol = expansion.east ? Infinity : this.dimensions.columns;
+		const maxRow = expansion.south ? Infinity : this.size.rows;
+		const maxCol = expansion.east ? Infinity : this.size.columns;
 		if (
 			!(
 				targetRegion.start.row >= 0 &&
@@ -337,29 +337,29 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 			this.expandGrid({
 				rows: south ? requiredRows : undefined,
 				columns: east ? requiredColumns : undefined,
-				strategy: 'set'
+				strategy: 'Set'
 			});
 		}
 
-		// Find first non-null content in target region
-		let occupyingContent: GGridCellContent | null = null;
+		// Find first non-null id in target region
+		let occupyingId: GGridCellId | null = null;
 		this.iterateRegion(targetRegion, (row, col) => {
 			const cell = this._cells[row]?.[col];
-			if (cell != null && content !== cell && occupyingContent == null) {
-				occupyingContent = cell;
+			if (cell != null && id !== cell && occupyingId == null) {
+				occupyingId = cell;
 			}
 		});
 
-		if (occupyingContent == null) {
+		if (occupyingId == null) {
 			this.clearRegion(currentRegion);
-			this.fillRegion(targetRegion, content);
+			this.fillRegion(targetRegion, id);
 			return true;
 		}
 
 		const occupyingRegion = this.findRegion(
 			{ row: targetRegion.start.row, col: targetRegion.start.col },
 			{
-				isValidCell: (r, c) => this._cells[r]?.[c] === occupyingContent
+				isValidCell: (r, c) => this._cells[r]?.[c] === occupyingId
 			}
 		);
 
@@ -368,20 +368,20 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 		this.clearRegion(occupyingRegion);
 		this.fillRegion(
 			{ start: currentRegion.start, dimension: occupyingRegion.dimension },
-			occupyingContent
+			occupyingId
 		);
-		this.fillRegion(targetRegion, content);
+		this.fillRegion(targetRegion, id);
 
 		return true;
 	}
 
 	/**
-	 * Swaps content between two regions while maintaining their original shapes
+	 * Swaps regions while maintaining their original shapes
 	 * @example
 	 * // Before: [['A', 'A', 'B'], ['A', 'A', 'B']]
 	 * grid.swapRegions(
-	 *   { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } }, // 2x2 'A' region
-	 *   { start: { row: 0, col: 2 }, dimension: { width: 1, height: 2 } }, // 1x2 'B' region
+	 *   { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } }, // Region with ID 'A'
+	 *   { start: { row: 0, col: 2 }, dimension: { width: 1, height: 2 } }, // Region with ID 'B'
 	 *   'A', 'B'
 	 * )
 	 * // After: [['B', 'B', 'A'], ['B', 'B', 'A']]
@@ -389,13 +389,13 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	public swapRegions(
 		region1: TGridRegion,
 		region2: TGridRegion,
-		content1: GGridCellContent,
-		content2: GGridCellContent
+		id1: GGridCellId,
+		id2: GGridCellId
 	): void {
 		this.clearRegion(region1);
 		this.clearRegion(region2);
-		this.fillRegion(region1, content2);
-		this.fillRegion(region2, content1);
+		this.fillRegion(region1, id2);
+		this.fillRegion(region2, id1);
 	}
 
 	/**
@@ -414,7 +414,7 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	}
 
 	/**
-	 * Fills the specified region with content
+	 * Fills the specified region with the given ID
 	 * @example
 	 * // Before: [[null, null], ['B', 'B']]
 	 * grid.fillRegion(
@@ -423,10 +423,10 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	 * )
 	 * // After: [['A', 'A'], ['B', 'B']]
 	 */
-	public fillRegion(region: TGridRegion, content: GGridCellContent | null): void {
+	public fillRegion(region: TGridRegion, id: GGridCellId | null): void {
 		this.iterateRegion(region, (row, col) => {
 			if (this._cells[row] != null) {
-				this._cells[row][col] = content;
+				this._cells[row][col] = id;
 			}
 		});
 	}
@@ -478,28 +478,28 @@ interface TGridConfig {
 	expansion: TGridExpansionConfig;
 }
 
-type TGridOptions = Partial<TGridConfig>;
-
-interface TGridRegion {
-	start: TGridPosition;
-	dimension: TGridDimensions;
-}
-
-interface TGridRegionWithContent<GGridCellContent extends TGridCellContent> extends TGridRegion {
-	content: GGridCellContent;
-}
-
-type TEmptyGridCell = null;
-type TGridCellContent = string | number;
-
 // Only south and east expansion make sense in a grid system,
 // similar to how spreadsheets work?
-// North and west expansion would require shifting all content
+// North and west expansion would require shifting all cells
 // and negative column and row input values.
 interface TGridExpansionConfig {
 	south: boolean;
 	east: boolean;
 }
+
+type TGridOptions = Partial<TGridConfig>;
+
+export interface TGridRegion {
+	start: TGridPosition;
+	dimension: TGridDimensions;
+}
+
+export interface TGridRegionWithId<GGridCellId extends TGridCellId> extends TGridRegion {
+	id: GGridCellId;
+}
+
+export type TEmptyGridCell = null;
+export type TGridCellId = string | number;
 
 export interface TGridRange {
 	start: TGridPosition;
@@ -516,6 +516,11 @@ export interface TGridDimensions {
 	height: number;
 }
 
+export interface TGridSize {
+	rows: number;
+	columns: number;
+}
+
 interface TFindRegionMethodOptions {
 	isValidCell?: (row: number, col: number) => boolean;
 	directions?: {
@@ -527,7 +532,7 @@ interface TFindRegionMethodOptions {
 }
 
 interface TMoveRegionMethodOptions {
-	strategy?: 'override' | 'rearrange';
+	strategy?: 'Override' | 'Rearrange';
 	expansion?: {
 		south?: boolean;
 		east?: boolean;
@@ -535,7 +540,7 @@ interface TMoveRegionMethodOptions {
 }
 
 interface TExpandGridMethodOptions {
-	strategy?: 'set' | 'add';
+	strategy?: 'Set' | 'Add';
 	rows?: number;
 	columns?: number;
 }
