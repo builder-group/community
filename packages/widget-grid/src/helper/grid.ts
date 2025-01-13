@@ -1,6 +1,6 @@
 export class Grid<GGridCellContent extends TGridCellContent = string> {
-	private grid: (GGridCellContent | null)[][];
-	private config: TGridConfig;
+	private _cells: (GGridCellContent | null)[][];
+	private _config: TGridConfig;
 
 	/**
 	 * Creates a new Grid with optional initial content and configuration
@@ -9,14 +9,14 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	 * const expandableGrid = new Grid([], { expansion: { south: true, east: true } })
 	 */
 	constructor(grid: (GGridCellContent | TEmptyGridCell)[][] = [[]], options: TGridOptions = {}) {
-		this.config = {
+		this._config = {
 			expansion: {
 				south: false,
 				east: false
 			},
 			...options
 		};
-		this.grid = grid;
+		this._cells = grid;
 	}
 
 	/**
@@ -26,8 +26,8 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	 */
 	public get dimensions(): { rows: number; columns: number } {
 		return {
-			rows: this.grid.length,
-			columns: this.grid[0]?.length ?? 0
+			rows: this._cells.length,
+			columns: this._cells[0]?.length ?? 0
 		};
 	}
 
@@ -37,7 +37,182 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	 * const cells = grid.cells // [['A', 'B'], ['C', null]]
 	 */
 	public get cells(): ReadonlyArray<ReadonlyArray<GGridCellContent | TEmptyGridCell>> {
-		return this.grid; // .map((row) => [...row]);
+		return this._cells; // .map((row) => [...row]);
+	}
+
+	/**
+	 * Returns all rectangular regions in the grid, optionally within a specified range
+	 * @example
+	 * const grid = new Grid([
+	 *   ['A', 'A', 'B'],
+	 *   ['A', 'A', 'B'],
+	 *   ['C', 'C', 'B']
+	 * ])
+	 * grid.getRegions()
+	 * // Returns:
+	 * // [
+	 * //   { content: 'A', start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } },
+	 * //   { content: 'B', start: { row: 0, col: 2 }, dimension: { width: 1, height: 3 } },
+	 * //   { content: 'C', start: { row: 2, col: 0 }, dimension: { width: 2, height: 1 } }
+	 * // ]
+	 */
+	public getRegions(range?: TGridRange): TGridRegionWithContent<GGridCellContent>[] {
+		const { rows, columns } = this.dimensions;
+		if (rows === 0 || columns === 0) {
+			return [];
+		}
+
+		// Use provided range or full grid
+		const computeRange = range ?? {
+			start: { row: 0, col: 0 },
+			end: { row: rows, col: columns }
+		};
+
+		const visitedCells = new Set<string>();
+		const regions: TGridRegionWithContent<GGridCellContent>[] = [];
+
+		// Only compute regions within the specified range
+		this.iterateRange(computeRange, (row, col) => {
+			const cellKey = this.getCellKey(row, col);
+			if (visitedCells.has(cellKey)) {
+				return;
+			}
+
+			const content = this._cells[row]?.[col];
+			if (content == null) {
+				visitedCells.add(cellKey);
+				return;
+			}
+
+			const region = this.findRegion(
+				{ row, col },
+				{
+					directions: {
+						right: true,
+						down: true
+					},
+					isValidCell: (r, c) => {
+						// Check bounds
+						if (
+							r < computeRange.start.row ||
+							r >= computeRange.end.row ||
+							c < computeRange.start.col ||
+							c >= computeRange.end.col
+						) {
+							return false;
+						}
+
+						// Check content and not visited
+						return this._cells[r]?.[c] === content && !visitedCells.has(this.getCellKey(r, c));
+					}
+				}
+			);
+
+			this.iterateRegion(region, (r, c) => {
+				visitedCells.add(this.getCellKey(r, c));
+			});
+
+			regions.push({
+				content,
+				...region
+			});
+		});
+
+		return regions;
+	}
+
+	/**
+	 * Finds a rectangular region from a position by expanding in allowed directions until a condition is met
+	 * @example
+	 * // Find region in all directions (default)
+	 * grid.findRegion(
+	 *   { row: 1, col: 1 },
+	 *   (row, col) => grid.cells[row]?.[col] === 'A'
+	 * )
+	 *
+	 * // Find region only expanding down and right
+	 * grid.findRegion(
+	 *   { row: 0, col: 0 },
+	 *   (row, col) => grid.cells[row]?.[col] === 'A',
+	 *   { directions: { down: true, right: true } }
+	 * )
+	 */
+	public findRegion(position: TGridPosition, options: TFindRegionOptions = {}): TGridRegion {
+		const {
+			isValidCell = (r, c) => this._cells[r]?.[c] === this._cells[position.row]?.[position.col],
+			directions = {}
+		} = options;
+		const {
+			up: upDirection = true,
+			down: downDirection = true,
+			left: leftDirection = true,
+			right: rightDirection = true
+		} = directions;
+		let left = 0;
+		let right = 0;
+		let up = 0;
+		let down = 0;
+
+		// Expand left until invalid or grid boundary
+		if (leftDirection) {
+			while (
+				position.col - (left + 1) >= 0 &&
+				isValidCell(position.row, position.col - (left + 1))
+			) {
+				left++;
+			}
+		}
+
+		// Expand right until invalid or grid boundary
+		if (rightDirection) {
+			while (
+				position.col + right + 1 < this.dimensions.columns &&
+				isValidCell(position.row, position.col + right + 1)
+			) {
+				right++;
+			}
+		}
+
+		// Expand up until invalid or grid boundary
+		if (upDirection) {
+			while (position.row - (up + 1) >= 0) {
+				let isRowValid = true;
+				for (let col = position.col - left; col <= position.col + right; col++) {
+					if (!isValidCell(position.row - (up + 1), col)) {
+						isRowValid = false;
+						break;
+					}
+				}
+				if (!isRowValid) break;
+				up++;
+			}
+		}
+
+		// Expand down until invalid or grid boundary
+		if (downDirection) {
+			while (position.row + down + 1 < this.dimensions.rows) {
+				let isRowValid = true;
+				for (let col = position.col - left; col <= position.col + right; col++) {
+					if (!isValidCell(position.row + down + 1, col)) {
+						isRowValid = false;
+						break;
+					}
+				}
+				if (!isRowValid) break;
+				down++;
+			}
+		}
+
+		return {
+			start: {
+				row: position.row - up,
+				col: position.col - left
+			},
+			dimension: {
+				width: left + right + 1,
+				height: up + down + 1
+			}
+		};
 	}
 
 	/**
@@ -92,8 +267,8 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	 */
 	public clearRegion(region: TGridRegion): void {
 		this.iterateRegion(region, (row, col) => {
-			if (this.grid[row] != null) {
-				this.grid[row][col] = null;
+			if (this._cells[row] != null) {
+				this._cells[row][col] = null;
 			}
 		});
 	}
@@ -110,10 +285,17 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	 */
 	public fillRegion(region: TGridRegion, content: GGridCellContent): void {
 		this.iterateRegion(region, (row, col) => {
-			if (this.grid[row] != null) {
-				this.grid[row][col] = content;
+			if (this._cells[row] != null) {
+				this._cells[row][col] = content;
 			}
 		});
+	}
+
+	/**
+	 * Generates a unique key for a cell position
+	 */
+	public getCellKey(row: number, col: number): string {
+		return `${row}-${col}`;
 	}
 
 	/**
@@ -134,13 +316,24 @@ export class Grid<GGridCellContent extends TGridCellContent = string> {
 	}
 
 	/**
+	 * Iterates over cells within a specified range
+	 */
+	private iterateRange(range: TGridRange, callback: (row: number, col: number) => void): void {
+		for (let row = range.start.row; row < range.end.row; row++) {
+			for (let col = range.start.col; col < range.end.col; col++) {
+				callback(row, col);
+			}
+		}
+	}
+
+	/**
 	 * String representation of the grid, using '-' for empty cells
 	 * @example
 	 * // grid.cells = [['A', null], [null, 'B']]
 	 * grid.toString() // 'A -\n- B'
 	 */
 	public toString(): string {
-		return this.grid
+		return this._cells
 			.map((row) => row.map((cell) => (cell == null ? '-' : cell)).join(' '))
 			.join('\n');
 	}
@@ -155,8 +348,12 @@ interface TGridConfig {
 type TGridOptions = Partial<TGridConfig>;
 
 interface TGridRegion {
-	start: { row: number; col: number };
-	dimension: { width: number; height: number };
+	start: TGridPosition;
+	dimension: TGridDimensions;
+}
+
+interface TGridRegionWithContent<GGridCellContent extends TGridCellContent> extends TGridRegion {
+	content: GGridCellContent;
 }
 
 type TEmptyGridCell = null;
@@ -169,4 +366,29 @@ type TGridCellContent = string | number;
 interface TGridExpansionConfig {
 	south: boolean;
 	east: boolean;
+}
+
+export interface TGridRange {
+	start: TGridPosition;
+	end: TGridPosition;
+}
+
+export interface TGridPosition {
+	row: number;
+	col: number;
+}
+
+export interface TGridDimensions {
+	width: number;
+	height: number;
+}
+
+interface TFindRegionOptions {
+	isValidCell?: (row: number, col: number) => boolean;
+	directions?: {
+		up?: boolean;
+		down?: boolean;
+		left?: boolean;
+		right?: boolean;
+	};
 }

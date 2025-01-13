@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Grid } from './grid';
+import { Grid, TGridRange } from './grid';
 
 describe('Grid class', () => {
 	describe('constructor', () => {
@@ -224,6 +224,292 @@ describe('Grid class', () => {
 		it('should handle empty grid', () => {
 			const grid = new Grid();
 			expect(grid.cells).toEqual([[]]);
+		});
+	});
+
+	describe('getRegions', () => {
+		it('should handle empty grid', () => {
+			const grid = new Grid([]);
+			expect(grid.getRegions()).toEqual([]);
+
+			const grid2 = new Grid([[], []]);
+			expect(grid2.getRegions()).toEqual([]);
+		});
+
+		it('should detect single cell regions', () => {
+			const grid = new Grid([
+				['1', '2'],
+				['3', '4']
+			]);
+
+			expect(grid.getRegions()).toEqual([
+				{ content: '1', start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ content: '2', start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } },
+				{ content: '3', start: { row: 1, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ content: '4', start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } }
+			]);
+		});
+
+		it('should detect rectangular regions', () => {
+			const grid = new Grid([
+				['1', '1'],
+				['1', '1']
+			]);
+
+			expect(grid.getRegions()).toEqual([
+				{ content: '1', start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } }
+			]);
+		});
+
+		it('should handle null cells', () => {
+			const grid = new Grid([
+				['1', null],
+				['2', '2']
+			]);
+
+			expect(grid.getRegions()).toEqual([
+				{ content: '1', start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ content: '2', start: { row: 1, col: 0 }, dimension: { width: 2, height: 1 } }
+			]);
+		});
+
+		it('should detect multiple rectangular regions', () => {
+			const grid = new Grid([
+				['1', '1', '2'],
+				['1', '1', '2'],
+				['3', '3', '2']
+			]);
+
+			expect(grid.getRegions()).toEqual([
+				{ content: '1', start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } },
+				{ content: '2', start: { row: 0, col: 2 }, dimension: { width: 1, height: 3 } },
+				{ content: '3', start: { row: 2, col: 0 }, dimension: { width: 2, height: 1 } }
+			]);
+		});
+
+		it('should handle irregular shapes by finding largest rectangles', () => {
+			const grid = new Grid([
+				['1', '1', '2'],
+				['1', '2', '2'],
+				['3', '3', '3']
+			]);
+
+			expect(grid.getRegions()).toEqual([
+				{ content: '1', start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } },
+				{ content: '2', start: { row: 0, col: 2 }, dimension: { width: 1, height: 2 } },
+				{ content: '1', start: { row: 1, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ content: '2', start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } },
+				{ content: '3', start: { row: 2, col: 0 }, dimension: { width: 3, height: 1 } }
+			]);
+		});
+
+		it('should compute regions strictly within range', () => {
+			const grid = new Grid([
+				['1', '1', '2', '4'],
+				['1', '1', '2', '4'],
+				['3', '3', '2', '4']
+			]);
+
+			const range: TGridRange = {
+				start: { row: 0, col: 2 },
+				end: { row: 2, col: 4 }
+			};
+
+			expect(grid.getRegions(range)).toEqual([
+				{ content: '2', start: { row: 0, col: 2 }, dimension: { width: 1, height: 2 } },
+				{ content: '4', start: { row: 0, col: 3 }, dimension: { width: 1, height: 2 } }
+			]);
+		});
+
+		it('should handle range at grid boundaries', () => {
+			const grid = new Grid([
+				['1', '1', '2'],
+				['1', '1', '2'],
+				['3', '3', '2']
+			]);
+
+			const range: TGridRange = {
+				start: { row: 2, col: 0 },
+				end: { row: 3, col: 2 }
+			};
+
+			expect(grid.getRegions(range)).toEqual([
+				{ content: '3', start: { row: 2, col: 0 }, dimension: { width: 2, height: 1 } }
+			]);
+		});
+	});
+
+	describe('getCellKey', () => {
+		it('should generate unique keys for different positions', () => {
+			const grid = new Grid();
+			expect(grid.getCellKey(0, 0)).toBe('0-0');
+			expect(grid.getCellKey(1, 2)).toBe('1-2');
+			expect(grid.getCellKey(10, 20)).toBe('10-20');
+		});
+
+		it('should handle negative positions', () => {
+			const grid = new Grid();
+			expect(grid.getCellKey(-1, -2)).toBe('-1--2');
+		});
+	});
+
+	describe('findRegion', () => {
+		it('should use default isValidCell to match content at position', () => {
+			const grid = new Grid([
+				['A', 'A', 'B'],
+				['A', 'A', 'B'],
+				['C', 'C', 'B']
+			]);
+
+			const region = grid.findRegion({ row: 0, col: 0 });
+
+			expect(region).toEqual({
+				start: { row: 0, col: 0 },
+				dimension: { width: 2, height: 2 }
+			});
+		});
+
+		it('should use custom isValidCell when provided', () => {
+			const grid = new Grid([
+				['1', '2', '3'],
+				['4', '5', '6']
+			]);
+
+			const region = grid.findRegion(
+				{
+					row: 0,
+					col: 0
+				},
+				{
+					isValidCell: (_, __) => true
+				}
+			);
+
+			expect(region).toEqual({
+				start: { row: 0, col: 0 },
+				dimension: { width: 3, height: 2 }
+			});
+		});
+
+		describe('direction controls', () => {
+			const grid = new Grid([
+				['X', 'X', 'X'],
+				['X', 'X', 'X'],
+				['X', 'X', 'X']
+			]);
+
+			it('should expand in all directions by default', () => {
+				const region = grid.findRegion({ row: 1, col: 1 });
+
+				expect(region).toEqual({
+					start: { row: 0, col: 0 },
+					dimension: { width: 3, height: 3 }
+				});
+			});
+
+			it('should not expand when all directions are false', () => {
+				const region = grid.findRegion(
+					{
+						row: 1,
+						col: 1
+					},
+					{
+						directions: {
+							up: false,
+							down: false,
+							left: false,
+							right: false
+						}
+					}
+				);
+
+				expect(region).toEqual({
+					start: { row: 1, col: 1 },
+					dimension: { width: 1, height: 1 }
+				});
+			});
+
+			it('should respect individual direction controls', () => {
+				// Test each direction individually
+				const tests = [
+					{
+						direction: 'right',
+						position: { row: 1, col: 0 },
+						expected: {
+							start: { row: 1, col: 0 },
+							dimension: { width: 3, height: 1 }
+						}
+					},
+					{
+						direction: 'down',
+						position: { row: 0, col: 1 },
+						expected: {
+							start: { row: 0, col: 1 },
+							dimension: { width: 1, height: 3 }
+						}
+					},
+					{
+						direction: 'left',
+						position: { row: 1, col: 2 },
+						expected: {
+							start: { row: 1, col: 0 },
+							dimension: { width: 3, height: 1 }
+						}
+					},
+					{
+						direction: 'up',
+						position: { row: 2, col: 1 },
+						expected: {
+							start: { row: 0, col: 1 },
+							dimension: { width: 1, height: 3 }
+						}
+					}
+				];
+
+				tests.forEach(({ direction, position, expected }) => {
+					const region = grid.findRegion(position, {
+						directions: {
+							up: false,
+							down: false,
+							left: false,
+							right: false,
+							[direction]: true
+						}
+					});
+
+					expect(region).toEqual(expected);
+				});
+			});
+		});
+
+		describe('boundary handling', () => {
+			it('should respect grid boundaries', () => {
+				const grid = new Grid([
+					['A', 'A'],
+					['A', 'A']
+				]);
+
+				const region = grid.findRegion({ row: 0, col: 0 });
+
+				expect(region).toEqual({
+					start: { row: 0, col: 0 },
+					dimension: { width: 2, height: 2 }
+				});
+			});
+
+			it('should handle position at grid edges', () => {
+				const grid = new Grid([
+					['A', 'A'],
+					['A', 'A']
+				]);
+
+				const region = grid.findRegion({ row: 1, col: 1 });
+
+				expect(region).toEqual({
+					start: { row: 0, col: 0 },
+					dimension: { width: 2, height: 2 }
+				});
+			});
 		});
 	});
 });
