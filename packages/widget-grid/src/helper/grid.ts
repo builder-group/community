@@ -1,5 +1,7 @@
+import { createState, TState } from 'feature-state';
+
 export class Grid<GGridCellId extends TGridCellId = string> {
-	private _cells: (GGridCellId | null)[][];
+	private _cells: TState<(GGridCellId | null)[][], []>; // TODO: Make this a state? We need to listen on changes and a state is basically a value with listeners..
 	private _config: TGridConfig;
 
 	/**
@@ -8,7 +10,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 * const grid = new Grid([['A', 'B'], ['C', 'D']])
 	 * const expandableGrid = new Grid([], { expansion: { south: true, east: true } })
 	 */
-	constructor(grid: (GGridCellId | TEmptyGridCell)[][] = [[]], options: TGridOptions = {}) {
+	constructor(cells: (GGridCellId | TEmptyGridCell)[][] = [[]], options: TGridOptions = {}) {
 		this._config = {
 			expansion: {
 				south: false,
@@ -16,7 +18,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 			},
 			...options
 		};
-		this._cells = grid;
+		this._cells = createState(cells);
 	}
 
 	/**
@@ -26,18 +28,25 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 */
 	public get size(): TGridSize {
 		return {
-			rows: this._cells.length,
-			columns: this._cells[0]?.length ?? 0
+			rows: this.cells.length,
+			columns: this.cells[0]?.length ?? 0
 		};
 	}
 
 	/**
-	 * Read-only access to grid cells
-	 * @example
-	 * const cells = grid.cells // [['A', 'B'], ['C', null]]
+	 * Direct access to grid cells state
 	 */
-	public get cells(): ReadonlyArray<ReadonlyArray<GGridCellId | TEmptyGridCell>> {
-		return this._cells; // .map((row) => [...row]);
+	// TODO: Make private and readonly?
+	public get cellsState(): TState<(GGridCellId | null)[][], []> {
+		return this._cells;
+	}
+
+	/**
+	 * Direct access to grid cells
+	 */
+	// TODO: Make private and readonly?
+	public get cells(): (GGridCellId | null)[][] {
+		return this._cells._v;
 	}
 
 	/**
@@ -45,6 +54,13 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 */
 	public getCellKey(row: number, col: number): string {
 		return `${row}-${col}`;
+	}
+
+	/**
+	 * Returns the cell at the specified position
+	 */
+	public getCellAt(row: number, col: number): GGridCellId | TEmptyGridCell {
+		return this.cells[row]?.[col] ?? null;
 	}
 
 	/**
@@ -74,12 +90,12 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 		}
 
 		// Add rows
-		while (this._cells.length < targetRows) {
-			this._cells.push(new Array(this.size.columns).fill(null));
+		while (this.cells.length < targetRows) {
+			this.cells.push(new Array(this.size.columns).fill(null));
 		}
 
 		// Add columns
-		for (const row of this._cells) {
+		for (const row of this.cells) {
 			while (row.length < targetColumns) {
 				row.push(null);
 			}
@@ -124,7 +140,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 				return;
 			}
 
-			const id = this._cells[row]?.[col];
+			const id = this.cells[row]?.[col];
 			if (id == null) {
 				visitedCells.add(cellKey);
 				return;
@@ -149,7 +165,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 						}
 
 						// Check id and not visited
-						return this._cells[r]?.[c] === id && !visitedCells.has(this.getCellKey(r, c));
+						return this.cells[r]?.[c] === id && !visitedCells.has(this.getCellKey(r, c));
 					}
 				}
 			);
@@ -185,7 +201,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 */
 	public findRegion(position: TGridPosition, options: TFindRegionMethodOptions = {}): TGridRegion {
 		const {
-			isValidCell = (r, c) => this._cells[r]?.[c] === this._cells[position.row]?.[position.col],
+			isValidCell = (r, c) => this.cells[r]?.[c] === this.cells[position.row]?.[position.col],
 			directions = {}
 		} = options;
 		const {
@@ -298,7 +314,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 * Moves region by overriding target region's cells
 	 */
 	private moveRegionByOverride(currentRegion: TGridRegion, targetRegion: TGridRegion): boolean {
-		const id = this._cells[currentRegion.start.row]?.[currentRegion.start.col] ?? null;
+		const id = this.cells[currentRegion.start.row]?.[currentRegion.start.col] ?? null;
 		this.clearRegion(currentRegion);
 		this.fillRegion(targetRegion, id);
 		return true;
@@ -313,7 +329,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 		expansion: { south?: boolean; east?: boolean } = {}
 	): boolean {
 		const { south = false, east = false } = expansion;
-		const id = this._cells[currentRegion.start.row]?.[currentRegion.start.col] ?? null;
+		const id = this.cells[currentRegion.start.row]?.[currentRegion.start.col] ?? null;
 
 		// Check bounds
 		const maxRow = expansion.south ? Infinity : this.size.rows;
@@ -344,7 +360,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 		// Find first non-null id in target region
 		let occupyingId: GGridCellId | null = null;
 		this.iterateRegion(targetRegion, (row, col) => {
-			const cell = this._cells[row]?.[col];
+			const cell = this.cells[row]?.[col];
 			if (cell != null && id !== cell && occupyingId == null) {
 				occupyingId = cell;
 			}
@@ -359,7 +375,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 		const occupyingRegion = this.findRegion(
 			{ row: targetRegion.start.row, col: targetRegion.start.col },
 			{
-				isValidCell: (r, c) => this._cells[r]?.[c] === occupyingId
+				isValidCell: (r, c) => this.cells[r]?.[c] === occupyingId
 			}
 		);
 
@@ -407,8 +423,8 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 */
 	public clearRegion(region: TGridRegion): void {
 		this.iterateRegion(region, (row, col) => {
-			if (this._cells[row] != null) {
-				this._cells[row][col] = null;
+			if (this.cells[row] != null) {
+				this.cells[row][col] = null;
 			}
 		});
 	}
@@ -425,8 +441,8 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 */
 	public fillRegion(region: TGridRegion, id: GGridCellId | null): void {
 		this.iterateRegion(region, (row, col) => {
-			if (this._cells[row] != null) {
-				this._cells[row][col] = id;
+			if (this.cells[row] != null) {
+				this.cells[row][col] = id;
 			}
 		});
 	}
@@ -466,7 +482,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 * grid.toString() // 'A -\n- B'
 	 */
 	public toString(): string {
-		return this._cells
+		return this.cells
 			.map((row) => row.map((cell) => (cell == null ? '-' : cell)).join(' '))
 			.join('\n');
 	}

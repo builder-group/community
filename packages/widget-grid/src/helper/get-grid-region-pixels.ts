@@ -1,7 +1,8 @@
-import { TDimensions, TWidgetRegion, TWidgetRegionPixels } from '../types';
+import { TDimensions, TWidgetRegionPixels } from '../types';
+import { TGridRegion } from './grid';
 
-export function getWidgetRegionPixels(
-	region: TWidgetRegion,
+export function getGridRegionPixels(
+	region: TGridRegion,
 	cellSize: TDimensions
 ): TWidgetRegionPixels {
 	return {

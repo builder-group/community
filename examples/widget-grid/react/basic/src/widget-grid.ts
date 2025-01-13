@@ -23,7 +23,7 @@ const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
 			{
 				label: 'Shuffle',
 				action: (widgetGrid) => {
-					widgetGrid.grid.set([
+					widgetGrid.grid.cellsState.set([
 						['3', '3', '5', '1'],
 						['3', '3', '5', '1'],
 						['2', '2', '4', '4']
@@ -33,7 +33,7 @@ const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
 			{
 				label: 'Reset',
 				action: (widgetGrid) => {
-					widgetGrid.grid.set(initalGrid);
+					widgetGrid.grid.cellsState.set(initalGrid);
 				}
 			}
 		]
@@ -83,7 +83,7 @@ const createPerformancePreset = (cols = 50, rows = 50): TWidgetGridPreset<TPerfo
 		return { grid, widgets };
 	}
 
-	function shuffleGrid(grid: string[][]): string[][] {
+	function shuffleCells(grid: (string | null)[][]): (string | null)[][] {
 		// Flatten the grid into a single array
 		const flatGrid = grid.flat();
 
@@ -96,7 +96,7 @@ const createPerformancePreset = (cols = 50, rows = 50): TWidgetGridPreset<TPerfo
 		// Reconstruct the 2D array
 		const rows = grid.length;
 		const cols = grid[0].length;
-		const shuffledGrid: string[][] = [];
+		const shuffledGrid: (string | null)[][] = [];
 
 		for (let i = 0; i < rows; i++) {
 			shuffledGrid.push(flatGrid.slice(i * cols, (i + 1) * cols));
@@ -117,7 +117,7 @@ const createPerformancePreset = (cols = 50, rows = 50): TWidgetGridPreset<TPerfo
 			{
 				label: 'Shuffle',
 				action: (widgetGrid) => {
-					widgetGrid.grid.set((grid) => shuffleGrid(grid));
+					widgetGrid.grid.cellsState.set((grid) => shuffleCells(grid));
 				}
 			}
 		]

@@ -1,6 +1,6 @@
 import { useFeatureState } from 'feature-react/state';
 import React from 'react';
-import { getWidgetRegionPixels, TWidget, TWidgetBaseContent, TWidgetGrid } from 'widget-grid';
+import { getGridRegionPixels, TWidget, TWidgetBaseContent, TWidgetGrid } from 'widget-grid';
 import { useRenderCount } from '../hooks';
 
 export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
@@ -112,7 +112,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 				}
 
 				// Apply initial position based on prev region
-				const regionPixels = region != null ? getWidgetRegionPixels(region, cellSize) : null;
+				const regionPixels = region != null ? getGridRegionPixels(region, cellSize) : null;
 				Object.assign(element.style, {
 					position: 'absolute',
 					width: `${regionPixels?.width}px`,
@@ -125,7 +125,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 				element.offsetHeight;
 
 				// Enable transition and move to new position
-				const nextRegionPixels = getWidgetRegionPixels(nextRegion, cellSize);
+				const nextRegionPixels = getGridRegionPixels(nextRegion, cellSize);
 				Object.assign(element.style, {
 					position: 'absolute',
 					width: `${nextRegionPixels.width}px`,

@@ -1,11 +1,6 @@
 import { notEmpty } from '@blgc/utils';
 import { createState } from 'feature-state';
-import {
-	getGridSize,
-	getWidgetRegionPixels,
-	getWidgetRegions,
-	pointerEventToViewportPoint
-} from './helper';
+import { getGridRegionPixels, Grid, pointerEventToViewportPoint, TGridRegion } from './helper';
 import {
 	TBaseWidget,
 	TBoundingRect,
@@ -14,7 +9,6 @@ import {
 	TWidget,
 	TWidgetBaseContent,
 	TWidgetId,
-	TWidgetRegion,
 	TXYPosition,
 	type TWidgetGrid
 } from './types';
@@ -22,26 +16,28 @@ import {
 export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 	config: TCreateWidgetGridConfig<GContent>
 ): TWidgetGrid<GContent, []> {
-	const { widgets: baseWidgets, grid, cellSize } = config;
+	const { widgets: baseWidgets, grid: gridCells, cellSize } = config;
+
+	const grid = new Grid(gridCells);
 
 	// Create a map for O(1) lookup of regions by widget ID
-	const regions = getWidgetRegions(grid);
+	const regions = grid.getRegions();
 	const regionsByWidgetId = regions.reduce(
 		(acc, region) => {
-			acc[region.widgetId] = {
+			acc[region.id] = {
 				start: region.start,
 				dimension: region.dimension
 			};
 			return acc;
 		},
-		{} as Record<TWidgetId, TWidgetRegion>
+		{} as Record<TWidgetId, TGridRegion>
 	);
 
 	// Convert base widgets to full widgets with regions in one pass
 	const widgets = baseWidgets.reduce(
 		(acc, baseWidget) => {
 			const region = regionsByWidgetId[baseWidget.id] ?? null;
-			const regionPixels = region != null ? getWidgetRegionPixels(region, cellSize) : null;
+			const regionPixels = region != null ? getGridRegionPixels(region, cellSize) : null;
 			const widget = {
 				id: baseWidget.id,
 				content: createState(baseWidget.content as GContent),
@@ -76,14 +72,14 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		_features: [],
 		_widgets: widgets,
 		_selected: createState<TWidgetId[]>([]),
-		grid: createState(config.grid),
-		size: createState(getGridSize(config.grid)),
+		grid,
+		size: createState(grid.size),
 		interactionMode: createState<TInteractionMode>({ type: 'None' }),
 		cellSize: createState(cellSize),
 		boundingRect: createState<TBoundingRect>({ left: 0, top: 0 }),
 		getWidgetAt(row, col) {
-			const widgetId = this.grid._v[row]?.[col];
-			return widgetId != null ? (this._widgets[widgetId] ?? null) : null;
+			const id = this.grid.getCellAt(row, col);
+			return id != null ? (this._widgets[id] ?? null) : null;
 		},
 		getWidgetById(id) {
 			return this._widgets[id] ?? null;
@@ -92,7 +88,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 			return this._selected._v.map((id) => this._widgets[id]).filter(notEmpty);
 		},
 		getWidgetRegions() {
-			return getWidgetRegions(this.grid._v);
+			return this.grid.getRegions();
 		},
 		select(widgetIds: TWidgetId[], toggle = false) {
 			if (!toggle) {
@@ -127,11 +123,11 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 
 	// TODO: Should I work with side effects? Or update e.g. region, position, size, etc. more directly?
 
-	widgetGrid.grid.listen(
+	widgetGrid.grid.cellsState.listen(
 		({ value, ...additionalData }) => {
-			const newRegions = getWidgetRegions(value as string[][]);
+			const newRegions = grid.getRegions();
 			newRegions.forEach((region) => {
-				const widget = widgetGrid._widgets[region.widgetId];
+				const widget = widgetGrid._widgets[region.id];
 				if (
 					widget != null &&
 					(widget.region._v?.start.row !== region.start.row ||
@@ -146,7 +142,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 						},
 						{ additionalData: { ...additionalData, source: 'update-widget-regions' } }
 					);
-					const regionPixels = getWidgetRegionPixels(region, cellSize);
+					const regionPixels = getGridRegionPixels(region, cellSize);
 					widget.position.set(
 						{ x: regionPixels.x, y: regionPixels.y },
 						{ additionalData: { ...additionalData, source: 'update-widget-regions' } }
@@ -161,9 +157,9 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		{ key: 'update-widget-regions' }
 	);
 
-	widgetGrid.grid.listen(
-		({ value }) => {
-			const newSize = getGridSize(value as string[][]);
+	widgetGrid.grid.cellsState.listen(
+		() => {
+			const newSize = grid.size;
 			if (
 				newSize.rows !== widgetGrid.size._v.rows ||
 				newSize.columns !== widgetGrid.size._v.columns
@@ -211,7 +207,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 				for (const widget of widgetGrid.getSelectedWidgets()) {
 					const region = widget.region._v;
 					if (region != null) {
-						const regionPixels = getWidgetRegionPixels(region, cellSize);
+						const regionPixels = getGridRegionPixels(region, cellSize);
 						widget.position.set({
 							x: regionPixels.x,
 							y: regionPixels.y

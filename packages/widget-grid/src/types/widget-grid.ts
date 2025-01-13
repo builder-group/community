@@ -1,7 +1,8 @@
 import { TFeatureDefinition, TWithFeatures } from '@blgc/types/features';
 import { TState } from 'feature-state';
+import { Grid, TGridRegion, TGridSize } from '../helper';
 import { TBoundingRect, TDimensions, TXYPosition } from './utils';
-import { TGridPosition, TWidget, TWidgetBaseContent, TWidgetId, TWidgetRegion } from './widget';
+import { TWidget, TWidgetBaseContent, TWidgetId } from './widget';
 
 export type TWidgetGrid<
 	GContent extends TWidgetBaseContent,
@@ -13,7 +14,7 @@ export type TWidgetGrid<
 		// List of currently selected widget IDs
 		_selected: TState<TWidgetId[], []>;
 		// 2D array representing the grid layout
-		grid: TState<string[][], []>;
+		grid: Grid<TWidgetId>;
 		size: TState<TGridSize, []>;
 		// Mode for user interaction (e.g. Translating, Pressing, etc.)
 		interactionMode: TState<TInteractionMode, []>;
@@ -24,7 +25,7 @@ export type TWidgetGrid<
 		getWidgetAt: (row: number, col: number) => TWidget<GContent> | null;
 		getWidgetById: (id: string) => TWidget<GContent> | null;
 		getSelectedWidgets: () => TWidget<GContent>[];
-		getWidgetRegions: () => TWidgetRegion[];
+		getWidgetRegions: () => TGridRegion[];
 		select: (widgetIds: string[], toggle?: boolean) => void;
 		unselect: () => void;
 		pointerEventToViewportPoint: (pointerEvent: {
@@ -66,14 +67,4 @@ export interface TInteractionModeResizing {
 
 export interface TInteractionModeEditing {
 	type: 'Editing';
-}
-
-export interface TGridRange {
-	start: TGridPosition;
-	end: TGridPosition;
-}
-
-export interface TGridSize {
-	rows: number;
-	columns: number;
 }
