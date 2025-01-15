@@ -2,8 +2,8 @@
 
 ### Strategies
 
-#### 1. Drop-Replace Strategy
-A basic drag-and-drop strategy - place the region wherever it's dropped and leave an empty space behind.
+#### 1. Override Strategy
+Place the region wherever it's moved, override the target region, and leave an empty space behind.
 
 **Rules:**
 1. Region is placed directly at the target position, regardless of what's there
@@ -57,7 +57,7 @@ An advanced strategy that combines swapping with a gravitational pull toward the
 ### Movement Examples
 
 #### **Example 1: Move A from [0, 0] to [1, 0]**
-*Strategy:* `drop-replace`
+*Strategy:* `override`
 ```js
 [A, B, C]  ->  [-, A, C]
 [D, E, F]      [D, E, F]
@@ -71,7 +71,7 @@ An advanced strategy that combines swapping with a gravitational pull toward the
 ```
 
 #### **Example 2: Move A from [0, 0] to [2, 0]**
-*Strategy:* `drop-replace`
+*Strategy:* `override`
 ```js
 [A, B, C]  ->  [-, C, A]
 [D, E, F]      [D, E, F]
@@ -85,7 +85,7 @@ An advanced strategy that combines swapping with a gravitational pull toward the
 ```
 
 #### **Example 3: Move A from [0, 0] to [0, 1]**
-*Strategy:* `drop-replace`
+*Strategy:* `override`
 ```js
 [A, B, C]  ->  [-, B, C]
 [D, E, F]      [A, E, F]
@@ -99,7 +99,7 @@ An advanced strategy that combines swapping with a gravitational pull toward the
 ```
 
 #### **Example 4: Move A from [0, 0] to [0, 2]**
-*Strategy:* `drop-replace`
+*Strategy:* `override`
 ```js
 [A, B, C]  ->  [-, B, C]
 [D, E, F]      [G, E, F]
@@ -113,7 +113,7 @@ An advanced strategy that combines swapping with a gravitational pull toward the
 ```
 
 #### **Example 5: Move A from [0, 0] to [1, 1]**
-*Strategy:* `drop-replace`
+*Strategy:* `override`
 ```js
 [A, B, C]  ->  [-, B, C]
 [D, E, F]      [D, A, F]
@@ -135,7 +135,7 @@ An advanced strategy that combines swapping with a gravitational pull toward the
 ```
 
 #### **Example 6: Move A from [0, 0] to [2, 2]**
-*Strategy:* `drop-replace`
+*Strategy:* `override`
 ```js
 [A, B, C]  ->  [-, B, C]
 [D, E, F]      [D, E, F]
@@ -159,7 +159,7 @@ An advanced strategy that combines swapping with a gravitational pull toward the
 ### 8x 1x1 & 1x 1x2 Widget Grid Examples
 
 #### **Example 1: Move A from [0, 0] to [1, 0]**
-*Strategy:* `drop-replace`
+*Strategy:* `override`
 ```js
 [A, B, C]  ->  [-, A, C]
 [A, D, E]      [-, A, E]
@@ -173,7 +173,7 @@ An advanced strategy that combines swapping with a gravitational pull toward the
 ```
 
 #### **Example 2: Move A from [0, 0] to [2, 0]**
-*Strategy:* `drop-replace`
+*Strategy:* `override`
 ```js
 [A, B, C]  ->  [-, C, A]
 [A, D, E]      [-, E, A]
@@ -187,7 +187,7 @@ An advanced strategy that combines swapping with a gravitational pull toward the
 ```
 
 #### **Example 3: Move A from [0, 0] to [0, 1]**
-*Strategy:* `drop-replace`
+*Strategy:* `override`
 ```js
 [A, B, C]  ->  [-, B, C]
 [A, D, E]      [A, D, E]
@@ -201,7 +201,7 @@ An advanced strategy that combines swapping with a gravitational pull toward the
 ```
 
 #### **Example 4: Move A from [0, 0] to [0, 2]**
-*Strategy:* `drop-replace`
+*Strategy:* `override`
 ```js
 [A, B, C]  ->  [-, B, C]
 [A, D, E]      [-, D, E]

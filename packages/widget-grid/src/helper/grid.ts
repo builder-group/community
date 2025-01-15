@@ -293,6 +293,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 *   { strategy: 'Rearrange', expansion: { south: true, east: true } }
 	 * )
 	 */
+	// TODO: We targetRegion should be position?
 	public moveRegion(
 		currentRegion: TGridRegion,
 		targetRegion: TGridRegion,
@@ -305,6 +306,8 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 				return this.moveRegionByOverride(currentRegion, targetRegion);
 			case 'Rearrange':
 				return this.moveRegionByRearrange(currentRegion, targetRegion, expansion);
+			case 'SwapCascade':
+				return this.moveRegionBySwapCascade(currentRegion, targetRegion);
 			default:
 				return false;
 		}
@@ -318,6 +321,56 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 		this.clearRegion(currentRegion);
 		this.fillRegion(targetRegion, id);
 		return true;
+	}
+
+	private moveRegionBySwapCascade(currentRegion: TGridRegion, targetRegion: TGridRegion): boolean {
+		const id = this.cells[currentRegion.start.row]?.[currentRegion.start.col] ?? null;
+		const updatedRegions: TGridRegion[] = [];
+
+		// Find all regions that occupy the target region
+		const occupyingRegions: TGridRegionWithId<GGridCellId>[] = [];
+		this.iterateRegion(targetRegion, (row, col) => {
+			const cell = this.cells[row]?.[col];
+			if (cell != null && id !== cell && !occupyingRegions.some((r) => r.id === cell)) {
+				const occupyingRegion = this.findRegion(
+					{ row, col },
+					{
+						isValidCell: (r, c) => this.cells[r]?.[c] === cell
+					}
+				);
+				occupyingRegions.push({
+					id: cell,
+					...occupyingRegion
+				});
+			}
+		});
+
+		// Swap regions if they have the same dimensions
+		const boundingOccupyingRegion = this.getBoundingRegion(occupyingRegions);
+		if (
+			boundingOccupyingRegion?.dimension.width === currentRegion.dimension.width &&
+			boundingOccupyingRegion?.dimension.height === currentRegion.dimension.height
+		) {
+			const offset = this.getOffset(targetRegion.start, currentRegion.start);
+			for (const occupyingRegion of occupyingRegions) {
+				this.fillRegion(
+					{
+						start: {
+							row: occupyingRegion.start.row + offset.row,
+							col: occupyingRegion.start.col + offset.col
+						},
+						dimension: occupyingRegion.dimension
+					},
+					occupyingRegion.id
+				);
+			}
+			this.fillRegion(targetRegion, id);
+			return true;
+		}
+
+		// TODO: What if not same dimensions
+
+		return false;
 	}
 
 	/**
@@ -448,6 +501,48 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	}
 
 	/**
+	 * Returns the smallest region that contains all input regions
+	 * @example
+	 * const regions = [
+	 *   { start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } },
+	 *   { start: { row: 1, col: 1 }, dimension: { width: 2, height: 2 } }
+	 * ];
+	 * grid.getBoundingRegion(regions)
+	 * // Returns: {
+	 * //   start: { row: 0, col: 0 },
+	 * //   dimension: { width: 3, height: 3 }
+	 * // }
+	 */
+	public getBoundingRegion(regions: TGridRegion[]): TGridRegion | null {
+		if (regions.length === 0) {
+			return null;
+		}
+
+		let minRow = Infinity;
+		let minCol = Infinity;
+		let maxRow = -Infinity;
+		let maxCol = -Infinity;
+
+		for (const region of regions) {
+			minRow = Math.min(minRow, region.start.row);
+			minCol = Math.min(minCol, region.start.col);
+			maxRow = Math.max(maxRow, region.start.row + region.dimension.height);
+			maxCol = Math.max(maxCol, region.start.col + region.dimension.width);
+		}
+
+		return {
+			start: {
+				row: minRow,
+				col: minCol
+			},
+			dimension: {
+				width: maxCol - minCol,
+				height: maxRow - minRow
+			}
+		};
+	}
+
+	/**
 	 * Iterates over each cell in the specified region
 	 * @example
 	 * grid.iterateRegion(
@@ -473,6 +568,20 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 				callback(row, col);
 			}
 		}
+	}
+
+	/**
+	 * Calculates the offset vector from one position to another
+	 * @example
+	 * const pos1 = { row: 1, col: 1 };
+	 * const pos2 = { row: 3, col: 0 };
+	 * grid.getOffset(pos1, pos2) // Returns { row: 2, col: -1 } (2 steps down, 1 step left)
+	 */
+	public getOffset(from: TGridPosition, to: TGridPosition): TGridPosition {
+		return {
+			row: to.row - from.row,
+			col: to.col - from.col
+		};
 	}
 
 	/**
@@ -548,7 +657,7 @@ interface TFindRegionMethodOptions {
 }
 
 interface TMoveRegionMethodOptions {
-	strategy?: 'Override' | 'Rearrange';
+	strategy?: 'Override' | 'Rearrange' | 'SwapCascade';
 	expansion?: {
 		south?: boolean;
 		east?: boolean;

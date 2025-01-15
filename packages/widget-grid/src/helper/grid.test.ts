@@ -250,6 +250,48 @@ describe('Grid class', () => {
 		});
 	});
 
+	describe('getBoundingRegion', () => {
+		it('should return null for empty regions array', () => {
+			const grid = new Grid();
+			expect(grid.getBoundingRegion([])).toBeNull();
+		});
+
+		it('should return the same region for single region input', () => {
+			const grid = new Grid();
+			const region = {
+				start: { row: 1, col: 1 },
+				dimension: { width: 2, height: 2 }
+			};
+			expect(grid.getBoundingRegion([region])).toEqual(region);
+		});
+
+		it('should return correct bounding region for multiple regions', () => {
+			const grid = new Grid();
+			const regions = [
+				{ start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } },
+				{ start: { row: 1, col: 1 }, dimension: { width: 2, height: 2 } }
+			];
+
+			expect(grid.getBoundingRegion(regions)).toEqual({
+				start: { row: 0, col: 0 },
+				dimension: { width: 3, height: 3 }
+			});
+		});
+
+		it('should handle overlapping regions', () => {
+			const grid = new Grid();
+			const regions = [
+				{ start: { row: 0, col: 0 }, dimension: { width: 3, height: 3 } },
+				{ start: { row: 1, col: 1 }, dimension: { width: 3, height: 3 } }
+			];
+
+			expect(grid.getBoundingRegion(regions)).toEqual({
+				start: { row: 0, col: 0 },
+				dimension: { width: 4, height: 4 }
+			});
+		});
+	});
+
 	describe('moveRegion', () => {
 		describe('override strategy (default)', () => {
 			it('should move content to a new region', () => {
@@ -498,6 +540,94 @@ describe('Grid class', () => {
 						[null, null, null]
 					]);
 				});
+			});
+		});
+
+		describe('swap-cascade strategy', () => {
+			it('should swap 1x1 regions', () => {
+				const grid = new Grid([
+					['A', 'B', 'C'],
+					['D', 'E', 'F'],
+					['G', 'H', 'I']
+				]);
+
+				const result = grid.moveRegion(
+					{
+						start: { row: 0, col: 0 },
+						dimension: { width: 1, height: 1 }
+					},
+					{
+						start: { row: 0, col: 1 },
+						dimension: { width: 1, height: 1 }
+					},
+					{ strategy: 'SwapCascade' }
+				);
+
+				expect(result).toBe(true);
+				expect(grid.cells).toEqual([
+					['B', 'A', 'C'],
+					['D', 'E', 'F'],
+					['G', 'H', 'I']
+				]);
+			});
+
+			it('should swap 1x2 region with two 1x1 regions', () => {
+				const grid = new Grid([
+					['A', 'B', 'C'],
+					['A', 'D', 'E'],
+					['F', 'G', 'H']
+				]);
+
+				const result = grid.moveRegion(
+					{
+						start: { row: 0, col: 0 },
+						dimension: { width: 1, height: 2 }
+					},
+					{
+						start: { row: 0, col: 1 },
+						dimension: { width: 1, height: 2 }
+					},
+					{ strategy: 'SwapCascade' }
+				);
+
+				expect(result).toBe(true);
+				expect(grid.cells).toEqual([
+					['B', 'A', 'C'],
+					['D', 'A', 'E'],
+					['F', 'G', 'H']
+				]);
+			});
+
+			it('todo', () => {
+				const grid = new Grid([
+					['A', 'B', 'C'],
+					['A', 'B', 'D'],
+					['E', 'F', 'G']
+				]);
+
+				const result = grid.moveRegion(
+					{
+						start: { row: 0, col: 0 },
+						dimension: { width: 1, height: 2 }
+					},
+					{
+						start: { row: 1, col: 1 },
+						dimension: { width: 1, height: 2 }
+					},
+					{ strategy: 'SwapCascade' }
+				);
+
+				expect(result).toBe(true);
+				// B - C  // B moves left, leaving a gap
+				// B A D  // A goes to target
+				// E A G  // A continues down
+				// - F -  // F gets pushed down
+				expect(grid.cells).toEqual([
+					['B', null, 'C'],
+					['B', 'A', 'D'],
+					['E', 'A', 'G'],
+					[null, 'F', null]
+				]);
 			});
 		});
 	});
@@ -800,6 +930,28 @@ describe('Grid class', () => {
 					dimension: { width: 2, height: 2 }
 				});
 			});
+		});
+	});
+
+	describe('getOffset', () => {
+		it('should return zero offset for same position', () => {
+			const grid = new Grid();
+			const pos = { row: 1, col: 1 };
+			expect(grid.getOffset(pos, pos)).toEqual({ row: 0, col: 0 });
+		});
+
+		it('should calculate positive offsets', () => {
+			const grid = new Grid();
+			const from = { row: 1, col: 1 };
+			const to = { row: 3, col: 4 };
+			expect(grid.getOffset(from, to)).toEqual({ row: 2, col: 3 });
+		});
+
+		it('should calculate negative offsets', () => {
+			const grid = new Grid();
+			const from = { row: 3, col: 3 };
+			const to = { row: 1, col: 0 };
+			expect(grid.getOffset(from, to)).toEqual({ row: -2, col: -3 });
 		});
 	});
 });
