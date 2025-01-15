@@ -292,343 +292,172 @@ describe('Grid class', () => {
 		});
 	});
 
-	describe('moveRegion', () => {
-		describe('override strategy (default)', () => {
-			it('should move content to a new region', () => {
-				const grid = new Grid([
-					['A', 'A', null],
-					[null, null, null],
-					[null, null, null]
-				]);
+	describe('moveRegionByOverride', () => {
+		it('should move content to a new region', () => {
+			const grid = new Grid([
+				['A', 'A', null],
+				[null, null, null],
+				[null, null, null]
+			]);
 
-				const result = grid.moveRegion(
-					{
-						start: { row: 0, col: 0 },
-						dimension: { width: 2, height: 1 }
-					},
-					{
-						start: { row: 1, col: 0 },
-						dimension: { width: 2, height: 1 }
-					}
-				);
+			const result = grid.moveRegionByOverride(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { width: 2, height: 1 }
+				},
+				{ row: 1, col: 0 }
+			);
 
-				expect(result).toBe(true);
-				expect(grid.cells).toEqual([
-					[null, null, null],
-					['A', 'A', null],
-					[null, null, null]
-				]);
-			});
-
-			it('should override existing content in target region', () => {
-				const grid = new Grid([
-					['A', 'A', null],
-					['B', 'B', null],
-					[null, null, null]
-				]);
-
-				const result = grid.moveRegion(
-					{
-						start: { row: 0, col: 0 },
-						dimension: { width: 2, height: 1 }
-					},
-					{
-						start: { row: 1, col: 0 },
-						dimension: { width: 2, height: 1 }
-					}
-				);
-
-				expect(result).toBe(true);
-				expect(grid.cells).toEqual([
-					[null, null, null],
-					['A', 'A', null],
-					[null, null, null]
-				]);
-			});
+			expect(result).toBe(true);
+			expect(grid.cells).toEqual([
+				[null, null, null],
+				['A', 'A', null],
+				[null, null, null]
+			]);
 		});
 
-		describe('rearrange strategy', () => {
-			it('should move content to empty region', () => {
-				const grid = new Grid([
-					['A', 'A', null],
-					[null, null, null],
-					[null, null, null]
-				]);
+		it('should override existing content in target region', () => {
+			const grid = new Grid([
+				['A', 'A', null],
+				['B', 'B', null],
+				[null, null, null]
+			]);
 
-				const result = grid.moveRegion(
-					{
-						start: { row: 0, col: 0 },
-						dimension: { width: 2, height: 1 }
-					},
-					{
-						start: { row: 1, col: 0 },
-						dimension: { width: 2, height: 1 }
-					},
-					{ strategy: 'Rearrange' }
-				);
+			const result = grid.moveRegionByOverride(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { width: 2, height: 1 }
+				},
+				{ row: 1, col: 0 }
+			);
 
-				expect(result).toBe(true);
-				expect(grid.cells).toEqual([
-					[null, null, null],
-					['A', 'A', null],
-					[null, null, null]
-				]);
-			});
-
-			it('should swap content with occupied region', () => {
-				const grid = new Grid([
-					['A', 'A', null],
-					['B', null, null],
-					[null, null, null]
-				]);
-
-				const result = grid.moveRegion(
-					{
-						start: { row: 0, col: 0 },
-						dimension: { width: 2, height: 1 }
-					},
-					{
-						start: { row: 1, col: 0 },
-						dimension: { width: 2, height: 1 }
-					},
-					{ strategy: 'Rearrange' }
-				);
-
-				expect(result).toBe(true);
-				expect(grid.cells).toEqual([
-					['B', null, null],
-					['A', 'A', null],
-					[null, null, null]
-				]);
-			});
-
-			// it('should handle multiple affected regions', () => {
-			// 	const grid = new Grid([
-			// 		['A', 'A', null],
-			// 		['B', 'C', null],
-			// 		[null, null, null]
-			// 	]);
-
-			// 	const result = grid.moveRegion(
-			// 		{
-			// 			start: { row: 0, col: 0 },
-			// 			dimension: { width: 2, height: 1 }
-			// 		},
-			// 		{
-			// 			start: { row: 1, col: 0 },
-			// 			dimension: { width: 2, height: 1 }
-			// 		},
-			// 		{ strategy: 'Rearrange' }
-			// 	);
-
-			// 	expect(result).toBe(true);
-			// 	expect(grid.cells).toEqual([
-			// 		['B', 'C', null],
-			// 		['A', 'A', null],
-			// 		[null, null, null]
-			// 	]);
-			// });
-
-			describe('expansion', () => {
-				it('should expand south when allowed', () => {
-					const grid = new Grid([
-						['A', 'A', null],
-						[null, null, null]
-					]);
-
-					const result = grid.moveRegion(
-						{
-							start: { row: 0, col: 0 },
-							dimension: { width: 2, height: 1 }
-						},
-						{
-							start: { row: 2, col: 0 },
-							dimension: { width: 2, height: 1 }
-						},
-						{
-							strategy: 'Rearrange',
-							expansion: { south: true }
-						}
-					);
-
-					expect(result).toBe(true);
-					expect(grid.cells).toEqual([
-						[null, null, null],
-						[null, null, null],
-						['A', 'A', null]
-					]);
-				});
-
-				it('should expand east when allowed', () => {
-					const grid = new Grid([
-						['A', 'A'],
-						[null, null]
-					]);
-
-					const result = grid.moveRegion(
-						{
-							start: { row: 0, col: 0 },
-							dimension: { width: 2, height: 1 }
-						},
-						{
-							start: { row: 0, col: 1 },
-							dimension: { width: 2, height: 1 }
-						},
-						{
-							strategy: 'Rearrange',
-							expansion: { east: true }
-						}
-					);
-
-					expect(result).toBe(true);
-					expect(grid.cells).toEqual([
-						[null, 'A', 'A'],
-						[null, null, null]
-					]);
-				});
-
-				it('should handle both south and east expansion', () => {
-					const grid = new Grid([
-						['A', 'A'],
-						[null, null]
-					]);
-
-					const result = grid.moveRegion(
-						{
-							start: { row: 0, col: 0 },
-							dimension: { width: 2, height: 1 }
-						},
-						{
-							start: { row: 2, col: 2 },
-							dimension: { width: 2, height: 1 }
-						},
-						{
-							strategy: 'Rearrange',
-							expansion: { south: true, east: true }
-						}
-					);
-
-					expect(result).toBe(true);
-					expect(grid.cells).toEqual([
-						[null, null, null, null],
-						[null, null, null, null],
-						[null, null, 'A', 'A']
-					]);
-				});
-
-				it('should not allow expansion beyond grid bounds if not enabled', () => {
-					const grid = new Grid([
-						['A', 'A', null],
-						[null, null, null]
-					]);
-
-					const result = grid.moveRegion(
-						{
-							start: { row: 0, col: 0 },
-							dimension: { width: 2, height: 1 }
-						},
-						{
-							start: { row: 2, col: 0 },
-							dimension: { width: 2, height: 1 }
-						},
-						{ strategy: 'Rearrange' }
-					);
-
-					expect(result).toBe(false);
-					expect(grid.cells).toEqual([
-						['A', 'A', null],
-						[null, null, null]
-					]);
-				});
-			});
+			expect(result).toBe(true);
+			expect(grid.cells).toEqual([
+				[null, null, null],
+				['A', 'A', null],
+				[null, null, null]
+			]);
 		});
 
-		describe('swap-cascade strategy', () => {
-			it('should swap 1x1 regions', () => {
-				const grid = new Grid([
-					['A', 'B', 'C'],
-					['D', 'E', 'F'],
-					['G', 'H', 'I']
-				]);
+		it('should not override existing content in target region if override is false', () => {
+			const grid = new Grid([
+				['A', 'A', null],
+				['B', 'B', null],
+				[null, null, null]
+			]);
 
-				const result = grid.moveRegion(
-					{
-						start: { row: 0, col: 0 },
-						dimension: { width: 1, height: 1 }
-					},
-					{
-						start: { row: 0, col: 1 },
-						dimension: { width: 1, height: 1 }
-					},
-					{ strategy: 'SwapCascade' }
-				);
+			const result = grid.moveRegionByOverride(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { width: 2, height: 1 }
+				},
+				{ row: 1, col: 0 },
+				{ override: false }
+			);
 
-				expect(result).toBe(true);
-				expect(grid.cells).toEqual([
-					['B', 'A', 'C'],
-					['D', 'E', 'F'],
-					['G', 'H', 'I']
-				]);
-			});
+			expect(result).toBe(false);
+			expect(grid.cells).toEqual([
+				['A', 'A', null],
+				['B', 'B', null],
+				[null, null, null]
+			]);
+		});
+	});
 
-			it('should swap 1x2 region with two 1x1 regions', () => {
-				const grid = new Grid([
-					['A', 'B', 'C'],
-					['A', 'D', 'E'],
-					['F', 'G', 'H']
-				]);
+	describe('moveRegionBySwapCascade', () => {
+		it('should swap 1x1 regions', () => {
+			const grid = new Grid([
+				['A', 'B', 'C'],
+				['D', 'E', 'F'],
+				['G', 'H', 'I']
+			]);
 
-				const result = grid.moveRegion(
-					{
-						start: { row: 0, col: 0 },
-						dimension: { width: 1, height: 2 }
-					},
-					{
-						start: { row: 0, col: 1 },
-						dimension: { width: 1, height: 2 }
-					},
-					{ strategy: 'SwapCascade' }
-				);
+			const result = grid.moveRegionBySwapCascade(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { width: 1, height: 1 }
+				},
+				{ row: 0, col: 1 }
+			);
 
-				expect(result).toBe(true);
-				expect(grid.cells).toEqual([
-					['B', 'A', 'C'],
-					['D', 'A', 'E'],
-					['F', 'G', 'H']
-				]);
-			});
+			expect(result).toBe(true);
+			expect(grid.cells).toEqual([
+				['B', 'A', 'C'],
+				['D', 'E', 'F'],
+				['G', 'H', 'I']
+			]);
+		});
 
-			it('todo', () => {
-				const grid = new Grid([
-					['A', 'B', 'C'],
-					['A', 'B', 'D'],
-					['E', 'F', 'G']
-				]);
+		it('should swap 1x2 region with two 1x1 regions', () => {
+			const grid = new Grid([
+				['A', 'B', 'C'],
+				['A', 'D', 'E'],
+				['F', 'G', 'H']
+			]);
 
-				const result = grid.moveRegion(
-					{
-						start: { row: 0, col: 0 },
-						dimension: { width: 1, height: 2 }
-					},
-					{
-						start: { row: 1, col: 1 },
-						dimension: { width: 1, height: 2 }
-					},
-					{ strategy: 'SwapCascade' }
-				);
+			const result = grid.moveRegionBySwapCascade(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { width: 1, height: 2 }
+				},
+				{ row: 0, col: 1 }
+			);
 
-				expect(result).toBe(true);
-				// B - C  // B moves left, leaving a gap
-				// B A D  // A goes to target
-				// E A G  // A continues down
-				// - F -  // F gets pushed down
-				expect(grid.cells).toEqual([
-					['B', null, 'C'],
-					['B', 'A', 'D'],
-					['E', 'A', 'G'],
-					[null, 'F', null]
-				]);
-			});
+			expect(result).toBe(true);
+			expect(grid.cells).toEqual([
+				['B', 'A', 'C'],
+				['D', 'A', 'E'],
+				['F', 'G', 'H']
+			]);
+		});
+
+		it('should cascade if no swap is possible', () => {
+			const grid = new Grid([
+				['A', 'B', 'C'],
+				['A', 'B', 'D'],
+				['E', 'F', 'G']
+			]);
+
+			const result = grid.moveRegionBySwapCascade(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { width: 1, height: 2 }
+				},
+				{ row: 1, col: 1 }
+			);
+
+			expect(result).toBe(true);
+			expect(grid.cells).toEqual([
+				['B', 'F', 'C'],
+				['B', 'A', 'D'],
+				['E', 'A', 'G']
+			]);
+		});
+
+		it('todo2', () => {
+			const grid = new Grid([
+				['A', 'B', 'B'],
+				['A', 'B', 'B'],
+				['C', 'D', 'E']
+			]);
+
+			const result = grid.moveRegionBySwapCascade(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { width: 1, height: 2 }
+				},
+				{ row: 1, col: 1 }
+			);
+
+			expect(result).toBe(true);
+			expect(grid.cells).toEqual([
+				['D', null, null],
+				['C', 'A', null],
+				[null, 'A', null],
+				[null, 'B', 'B'],
+				[null, 'B', 'B'],
+				[null, null, 'E']
+			]);
 		});
 	});
 
@@ -929,6 +758,248 @@ describe('Grid class', () => {
 					start: { row: 0, col: 0 },
 					dimension: { width: 2, height: 2 }
 				});
+			});
+		});
+	});
+
+	describe('getOccupyingRegions', () => {
+		it('should return empty array for empty region', () => {
+			const grid = new Grid([
+				['A', 'B'],
+				['C', 'D']
+			]);
+			const region = { start: { row: 0, col: 0 }, dimension: { width: 0, height: 0 } };
+			expect(grid.getOccupyingRegions(region)).toEqual([]);
+		});
+
+		it('should return single region when only one region occupies the space', () => {
+			const grid = new Grid([
+				['A', 'A'],
+				['A', 'A']
+			]);
+			const region = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } };
+			const occupying = grid.getOccupyingRegions(region);
+
+			expect(occupying).toHaveLength(1);
+			expect(occupying[0]).toEqual({
+				id: 'A',
+				start: { row: 0, col: 0 },
+				dimension: { width: 2, height: 2 }
+			});
+		});
+
+		it('should return multiple regions when space is occupied by different regions', () => {
+			const grid = new Grid([
+				['A', 'B', 'B'],
+				['A', 'C', 'B'],
+				['D', 'D', 'D']
+			]);
+			const region = { start: { row: 0, col: 1 }, dimension: { width: 2, height: 2 } };
+			const occupying = grid.getOccupyingRegions(region);
+
+			expect(occupying).toHaveLength(2);
+			expect(occupying).toContainEqual({
+				id: 'B',
+				start: { row: 0, col: 1 },
+				dimension: { width: 1, height: 3 }
+			});
+			expect(occupying).toContainEqual({
+				id: 'C',
+				start: { row: 1, col: 1 },
+				dimension: { width: 1, height: 1 }
+			});
+		});
+
+		it('should handle regions at grid boundaries', () => {
+			const grid = new Grid([
+				['A', 'B', 'C'],
+				['A', 'B', 'C']
+			]);
+			const region = { start: { row: 0, col: 2 }, dimension: { width: 1, height: 2 } };
+			const occupying = grid.getOccupyingRegions(region);
+
+			expect(occupying).toHaveLength(1);
+			expect(occupying[0]).toEqual({
+				id: 'C',
+				start: { row: 0, col: 2 },
+				dimension: { width: 1, height: 2 }
+			});
+		});
+
+		it('should handle null cells', () => {
+			const grid = new Grid([
+				['A', null, 'B'],
+				['A', 'C', 'B']
+			]);
+			const region = { start: { row: 0, col: 0 }, dimension: { width: 3, height: 1 } };
+			const occupying = grid.getOccupyingRegions(region);
+
+			expect(occupying).toHaveLength(2);
+			expect(occupying).toContainEqual({
+				id: 'A',
+				start: { row: 0, col: 0 },
+				dimension: { width: 1, height: 2 }
+			});
+			expect(occupying).toContainEqual({
+				id: 'B',
+				start: { row: 0, col: 2 },
+				dimension: { width: 1, height: 2 }
+			});
+		});
+	});
+
+	describe('getComplementaryRegions', () => {
+		it('should return empty array when regions are the same size', () => {
+			const grid = new Grid();
+			const region = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } };
+			expect(grid.getComplementaryRegions(region, region)).toEqual([]);
+		});
+
+		it('should return all surrounding regions for centered placement', () => {
+			const grid = new Grid();
+			const container = { start: { row: 0, col: 0 }, dimension: { width: 3, height: 3 } };
+			const placed = { start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } };
+
+			const complementary = grid.getComplementaryRegions(container, placed);
+
+			expect(complementary).toHaveLength(4); // top, left, right, bottom
+			expect(complementary).toContainEqual({
+				start: { row: 0, col: 0 },
+				dimension: { width: 3, height: 1 }
+			}); // top
+			expect(complementary).toContainEqual({
+				start: { row: 1, col: 0 },
+				dimension: { width: 1, height: 1 }
+			}); // left
+			expect(complementary).toContainEqual({
+				start: { row: 1, col: 2 },
+				dimension: { width: 1, height: 1 }
+			}); // right
+			expect(complementary).toContainEqual({
+				start: { row: 2, col: 0 },
+				dimension: { width: 3, height: 1 }
+			}); // bottom
+		});
+
+		it('should handle placement at edges', () => {
+			const grid = new Grid();
+			const container = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } };
+			const placed = { start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } };
+
+			const complementary = grid.getComplementaryRegions(container, placed);
+
+			expect(complementary).toHaveLength(2); // right and bottom only
+			expect(complementary).toContainEqual({
+				start: { row: 0, col: 1 },
+				dimension: { width: 1, height: 1 }
+			}); // right
+			expect(complementary).toContainEqual({
+				start: { row: 1, col: 0 },
+				dimension: { width: 2, height: 1 }
+			}); // bottom
+		});
+
+		it('should return container region when regions do not overlap', () => {
+			const grid = new Grid();
+			const container = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } };
+			const placed = { start: { row: 3, col: 3 }, dimension: { width: 1, height: 1 } };
+
+			const complementary = grid.getComplementaryRegions(container, placed);
+
+			// When regions don't overlap, the entire container is available space
+			expect(complementary).toEqual([container]);
+		});
+	});
+
+	describe('mergeAdjacentRegions', () => {
+		it('should return empty array for empty input', () => {
+			const grid = new Grid();
+			expect(grid.mergeAdjacentRegions([])).toEqual([]);
+		});
+
+		it('should return same region for single region input', () => {
+			const grid = new Grid();
+			const region = { start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } };
+			expect(grid.mergeAdjacentRegions([region])).toEqual([region]);
+		});
+
+		it('should merge horizontally adjacent regions', () => {
+			const grid = new Grid();
+			const regions = [
+				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } }
+			];
+			expect(grid.mergeAdjacentRegions(regions)).toEqual([
+				{ start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } }
+			]);
+		});
+
+		it('should merge vertically adjacent regions', () => {
+			const grid = new Grid();
+			const regions = [
+				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ start: { row: 1, col: 0 }, dimension: { width: 1, height: 1 } }
+			];
+			expect(grid.mergeAdjacentRegions(regions)).toEqual([
+				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 2 } }
+			]);
+		});
+
+		it('should merge multiple regions in sequence', () => {
+			const grid = new Grid();
+			const regions = [
+				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } },
+				{ start: { row: 0, col: 2 }, dimension: { width: 1, height: 1 } }
+			];
+			expect(grid.mergeAdjacentRegions(regions)).toEqual([
+				{ start: { row: 0, col: 0 }, dimension: { width: 3, height: 1 } }
+			]);
+		});
+
+		it('should not merge non-adjacent regions', () => {
+			const grid = new Grid();
+			const regions = [
+				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ start: { row: 0, col: 2 }, dimension: { width: 1, height: 1 } }
+			];
+			expect(grid.mergeAdjacentRegions(regions)).toEqual(regions);
+		});
+
+		it('should not merge regions with different dimensions', () => {
+			const grid = new Grid();
+			const regions = [
+				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ start: { row: 0, col: 1 }, dimension: { width: 1, height: 2 } }
+			];
+			expect(grid.mergeAdjacentRegions(regions)).toEqual(regions);
+		});
+
+		it('should not mutate input array by default', () => {
+			const grid = new Grid();
+			const regions = [
+				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } }
+			];
+			const originalRegions = [...regions];
+
+			grid.mergeAdjacentRegions(regions);
+			expect(regions).toEqual(originalRegions);
+		});
+
+		it('should mutate input array when mutate option is true', () => {
+			const grid = new Grid();
+			const regions = [
+				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } }
+			];
+
+			const result = grid.mergeAdjacentRegions(regions, { mutate: true });
+			expect(result).toBe(regions); // Same array reference
+			expect(regions).toHaveLength(1); // Array was mutated
+			expect(regions[0]).toEqual({
+				start: { row: 0, col: 0 },
+				dimension: { width: 2, height: 1 }
 			});
 		});
 	});
