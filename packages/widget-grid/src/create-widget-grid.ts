@@ -82,40 +82,45 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 			grid.cellsState.set(cells);
 			this.syncGrid();
 		},
-		syncGrid() {
+		syncGrid(options = {}) {
+			const { size = true, regions = true } = options;
+
 			// Sync regions
-			for (const region of grid.getRegions()) {
-				const widget = widgetGrid._widgets[region.id];
-				if (
-					widget != null &&
-					(widget.region._v?.start.row !== region.start.row ||
-						widget.region._v?.start.col !== region.start.col ||
-						widget.region._v?.dimension.width !== region.dimension.width ||
-						widget.region._v?.dimension.height !== region.dimension.height)
-				) {
-					widget.region.set(
-						{
-							start: region.start,
-							dimension: region.dimension
-						},
-						{ additionalData: { source: 'sync-grid' } }
-					);
-					const regionPixels = getGridRegionPixels(region, cellSize);
-					widget.position.set(
-						{ x: regionPixels.x, y: regionPixels.y },
-						{ additionalData: { source: 'sync-grid' } }
-					);
-					widget.size.set(
-						{ width: regionPixels.width, height: regionPixels.height },
-						{ additionalData: { source: 'sync-grid' } }
-					);
+			if (regions) {
+				for (const region of grid.getRegions()) {
+					const widget = widgetGrid._widgets[region.id];
+					if (
+						widget != null &&
+						(widget.region._v?.start.row !== region.start.row ||
+							widget.region._v?.start.col !== region.start.col ||
+							widget.region._v?.dimension.width !== region.dimension.width ||
+							widget.region._v?.dimension.height !== region.dimension.height)
+					) {
+						widget.region.set(
+							{
+								start: region.start,
+								dimension: region.dimension
+							},
+							{ additionalData: { source: 'sync-grid' } }
+						);
+						const regionPixels = getGridRegionPixels(region, cellSize);
+						widget.position.set(
+							{ x: regionPixels.x, y: regionPixels.y },
+							{ additionalData: { source: 'sync-grid' } }
+						);
+						widget.size.set(
+							{ width: regionPixels.width, height: regionPixels.height },
+							{ additionalData: { source: 'sync-grid' } }
+						);
+					}
 				}
 			}
 
 			// Sync size
 			if (
-				grid.size.rows !== widgetGrid._size._v.rows ||
-				grid.size.columns !== widgetGrid._size._v.columns
+				size &&
+				(grid.size.rows !== widgetGrid._size._v.rows ||
+					grid.size.columns !== widgetGrid._size._v.columns)
 			) {
 				widgetGrid._size.set(grid.size, { additionalData: { source: 'sync-grid' } });
 			}
@@ -139,19 +144,31 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 			if (widgetRegion == null) {
 				return;
 			}
+
 			const affectedRegions = this._grid.cascadeMove(widgetRegion, newPosition);
+			if (affectedRegions.length === 0) {
+				return;
+			}
+
+			this._grid.cellsState._notify();
+
 			for (const region of affectedRegions) {
 				const widget = this.getWidgetById(region.id);
 				if (widget == null) {
 					continue;
 				}
-				widget.region.set(region, {
-					additionalData: {
-						source: 'move-widget',
-						background: region.id === widgetId
-					}
-				});
+				if (region.id !== widgetId) {
+					widget.region.set(region, {
+						additionalData: {
+							source: 'move-widget'
+						}
+					});
+				} else {
+					widget.region._v = region;
+				}
 			}
+
+			this.syncGrid({ regions: false, size: true });
 		},
 
 		setSelected(widgetIds) {

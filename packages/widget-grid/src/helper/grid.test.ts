@@ -177,6 +177,64 @@ describe('Grid class', () => {
 		});
 	});
 
+	describe('trimGrid', () => {
+		it('should remove empty rows from bottom', () => {
+			const grid = new Grid([
+				['A', 'B'],
+				[null, null],
+				[null, null]
+			]);
+
+			const removed = grid.trimGrid();
+
+			expect(grid.cells).toEqual([['A', 'B']]);
+			expect(removed).toBe(2);
+		});
+
+		it('should not remove rows with content', () => {
+			const grid = new Grid([
+				['A', null],
+				[null, 'B'],
+				[null, null]
+			]);
+
+			const removed = grid.trimGrid();
+
+			expect(grid.cells).toEqual([
+				['A', null],
+				[null, 'B']
+			]);
+			expect(removed).toBe(1);
+		});
+
+		it('should keep at least one row', () => {
+			const grid = new Grid([
+				[null, null],
+				[null, null]
+			]);
+
+			const removed = grid.trimGrid();
+
+			expect(grid.cells).toEqual([[null, null]]);
+			expect(removed).toBe(1);
+		});
+
+		it('should do nothing if no empty rows', () => {
+			const grid = new Grid([
+				['A', 'B'],
+				['C', null]
+			]);
+
+			const removed = grid.trimGrid();
+
+			expect(grid.cells).toEqual([
+				['A', 'B'],
+				['C', null]
+			]);
+			expect(removed).toBe(0);
+		});
+	});
+
 	describe('toString', () => {
 		it('should return empty string for empty grid', () => {
 			const grid = new Grid();
@@ -365,7 +423,7 @@ describe('Grid class', () => {
 	});
 
 	describe('cascadeMove', () => {
-		it('should move regions and return affected regions when swapping 1x1 regions', () => {
+		it('should move 1x1 region in east direction and swap with 1x1 region', () => {
 			const grid = new Grid([
 				['A', 'B', 'C'],
 				['D', 'E', 'F'],
@@ -391,7 +449,7 @@ describe('Grid class', () => {
 			]);
 		});
 
-		it('should move regions and return affected regions when swapping 1x2 with two 1x1 regions', () => {
+		it('should move 1x2 region in east direction and swap with two 1x1 regions', () => {
 			const grid = new Grid([
 				['A', 'B', 'C'],
 				['A', 'D', 'E'],
@@ -418,7 +476,59 @@ describe('Grid class', () => {
 			]);
 		});
 
-		it('[1] should move regions and return affected regions when cascading without swap', () => {
+		it('should move 1x2 region in south direction and swap with 1x1 region', () => {
+			const grid = new Grid([
+				['A', 'B', 'C'],
+				['A', 'D', 'E'],
+				['F', 'G', 'H']
+			]);
+
+			const result = grid.cascadeMove(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { width: 1, height: 2 }
+				},
+				{ row: 1, col: 0 }
+			);
+
+			expect(grid.cells).toEqual([
+				['F', 'B', 'C'],
+				['A', 'D', 'E'],
+				['A', 'G', 'H']
+			]);
+			expect(result).toEqual([
+				{ id: 'F', start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
+				{ id: 'A', start: { row: 1, col: 0 }, dimension: { width: 1, height: 2 } }
+			]);
+		});
+
+		it('should move region out of bounds in south direction', () => {
+			const grid = new Grid([
+				['A', null],
+				[null, null]
+			]);
+
+			const result = grid.cascadeMove(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { width: 1, height: 1 }
+				},
+				{ row: 4, col: 0 }
+			);
+
+			expect(grid.cells).toEqual([
+				[null, null],
+				[null, null],
+				[null, null],
+				[null, null],
+				['A', null]
+			]);
+			expect(result).toEqual([
+				{ id: 'A', start: { row: 4, col: 0 }, dimension: { width: 1, height: 1 } }
+			]);
+		});
+
+		it('should move 1x2 region in south east direction and trigger cascade', () => {
 			const grid = new Grid([
 				['A', 'B', 'C'],
 				['A', 'B', 'D'],
@@ -445,7 +555,7 @@ describe('Grid class', () => {
 			]);
 		});
 
-		it('[2] should move regions and return affected regions when cascading without swap', () => {
+		it('should move 1x2 region in south east direction and trigger cascade', () => {
 			const grid = new Grid([
 				['A', 'B', 'B'],
 				['A', 'B', 'B'],

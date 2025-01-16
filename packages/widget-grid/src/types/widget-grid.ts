@@ -24,7 +24,7 @@ export type TWidgetGrid<
 		boundingRect: TState<TBoundingRect, []>;
 
 		setGridCells: (cells: (string | null)[][]) => void;
-		syncGrid: () => void;
+		syncGrid: (options?: { size?: boolean; regions?: boolean }) => void;
 
 		getWidgetAt: (row: number, col: number) => TWidget<GContent> | null;
 		getWidgetById: (id: string) => TWidget<GContent> | null;

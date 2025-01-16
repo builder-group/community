@@ -21,12 +21,17 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 	useListener(widgetGrid._selected, ({ value, source, background }) => {
 		console.log(`[selectedWidgets] s: ${source}${background ? ' b: true' : ''}`, value);
 	});
-	useListener(widgetGrid.getWidgetById('1')?.region, ({ value, source, background }) => {
-		console.log(`[Widget 1 Region] s: ${source}${background ? ' b: true' : ''}`, value);
+	useListener(widgetGrid._grid.cellsState, () => {
+		console.log(widgetGrid._grid.toString());
 	});
-	useListener(widgetGrid.getWidgetById('1')?.position, ({ value, source, background }) => {
-		console.log(`[Widget 1 Position] s: ${source}${background ? ' b: true' : ''}`, value);
+
+	// TODO: REMOVE
+	useListener(widgetGrid.getWidgetById('A')?.region, ({ value, source, background }) => {
+		console.log(`[Widget A Region] s: ${source}${background ? ' b: true' : ''}`, value);
 	});
+	// useListener(widgetGrid.getWidgetById('A')?.position, ({ value, source, background }) => {
+	// 	console.log(`[Widget A Position] s: ${source}${background ? ' b: true' : ''}`, value);
+	// });
 
 	// =========================================================================
 	// Effects

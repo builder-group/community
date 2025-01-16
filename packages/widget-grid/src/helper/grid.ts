@@ -104,6 +104,40 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	}
 
 	/**
+	 * Removes empty rows from the bottom of the grid.
+	 * A row is considered empty if all its cells are null.
+	 * Will not remove rows that contain any non-null cells.
+	 *
+	 * @returns Number of rows removed
+	 *
+	 * @example
+	 * // Before trimming:
+	 * // [['A', 'B'],
+	 * //  [null, null],
+	 * //  [null, null]]
+	 * grid.trimGrid()
+	 * // After trimming:
+	 * // [['A', 'B']]
+	 * // Returns: 2
+	 */
+	public trimGrid(): number {
+		let rowsRemoved = 0;
+
+		// Start from bottom, remove rows until we find non-empty row
+		while (this.cells.length > 1) {
+			// Keep at least one row
+			const lastRow = this.cells[this.cells.length - 1];
+			if (lastRow?.some((cell) => cell !== null)) {
+				break;
+			}
+			this.cells.pop();
+			rowsRemoved++;
+		}
+
+		return rowsRemoved;
+	}
+
+	/**
 	 * Returns all rectangular regions in the grid, optionally within a specified range
 	 * @example
 	 * const grid = new Grid([
@@ -369,8 +403,16 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 			dimension: sourceRegion.dimension
 		};
 
+		// Expand grid if needed
+		this.expandGrid({
+			rows: targetRegion.start.row + targetRegion.dimension.height,
+			strategy: 'Set'
+		});
+
 		// Track regions that need to be moved out of the target region
-		const occupyingRegions = this.getOccupyingRegions(targetRegion);
+		const occupyingRegions = this.getOccupyingRegions(targetRegion).filter(
+			(region) => region.id !== id
+		);
 
 		// 1. Clear source region and track freed region
 		this.clearRegion(sourceRegion);
@@ -562,6 +604,9 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 				}
 			}
 		}
+
+		// Remove empty rows from the bottom of the grid
+		this.trimGrid();
 
 		return affectedRegions;
 	}

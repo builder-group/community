@@ -2,20 +2,23 @@ import { createWidgetGrid, TBaseWidget, TWidgetBaseContent, TWidgetGrid } from '
 
 const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
 	const initalGrid = [
-		['1', '1', '2', '3'],
-		['1', '1', '2', '3'],
-		['-', '5', '4', '4']
+		['A', 'B', 'C'],
+		['A', 'D', 'E'],
+		['F', 'G', 'H']
 	];
 
 	return {
 		grid: createWidgetGrid<TPlaygroundContent>({
 			grid: initalGrid,
 			widgets: [
-				{ id: '1', content: { type: 'item1' } },
-				{ id: '2', content: { type: 'item2' } },
-				{ id: '3', content: { type: 'item3' } },
-				{ id: '4', content: { type: 'item2' } },
-				{ id: '5', content: { type: 'item1' } }
+				{ id: 'A', content: { type: 'item1' } },
+				{ id: 'B', content: { type: 'item2' } },
+				{ id: 'C', content: { type: 'item3' } },
+				{ id: 'D', content: { type: 'item2' } },
+				{ id: 'E', content: { type: 'item1' } },
+				{ id: 'F', content: { type: 'item2' } },
+				{ id: 'G', content: { type: 'item3' } },
+				{ id: 'H', content: { type: 'item2' } }
 			],
 			cellSize: { width: 96, height: 96 }
 		}),
@@ -24,9 +27,9 @@ const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
 				label: 'Shuffle',
 				action: (widgetGrid) => {
 					widgetGrid.setGridCells([
-						['3', '3', '5', '1'],
-						['3', '3', '5', '1'],
-						['2', '2', '4', '4']
+						['B', 'B', 'C'],
+						['G', 'D', 'E'],
+						['H', 'A', 'F']
 					]);
 				}
 			},
