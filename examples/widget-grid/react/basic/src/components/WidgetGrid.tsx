@@ -1,4 +1,4 @@
-import { useFeatureState } from 'feature-react/state';
+import { useFeatureState, useListener } from 'feature-react/state';
 import React from 'react';
 import { TWidgetBaseContent, TWidgetGrid } from 'widget-grid';
 import { useBoundingRectObserver } from '../hooks';
@@ -8,11 +8,25 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 	props: TWidgetGridProps<GContent>
 ) => {
 	const { widgetGrid, renderItem } = props;
-	const { rows, columns } = useFeatureState(widgetGrid.size);
+	const { rows, columns } = useFeatureState(widgetGrid._size);
 	const { width: cellWidth, height: cellHeight } = useFeatureState(widgetGrid.cellSize);
 	const widgetGridRef = React.useRef<HTMLDivElement>(null);
 
 	useBoundingRectObserver(widgetGridRef, widgetGrid.boundingRect);
+
+	// TODO: REMOVE
+	useListener(widgetGrid.interactionMode, ({ value, source, background }) => {
+		console.log(`[interactionMode] s: ${source}${background ? ' b: true' : ''}`, value);
+	});
+	useListener(widgetGrid._selected, ({ value, source, background }) => {
+		console.log(`[selectedWidgets] s: ${source}${background ? ' b: true' : ''}`, value);
+	});
+	useListener(widgetGrid.getWidgetById('1')?.region, ({ value, source, background }) => {
+		console.log(`[Widget 1 Region] s: ${source}${background ? ' b: true' : ''}`, value);
+	});
+	useListener(widgetGrid.getWidgetById('1')?.position, ({ value, source, background }) => {
+		console.log(`[Widget 1 Position] s: ${source}${background ? ' b: true' : ''}`, value);
+	});
 
 	// =========================================================================
 	// Effects
@@ -31,10 +45,13 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 					const deltaY = cursorPosition.y - currentPosition.y;
 
 					for (const widget of widgetGrid.getSelectedWidgets()) {
-						widget.position.set((n) => ({
-							x: (n?.x ?? 0) + deltaX,
-							y: (n?.y ?? 0) + deltaY
-						}));
+						widget.position.set(
+							(n) => ({
+								x: (n?.x ?? 0) + deltaX,
+								y: (n?.y ?? 0) + deltaY
+							}),
+							{ additionalData: { source: 'translate' } }
+						);
 
 						const pos = widget.position._v;
 						const region = widget.region._v;
@@ -45,10 +62,10 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 						const newCol = Math.round(pos.x / cellWidth);
 						const newRow = Math.round(pos.y / cellHeight);
 						if (newCol !== region.start.col || newRow !== region.start.row) {
-							region.start = {
+							widgetGrid.moveWidget(widget.id, {
 								col: newCol,
 								row: newRow
-							};
+							});
 						}
 					}
 

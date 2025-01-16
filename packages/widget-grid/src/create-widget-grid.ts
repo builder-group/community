@@ -72,13 +72,57 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		_features: [],
 		_widgets: widgets,
 		_selected: createState<TWidgetId[]>([]),
-		grid,
-		size: createState(grid.size),
+		_grid: grid,
+		_size: createState(grid.size),
 		interactionMode: createState<TInteractionMode>({ type: 'None' }),
 		cellSize: createState(cellSize),
 		boundingRect: createState<TBoundingRect>({ left: 0, top: 0 }),
+
+		setGridCells(cells) {
+			grid.cellsState.set(cells);
+			this.syncGrid();
+		},
+		syncGrid() {
+			// Sync regions
+			for (const region of grid.getRegions()) {
+				const widget = widgetGrid._widgets[region.id];
+				if (
+					widget != null &&
+					(widget.region._v?.start.row !== region.start.row ||
+						widget.region._v?.start.col !== region.start.col ||
+						widget.region._v?.dimension.width !== region.dimension.width ||
+						widget.region._v?.dimension.height !== region.dimension.height)
+				) {
+					widget.region.set(
+						{
+							start: region.start,
+							dimension: region.dimension
+						},
+						{ additionalData: { source: 'sync-grid' } }
+					);
+					const regionPixels = getGridRegionPixels(region, cellSize);
+					widget.position.set(
+						{ x: regionPixels.x, y: regionPixels.y },
+						{ additionalData: { source: 'sync-grid' } }
+					);
+					widget.size.set(
+						{ width: regionPixels.width, height: regionPixels.height },
+						{ additionalData: { source: 'sync-grid' } }
+					);
+				}
+			}
+
+			// Sync size
+			if (
+				grid.size.rows !== widgetGrid._size._v.rows ||
+				grid.size.columns !== widgetGrid._size._v.columns
+			) {
+				widgetGrid._size.set(grid.size, { additionalData: { source: 'sync-grid' } });
+			}
+		},
+
 		getWidgetAt(row, col) {
-			const id = this.grid.getCellAt(row, col);
+			const id = this._grid.getCellAt(row, col);
 			return id != null ? (this._widgets[id] ?? null) : null;
 		},
 		getWidgetById(id) {
@@ -88,11 +132,39 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 			return this._selected._v.map((id) => this._widgets[id]).filter(notEmpty);
 		},
 		getWidgetRegions() {
-			return this.grid.getRegions();
+			return this._grid.getRegions();
+		},
+		moveWidget(widgetId, newPosition) {
+			const widgetRegion = this.getWidgetById(widgetId)?.region._v;
+			if (widgetRegion == null) {
+				return;
+			}
+			const affectedRegions = this._grid.cascadeMove(widgetRegion, newPosition);
+			for (const region of affectedRegions) {
+				const widget = this.getWidgetById(region.id);
+				if (widget == null) {
+					continue;
+				}
+				widget.region.set(region, {
+					additionalData: {
+						source: 'move-widget',
+						background: region.id === widgetId
+					}
+				});
+			}
+		},
+
+		setSelected(widgetIds) {
+			const prevValue = this._selected._v;
+			this._selected.set(widgetIds);
+			this.syncSelected(prevValue);
+		},
+		getSelected() {
+			return this._selected._v;
 		},
 		select(widgetIds: TWidgetId[], toggle = false) {
 			if (!toggle) {
-				this._selected.set(widgetIds);
+				this.setSelected(widgetIds);
 				return;
 			}
 
@@ -111,95 +183,43 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 				}
 			});
 
-			this._selected.set(newSelection);
+			this.setSelected(newSelection);
 		},
 		unselect() {
-			this._selected.set([]);
+			this.setSelected([]);
 		},
-		pointerEventToViewportPoint(pointerEvent) {
-			return pointerEventToViewportPoint(pointerEvent, this.boundingRect._v);
-		}
-	};
-
-	// TODO: Should I work with side effects? Or update e.g. region, position, size, etc. more directly?
-
-	widgetGrid.grid.cellsState.listen(
-		({ value, ...additionalData }) => {
-			const newRegions = grid.getRegions();
-			newRegions.forEach((region) => {
-				const widget = widgetGrid._widgets[region.id];
-				if (
-					widget != null &&
-					(widget.region._v?.start.row !== region.start.row ||
-						widget.region._v?.start.col !== region.start.col ||
-						widget.region._v?.dimension.width !== region.dimension.width ||
-						widget.region._v?.dimension.height !== region.dimension.height)
-				) {
-					widget.region.set(
-						{
-							start: region.start,
-							dimension: region.dimension
-						},
-						{ additionalData: { ...additionalData, source: 'update-widget-regions' } }
-					);
-					const regionPixels = getGridRegionPixels(region, cellSize);
-					widget.position.set(
-						{ x: regionPixels.x, y: regionPixels.y },
-						{ additionalData: { ...additionalData, source: 'update-widget-regions' } }
-					);
-					widget.size.set(
-						{ width: regionPixels.width, height: regionPixels.height },
-						{ additionalData: { ...additionalData, source: 'update-widget-regions' } }
-					);
-				}
-			});
-		},
-		{ key: 'update-widget-regions' }
-	);
-
-	widgetGrid.grid.cellsState.listen(
-		() => {
-			const newSize = grid.size;
-			if (
-				newSize.rows !== widgetGrid.size._v.rows ||
-				newSize.columns !== widgetGrid.size._v.columns
-			) {
-				widgetGrid.size.set(newSize, { additionalData: { source: 'update-grid-size' } });
-			}
-		},
-		{ key: 'update-grid-size' }
-	);
-
-	widgetGrid._selected.listen(
-		({ value, prevValue }) => {
+		syncSelected(prevValue) {
 			// Unselect widgets that were removed from selection
 			prevValue?.forEach((widgetId) => {
-				if (!value.includes(widgetId)) {
+				if (!this._selected._v.includes(widgetId)) {
 					const widget = widgetGrid._widgets[widgetId];
 					if (widget != null) {
 						widget.isSelected.set(false, {
-							additionalData: { source: 'update-selected-widgets' }
+							additionalData: { source: 'sync-selected' }
 						});
 					}
 				}
 			});
 
 			// Select newly added widgets
-			value.forEach((widgetId) => {
+			this._selected._v.forEach((widgetId) => {
 				if (!prevValue?.includes(widgetId)) {
 					const widget = widgetGrid._widgets[widgetId];
 					if (widget != null) {
 						widget.isSelected.set(true, {
-							additionalData: { source: 'update-selected-widgets' }
+							additionalData: { source: 'sync-selected' }
 						});
 					}
 				}
 			});
 		},
-		{
-			key: 'update-selected-widgets'
+
+		pointerEventToViewportPoint(pointerEvent) {
+			return pointerEventToViewportPoint(pointerEvent, this.boundingRect._v);
 		}
-	);
+	};
+
+	// TODO: Should I work with side effects? Or update e.g. region, position, size, etc. more directly?
 
 	widgetGrid.interactionMode.listen(
 		({ value }) => {

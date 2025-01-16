@@ -23,7 +23,7 @@ const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
 			{
 				label: 'Shuffle',
 				action: (widgetGrid) => {
-					widgetGrid.grid.cellsState.set([
+					widgetGrid.setGridCells([
 						['3', '3', '5', '1'],
 						['3', '3', '5', '1'],
 						['2', '2', '4', '4']
@@ -33,7 +33,7 @@ const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
 			{
 				label: 'Reset',
 				action: (widgetGrid) => {
-					widgetGrid.grid.cellsState.set(initalGrid);
+					widgetGrid.setGridCells(initalGrid);
 				}
 			}
 		]
@@ -117,7 +117,7 @@ const createPerformancePreset = (cols = 50, rows = 50): TWidgetGridPreset<TPerfo
 			{
 				label: 'Shuffle',
 				action: (widgetGrid) => {
-					widgetGrid.grid.cellsState.set((grid) => shuffleCells(grid));
+					widgetGrid.setGridCells(shuffleCells(widgetGrid._grid.cells));
 				}
 			}
 		]

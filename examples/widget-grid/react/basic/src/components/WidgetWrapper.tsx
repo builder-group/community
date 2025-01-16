@@ -100,7 +100,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 	React.useEffect(() => {
 		const unbind = widget.region.listen(
 			({ value: nextRegion }) => {
-				const isLargeGrid = widgetGrid.size._v.columns * widgetGrid.size._v.rows > 500;
+				const isLargeGrid = widgetGrid._size._v.columns * widgetGrid._size._v.rows > 500;
 				if (isLargeGrid || nextRegion == null) {
 					setRegion(nextRegion);
 					return;

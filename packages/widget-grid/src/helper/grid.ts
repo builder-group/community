@@ -1,5 +1,6 @@
 import { createState, TState } from 'feature-state';
 
+// TODO: Make feature object? e.g. to expand with custom move strategies, ..
 export class Grid<GGridCellId extends TGridCellId = string> {
 	private _cells: TState<(GGridCellId | null)[][], []>; // TODO: Make this a state? We need to listen on changes and a state is basically a value with listeners..
 	private _config: TGridConfig;
