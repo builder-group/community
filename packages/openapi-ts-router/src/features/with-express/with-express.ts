@@ -24,6 +24,7 @@ export function withExpress<GPaths extends object, GFeatures extends TFeatureDef
 				formatPath(path),
 				parseParamsMiddleware(config),
 				validationMiddleware(config),
+				...(config.middlewares ?? []),
 				requestHandler(config.handler as express.RequestHandler)
 			);
 		},
@@ -32,6 +33,7 @@ export function withExpress<GPaths extends object, GFeatures extends TFeatureDef
 				formatPath(path),
 				parseParamsMiddleware(config),
 				validationMiddleware(config),
+				...(config.middlewares ?? []),
 				requestHandler(config.handler as express.RequestHandler)
 			);
 		},
@@ -40,6 +42,7 @@ export function withExpress<GPaths extends object, GFeatures extends TFeatureDef
 				formatPath(path),
 				parseParamsMiddleware(config),
 				validationMiddleware(config),
+				...(config.middlewares ?? []),
 				requestHandler(config.handler as express.RequestHandler)
 			);
 		},
@@ -48,6 +51,7 @@ export function withExpress<GPaths extends object, GFeatures extends TFeatureDef
 				formatPath(path),
 				parseParamsMiddleware(config),
 				validationMiddleware(config),
+				...(config.middlewares ?? []),
 				requestHandler(config.handler as express.RequestHandler)
 			);
 		},
@@ -56,6 +60,7 @@ export function withExpress<GPaths extends object, GFeatures extends TFeatureDef
 				formatPath(path),
 				parseParamsMiddleware(config),
 				validationMiddleware(config),
+				...(config.middlewares ?? []),
 				requestHandler(config.handler as express.RequestHandler)
 			);
 		}
