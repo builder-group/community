@@ -1,5 +1,11 @@
 # feature-react
 
+## 0.0.35
+
+### Patch Changes
+
+- fixed types
+
 ## 0.0.33
 
 ### Patch Changes

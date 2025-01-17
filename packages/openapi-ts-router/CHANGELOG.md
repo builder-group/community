@@ -1,5 +1,17 @@
 # openapi-ts-router
 
+## 0.2.0
+
+### Minor Changes
+
+- [#96](https://github.com/builder-group/community/pull/96) [`65cf8bf`](https://github.com/builder-group/community/commit/65cf8bfa8235a82dc83cd1ded87528d5521ad526) Thanks [@marcandrews](https://github.com/marcandrews)! - adds middleware support to Express router
+
+## 0.1.3
+
+### Patch Changes
+
+- fixed types
+
 ## 0.1.2
 
 ### Patch Changes

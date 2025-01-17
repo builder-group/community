@@ -1,6 +1,6 @@
 {
 	"name": "feature-react",
-	"version": "0.0.33",
+	"version": "0.0.35",
 	"private": false,
 	"description": "ReactJs extension features for feature-state",
 	"keywords": [],
@@ -54,10 +54,12 @@
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest"
 	},
+	"dependencies": {
+		"@blgc/types": "workspace:*",
+		"@blgc/utils": "workspace:*"
+	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@blgc/types": "workspace:*",
-		"@blgc/utils": "workspace:*",
 		"@types/node": "^22.10.2",
 		"@types/react": "^19.0.2",
 		"feature-form": "workspace:*",

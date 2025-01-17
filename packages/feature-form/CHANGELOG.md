@@ -1,5 +1,14 @@
 # feature-form
 
+## 0.0.35
+
+### Patch Changes
+
+- fixed types
+
+- Updated dependencies []:
+  - feature-state@0.0.40
+
 ## 0.0.33
 
 ### Patch Changes

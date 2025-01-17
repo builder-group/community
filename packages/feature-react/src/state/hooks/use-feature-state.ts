@@ -14,7 +14,7 @@ export function useFeatureState<GValue, GFeatures extends TFeatureDefinition[]>(
 					forceRender();
 				}
 			},
-			{ key: 'use-global-state' }
+			{ key: 'use-feature-state' }
 		);
 
 		return () => {

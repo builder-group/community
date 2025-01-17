@@ -90,3 +90,22 @@ To switch between modes:
 
 - Development: `pnpm build` (includes declaration maps)
 - Production: `pnpm build:prod` (excludes declaration maps)
+
+### Why is `@blgc/types` listed as a dependency instead of a devDependency?
+
+The `@blgc/types` package provides crucial TypeScript type definitions to ensure full type safety for feature-based libraries. When listed as a `devDependency`, these types are excluded from the final NPM package, resulting in broken type checks and missing autocompletions in projects consuming these libraries. By adding it as a `dependency`, we ensure that the type definitions are bundled and accessible to downstream projects, maintaining a seamless developer experience.
+
+### Why do we use the "wrapper pattern" (`withLogger(withStorage(withUndo(createState(0))))`) instead of a declarative API?
+
+While declarative APIs like the following offer [better developer experience (DX)](https://www.reddit.com/r/reactjs/comments/1huxvci/i_built_a_bloated_state_manager_then_i_fixed_it/):
+
+```ts
+createState({
+	defaultValue: 0,
+	features: [withUndo(), withStorage(), withLogger()]
+});
+```
+
+We currently use the "wrapper pattern" because it ensures better TypeScript type inference. Each wrapper function modifies the state's type in a specific sequence, which is harder to achieve reliably with a feature array.
+
+We're [actively exploring solutions](https://github.com/builder-group/community/blob/develop/packages/feature-state/src/_experimental) to support both patterns, combining the type safety of the wrapper pattern with the simplicity of declarative APIs. Contributions and ideas are always welcome :)

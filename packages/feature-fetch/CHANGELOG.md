@@ -1,5 +1,11 @@
 # feature-fetch
 
+## 0.0.35
+
+### Patch Changes
+
+- fixed types
+
 ## 0.0.34
 
 ### Patch Changes

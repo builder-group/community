@@ -1,6 +1,6 @@
 {
 	"name": "feature-state",
-	"version": "0.0.38",
+	"version": "0.0.40",
 	"private": false,
 	"description": "Straightforward, typesafe, and feature-based state management library for ReactJs",
 	"keywords": [],
@@ -35,11 +35,11 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
+		"@blgc/types": "workspace:*",
 		"@blgc/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@blgc/types": "workspace:*",
 		"@types/node": "^22.10.2"
 	},
 	"size-limit": [
