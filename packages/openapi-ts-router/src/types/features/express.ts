@@ -101,8 +101,8 @@ export type TOpenApiExpressResponse<GPathOperation> = express.Response<
 // =============================================================================
 
 export type TOpenApiExpressRouteConfig<GPathOperation> = {
-	middlewares?: Array<express.RequestHandler>;
 	handler: TOpenApiExpressRequestHandler<GPathOperation>;
+	middlewares?: TOpenApiExpressRequestHandler<GPathOperation>[];
 } & TOpenApiExpressValidators<GPathOperation> &
 	TOpenApiExpressParamsParserOptions;
 

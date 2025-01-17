@@ -24,7 +24,7 @@ export function withExpress<GPaths extends object, GFeatures extends TFeatureDef
 				formatPath(path),
 				parseParamsMiddleware(config),
 				validationMiddleware(config),
-				...(config.middlewares ?? []),
+				...((config.middlewares as express.RequestHandler[]) ?? []),
 				requestHandler(config.handler as express.RequestHandler)
 			);
 		},
@@ -33,7 +33,7 @@ export function withExpress<GPaths extends object, GFeatures extends TFeatureDef
 				formatPath(path),
 				parseParamsMiddleware(config),
 				validationMiddleware(config),
-				...(config.middlewares ?? []),
+				...((config.middlewares as express.RequestHandler[]) ?? []),
 				requestHandler(config.handler as express.RequestHandler)
 			);
 		},
@@ -42,7 +42,7 @@ export function withExpress<GPaths extends object, GFeatures extends TFeatureDef
 				formatPath(path),
 				parseParamsMiddleware(config),
 				validationMiddleware(config),
-				...(config.middlewares ?? []),
+				...((config.middlewares as express.RequestHandler[]) ?? []),
 				requestHandler(config.handler as express.RequestHandler)
 			);
 		},
@@ -51,7 +51,7 @@ export function withExpress<GPaths extends object, GFeatures extends TFeatureDef
 				formatPath(path),
 				parseParamsMiddleware(config),
 				validationMiddleware(config),
-				...(config.middlewares ?? []),
+				...((config.middlewares as express.RequestHandler[]) ?? []),
 				requestHandler(config.handler as express.RequestHandler)
 			);
 		},
@@ -60,7 +60,7 @@ export function withExpress<GPaths extends object, GFeatures extends TFeatureDef
 				formatPath(path),
 				parseParamsMiddleware(config),
 				validationMiddleware(config),
-				...(config.middlewares ?? []),
+				...((config.middlewares as express.RequestHandler[]) ?? []),
 				requestHandler(config.handler as express.RequestHandler)
 			);
 		}
@@ -92,8 +92,11 @@ function parseParamsMiddleware(
 			// as primitive type instead of string.
 			// See: https://expressjs.com/en/5x/api.html#req.query
 			//      https://github.com/ljharb/qs/issues/91
-			req.query = parseQueryParams(req.query, parseQueryParamsBlacklist) as TParams;
-			req.params = parsePathParams(req.params, parsePathParamsBlacklist) as ParamsDictionary;
+			req.query = parseQueryParams(req.query as TParams, parseQueryParamsBlacklist) as TParams;
+			req.params = parsePathParams(
+				req.params as TParams,
+				parsePathParamsBlacklist
+			) as ParamsDictionary;
 
 			next();
 		};
