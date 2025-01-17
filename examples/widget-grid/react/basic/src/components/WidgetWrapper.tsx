@@ -104,7 +104,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 				return;
 			}
 
-			const isLargeGrid = widgetGrid._size._v.columns * widgetGrid._size._v.rows > 500;
+			const isLargeGrid = widgetGrid._size._v.cols * widgetGrid._size._v.rows > 500;
 			if (isLargeGrid || nextRegion == null || isMoved) {
 				setRegion(nextRegion);
 				return;
@@ -145,7 +145,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 				element.style.height = '';
 				element.style.transform = '';
 				element.style.transition = '';
-				element.style.gridArea = `${nextRegion.start.row + 1} / ${nextRegion.start.col + 1} / span ${nextRegion.dimension.height} / span ${nextRegion.dimension.width}`; // To avoid flickering to current region
+				element.style.gridArea = `${nextRegion.start.row + 1} / ${nextRegion.start.col + 1} / span ${nextRegion.dimension.rows} / span ${nextRegion.dimension.cols}`; // To avoid flickering to current region
 				setRegion(nextRegion); // Update region after animation
 				element.removeEventListener('transitionend', handleTransitionEnd);
 			};
@@ -173,7 +173,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 				layoutMode === 'Grid'
 					? {
 							position: 'relative',
-							gridArea: `${region.start.row + 1} / ${region.start.col + 1} / span ${region.dimension.height} / span ${region.dimension.width}`
+							gridArea: `${region.start.row + 1} / ${region.start.col + 1} / span ${region.dimension.rows} / span ${region.dimension.cols}`
 						}
 					: {
 							position: 'absolute',

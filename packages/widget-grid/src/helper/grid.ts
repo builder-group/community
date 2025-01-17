@@ -25,12 +25,12 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	/**
 	 * Current dimensions of the grid
 	 * @example
-	 * const { rows, columns } = grid.size // { rows: 2, columns: 3 }
+	 * const { rows, cols } = grid.size // { rows: 2, cols: 3 }
 	 */
-	public get size(): TGridSize {
+	public get size(): TGridDimensions {
 		return {
 			rows: this.cells.length,
-			columns: this.cells[0]?.length ?? 0
+			cols: this.cells[0]?.length ?? 0
 		};
 	}
 
@@ -68,13 +68,13 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 * Expands the grid using the specified strategy and dimensions
 	 * @example
 	 * // Set exact grid size (won't shrink)
-	 * grid.expandGrid({ strategy: 'set', rows: 5, columns: 4 })
+	 * grid.expandGrid({ strategy: 'set', rows: 5, cols: 4 })
 	 *
 	 * // Expand grid by adding dimensions
-	 * grid.expandGrid({ strategy: 'add', rows: 2, columns: 1 })
+	 * grid.expandGrid({ strategy: 'add', rows: 2, cols: 1 })
 	 */
 	public expandGrid(options: TExpandGridMethodOptions = {}): void {
-		const { strategy = 'Set', rows = 0, columns = 0 } = options;
+		const { strategy = 'Set', rows = 0, cols = 0 } = options;
 
 		let targetRows: number;
 		let targetColumns: number;
@@ -82,17 +82,17 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 		switch (strategy) {
 			case 'Add':
 				targetRows = this.size.rows + rows;
-				targetColumns = this.size.columns + columns;
+				targetColumns = this.size.cols + cols;
 				break;
 			case 'Set':
 			default:
 				targetRows = Math.max(this.size.rows, rows);
-				targetColumns = Math.max(this.size.columns, columns);
+				targetColumns = Math.max(this.size.cols, cols);
 		}
 
 		// Add rows
 		while (this.cells.length < targetRows) {
-			this.cells.push(new Array(this.size.columns).fill(null));
+			this.cells.push(new Array(this.size.cols).fill(null));
 		}
 
 		// Add columns
@@ -154,15 +154,15 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 * // ]
 	 */
 	public getRegions(range?: TGridRange): TGridRegionWithId<GGridCellId>[] {
-		const { rows, columns } = this.size;
-		if (rows === 0 || columns === 0) {
+		const { rows, cols } = this.size;
+		if (rows === 0 || cols === 0) {
 			return [];
 		}
 
 		// Use provided range or full grid
 		const computeRange = range ?? {
 			start: { row: 0, col: 0 },
-			end: { row: rows, col: columns }
+			end: { row: rows, col: cols }
 		};
 
 		const visitedCells = new Set<string>();
@@ -263,7 +263,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 		// Expand right until invalid or grid boundary
 		if (rightDirection) {
 			while (
-				position.col + right + 1 < this.size.columns &&
+				position.col + right + 1 < this.size.cols &&
 				isValidCell(position.row, position.col + right + 1)
 			) {
 				right++;
@@ -306,8 +306,8 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 				col: position.col - left
 			},
 			dimension: {
-				width: left + right + 1,
-				height: up + down + 1
+				cols: left + right + 1,
+				rows: up + down + 1
 			}
 		};
 	}
@@ -394,7 +394,12 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	): TGridRegionWithId<GGridCellId>[] {
 		const affectedRegions: TGridRegionWithId<GGridCellId>[] = [];
 		const id = this.cells[sourceRegion.start.row]?.[sourceRegion.start.col] ?? null;
-		if (id == null || targetPosition.col >= this.size.columns) {
+		if (id == null) {
+			return [];
+		}
+
+		// Don't allow placing regions outside the grid in north, south and west direction
+		if (targetPosition.col < 0 || targetPosition.col >= this.size.cols || targetPosition.row < 0) {
 			return [];
 		}
 
@@ -405,7 +410,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 
 		// Expand grid if needed
 		this.expandGrid({
-			rows: targetRegion.start.row + targetRegion.dimension.height,
+			rows: targetRegion.start.row + targetRegion.dimension.rows,
 			strategy: 'Set'
 		});
 
@@ -435,8 +440,8 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 						});
 						// Must fit within the freed region
 						const fitsSpace =
-							region.dimension.width <= freedRegion.dimension.width &&
-							region.dimension.height <= freedRegion.dimension.height;
+							region.dimension.cols <= freedRegion.dimension.cols &&
+							region.dimension.rows <= freedRegion.dimension.rows;
 
 						return isAdjacent && fitsSpace;
 					})
@@ -500,21 +505,21 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 			const boundingRegion = this.getBoundingRegion(occupyingRegions);
 			if (boundingRegion != null) {
 				const moveDownBy =
-					targetRegion.start.row + targetRegion.dimension.height - boundingRegion.start.row;
+					targetRegion.start.row + targetRegion.dimension.rows - boundingRegion.start.row;
 				const regionsToMove = this.getOccupyingRegions({
 					start: {
 						row: boundingRegion.start.row,
 						col: boundingRegion.start.col
 					},
 					dimension: {
-						width: boundingRegion.dimension.width,
-						height: this.size.rows - boundingRegion.start.row
+						cols: boundingRegion.dimension.cols,
+						rows: this.size.rows - boundingRegion.start.row
 					}
 				});
 
 				// Expand grid if needed
 				const maxRowNeeded = Math.max(
-					...regionsToMove.map((region) => region.start.row + region.dimension.height + moveDownBy)
+					...regionsToMove.map((region) => region.start.row + region.dimension.rows + moveDownBy)
 				);
 				if (maxRowNeeded > this.size.rows) {
 					this.expandGrid({ rows: maxRowNeeded, strategy: 'Set' });
@@ -551,12 +556,12 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 				// Find all regions below this freed space that could potentially move up
 				const regionsBelow = this.getOccupyingRegions({
 					start: {
-						row: freedRegion.start.row + freedRegion.dimension.height,
+						row: freedRegion.start.row + freedRegion.dimension.rows,
 						col: freedRegion.start.col
 					},
 					dimension: {
-						width: freedRegion.dimension.width,
-						height: this.size.rows - (freedRegion.start.row + freedRegion.dimension.height)
+						cols: freedRegion.dimension.cols,
+						rows: this.size.rows - (freedRegion.start.row + freedRegion.dimension.rows)
 					}
 				}).filter((region) => !this.doRegionsOverlap(region, targetRegion));
 
@@ -567,13 +572,13 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 						(region) =>
 							// Region must fit within the freed region width
 							region.start.col >= freedRegion.start.col &&
-							region.start.col + region.dimension.width <=
-								freedRegion.start.col + freedRegion.dimension.width &&
+							region.start.col + region.dimension.cols <=
+								freedRegion.start.col + freedRegion.dimension.cols &&
 							// Moving up shouldn't create overlap with target region
 							!this.doRegionsOverlap(
 								{
 									start: {
-										row: region.start.row - freedRegion.dimension.height,
+										row: region.start.row - freedRegion.dimension.rows,
 										col: region.start.col
 									},
 									dimension: region.dimension
@@ -583,7 +588,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 					);
 
 				if (canMoveUp) {
-					const moveUpBy = freedRegion.dimension.height;
+					const moveUpBy = freedRegion.dimension.rows;
 					// Move regions up from top to bottom to maintain relative positions
 					regionsBelow
 						.sort((a, b) => a.start.row - b.start.row)
@@ -614,10 +619,10 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 
 	public doRegionsOverlap(region1: TGridRegion, region2: TGridRegion): boolean {
 		return !(
-			region1.start.row + region1.dimension.height <= region2.start.row ||
-			region1.start.row >= region2.start.row + region2.dimension.height ||
-			region1.start.col + region1.dimension.width <= region2.start.col ||
-			region1.start.col >= region2.start.col + region2.dimension.width
+			region1.start.row + region1.dimension.rows <= region2.start.row ||
+			region1.start.row >= region2.start.row + region2.dimension.rows ||
+			region1.start.col + region1.dimension.cols <= region2.start.col ||
+			region1.start.col >= region2.start.col + region2.dimension.cols
 		);
 	}
 
@@ -636,18 +641,33 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 		options: { maxGap?: number; includeDiagonal?: boolean } = {}
 	): boolean {
 		const { maxGap = 0, includeDiagonal = true } = options;
-		const maxDistance = maxGap + 1; // Use distance instead of gap to distinguish diagonal from orthogonal neighbors, as gap is 0 for all direct neighbors
+		const maxDistance = maxGap + 1;
 
-		// Compute the horizontal and vertical distance between the regions
-		const horizontalDistance = Math.max(
-			0,
-			Math.abs(region2.start.col - (region1.start.col + region1.dimension.width - 1))
-		);
-		const verticalDistance = Math.max(
-			0,
-			Math.abs(region2.start.row - (region1.start.row + region1.dimension.height - 1))
-		);
+		// Calculate horizontal overlap and distance
+		const r1Left = region1.start.col;
+		const r1Right = region1.start.col + region1.dimension.cols - 1;
+		const r2Left = region2.start.col;
+		const r2Right = region2.start.col + region2.dimension.cols - 1;
 
+		const sharesHorizontalSpace = !(r1Right < r2Left || r2Right < r1Left);
+		const horizontalDistance = sharesHorizontalSpace
+			? 0
+			: Math.min(Math.abs(r1Left - r2Right), Math.abs(r2Left - r1Right));
+
+		// Calculate vertical overlap and distance
+		const r1Top = region1.start.row;
+		const r1Bottom = region1.start.row + region1.dimension.rows - 1;
+		const r2Top = region2.start.row;
+		const r2Bottom = region2.start.row + region2.dimension.rows - 1;
+
+		const sharesVerticalSpace = !(r1Bottom < r2Top || r2Bottom < r1Top);
+		const verticalDistance = sharesVerticalSpace
+			? 0
+			: Math.min(Math.abs(r1Top - r2Bottom), Math.abs(r2Top - r1Bottom));
+
+		// Regions are adjacent if:
+		// 1. They are within maxDistance in both directions
+		// 2. If includeDiagonal is false, the distances must be different
 		return (
 			horizontalDistance <= maxDistance &&
 			verticalDistance <= maxDistance &&
@@ -737,8 +757,8 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 		for (const region of regions) {
 			minRow = Math.min(minRow, region.start.row);
 			minCol = Math.min(minCol, region.start.col);
-			maxRow = Math.max(maxRow, region.start.row + region.dimension.height);
-			maxCol = Math.max(maxCol, region.start.col + region.dimension.width);
+			maxRow = Math.max(maxRow, region.start.row + region.dimension.rows);
+			maxCol = Math.max(maxCol, region.start.col + region.dimension.cols);
 		}
 
 		return {
@@ -747,8 +767,8 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 				col: minCol
 			},
 			dimension: {
-				width: maxCol - minCol,
-				height: maxRow - minRow
+				cols: maxCol - minCol,
+				rows: maxRow - minRow
 			}
 		};
 	}
@@ -814,10 +834,10 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	public getComplementaryRegions(container: TGridRegion, placed: TGridRegion): TGridRegion[] {
 		// Check if regions overlap at all
 		if (
-			placed.start.row >= container.start.row + container.dimension.height ||
-			placed.start.row + placed.dimension.height <= container.start.row ||
-			placed.start.col >= container.start.col + container.dimension.width ||
-			placed.start.col + placed.dimension.width <= container.start.col
+			placed.start.row >= container.start.row + container.dimension.rows ||
+			placed.start.row + placed.dimension.rows <= container.start.row ||
+			placed.start.col >= container.start.col + container.dimension.cols ||
+			placed.start.col + placed.dimension.cols <= container.start.col
 		) {
 			// If no overlap, return the entire container as available space
 			return [container];
@@ -830,8 +850,8 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 			complementary.push({
 				start: container.start,
 				dimension: {
-					width: container.dimension.width,
-					height: placed.start.row - container.start.row
+					cols: container.dimension.cols,
+					rows: placed.start.row - container.start.row
 				}
 			});
 		}
@@ -844,15 +864,15 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 					col: container.start.col
 				},
 				dimension: {
-					width: placed.start.col - container.start.col,
-					height: placed.dimension.height
+					cols: placed.start.col - container.start.col,
+					rows: placed.dimension.rows
 				}
 			});
 		}
 
 		// Right region (if exists)
-		const placedEndCol = placed.start.col + placed.dimension.width;
-		const containerEndCol = container.start.col + container.dimension.width;
+		const placedEndCol = placed.start.col + placed.dimension.cols;
+		const containerEndCol = container.start.col + container.dimension.cols;
 		if (placedEndCol < containerEndCol) {
 			complementary.push({
 				start: {
@@ -860,15 +880,15 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 					col: placedEndCol
 				},
 				dimension: {
-					width: containerEndCol - placedEndCol,
-					height: placed.dimension.height
+					cols: containerEndCol - placedEndCol,
+					rows: placed.dimension.rows
 				}
 			});
 		}
 
 		// Bottom region (if exists)
-		const placedEndRow = placed.start.row + placed.dimension.height;
-		const containerEndRow = container.start.row + container.dimension.height;
+		const placedEndRow = placed.start.row + placed.dimension.rows;
+		const containerEndRow = container.start.row + container.dimension.rows;
 		if (placedEndRow < containerEndRow) {
 			complementary.push({
 				start: {
@@ -876,8 +896,8 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 					col: container.start.col
 				},
 				dimension: {
-					width: container.dimension.width,
-					height: containerEndRow - placedEndRow
+					cols: container.dimension.cols,
+					rows: containerEndRow - placedEndRow
 				}
 			});
 		}
@@ -895,8 +915,8 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 * // Logs: 0,0 -> 0,1 -> 1,0 -> 1,1
 	 */
 	public iterateRegion(region: TGridRegion, callback: (row: number, col: number) => void): void {
-		for (let row = region.start.row; row < region.start.row + region.dimension.height; row++) {
-			for (let col = region.start.col; col < region.start.col + region.dimension.width; col++) {
+		for (let row = region.start.row; row < region.start.row + region.dimension.rows; row++) {
+			for (let col = region.start.col; col < region.start.col + region.dimension.cols; col++) {
 				callback(row, col);
 			}
 		}
@@ -906,7 +926,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 * Returns the area of a region
 	 */
 	public getRegionArea(region: TGridRegion): number {
-		return region.dimension.width * region.dimension.height;
+		return region.dimension.cols * region.dimension.rows;
 	}
 
 	/**
@@ -945,10 +965,10 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 
 					// Try to merge horizontally
 					if (
-						region1.dimension.height === region2.dimension.height &&
+						region1.dimension.rows === region2.dimension.rows &&
 						region1.start.row === region2.start.row &&
-						(region1.start.col + region1.dimension.width === region2.start.col ||
-							region2.start.col + region2.dimension.width === region1.start.col)
+						(region1.start.col + region1.dimension.cols === region2.start.col ||
+							region2.start.col + region2.dimension.cols === region1.start.col)
 					) {
 						merged[i] = {
 							start: {
@@ -956,8 +976,8 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 								col: Math.min(region1.start.col, region2.start.col)
 							},
 							dimension: {
-								height: region1.dimension.height,
-								width: region1.dimension.width + region2.dimension.width
+								rows: region1.dimension.rows,
+								cols: region1.dimension.cols + region2.dimension.cols
 							}
 						};
 						merged.splice(j, 1);
@@ -967,10 +987,10 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 
 					// Try to merge vertically
 					if (
-						region1.dimension.width === region2.dimension.width &&
+						region1.dimension.cols === region2.dimension.cols &&
 						region1.start.col === region2.start.col &&
-						(region1.start.row + region1.dimension.height === region2.start.row ||
-							region2.start.row + region2.dimension.height === region1.start.row)
+						(region1.start.row + region1.dimension.rows === region2.start.row ||
+							region2.start.row + region2.dimension.rows === region1.start.row)
 					) {
 						merged[i] = {
 							start: {
@@ -978,8 +998,8 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 								col: region1.start.col
 							},
 							dimension: {
-								height: region1.dimension.height + region2.dimension.height,
-								width: region1.dimension.width
+								rows: region1.dimension.rows + region2.dimension.rows,
+								cols: region1.dimension.cols
 							}
 						};
 						merged.splice(j, 1);
@@ -1074,13 +1094,8 @@ export interface TGridPosition {
 }
 
 export interface TGridDimensions {
-	width: number;
-	height: number;
-}
-
-export interface TGridSize {
 	rows: number;
-	columns: number;
+	cols: number;
 }
 
 interface TFindRegionMethodOptions {
@@ -1096,5 +1111,5 @@ interface TFindRegionMethodOptions {
 interface TExpandGridMethodOptions {
 	strategy?: 'Set' | 'Add';
 	rows?: number;
-	columns?: number;
+	cols?: number;
 }

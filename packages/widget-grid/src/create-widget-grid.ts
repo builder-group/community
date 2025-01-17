@@ -5,8 +5,8 @@ import {
 	getGridRegionPixels,
 	Grid,
 	pointerEventToViewportPoint,
-	TGridRegion,
-	TGridSize
+	TGridDimensions,
+	TGridRegion
 } from './helper';
 import {
 	TBaseWidget,
@@ -31,7 +31,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		_widgets: {},
 		_selected: createState<TWidgetId[]>([]),
 		_grid: new Grid(config.grid),
-		_size: createState<TGridSize>({ rows: 0, columns: 0 }),
+		_size: createState<TGridDimensions>({ rows: 0, cols: 0 }),
 		interactionMode: createState<TInteractionMode>({ type: 'None' }),
 		cellSize: createState(config.cellSize),
 		boundingRect: createState<TBoundingRect>({ left: 0, top: 0 }),
@@ -98,8 +98,8 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 						widget != null &&
 						(widget.region._v?.start.row !== region.start.row ||
 							widget.region._v?.start.col !== region.start.col ||
-							widget.region._v?.dimension.width !== region.dimension.width ||
-							widget.region._v?.dimension.height !== region.dimension.height)
+							widget.region._v?.dimension.cols !== region.dimension.cols ||
+							widget.region._v?.dimension.rows !== region.dimension.rows)
 					) {
 						widget.region.set(
 							{
@@ -124,8 +124,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 			// Sync size
 			if (
 				size &&
-				(this._grid.size.rows !== this._size._v.rows ||
-					this._grid.size.columns !== this._size._v.columns)
+				(this._grid.size.rows !== this._size._v.rows || this._grid.size.cols !== this._size._v.cols)
 			) {
 				this._size.set(this._grid.size, { additionalData: { source: 'sync-grid' } });
 			}

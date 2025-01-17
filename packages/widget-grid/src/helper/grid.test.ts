@@ -24,7 +24,7 @@ describe('Grid class', () => {
 	describe('size getter', () => {
 		it('should return correct size for empty grid', () => {
 			const grid = new Grid();
-			expect(grid.size).toEqual({ rows: 1, columns: 0 });
+			expect(grid.size).toEqual({ rows: 1, cols: 0 });
 		});
 
 		it('should return correct size for non-empty grid', () => {
@@ -33,17 +33,17 @@ describe('Grid class', () => {
 				['4', '5', '6']
 			];
 			const grid = new Grid(initialGrid);
-			expect(grid.size).toEqual({ rows: 2, columns: 3 });
+			expect(grid.size).toEqual({ rows: 2, cols: 3 });
 		});
 
 		it('should handle single-row grid', () => {
 			const grid = new Grid([['1', '2', '3']]);
-			expect(grid.size).toEqual({ rows: 1, columns: 3 });
+			expect(grid.size).toEqual({ rows: 1, cols: 3 });
 		});
 
 		it('should handle single-column grid', () => {
 			const grid = new Grid([['1'], ['2'], ['3']]);
-			expect(grid.size).toEqual({ rows: 3, columns: 1 });
+			expect(grid.size).toEqual({ rows: 3, cols: 1 });
 		});
 	});
 
@@ -117,9 +117,9 @@ describe('Grid class', () => {
 					['B', 'B']
 				]);
 
-				grid.expandGrid({ strategy: 'Set', rows: 3, columns: 4 });
+				grid.expandGrid({ strategy: 'Set', rows: 3, cols: 4 });
 
-				expect(grid.size).toEqual({ rows: 3, columns: 4 });
+				expect(grid.size).toEqual({ rows: 3, cols: 4 });
 				expect(grid.cells).toEqual([
 					['A', 'A', null, null],
 					['B', 'B', null, null],
@@ -133,9 +133,9 @@ describe('Grid class', () => {
 					['B', 'B', 'B']
 				]);
 
-				grid.expandGrid({ strategy: 'Set', rows: 1, columns: 2 });
+				grid.expandGrid({ strategy: 'Set', rows: 1, cols: 2 });
 
-				expect(grid.size).toEqual({ rows: 2, columns: 3 });
+				expect(grid.size).toEqual({ rows: 2, cols: 3 });
 				expect(grid.cells).toEqual([
 					['A', 'A', 'A'],
 					['B', 'B', 'B']
@@ -144,15 +144,15 @@ describe('Grid class', () => {
 		});
 
 		describe('add strategy', () => {
-			it('should add specified rows and columns', () => {
+			it('should add specified rows and cols', () => {
 				const grid = new Grid([
 					['A', 'A'],
 					['B', 'B']
 				]);
 
-				grid.expandGrid({ strategy: 'Add', rows: 1, columns: 2 });
+				grid.expandGrid({ strategy: 'Add', rows: 1, cols: 2 });
 
-				expect(grid.size).toEqual({ rows: 3, columns: 4 });
+				expect(grid.size).toEqual({ rows: 3, cols: 4 });
 				expect(grid.cells).toEqual([
 					['A', 'A', null, null],
 					['B', 'B', null, null],
@@ -166,9 +166,9 @@ describe('Grid class', () => {
 					['B', 'B']
 				]);
 
-				grid.expandGrid({ strategy: 'Add', rows: 0, columns: 0 });
+				grid.expandGrid({ strategy: 'Add', rows: 0, cols: 0 });
 
-				expect(grid.size).toEqual({ rows: 2, columns: 2 });
+				expect(grid.size).toEqual({ rows: 2, cols: 2 });
 				expect(grid.cells).toEqual([
 					['A', 'A'],
 					['B', 'B']
@@ -273,7 +273,7 @@ describe('Grid class', () => {
 
 			grid.clearRegion({
 				start: { row: 0, col: 0 },
-				dimension: { width: 2, height: 2 }
+				dimension: { cols: 2, rows: 2 }
 			});
 
 			expect(grid.cells).toEqual([
@@ -295,7 +295,7 @@ describe('Grid class', () => {
 			grid.fillRegion(
 				{
 					start: { row: 0, col: 0 },
-					dimension: { width: 2, height: 2 }
+					dimension: { cols: 2, rows: 2 }
 				},
 				'A'
 			);
@@ -318,7 +318,7 @@ describe('Grid class', () => {
 			const grid = new Grid();
 			const region = {
 				start: { row: 1, col: 1 },
-				dimension: { width: 2, height: 2 }
+				dimension: { cols: 2, rows: 2 }
 			};
 			expect(grid.getBoundingRegion([region])).toEqual(region);
 		});
@@ -326,26 +326,26 @@ describe('Grid class', () => {
 		it('should return correct bounding region for multiple regions', () => {
 			const grid = new Grid();
 			const regions = [
-				{ start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } },
-				{ start: { row: 1, col: 1 }, dimension: { width: 2, height: 2 } }
+				{ start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 1 } },
+				{ start: { row: 1, col: 1 }, dimension: { cols: 2, rows: 2 } }
 			];
 
 			expect(grid.getBoundingRegion(regions)).toEqual({
 				start: { row: 0, col: 0 },
-				dimension: { width: 3, height: 3 }
+				dimension: { cols: 3, rows: 3 }
 			});
 		});
 
 		it('should handle overlapping regions', () => {
 			const grid = new Grid();
 			const regions = [
-				{ start: { row: 0, col: 0 }, dimension: { width: 3, height: 3 } },
-				{ start: { row: 1, col: 1 }, dimension: { width: 3, height: 3 } }
+				{ start: { row: 0, col: 0 }, dimension: { cols: 3, rows: 3 } },
+				{ start: { row: 1, col: 1 }, dimension: { cols: 3, rows: 3 } }
 			];
 
 			expect(grid.getBoundingRegion(regions)).toEqual({
 				start: { row: 0, col: 0 },
-				dimension: { width: 4, height: 4 }
+				dimension: { cols: 4, rows: 4 }
 			});
 		});
 	});
@@ -361,7 +361,7 @@ describe('Grid class', () => {
 			const result = grid.overrideMove(
 				{
 					start: { row: 0, col: 0 },
-					dimension: { width: 2, height: 1 }
+					dimension: { cols: 2, rows: 1 }
 				},
 				{ row: 1, col: 0 }
 			);
@@ -384,7 +384,7 @@ describe('Grid class', () => {
 			const result = grid.overrideMove(
 				{
 					start: { row: 0, col: 0 },
-					dimension: { width: 2, height: 1 }
+					dimension: { cols: 2, rows: 1 }
 				},
 				{ row: 1, col: 0 }
 			);
@@ -407,7 +407,7 @@ describe('Grid class', () => {
 			const result = grid.overrideMove(
 				{
 					start: { row: 0, col: 0 },
-					dimension: { width: 2, height: 1 }
+					dimension: { cols: 2, rows: 1 }
 				},
 				{ row: 1, col: 0 },
 				{ override: false }
@@ -433,7 +433,7 @@ describe('Grid class', () => {
 			const result = grid.cascadeMove(
 				{
 					start: { row: 0, col: 0 },
-					dimension: { width: 1, height: 1 }
+					dimension: { cols: 1, rows: 1 }
 				},
 				{ row: 0, col: 1 }
 			);
@@ -444,8 +444,8 @@ describe('Grid class', () => {
 				['G', 'H', 'I']
 			]);
 			expect(result).toEqual([
-				{ id: 'B', start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ id: 'A', start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } }
+				{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'A', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 1 } }
 			]);
 		});
 
@@ -459,7 +459,7 @@ describe('Grid class', () => {
 			const result = grid.cascadeMove(
 				{
 					start: { row: 0, col: 0 },
-					dimension: { width: 1, height: 2 }
+					dimension: { cols: 1, rows: 2 }
 				},
 				{ row: 0, col: 1 }
 			);
@@ -470,9 +470,9 @@ describe('Grid class', () => {
 				['F', 'G', 'H']
 			]);
 			expect(result).toEqual([
-				{ id: 'B', start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ id: 'D', start: { row: 1, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ id: 'A', start: { row: 0, col: 1 }, dimension: { width: 1, height: 2 } }
+				{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'D', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'A', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 2 } }
 			]);
 		});
 
@@ -486,7 +486,7 @@ describe('Grid class', () => {
 			const result = grid.cascadeMove(
 				{
 					start: { row: 0, col: 0 },
-					dimension: { width: 1, height: 2 }
+					dimension: { cols: 1, rows: 2 }
 				},
 				{ row: 1, col: 0 }
 			);
@@ -497,8 +497,8 @@ describe('Grid class', () => {
 				['A', 'G', 'H']
 			]);
 			expect(result).toEqual([
-				{ id: 'F', start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ id: 'A', start: { row: 1, col: 0 }, dimension: { width: 1, height: 2 } }
+				{ id: 'F', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'A', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 2 } }
 			]);
 		});
 
@@ -511,7 +511,7 @@ describe('Grid class', () => {
 			const result = grid.cascadeMove(
 				{
 					start: { row: 0, col: 0 },
-					dimension: { width: 1, height: 1 }
+					dimension: { cols: 1, rows: 1 }
 				},
 				{ row: 4, col: 0 }
 			);
@@ -524,7 +524,7 @@ describe('Grid class', () => {
 				['A', null]
 			]);
 			expect(result).toEqual([
-				{ id: 'A', start: { row: 4, col: 0 }, dimension: { width: 1, height: 1 } }
+				{ id: 'A', start: { row: 4, col: 0 }, dimension: { cols: 1, rows: 1 } }
 			]);
 		});
 
@@ -537,7 +537,7 @@ describe('Grid class', () => {
 			const result = grid.cascadeMove(
 				{
 					start: { row: 0, col: 0 },
-					dimension: { width: 1, height: 1 }
+					dimension: { cols: 1, rows: 1 }
 				},
 				{ row: 0, col: 4 }
 			);
@@ -559,7 +559,7 @@ describe('Grid class', () => {
 			const result = grid.cascadeMove(
 				{
 					start: { row: 0, col: 0 },
-					dimension: { width: 1, height: 2 }
+					dimension: { cols: 1, rows: 2 }
 				},
 				{ row: 1, col: 1 }
 			);
@@ -570,9 +570,9 @@ describe('Grid class', () => {
 				['E', 'A', 'G']
 			]);
 			expect(result).toEqual([
-				{ id: 'B', start: { row: 0, col: 0 }, dimension: { width: 1, height: 2 } },
-				{ id: 'F', start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } },
-				{ id: 'A', start: { row: 1, col: 1 }, dimension: { width: 1, height: 2 } }
+				{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 2 } },
+				{ id: 'F', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'A', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 2 } }
 			]);
 		});
 
@@ -586,7 +586,7 @@ describe('Grid class', () => {
 			const result = grid.cascadeMove(
 				{
 					start: { row: 0, col: 0 },
-					dimension: { width: 1, height: 2 }
+					dimension: { cols: 1, rows: 2 }
 				},
 				{ row: 1, col: 1 }
 			);
@@ -600,11 +600,11 @@ describe('Grid class', () => {
 				[null, null, 'E']
 			]);
 			expect(result).toEqual([
-				{ id: 'D', start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ id: 'E', start: { row: 5, col: 2 }, dimension: { width: 1, height: 1 } },
-				{ id: 'B', start: { row: 3, col: 1 }, dimension: { width: 2, height: 2 } },
-				{ id: 'A', start: { row: 1, col: 1 }, dimension: { width: 1, height: 2 } },
-				{ id: 'C', start: { row: 1, col: 0 }, dimension: { width: 1, height: 1 } }
+				{ id: 'D', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'E', start: { row: 5, col: 2 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'B', start: { row: 3, col: 1 }, dimension: { cols: 2, rows: 2 } },
+				{ id: 'A', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 2 } },
+				{ id: 'C', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } }
 			]);
 		});
 	});
@@ -613,13 +613,13 @@ describe('Grid class', () => {
 		const grid = new Grid();
 
 		it('should detect orthogonal adjacency (maxGap = 0)', () => {
-			const center = { start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } };
+			const center = { start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 1 } };
 
 			const orthogonalNeighbors = [
-				{ start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } }, // North
-				{ start: { row: 2, col: 1 }, dimension: { width: 1, height: 1 } }, // South
-				{ start: { row: 1, col: 0 }, dimension: { width: 1, height: 1 } }, // West
-				{ start: { row: 1, col: 2 }, dimension: { width: 1, height: 1 } } // East
+				{ start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 1 } }, // North
+				{ start: { row: 2, col: 1 }, dimension: { cols: 1, rows: 1 } }, // South
+				{ start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } }, // West
+				{ start: { row: 1, col: 2 }, dimension: { cols: 1, rows: 1 } } // East
 			];
 
 			orthogonalNeighbors.forEach((neighbor) => {
@@ -628,13 +628,13 @@ describe('Grid class', () => {
 		});
 
 		it('should detect diagonal adjacency (maxGap = 0, includeDiagonal = true)', () => {
-			const center = { start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } };
+			const center = { start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 1 } };
 
 			const diagonalNeighbors = [
-				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } }, // NW
-				{ start: { row: 0, col: 2 }, dimension: { width: 1, height: 1 } }, // NE
-				{ start: { row: 2, col: 0 }, dimension: { width: 1, height: 1 } }, // SW
-				{ start: { row: 2, col: 2 }, dimension: { width: 1, height: 1 } } // SE
+				{ start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } }, // NW
+				{ start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 1 } }, // NE
+				{ start: { row: 2, col: 0 }, dimension: { cols: 1, rows: 1 } }, // SW
+				{ start: { row: 2, col: 2 }, dimension: { cols: 1, rows: 1 } } // SE
 			];
 
 			diagonalNeighbors.forEach((neighbor) => {
@@ -643,13 +643,13 @@ describe('Grid class', () => {
 		});
 
 		it('should not detect diagonal adjacency when includeDiagonal is false', () => {
-			const center = { start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } };
+			const center = { start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 1 } };
 
 			const diagonalNeighbors = [
-				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } }, // NW
-				{ start: { row: 0, col: 2 }, dimension: { width: 1, height: 1 } }, // NE
-				{ start: { row: 2, col: 0 }, dimension: { width: 1, height: 1 } }, // SW
-				{ start: { row: 2, col: 2 }, dimension: { width: 1, height: 1 } } // SE
+				{ start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } }, // NW
+				{ start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 1 } }, // NE
+				{ start: { row: 2, col: 0 }, dimension: { cols: 1, rows: 1 } }, // SW
+				{ start: { row: 2, col: 2 }, dimension: { cols: 1, rows: 1 } } // SE
 			];
 
 			diagonalNeighbors.forEach((neighbor) => {
@@ -658,39 +658,35 @@ describe('Grid class', () => {
 		});
 
 		it('should detect non-adjacency when regions are too far apart', () => {
-			const region1 = { start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } };
-			const region2 = { start: { row: 2, col: 2 }, dimension: { width: 1, height: 1 } };
+			const region1 = { start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } };
+			const region2 = { start: { row: 2, col: 2 }, dimension: { cols: 1, rows: 1 } };
 
 			expect(grid.areRegionsAdjacent(region1, region2)).toBe(false);
 		});
 
 		it('should detect adjacency within maxGap', () => {
-			const region1 = { start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } };
-			const region2 = { start: { row: 0, col: 2 }, dimension: { width: 1, height: 1 } };
+			const region1 = { start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } };
+			const region2 = { start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 1 } };
 
 			expect(grid.areRegionsAdjacent(region1, region2, { maxGap: 0 })).toBe(false); // Gap = 1, maxGap = 1 -> not adjacent
 			expect(grid.areRegionsAdjacent(region1, region2, { maxGap: 1 })).toBe(true); // Gap = 1, maxGap = 2 -> adjacent
 		});
 
 		it('should handle overlapping regions', () => {
-			const region1 = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } };
-			const region2 = { start: { row: 1, col: 1 }, dimension: { width: 2, height: 2 } };
+			const region1 = { start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 2 } };
+			const region2 = { start: { row: 1, col: 1 }, dimension: { cols: 2, rows: 2 } };
 
 			expect(grid.areRegionsAdjacent(region1, region2)).toBe(true);
 		});
 
 		it('should handle regions of different sizes', () => {
-			const region1 = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } };
-			const region2 = { start: { row: 2, col: 2 }, dimension: { width: 1, height: 1 } };
+			const region1 = { start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 2 } };
+			const region2 = { start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 1 } };
 
-			expect(grid.areRegionsAdjacent(region1, region2)).toBe(true); // Touching diagonally
-		});
-
-		it('should detect non-adjacency for non-overlapping larger regions', () => {
-			const region1 = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } };
-			const region2 = { start: { row: 3, col: 3 }, dimension: { width: 2, height: 2 } };
-
-			expect(grid.areRegionsAdjacent(region1, region2)).toBe(false); // Too far apart
+			expect(grid.areRegionsAdjacent(region1, region2, { includeDiagonal: true })).toBe(true);
+			expect(grid.areRegionsAdjacent(region1, region2, { includeDiagonal: false })).toBe(true);
+			expect(grid.areRegionsAdjacent(region2, region1, { includeDiagonal: true })).toBe(true);
+			expect(grid.areRegionsAdjacent(region2, region1, { includeDiagonal: false })).toBe(true);
 		});
 	});
 
@@ -705,11 +701,11 @@ describe('Grid class', () => {
 			grid.swapRegions(
 				{
 					start: { row: 0, col: 0 },
-					dimension: { width: 2, height: 2 }
+					dimension: { cols: 2, rows: 2 }
 				},
 				{
 					start: { row: 0, col: 2 },
-					dimension: { width: 1, height: 3 }
+					dimension: { cols: 1, rows: 3 }
 				},
 				'A',
 				'B'
@@ -739,10 +735,10 @@ describe('Grid class', () => {
 			]);
 
 			expect(grid.getRegions()).toEqual([
-				{ id: '1', start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ id: '2', start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } },
-				{ id: '3', start: { row: 1, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ id: '4', start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } }
+				{ id: '1', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ id: '2', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 1 } },
+				{ id: '3', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ id: '4', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 1 } }
 			]);
 		});
 
@@ -753,7 +749,7 @@ describe('Grid class', () => {
 			]);
 
 			expect(grid.getRegions()).toEqual([
-				{ id: '1', start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } }
+				{ id: '1', start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 2 } }
 			]);
 		});
 
@@ -765,9 +761,9 @@ describe('Grid class', () => {
 			]);
 
 			expect(grid.getRegions()).toEqual([
-				{ id: '1', start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } },
-				{ id: '2', start: { row: 0, col: 2 }, dimension: { width: 1, height: 3 } },
-				{ id: '3', start: { row: 2, col: 0 }, dimension: { width: 2, height: 1 } }
+				{ id: '1', start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 2 } },
+				{ id: '2', start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 3 } },
+				{ id: '3', start: { row: 2, col: 0 }, dimension: { cols: 2, rows: 1 } }
 			]);
 		});
 
@@ -778,8 +774,8 @@ describe('Grid class', () => {
 			]);
 
 			expect(grid.getRegions()).toEqual([
-				{ id: '1', start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ id: '2', start: { row: 1, col: 0 }, dimension: { width: 2, height: 1 } }
+				{ id: '1', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ id: '2', start: { row: 1, col: 0 }, dimension: { cols: 2, rows: 1 } }
 			]);
 		});
 
@@ -791,11 +787,11 @@ describe('Grid class', () => {
 			]);
 
 			expect(grid.getRegions()).toEqual([
-				{ id: '1', start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } },
-				{ id: '2', start: { row: 0, col: 2 }, dimension: { width: 1, height: 2 } },
-				{ id: '1', start: { row: 1, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ id: '2', start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } },
-				{ id: '3', start: { row: 2, col: 0 }, dimension: { width: 3, height: 1 } }
+				{ id: '1', start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 1 } },
+				{ id: '2', start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 2 } },
+				{ id: '1', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ id: '2', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 1 } },
+				{ id: '3', start: { row: 2, col: 0 }, dimension: { cols: 3, rows: 1 } }
 			]);
 		});
 
@@ -812,8 +808,8 @@ describe('Grid class', () => {
 			};
 
 			expect(grid.getRegions(range)).toEqual([
-				{ id: '2', start: { row: 0, col: 2 }, dimension: { width: 1, height: 2 } },
-				{ id: '4', start: { row: 0, col: 3 }, dimension: { width: 1, height: 2 } }
+				{ id: '2', start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 2 } },
+				{ id: '4', start: { row: 0, col: 3 }, dimension: { cols: 1, rows: 2 } }
 			]);
 		});
 
@@ -830,7 +826,7 @@ describe('Grid class', () => {
 			};
 
 			expect(grid.getRegions(range)).toEqual([
-				{ id: '3', start: { row: 2, col: 0 }, dimension: { width: 2, height: 1 } }
+				{ id: '3', start: { row: 2, col: 0 }, dimension: { cols: 2, rows: 1 } }
 			]);
 		});
 	});
@@ -847,7 +843,7 @@ describe('Grid class', () => {
 
 			expect(region).toEqual({
 				start: { row: 0, col: 0 },
-				dimension: { width: 2, height: 2 }
+				dimension: { cols: 2, rows: 2 }
 			});
 		});
 
@@ -869,7 +865,7 @@ describe('Grid class', () => {
 
 			expect(region).toEqual({
 				start: { row: 0, col: 0 },
-				dimension: { width: 3, height: 2 }
+				dimension: { cols: 3, rows: 2 }
 			});
 		});
 
@@ -885,7 +881,7 @@ describe('Grid class', () => {
 
 				expect(region).toEqual({
 					start: { row: 0, col: 0 },
-					dimension: { width: 3, height: 3 }
+					dimension: { cols: 3, rows: 3 }
 				});
 			});
 
@@ -907,7 +903,7 @@ describe('Grid class', () => {
 
 				expect(region).toEqual({
 					start: { row: 1, col: 1 },
-					dimension: { width: 1, height: 1 }
+					dimension: { cols: 1, rows: 1 }
 				});
 			});
 
@@ -919,7 +915,7 @@ describe('Grid class', () => {
 						position: { row: 1, col: 0 },
 						expected: {
 							start: { row: 1, col: 0 },
-							dimension: { width: 3, height: 1 }
+							dimension: { cols: 3, rows: 1 }
 						}
 					},
 					{
@@ -927,7 +923,7 @@ describe('Grid class', () => {
 						position: { row: 0, col: 1 },
 						expected: {
 							start: { row: 0, col: 1 },
-							dimension: { width: 1, height: 3 }
+							dimension: { cols: 1, rows: 3 }
 						}
 					},
 					{
@@ -935,7 +931,7 @@ describe('Grid class', () => {
 						position: { row: 1, col: 2 },
 						expected: {
 							start: { row: 1, col: 0 },
-							dimension: { width: 3, height: 1 }
+							dimension: { cols: 3, rows: 1 }
 						}
 					},
 					{
@@ -943,7 +939,7 @@ describe('Grid class', () => {
 						position: { row: 2, col: 1 },
 						expected: {
 							start: { row: 0, col: 1 },
-							dimension: { width: 1, height: 3 }
+							dimension: { cols: 1, rows: 3 }
 						}
 					}
 				];
@@ -975,7 +971,7 @@ describe('Grid class', () => {
 
 				expect(region).toEqual({
 					start: { row: 0, col: 0 },
-					dimension: { width: 2, height: 2 }
+					dimension: { cols: 2, rows: 2 }
 				});
 			});
 
@@ -989,7 +985,7 @@ describe('Grid class', () => {
 
 				expect(region).toEqual({
 					start: { row: 0, col: 0 },
-					dimension: { width: 2, height: 2 }
+					dimension: { cols: 2, rows: 2 }
 				});
 			});
 		});
@@ -1001,7 +997,7 @@ describe('Grid class', () => {
 				['A', 'B'],
 				['C', 'D']
 			]);
-			const region = { start: { row: 0, col: 0 }, dimension: { width: 0, height: 0 } };
+			const region = { start: { row: 0, col: 0 }, dimension: { cols: 0, rows: 0 } };
 			expect(grid.getOccupyingRegions(region)).toEqual([]);
 		});
 
@@ -1010,14 +1006,14 @@ describe('Grid class', () => {
 				['A', 'A'],
 				['A', 'A']
 			]);
-			const region = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } };
+			const region = { start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 1 } };
 			const occupying = grid.getOccupyingRegions(region);
 
 			expect(occupying).toEqual([
 				{
 					id: 'A',
 					start: { row: 0, col: 0 },
-					dimension: { width: 2, height: 2 }
+					dimension: { cols: 2, rows: 2 }
 				}
 			]);
 		});
@@ -1028,24 +1024,24 @@ describe('Grid class', () => {
 				['A', 'C', 'D'],
 				['E', 'E', 'E']
 			]);
-			const region = { start: { row: 0, col: 1 }, dimension: { width: 2, height: 2 } };
+			const region = { start: { row: 0, col: 1 }, dimension: { cols: 2, rows: 2 } };
 			const occupying = grid.getOccupyingRegions(region);
 
 			expect(occupying).toEqual([
 				{
 					id: 'B',
 					start: { row: 0, col: 1 },
-					dimension: { width: 2, height: 1 }
+					dimension: { cols: 2, rows: 1 }
 				},
 				{
 					id: 'C',
 					start: { row: 1, col: 1 },
-					dimension: { width: 1, height: 1 }
+					dimension: { cols: 1, rows: 1 }
 				},
 				{
 					id: 'D',
 					start: { row: 1, col: 2 },
-					dimension: { width: 1, height: 1 }
+					dimension: { cols: 1, rows: 1 }
 				}
 			]);
 		});
@@ -1055,14 +1051,14 @@ describe('Grid class', () => {
 				['A', 'B', 'C'],
 				['A', 'B', 'C']
 			]);
-			const region = { start: { row: 0, col: 2 }, dimension: { width: 1, height: 2 } };
+			const region = { start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 2 } };
 			const occupying = grid.getOccupyingRegions(region);
 
 			expect(occupying).toEqual([
 				{
 					id: 'C',
 					start: { row: 0, col: 2 },
-					dimension: { width: 1, height: 2 }
+					dimension: { cols: 1, rows: 2 }
 				}
 			]);
 		});
@@ -1072,19 +1068,19 @@ describe('Grid class', () => {
 				['A', null, 'B'],
 				['A', 'C', 'B']
 			]);
-			const region = { start: { row: 0, col: 0 }, dimension: { width: 3, height: 1 } };
+			const region = { start: { row: 0, col: 0 }, dimension: { cols: 3, rows: 1 } };
 			const occupying = grid.getOccupyingRegions(region);
 
 			expect(occupying).toEqual([
 				{
 					id: 'A',
 					start: { row: 0, col: 0 },
-					dimension: { width: 1, height: 2 }
+					dimension: { cols: 1, rows: 2 }
 				},
 				{
 					id: 'B',
 					start: { row: 0, col: 2 },
-					dimension: { width: 1, height: 2 }
+					dimension: { cols: 1, rows: 2 }
 				}
 			]);
 		});
@@ -1093,58 +1089,58 @@ describe('Grid class', () => {
 	describe('getComplementaryRegions', () => {
 		it('should return empty array when regions are the same size', () => {
 			const grid = new Grid();
-			const region = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } };
+			const region = { start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 2 } };
 			expect(grid.getComplementaryRegions(region, region)).toEqual([]);
 		});
 
 		it('should return all surrounding regions for centered placement', () => {
 			const grid = new Grid();
-			const container = { start: { row: 0, col: 0 }, dimension: { width: 3, height: 3 } };
-			const placed = { start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } };
+			const container = { start: { row: 0, col: 0 }, dimension: { cols: 3, rows: 3 } };
+			const placed = { start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 1 } };
 
 			const complementary = grid.getComplementaryRegions(container, placed);
 
 			expect(complementary).toHaveLength(4); // top, left, right, bottom
 			expect(complementary).toContainEqual({
 				start: { row: 0, col: 0 },
-				dimension: { width: 3, height: 1 }
+				dimension: { cols: 3, rows: 1 }
 			}); // top
 			expect(complementary).toContainEqual({
 				start: { row: 1, col: 0 },
-				dimension: { width: 1, height: 1 }
+				dimension: { cols: 1, rows: 1 }
 			}); // left
 			expect(complementary).toContainEqual({
 				start: { row: 1, col: 2 },
-				dimension: { width: 1, height: 1 }
+				dimension: { cols: 1, rows: 1 }
 			}); // right
 			expect(complementary).toContainEqual({
 				start: { row: 2, col: 0 },
-				dimension: { width: 3, height: 1 }
+				dimension: { cols: 3, rows: 1 }
 			}); // bottom
 		});
 
 		it('should handle placement at edges', () => {
 			const grid = new Grid();
-			const container = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } };
-			const placed = { start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } };
+			const container = { start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 2 } };
+			const placed = { start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } };
 
 			const complementary = grid.getComplementaryRegions(container, placed);
 
 			expect(complementary).toHaveLength(2); // right and bottom only
 			expect(complementary).toContainEqual({
 				start: { row: 0, col: 1 },
-				dimension: { width: 1, height: 1 }
+				dimension: { cols: 1, rows: 1 }
 			}); // right
 			expect(complementary).toContainEqual({
 				start: { row: 1, col: 0 },
-				dimension: { width: 2, height: 1 }
+				dimension: { cols: 2, rows: 1 }
 			}); // bottom
 		});
 
 		it('should return container region when regions do not overlap', () => {
 			const grid = new Grid();
-			const container = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } };
-			const placed = { start: { row: 3, col: 3 }, dimension: { width: 1, height: 1 } };
+			const container = { start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 2 } };
+			const placed = { start: { row: 3, col: 3 }, dimension: { cols: 1, rows: 1 } };
 
 			const complementary = grid.getComplementaryRegions(container, placed);
 
@@ -1161,49 +1157,49 @@ describe('Grid class', () => {
 
 		it('should return same region for single region input', () => {
 			const grid = new Grid();
-			const region = { start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } };
+			const region = { start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } };
 			expect(grid.mergeAdjacentRegions([region])).toEqual([region]);
 		});
 
 		it('should merge horizontally adjacent regions', () => {
 			const grid = new Grid();
 			const regions = [
-				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } }
+				{ start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 1 } }
 			];
 			expect(grid.mergeAdjacentRegions(regions)).toEqual([
-				{ start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } }
+				{ start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 1 } }
 			]);
 		});
 
 		it('should merge vertically adjacent regions', () => {
 			const grid = new Grid();
 			const regions = [
-				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ start: { row: 1, col: 0 }, dimension: { width: 1, height: 1 } }
+				{ start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } }
 			];
 			expect(grid.mergeAdjacentRegions(regions)).toEqual([
-				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 2 } }
+				{ start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 2 } }
 			]);
 		});
 
 		it('should merge multiple regions in sequence', () => {
 			const grid = new Grid();
 			const regions = [
-				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } },
-				{ start: { row: 0, col: 2 }, dimension: { width: 1, height: 1 } }
+				{ start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 1 } },
+				{ start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 1 } }
 			];
 			expect(grid.mergeAdjacentRegions(regions)).toEqual([
-				{ start: { row: 0, col: 0 }, dimension: { width: 3, height: 1 } }
+				{ start: { row: 0, col: 0 }, dimension: { cols: 3, rows: 1 } }
 			]);
 		});
 
 		it('should not merge non-adjacent regions', () => {
 			const grid = new Grid();
 			const regions = [
-				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ start: { row: 0, col: 2 }, dimension: { width: 1, height: 1 } }
+				{ start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 1 } }
 			];
 			expect(grid.mergeAdjacentRegions(regions)).toEqual(regions);
 		});
@@ -1211,8 +1207,8 @@ describe('Grid class', () => {
 		it('should not merge regions with different dimensions', () => {
 			const grid = new Grid();
 			const regions = [
-				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ start: { row: 0, col: 1 }, dimension: { width: 1, height: 2 } }
+				{ start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 2 } }
 			];
 			expect(grid.mergeAdjacentRegions(regions)).toEqual(regions);
 		});
@@ -1220,8 +1216,8 @@ describe('Grid class', () => {
 		it('should not mutate input array by default', () => {
 			const grid = new Grid();
 			const regions = [
-				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } }
+				{ start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 1 } }
 			];
 			const originalRegions = [...regions];
 
@@ -1232,8 +1228,8 @@ describe('Grid class', () => {
 		it('should mutate input array when mutate option is true', () => {
 			const grid = new Grid();
 			const regions = [
-				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-				{ start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } }
+				{ start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 1 } }
 			];
 
 			const result = grid.mergeAdjacentRegions(regions, { mutate: true });
@@ -1241,7 +1237,7 @@ describe('Grid class', () => {
 			expect(regions).toHaveLength(1); // Array was mutated
 			expect(regions[0]).toEqual({
 				start: { row: 0, col: 0 },
-				dimension: { width: 2, height: 1 }
+				dimension: { cols: 2, rows: 1 }
 			});
 		});
 	});

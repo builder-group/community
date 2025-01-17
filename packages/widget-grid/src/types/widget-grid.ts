@@ -1,6 +1,6 @@
 import { TFeatureDefinition, TWithFeatures } from '@blgc/types/features';
 import { TState } from 'feature-state';
-import { Grid, TGridPosition, TGridRegion, TGridSize } from '../helper';
+import { Grid, TGridDimensions, TGridPosition, TGridRegion } from '../helper';
 import { TBoundingRect, TDimensions, TXYPosition } from './utils';
 import { TWidget, TWidgetBaseContent, TWidgetId } from './widget';
 
@@ -15,7 +15,7 @@ export type TWidgetGrid<
 		_selected: TState<TWidgetId[], []>;
 		// 2D array representing the grid layout
 		_grid: Grid<TWidgetId>;
-		_size: TState<TGridSize, []>;
+		_size: TState<TGridDimensions, []>;
 		// Mode for user interaction (e.g. Translating, Pressing, etc.)
 		interactionMode: TState<TInteractionMode, []>;
 		// Size of each cell in the grid

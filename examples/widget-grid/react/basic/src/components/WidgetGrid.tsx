@@ -8,7 +8,7 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 	props: TWidgetGridProps<GContent>
 ) => {
 	const { widgetGrid, renderItem } = props;
-	const { rows, columns } = useFeatureState(widgetGrid._size);
+	const { rows, cols } = useFeatureState(widgetGrid._size);
 	const { width: cellWidth, height: cellHeight } = useFeatureState(widgetGrid.cellSize);
 	const widgetGridRef = React.useRef<HTMLDivElement>(null);
 
@@ -103,10 +103,10 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 			ref={widgetGridRef}
 			style={{
 				position: 'relative',
-				width: columns * cellWidth,
+				width: cols * cellWidth,
 				height: rows * cellHeight,
 				display: 'grid',
-				gridTemplateColumns: `repeat(${columns}, ${cellWidth}px)`,
+				gridTemplateColumns: `repeat(${cols}, ${cellWidth}px)`,
 				gridTemplateRows: `repeat(${rows}, ${cellHeight}px)`,
 				gap: '0px'
 			}}

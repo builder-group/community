@@ -8,7 +8,7 @@ export function getGridRegionPixels(
 	return {
 		x: region.start.col * cellSize.width,
 		y: region.start.row * cellSize.height,
-		width: region.dimension.width * cellSize.width,
-		height: region.dimension.height * cellSize.height
+		width: region.dimension.cols * cellSize.width,
+		height: region.dimension.rows * cellSize.height
 	};
 }
