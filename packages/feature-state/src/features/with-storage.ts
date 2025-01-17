@@ -3,6 +3,7 @@ import type { TPersistFeature, TState } from '../types';
 
 export const FAILED_TO_LOAD_FROM_STORAGE_IDENTIFIER = null;
 export const LOAD_FROM_STORAGE_SOURCE_KEY = 'loadFromStorage';
+
 export interface TStorageInterface<GStorageValue> {
 	save: (key: string, value: GStorageValue) => Promise<boolean> | boolean;
 	load: (
