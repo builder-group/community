@@ -612,105 +612,85 @@ describe('Grid class', () => {
 	describe('areRegionsAdjacent', () => {
 		const grid = new Grid();
 
-		describe('basic adjacency (maxDistance=0)', () => {
-			it('should detect adjacency in all directions', () => {
-				const center = { start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } };
+		it('should detect orthogonal adjacency (maxGap = 0)', () => {
+			const center = { start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } };
 
-				// Test all 8 directions
-				const directions = [
-					// Orthogonal
-					{ row: 0, col: 1 }, // N
-					{ row: 2, col: 1 }, // S
-					{ row: 1, col: 0 }, // W
-					{ row: 1, col: 2 }, // E
-					// Diagonal
-					{ row: 0, col: 0 }, // NW
-					{ row: 0, col: 2 }, // NE
-					{ row: 2, col: 0 }, // SW
-					{ row: 2, col: 2 } // SE
-				];
+			const orthogonalNeighbors = [
+				{ start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } }, // North
+				{ start: { row: 2, col: 1 }, dimension: { width: 1, height: 1 } }, // South
+				{ start: { row: 1, col: 0 }, dimension: { width: 1, height: 1 } }, // West
+				{ start: { row: 1, col: 2 }, dimension: { width: 1, height: 1 } } // East
+			];
 
-				directions.forEach((pos) => {
-					expect(
-						grid.areRegionsAdjacent(center, {
-							start: pos,
-							dimension: { width: 1, height: 1 }
-						})
-					).toBe(true);
-				});
-			});
-
-			it('should detect non-adjacent regions', () => {
-				const region1 = { start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } };
-
-				// Gap of 1
-				expect(
-					grid.areRegionsAdjacent(region1, {
-						start: { row: 0, col: 2 },
-						dimension: { width: 1, height: 1 }
-					})
-				).toBe(false);
+			orthogonalNeighbors.forEach((neighbor) => {
+				expect(grid.areRegionsAdjacent(center, neighbor)).toBe(true);
 			});
 		});
 
-		describe('with maxDistance', () => {
-			it('should respect maxDistance parameter (n)', () => {
-				const region1 = { start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } };
-				const region2 = { start: { row: 0, col: 3 }, dimension: { width: 1, height: 1 } };
+		it('should detect diagonal adjacency (maxGap = 0, includeDiagonal = true)', () => {
+			const center = { start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } };
 
-				// Gap of 1 with maxDistance=1
-				expect(grid.areRegionsAdjacent(region1, region2, { maxDistance: 2 })).toBe(true);
+			const diagonalNeighbors = [
+				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } }, // NW
+				{ start: { row: 0, col: 2 }, dimension: { width: 1, height: 1 } }, // NE
+				{ start: { row: 2, col: 0 }, dimension: { width: 1, height: 1 } }, // SW
+				{ start: { row: 2, col: 2 }, dimension: { width: 1, height: 1 } } // SE
+			];
 
-				// Gap of 1 with maxDistance=0
-				expect(grid.areRegionsAdjacent(region1, region2, { maxDistance: 1 })).toBe(false);
-			});
-
-			it('should respect maxDistance parameter (s)', () => {
-				const region1 = { start: { row: 0, col: 3 }, dimension: { width: 1, height: 1 } };
-				const region2 = { start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } };
-
-				// Gap of 1 with maxDistance=1
-				expect(grid.areRegionsAdjacent(region1, region2, { maxDistance: 2 })).toBe(true);
-
-				// Gap of 1 with maxDistance=0
-				expect(grid.areRegionsAdjacent(region1, region2, { maxDistance: 1 })).toBe(false);
+			diagonalNeighbors.forEach((neighbor) => {
+				expect(grid.areRegionsAdjacent(center, neighbor, { includeDiagonal: true })).toBe(true);
 			});
 		});
 
-		describe('diagonal behavior', () => {
-			it('should handle diagonal adjacency based on includeDiagonal option', () => {
-				const region1 = { start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } };
-				const region2 = { start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } };
+		it('should not detect diagonal adjacency when includeDiagonal is false', () => {
+			const center = { start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } };
 
-				// Diagonal allowed (default)
-				expect(grid.areRegionsAdjacent(region1, region2)).toBe(true);
+			const diagonalNeighbors = [
+				{ start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } }, // NW
+				{ start: { row: 0, col: 2 }, dimension: { width: 1, height: 1 } }, // NE
+				{ start: { row: 2, col: 0 }, dimension: { width: 1, height: 1 } }, // SW
+				{ start: { row: 2, col: 2 }, dimension: { width: 1, height: 1 } } // SE
+			];
 
-				// Diagonal not allowed
-				expect(grid.areRegionsAdjacent(region1, region2, { includeDiagonal: false })).toBe(false);
+			diagonalNeighbors.forEach((neighbor) => {
+				expect(grid.areRegionsAdjacent(center, neighbor, { includeDiagonal: false })).toBe(false);
 			});
 		});
 
-		describe('larger regions', () => {
-			it('should handle regions of different sizes', () => {
-				const region1 = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } };
-				const region2 = { start: { row: 0, col: 2 }, dimension: { width: 1, height: 1 } };
+		it('should detect non-adjacency when regions are too far apart', () => {
+			const region1 = { start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } };
+			const region2 = { start: { row: 2, col: 2 }, dimension: { width: 1, height: 1 } };
 
-				expect(grid.areRegionsAdjacent(region1, region2)).toBe(true);
-			});
+			expect(grid.areRegionsAdjacent(region1, region2)).toBe(false);
+		});
 
-			it('should handle overlapping regions', () => {
-				const region1 = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } };
-				const region2 = { start: { row: 1, col: 1 }, dimension: { width: 2, height: 2 } };
+		it('should detect adjacency within maxGap', () => {
+			const region1 = { start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } };
+			const region2 = { start: { row: 0, col: 2 }, dimension: { width: 1, height: 1 } };
 
-				expect(grid.areRegionsAdjacent(region1, region2)).toBe(true);
-			});
+			expect(grid.areRegionsAdjacent(region1, region2, { maxGap: 0 })).toBe(false); // Gap = 1, maxGap = 1 -> not adjacent
+			expect(grid.areRegionsAdjacent(region1, region2, { maxGap: 1 })).toBe(true); // Gap = 1, maxGap = 2 -> adjacent
+		});
 
-			it('should handle diagonal regions of different sizes', () => {
-				const region1 = { start: { row: 0, col: 0 }, dimension: { width: 1, height: 2 } };
-				const region2 = { start: { row: 2, col: 1 }, dimension: { width: 1, height: 1 } };
+		it('should handle overlapping regions', () => {
+			const region1 = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } };
+			const region2 = { start: { row: 1, col: 1 }, dimension: { width: 2, height: 2 } };
 
-				expect(grid.areRegionsAdjacent(region1, region2)).toBe(true);
-			});
+			expect(grid.areRegionsAdjacent(region1, region2)).toBe(true);
+		});
+
+		it('should handle regions of different sizes', () => {
+			const region1 = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } };
+			const region2 = { start: { row: 2, col: 2 }, dimension: { width: 1, height: 1 } };
+
+			expect(grid.areRegionsAdjacent(region1, region2)).toBe(true); // Touching diagonally
+		});
+
+		it('should detect non-adjacency for non-overlapping larger regions', () => {
+			const region1 = { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } };
+			const region2 = { start: { row: 3, col: 3 }, dimension: { width: 2, height: 2 } };
+
+			expect(grid.areRegionsAdjacent(region1, region2)).toBe(false); // Too far apart
 		});
 	});
 

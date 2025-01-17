@@ -430,7 +430,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 					.filter((region) => {
 						// Must be adjacent within distance constraints
 						const isAdjacent = this.areRegionsAdjacent(freedRegion, region, {
-							maxDistance: isTargetRegion ? 0 : 9,
+							maxGap: isTargetRegion ? 0 : Infinity,
 							includeDiagonal: true // TODO: Figure out what feels more natural
 						});
 						// Must fit within the freed region
@@ -612,7 +612,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 		return affectedRegions;
 	}
 
-	private doRegionsOverlap(region1: TGridRegion, region2: TGridRegion): boolean {
+	public doRegionsOverlap(region1: TGridRegion, region2: TGridRegion): boolean {
 		return !(
 			region1.start.row + region1.dimension.height <= region2.start.row ||
 			region1.start.row >= region2.start.row + region2.dimension.height ||
@@ -626,49 +626,33 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 * @param region1 First region to check
 	 * @param region2 Second region to check
 	 * @param options Configuration options
-	 * @param options.maxDistance Maximum number of cells that can be between regions (default: 0)
+	 * @param options.maxGap Maximum number of cells that can be between regions (default: 0)
 	 * @param options.includeDiagonal Whether to consider diagonal adjacency (default: true)
 	 * @returns True if regions are adjacent according to the specified parameters
-	 * @example
-	 * // Check if regions are directly adjacent (no gap)
-	 * grid.areRegionsAdjacent(region1, region2, { maxDistance: 0 })
-	 *
-	 * // Check if regions are at most 2 cells apart, excluding diagonals
-	 * grid.areRegionsAdjacent(region1, region2, { maxDistance: 2, includeDiagonal: false })
-	 *
-	 * // Default behavior: 0 cell gap allowed, including diagonals
-	 * grid.areRegionsAdjacent(region1, region2)
 	 */
 	public areRegionsAdjacent(
 		region1: TGridRegion,
 		region2: TGridRegion,
-		options: { maxDistance?: number; includeDiagonal?: boolean } = {}
+		options: { maxGap?: number; includeDiagonal?: boolean } = {}
 	): boolean {
-		const { maxDistance = 0, includeDiagonal = true } = options;
+		const { maxGap = 0, includeDiagonal = true } = options;
+		const maxDistance = maxGap + 1; // Use distance instead of gap to distinguish diagonal from orthogonal neighbors, as gap is 0 for all direct neighbors
 
-		// Calculate the bounds of each region
-		const r1Right = region1.start.col + region1.dimension.width - 1;
-		const r1Bottom = region1.start.row + region1.dimension.height - 1;
+		// Compute the horizontal and vertical distance between the regions
+		const horizontalDistance = Math.max(
+			0,
+			Math.abs(region2.start.col - (region1.start.col + region1.dimension.width - 1))
+		);
+		const verticalDistance = Math.max(
+			0,
+			Math.abs(region2.start.row - (region1.start.row + region1.dimension.height - 1))
+		);
 
-		// Compute the horizontal and vertical gaps between the regions
-		const horizontalGap = Math.max(0, Math.abs(region2.start.col - r1Right) - 1);
-		const verticalGap = Math.max(0, Math.abs(region2.start.row - r1Bottom) - 1);
-
-		// Check for diagonal adjacency (when horizontalGap equals verticalGap)
-		const isDiagonal = horizontalGap === verticalGap && horizontalGap <= maxDistance;
-
-		// Regions are adjacent if:
-		// 1. They overlap (gap < 0)
-		// 2. They touch (gap = 0)
-		// 3. They are within maxDistance (gap <= maxDistance)
-
-		// If diagonal adjacency is not allowed, exclude diagonal cases
-		if (!includeDiagonal && isDiagonal) {
-			return false;
-		}
-
-		// Adjacency is valid if both gaps are within maxDistance
-		return horizontalGap <= maxDistance && verticalGap <= maxDistance;
+		return (
+			horizontalDistance <= maxDistance &&
+			verticalDistance <= maxDistance &&
+			(includeDiagonal || horizontalDistance !== verticalDistance)
+		);
 	}
 
 	/**
