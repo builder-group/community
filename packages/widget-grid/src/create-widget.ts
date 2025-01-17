@@ -42,6 +42,10 @@ export function createWidget<GContent extends TWidgetBaseContent>(
 				}
 			});
 
+			this.layoutMode.listen(() => {
+				this.syncPosition();
+			});
+
 			// @ts-expect-error -- Remove init method after initialization
 			delete this.init;
 			return this;
