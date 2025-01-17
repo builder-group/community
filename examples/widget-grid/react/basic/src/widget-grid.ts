@@ -120,7 +120,7 @@ const createPerformancePreset = (cols = 50, rows = 50): TWidgetGridPreset<TPerfo
 			{
 				label: 'Shuffle',
 				action: (widgetGrid) => {
-					widgetGrid.setGridCells(shuffleCells(widgetGrid._grid.cells));
+					widgetGrid.setGridCells(shuffleCells(widgetGrid.grid.cells));
 				}
 			}
 		]

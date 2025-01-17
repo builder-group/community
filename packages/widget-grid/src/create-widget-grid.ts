@@ -1,6 +1,13 @@
 import { notEmpty } from '@blgc/utils';
 import { createState } from 'feature-state';
-import { getGridRegionPixels, Grid, pointerEventToViewportPoint, TGridRegion } from './helper';
+import { createWidget } from './create-widget';
+import {
+	getGridRegionPixels,
+	Grid,
+	pointerEventToViewportPoint,
+	TGridRegion,
+	TGridSize
+} from './helper';
 import {
 	TBaseWidget,
 	TBoundingRect,
@@ -9,77 +16,75 @@ import {
 	TWidget,
 	TWidgetBaseContent,
 	TWidgetId,
-	TXYPosition,
+	TWithInit,
 	type TWidgetGrid
 } from './types';
 
 export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 	config: TCreateWidgetGridConfig<GContent>
 ): TWidgetGrid<GContent, []> {
-	const { widgets: baseWidgets, grid: gridCells, cellSize } = config;
-
-	const grid = new Grid(gridCells);
-
-	// Create a map for O(1) lookup of regions by widget ID
-	const regions = grid.getRegions();
-	const regionsByWidgetId = regions.reduce(
-		(acc, region) => {
-			acc[region.id] = {
-				start: region.start,
-				dimension: region.dimension
-			};
-			return acc;
-		},
-		{} as Record<TWidgetId, TGridRegion>
-	);
-
-	// Convert base widgets to full widgets with regions in one pass
-	const widgets = baseWidgets.reduce(
-		(acc, baseWidget) => {
-			const region = regionsByWidgetId[baseWidget.id] ?? null;
-			const regionPixels = region != null ? getGridRegionPixels(region, cellSize) : null;
-			const widget = {
-				id: baseWidget.id,
-				content: createState(baseWidget.content as GContent),
-				region: createState(region),
-				layoutMode: createState<'Grid' | 'Absolute'>('Grid'),
-				position: createState<TXYPosition | null>(
-					regionPixels != null ? { x: regionPixels.x, y: regionPixels.y } : null
-				),
-				size: createState<TDimensions | null>(
-					regionPixels != null ? { width: regionPixels.width, height: regionPixels.height } : null
-				),
-				isSelected: createState(baseWidget.selected ?? false),
-				isLocked: createState(baseWidget.locked ?? false)
-			};
-
-			widget.isSelected.listen(({ value }) => {
-				if (value) {
-					widget.layoutMode.set('Absolute', { additionalData: { source: 'is-selected' } });
-				} else {
-					widget.layoutMode.set('Grid', { additionalData: { source: 'is-selected' } });
-				}
-			});
-
-			acc[baseWidget.id] = widget;
-
-			return acc;
-		},
-		{} as Record<TWidgetId, TWidget<GContent>>
-	);
-
-	const widgetGrid: TWidgetGrid<GContent, []> = {
+	const widgetGrid: TWithInit<
+		TWidgetGrid<GContent, []>,
+		{ baseWidgets: TCreateWidgetGridConfig<GContent>['widgets'] }
+	> = {
 		_features: [],
-		_widgets: widgets,
+		_widgets: {},
 		_selected: createState<TWidgetId[]>([]),
-		_grid: grid,
-		_size: createState(grid.size),
+		_grid: new Grid(config.grid),
+		_size: createState<TGridSize>({ rows: 0, columns: 0 }),
 		interactionMode: createState<TInteractionMode>({ type: 'None' }),
-		cellSize: createState(cellSize),
+		cellSize: createState(config.cellSize),
 		boundingRect: createState<TBoundingRect>({ left: 0, top: 0 }),
 
+		init({ baseWidgets }) {
+			this._size.set(this._grid.size, { additionalData: { source: 'init' } });
+
+			// Create a map for O(1) lookup of regions by widget ID
+			const regions = this._grid.getRegions();
+			const regionsByWidgetId = regions.reduce(
+				(acc, region) => {
+					acc[region.id] = {
+						start: region.start,
+						dimension: region.dimension
+					};
+					return acc;
+				},
+				{} as Record<TWidgetId, TGridRegion>
+			);
+
+			// Convert base widgets to full widgets with regions in one pass
+			this._widgets = baseWidgets.reduce(
+				(acc, baseWidget) => {
+					acc[baseWidget.id] = createWidget({
+						baseWidget,
+						widgetGrid: this,
+						region: regionsByWidgetId[baseWidget.id]
+					});
+					return acc;
+				},
+				{} as Record<TWidgetId, TWidget<GContent>>
+			);
+
+			// TODO: Should I work with side effects? Or update e.g. region, position, size, etc. more directly?
+
+			this.interactionMode.listen(
+				({ value }) => {
+					if (value.type === 'None') {
+						for (const widget of widgetGrid.getSelectedWidgets()) {
+							widget.syncPosition();
+						}
+					}
+				},
+				{ key: 'interaction-mode' }
+			);
+
+			// @ts-expect-error -- Remove init method after initialization
+			delete this.init;
+			return this;
+		},
+
 		setGridCells(cells) {
-			grid.cellsState.set(cells);
+			this._grid.cellsState.set(cells);
 			this.syncGrid();
 		},
 		syncGrid(options = {}) {
@@ -87,7 +92,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 
 			// Sync regions
 			if (regions) {
-				for (const region of grid.getRegions()) {
+				for (const region of this._grid.getRegions()) {
 					const widget = widgetGrid._widgets[region.id];
 					if (
 						widget != null &&
@@ -103,7 +108,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 							},
 							{ additionalData: { source: 'sync-grid' } }
 						);
-						const regionPixels = getGridRegionPixels(region, cellSize);
+						const regionPixels = getGridRegionPixels(region, this.cellSize._v);
 						widget.position.set(
 							{ x: regionPixels.x, y: regionPixels.y },
 							{ additionalData: { source: 'sync-grid' } }
@@ -119,10 +124,10 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 			// Sync size
 			if (
 				size &&
-				(grid.size.rows !== widgetGrid._size._v.rows ||
-					grid.size.columns !== widgetGrid._size._v.columns)
+				(this._grid.size.rows !== this._size._v.rows ||
+					this._grid.size.columns !== this._size._v.columns)
 			) {
-				widgetGrid._size.set(grid.size, { additionalData: { source: 'sync-grid' } });
+				this._size.set(this._grid.size, { additionalData: { source: 'sync-grid' } });
 			}
 		},
 
@@ -236,27 +241,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		}
 	};
 
-	// TODO: Should I work with side effects? Or update e.g. region, position, size, etc. more directly?
-
-	widgetGrid.interactionMode.listen(
-		({ value }) => {
-			if (value.type === 'None') {
-				for (const widget of widgetGrid.getSelectedWidgets()) {
-					const region = widget.region._v;
-					if (region != null) {
-						const regionPixels = getGridRegionPixels(region, cellSize);
-						widget.position.set({
-							x: regionPixels.x,
-							y: regionPixels.y
-						});
-					}
-				}
-			}
-		},
-		{ key: 'interaction-mode' }
-	);
-
-	return widgetGrid;
+	return widgetGrid.init({ baseWidgets: config.widgets });
 }
 
 export interface TCreateWidgetGridConfig<GContent extends TWidgetBaseContent> {

@@ -1,9 +1,10 @@
 import { TState } from 'feature-state';
 import { TGridRegion } from '../helper';
 import { TDimensions, TXYPosition } from './utils';
+import { TWidgetGrid } from './widget-grid';
 
 export interface TWidget<GContent extends TWidgetBaseContent> {
-	// _widgetGrid: TWidgetGrid<GContent, []>;
+	_widgetGrid: TWidgetGrid<GContent, []>;
 	id: TWidgetId;
 	layoutMode: TState<'Grid' | 'Absolute', []>;
 	// nextRegion: TState<TWidgetRegion | null, []>;
@@ -19,6 +20,8 @@ export interface TWidget<GContent extends TWidgetBaseContent> {
 	isSelected: TState<boolean, []>;
 	// Whether the widget is locked
 	isLocked: TState<boolean, []>;
+
+	syncPosition: () => void;
 }
 
 export interface TBaseWidget<GContent extends TWidgetBaseContent> {

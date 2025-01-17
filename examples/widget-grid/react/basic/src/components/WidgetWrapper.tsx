@@ -20,9 +20,9 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 	const count = useRenderCount();
 	const elementRef = React.useRef<HTMLDivElement>(null);
 
-	// if (widget.id === 'A') {
-	// 	console.log({ layoutMode, region });
-	// }
+	if (widget.id === 'A') {
+		console.log({ layoutMode, region });
+	}
 
 	// =========================================================================
 	// Events
