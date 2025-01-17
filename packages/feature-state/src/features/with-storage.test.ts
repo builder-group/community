@@ -44,7 +44,7 @@ describe('withStorage function', () => {
 		const key = 'testKey';
 		const persistedValue = 42;
 		await mockStorage.save(key, persistedValue);
-		const state = withStorage(mockStorage, key)(createState(0));
+		const state = withStorage(createState(0), mockStorage, key);
 
 		// Act
 		const result = await state.persist();
@@ -57,7 +57,7 @@ describe('withStorage function', () => {
 	it('should persist state changes', async () => {
 		// Prepare
 		const key = 'testKey';
-		const state = withStorage(mockStorage, key)(createState(10));
+		const state = withStorage(createState(10), mockStorage, key);
 		await state.persist();
 
 		// Act
@@ -71,7 +71,7 @@ describe('withStorage function', () => {
 	it('should delete persisted state', async () => {
 		// Prepare
 		const key = 'testKey';
-		const state = withStorage(mockStorage, key)(createState(10));
+		const state = withStorage(createState(10), mockStorage, key);
 		await state.persist();
 
 		// Act
@@ -85,7 +85,7 @@ describe('withStorage function', () => {
 	it('should return false if deleting non-existent key', async () => {
 		// Prepare
 		const key = 'nonExistentKey';
-		const state = withStorage(mockStorage, key)(createState(10));
+		const state = withStorage(createState(10), mockStorage, key);
 
 		// Act
 		const deleteResult = await state.deleteFormStorage();
@@ -99,7 +99,7 @@ describe('withStorage function', () => {
 		const key = 'testKey';
 
 		// Act
-		const state = withStorage(mockStorage, key)(createState(10));
+		const state = withStorage(createState(10), mockStorage, key);
 		await state.persist();
 
 		// Assert

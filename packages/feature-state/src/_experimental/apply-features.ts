@@ -1,5 +1,5 @@
 import { TFeatureDefinition } from '@blgc/types/features';
-import { TState } from './types';
+import { TState } from '../types';
 
 // We tried two approaches with array parameters that didn't work due to TypeScript limitations:
 //

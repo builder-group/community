@@ -5,7 +5,7 @@ import { withSelector } from './with-selector';
 describe('withSelector function', () => {
 	it('should notify listener when selected path changes', () => {
 		// Prepare
-		const state = withSelector()(createState({ user: { name: 'John', age: 30 } }));
+		const state = withSelector(createState({ user: { name: 'John', age: 30 } }));
 		const callback = vi.fn();
 
 		// Act
@@ -18,7 +18,7 @@ describe('withSelector function', () => {
 
 	it('should not notify listener when unrelated path changes', () => {
 		// Prepare
-		const state = withSelector()(createState({ user: { name: 'John', age: 30 } }));
+		const state = withSelector(createState({ user: { name: 'John', age: 30 } }));
 		const callback = vi.fn();
 
 		// Act
@@ -31,7 +31,7 @@ describe('withSelector function', () => {
 
 	it('should notify listener when any of multiple selected paths change', () => {
 		// Prepare
-		const state = withSelector()(createState({ user: { name: 'John', age: 30 } }));
+		const state = withSelector(createState({ user: { name: 'John', age: 30 } }));
 		const callback = vi.fn();
 
 		// Act
@@ -44,7 +44,7 @@ describe('withSelector function', () => {
 
 	it('should notify listener when parent of selected path changes', () => {
 		// Prepare
-		const state = withSelector()(createState({ user: { name: 'John', age: 30 } }));
+		const state = withSelector(createState({ user: { name: 'John', age: 30 } }));
 		const callback = vi.fn();
 
 		// Act
@@ -58,7 +58,7 @@ describe('withSelector function', () => {
 
 	it('should work with function-based selectors', () => {
 		// Prepare
-		const state = withSelector()(createState({ count: 0 }));
+		const state = withSelector(createState({ count: 0 }));
 		const callback = vi.fn();
 
 		// Act
@@ -72,7 +72,7 @@ describe('withSelector function', () => {
 
 	it('should notify listener when prevValue is null', () => {
 		// Prepare
-		const state = withSelector()(createState(null));
+		const state = withSelector(createState(null));
 		const callback = vi.fn();
 
 		// Act
@@ -85,7 +85,7 @@ describe('withSelector function', () => {
 
 	it('should notify listener when changedProperties is null', () => {
 		// Prepare
-		const state = withSelector()(createState({ user: { name: 'John' } }));
+		const state = withSelector(createState({ user: { name: 'John' } }));
 		const callback = vi.fn();
 
 		// Act
