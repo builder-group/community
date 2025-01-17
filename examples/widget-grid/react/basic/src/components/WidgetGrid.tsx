@@ -26,9 +26,9 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 	});
 
 	// TODO: REMOVE
-	useListener(widgetGrid.getWidgetById('A')?.region, ({ value, source, background }) => {
-		console.log(`[Widget A Region] s: ${source}${background ? ' b: true' : ''}`, value);
-	});
+	// useListener(widgetGrid.getWidgetById('A')?.region, ({ value, source, background }) => {
+	// 	console.log(`[Widget A Region] s: ${source}${background ? ' b: true' : ''}`, value);
+	// });
 	// useListener(widgetGrid.getWidgetById('A')?.position, ({ value, source, background }) => {
 	// 	console.log(`[Widget A Position] s: ${source}${background ? ' b: true' : ''}`, value);
 	// });

@@ -20,10 +20,6 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 	const count = useRenderCount();
 	const elementRef = React.useRef<HTMLDivElement>(null);
 
-	if (widget.id === 'A') {
-		console.log({ layoutMode, region });
-	}
-
 	// =========================================================================
 	// Events
 	// =========================================================================
@@ -103,9 +99,13 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 	// Animate the transition between current and next region
 	useListener(
 		widget.region,
-		({ value: nextRegion }) => {
+		({ value: nextRegion, background, isMoved }) => {
+			if (background) {
+				return;
+			}
+
 			const isLargeGrid = widgetGrid._size._v.columns * widgetGrid._size._v.rows > 500;
-			if (isLargeGrid || nextRegion == null) {
+			if (isLargeGrid || nextRegion == null || isMoved) {
 				setRegion(nextRegion);
 				return;
 			}

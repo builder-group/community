@@ -394,7 +394,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	): TGridRegionWithId<GGridCellId>[] {
 		const affectedRegions: TGridRegionWithId<GGridCellId>[] = [];
 		const id = this.cells[sourceRegion.start.row]?.[sourceRegion.start.col] ?? null;
-		if (id == null) {
+		if (id == null || targetPosition.col >= this.size.columns) {
 			return [];
 		}
 
@@ -430,7 +430,8 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 					.filter((region) => {
 						// Must be adjacent within distance constraints
 						const isAdjacent = this.areRegionsAdjacent(freedRegion, region, {
-							maxDistance: isTargetRegion ? 0 : 9
+							maxDistance: isTargetRegion ? 0 : 9,
+							includeDiagonal: true // TODO: Figure out what feels more natural
 						});
 						// Must fit within the freed region
 						const fitsSpace =

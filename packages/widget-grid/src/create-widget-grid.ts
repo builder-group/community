@@ -162,15 +162,12 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 				if (widget == null) {
 					continue;
 				}
-				if (region.id !== widgetId) {
-					widget.region.set(region, {
-						additionalData: {
-							source: 'move-widget'
-						}
-					});
-				} else {
-					widget.region._v = region;
-				}
+				widget.region.set(region, {
+					additionalData: {
+						source: 'move-widget',
+						isMoved: region.id === widgetId
+					}
+				});
 			}
 
 			this.syncGrid({ regions: false, size: true });

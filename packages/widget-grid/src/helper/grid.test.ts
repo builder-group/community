@@ -528,6 +528,27 @@ describe('Grid class', () => {
 			]);
 		});
 
+		it('should not move region out of bounds in east direction', () => {
+			const grid = new Grid([
+				['A', null],
+				[null, null]
+			]);
+
+			const result = grid.cascadeMove(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { width: 1, height: 1 }
+				},
+				{ row: 0, col: 4 }
+			);
+
+			expect(grid.cells).toEqual([
+				['A', null],
+				[null, null]
+			]);
+			expect(result).toEqual([]);
+		});
+
 		it('should move 1x2 region in south east direction and trigger cascade', () => {
 			const grid = new Grid([
 				['A', 'B', 'C'],
