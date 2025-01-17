@@ -23,6 +23,7 @@ export function withHono<GPaths extends object, GFeatures extends TFeatureDefini
 				formatPath(path),
 				parseParamsMiddleware(config),
 				validationMiddleware(config),
+				...((config.middlewares as [hono.MiddlewareHandler]) ?? []),
 				config.handler
 			);
 		},
@@ -31,6 +32,7 @@ export function withHono<GPaths extends object, GFeatures extends TFeatureDefini
 				formatPath(path),
 				parseParamsMiddleware(config),
 				validationMiddleware(config),
+				...((config.middlewares as [hono.MiddlewareHandler]) ?? []),
 				config.handler
 			);
 		},
@@ -39,6 +41,7 @@ export function withHono<GPaths extends object, GFeatures extends TFeatureDefini
 				formatPath(path),
 				parseParamsMiddleware(config),
 				validationMiddleware(config),
+				...((config.middlewares as [hono.MiddlewareHandler]) ?? []),
 				config.handler
 			);
 		},
@@ -47,6 +50,7 @@ export function withHono<GPaths extends object, GFeatures extends TFeatureDefini
 				formatPath(path),
 				parseParamsMiddleware(config),
 				validationMiddleware(config),
+				...((config.middlewares as [hono.MiddlewareHandler]) ?? []),
 				config.handler
 			);
 		},
@@ -55,6 +59,7 @@ export function withHono<GPaths extends object, GFeatures extends TFeatureDefini
 				formatPath(path),
 				parseParamsMiddleware(config),
 				validationMiddleware(config),
+				...((config.middlewares as [hono.MiddlewareHandler]) ?? []),
 				config.handler
 			);
 		}

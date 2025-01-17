@@ -74,6 +74,11 @@ export type TOpenApiHonoRequestHandler<GPath extends string, GPathOperation> = h
 	TOpenApiHonoResponse<GPathOperation>
 >;
 
+export type TOpenApiHonoMiddlewareHandler<
+	GPath extends string,
+	GPathOperation
+> = hono.MiddlewareHandler<any, TOpenApiToHonoUrlPattern<GPath>, TOpenApiHonoInput<GPathOperation>>;
+
 type TOpenApiToHonoUrlPattern<T extends string> =
 	T extends `${infer Start}{${infer Param}}${infer End}` ? `${Start}:${Param}${End}` : T;
 
@@ -113,6 +118,7 @@ export type TOpenApiHonoResponse<GPathOperation> =
 
 export type TOpenApiHonoRouteConfig<GPath extends string, GPathOperation> = {
 	handler: TOpenApiHonoRequestHandler<GPath, GPathOperation>;
+	middlewares?: TOpenApiHonoMiddlewareHandler<GPath, GPathOperation>[];
 } & TOpenApiHonoValidators<GPathOperation> &
 	TOpenApiHonoParamsParserOptions;
 

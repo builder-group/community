@@ -14,8 +14,15 @@ openApiRouter.get('/pet/{petId}', {
 			petId: v.number()
 		})
 	),
+	middlewares: [
+		(req, res, next) => {
+			console.log('middleware');
+			next();
+		}
+	],
 	handler: (req, res) => {
 		const { petId } = req.params;
+		console.log('handler');
 
 		res.send({
 			name: 'Falko',

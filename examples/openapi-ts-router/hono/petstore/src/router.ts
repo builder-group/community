@@ -14,8 +14,15 @@ openApiRouter.get('/pet/{petId}', {
 			petId: z.number()
 		})
 	),
+	middlewares: [
+		async (c, next) => {
+			console.log('middleware');
+			await next();
+		}
+	],
 	handler: (c) => {
 		const { petId } = c.req.valid('param');
+		console.log('handler');
 
 		return c.json({
 			name: 'Falko',

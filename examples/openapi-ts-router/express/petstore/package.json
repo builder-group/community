@@ -15,15 +15,15 @@
 	"dependencies": {
 		"express": "^4.21.2",
 		"openapi-ts-router": "workspace:*",
-		"valibot": "1.0.0-beta.9",
+		"valibot": "1.0.0-beta.12",
 		"validation-adapters": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@types/express": "^5.0.0",
-		"@types/node": "^22.10.3",
+		"@types/node": "^22.10.7",
 		"nodemon": "^3.1.9",
-		"openapi-typescript": "^7.4.4",
+		"openapi-typescript": "^7.5.2",
 		"ts-node": "^10.9.2",
 		"tsconfig-paths": "^4.2.0"
 	}
