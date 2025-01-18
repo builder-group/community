@@ -553,6 +553,23 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	}
 
 	/**
+	 * Checks if a region is out of bounds in specified directions
+	 */
+	public isRegionOutOfBounds(
+		region: TGridRegion,
+		options: { north?: boolean; east?: boolean; south?: boolean; west?: boolean } = {}
+	): boolean {
+		const { north = true, east = true, south = true, west = true } = options;
+
+		return (
+			(north && region.start.row < 0) ||
+			(east && region.start.col + region.dimension.cols > this.size.cols) ||
+			(south && region.start.row + region.dimension.rows > this.size.rows) ||
+			(west && region.start.col < 0)
+		);
+	}
+
+	/**
 	 * Checks if a region fits within another region
 	 */
 	public doesRegionFit(region: TGridRegion, targetRegion: TGridRegion): boolean {
@@ -573,6 +590,11 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 			start: targetPosition,
 			dimension: region.dimension
 		};
+
+		// Check if target region would fit within grid dimensions
+		if (this.isRegionOutOfBounds(targetRegion)) {
+			return false;
+		}
 
 		// Get regions that would be affected by this move
 		const occupyingRegions = this.getOccupyingRegions(targetRegion).filter(
@@ -615,7 +637,6 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	}
 
 	// TODO: Open Issues
-	// - Bug: Widgets disappear, reason unknown
 	// - Only allow downward movement as long as it's adjacent with widget above
 
 	/**
@@ -648,17 +669,19 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 			return [];
 		}
 
-		// Don't allow placing regions outside the grid in north, south and west direction
-		if (targetPosition.col < 0 || targetPosition.col >= this.size.cols || targetPosition.row < 0) {
-			return [];
-		}
-
 		const targetRegion: TGridRegion = {
 			start: targetPosition,
 			dimension: sourceRegion.dimension
 		};
 
-		// Expand grid if needed
+		// Don't allow placing regions outside the grid in north, east and west direction
+		if (
+			this.isRegionOutOfBounds(targetRegion, { north: true, east: true, south: false, west: true })
+		) {
+			return [];
+		}
+
+		// Expand grid in south direction if needed
 		this.expandGrid({
 			rows: targetRegion.start.row + targetRegion.dimension.rows,
 			strategy: 'Set'

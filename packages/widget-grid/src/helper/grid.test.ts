@@ -559,6 +559,33 @@ describe('Grid class', () => {
 			]);
 		});
 
+		it('should move 1x1 region in north direction and swap with 1x2 region', () => {
+			const grid = new Grid([
+				['A', 'B', 'C'],
+				['A', 'D', 'E'],
+				['F', 'G', 'H']
+			]);
+
+			const result = grid.cascadeMove(
+				{
+					start: { row: 2, col: 0 },
+					dimension: { cols: 1, rows: 1 }
+				},
+				{ row: 1, col: 0 }
+			);
+
+			expect(grid.cells).toEqual([
+				[null, 'B', 'C'],
+				['F', 'D', 'E'],
+				['A', 'G', 'H'],
+				['A', null, null]
+			]);
+			expect(result).toEqual([
+				{ id: 'A', start: { row: 2, col: 0 }, dimension: { cols: 1, rows: 2 } },
+				{ id: 'F', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } }
+			]);
+		});
+
 		it('should move 1x2 region in north direction and swap with 1x1 region', () => {
 			const grid = new Grid([
 				['F', 'B', 'C'],
@@ -611,7 +638,7 @@ describe('Grid class', () => {
 			]);
 		});
 
-		it('should not move region out of bounds in east direction', () => {
+		it('should not move 1x1 region out of bounds in east direction', () => {
 			const grid = new Grid([
 				['A', null],
 				[null, null]
@@ -630,6 +657,101 @@ describe('Grid class', () => {
 				[null, null]
 			]);
 			expect(result).toEqual([]);
+		});
+
+		it('should not move 2x1 region out of bounds in east direction', () => {
+			const grid = new Grid([
+				['A', 'A'],
+				[null, null]
+			]);
+
+			const result = grid.cascadeMove(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { cols: 2, rows: 1 }
+				},
+				{ row: 0, col: 1 }
+			);
+
+			expect(grid.cells).toEqual([
+				['A', 'A'],
+				[null, null]
+			]);
+			expect(result).toEqual([]);
+		});
+
+		it('should move 1x2 region in west direction and trigger cascade', () => {
+			const grid = new Grid([
+				['A', 'B', 'B'],
+				['A', 'C', 'D'],
+				['E', 'F', 'G']
+			]);
+
+			const result = grid.cascadeMove(
+				{
+					start: { row: 0, col: 1 },
+					dimension: { cols: 2, rows: 1 }
+				},
+				{ row: 0, col: 0 }
+			);
+
+			// expect(grid.cells).toEqual([
+			// ['B', 'B', 'D'],
+			// ['A', 'C', 'G'],
+			// ['A', 'F', null],
+			// ['E', null, null]
+			// ]);
+			expect(grid.cells).toEqual([
+				['B', 'B', null],
+				['A', 'C', 'D'],
+				['A', 'F', 'G'],
+				['E', null, null]
+			]);
+			expect(result).toEqual([
+				{ id: 'E', start: { row: 3, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'A', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 2 } },
+				{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 1 } }
+			]);
+		});
+
+		it('should move 1x2 region in east direction and trigger cascade', () => {
+			const grid = new Grid([
+				['A', 'B', 'B'],
+				['A', 'C', 'D'],
+				['E', 'F', 'G']
+			]);
+
+			const result = grid.cascadeMove(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { cols: 1, rows: 2 }
+				},
+				{ row: 0, col: 1 }
+			);
+
+			// expect(grid.cells).toEqual([
+			// ['E', 'A', null],
+			// [null, 'A', null],
+			// [null, 'B', 'B'],
+			// [null, 'C', 'D'],
+			// [null, 'F', 'G']
+			// ]);
+			expect(grid.cells).toEqual([
+				['C', 'A', null],
+				['E', 'A', null],
+				[null, 'B', 'B'],
+				[null, null, 'D'],
+				[null, 'F', 'G']
+			]);
+			expect(result).toEqual([
+				{ id: 'C', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'F', start: { row: 4, col: 1 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'G', start: { row: 4, col: 2 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'D', start: { row: 3, col: 2 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'B', start: { row: 2, col: 1 }, dimension: { cols: 2, rows: 1 } },
+				{ id: 'A', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 2 } },
+				{ id: 'E', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } }
+			]);
 		});
 
 		it('[1] should move 1x2 region in south east direction and trigger cascade', () => {
