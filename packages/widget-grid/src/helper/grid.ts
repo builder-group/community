@@ -239,75 +239,89 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	}
 
 	/**
-	 * Returns an array of rectangular regions that represent the empty space
-	 * when placing one region inside another
+	 * Returns an array of regions that represent the remaining regions from the container region
+	 * when the cutout region is "cut out" from it.
+	 * @example
+	 * [
+	 *   [Y, Y, Y], // Container (Y)
+	 *   [Y, X, Y], // Cutout (X)
+	 *   [Y, Y, Y]
+	 * ]
+	 * [
+	 *   [A, A, A], // Top region (A)
+	 *   [B, X, C], // Left (B), Cutout (X), Right (C)
+	 *   [D, D, D]  // Bottom region (D)
+	 * ]
 	 */
-	public getComplementaryRegions(container: TGridRegion, placed: TGridRegion): TGridRegion[] {
+	public getComplementaryRegions(
+		containerRegion: TGridRegion,
+		cutoutRegion: TGridRegion
+	): TGridRegion[] {
 		// Check if regions overlap at all
 		if (
-			placed.start.row >= container.start.row + container.dimension.rows ||
-			placed.start.row + placed.dimension.rows <= container.start.row ||
-			placed.start.col >= container.start.col + container.dimension.cols ||
-			placed.start.col + placed.dimension.cols <= container.start.col
+			cutoutRegion.start.row >= containerRegion.start.row + containerRegion.dimension.rows ||
+			cutoutRegion.start.row + cutoutRegion.dimension.rows <= containerRegion.start.row ||
+			cutoutRegion.start.col >= containerRegion.start.col + containerRegion.dimension.cols ||
+			cutoutRegion.start.col + cutoutRegion.dimension.cols <= containerRegion.start.col
 		) {
 			// If no overlap, return the entire container as available space
-			return [container];
+			return [containerRegion];
 		}
 
 		const complementary: TGridRegion[] = [];
 
 		// Top region (if exists)
-		if (placed.start.row > container.start.row) {
+		if (cutoutRegion.start.row > containerRegion.start.row) {
 			complementary.push({
-				start: container.start,
+				start: containerRegion.start,
 				dimension: {
-					cols: container.dimension.cols,
-					rows: placed.start.row - container.start.row
+					cols: containerRegion.dimension.cols,
+					rows: cutoutRegion.start.row - containerRegion.start.row
 				}
 			});
 		}
 
 		// Left region (if exists)
-		if (placed.start.col > container.start.col) {
+		if (cutoutRegion.start.col > containerRegion.start.col) {
 			complementary.push({
 				start: {
-					row: placed.start.row,
-					col: container.start.col
+					row: cutoutRegion.start.row,
+					col: containerRegion.start.col
 				},
 				dimension: {
-					cols: placed.start.col - container.start.col,
-					rows: placed.dimension.rows
+					cols: cutoutRegion.start.col - containerRegion.start.col,
+					rows: cutoutRegion.dimension.rows
 				}
 			});
 		}
 
 		// Right region (if exists)
-		const placedEndCol = placed.start.col + placed.dimension.cols;
-		const containerEndCol = container.start.col + container.dimension.cols;
+		const placedEndCol = cutoutRegion.start.col + cutoutRegion.dimension.cols;
+		const containerEndCol = containerRegion.start.col + containerRegion.dimension.cols;
 		if (placedEndCol < containerEndCol) {
 			complementary.push({
 				start: {
-					row: placed.start.row,
+					row: cutoutRegion.start.row,
 					col: placedEndCol
 				},
 				dimension: {
 					cols: containerEndCol - placedEndCol,
-					rows: placed.dimension.rows
+					rows: cutoutRegion.dimension.rows
 				}
 			});
 		}
 
 		// Bottom region (if exists)
-		const placedEndRow = placed.start.row + placed.dimension.rows;
-		const containerEndRow = container.start.row + container.dimension.rows;
+		const placedEndRow = cutoutRegion.start.row + cutoutRegion.dimension.rows;
+		const containerEndRow = containerRegion.start.row + containerRegion.dimension.rows;
 		if (placedEndRow < containerEndRow) {
 			complementary.push({
 				start: {
 					row: placedEndRow,
-					col: container.start.col
+					col: containerRegion.start.col
 				},
 				dimension: {
-					cols: container.dimension.cols,
+					cols: containerRegion.dimension.cols,
 					rows: containerEndRow - placedEndRow
 				}
 			});
@@ -666,54 +680,73 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 			for (const [freedIndex, freedRegion] of freedRegions.entries()) {
 				const isTargetRegion = this.doRegionsOverlap(freedRegion, targetRegion);
 
-				// Find best fitting region from occupying regions
-				const bestFit = occupyingRegions
-					.filter((region) => {
+				// Find best fitting region and position from occupying regions
+				const moves = occupyingRegions
+					.reduce<
+						Array<{
+							region: TGridRegionWithId<GGridCellId>;
+							position: TGridPosition;
+							avoidsTarget: boolean;
+						}>
+					>((moves, region) => {
 						// Must be adjacent within distance constraints
 						const isAdjacent = this.areRegionsAdjacent(freedRegion, region, {
 							maxGap: isTargetRegion ? 0 : Infinity,
 							includeDiagonal: false
 						});
 						if (!isAdjacent) {
-							return false;
+							return moves;
 						}
 
-						// Check if the region can be moved to the freed space
-						const canMove = this.canMoveRegionTo(region, freedRegion.start);
-						if (!canMove) {
-							return false;
-						}
+						// Check all possible positions within freed region
+						this.iterateRegion(freedRegion, (row, col) => {
+							const position: TGridPosition = { row, col };
 
-						// Check if this move actually frees up space
-						const freedRegions = this.getComplementaryRegions(region, {
-							start: freedRegion.start,
-							dimension: region.dimension
+							// Check if the region can be moved to this position
+							if (!this.canMoveRegionTo(region, position)) {
+								return;
+							}
+
+							const newRegion: TGridRegion = {
+								start: position,
+								dimension: region.dimension
+							};
+
+							// Check if this move actually contributes to freeing up the target region
+							const freedRegions = this.getComplementaryRegions(region, newRegion);
+							const freesTarget = freedRegions.some((r) => this.doRegionsOverlap(r, targetRegion));
+							if (!freesTarget) {
+								return;
+							}
+
+							moves.push({
+								region,
+								position,
+								avoidsTarget: !this.doRegionsOverlap(newRegion, targetRegion)
+							});
 						});
-						const freesTarget = freedRegions.some((r) => this.doRegionsOverlap(r, targetRegion));
-						if (!freesTarget) {
-							return false;
+
+						return moves;
+					}, [])
+					// Sort moves by target avoidance first, then region size
+					.sort((a, b) => {
+						if (a.avoidsTarget !== b.avoidsTarget) {
+							return a.avoidsTarget ? -1 : 1;
 						}
+						return this.getRegionArea(b.region) - this.getRegionArea(a.region);
+					});
+				const bestMove = moves[0];
 
-						return true;
-					})
-					// Prefer larger regions to minimize fragmentation
-					.sort((a, b) => this.getRegionArea(b) - this.getRegionArea(a))[0];
-
-				if (bestFit == null) {
+				if (bestMove == null) {
 					continue;
 				}
 
-				// Move the region to freed region
-				this.overrideMove(bestFit, freedRegion.start);
+				// Move the region to best position
+				this.overrideMove(bestMove.region, bestMove.position);
 
 				// Update tracking of occupying regions
-				if (
-					!this.doRegionsOverlap(
-						{ start: freedRegion.start, dimension: bestFit.dimension },
-						targetRegion
-					)
-				) {
-					const index = occupyingRegions.findIndex((r) => r.id === bestFit.id);
+				if (bestMove.avoidsTarget) {
+					const index = occupyingRegions.findIndex((r) => r.id === bestMove.region.id);
 					if (index !== -1) {
 						occupyingRegions.splice(index, 1);
 					}
@@ -725,7 +758,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 					// Remaining free regions in current freed region
 					...this.getFreeRegions(freedRegion, { merge: false }),
 					// Regions freed up from moved region's original position
-					...this.getFreeRegions(bestFit, { merge: false }).filter(
+					...this.getFreeRegions(bestMove.region, { merge: false }).filter(
 						(region) => !this.doRegionsOverlap(region, targetRegion)
 					)
 				);
@@ -735,9 +768,9 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 
 				// Track affected region
 				affectedRegions.push({
-					id: bestFit.id,
-					start: freedRegion.start,
-					dimension: bestFit.dimension
+					id: bestMove.region.id,
+					start: bestMove.position,
+					dimension: bestMove.region.dimension
 				});
 
 				movedSomething = true;

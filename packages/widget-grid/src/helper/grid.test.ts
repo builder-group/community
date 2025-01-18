@@ -559,6 +559,32 @@ describe('Grid class', () => {
 			]);
 		});
 
+		it('should move 1x2 region in north direction and swap with 1x1 region', () => {
+			const grid = new Grid([
+				['F', 'B', 'C'],
+				['A', 'D', 'E'],
+				['A', 'G', 'H']
+			]);
+
+			const result = grid.cascadeMove(
+				{
+					start: { row: 1, col: 0 },
+					dimension: { cols: 1, rows: 2 }
+				},
+				{ row: 0, col: 0 }
+			);
+
+			expect(grid.cells).toEqual([
+				['A', 'B', 'C'],
+				['A', 'D', 'E'],
+				['F', 'G', 'H']
+			]);
+			expect(result).toEqual([
+				{ id: 'F', start: { row: 2, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'A', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 2 } }
+			]);
+		});
+
 		it('should move region out of bounds in south direction', () => {
 			const grid = new Grid([
 				['A', null],
@@ -1215,35 +1241,45 @@ describe('Grid class', () => {
 		it('should return all surrounding regions for centered placement', () => {
 			const grid = new Grid();
 			const container = { start: { row: 0, col: 0 }, dimension: { cols: 3, rows: 3 } };
-			const placed = { start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 1 } };
+			const cutout = { start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 1 } };
 
-			const complementary = grid.getComplementaryRegions(container, placed);
+			const complementary = grid.getComplementaryRegions(container, cutout);
 
+			// [
+			//   [Y, Y, Y], // Container (Y)
+			//   [Y, X, Y], // Cutout (X)
+			//   [Y, Y, Y]
+			// ]
+			// [
+			//   [A, A, A], // Top region (A)
+			//   [B, X, C], // Left (B), Cutout (X), Right (C)
+			//   [D, D, D]  // Bottom region (D)
+			// ]
 			expect(complementary).toHaveLength(4); // top, left, right, bottom
 			expect(complementary).toContainEqual({
 				start: { row: 0, col: 0 },
 				dimension: { cols: 3, rows: 1 }
-			}); // top
+			}); // top (A)
 			expect(complementary).toContainEqual({
 				start: { row: 1, col: 0 },
 				dimension: { cols: 1, rows: 1 }
-			}); // left
+			}); // left (B)
 			expect(complementary).toContainEqual({
 				start: { row: 1, col: 2 },
 				dimension: { cols: 1, rows: 1 }
-			}); // right
+			}); // right (C)
 			expect(complementary).toContainEqual({
 				start: { row: 2, col: 0 },
 				dimension: { cols: 3, rows: 1 }
-			}); // bottom
+			}); // bottom (D)
 		});
 
 		it('should handle placement at edges', () => {
 			const grid = new Grid();
 			const container = { start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 2 } };
-			const placed = { start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } };
+			const cutout = { start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } };
 
-			const complementary = grid.getComplementaryRegions(container, placed);
+			const complementary = grid.getComplementaryRegions(container, cutout);
 
 			expect(complementary).toHaveLength(2); // right and bottom only
 			expect(complementary).toContainEqual({
@@ -1259,9 +1295,9 @@ describe('Grid class', () => {
 		it('should return container region when regions do not overlap', () => {
 			const grid = new Grid();
 			const container = { start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 2 } };
-			const placed = { start: { row: 3, col: 3 }, dimension: { cols: 1, rows: 1 } };
+			const cutout = { start: { row: 3, col: 3 }, dimension: { cols: 1, rows: 1 } };
 
-			const complementary = grid.getComplementaryRegions(container, placed);
+			const complementary = grid.getComplementaryRegions(container, cutout);
 
 			// When regions don't overlap, the entire container is available space
 			expect(complementary).toEqual([container]);
