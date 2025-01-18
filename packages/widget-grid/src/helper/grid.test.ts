@@ -476,6 +476,63 @@ describe('Grid class', () => {
 			]);
 		});
 
+		it('should move 1x2 region in east direction and swap with 2x2 region', () => {
+			const grid = new Grid([
+				['A', 'B', 'B'],
+				['A', 'B', 'B'],
+				['C', 'D', 'E']
+			]);
+
+			const result = grid.cascadeMove(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { cols: 1, rows: 2 }
+				},
+				{ row: 0, col: 2 }
+			);
+
+			expect(grid.cells).toEqual([
+				['B', 'B', 'A'],
+				['B', 'B', 'A'],
+				['C', 'D', 'E']
+			]);
+			expect(result).toEqual([
+				{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 2 } },
+				{ id: 'A', start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 2 } }
+			]);
+		});
+
+		it('should move 1x2 region in east direction and trigger cascade', () => {
+			const grid = new Grid([
+				['A', 'B', 'B'],
+				['A', 'B', 'B'],
+				['C', 'D', 'E']
+			]);
+
+			const result = grid.cascadeMove(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { cols: 1, rows: 2 }
+				},
+				{ row: 0, col: 1 }
+			);
+
+			expect(grid.cells).toEqual([
+				['C', 'A', null],
+				[null, 'A', null],
+				[null, 'B', 'B'],
+				[null, 'B', 'B'],
+				[null, 'D', 'E']
+			]);
+			expect(result).toEqual([
+				{ id: 'D', start: { row: 4, col: 1 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'E', start: { row: 4, col: 2 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'B', start: { row: 2, col: 1 }, dimension: { cols: 2, rows: 2 } },
+				{ id: 'A', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 2 } },
+				{ id: 'C', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } }
+			]);
+		});
+
 		it('should move 1x2 region in south direction and swap with 1x1 region', () => {
 			const grid = new Grid([
 				['A', 'B', 'C'],
@@ -549,7 +606,72 @@ describe('Grid class', () => {
 			expect(result).toEqual([]);
 		});
 
-		it('should move 1x2 region in south east direction and trigger cascade', () => {
+		it('[1] should move 1x2 region in south east direction and trigger cascade', () => {
+			const grid = new Grid([
+				['A', 'B', 'C'],
+				['A', 'D', 'E'],
+				['F', 'G', 'H']
+			]);
+
+			const result = grid.cascadeMove(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { cols: 1, rows: 2 }
+				},
+				{ row: 1, col: 1 }
+			);
+
+			// expect(grid.cells).toEqual([
+			// 	['F', 'B', 'C'],
+			// 	[null, 'A', 'E'],
+			// 	[null, 'A', 'H'],
+			// 	[null, 'D', null],
+			// 	[null, 'G', null]
+			// ]);
+			expect(grid.cells).toEqual([
+				['D', 'B', 'C'],
+				['F', 'A', 'E'],
+				[null, 'A', 'H'],
+				[null, 'G', null]
+			]);
+			expect(result).toEqual([
+				{ id: 'D', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'G', start: { row: 3, col: 1 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'A', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 2 } },
+				{ id: 'F', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } }
+			]);
+		});
+
+		it('[2] should move 1x2 region in south east direction and trigger cascade', () => {
+			const grid = new Grid([
+				['A', 'B', 'C'],
+				['A', 'D', 'E'],
+				['F', 'G', 'H']
+			]);
+
+			const result = grid.cascadeMove(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { cols: 1, rows: 2 }
+				},
+				{ row: 2, col: 1 }
+			);
+
+			expect(grid.cells).toEqual([
+				['F', 'B', 'C'],
+				[null, 'D', 'E'],
+				[null, 'A', 'H'],
+				[null, 'A', null],
+				[null, 'G', null]
+			]);
+			expect(result).toEqual([
+				{ id: 'G', start: { row: 4, col: 1 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'A', start: { row: 2, col: 1 }, dimension: { cols: 1, rows: 2 } },
+				{ id: 'F', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } }
+			]);
+		});
+
+		it('[3] should move 1x2 region in south east direction and trigger cascade', () => {
 			const grid = new Grid([
 				['A', 'B', 'C'],
 				['A', 'B', 'D'],
@@ -575,38 +697,6 @@ describe('Grid class', () => {
 				{ id: 'A', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 2 } }
 			]);
 		});
-
-		it('should move 1x2 region in south east direction and trigger cascade', () => {
-			const grid = new Grid([
-				['A', 'B', 'B'],
-				['A', 'B', 'B'],
-				['C', 'D', 'E']
-			]);
-
-			const result = grid.cascadeMove(
-				{
-					start: { row: 0, col: 0 },
-					dimension: { cols: 1, rows: 2 }
-				},
-				{ row: 1, col: 1 }
-			);
-
-			expect(grid.cells).toEqual([
-				['D', null, null],
-				['C', 'A', null],
-				[null, 'A', null],
-				[null, 'B', 'B'],
-				[null, 'B', 'B'],
-				[null, null, 'E']
-			]);
-			expect(result).toEqual([
-				{ id: 'D', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
-				{ id: 'E', start: { row: 5, col: 2 }, dimension: { cols: 1, rows: 1 } },
-				{ id: 'B', start: { row: 3, col: 1 }, dimension: { cols: 2, rows: 2 } },
-				{ id: 'A', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 2 } },
-				{ id: 'C', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } }
-			]);
-		});
 	});
 
 	describe('areRegionsAdjacent', () => {
@@ -624,10 +714,11 @@ describe('Grid class', () => {
 
 			orthogonalNeighbors.forEach((neighbor) => {
 				expect(grid.areRegionsAdjacent(center, neighbor)).toBe(true);
+				expect(grid.areRegionsAdjacent(neighbor, center)).toBe(true);
 			});
 		});
 
-		it('should detect diagonal adjacency (maxGap = 0, includeDiagonal = true)', () => {
+		it('should detect diagonal adjacency (maxGap = 0)', () => {
 			const center = { start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 1 } };
 
 			const diagonalNeighbors = [
@@ -639,21 +730,55 @@ describe('Grid class', () => {
 
 			diagonalNeighbors.forEach((neighbor) => {
 				expect(grid.areRegionsAdjacent(center, neighbor, { includeDiagonal: true })).toBe(true);
+				expect(grid.areRegionsAdjacent(center, neighbor, { includeDiagonal: false })).toBe(false);
+				expect(grid.areRegionsAdjacent(neighbor, center, { includeDiagonal: true })).toBe(true);
+				expect(grid.areRegionsAdjacent(neighbor, center, { includeDiagonal: false })).toBe(false);
 			});
 		});
 
-		it('should not detect diagonal adjacency when includeDiagonal is false', () => {
-			const center = { start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 1 } };
+		it('should detect orthogonal adjacency with gap (maxGap = 5)', () => {
+			const center = { start: { row: 6, col: 6 }, dimension: { cols: 1, rows: 1 } };
 
-			const diagonalNeighbors = [
-				{ start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } }, // NW
-				{ start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 1 } }, // NE
-				{ start: { row: 2, col: 0 }, dimension: { cols: 1, rows: 1 } }, // SW
-				{ start: { row: 2, col: 2 }, dimension: { cols: 1, rows: 1 } } // SE
+			const orthogonalNeighborsWithGap = [
+				{ start: { row: 0, col: 6 }, dimension: { cols: 1, rows: 1 } }, // North (gap of 5)
+				{ start: { row: 12, col: 6 }, dimension: { cols: 1, rows: 1 } }, // South (gap of 5)
+				{ start: { row: 6, col: 0 }, dimension: { cols: 1, rows: 1 } }, // West (gap of 5)
+				{ start: { row: 6, col: 12 }, dimension: { cols: 1, rows: 1 } } // East (gap of 5)
 			];
 
-			diagonalNeighbors.forEach((neighbor) => {
-				expect(grid.areRegionsAdjacent(center, neighbor, { includeDiagonal: false })).toBe(false);
+			orthogonalNeighborsWithGap.forEach((neighbor) => {
+				expect(grid.areRegionsAdjacent(center, neighbor, { maxGap: 5 })).toBe(true);
+				expect(grid.areRegionsAdjacent(center, neighbor)).toBe(false);
+				expect(grid.areRegionsAdjacent(neighbor, center, { maxGap: 5 })).toBe(true);
+				expect(grid.areRegionsAdjacent(neighbor, center)).toBe(false);
+			});
+		});
+
+		it('should detect diagonal adjacency with gap (maxGap = 5)', () => {
+			const center = { start: { row: 6, col: 6 }, dimension: { cols: 1, rows: 1 } };
+
+			const diagonalNeighborsWithGap = [
+				{ start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } }, // NW (gap of 5)
+				{ start: { row: 0, col: 12 }, dimension: { cols: 1, rows: 1 } }, // NE (gap of 5)
+				{ start: { row: 12, col: 0 }, dimension: { cols: 1, rows: 1 } }, // SW (gap of 5)
+				{ start: { row: 12, col: 12 }, dimension: { cols: 1, rows: 1 } } // SE (gap of 5)
+			];
+
+			diagonalNeighborsWithGap.forEach((neighbor) => {
+				expect(
+					grid.areRegionsAdjacent(center, neighbor, { maxGap: 5, includeDiagonal: true })
+				).toBe(true);
+				expect(grid.areRegionsAdjacent(center, neighbor, { includeDiagonal: true })).toBe(false);
+				expect(
+					grid.areRegionsAdjacent(center, neighbor, { maxGap: 5, includeDiagonal: false })
+				).toBe(false);
+				expect(
+					grid.areRegionsAdjacent(neighbor, center, { maxGap: 5, includeDiagonal: true })
+				).toBe(true);
+				expect(grid.areRegionsAdjacent(neighbor, center, { includeDiagonal: true })).toBe(false);
+				expect(
+					grid.areRegionsAdjacent(neighbor, center, { maxGap: 5, includeDiagonal: false })
+				).toBe(false);
 			});
 		});
 
@@ -662,14 +787,7 @@ describe('Grid class', () => {
 			const region2 = { start: { row: 2, col: 2 }, dimension: { cols: 1, rows: 1 } };
 
 			expect(grid.areRegionsAdjacent(region1, region2)).toBe(false);
-		});
-
-		it('should detect adjacency within maxGap', () => {
-			const region1 = { start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } };
-			const region2 = { start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 1 } };
-
-			expect(grid.areRegionsAdjacent(region1, region2, { maxGap: 0 })).toBe(false); // Gap = 1, maxGap = 1 -> not adjacent
-			expect(grid.areRegionsAdjacent(region1, region2, { maxGap: 1 })).toBe(true); // Gap = 1, maxGap = 2 -> adjacent
+			expect(grid.areRegionsAdjacent(region2, region1)).toBe(false);
 		});
 
 		it('should handle overlapping regions', () => {
@@ -677,6 +795,7 @@ describe('Grid class', () => {
 			const region2 = { start: { row: 1, col: 1 }, dimension: { cols: 2, rows: 2 } };
 
 			expect(grid.areRegionsAdjacent(region1, region2)).toBe(true);
+			expect(grid.areRegionsAdjacent(region2, region1)).toBe(true);
 		});
 
 		it('should handle regions of different sizes', () => {
@@ -1242,25 +1361,78 @@ describe('Grid class', () => {
 		});
 	});
 
-	describe('getOffset', () => {
-		it('should return zero offset for same position', () => {
-			const grid = new Grid();
-			const pos = { row: 1, col: 1 };
-			expect(grid.getOffset(pos, pos)).toEqual({ row: 0, col: 0 });
+	describe('getFreeRegions', () => {
+		it('should return empty array for region with no empty cells', () => {
+			const grid = new Grid([
+				['A', 'A'],
+				['B', 'B']
+			]);
+
+			const region = { start: { row: 0, col: 0 }, dimension: { rows: 2, cols: 2 } };
+			expect(grid.getFreeRegions(region)).toEqual([]);
 		});
 
-		it('should calculate positive offsets', () => {
-			const grid = new Grid();
-			const from = { row: 1, col: 1 };
-			const to = { row: 3, col: 4 };
-			expect(grid.getOffset(from, to)).toEqual({ row: 2, col: 3 });
+		it('should merge adjacent empty regions vertically', () => {
+			const grid = new Grid([
+				['A', null],
+				['B', null]
+			]);
+
+			const region = { start: { row: 0, col: 0 }, dimension: { rows: 2, cols: 2 } };
+			expect(grid.getFreeRegions(region)).toEqual([
+				{ start: { row: 0, col: 1 }, dimension: { rows: 2, cols: 1 } }
+			]);
 		});
 
-		it('should calculate negative offsets', () => {
-			const grid = new Grid();
-			const from = { row: 3, col: 3 };
-			const to = { row: 1, col: 0 };
-			expect(grid.getOffset(from, to)).toEqual({ row: -2, col: -3 });
+		it('should merge adjacent empty regions horizontally', () => {
+			const grid = new Grid([
+				['A', null, null],
+				['B', 'B', 'B']
+			]);
+
+			const region = { start: { row: 0, col: 0 }, dimension: { rows: 2, cols: 3 } };
+			expect(grid.getFreeRegions(region)).toEqual([
+				{ start: { row: 0, col: 1 }, dimension: { rows: 1, cols: 2 } }
+			]);
+		});
+
+		it('should return multiple regions for non-adjacent empty cells', () => {
+			const grid = new Grid([
+				['A', null, 'B'],
+				['C', 'D', null]
+			]);
+
+			const region = { start: { row: 0, col: 0 }, dimension: { rows: 2, cols: 3 } };
+			expect(grid.getFreeRegions(region)).toEqual([
+				{ start: { row: 0, col: 1 }, dimension: { rows: 1, cols: 1 } },
+				{ start: { row: 1, col: 2 }, dimension: { rows: 1, cols: 1 } }
+			]);
+		});
+
+		it('should handle region bounds within grid', () => {
+			const grid = new Grid([
+				['A', null, 'B'],
+				[null, null, 'B'],
+				['C', 'C', 'C']
+			]);
+
+			const region = { start: { row: 0, col: 0 }, dimension: { rows: 2, cols: 2 } };
+			expect(grid.getFreeRegions(region)).toEqual([
+				{ start: { row: 0, col: 1 }, dimension: { rows: 2, cols: 1 } },
+				{ start: { row: 1, col: 0 }, dimension: { rows: 1, cols: 1 } }
+			]);
+		});
+
+		it('should return entire region if all cells are empty', () => {
+			const grid = new Grid([
+				[null, null],
+				[null, null]
+			]);
+
+			const region = { start: { row: 0, col: 0 }, dimension: { rows: 2, cols: 2 } };
+			expect(grid.getFreeRegions(region)).toEqual([
+				{ start: { row: 0, col: 0 }, dimension: { rows: 2, cols: 2 } }
+			]);
 		});
 	});
 });

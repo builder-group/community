@@ -3,14 +3,8 @@ import { createState, TState } from 'feature-state';
 // TODO: Make feature object? e.g. to expand with custom move strategies, ..
 export class Grid<GGridCellId extends TGridCellId = string> {
 	private _cells: TState<(GGridCellId | null)[][], []>; // TODO: Make this a state? We need to listen on changes and a state is basically a value with listeners..
-	private _config: TGridConfig;
+	private _config: TGridConfig; // TODO: Integrate
 
-	/**
-	 * Creates a new Grid with optional initial cell ids and configuration
-	 * @example
-	 * const grid = new Grid([['A', 'B'], ['C', 'D']])
-	 * const expandableGrid = new Grid([], { expansion: { south: true, east: true } })
-	 */
 	constructor(cells: (GGridCellId | TEmptyGridCell)[][] = [[]], options: TGridOptions = {}) {
 		this._config = {
 			expansion: {
@@ -24,8 +18,6 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 
 	/**
 	 * Current dimensions of the grid
-	 * @example
-	 * const { rows, cols } = grid.size // { rows: 2, cols: 3 }
 	 */
 	public get size(): TGridDimensions {
 		return {
@@ -66,12 +58,6 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 
 	/**
 	 * Expands the grid using the specified strategy and dimensions
-	 * @example
-	 * // Set exact grid size (won't shrink)
-	 * grid.expandGrid({ strategy: 'set', rows: 5, cols: 4 })
-	 *
-	 * // Expand grid by adding dimensions
-	 * grid.expandGrid({ strategy: 'add', rows: 2, cols: 1 })
 	 */
 	public expandGrid(options: TExpandGridMethodOptions = {}): void {
 		const { strategy = 'Set', rows = 0, cols = 0 } = options;
@@ -107,18 +93,6 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 * Removes empty rows from the bottom of the grid.
 	 * A row is considered empty if all its cells are null.
 	 * Will not remove rows that contain any non-null cells.
-	 *
-	 * @returns Number of rows removed
-	 *
-	 * @example
-	 * // Before trimming:
-	 * // [['A', 'B'],
-	 * //  [null, null],
-	 * //  [null, null]]
-	 * grid.trimGrid()
-	 * // After trimming:
-	 * // [['A', 'B']]
-	 * // Returns: 2
 	 */
 	public trimGrid(): number {
 		let rowsRemoved = 0;
@@ -139,19 +113,6 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 
 	/**
 	 * Returns all rectangular regions in the grid, optionally within a specified range
-	 * @example
-	 * const grid = new Grid([
-	 *   ['A', 'A', 'B'],
-	 *   ['A', 'A', 'B'],
-	 *   ['C', 'C', 'B']
-	 * ])
-	 * grid.getRegions()
-	 * // Returns regions with their IDs:
-	 * // [
-	 *   { id: 'A', start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } },
-	 *   { id: 'B', start: { row: 0, col: 2 }, dimension: { width: 1, height: 3 } },
-	 *   { id: 'C', start: { row: 2, col: 0 }, dimension: { width: 2, height: 1 } }
-	 * // ]
 	 */
 	public getRegions(range?: TGridRange): TGridRegionWithId<GGridCellId>[] {
 		const { rows, cols } = this.size;
@@ -219,20 +180,172 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	}
 
 	/**
+	 * Returns the smallest region that contains all input regions
+	 */
+	public getBoundingRegion(regions: TGridRegion[]): TGridRegion | null {
+		if (regions.length === 0) {
+			return null;
+		}
+
+		let minRow = Infinity;
+		let minCol = Infinity;
+		let maxRow = -Infinity;
+		let maxCol = -Infinity;
+
+		for (const region of regions) {
+			minRow = Math.min(minRow, region.start.row);
+			minCol = Math.min(minCol, region.start.col);
+			maxRow = Math.max(maxRow, region.start.row + region.dimension.rows);
+			maxCol = Math.max(maxCol, region.start.col + region.dimension.cols);
+		}
+
+		return {
+			start: {
+				row: minRow,
+				col: minCol
+			},
+			dimension: {
+				cols: maxCol - minCol,
+				rows: maxRow - minRow
+			}
+		};
+	}
+
+	/**
+	 * Returns all regions that occupy any part of the specified region
+	 */
+	public getOccupyingRegions(region: TGridRegion): TGridRegionWithId<GGridCellId>[] {
+		const occupyingRegions: TGridRegionWithId<GGridCellId>[] = [];
+		const processedIds = new Set<GGridCellId>();
+
+		this.iterateRegion(region, (row, col) => {
+			const cellId = this.cells[row]?.[col];
+			if (cellId != null && !processedIds.has(cellId)) {
+				processedIds.add(cellId);
+				const occupyingRegion = this.findRegion(
+					{ row, col },
+					{
+						isValidCell: (r, c) => this.cells[r]?.[c] === cellId
+					}
+				);
+				occupyingRegions.push({
+					id: cellId,
+					...occupyingRegion
+				});
+			}
+		});
+
+		return occupyingRegions;
+	}
+
+	/**
+	 * Returns an array of rectangular regions that represent the empty space
+	 * when placing one region inside another
+	 */
+	public getComplementaryRegions(container: TGridRegion, placed: TGridRegion): TGridRegion[] {
+		// Check if regions overlap at all
+		if (
+			placed.start.row >= container.start.row + container.dimension.rows ||
+			placed.start.row + placed.dimension.rows <= container.start.row ||
+			placed.start.col >= container.start.col + container.dimension.cols ||
+			placed.start.col + placed.dimension.cols <= container.start.col
+		) {
+			// If no overlap, return the entire container as available space
+			return [container];
+		}
+
+		const complementary: TGridRegion[] = [];
+
+		// Top region (if exists)
+		if (placed.start.row > container.start.row) {
+			complementary.push({
+				start: container.start,
+				dimension: {
+					cols: container.dimension.cols,
+					rows: placed.start.row - container.start.row
+				}
+			});
+		}
+
+		// Left region (if exists)
+		if (placed.start.col > container.start.col) {
+			complementary.push({
+				start: {
+					row: placed.start.row,
+					col: container.start.col
+				},
+				dimension: {
+					cols: placed.start.col - container.start.col,
+					rows: placed.dimension.rows
+				}
+			});
+		}
+
+		// Right region (if exists)
+		const placedEndCol = placed.start.col + placed.dimension.cols;
+		const containerEndCol = container.start.col + container.dimension.cols;
+		if (placedEndCol < containerEndCol) {
+			complementary.push({
+				start: {
+					row: placed.start.row,
+					col: placedEndCol
+				},
+				dimension: {
+					cols: containerEndCol - placedEndCol,
+					rows: placed.dimension.rows
+				}
+			});
+		}
+
+		// Bottom region (if exists)
+		const placedEndRow = placed.start.row + placed.dimension.rows;
+		const containerEndRow = container.start.row + container.dimension.rows;
+		if (placedEndRow < containerEndRow) {
+			complementary.push({
+				start: {
+					row: placedEndRow,
+					col: container.start.col
+				},
+				dimension: {
+					cols: container.dimension.cols,
+					rows: containerEndRow - placedEndRow
+				}
+			});
+		}
+
+		return complementary;
+	}
+
+	/**
+	 * Returns all empty (null) regions within the given region, merged into the largest possible rectangles
+	 */
+	public getFreeRegions(region: TGridRegion, options: { merge?: boolean } = {}): TGridRegion[] {
+		const { merge = true } = options;
+
+		// First collect all empty positions
+		const freeRegions: TGridRegion[] = [];
+		this.iterateRegion(region, (row, col) => {
+			if (this.cells[row]?.[col] === null) {
+				freeRegions.push({ start: { row, col }, dimension: { rows: 1, cols: 1 } });
+			}
+		});
+		if (freeRegions.length === 0) {
+			return [];
+		}
+
+		// Merge adjacent regions into largest possible rectangles
+		return merge ? this.mergeAdjacentRegions(freeRegions) : freeRegions;
+	}
+
+	/**
+	 * Returns the area of a region
+	 */
+	public getRegionArea(region: TGridRegion): number {
+		return region.dimension.cols * region.dimension.rows;
+	}
+
+	/**
 	 * Finds a rectangular region from a position by expanding in allowed directions until a condition is met
-	 * @example
-	 * // Find region in all directions (default)
-	 * grid.findRegion(
-	 *   { row: 1, col: 1 },
-	 *   (row, col) => grid.cells[row]?.[col] === 'A'
-	 * )
-	 *
-	 * // Find region only expanding down and right
-	 * grid.findRegion(
-	 *   { row: 0, col: 0 },
-	 *   (row, col) => grid.cells[row]?.[col] === 'A',
-	 *   { directions: { down: true, right: true } }
-	 * )
 	 */
 	public findRegion(position: TGridPosition, options: TFindRegionMethodOptions = {}): TGridRegion {
 		const {
@@ -313,6 +426,149 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	}
 
 	/**
+	 * Swaps regions while maintaining their original shapes
+	 */
+	public swapRegions(
+		region1: TGridRegion,
+		region2: TGridRegion,
+		id1: GGridCellId,
+		id2: GGridCellId
+	): void {
+		this.clearRegion(region1);
+		this.clearRegion(region2);
+		this.fillRegion(region1, id2);
+		this.fillRegion(region2, id1);
+	}
+
+	/**
+	 * Sets all cells in the specified region to null
+	 */
+	public clearRegion(region: TGridRegion): void {
+		this.iterateRegion(region, (row, col) => {
+			if (this.cells[row] != null) {
+				this.cells[row][col] = null;
+			}
+		});
+	}
+
+	/**
+	 * Fills the specified region with the given ID
+	 */
+	public fillRegion(region: TGridRegion, id: GGridCellId | null): void {
+		this.iterateRegion(region, (row, col) => {
+			if (this.cells[row] != null) {
+				this.cells[row][col] = id;
+			}
+		});
+	}
+
+	/**
+	 * Iterates over each cell in the specified region
+	 */
+	public iterateRegion(region: TGridRegion, callback: (row: number, col: number) => void): void {
+		for (let row = region.start.row; row < region.start.row + region.dimension.rows; row++) {
+			for (let col = region.start.col; col < region.start.col + region.dimension.cols; col++) {
+				callback(row, col);
+			}
+		}
+	}
+
+	public doRegionsOverlap(region1: TGridRegion, region2: TGridRegion): boolean {
+		return !(
+			region1.start.row + region1.dimension.rows <= region2.start.row ||
+			region1.start.row >= region2.start.row + region2.dimension.rows ||
+			region1.start.col + region1.dimension.cols <= region2.start.col ||
+			region1.start.col >= region2.start.col + region2.dimension.cols
+		);
+	}
+
+	/**
+	 * Checks if two regions are adjacent within specified parameters
+	 */
+	public areRegionsAdjacent(
+		region1: TGridRegion,
+		region2: TGridRegion,
+		options: { maxGap?: number; includeDiagonal?: boolean } = {}
+	): boolean {
+		const { maxGap = 0, includeDiagonal = true } = options;
+		const maxDistance = maxGap + 1;
+
+		// Calculate horizontal overlap and distance
+		const r1Left = region1.start.col;
+		const r1Right = region1.start.col + region1.dimension.cols - 1;
+		const r2Left = region2.start.col;
+		const r2Right = region2.start.col + region2.dimension.cols - 1;
+
+		const sharesHorizontalSpace = !(r1Right < r2Left || r2Right < r1Left);
+		const horizontalDistance = sharesHorizontalSpace
+			? 0
+			: Math.min(Math.abs(r1Left - r2Right), Math.abs(r2Left - r1Right));
+
+		// Calculate vertical overlap and distance
+		const r1Top = region1.start.row;
+		const r1Bottom = region1.start.row + region1.dimension.rows - 1;
+		const r2Top = region2.start.row;
+		const r2Bottom = region2.start.row + region2.dimension.rows - 1;
+
+		const sharesVerticalSpace = !(r1Bottom < r2Top || r2Bottom < r1Top);
+		const verticalDistance = sharesVerticalSpace
+			? 0
+			: Math.min(Math.abs(r1Top - r2Bottom), Math.abs(r2Top - r1Bottom));
+
+		// Regions are adjacent if:
+		// 1. They are within maxDistance in both directions
+		// 2. If includeDiagonal is false, the distances must be different
+		return (
+			horizontalDistance <= maxDistance &&
+			verticalDistance <= maxDistance &&
+			(includeDiagonal || horizontalDistance !== verticalDistance)
+		);
+	}
+
+	/**
+	 * Checks if a region is empty
+	 */
+	public isRegionEmpty(region: TGridRegion): boolean {
+		let isEmpty = true;
+		this.iterateRegion(region, (row, col) => {
+			if (this.cells[row]?.[col] !== null) {
+				isEmpty = false;
+			}
+		});
+		return isEmpty;
+	}
+
+	/**
+	 * Checks if a region fits within another region
+	 */
+	public doesRegionFit(region: TGridRegion, targetRegion: TGridRegion): boolean {
+		return (
+			region.dimension.cols <= targetRegion.dimension.cols &&
+			region.dimension.rows <= targetRegion.dimension.rows
+		);
+	}
+
+	/**
+	 * Checks if a region can be moved to a target position
+	 */
+	public canMoveRegionTo(
+		region: TGridRegionWithId<GGridCellId>,
+		targetPosition: TGridPosition
+	): boolean {
+		const targetRegion = {
+			start: targetPosition,
+			dimension: region.dimension
+		};
+
+		// Get regions that would be affected by this move
+		const occupyingRegions = this.getOccupyingRegions(targetRegion).filter(
+			(r) => r.id !== region.id
+		);
+
+		return occupyingRegions.length === 0;
+	}
+
+	/**
 	 * Moves a region to a new position using the override strategy.
 	 * This strategy simply places the region at the target position and leaves an empty space behind.
 	 *
@@ -322,19 +578,6 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 * 3. Original position becomes empty
 	 * 4. No cascading effects on other regions
 	 * 5. Can create gaps in the grid
-	 *
-	 * @param currentRegion - Region to be moved
-	 * @param targetPosition - Where to place the region
-	 * @param options.override - Whether to override existing content (default: true)
-	 * @returns true if move was successful, false if blocked and override=false
-	 *
-	 * @example
-	 * // Before: [['A', 'A'], ['B', 'B']]
-	 * grid.overrideMove(
-	 *   { start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } },
-	 *   { row: 1, col: 0 }
-	 * )
-	 * // After: [[null, null], ['A', 'A']]
 	 */
 	public overrideMove(
 		currentRegion: TGridRegion,
@@ -357,6 +600,10 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 		return true;
 	}
 
+	// TODO: Open Issues
+	// - Bug: Widgets disappear, reason unknown
+	// - Only allow downward movement as long as it's adjacent with widget above
+
 	/**
 	 * Moves a region to a new position using a cascade strategy that maintains grid cohesion.
 	 * This strategy attempts to maintain a compact grid by cascading regions into freed spaces
@@ -376,17 +623,6 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 * 4. Allow regions to move up into freed spaces
 	 * 5. Maintain vertical alignment where possible
 	 * 6. Expand grid vertically if needed
-	 *
-	 * @param sourceRegion - Region to be moved
-	 * @param targetPosition - Where to move the region
-	 * @returns Array of regions that were affected by the move (empty if move failed)
-	 *
-	 * @example
-	 * // Moving region 'A' to position [1,1] causes cascading moves
-	 * // Before:     After:
-	 * // [A B C]    [B F C]
-	 * // [A B D] -> [B A D]
-	 * // [E F G]    [E A G]
 	 */
 	public cascadeMove(
 		sourceRegion: TGridRegion,
@@ -436,14 +672,29 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 						// Must be adjacent within distance constraints
 						const isAdjacent = this.areRegionsAdjacent(freedRegion, region, {
 							maxGap: isTargetRegion ? 0 : Infinity,
-							includeDiagonal: true // TODO: Figure out what feels more natural
+							includeDiagonal: false
 						});
-						// Must fit within the freed region
-						const fitsSpace =
-							region.dimension.cols <= freedRegion.dimension.cols &&
-							region.dimension.rows <= freedRegion.dimension.rows;
+						if (!isAdjacent) {
+							return false;
+						}
 
-						return isAdjacent && fitsSpace;
+						// Check if the region can be moved to the freed space
+						const canMove = this.canMoveRegionTo(region, freedRegion.start);
+						if (!canMove) {
+							return false;
+						}
+
+						// Check if this move actually frees up space
+						const freedRegions = this.getComplementaryRegions(region, {
+							start: freedRegion.start,
+							dimension: region.dimension
+						});
+						const freesTarget = freedRegions.some((r) => this.doRegionsOverlap(r, targetRegion));
+						if (!freesTarget) {
+							return false;
+						}
+
+						return true;
 					})
 					// Prefer larger regions to minimize fragmentation
 					.sort((a, b) => this.getRegionArea(b) - this.getRegionArea(a))[0];
@@ -471,13 +722,12 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 				// Remove used region and add new freed regions
 				freedRegions.splice(freedIndex, 1);
 				freedRegions.push(
-					// Regions remaining in current freed region
-					...this.getComplementaryRegions(freedRegion, {
-						start: freedRegion.start,
-						dimension: bestFit.dimension
-					}),
+					// Remaining free regions in current freed region
+					...this.getFreeRegions(freedRegion, { merge: false }),
 					// Regions freed up from moved region's original position
-					...this.getComplementaryRegions(bestFit, targetRegion)
+					...this.getFreeRegions(bestFit, { merge: false }).filter(
+						(region) => !this.doRegionsOverlap(region, targetRegion)
+					)
 				);
 
 				// Optimize freed regions by merging adjacent regions
@@ -617,331 +867,8 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 		return affectedRegions;
 	}
 
-	public doRegionsOverlap(region1: TGridRegion, region2: TGridRegion): boolean {
-		return !(
-			region1.start.row + region1.dimension.rows <= region2.start.row ||
-			region1.start.row >= region2.start.row + region2.dimension.rows ||
-			region1.start.col + region1.dimension.cols <= region2.start.col ||
-			region1.start.col >= region2.start.col + region2.dimension.cols
-		);
-	}
-
-	/**
-	 * Checks if two regions are adjacent within specified parameters
-	 * @param region1 First region to check
-	 * @param region2 Second region to check
-	 * @param options Configuration options
-	 * @param options.maxGap Maximum number of cells that can be between regions (default: 0)
-	 * @param options.includeDiagonal Whether to consider diagonal adjacency (default: true)
-	 * @returns True if regions are adjacent according to the specified parameters
-	 */
-	public areRegionsAdjacent(
-		region1: TGridRegion,
-		region2: TGridRegion,
-		options: { maxGap?: number; includeDiagonal?: boolean } = {}
-	): boolean {
-		const { maxGap = 0, includeDiagonal = true } = options;
-		const maxDistance = maxGap + 1;
-
-		// Calculate horizontal overlap and distance
-		const r1Left = region1.start.col;
-		const r1Right = region1.start.col + region1.dimension.cols - 1;
-		const r2Left = region2.start.col;
-		const r2Right = region2.start.col + region2.dimension.cols - 1;
-
-		const sharesHorizontalSpace = !(r1Right < r2Left || r2Right < r1Left);
-		const horizontalDistance = sharesHorizontalSpace
-			? 0
-			: Math.min(Math.abs(r1Left - r2Right), Math.abs(r2Left - r1Right));
-
-		// Calculate vertical overlap and distance
-		const r1Top = region1.start.row;
-		const r1Bottom = region1.start.row + region1.dimension.rows - 1;
-		const r2Top = region2.start.row;
-		const r2Bottom = region2.start.row + region2.dimension.rows - 1;
-
-		const sharesVerticalSpace = !(r1Bottom < r2Top || r2Bottom < r1Top);
-		const verticalDistance = sharesVerticalSpace
-			? 0
-			: Math.min(Math.abs(r1Top - r2Bottom), Math.abs(r2Top - r1Bottom));
-
-		// Regions are adjacent if:
-		// 1. They are within maxDistance in both directions
-		// 2. If includeDiagonal is false, the distances must be different
-		return (
-			horizontalDistance <= maxDistance &&
-			verticalDistance <= maxDistance &&
-			(includeDiagonal || horizontalDistance !== verticalDistance)
-		);
-	}
-
-	/**
-	 * Swaps regions while maintaining their original shapes
-	 * @example
-	 * // Before: [['A', 'A', 'B'], ['A', 'A', 'B']]
-	 * grid.swapRegions(
-	 *   { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } }, // Region with ID 'A'
-	 *   { start: { row: 0, col: 2 }, dimension: { width: 1, height: 2 } }, // Region with ID 'B'
-	 *   'A', 'B'
-	 * )
-	 * // After: [['B', 'B', 'A'], ['B', 'B', 'A']]
-	 */
-	public swapRegions(
-		region1: TGridRegion,
-		region2: TGridRegion,
-		id1: GGridCellId,
-		id2: GGridCellId
-	): void {
-		this.clearRegion(region1);
-		this.clearRegion(region2);
-		this.fillRegion(region1, id2);
-		this.fillRegion(region2, id1);
-	}
-
-	/**
-	 * Sets all cells in the specified region to null
-	 * @example
-	 * // Before: [['A', 'A'], ['B', 'B']]
-	 * grid.clearRegion({ start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } })
-	 * // After: [[null, null], ['B', 'B']]
-	 */
-	public clearRegion(region: TGridRegion): void {
-		this.iterateRegion(region, (row, col) => {
-			if (this.cells[row] != null) {
-				this.cells[row][col] = null;
-			}
-		});
-	}
-
-	/**
-	 * Fills the specified region with the given ID
-	 * @example
-	 * // Before: [[null, null], ['B', 'B']]
-	 * grid.fillRegion(
-	 *   { start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } },
-	 *   'A'
-	 * )
-	 * // After: [['A', 'A'], ['B', 'B']]
-	 */
-	public fillRegion(region: TGridRegion, id: GGridCellId | null): void {
-		this.iterateRegion(region, (row, col) => {
-			if (this.cells[row] != null) {
-				this.cells[row][col] = id;
-			}
-		});
-	}
-
-	/**
-	 * Returns the smallest region that contains all input regions
-	 * @example
-	 * const regions = [
-	 *   { start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } },
-	 *   { start: { row: 1, col: 1 }, dimension: { width: 2, height: 2 } }
-	 * ];
-	 * grid.getBoundingRegion(regions)
-	 * // Returns: {
-	 * //   start: { row: 0, col: 0 },
-	 * //   dimension: { width: 3, height: 3 }
-	 * // }
-	 */
-	public getBoundingRegion(regions: TGridRegion[]): TGridRegion | null {
-		if (regions.length === 0) {
-			return null;
-		}
-
-		let minRow = Infinity;
-		let minCol = Infinity;
-		let maxRow = -Infinity;
-		let maxCol = -Infinity;
-
-		for (const region of regions) {
-			minRow = Math.min(minRow, region.start.row);
-			minCol = Math.min(minCol, region.start.col);
-			maxRow = Math.max(maxRow, region.start.row + region.dimension.rows);
-			maxCol = Math.max(maxCol, region.start.col + region.dimension.cols);
-		}
-
-		return {
-			start: {
-				row: minRow,
-				col: minCol
-			},
-			dimension: {
-				cols: maxCol - minCol,
-				rows: maxRow - minRow
-			}
-		};
-	}
-
-	/**
-	 * Returns all regions that occupy any part of the specified region
-	 * @example
-	 * // Grid: [['A', 'B', 'B'],
-	 * //        ['A', 'C', 'B'],
-	 * //        ['D', 'D', 'D']]
-	 * const region = { start: { row: 0, col: 1 }, dimension: { width: 2, height: 2 } };
-	 * grid.getOccupyingRegions(region)
-	 * // Returns: [
-	 * //   { id: 'B', start: { row: 0, col: 1 }, dimension: { width: 2, height: 2 } },
-	 * //   { id: 'C', start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } }
-	 * // ]
-	 */
-	public getOccupyingRegions(region: TGridRegion): TGridRegionWithId<GGridCellId>[] {
-		const occupyingRegions: TGridRegionWithId<GGridCellId>[] = [];
-		const processedIds = new Set<GGridCellId>();
-
-		this.iterateRegion(region, (row, col) => {
-			const cellId = this.cells[row]?.[col];
-			if (cellId != null && !processedIds.has(cellId)) {
-				processedIds.add(cellId);
-				const occupyingRegion = this.findRegion(
-					{ row, col },
-					{
-						isValidCell: (r, c) => this.cells[r]?.[c] === cellId
-					}
-				);
-				occupyingRegions.push({
-					id: cellId,
-					...occupyingRegion
-				});
-			}
-		});
-
-		return occupyingRegions;
-	}
-
-	public isRegionEmpty(region: TGridRegion): boolean {
-		let isEmpty = true;
-		this.iterateRegion(region, (row, col) => {
-			if (this.cells[row]?.[col] !== null) {
-				isEmpty = false;
-			}
-		});
-		return isEmpty;
-	}
-
-	/**
-	 * Returns an array of rectangular regions that represent the empty space
-	 * when placing one region inside another
-	 * @example
-	 * // When placing a 1x1 region at (1,1) inside a 2x2 region at (0,0)
-	 * // Returns three regions: top row, left bottom, right bottom
-	 * getComplementaryRegions(
-	 *   { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } },
-	 *   { start: { row: 1, col: 1 }, dimension: { width: 1, height: 1 } }
-	 * )
-	 */
-	public getComplementaryRegions(container: TGridRegion, placed: TGridRegion): TGridRegion[] {
-		// Check if regions overlap at all
-		if (
-			placed.start.row >= container.start.row + container.dimension.rows ||
-			placed.start.row + placed.dimension.rows <= container.start.row ||
-			placed.start.col >= container.start.col + container.dimension.cols ||
-			placed.start.col + placed.dimension.cols <= container.start.col
-		) {
-			// If no overlap, return the entire container as available space
-			return [container];
-		}
-
-		const complementary: TGridRegion[] = [];
-
-		// Top region (if exists)
-		if (placed.start.row > container.start.row) {
-			complementary.push({
-				start: container.start,
-				dimension: {
-					cols: container.dimension.cols,
-					rows: placed.start.row - container.start.row
-				}
-			});
-		}
-
-		// Left region (if exists)
-		if (placed.start.col > container.start.col) {
-			complementary.push({
-				start: {
-					row: placed.start.row,
-					col: container.start.col
-				},
-				dimension: {
-					cols: placed.start.col - container.start.col,
-					rows: placed.dimension.rows
-				}
-			});
-		}
-
-		// Right region (if exists)
-		const placedEndCol = placed.start.col + placed.dimension.cols;
-		const containerEndCol = container.start.col + container.dimension.cols;
-		if (placedEndCol < containerEndCol) {
-			complementary.push({
-				start: {
-					row: placed.start.row,
-					col: placedEndCol
-				},
-				dimension: {
-					cols: containerEndCol - placedEndCol,
-					rows: placed.dimension.rows
-				}
-			});
-		}
-
-		// Bottom region (if exists)
-		const placedEndRow = placed.start.row + placed.dimension.rows;
-		const containerEndRow = container.start.row + container.dimension.rows;
-		if (placedEndRow < containerEndRow) {
-			complementary.push({
-				start: {
-					row: placedEndRow,
-					col: container.start.col
-				},
-				dimension: {
-					cols: container.dimension.cols,
-					rows: containerEndRow - placedEndRow
-				}
-			});
-		}
-
-		return complementary;
-	}
-
-	/**
-	 * Iterates over each cell in the specified region
-	 * @example
-	 * grid.iterateRegion(
-	 *   { start: { row: 0, col: 0 }, dimension: { width: 2, height: 2 } },
-	 *   (row, col) => console.log(row, col)
-	 * )
-	 * // Logs: 0,0 -> 0,1 -> 1,0 -> 1,1
-	 */
-	public iterateRegion(region: TGridRegion, callback: (row: number, col: number) => void): void {
-		for (let row = region.start.row; row < region.start.row + region.dimension.rows; row++) {
-			for (let col = region.start.col; col < region.start.col + region.dimension.cols; col++) {
-				callback(row, col);
-			}
-		}
-	}
-
-	/**
-	 * Returns the area of a region
-	 */
-	public getRegionArea(region: TGridRegion): number {
-		return region.dimension.cols * region.dimension.rows;
-	}
-
 	/**
 	 * Merges adjacent regions into larger rectangles where possible
-	 * @param regions Array of regions to merge
-	 * @param options.mutate If true, modifies the input array directly instead of creating a new one
-	 * @returns Array of merged regions (same array if mutate=true)
-	 * @example
-	 * // Merge two horizontally adjacent 1x1 regions into a 2x1 region
-	 * const regions = [
-	 *   { start: { row: 0, col: 0 }, dimension: { width: 1, height: 1 } },
-	 *   { start: { row: 0, col: 1 }, dimension: { width: 1, height: 1 } }
-	 * ];
-	 * grid.mergeAdjacentRegions(regions)
-	 * // Returns: [{ start: { row: 0, col: 0 }, dimension: { width: 2, height: 1 } }]
 	 */
 	public mergeAdjacentRegions(
 		regions: TGridRegion[],
@@ -1028,24 +955,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	}
 
 	/**
-	 * Calculates the offset vector from one position to another
-	 * @example
-	 * const pos1 = { row: 1, col: 1 };
-	 * const pos2 = { row: 3, col: 0 };
-	 * grid.getOffset(pos1, pos2) // Returns { row: 2, col: -1 } (2 steps down, 1 step left)
-	 */
-	public getOffset(from: TGridPosition, to: TGridPosition): TGridPosition {
-		return {
-			row: to.row - from.row,
-			col: to.col - from.col
-		};
-	}
-
-	/**
 	 * String representation of the grid, using '-' for empty cells
-	 * @example
-	 * // grid.cells = [['A', null], [null, 'B']]
-	 * grid.toString() // 'A -\n- B'
 	 */
 	public toString(): string {
 		return this.cells
