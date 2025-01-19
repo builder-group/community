@@ -2,9 +2,12 @@ import { createWidgetGrid, TBaseWidget, TWidgetBaseContent, TWidgetGrid } from '
 
 const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
 	const initalGrid = [
-		['A', 'B', 'C'],
-		['A', 'D', 'E'],
-		['F', 'G', 'H']
+		['A', 'B', 'B'],
+		['A', 'C', 'D'],
+		['E', 'F', 'G']
+		// ['A', 'B', 'C'],
+		// ['A', 'D', 'E'],
+		// ['F', 'G', 'H']
 	];
 
 	return {

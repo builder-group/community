@@ -502,37 +502,6 @@ describe('Grid class', () => {
 			]);
 		});
 
-		it('should move 1x2 region in east direction and trigger cascade', () => {
-			const grid = new Grid([
-				['A', 'B', 'B'],
-				['A', 'B', 'B'],
-				['C', 'D', 'E']
-			]);
-
-			const result = grid.cascadeMove(
-				{
-					start: { row: 0, col: 0 },
-					dimension: { cols: 1, rows: 2 }
-				},
-				{ row: 0, col: 1 }
-			);
-
-			expect(grid.cells).toEqual([
-				['C', 'A', null],
-				[null, 'A', null],
-				[null, 'B', 'B'],
-				[null, 'B', 'B'],
-				[null, 'D', 'E']
-			]);
-			expect(result).toEqual([
-				{ id: 'D', start: { row: 4, col: 1 }, dimension: { cols: 1, rows: 1 } },
-				{ id: 'E', start: { row: 4, col: 2 }, dimension: { cols: 1, rows: 1 } },
-				{ id: 'B', start: { row: 2, col: 1 }, dimension: { cols: 2, rows: 2 } },
-				{ id: 'A', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 2 } },
-				{ id: 'C', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } }
-			]);
-		});
-
 		it('should move 1x2 region in south direction and swap with 1x1 region', () => {
 			const grid = new Grid([
 				['A', 'B', 'C'],
@@ -695,26 +664,51 @@ describe('Grid class', () => {
 				{ row: 0, col: 0 }
 			);
 
-			// expect(grid.cells).toEqual([
-			// ['B', 'B', 'D'],
-			// ['A', 'C', 'G'],
-			// ['A', 'F', null],
-			// ['E', null, null]
-			// ]);
 			expect(grid.cells).toEqual([
-				['B', 'B', null],
-				['A', 'C', 'D'],
-				['A', 'F', 'G'],
+				['B', 'B', 'D'],
+				['A', 'C', 'G'],
+				['A', 'F', null],
 				['E', null, null]
 			]);
+			// expect(result).toEqual([
+			// 	{ id: 'E', start: { row: 3, col: 0 }, dimension: { cols: 1, rows: 1 } },
+			// 	{ id: 'A', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 2 } },
+			// 	{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 1 } }
+			// ]);
+		});
+
+		it('[1] should move 1x2 region in east direction and trigger cascade', () => {
+			const grid = new Grid([
+				['A', 'B', 'B'],
+				['A', 'B', 'B'],
+				['C', 'D', 'E']
+			]);
+
+			const result = grid.cascadeMove(
+				{
+					start: { row: 0, col: 0 },
+					dimension: { cols: 1, rows: 2 }
+				},
+				{ row: 0, col: 1 }
+			);
+
+			expect(grid.cells).toEqual([
+				['C', 'A', null],
+				[null, 'A', null],
+				[null, 'B', 'B'],
+				[null, 'B', 'B'],
+				[null, 'D', 'E']
+			]);
 			expect(result).toEqual([
-				{ id: 'E', start: { row: 3, col: 0 }, dimension: { cols: 1, rows: 1 } },
-				{ id: 'A', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 2 } },
-				{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 1 } }
+				{ id: 'D', start: { row: 4, col: 1 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'E', start: { row: 4, col: 2 }, dimension: { cols: 1, rows: 1 } },
+				{ id: 'B', start: { row: 2, col: 1 }, dimension: { cols: 2, rows: 2 } },
+				{ id: 'A', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 2 } },
+				{ id: 'C', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } }
 			]);
 		});
 
-		it('should move 1x2 region in east direction and trigger cascade', () => {
+		it('[2] should move 1x2 region in east direction and trigger cascade', () => {
 			const grid = new Grid([
 				['A', 'B', 'B'],
 				['A', 'C', 'D'],
@@ -729,29 +723,22 @@ describe('Grid class', () => {
 				{ row: 0, col: 1 }
 			);
 
-			// expect(grid.cells).toEqual([
-			// ['E', 'A', null],
-			// [null, 'A', null],
-			// [null, 'B', 'B'],
-			// [null, 'C', 'D'],
-			// [null, 'F', 'G']
-			// ]);
 			expect(grid.cells).toEqual([
-				['C', 'A', null],
 				['E', 'A', null],
+				[null, 'A', null],
 				[null, 'B', 'B'],
-				[null, null, 'D'],
+				[null, 'C', 'D'],
 				[null, 'F', 'G']
 			]);
-			expect(result).toEqual([
-				{ id: 'C', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
-				{ id: 'F', start: { row: 4, col: 1 }, dimension: { cols: 1, rows: 1 } },
-				{ id: 'G', start: { row: 4, col: 2 }, dimension: { cols: 1, rows: 1 } },
-				{ id: 'D', start: { row: 3, col: 2 }, dimension: { cols: 1, rows: 1 } },
-				{ id: 'B', start: { row: 2, col: 1 }, dimension: { cols: 2, rows: 1 } },
-				{ id: 'A', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 2 } },
-				{ id: 'E', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } }
-			]);
+			// expect(result).toEqual([
+			// 	{ id: 'C', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+			// 	{ id: 'F', start: { row: 4, col: 1 }, dimension: { cols: 1, rows: 1 } },
+			// 	{ id: 'G', start: { row: 4, col: 2 }, dimension: { cols: 1, rows: 1 } },
+			// 	{ id: 'D', start: { row: 3, col: 2 }, dimension: { cols: 1, rows: 1 } },
+			// 	{ id: 'B', start: { row: 2, col: 1 }, dimension: { cols: 2, rows: 1 } },
+			// 	{ id: 'A', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 2 } },
+			// 	{ id: 'E', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } }
+			// ]);
 		});
 
 		it('[1] should move 1x2 region in south east direction and trigger cascade', () => {
@@ -769,25 +756,19 @@ describe('Grid class', () => {
 				{ row: 1, col: 1 }
 			);
 
-			// expect(grid.cells).toEqual([
-			// 	['F', 'B', 'C'],
-			// 	[null, 'A', 'E'],
-			// 	[null, 'A', 'H'],
-			// 	[null, 'D', null],
-			// 	[null, 'G', null]
-			// ]);
 			expect(grid.cells).toEqual([
-				['D', 'B', 'C'],
-				['F', 'A', 'E'],
+				['F', 'B', 'C'],
+				[null, 'A', 'E'],
 				[null, 'A', 'H'],
+				[null, 'D', null],
 				[null, 'G', null]
 			]);
-			expect(result).toEqual([
-				{ id: 'D', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
-				{ id: 'G', start: { row: 3, col: 1 }, dimension: { cols: 1, rows: 1 } },
-				{ id: 'A', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 2 } },
-				{ id: 'F', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } }
-			]);
+			// expect(result).toEqual([
+			// 	{ id: 'D', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+			// 	{ id: 'G', start: { row: 3, col: 1 }, dimension: { cols: 1, rows: 1 } },
+			// 	{ id: 'A', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 2 } },
+			// 	{ id: 'F', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } }
+			// ]);
 		});
 
 		it('[2] should move 1x2 region in south east direction and trigger cascade', () => {

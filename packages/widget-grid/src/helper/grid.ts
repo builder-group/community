@@ -553,6 +553,19 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	}
 
 	/**
+	 * Checks if a region has an empty cell
+	 */
+	public hasRegionEmptyCell(region: TGridRegion): boolean {
+		let hasEmpty = false;
+		this.iterateRegion(region, (row, col) => {
+			if (this.cells[row]?.[col] === null) {
+				hasEmpty = true;
+			}
+		});
+		return hasEmpty;
+	}
+
+	/**
 	 * Checks if a region is out of bounds in specified directions
 	 */
 	public isRegionOutOfBounds(
@@ -638,6 +651,8 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 
 	// TODO: Open Issues
 	// - Only allow downward movement as long as it's adjacent with widget above
+	// - Edge cases where regions get out of bounds
+	// - Doesn't feel natural sometimes
 
 	/**
 	 * Moves a region to a new position using a cascade strategy that maintains grid cohesion.
@@ -650,20 +665,12 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 	 * 3. Push down regions that block the target position
 	 * 4. Place the region at target position
 	 * 5. Bubble up regions where possible to fill gaps
-	 *
-	 * Strategy Rules:
-	 * 1. Never delete regions, only move them
-	 * 2. Prefer moving adjacent regions into freed spaces
-	 * 3. Push blocking regions down to make space
-	 * 4. Allow regions to move up into freed spaces
-	 * 5. Maintain vertical alignment where possible
-	 * 6. Expand grid vertically if needed
 	 */
 	public cascadeMove(
 		sourceRegion: TGridRegion,
 		targetPosition: TGridPosition
 	): TGridRegionWithId<GGridCellId>[] {
-		const affectedRegions: TGridRegionWithId<GGridCellId>[] = [];
+		let affectedRegions: TGridRegionWithId<GGridCellId>[] = [];
 		const id = this.cells[sourceRegion.start.row]?.[sourceRegion.start.col] ?? null;
 		if (id == null) {
 			return [];
@@ -694,9 +701,14 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 
 		// 1. Clear source region and track freed region
 		this.clearRegion(sourceRegion);
-		const freedRegions: TGridRegion[] = [sourceRegion];
+		let freedRegions: TGridRegion[] = [...this.getComplementaryRegions(sourceRegion, targetRegion)];
 
 		// 2. Fill freed spaces with fitting regions
+		const moveHistory: Array<{
+			region: TGridRegionWithId<GGridCellId>;
+			originalPosition: TGridPosition;
+			newPosition: TGridPosition;
+		}> = [];
 		while (true) {
 			let movedSomething = false;
 
@@ -764,6 +776,13 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 					continue;
 				}
 
+				// Track move for potential undo
+				moveHistory.push({
+					region: bestMove.region,
+					originalPosition: bestMove.region.start,
+					newPosition: bestMove.position
+				});
+
 				// Move the region to best position
 				this.overrideMove(bestMove.region, bestMove.position);
 
@@ -804,6 +823,19 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 			if (!movedSomething || freedRegions.length === 0) {
 				break;
 			}
+		}
+
+		// If parts of source region that don't overlap with target region aren't filled, undo all moves
+		const nonOverlappingRegions = this.getComplementaryRegions(sourceRegion, targetRegion);
+		const hasUnfilledRegions = nonOverlappingRegions.some((region) =>
+			this.hasRegionEmptyCell(region)
+		);
+		if (hasUnfilledRegions) {
+			for (const move of moveHistory.reverse()) {
+				this.overrideMove({ ...move.region, start: move.newPosition }, move.originalPosition);
+			}
+			freedRegions = [...nonOverlappingRegions];
+			affectedRegions = [];
 		}
 
 		// 3. Push down remaining blocking regions
@@ -876,10 +908,7 @@ export class Grid<GGridCellId extends TGridCellId = string> {
 					regionsBelow.length > 0 &&
 					regionsBelow.every(
 						(region) =>
-							// Region must fit within the freed region width
-							region.start.col >= freedRegion.start.col &&
-							region.start.col + region.dimension.cols <=
-								freedRegion.start.col + freedRegion.dimension.cols &&
+							this.canMoveRegionTo(region, freedRegion.start) &&
 							// Moving up shouldn't create overlap with target region
 							!this.doRegionsOverlap(
 								{
