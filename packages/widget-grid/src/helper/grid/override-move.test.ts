@@ -75,4 +75,29 @@ describe('overrideMove', () => {
 			[null, null, null]
 		]);
 	});
+
+	it('should expand grid when moving out of bounds with expand option', () => {
+		const cells: TGridCells<string> = [
+			['A', 'A', null],
+			[null, null, null],
+			[null, null, null]
+		];
+
+		const result = overrideMove(
+			cells,
+			{
+				start: { row: 0, col: 0 },
+				dimension: { cols: 2, rows: 1 }
+			},
+			{ row: 3, col: 2 }
+		);
+
+		expect(result).toBe(true);
+		expect(cells).toEqual([
+			[null, null, null, null],
+			[null, null, null, null],
+			[null, null, null, null],
+			[null, null, 'A', 'A']
+		]);
+	});
 });
