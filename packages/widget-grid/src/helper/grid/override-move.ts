@@ -1,7 +1,7 @@
+import { canRegionBeMovedToPos, TCanRegionBeMovedToPosOptions } from './can-region-be-moved-to-pos';
 import { clearRegion } from './clear-region';
 import { fillRegion } from './fill-region';
 import { getCell } from './get-cell';
-import { isRegionAllowedCells } from './is-region-allowed-cells';
 import { TGridCellId, TGridCells, TGridPosition, TGridRegion } from './types';
 
 /**
@@ -10,27 +10,27 @@ import { TGridCellId, TGridCells, TGridPosition, TGridRegion } from './types';
  */
 export function overrideMove<GGridCellId extends TGridCellId>(
 	cells: TGridCells<GGridCellId>,
-	currentRegion: TGridRegion,
+	sourceRegion: TGridRegion,
 	targetPosition: TGridPosition,
 	options: TOverrideMoveOptions = {}
 ): boolean {
-	const { override = true } = options;
+	const { override = true, outOfBounds } = options;
 	const targetRegion: TGridRegion = {
 		start: targetPosition,
-		dimension: currentRegion.dimension
+		dimension: sourceRegion.dimension
 	};
 
-	const cell = getCell(cells, currentRegion.start);
-	if (!override && !isRegionAllowedCells(cells, targetRegion, [null, cell])) {
+	if (!canRegionBeMovedToPos(cells, sourceRegion, targetPosition, { override, outOfBounds })) {
 		return false;
 	}
 
-	clearRegion(cells, currentRegion);
+	const cell = getCell(cells, sourceRegion.start);
+	clearRegion(cells, sourceRegion);
 	fillRegion(cells, targetRegion, cell);
 
 	return true;
 }
 
-interface TOverrideMoveOptions {
-	override?: boolean;
+interface TOverrideMoveOptions extends TCanRegionBeMovedToPosOptions {
+	// TODO: Add option to expand grid if needed
 }

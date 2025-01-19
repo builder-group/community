@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { isRegionAllowedCells } from './is-region-allowed-cells';
+import { doesRegionConsistOfCells } from './does-region-consist-of-cells';
 import { TGridCells } from './types';
 
-describe('isRegionAllowedCells', () => {
+describe('doesRegionConsistOfCells', () => {
 	it('should return true when region contains only allowed cells', () => {
 		const cells: TGridCells<string> = [
 			['A', 'A', 'B'],
@@ -10,7 +10,7 @@ describe('isRegionAllowedCells', () => {
 			['A', 'A', 'B']
 		];
 
-		const result = isRegionAllowedCells(
+		const result = doesRegionConsistOfCells(
 			cells,
 			{
 				start: { row: 0, col: 0 },
@@ -29,7 +29,7 @@ describe('isRegionAllowedCells', () => {
 			['A', 'B', 'C']
 		];
 
-		const result = isRegionAllowedCells(
+		const result = doesRegionConsistOfCells(
 			cells,
 			{
 				start: { row: 0, col: 0 },
@@ -50,7 +50,7 @@ describe('isRegionAllowedCells', () => {
 
 		// Without null in allowed cells
 		expect(
-			isRegionAllowedCells(
+			doesRegionConsistOfCells(
 				cells,
 				{
 					start: { row: 0, col: 0 },
@@ -62,7 +62,7 @@ describe('isRegionAllowedCells', () => {
 
 		// With null in allowed cells
 		expect(
-			isRegionAllowedCells(
+			doesRegionConsistOfCells(
 				cells,
 				{
 					start: { row: 0, col: 0 },
@@ -80,7 +80,7 @@ describe('isRegionAllowedCells', () => {
 			['B', 'A', 'A']
 		];
 
-		const result = isRegionAllowedCells(
+		const result = doesRegionConsistOfCells(
 			cells,
 			{
 				start: { row: 1, col: 1 },
@@ -100,7 +100,7 @@ describe('isRegionAllowedCells', () => {
 		];
 
 		expect(
-			isRegionAllowedCells(
+			doesRegionConsistOfCells(
 				cells,
 				{
 					start: { row: 1, col: 1 },
@@ -111,7 +111,7 @@ describe('isRegionAllowedCells', () => {
 		).toBe(true);
 
 		expect(
-			isRegionAllowedCells(
+			doesRegionConsistOfCells(
 				cells,
 				{
 					start: { row: 0, col: 2 },
@@ -128,7 +128,7 @@ describe('isRegionAllowedCells', () => {
 			['C', 'D']
 		];
 
-		const result = isRegionAllowedCells(
+		const result = doesRegionConsistOfCells(
 			cells,
 			{
 				start: { row: 0, col: 0 },
@@ -149,7 +149,7 @@ describe('isRegionAllowedCells', () => {
 
 		// Without null in allowed cells
 		expect(
-			isRegionAllowedCells(
+			doesRegionConsistOfCells(
 				cells,
 				{
 					start: { row: 0, col: 0 },
@@ -161,7 +161,7 @@ describe('isRegionAllowedCells', () => {
 
 		// With null in allowed cells
 		expect(
-			isRegionAllowedCells(
+			doesRegionConsistOfCells(
 				cells,
 				{
 					start: { row: 0, col: 0 },

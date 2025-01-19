@@ -23,3 +23,10 @@ export interface TGridDimensions {
 	rows: number;
 	cols: number;
 }
+
+export interface TGridDirections {
+	north: boolean;
+	east: boolean;
+	south: boolean;
+	west: boolean;
+}
