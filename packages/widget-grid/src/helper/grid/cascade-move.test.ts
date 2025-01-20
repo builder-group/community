@@ -260,11 +260,13 @@ describe('cascadeMove', () => {
 			['A', 'F', null],
 			['E', null, null]
 		]);
-		// expect(result).toEqual([
-		// 	{ id: 'E', start: { row: 3, col: 0 }, dimension: { cols: 1, rows: 1 } },
-		// 	{ id: 'A', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 2 } },
-		// 	{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 1 } }
-		// ]);
+		expect(result).toEqual([
+			{ id: 'E', start: { row: 3, col: 0 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'A', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 2 } },
+			{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 1 } },
+			{ id: 'D', start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'G', start: { row: 1, col: 2 }, dimension: { cols: 1, rows: 1 } }
+		]);
 	});
 
 	it('[1] should move 1x2 region in east direction and trigger cascade', () => {
@@ -322,15 +324,15 @@ describe('cascadeMove', () => {
 			[null, 'C', 'D'],
 			[null, 'F', 'G']
 		]);
-		// expect(result).toEqual([
-		// 	{ id: 'C', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
-		// 	{ id: 'F', start: { row: 4, col: 1 }, dimension: { cols: 1, rows: 1 } },
-		// 	{ id: 'G', start: { row: 4, col: 2 }, dimension: { cols: 1, rows: 1 } },
-		// 	{ id: 'D', start: { row: 3, col: 2 }, dimension: { cols: 1, rows: 1 } },
-		// 	{ id: 'B', start: { row: 2, col: 1 }, dimension: { cols: 2, rows: 1 } },
-		// 	{ id: 'A', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 2 } },
-		// 	{ id: 'E', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } }
-		// ]);
+		expect(result).toEqual([
+			{ id: 'F', start: { row: 4, col: 1 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'G', start: { row: 4, col: 2 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'C', start: { row: 3, col: 1 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'D', start: { row: 3, col: 2 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'B', start: { row: 2, col: 1 }, dimension: { cols: 2, rows: 1 } },
+			{ id: 'A', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 2 } },
+			{ id: 'E', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } }
+		]);
 	});
 
 	it('[1] should move 1x2 region in south east direction and trigger cascade', () => {
@@ -356,12 +358,12 @@ describe('cascadeMove', () => {
 			[null, 'D', null],
 			[null, 'G', null]
 		]);
-		// expect(result).toEqual([
-		// 	{ id: 'D', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
-		// 	{ id: 'G', start: { row: 3, col: 1 }, dimension: { cols: 1, rows: 1 } },
-		// 	{ id: 'A', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 2 } },
-		// 	{ id: 'F', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } }
-		// ]);
+		expect(result).toEqual([
+			{ id: 'G', start: { row: 4, col: 1 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'D', start: { row: 3, col: 1 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'A', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 2 } },
+			{ id: 'F', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } }
+		]);
 	});
 
 	it('[2] should move 1x2 region in south east direction and trigger cascade', () => {
@@ -411,13 +413,14 @@ describe('cascadeMove', () => {
 		);
 
 		expect(cells).toEqual([
-			['B', 'F', 'C'],
+			['B', null, 'C'],
 			['B', 'A', 'D'],
-			['E', 'A', 'G']
+			['E', 'A', 'G'],
+			[null, 'F', null]
 		]);
 		expect(result).toEqual([
 			{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 2 } },
-			{ id: 'F', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'F', start: { row: 3, col: 1 }, dimension: { cols: 1, rows: 1 } },
 			{ id: 'A', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 2 } }
 		]);
 	});

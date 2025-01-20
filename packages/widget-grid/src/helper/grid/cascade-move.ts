@@ -6,6 +6,7 @@ import { clearRegion } from './clear-region';
 import { createCellsSnapshot } from './create-cells-snapshot';
 import { doRegionsOverlap } from './do-regions-overlap';
 import { doesRegionContainCells } from './does-region-contain-cells';
+import { expandGrid } from './expand-grid';
 import { fillRegion } from './fill-region';
 import { getCell } from './get-cell';
 import { getComplementaryRegions } from './get-complementary-regions';
@@ -13,10 +14,12 @@ import { getEmptyCells } from './get-empty-cells';
 import { getGridSize } from './get-grid-size';
 import { getOccupyingRegions } from './get-occupying-regions';
 import { getRegionArea } from './get-region-area';
+import { isRegionOutOfBounds } from './is-region-out-of-bounds';
 import { iterateRegion } from './iterate-region';
 import { mergeAdjacentRegions } from './merge-adjacent-regions';
 import { overrideMove } from './override-move';
 import { pushRegions } from './push-regions';
+import { trimGrid } from './trim-grid';
 import { TGridCellId, TGridCells, TGridPosition, TGridRegion, TGridRegionWithId } from './types';
 
 /**
@@ -47,39 +50,43 @@ export function cascadeMove<GGridCellId extends TGridCellId>(
 		dimension: sourceRegion.dimension
 	};
 
-	// Track regions that need to be moved out of the target region
-	const occupyingRegions: Map<GGridCellId, TGridRegion> = new Map(
-		getOccupyingRegions(cells, targetRegion)
-			.filter((region) => region.id !== cell)
-			.map((r) => [r.id, { start: r.start, dimension: r.dimension }])
-	);
+	// TODO: Snapshot cells to avoid applying invalid moves
 
 	// 1. Clear source region
 	clearRegion(cells, sourceRegion);
 
 	// 2. Fill freed region with adjacent regions that fit, only applied if fully filled
-	if (occupyingRegions.size > 0) {
-		movedRegions.push(
-			...fillSourceRegionBySwapping(cells, sourceRegion, targetRegion, occupyingRegions)
-		);
-	}
+	movedRegions.push(...fillSourceRegionBySwapping(cells, sourceRegion, targetRegion));
 
 	// 3. Push down regions that block the target position
-	if (occupyingRegions.size > 0) {
-		movedRegions.push(...pushDownOccupyingRegions(cells, targetRegion, occupyingRegions));
+	movedRegions.push(...pushDownOccupyingRegions(cells, targetRegion));
+
+	// TODO: Return if target region is still occupied?
+	// But then we need to undo all applied moves
+	if (getTargetOccupyingRegions(cells, targetRegion).length > 0) {
+		console.error('Target region is still occupied. This should not happen!');
 	}
 
-	// TODO: Return if target region is still occupied
-	// if (occupyingRegions.size > 0) {
-	// 	return [];
-	// }
-
 	// 4. Place region at target
+	if (
+		isRegionOutOfBounds(cells, targetRegion, {
+			directionsToCheck: { north: false, east: true, south: true, west: false }
+		})
+	) {
+		expandGrid(cells, {
+			strategy: 'Set',
+			rows: targetPosition.row + sourceRegion.dimension.rows,
+			cols: targetPosition.col + sourceRegion.dimension.cols
+		});
+	}
 	fillRegion(cells, targetRegion, cell);
 	movedRegions.push({ id: cell, ...targetRegion });
 
 	// 5. Bubble up regions where possible to fill gaps
-	movedRegions.push(...bubbleRegionsUp(cells));
+	movedRegions.push(...bubbleRegionsUp(cells, { fixedRegionIds: new Set([cell]) }));
+
+	// Trim empty rows and columns
+	trimGrid(cells);
 
 	return movedRegions;
 }
@@ -87,24 +94,19 @@ export function cascadeMove<GGridCellId extends TGridCellId>(
 export function fillSourceRegionBySwapping<GGridCellId extends TGridCellId>(
 	cells: TGridCells<GGridCellId>,
 	sourceRegion: TGridRegion,
-	targetRegion: TGridRegion,
-	occupyingRegions: Map<GGridCellId, TGridRegion>
+	targetRegion: TGridRegion
 ): TGridRegionWithId<GGridCellId>[] {
 	const size = getGridSize(cells);
-	const northWestCorner: TGridPosition = {
-		col: Math.min(sourceRegion.start.col, targetRegion.start.col),
-		row: Math.min(sourceRegion.start.row, targetRegion.start.row)
-	};
+	const cellsSnapshotStart: TGridPosition = { row: 0, col: 0 };
 	const cellsSnapshot = createCellsSnapshot(cells, {
-		start: northWestCorner,
-		dimension: {
-			cols: size.cols - northWestCorner.col,
-			rows: size.rows - northWestCorner.row
-		}
-	});
+		start: cellsSnapshotStart,
+		dimension: size
+	}); // TODO: Optimize (shrink) snapshot size
+
 	const movedRegions: TGridRegionWithId<GGridCellId>[] = [];
 	const complementaryRegions = getComplementaryRegions(sourceRegion, targetRegion);
 	const freedRegions = [...complementaryRegions];
+	const occupyingRegions = getTargetOccupyingRegions(cellsSnapshot, targetRegion);
 
 	while (freedRegions.length > 0) {
 		const freedRegion = freedRegions.shift();
@@ -117,12 +119,12 @@ export function fillSourceRegionBySwapping<GGridCellId extends TGridCellId>(
 			sourceRegion,
 			targetRegion,
 			freedRegion,
-			Array.from(occupyingRegions, ([id, region]) => ({ id, ...region }))
+			occupyingRegions
 		);
 
 		// No valid move found for this freed region
 		if (bestMove == null) {
-			// freedRegions.push(freedRegion); // TODO: Avoid endless loop
+			// freedRegions.push(freedRegion); // TODO: Avoid endless loop but we might want to feed it back in
 			continue;
 		}
 
@@ -134,9 +136,9 @@ export function fillSourceRegionBySwapping<GGridCellId extends TGridCellId>(
 			dimension: bestMove.region.dimension
 		});
 
-		// Update occupyingRegions - remove if no longer overlapping
+		// Remove best move from occupying region list
 		if (bestMove.avoidsTarget) {
-			occupyingRegions.delete(bestMove.region.id);
+			occupyingRegions.splice(bestMove.index, 1);
 		}
 
 		// Update freed regions
@@ -157,7 +159,7 @@ export function fillSourceRegionBySwapping<GGridCellId extends TGridCellId>(
 	}
 
 	// Apply snapshot to cells
-	applyCells(cells, cellsSnapshot, northWestCorner);
+	applyCells(cells, cellsSnapshot, cellsSnapshotStart);
 
 	return movedRegions;
 }
@@ -171,7 +173,7 @@ function findBestMove<GGridCellId extends TGridCellId>(
 ): TMove<GGridCellId> | null {
 	const possibleMoves: TMove<GGridCellId>[] = [];
 
-	for (const region of occupyingRegions) {
+	for (const [index, region] of occupyingRegions.entries()) {
 		// Must be adjacent
 		const isAdjacent =
 			areRegionsAdjacent(freedRegion, region, {
@@ -193,14 +195,13 @@ function findBestMove<GGridCellId extends TGridCellId>(
 				dimension: region.dimension
 			};
 
-			// Check if move helps free target
-			const newFreedRegions = getComplementaryRegions(region, newRegion);
-			const freesTarget = newFreedRegions.some((r) => doRegionsOverlap(r, targetRegion));
-			if (!freesTarget) {
+			// Check if move helps to free target
+			if (doRegionsOverlap(newRegion, targetRegion)) {
 				return;
 			}
 
 			possibleMoves.push({
+				index,
 				region,
 				newPosition: pos,
 				avoidsTarget: !doRegionsOverlap(newRegion, targetRegion)
@@ -220,6 +221,7 @@ function findBestMove<GGridCellId extends TGridCellId>(
 }
 
 interface TMove<GGridCellId extends TGridCellId> {
+	index: number;
 	region: TGridRegionWithId<GGridCellId>;
 	newPosition: TGridPosition;
 	avoidsTarget: boolean;
@@ -227,9 +229,9 @@ interface TMove<GGridCellId extends TGridCellId> {
 
 function pushDownOccupyingRegions<GGridCellId extends TGridCellId>(
 	cells: TGridCells<GGridCellId>,
-	targetRegion: TGridRegion,
-	occupyingRegions: Map<GGridCellId, TGridRegion>
+	targetRegion: TGridRegion
 ): TGridRegionWithId<GGridCellId>[] {
+	let occupyingRegions = getTargetOccupyingRegions(cells, targetRegion);
 	const movedRegions: TGridRegionWithId<GGridCellId>[] = [];
 	let madeProgress: boolean;
 
@@ -237,14 +239,14 @@ function pushDownOccupyingRegions<GGridCellId extends TGridCellId>(
 		madeProgress = false;
 
 		// Find northwesternmost occupying region
-		const northWestRegion = Array.from(occupyingRegions.entries()).reduce(
-			(nw, [id, region]) => {
+		const northWestRegion = occupyingRegions.reduce(
+			(nw, region) => {
 				if (
 					nw == null ||
 					region.start.row < nw.start.row ||
 					(region.start.row === nw.start.row && region.start.col < nw.start.col)
 				) {
-					return { id, ...region };
+					return region;
 				}
 				return nw;
 			},
@@ -270,17 +272,16 @@ function pushDownOccupyingRegions<GGridCellId extends TGridCellId>(
 		if (pushedRegions.length > 0) {
 			madeProgress = true;
 			movedRegions.push(...pushedRegions);
-
-			// Update occupyingRegions - remove if no longer overlapping
-			const updatedNorthWestRegion = pushedRegions.find((r) => r.id === northWestRegion.id);
-			if (
-				updatedNorthWestRegion != null &&
-				!doRegionsOverlap(updatedNorthWestRegion, targetRegion)
-			) {
-				occupyingRegions.delete(northWestRegion.id);
-			}
+			occupyingRegions = getTargetOccupyingRegions(cells, targetRegion);
 		}
-	} while (madeProgress && occupyingRegions.size > 0);
+	} while (madeProgress && occupyingRegions.length > 0);
 
 	return movedRegions;
+}
+
+function getTargetOccupyingRegions<GGridCellId extends TGridCellId>(
+	cells: TGridCells<GGridCellId>,
+	targetRegion: TGridRegion
+): TGridRegionWithId<GGridCellId>[] {
+	return getOccupyingRegions(cells, targetRegion);
 }

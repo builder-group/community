@@ -1,12 +1,15 @@
 import { clearRegion } from './clear-region';
+import { doesRegionContainCells } from './does-region-contain-cells';
 import { fillRegion } from './fill-region';
 import { getRegions } from './get-regions';
 import { isRegionEmpty } from './is-region-empty';
 import { TGridCellId, TGridCells, TGridRegion, TGridRegionWithId } from './types';
 
 export function bubbleRegionsUp<GGridCellId extends TGridCellId>(
-	cells: TGridCells<GGridCellId>
+	cells: TGridCells<GGridCellId>,
+	options: TBubbleRegionsUpOptions<GGridCellId> = {}
 ): TGridRegionWithId<GGridCellId>[] {
+	const { fixedRegionIds = new Set() } = options;
 	const movedRegions: TGridRegionWithId<GGridCellId>[] = [];
 	let madeChanges: boolean;
 
@@ -17,8 +20,8 @@ export function bubbleRegionsUp<GGridCellId extends TGridCellId>(
 		const regions = getRegions(cells).sort((a, b) => a.start.row - b.start.row);
 
 		for (const region of regions) {
-			// Skip regions at the top row
-			if (region.start.row === 0) {
+			// Skip fixed regions and regions at the top row
+			if (fixedRegionIds.has(region.id) || region.start.row === 0) {
 				continue;
 			}
 
@@ -29,6 +32,14 @@ export function bubbleRegionsUp<GGridCellId extends TGridCellId>(
 					start: { row, col: region.start.col },
 					dimension: { rows: 1, cols: region.dimension.cols }
 				};
+
+				// Check if we hit a fixed region
+				if (
+					fixedRegionIds.size > 0 &&
+					doesRegionContainCells(cells, spaceAbove, Array.from(fixedRegionIds))
+				) {
+					break;
+				}
 
 				if (isRegionEmpty(cells, spaceAbove)) {
 					maxUpwardMove++;
@@ -60,4 +71,8 @@ export function bubbleRegionsUp<GGridCellId extends TGridCellId>(
 	} while (madeChanges); // Continue until no more moves are possible
 
 	return movedRegions;
+}
+
+interface TBubbleRegionsUpOptions<GGridCellId extends TGridCellId> {
+	fixedRegionIds?: Set<GGridCellId>;
 }

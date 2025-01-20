@@ -189,4 +189,30 @@ describe('bubbleRegionsUp', () => {
 			}
 		]);
 	});
+
+	it('should bubble up regions respecting fixed regions', () => {
+		const cells: TGridCells<string> = [
+			[null, null, null],
+			[null, 'B', null],
+			['A', 'A', 'C']
+		];
+
+		const result = bubbleRegionsUp(cells, {
+			fixedRegionIds: new Set(['B'])
+		});
+
+		expect(cells).toEqual([
+			[null, null, 'C'],
+			[null, 'B', null],
+			['A', 'A', null]
+		]);
+
+		expect(result).toEqual([
+			{
+				id: 'C',
+				start: { row: 0, col: 2 },
+				dimension: { rows: 1, cols: 1 }
+			}
+		]);
+	});
 });
