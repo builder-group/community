@@ -112,7 +112,7 @@ describe('cascadeMove', () => {
 		]);
 	});
 
-	it('should move 1x1 region in north direction and swap with 1x2 region', () => {
+	it('should move 1x1 region in north direction and trigger cascade', () => {
 		const cells: TGridCells<string> = [
 			['A', 'B', 'C'],
 			['A', 'D', 'E'],
