@@ -1,7 +1,7 @@
 import { doesRegionConsistOfCells } from './does-region-consist-of-cells';
 import { getCell } from './get-cell';
-import { isRegionOutOfBounds, TIsRegionOutOfBoundsOptions } from './is-region-out-of-bounds';
-import { TGridCellId, TGridCells, TGridPosition, TGridRegion } from './types';
+import { isRegionOutOfBounds } from './is-region-out-of-bounds';
+import { TGridCellId, TGridCells, TGridDirections, TGridPosition, TGridRegion } from './types';
 
 export function canRegionBeMovedToPos<GGridCellId extends TGridCellId>(
 	cells: TGridCells<GGridCellId>,
@@ -9,7 +9,7 @@ export function canRegionBeMovedToPos<GGridCellId extends TGridCellId>(
 	targetPosition: TGridPosition,
 	options: TCanRegionBeMovedToPosOptions = {}
 ): boolean {
-	const { override = false, outOfBounds } = options;
+	const { override = false, allowOutOfBounds } = options;
 	const targetRegion: TGridRegion = {
 		start: targetPosition,
 		dimension: sourceRegion.dimension
@@ -18,11 +18,12 @@ export function canRegionBeMovedToPos<GGridCellId extends TGridCellId>(
 	const cell = getCell(cells, sourceRegion.start);
 	return (
 		(override || doesRegionConsistOfCells(cells, targetRegion, [null, cell])) &&
-		(outOfBounds == null || !isRegionOutOfBounds(cells, targetRegion, outOfBounds))
+		(allowOutOfBounds == null ||
+			!isRegionOutOfBounds(cells, targetRegion, { directionsToCheck: allowOutOfBounds }))
 	);
 }
 
 export interface TCanRegionBeMovedToPosOptions {
 	override?: boolean;
-	outOfBounds?: TIsRegionOutOfBoundsOptions;
+	allowOutOfBounds?: Partial<TGridDirections>;
 }

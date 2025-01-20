@@ -30,3 +30,5 @@ export interface TGridDirections {
 	south: boolean;
 	west: boolean;
 }
+
+export type TGridDirection = 'North' | 'East' | 'South' | 'West';

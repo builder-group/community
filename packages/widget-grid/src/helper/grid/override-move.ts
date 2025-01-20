@@ -16,7 +16,7 @@ export function overrideMove<GGridCellId extends TGridCellId>(
 	targetPosition: TGridPosition,
 	options: TOverrideMoveOptions = {}
 ): boolean {
-	const { override = true, outOfBounds } = options;
+	const { override = true, allowOutOfBounds: outOfBounds } = options;
 	const cell = getCell(cells, sourceRegion.start);
 	if (cell == null) {
 		return false;
@@ -27,7 +27,12 @@ export function overrideMove<GGridCellId extends TGridCellId>(
 		dimension: sourceRegion.dimension
 	};
 
-	if (!canRegionBeMovedToPos(cells, sourceRegion, targetPosition, { override, outOfBounds })) {
+	if (
+		!canRegionBeMovedToPos(cells, sourceRegion, targetPosition, {
+			override,
+			allowOutOfBounds: outOfBounds
+		})
+	) {
 		return false;
 	}
 

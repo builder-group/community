@@ -69,7 +69,7 @@ describe('canRegionBeMovedToPos', () => {
 				dimension: { cols: 2, rows: 1 }
 			},
 			{ row: 3, col: 0 },
-			{ outOfBounds: { directionsToCheck: { south: true } } }
+			{ allowOutOfBounds: { south: true } }
 		);
 		expect(result).toBe(false);
 	});
@@ -87,7 +87,7 @@ describe('canRegionBeMovedToPos', () => {
 				dimension: { cols: 2, rows: 1 }
 			},
 			{ row: 3, col: 0 },
-			{ outOfBounds: { directionsToCheck: { north: true, east: true, west: true, south: false } } }
+			{ allowOutOfBounds: { north: true, east: true, west: true, south: false } }
 		);
 		expect(result).toBe(true);
 	});
@@ -107,7 +107,7 @@ describe('canRegionBeMovedToPos', () => {
 			{ row: 3, col: 0 },
 			{
 				override: false,
-				outOfBounds: { directionsToCheck: { south: true } }
+				allowOutOfBounds: { south: true }
 			}
 		);
 		expect(result).toBe(false);
