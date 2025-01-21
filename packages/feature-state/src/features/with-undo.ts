@@ -19,20 +19,20 @@ export function withUndo<GValue, GFeatures extends TFeatureDefinition[]>(
 	};
 
 	// Merge existing features from the state with the new undo feature
-	const extendedState = Object.assign(initialState, undoFeature) as unknown as TState<
+	const extendedState = Object.assign(initialState, undoFeature) as TState<
 		GValue,
 		[TUndoFeature<GValue>]
 	>;
 	extendedState._features.push('undo');
 
 	extendedState.listen(
-		({ state }) => {
+		({ value }) => {
 			// Maintaining the history stack size
-			if (state._history.length >= historyLimit) {
-				state._history.shift(); // Remove oldest state
+			if (extendedState._history.length >= historyLimit) {
+				extendedState._history.shift(); // Remove oldest state
 			}
 
-			state._history.push(state._v);
+			extendedState._history.push(value);
 		},
 		{ key: 'with-undo' }
 	);

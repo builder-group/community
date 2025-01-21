@@ -1,4 +1,3 @@
-import { TFeatureDefinition } from '@blgc/types/features';
 import { type TNestedPath } from '@blgc/utils';
 import { type TListenerCallback, type TListenerOptions, type TStateSetOptions } from './state';
 
@@ -26,14 +25,13 @@ export interface TPersistFeature {
 	};
 }
 
-export interface TSelectorFeature<GValue, GFeatures extends TFeatureDefinition[] = []> {
+export interface TSelectorFeature<GValue> {
 	key: 'selector';
 	api: {
-		_pv: GValue;
 		listenToSelected: (
 			queueIf: TNestedPath<GValue>[] | ((value: GValue) => unknown),
-			callback: TListenerCallback<GValue, GFeatures>,
-			options?: Omit<TListenerOptions<GValue, GFeatures>, 'queueIf'>
+			callback: TListenerCallback<GValue>,
+			options?: Omit<TListenerOptions<GValue>, 'queueIf'>
 		) => () => void;
 	};
 }

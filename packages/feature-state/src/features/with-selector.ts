@@ -5,10 +5,9 @@ import { TSelectorFeature, type TState } from '../types';
 export function withSelector<GValue, GFeatures extends TFeatureDefinition[]>(
 	initialState: TEnforceFeatureConstraint<TState<GValue, GFeatures>, TState<GValue, GFeatures>, []>
 ): TState<GValue, [TSelectorFeature<GValue>, ...GFeatures]> {
-	const selectorFeature: TSelectorFeature<GValue, [TSelectorFeature<GValue, GFeatures>]>['api'] = {
-		_pv: initialState._v,
+	const selectorFeature: TSelectorFeature<GValue>['api'] = {
 		listenToSelected(
-			this: TState<GValue, [TSelectorFeature<GValue, GFeatures>]>,
+			this: TState<GValue, [TSelectorFeature<GValue>]>,
 			queueIf,
 			callback,
 			listenOptions = {}
@@ -16,10 +15,10 @@ export function withSelector<GValue, GFeatures extends TFeatureDefinition[]>(
 			return this.listen(callback, {
 				...listenOptions,
 				key: 'with-selector_selector',
-				queueIf: ({ state, changedProperties }) => {
+				queueIf: ({ value, prevValue, changedProperties }) => {
 					return (
 						// Notify if we can't verify what changed (assume everything changed)
-						(state._pv == null && changedProperties == null) ||
+						(prevValue == null && changedProperties == null) ||
 						// Notify if any changed property matches or is a parent of any selected property
 						(changedProperties != null &&
 							Array.isArray(changedProperties) &&
@@ -30,14 +29,14 @@ export function withSelector<GValue, GFeatures extends TFeatureDefinition[]>(
 								)
 							)) ||
 						// Notify if any selected property's value has changed
-						(state._pv != null &&
+						(prevValue != null &&
 							((Array.isArray(queueIf) &&
 								queueIf.some(
 									(selectedProp) =>
-										getNestedProperty(state._v, selectedProp) !==
-										getNestedProperty(state._pv, selectedProp)
+										getNestedProperty(value, selectedProp) !==
+										getNestedProperty(prevValue as GValue, selectedProp)
 								)) ||
-								(typeof queueIf === 'function' && queueIf(state._v) !== queueIf(state._pv))))
+								(typeof queueIf === 'function' && queueIf(value) !== queueIf(prevValue))))
 					);
 				}
 			});
@@ -45,18 +44,11 @@ export function withSelector<GValue, GFeatures extends TFeatureDefinition[]>(
 	};
 
 	// Merge existing features from the state with the new selector feature
-	const extendedState = Object.assign(initialState, selectorFeature) as unknown as TState<
+	const extendedState = Object.assign(initialState, selectorFeature) as TState<
 		GValue,
 		[TSelectorFeature<GValue>]
 	>;
 	extendedState._features.push('selector');
-
-	extendedState.listen(
-		({ state }) => {
-			state._pv = state._v;
-		},
-		{ key: 'with-selector_prev-value', level: 99 }
-	);
 
 	return extendedState as unknown as TState<GValue, [TSelectorFeature<GValue>, ...GFeatures]>;
 }

@@ -176,3 +176,23 @@ state.multiUndo(2);
 ```
 
 - **`count`**: The number of undo steps to perform, reverting the state back by the specified number of changes
+
+## ❓ FAQ
+
+### Why can't we pass the state itself into the listener queue?
+
+When passing the state object directly into the listener queue, any subsequent state changes before the queue is processed will affect the state reference in the queued listeners. This means listeners would always capture the latest state value rather than the value at the time they were queued.
+
+For example:
+```ts
+const $counter = createState(0);
+
+$counter.listen((data) => {
+  // By the time this runs, state._v might be different 
+  // from when the listener was queued
+  console.log(data.state._v);
+});
+
+$counter.set(1); // Queues listener
+$counter.set(2); // Changes state before queue processes
+```

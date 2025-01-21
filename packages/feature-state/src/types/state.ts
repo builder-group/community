@@ -4,7 +4,7 @@ import { type TNestedPath } from '@blgc/utils';
 export type TState<GValue, GFeatures extends TFeatureDefinition[]> = TWithFeatures<
 	{
 		_v: GValue;
-		_listeners: TListener<GValue, GFeatures>[];
+		_listeners: TListener<GValue>[];
 		/**
 		 * Triggers all registered listeners to run with the current state value.
 		 */
@@ -42,10 +42,7 @@ export type TState<GValue, GFeatures extends TFeatureDefinition[]> = TWithFeatur
 		 * @param level - Optional parameter to specify the listener's priority level.
 		 * @returns A function that, when called, will unsubscribe the listener.
 		 */
-		listen: (
-			callback: TListenerCallback<GValue, GFeatures>,
-			options?: TListenerOptions<GValue, GFeatures>
-		) => () => void;
+		listen: (callback: TListenerCallback<GValue>, options?: TListenerOptions<GValue>) => () => void;
 		/**
 		 * Subscribes to state changes and invokes the callback immediately with the current state value.
 		 *
@@ -63,22 +60,20 @@ export type TState<GValue, GFeatures extends TFeatureDefinition[]> = TWithFeatur
 		 * @returns A function that, when called, will unsubscribe the listener.
 		 */
 		subscribe: (
-			callback: TListenerCallback<GValue, GFeatures>,
-			options?: Partial<Omit<TListener<GValue, GFeatures>, 'callback'>>
+			callback: TListenerCallback<GValue>,
+			options?: Partial<Omit<TListener<GValue>, 'callback'>>
 		) => () => void;
 	},
 	GFeatures
 >;
 
-export type TListenerCallback<GValue, GFeatures extends TFeatureDefinition[]> = (
-	data: TListenerCallbackData<GValue, GFeatures>
+export type TListenerCallback<GValue> = (
+	data: TListenerCallbackData<GValue>
 ) => Promise<void> | void;
 
-// TODO: Reference state or just value, because it will be pushed into a global queue?
-// https://stackoverflow.com/questions/78645591/best-practices-for-managing-object-references-in-callbacks-javascript
-export interface TListenerCallbackData<GValue, GFeatures extends TFeatureDefinition[]>
-	extends TAdditionalListenerCallbackData<GValue> {
-	state: TState<GValue, GFeatures>;
+export interface TListenerCallbackData<GValue> extends TAdditionalListenerCallbackData<GValue> {
+	value: GValue;
+	prevValue?: GValue;
 }
 
 export interface TAdditionalListenerCallbackData<GValue> {
@@ -88,26 +83,25 @@ export interface TAdditionalListenerCallbackData<GValue> {
 	changedProperties?: TNestedPath<GValue>[];
 }
 
-export interface TListener<GValue, GFeatures extends TFeatureDefinition[]> {
+export interface TListener<GValue> {
 	key?: string;
 	level: number;
-	callback: TListenerCallback<GValue, GFeatures>;
-	queueIf?: (data: TListenerCallbackData<GValue, GFeatures>) => boolean;
+	callback: TListenerCallback<GValue>;
+	queueIf?: (data: TListenerCallbackData<GValue>) => boolean;
 }
 
-export type TListenerOptions<GValue, GFeatures extends TFeatureDefinition[]> = Partial<
-	Omit<TListener<GValue, GFeatures>, 'callback'>
->;
+export type TListenerOptions<GValue> = Partial<Omit<TListener<GValue>, 'callback'>>;
 
 export interface TListenerQueueItem<GValue = any> {
-	level: TListener<GValue, []>['level'];
-	callback: TListener<GValue, []>['callback'];
-	data: TListenerCallbackData<GValue, []>;
+	level: TListener<GValue>['level'];
+	callback: TListener<GValue>['callback'];
+	data: TListenerCallbackData<GValue>;
 }
 
 export interface TStateNotifyOptions<GValue> {
 	processListenerQueue?: boolean;
 	listenerData?: TAdditionalListenerCallbackData<GValue>;
+	prevValue?: GValue;
 }
 
 export type TStateSetOptions<GValue> = Omit<TStateNotifyOptions<GValue>, 'prevValue'>;

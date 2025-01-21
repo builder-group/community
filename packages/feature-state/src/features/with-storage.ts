@@ -34,9 +34,9 @@ export function withStorage<
 
 			// Setup listener
 			this.listen(
-				async ({ state, source }) => {
+				async ({ value, source }) => {
 					if (source !== LOAD_FROM_STORAGE_SOURCE_KEY) {
-						await storage.save(key, state._v as GStorageValue);
+						await storage.save(key, value as GStorageValue);
 					}
 				},
 				{ key: 'with-persist' }
@@ -61,7 +61,7 @@ export function withStorage<
 	};
 
 	// Merge existing features from the state with the new persist feature
-	const extendedState = Object.assign(initialState, persistFeature) as unknown as TState<
+	const extendedState = Object.assign(initialState, persistFeature) as TState<
 		GValue,
 		[TPersistFeature]
 	>;

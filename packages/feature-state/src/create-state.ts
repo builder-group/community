@@ -9,12 +9,13 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 		_listeners: [],
 		_v: initialValue,
 		_notify(notifyOptions = {}) {
-			const { processListenerQueue = true, listenerData = {} } = notifyOptions;
+			const { processListenerQueue = true, listenerData = {}, prevValue } = notifyOptions;
 
 			// Push current state's listeners to the queue
 			for (const listener of this._listeners) {
-				const data: TListenerCallbackData<GValue, []> = Object.assign(listenerData, {
-					state: this
+				const data: TListenerCallbackData<GValue> = Object.assign(listenerData, {
+					value: this._v,
+					prevValue
 				});
 				if (listener.queueIf == null || listener.queueIf(data)) {
 					GLOBAL_LISTENER_QUEUE.push({
@@ -45,17 +46,18 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 				this._v = newValue;
 				this._notify({
 					listenerData,
-					processListenerQueue
+					processListenerQueue,
+					prevValue
 				});
 			}
 		},
 		listen(callback, listenOptions = {}) {
-			const { level = 0, key, queueIf: callIf } = listenOptions;
-			const listener: TListener<GValue, []> = {
+			const { level = 0, key, queueIf } = listenOptions;
+			const listener: TListener<GValue> = {
 				key,
 				level,
 				callback,
-				queueIf: callIf
+				queueIf
 			};
 			this._listeners.push(listener);
 
@@ -69,13 +71,12 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 		},
 		subscribe(callback, subscribeOptions) {
 			const unbind = this.listen(callback, subscribeOptions);
-			void callback({ state: this });
+			void callback({ value: this._v });
 			return unbind;
 		}
 	};
 }
 
-// TODO: Referencing the state directly causes the queue to always capture latest values (and not value at time of queueing)
 export async function processStateQueue(): Promise<void> {
 	// Drain the queue
 	const queueToProcess = GLOBAL_LISTENER_QUEUE.splice(0, GLOBAL_LISTENER_QUEUE.length);
