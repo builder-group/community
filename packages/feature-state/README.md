@@ -196,3 +196,14 @@ $counter.listen((data) => {
 $counter.set(1); // Queues listener
 $counter.set(2); // Changes state before queue processes
 ```
+
+If you want to access the state inside the listener, you can simply capture it:
+```ts
+const $counter = createState(0);
+
+$counter.listen((data) => {
+    $counter.set(data.value + 1);
+});
+```
+
+While you can still reference `$counter` directly in listeners, there's no guarantee about its value since it might have changed between queueing and execution of the listener. That's why using `data.value` is the safer approach.

@@ -45,18 +45,18 @@ export interface TSubmitOptions<
 	onValidSubmit?: TValidSubmitCallback<GFormData>;
 	onInvalidSubmit?: TInvalidSubmitCallback<GFormData>;
 	postSubmitCallback?: TPostSubmitCallback<GFormData, GFeatures>;
-	additionalData?: TAdditionalSubmitCallbackData;
+	listenerData?: TAdditionalSubmitCallbackData;
 	assignToInitial?: boolean;
 }
 
 export type TValidSubmitCallback<GFormData extends TFormData> = (
 	formData: Readonly<GFormData>,
-	additionalData?: TAdditionalSubmitCallbackData
+	listenerData?: TAdditionalSubmitCallbackData
 ) => TSubmitCallbackResponse;
 
 export type TInvalidSubmitCallback<GFormData extends TFormData> = (
 	errors: TInvalidFormFieldErrors<GFormData>,
-	additionalData?: TAdditionalSubmitCallbackData
+	listenerData?: TAdditionalSubmitCallbackData
 ) => TSubmitCallbackResponse;
 
 export type TSubmitCallbackResponse = Promise<void | TSubmitData> | void | TSubmitData;

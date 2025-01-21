@@ -104,12 +104,12 @@ const $form = withGlobalBind(
 				}
 			}
 		},
-		onValidSubmit: (data, additionalData) => {
-			console.log('ValidSubmit', { data, additionalData });
+		onValidSubmit: (data, listenerData) => {
+			console.log('ValidSubmit', { data, listenerData });
 			return { valid: true };
 		},
-		onInvalidSubmit: (errors, additionalData) => {
-			console.log('Invalid Submit', { errors, additionalData });
+		onInvalidSubmit: (errors, listenerData) => {
+			console.log('Invalid Submit', { errors, listenerData });
 			return { valid: false };
 		},
 		notifyOnStatusChange: false,
@@ -155,7 +155,7 @@ function App() {
 				defaultValue={field('gender')._intialValue}
 				onChange={(e) =>
 					field('gender').set(e.target.value as TGender, {
-						additionalData: { background: true }
+						listenerData: { background: true }
 					})
 				}
 			>
@@ -189,7 +189,7 @@ function App() {
 								id: shortId(),
 								color: randomHex()
 							},
-							{ additionalData: { background: false } }
+							{ listenerData: { background: false } }
 						);
 					}}
 				>

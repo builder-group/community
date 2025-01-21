@@ -79,11 +79,11 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 
 export async function processStateQueue(): Promise<void> {
 	// Drain the queue
-	const queueToProcess = GLOBAL_LISTENER_QUEUE.splice(0, GLOBAL_LISTENER_QUEUE.length);
-	queueToProcess.sort((a, b) => a.level - b.level);
+	const toProcess = GLOBAL_LISTENER_QUEUE.splice(0, GLOBAL_LISTENER_QUEUE.length);
+	toProcess.sort((a, b) => a.level - b.level);
 
 	// Process each item in the queue sequentially
-	for (const queueItem of queueToProcess) {
+	for (const queueItem of toProcess) {
 		await queueItem.callback(queueItem.data);
 	}
 }

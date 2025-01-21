@@ -25,7 +25,7 @@ export function createFormField<GValue>(
 		collectErrorMode = 'firstError',
 		notifyOnStatusChange = true
 	} = config;
-	const formFieldState = createState(initialValue, { deferred: false });
+	const formFieldState = createState(initialValue);
 
 	const status = createStatus({ type: 'UNVALIDATED' });
 
@@ -33,7 +33,7 @@ export function createFormField<GValue>(
 	if (notifyOnStatusChange) {
 		status.listen(
 			(data) => {
-				formFieldState._notify({ additionalData: { source: 'status', status: data.value } });
+				formFieldState._notify({ listenerData: { source: 'status', status: data.value } });
 			},
 			{ key: 'form-field' }
 		);
@@ -88,7 +88,7 @@ export function createFormField<GValue>(
 			this.isTouched = true;
 		},
 		reset(this: TFormField<GValue>) {
-			this.set(this._intialValue, { additionalData: { source: 'reset' } });
+			this.set(this._intialValue, { listenerData: { source: 'reset' } });
 			this.isTouched = false;
 			this.isSubmitted = false;
 			this.isSubmitting = false;

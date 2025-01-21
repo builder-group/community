@@ -45,10 +45,10 @@ export function useForm<GFormData extends TFormData, GFeatures extends TFeatureD
 					event?.preventDefault();
 				}
 
-				if (submitOptions.additionalData != null) {
-					submitOptions.additionalData.event = event;
+				if (submitOptions.listenerData != null) {
+					submitOptions.listenerData.event = event;
 				} else {
-					submitOptions.additionalData = { event };
+					submitOptions.listenerData = { event };
 				}
 
 				return form.submit(submitOptions);
