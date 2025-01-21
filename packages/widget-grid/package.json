@@ -1,8 +1,8 @@
 {
 	"name": "widget-grid",
-	"version": "0.0.2",
+	"version": "0.0.4",
 	"private": false,
-	"description": "todo",
+	"description": "A framework agnostic library for creating and manipulating widget grids",
 	"keywords": [],
 	"homepage": "https://builder.group/?source=package-json",
 	"bugs": {

@@ -196,7 +196,7 @@ See [Generator vs Iterator vs Callback](https://observablehq.com/@domoritz/yield
 
 [Benchmark implementation in Vanilla Profiler](https://github.com/builder-group/community/tree/develop/examples/xml-tokenizer/vanilla/playground)
 
-## 💡 Resources
+## 💡 Resources / References
 
 - [How I developed the fastest XML parser](https://tnickel.de/2020/08/30/2020-08-how-the-fastest-xml-parser-is-build/)
 - [txml](https://github.com/TobiasNickel/tXml)

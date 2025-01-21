@@ -112,6 +112,6 @@ We're [actively exploring solutions](https://github.com/builder-group/community/
 
 ### Why do feature-based libraries use Objects instead of Classes?
 
-This [Medium post](https://medium.com/@markmiro/thoughts-on-choosing-between-plain-js-objects-and-classes-6422af8aaad5) explains the key differences well.  
+This [Medium post](https://medium.com/@markmiro/thoughts-on-choosing-between-plain-js-objects-and-classes-6422af8aaad5) explains the key differences well.
 
 In short, we use objects because they are more flexible and allow for the kind of extensibility we need. Achieving this level of extensibility with classes isn't feasible for our use case, so using objects was the better choice.
