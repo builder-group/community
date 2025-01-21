@@ -1,6 +1,6 @@
 import { useFeatureState, useListener } from 'feature-react/state';
 import React from 'react';
-import { TWidgetBaseContent, TWidgetGrid } from 'widget-grid';
+import { gridToString, TWidgetBaseContent, TWidgetGrid } from 'widget-grid';
 import { useBoundingRectObserver } from '../hooks';
 import { TWidgetWrapperProps, WidgetWrapper } from './WidgetWrapper';
 
@@ -9,7 +9,7 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 ) => {
 	const { widgetGrid, renderItem } = props;
 	const { rows, cols } = useFeatureState(widgetGrid._size);
-	const { width: cellWidth, height: cellHeight } = useFeatureState(widgetGrid.cellSize);
+	const { cell, gap } = useFeatureState(widgetGrid.layout);
 	const widgetGridRef = React.useRef<HTMLDivElement>(null);
 
 	useBoundingRectObserver(widgetGridRef, widgetGrid.boundingRect);
@@ -21,8 +21,8 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 	useListener(widgetGrid._selected, ({ value, source, background }) => {
 		console.log(`[selectedWidgets] s: ${source}${background ? ' b: true' : ''}`, value);
 	});
-	useListener(widgetGrid._grid.cellsState, () => {
-		console.log(widgetGrid._grid.toString());
+	useListener(widgetGrid._cells, () => {
+		console.log(gridToString(widgetGrid._cells._v));
 	});
 
 	// TODO: REMOVE
@@ -64,8 +64,8 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 							continue;
 						}
 
-						const newCol = Math.round(pos.x / cellWidth);
-						const newRow = Math.round(pos.y / cellHeight);
+						const newCol = Math.round(pos.x / cell.width);
+						const newRow = Math.round(pos.y / cell.height);
 						if (newCol !== region.start.col || newRow !== region.start.row) {
 							widgetGrid.moveWidget(widget.id, {
 								col: newCol,
@@ -81,7 +81,7 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 				// do nothing
 			}
 		},
-		[widgetGrid, cellWidth, cellHeight]
+		[widgetGrid, cell]
 	);
 
 	const handlePointerUp = React.useCallback(
@@ -103,24 +103,18 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 			ref={widgetGridRef}
 			style={{
 				position: 'relative',
-				width: cols * cellWidth,
-				height: rows * cellHeight,
+				width: cols * cell.width,
+				height: rows * cell.height,
 				display: 'grid',
-				gridTemplateColumns: `repeat(${cols}, ${cellWidth}px)`,
-				gridTemplateRows: `repeat(${rows}, ${cellHeight}px)`,
-				gap: '0px'
+				gridTemplateColumns: `repeat(${cols}, ${cell.width}px)`,
+				gridTemplateRows: `repeat(${rows}, ${cell.height}px)`,
+				gap: `${gap.width}px ${gap.height}px`
 			}}
 			onPointerMove={handlePointerMove}
 			onPointerUp={handlePointerUp}
 		>
 			{Object.values(widgetGrid._widgets).map((widget, index) => (
-				<WidgetWrapper
-					key={widget.id}
-					index={index}
-					widget={widget}
-					renderItem={renderItem}
-					widgetGrid={widgetGrid}
-				/>
+				<WidgetWrapper key={widget.id} index={index} widget={widget} renderItem={renderItem} />
 			))}
 		</div>
 	);

@@ -1,13 +1,13 @@
 import { useFeatureState, useListener } from 'feature-react/state';
 import React from 'react';
-import { getGridRegionPixels, TWidget, TWidgetBaseContent, TWidgetGrid } from 'widget-grid';
+import { TWidget, TWidgetBaseContent } from 'widget-grid';
 import { useRenderCount } from '../hooks';
 
 export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 	props: TWidgetWrapperProps<GContent>
 ) => {
-	const { renderItem, index, widget, widgetGrid } = props;
-	const cellSize = useFeatureState(widgetGrid.cellSize);
+	const { renderItem, index, widget } = props;
+	const widgetGrid = React.useMemo(() => widget._widgetGrid, [widget]);
 	const isSelected = useFeatureState(widget.isSelected);
 
 	const [region, setRegion] = React.useState(widget.region._v);
@@ -116,7 +116,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 			}
 
 			// Apply initial position based on prev region
-			const regionPixels = region != null ? getGridRegionPixels(region, cellSize) : null;
+			const regionPixels = region != null ? widgetGrid.getRegionPixels(region) : null;
 			Object.assign(element.style, {
 				position: 'absolute',
 				width: `${regionPixels?.width}px`,
@@ -129,7 +129,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 			element.offsetHeight;
 
 			// Enable transition and move to new position
-			const nextRegionPixels = getGridRegionPixels(nextRegion, cellSize);
+			const nextRegionPixels = widgetGrid.getRegionPixels(nextRegion);
 			Object.assign(element.style, {
 				position: 'absolute',
 				width: `${nextRegionPixels.width}px`,
@@ -153,7 +153,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 			element.addEventListener('transitionend', handleTransitionEnd);
 		},
 		{ key: 'use-listener_WidgetWrapper' },
-		[cellSize, region, widget.region, widgetGrid]
+		[region, widget.region, widgetGrid]
 	);
 
 	// Hide widget if no region is available
@@ -202,7 +202,6 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 };
 
 export interface TWidgetWrapperProps<GContent> {
-	widgetGrid: TWidgetGrid<GContent, []>;
 	renderItem: (widget: TWidget<GContent>) => React.ReactNode;
 	index: number;
 	widget: TWidget<GContent>;

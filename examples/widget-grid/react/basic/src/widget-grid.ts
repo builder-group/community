@@ -1,7 +1,14 @@
-import { createWidgetGrid, TBaseWidget, TWidgetBaseContent, TWidgetGrid } from 'widget-grid';
+import {
+	createWidgetGrid,
+	TBaseWidget,
+	TGridCells,
+	TWidgetBaseContent,
+	TWidgetGrid,
+	TWidgetId
+} from 'widget-grid';
 
 const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
-	const initalGrid = [
+	const initialCells: TGridCells<TWidgetId> = [
 		['A', 'B', 'B'],
 		['A', 'C', 'D'],
 		['E', 'F', 'G']
@@ -12,7 +19,7 @@ const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
 
 	return {
 		grid: createWidgetGrid<TPlaygroundContent>({
-			grid: initalGrid,
+			cells: initialCells,
 			widgets: [
 				{ id: 'A', content: { type: 'item1' } },
 				{ id: 'B', content: { type: 'item2' } },
@@ -23,13 +30,13 @@ const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
 				{ id: 'G', content: { type: 'item3' } },
 				{ id: 'H', content: { type: 'item2' } }
 			],
-			cellSize: { width: 96, height: 96 }
+			layout: { cell: { width: 96, height: 96 }, gap: { width: 0, height: 0 } }
 		}),
 		actions: [
 			{
 				label: 'Shuffle',
 				action: (widgetGrid) => {
-					widgetGrid.setGridCells([
+					widgetGrid.setCells([
 						['B', 'B', 'C'],
 						['G', 'D', 'E'],
 						['H', 'A', 'F']
@@ -39,7 +46,7 @@ const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
 			{
 				label: 'Reset',
 				action: (widgetGrid) => {
-					widgetGrid.setGridCells(initalGrid);
+					widgetGrid.setCells(initialCells);
 				}
 			}
 		]
@@ -65,10 +72,10 @@ const createPerformancePreset = (cols = 50, rows = 50): TWidgetGridPreset<TPerfo
 		rows: number,
 		columns: number
 	): {
-		grid: string[][];
+		cells: TGridCells<TWidgetId>;
 		widgets: TBaseWidget<TPerformanceContent>[];
 	} {
-		const grid: string[][] = Array(rows)
+		const cells: TGridCells<TWidgetId> = Array(rows)
 			.fill(null)
 			.map((_, row) =>
 				Array(columns)
@@ -86,12 +93,12 @@ const createPerformancePreset = (cols = 50, rows = 50): TWidgetGridPreset<TPerfo
 				}
 			}));
 
-		return { grid, widgets };
+		return { cells, widgets };
 	}
 
-	function shuffleCells(grid: (string | null)[][]): (string | null)[][] {
+	function shuffleCells(cells: TGridCells<TWidgetId>): TGridCells<TWidgetId> {
 		// Flatten the grid into a single array
-		const flatGrid = grid.flat();
+		const flatGrid = cells.flat();
 
 		// Fisher-Yates shuffle algorithm
 		for (let i = flatGrid.length - 1; i > 0; i--) {
@@ -100,30 +107,30 @@ const createPerformancePreset = (cols = 50, rows = 50): TWidgetGridPreset<TPerfo
 		}
 
 		// Reconstruct the 2D array
-		const rows = grid.length;
-		const cols = grid[0].length;
-		const shuffledGrid: (string | null)[][] = [];
+		const rows = cells.length;
+		const cols = cells[0].length;
+		const shuffledCells: TGridCells<TWidgetId> = [];
 
 		for (let i = 0; i < rows; i++) {
-			shuffledGrid.push(flatGrid.slice(i * cols, (i + 1) * cols));
+			shuffledCells.push(flatGrid.slice(i * cols, (i + 1) * cols));
 		}
 
-		return shuffledGrid;
+		return shuffledCells;
 	}
 
-	const { grid, widgets } = generateTestGrid(cols, rows);
+	const { cells, widgets } = generateTestGrid(cols, rows);
 
 	return {
 		grid: createWidgetGrid<TPerformanceContent>({
-			grid,
+			cells,
 			widgets,
-			cellSize: { width: 100, height: 100 }
+			layout: { cell: { width: 100, height: 100 }, gap: { width: 0, height: 0 } }
 		}),
 		actions: [
 			{
 				label: 'Shuffle',
 				action: (widgetGrid) => {
-					widgetGrid.setGridCells(shuffleCells(widgetGrid._grid.cells));
+					widgetGrid.setCells(shuffleCells(widgetGrid._cells._v));
 				}
 			}
 		]

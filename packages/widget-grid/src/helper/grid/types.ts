@@ -1,3 +1,5 @@
+import { TDimensions } from '../../types';
+
 export interface TGridRegion {
 	start: TGridPosition;
 	dimension: TGridDimensions;
@@ -32,3 +34,8 @@ export interface TGridDirections {
 }
 
 export type TGridDirection = 'North' | 'East' | 'South' | 'West';
+
+export interface TGridLayout {
+	cell: TDimensions;
+	gap: TDimensions;
+}

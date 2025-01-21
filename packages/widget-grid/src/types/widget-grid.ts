@@ -1,7 +1,14 @@
 import { TFeatureDefinition, TWithFeatures } from '@blgc/types/features';
 import { TState } from 'feature-state';
-import { Grid, TGridDimensions, TGridPosition, TGridRegion } from '../helper';
-import { TBoundingRect, TDimensions, TXYPosition } from './utils';
+import {
+	TGridCells,
+	TGridDimensions,
+	TGridLayout,
+	TGridPosition,
+	TGridRegion,
+	TRegionPixels
+} from '../helper';
+import { TBoundingRect, TXYPosition } from './utils';
 import { TWidget, TWidgetBaseContent, TWidgetId } from './widget';
 
 export type TWidgetGrid<
@@ -14,22 +21,23 @@ export type TWidgetGrid<
 		// List of currently selected widget IDs
 		_selected: TState<TWidgetId[], []>;
 		// 2D array representing the grid layout
-		_grid: Grid<TWidgetId>;
+		_cells: TState<TGridCells<TWidgetId>, []>;
 		_size: TState<TGridDimensions, []>;
 		// Mode for user interaction (e.g. Translating, Pressing, etc.)
 		interactionMode: TState<TInteractionMode, []>;
 		// Size of each cell in the grid
-		cellSize: TState<TDimensions, []>;
+		layout: TState<TGridLayout, []>;
 		// Offset of the viewport relative to the window
 		boundingRect: TState<TBoundingRect, []>;
 
-		setGridCells: (cells: (string | null)[][]) => void;
-		syncGrid: (options?: { size?: boolean; regions?: boolean }) => void;
+		setCells: (cells: (string | null)[][]) => void;
+		syncCells: (options?: { size?: boolean; regions?: boolean }) => void;
 
-		getWidgetAt: (row: number, col: number) => TWidget<GContent> | null;
+		getWidgetAt: (position: TGridPosition) => TWidget<GContent> | null;
 		getWidgetById: (id: string) => TWidget<GContent> | null;
 		getSelectedWidgets: () => TWidget<GContent>[];
 		getWidgetRegions: () => TGridRegion[];
+		getRegionPixels: (region: TGridRegion) => TRegionPixels;
 		moveWidget: (widgetId: string, newPosition: TGridPosition) => void;
 
 		setSelected: (widgetIds: string[]) => void;

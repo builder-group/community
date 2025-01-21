@@ -1,5 +1,5 @@
 import { createState } from 'feature-state';
-import { getGridRegionPixels, TGridRegion } from './helper';
+import { TGridRegion } from './helper';
 import {
 	TBaseWidget,
 	TDimensions,
@@ -26,9 +26,7 @@ export function createWidget<GContent extends TWidgetBaseContent>(
 
 		init() {
 			const regionPixels =
-				this.region._v != null
-					? getGridRegionPixels(this.region._v, this._widgetGrid.cellSize._v)
-					: null;
+				this.region._v != null ? this._widgetGrid.getRegionPixels(this.region._v) : null;
 			if (regionPixels != null) {
 				this.position.set({ x: regionPixels.x, y: regionPixels.y });
 				this.size.set({ width: regionPixels.width, height: regionPixels.height });
@@ -53,7 +51,7 @@ export function createWidget<GContent extends TWidgetBaseContent>(
 
 		syncPosition() {
 			if (this.region._v != null) {
-				const regionPixels = getGridRegionPixels(this.region._v, this._widgetGrid.cellSize._v);
+				const regionPixels = this._widgetGrid.getRegionPixels(this.region._v);
 				this.position.set({
 					x: regionPixels.x,
 					y: regionPixels.y

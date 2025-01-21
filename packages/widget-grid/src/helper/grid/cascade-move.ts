@@ -50,6 +50,15 @@ export function cascadeMove<GGridCellId extends TGridCellId>(
 		dimension: sourceRegion.dimension
 	};
 
+	// Don't allow placing regions outside the grid in north, east and west direction
+	if (
+		isRegionOutOfBounds(cells, targetRegion, {
+			directionsToCheck: { north: true, east: true, south: false, west: true }
+		})
+	) {
+		return [];
+	}
+
 	// TODO: Snapshot cells to avoid applying invalid moves
 
 	// 1. Clear source region

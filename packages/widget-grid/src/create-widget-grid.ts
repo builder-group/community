@@ -2,16 +2,20 @@ import { notEmpty } from '@blgc/utils';
 import { createState } from 'feature-state';
 import { createWidget } from './create-widget';
 import {
-	getGridRegionPixels,
-	Grid,
+	cascadeMove,
+	getCell,
+	getGridSize,
+	getRegionPixels,
+	getRegions,
 	pointerEventToViewportPoint,
+	TGridCells,
 	TGridDimensions,
+	TGridLayout,
 	TGridRegion
 } from './helper';
 import {
 	TBaseWidget,
 	TBoundingRect,
-	TDimensions,
 	TInteractionMode,
 	TWidget,
 	TWidgetBaseContent,
@@ -30,17 +34,17 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		_features: [],
 		_widgets: {},
 		_selected: createState<TWidgetId[]>([]),
-		_grid: new Grid(config.grid),
+		_cells: createState<TGridCells<TWidgetId>>(config.cells),
 		_size: createState<TGridDimensions>({ rows: 0, cols: 0 }),
 		interactionMode: createState<TInteractionMode>({ type: 'None' }),
-		cellSize: createState(config.cellSize),
+		layout: createState(config.layout),
 		boundingRect: createState<TBoundingRect>({ left: 0, top: 0 }),
 
 		init({ baseWidgets }) {
-			this._size.set(this._grid.size, { additionalData: { source: 'init' } });
+			this._size.set(getGridSize(this._cells._v), { additionalData: { source: 'init' } });
 
 			// Create a map for O(1) lookup of regions by widget ID
-			const regions = this._grid.getRegions();
+			const regions = getRegions(this._cells._v);
 			const regionsByWidgetId = regions.reduce(
 				(acc, region) => {
 					acc[region.id] = {
@@ -83,17 +87,17 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 			return this;
 		},
 
-		setGridCells(cells) {
-			this._grid.cellsState.set(cells);
-			this.syncGrid();
+		setCells(cells) {
+			this._cells.set(cells);
+			this.syncCells();
 		},
-		syncGrid(options = {}) {
+		syncCells(options = {}) {
 			const { size = true, regions = true } = options;
 
 			// Sync regions
 			if (regions) {
-				for (const region of this._grid.getRegions()) {
-					const widget = widgetGrid._widgets[region.id];
+				for (const region of getRegions(this._cells._v)) {
+					const widget = this._widgets[region.id];
 					if (
 						widget != null &&
 						(widget.region._v?.start.row !== region.start.row ||
@@ -108,7 +112,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 							},
 							{ additionalData: { source: 'sync-grid' } }
 						);
-						const regionPixels = getGridRegionPixels(region, this.cellSize._v);
+						const regionPixels = this.getRegionPixels(region);
 						widget.position.set(
 							{ x: regionPixels.x, y: regionPixels.y },
 							{ additionalData: { source: 'sync-grid' } }
@@ -122,16 +126,14 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 			}
 
 			// Sync size
-			if (
-				size &&
-				(this._grid.size.rows !== this._size._v.rows || this._grid.size.cols !== this._size._v.cols)
-			) {
-				this._size.set(this._grid.size, { additionalData: { source: 'sync-grid' } });
+			const gridSize = getGridSize(this._cells._v);
+			if (size && (gridSize.rows !== this._size._v.rows || gridSize.cols !== this._size._v.cols)) {
+				this._size.set(gridSize, { additionalData: { source: 'sync-grid' } });
 			}
 		},
 
-		getWidgetAt(row, col) {
-			const id = this._grid.getCellAt(row, col);
+		getWidgetAt(position) {
+			const id = getCell(this._cells._v, position);
 			return id != null ? (this._widgets[id] ?? null) : null;
 		},
 		getWidgetById(id) {
@@ -141,7 +143,10 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 			return this._selected._v.map((id) => this._widgets[id]).filter(notEmpty);
 		},
 		getWidgetRegions() {
-			return this._grid.getRegions();
+			return getRegions(this._cells._v);
+		},
+		getRegionPixels(region) {
+			return getRegionPixels(region, this.layout._v);
 		},
 		moveWidget(widgetId, newPosition) {
 			const widgetRegion = this.getWidgetById(widgetId)?.region._v;
@@ -149,12 +154,12 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 				return;
 			}
 
-			const affectedRegions = this._grid.cascadeMove(widgetRegion, newPosition);
+			const affectedRegions = cascadeMove(this._cells._v, widgetRegion, newPosition);
 			if (affectedRegions.length === 0) {
 				return;
 			}
 
-			this._grid.cellsState._notify();
+			this._cells._notify();
 
 			for (const region of affectedRegions) {
 				const widget = this.getWidgetById(region.id);
@@ -169,7 +174,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 				});
 			}
 
-			this.syncGrid({ regions: false, size: true });
+			this.syncCells({ regions: false, size: true });
 		},
 
 		setSelected(widgetIds) {
@@ -241,7 +246,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 }
 
 export interface TCreateWidgetGridConfig<GContent extends TWidgetBaseContent> {
-	grid: string[][];
+	cells: TGridCells<TWidgetId>;
 	widgets: TBaseWidget<GContent>[];
-	cellSize: TDimensions;
+	layout: TGridLayout;
 }

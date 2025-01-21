@@ -1,11 +1,10 @@
-import { TDimensions } from '../../types';
-import { TGridRegion } from './types';
+import { TGridLayout, TGridRegion } from './types';
 
 export function getRegionPixels(
 	region: TGridRegion,
-	options: TGetRegionPixelsOptions = {}
+	layout: Partial<TGridLayout> = {}
 ): TRegionPixels {
-	const { cell = { width: 1, height: 1 }, gap = { width: 0, height: 0 } } = options;
+	const { cell = { width: 1, height: 1 }, gap = { width: 0, height: 0 } } = layout;
 
 	if (region.dimension.rows === 0 || region.dimension.cols === 0) {
 		return {
@@ -22,11 +21,6 @@ export function getRegionPixels(
 		width: region.dimension.cols * cell.width + (region.dimension.cols - 1) * gap.width, // Gaps between columns
 		height: region.dimension.rows * cell.height + (region.dimension.rows - 1) * gap.height // Gaps between rows
 	};
-}
-
-interface TGetRegionPixelsOptions {
-	cell?: TDimensions;
-	gap?: TDimensions;
 }
 
 export interface TRegionPixels {
