@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { cascadeMove } from './cascade-move';
+import { gridToString } from './grid-to-string';
 import { TGridCells } from './types';
 
 describe('cascadeMove', () => {
@@ -111,6 +112,30 @@ describe('cascadeMove', () => {
 			{ id: 'C', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } },
 			{ id: 'D', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 1 } },
 			{ id: 'A', start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 2 } }
+		]);
+	});
+
+	it('should move 1x2 region in west direction and swap with multiple smaller region', () => {
+		const cells: TGridCells<string> = [
+			['B', 'B', 'A'],
+			['C', 'D', 'A'],
+			['E', 'F', 'G']
+		];
+
+		const result = cascadeMove(
+			cells,
+			{
+				start: { row: 0, col: 2 },
+				dimension: { cols: 1, rows: 2 }
+			},
+			{ row: 0, col: 0 }
+		);
+
+		console.log(gridToString(cells));
+		expect(cells).toEqual([
+			['A', 'B', 'B'],
+			['A', 'C', 'D'],
+			['E', 'F', 'G']
 		]);
 	});
 

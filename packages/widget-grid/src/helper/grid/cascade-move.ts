@@ -180,34 +180,47 @@ function findBestSwapMove<GGridCellId extends TGridCellId>(
 
 	for (const [index, region] of boundingRegions.entries()) {
 		// Check all possible positions within freed region
-		iterateRegion(freedRegion, (pos) => {
-			// Validate move
-			if (!canRegionBeMovedToPos(cells, region, pos)) {
-				return;
-			}
+		iterateRegion(freedRegion, (freedPos) => {
+			// Try each cell of the region as an anchor point
+			iterateRegion(region, (regionPos) => {
+				// Calculate where the region would start if this cell was at freedPos
+				const startPos: TGridPosition = {
+					row: freedPos.row - (regionPos.row - region.start.row),
+					col: freedPos.col - (regionPos.col - region.start.col)
+				};
 
-			const newRegion: TGridRegion = {
-				start: pos,
-				dimension: region.dimension
-			};
+				// Validate move
+				if (
+					!canRegionBeMovedToPos(cells, region, startPos, {
+						allowOutOfBounds: { north: false, east: false, south: true, west: false }
+					})
+				) {
+					return;
+				}
 
-			// Check if move is diagonal
-			if (pos.row !== region.start.row && pos.col !== region.start.col) {
-				return;
-			}
+				const newRegion: TGridRegion = {
+					start: startPos,
+					dimension: region.dimension
+				};
 
-			// Check if move helps freeing target region
-			if (doRegionsOverlap(newRegion, targetRegion)) {
-				return;
-			}
+				// Check if move is diagonal
+				if (startPos.row !== region.start.row && startPos.col !== region.start.col) {
+					return;
+				}
 
-			possibleMoves.push({
-				index,
-				region,
-				newPosition: pos,
-				avoidsTarget: !doRegionsOverlap(newRegion, targetRegion),
-				distance: getRegionGap(freedRegion, region),
-				area: getRegionArea(region)
+				// Check if move helps freeing target region
+				if (doRegionsOverlap(newRegion, targetRegion)) {
+					return;
+				}
+
+				possibleMoves.push({
+					index,
+					region,
+					newPosition: startPos,
+					avoidsTarget: !doRegionsOverlap(newRegion, targetRegion),
+					distance: getRegionGap(freedRegion, region),
+					area: getRegionArea(region)
+				});
 			});
 		});
 	}

@@ -96,7 +96,7 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 										row: newRow
 									});
 									delete pendingMovesRef.current[widget.id];
-								}, 500);
+								}, 200);
 
 								pendingMovesRef.current[widget.id] = {
 									position: { col: newCol, row: newRow },

@@ -14,13 +14,21 @@ export function canRegionBeMovedToPos<GGridCellId extends TGridCellId>(
 		start: targetPosition,
 		dimension: sourceRegion.dimension
 	};
-
 	const cell = getCell(cells, sourceRegion.start);
-	return (
-		(override || doesRegionConsistOfCells(cells, targetRegion, [null, cell])) &&
-		(allowOutOfBounds == null ||
-			!isRegionOutOfBounds(cells, targetRegion, { directionsToCheck: allowOutOfBounds }))
-	);
+
+	const noOverride = override || doesRegionConsistOfCells(cells, targetRegion, [null, cell]);
+	const inBounds =
+		allowOutOfBounds == null ||
+		!isRegionOutOfBounds(cells, targetRegion, {
+			directionsToCheck: {
+				north: allowOutOfBounds.north != null ? !allowOutOfBounds.north : true,
+				east: allowOutOfBounds.east != null ? !allowOutOfBounds.east : true,
+				south: allowOutOfBounds.south != null ? !allowOutOfBounds.south : true,
+				west: allowOutOfBounds.west != null ? !allowOutOfBounds.west : true
+			}
+		});
+
+	return inBounds && noOverride;
 }
 
 export interface TCanRegionBeMovedToPosOptions {
