@@ -1,5 +1,4 @@
 import { applyCells } from './apply-cells';
-import { areRegionsAdjacent } from './are-regions-adjacent';
 import { bubbleRegionsUp } from './bubble-regions-up';
 import { canRegionBeMovedToPos } from './can-region-be-moved-to-pos';
 import { clearRegion } from './clear-region';
@@ -8,12 +7,14 @@ import { doRegionsOverlap } from './do-regions-overlap';
 import { doesRegionContainCells } from './does-region-contain-cells';
 import { expandGrid } from './expand-grid';
 import { fillRegion } from './fill-region';
+import { getBoundingRegion } from './get-bounding-region';
 import { getCell } from './get-cell';
 import { getComplementaryRegions } from './get-complementary-regions';
 import { getEmptyCells } from './get-empty-cells';
 import { getGridSize } from './get-grid-size';
 import { getOccupyingRegions } from './get-occupying-regions';
 import { getRegionArea } from './get-region-area';
+import { getRegionGap } from './get-region-gap';
 import { isRegionOutOfBounds } from './is-region-out-of-bounds';
 import { iterateRegion } from './iterate-region';
 import { mergeAdjacentRegions } from './merge-adjacent-regions';
@@ -115,7 +116,10 @@ export function fillSourceRegionBySwapping<GGridCellId extends TGridCellId>(
 	const movedRegions: TGridRegionWithId<GGridCellId>[] = [];
 	const complementaryRegions = getComplementaryRegions(sourceRegion, targetRegion);
 	const freedRegions = [...complementaryRegions];
-	const occupyingRegions = getOccupyingRegions(cellsSnapshot, targetRegion);
+	const boundingRegions = getOccupyingRegions(
+		cellsSnapshot,
+		getBoundingRegion([targetRegion, sourceRegion])
+	);
 
 	while (freedRegions.length > 0) {
 		const freedRegion = freedRegions.shift();
@@ -123,13 +127,7 @@ export function fillSourceRegionBySwapping<GGridCellId extends TGridCellId>(
 			continue;
 		}
 
-		const bestMove = findBestSwapMove(
-			cellsSnapshot,
-			sourceRegion,
-			targetRegion,
-			freedRegion,
-			occupyingRegions
-		);
+		const bestMove = findBestSwapMove(cellsSnapshot, targetRegion, freedRegion, boundingRegions);
 
 		// No valid move found for this freed region
 		if (bestMove == null) {
@@ -146,7 +144,7 @@ export function fillSourceRegionBySwapping<GGridCellId extends TGridCellId>(
 
 		// Remove best move from occupying region list
 		if (bestMove.avoidsTarget) {
-			occupyingRegions.splice(bestMove.index, 1);
+			boundingRegions.splice(bestMove.index, 1);
 		}
 
 		// Update freed regions
@@ -174,23 +172,13 @@ export function fillSourceRegionBySwapping<GGridCellId extends TGridCellId>(
 
 function findBestSwapMove<GGridCellId extends TGridCellId>(
 	cells: TGridCells<GGridCellId>,
-	sourceRegion: TGridRegion,
 	targetRegion: TGridRegion,
 	freedRegion: TGridRegion,
-	occupyingRegions: TGridRegionWithId<GGridCellId>[]
+	boundingRegions: TGridRegionWithId<GGridCellId>[]
 ): TSwapMove<GGridCellId> | null {
 	const possibleMoves: TSwapMove<GGridCellId>[] = [];
 
-	for (const [index, region] of occupyingRegions.entries()) {
-		// Must be adjacent
-		const isAdjacent =
-			areRegionsAdjacent(freedRegion, region, {
-				includeDiagonal: false
-			}) || areRegionsAdjacent(sourceRegion, region, { includeDiagonal: false });
-		if (!isAdjacent) {
-			continue;
-		}
-
+	for (const [index, region] of boundingRegions.entries()) {
 		// Check all possible positions within freed region
 		iterateRegion(freedRegion, (pos) => {
 			// Validate move
@@ -203,14 +191,12 @@ function findBestSwapMove<GGridCellId extends TGridCellId>(
 				dimension: region.dimension
 			};
 
-			// // Check if move helps to free target (even just partly)
-			// const freedRegions = getComplementaryRegions(region, newRegion);
-			// const freesTarget = freedRegions.some((r) => doRegionsOverlap(r, targetRegion));
-			// if (!freesTarget) {
-			// 	return;
-			// }
+			// Check if move is diagonal
+			if (pos.row !== region.start.row && pos.col !== region.start.col) {
+				return;
+			}
 
-			// Check if move helps to free target
+			// Check if move helps freeing target region
 			if (doRegionsOverlap(newRegion, targetRegion)) {
 				return;
 			}
@@ -219,17 +205,25 @@ function findBestSwapMove<GGridCellId extends TGridCellId>(
 				index,
 				region,
 				newPosition: pos,
-				avoidsTarget: !doRegionsOverlap(newRegion, targetRegion)
+				avoidsTarget: !doRegionsOverlap(newRegion, targetRegion),
+				distance: getRegionGap(freedRegion, region),
+				area: getRegionArea(region)
 			});
 		});
 	}
 
-	// Sort moves by target avoidance first, then region size
+	// Sort moves by:
+	// 1. Target avoidance (prefer moves that avoid target)
+	// 2. Distance (prefer closer regions)
+	// 3. Region size (prefer larger regions)
 	possibleMoves.sort((a, b) => {
 		if (a.avoidsTarget !== b.avoidsTarget) {
 			return a.avoidsTarget ? -1 : 1;
 		}
-		return getRegionArea(b.region) - getRegionArea(a.region);
+		if (a.distance !== b.distance) {
+			return a.distance - b.distance;
+		}
+		return b.area - a.area;
 	});
 
 	return possibleMoves[0] ?? null;
@@ -240,6 +234,8 @@ interface TSwapMove<GGridCellId extends TGridCellId> {
 	region: TGridRegionWithId<GGridCellId>;
 	newPosition: TGridPosition;
 	avoidsTarget: boolean;
+	distance: number;
+	area: number;
 }
 
 function pushDownOccupyingRegions<GGridCellId extends TGridCellId>(

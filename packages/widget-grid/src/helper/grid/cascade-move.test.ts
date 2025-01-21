@@ -106,10 +106,12 @@ describe('cascadeMove', () => {
 			['C', 'D', 'A'],
 			['E', 'F', 'G']
 		]);
-		// expect(result).toEqual([
-		// 	{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 2 } },
-		// 	{ id: 'A', start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 2 } }
-		// ]);
+		expect(result).toEqual([
+			{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 1 } },
+			{ id: 'C', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'D', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'A', start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 2 } }
+		]);
 	});
 
 	it('should move 1x2 region in south direction and swap with 1x1 region', () => {
@@ -379,17 +381,15 @@ describe('cascadeMove', () => {
 		);
 
 		expect(cells).toEqual([
-			['F', 'B', 'C'],
-			[null, 'A', 'E'],
-			[null, 'A', 'H'],
-			[null, 'D', null],
-			[null, 'G', null]
+			['B', 'G', 'C'],
+			['D', 'A', 'E'],
+			['F', 'A', 'H']
 		]);
 		expect(result).toEqual([
-			{ id: 'G', start: { row: 4, col: 1 }, dimension: { cols: 1, rows: 1 } },
-			{ id: 'D', start: { row: 3, col: 1 }, dimension: { cols: 1, rows: 1 } },
-			{ id: 'A', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 2 } },
-			{ id: 'F', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } }
+			{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'D', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'G', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'A', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 2 } }
 		]);
 	});
 
@@ -410,16 +410,16 @@ describe('cascadeMove', () => {
 		);
 
 		expect(cells).toEqual([
-			['F', 'B', 'C'],
-			[null, 'D', 'E'],
-			[null, 'A', 'H'],
-			[null, 'A', null],
-			[null, 'G', null]
+			['B', 'G', 'C'],
+			['D', null, 'E'],
+			['F', 'A', 'H'],
+			[null, 'A', null]
 		]);
 		expect(result).toEqual([
-			{ id: 'G', start: { row: 4, col: 1 }, dimension: { cols: 1, rows: 1 } },
-			{ id: 'A', start: { row: 2, col: 1 }, dimension: { cols: 1, rows: 2 } },
-			{ id: 'F', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } }
+			{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'D', start: { row: 1, col: 0 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'G', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'A', start: { row: 2, col: 1 }, dimension: { cols: 1, rows: 2 } }
 		]);
 	});
 
@@ -440,14 +440,13 @@ describe('cascadeMove', () => {
 		);
 
 		expect(cells).toEqual([
-			['B', null, 'C'],
+			['B', 'F', 'C'],
 			['B', 'A', 'D'],
-			['E', 'A', 'G'],
-			[null, 'F', null]
+			['E', 'A', 'G']
 		]);
 		expect(result).toEqual([
 			{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 1, rows: 2 } },
-			{ id: 'F', start: { row: 3, col: 1 }, dimension: { cols: 1, rows: 1 } },
+			{ id: 'F', start: { row: 0, col: 1 }, dimension: { cols: 1, rows: 1 } },
 			{ id: 'A', start: { row: 1, col: 1 }, dimension: { cols: 1, rows: 2 } }
 		]);
 	});
