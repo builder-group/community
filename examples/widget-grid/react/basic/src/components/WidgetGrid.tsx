@@ -1,6 +1,12 @@
 import { useFeatureState, useListener } from 'feature-react/state';
 import React from 'react';
-import { gridToString, TWidgetBaseContent, TWidgetGrid } from 'widget-grid';
+import {
+	gridToString,
+	TGridPosition,
+	TWidgetBaseContent,
+	TWidgetGrid,
+	TWidgetId
+} from 'widget-grid';
 import { useBoundingRectObserver } from '../hooks';
 import { TWidgetWrapperProps, WidgetWrapper } from './WidgetWrapper';
 
@@ -11,6 +17,9 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 	const { rows, cols } = useFeatureState(widgetGrid._size);
 	const { cell, gap } = useFeatureState(widgetGrid.layout);
 	const widgetGridRef = React.useRef<HTMLDivElement>(null);
+	const pendingMovesRef = React.useRef<
+		Record<TWidgetId, { position: TGridPosition; timeout: number }>
+	>({});
 
 	useBoundingRectObserver(widgetGridRef, widgetGrid.boundingRect);
 
@@ -66,11 +75,34 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 
 						const newCol = Math.round(pos.x / cell.width);
 						const newRow = Math.round(pos.y / cell.height);
+
 						if (newCol !== region.start.col || newRow !== region.start.row) {
-							widgetGrid.moveWidget(widget.id, {
-								col: newCol,
-								row: newRow
-							});
+							const pendingMove = pendingMovesRef.current[widget.id];
+
+							// If the intended position is different from the pending position, create new timeout
+							if (
+								pendingMove == null ||
+								pendingMove.position.col !== newCol ||
+								pendingMove.position.row !== newRow
+							) {
+								// Clear any existing timeout for this widget
+								if (pendingMove != null) {
+									clearTimeout(pendingMove.timeout);
+								}
+
+								const timeoutId = setTimeout(() => {
+									widgetGrid.moveWidget(widget.id, {
+										col: newCol,
+										row: newRow
+									});
+									delete pendingMovesRef.current[widget.id];
+								}, 500);
+
+								pendingMovesRef.current[widget.id] = {
+									position: { col: newCol, row: newRow },
+									timeout: timeoutId
+								};
+							}
 						}
 					}
 
@@ -87,6 +119,12 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 	const handlePointerUp = React.useCallback(
 		(event: React.PointerEvent<HTMLDivElement>): void => {
 			event.preventDefault();
+
+			// Clear all pending moves when pointer is released
+			Object.values(pendingMovesRef.current).forEach(({ timeout }) => {
+				window.clearTimeout(timeout);
+			});
+			pendingMovesRef.current = {};
 
 			widgetGrid.interactionMode.set({ type: 'None' });
 		},

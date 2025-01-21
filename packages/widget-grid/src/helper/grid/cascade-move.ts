@@ -72,7 +72,7 @@ export function cascadeMove<GGridCellId extends TGridCellId>(
 
 	// TODO: Return if target region is still occupied?
 	// But then we need to undo all applied moves
-	if (getTargetOccupyingRegions(cells, targetRegion).length > 0) {
+	if (getOccupyingRegions(cells, targetRegion).length > 0) {
 		console.error('Target region is still occupied. This should not happen!');
 	}
 
@@ -115,7 +115,7 @@ export function fillSourceRegionBySwapping<GGridCellId extends TGridCellId>(
 	const movedRegions: TGridRegionWithId<GGridCellId>[] = [];
 	const complementaryRegions = getComplementaryRegions(sourceRegion, targetRegion);
 	const freedRegions = [...complementaryRegions];
-	const occupyingRegions = getTargetOccupyingRegions(cellsSnapshot, targetRegion);
+	const occupyingRegions = getOccupyingRegions(cellsSnapshot, targetRegion);
 
 	while (freedRegions.length > 0) {
 		const freedRegion = freedRegions.shift();
@@ -123,7 +123,7 @@ export function fillSourceRegionBySwapping<GGridCellId extends TGridCellId>(
 			continue;
 		}
 
-		const bestMove = findBestMove(
+		const bestMove = findBestSwapMove(
 			cellsSnapshot,
 			sourceRegion,
 			targetRegion,
@@ -133,7 +133,6 @@ export function fillSourceRegionBySwapping<GGridCellId extends TGridCellId>(
 
 		// No valid move found for this freed region
 		if (bestMove == null) {
-			// freedRegions.push(freedRegion); // TODO: Avoid endless loop but we might want to feed it back in
 			continue;
 		}
 
@@ -173,14 +172,14 @@ export function fillSourceRegionBySwapping<GGridCellId extends TGridCellId>(
 	return movedRegions;
 }
 
-function findBestMove<GGridCellId extends TGridCellId>(
+function findBestSwapMove<GGridCellId extends TGridCellId>(
 	cells: TGridCells<GGridCellId>,
 	sourceRegion: TGridRegion,
 	targetRegion: TGridRegion,
 	freedRegion: TGridRegion,
 	occupyingRegions: TGridRegionWithId<GGridCellId>[]
-): TMove<GGridCellId> | null {
-	const possibleMoves: TMove<GGridCellId>[] = [];
+): TSwapMove<GGridCellId> | null {
+	const possibleMoves: TSwapMove<GGridCellId>[] = [];
 
 	for (const [index, region] of occupyingRegions.entries()) {
 		// Must be adjacent
@@ -203,6 +202,13 @@ function findBestMove<GGridCellId extends TGridCellId>(
 				start: pos,
 				dimension: region.dimension
 			};
+
+			// // Check if move helps to free target (even just partly)
+			// const freedRegions = getComplementaryRegions(region, newRegion);
+			// const freesTarget = freedRegions.some((r) => doRegionsOverlap(r, targetRegion));
+			// if (!freesTarget) {
+			// 	return;
+			// }
 
 			// Check if move helps to free target
 			if (doRegionsOverlap(newRegion, targetRegion)) {
@@ -229,7 +235,7 @@ function findBestMove<GGridCellId extends TGridCellId>(
 	return possibleMoves[0] ?? null;
 }
 
-interface TMove<GGridCellId extends TGridCellId> {
+interface TSwapMove<GGridCellId extends TGridCellId> {
 	index: number;
 	region: TGridRegionWithId<GGridCellId>;
 	newPosition: TGridPosition;
@@ -240,7 +246,7 @@ function pushDownOccupyingRegions<GGridCellId extends TGridCellId>(
 	cells: TGridCells<GGridCellId>,
 	targetRegion: TGridRegion
 ): TGridRegionWithId<GGridCellId>[] {
-	let occupyingRegions = getTargetOccupyingRegions(cells, targetRegion);
+	let occupyingRegions = getOccupyingRegions(cells, targetRegion);
 	const movedRegions: TGridRegionWithId<GGridCellId>[] = [];
 	let madeProgress: boolean;
 
@@ -281,16 +287,9 @@ function pushDownOccupyingRegions<GGridCellId extends TGridCellId>(
 		if (pushedRegions.length > 0) {
 			madeProgress = true;
 			movedRegions.push(...pushedRegions);
-			occupyingRegions = getTargetOccupyingRegions(cells, targetRegion);
+			occupyingRegions = getOccupyingRegions(cells, targetRegion);
 		}
 	} while (madeProgress && occupyingRegions.length > 0);
 
 	return movedRegions;
-}
-
-function getTargetOccupyingRegions<GGridCellId extends TGridCellId>(
-	cells: TGridCells<GGridCellId>,
-	targetRegion: TGridRegion
-): TGridRegionWithId<GGridCellId>[] {
-	return getOccupyingRegions(cells, targetRegion);
 }

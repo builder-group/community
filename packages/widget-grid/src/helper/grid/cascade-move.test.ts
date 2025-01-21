@@ -85,6 +85,33 @@ describe('cascadeMove', () => {
 		]);
 	});
 
+	it('should move 1x2 region in east direction and swap with multiple smaller region', () => {
+		const cells: TGridCells<string> = [
+			['A', 'B', 'B'],
+			['A', 'C', 'D'],
+			['E', 'F', 'G']
+		];
+
+		const result = cascadeMove(
+			cells,
+			{
+				start: { row: 0, col: 0 },
+				dimension: { cols: 1, rows: 2 }
+			},
+			{ row: 0, col: 2 }
+		);
+
+		expect(cells).toEqual([
+			['B', 'B', 'A'],
+			['C', 'D', 'A'],
+			['E', 'F', 'G']
+		]);
+		// expect(result).toEqual([
+		// 	{ id: 'B', start: { row: 0, col: 0 }, dimension: { cols: 2, rows: 2 } },
+		// 	{ id: 'A', start: { row: 0, col: 2 }, dimension: { cols: 1, rows: 2 } }
+		// ]);
+	});
+
 	it('should move 1x2 region in south direction and swap with 1x1 region', () => {
 		const cells: TGridCells<string> = [
 			['A', 'B', 'C'],
