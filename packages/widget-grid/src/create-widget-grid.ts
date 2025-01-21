@@ -41,7 +41,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		boundingRect: createState<TBoundingRect>({ left: 0, top: 0 }),
 
 		init({ baseWidgets }) {
-			this._size.set(getGridSize(this._cells._v), { additionalData: { source: 'init' } });
+			this._size.set(getGridSize(this._cells._v), { listenerData: { source: 'init' } });
 
 			// Create a map for O(1) lookup of regions by widget ID
 			const regions = getRegions(this._cells._v);
@@ -110,16 +110,16 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 								start: region.start,
 								dimension: region.dimension
 							},
-							{ additionalData: { source: 'sync-grid' } }
+							{ listenerData: { source: 'sync-grid' } }
 						);
 						const regionPixels = this.getRegionPixels(region);
 						widget.position.set(
 							{ x: regionPixels.x, y: regionPixels.y },
-							{ additionalData: { source: 'sync-grid' } }
+							{ listenerData: { source: 'sync-grid' } }
 						);
 						widget.size.set(
 							{ width: regionPixels.width, height: regionPixels.height },
-							{ additionalData: { source: 'sync-grid' } }
+							{ listenerData: { source: 'sync-grid' } }
 						);
 					}
 				}
@@ -128,7 +128,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 			// Sync size
 			const gridSize = getGridSize(this._cells._v);
 			if (size && (gridSize.rows !== this._size._v.rows || gridSize.cols !== this._size._v.cols)) {
-				this._size.set(gridSize, { additionalData: { source: 'sync-grid' } });
+				this._size.set(gridSize, { listenerData: { source: 'sync-grid' } });
 			}
 		},
 
@@ -167,7 +167,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 					continue;
 				}
 				widget.region.set(region, {
-					additionalData: {
+					listenerData: {
 						source: 'move-widget',
 						isMoved: region.id === widgetId
 					}
@@ -218,7 +218,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 					const widget = widgetGrid._widgets[widgetId];
 					if (widget != null) {
 						widget.isSelected.set(false, {
-							additionalData: { source: 'sync-selected' }
+							listenerData: { source: 'sync-selected' }
 						});
 					}
 				}
@@ -230,7 +230,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 					const widget = widgetGrid._widgets[widgetId];
 					if (widget != null) {
 						widget.isSelected.set(true, {
-							additionalData: { source: 'sync-selected' }
+							listenerData: { source: 'sync-selected' }
 						});
 					}
 				}

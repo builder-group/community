@@ -3,32 +3,20 @@ import type { TListener, TListenerCallbackData, TListenerQueueItem, TState } fro
 const GLOBAL_LISTENER_QUEUE: TListenerQueueItem[] = [];
 export const SET_SOURCE_KEY = 'set';
 
-export function createState<GValue>(
-	initialValue: GValue,
-	options: TCreateStateOptions = {}
-): TState<GValue, []> {
-	const { deferred = false } = options;
-
+export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 	return {
 		_features: [],
 		_listeners: [],
 		_v: initialValue,
 		_notify(notifyOptions = {}) {
-			const {
-				processListenerQueue = true,
-				additionalData = {},
-				deferred: innerDeferred = deferred,
-				prevValue
-			} = notifyOptions;
+			const { processListenerQueue = true, listenerData = {} } = notifyOptions;
 
 			// Push current state's listeners to the queue
 			for (const listener of this._listeners) {
-				const data: TListenerCallbackData<GValue> = {
-					...additionalData,
-					prevValue: prevValue as Readonly<GValue>,
-					value: this._v as Readonly<GValue>
-				};
-				if (listener.callIf == null || listener.callIf(data)) {
+				const data: TListenerCallbackData<GValue, []> = Object.assign(listenerData, {
+					state: this
+				});
+				if (listener.queueIf == null || listener.queueIf(data)) {
 					GLOBAL_LISTENER_QUEUE.push({
 						data,
 						callback: listener.callback,
@@ -39,12 +27,7 @@ export function createState<GValue>(
 
 			// Process queue
 			if (processListenerQueue) {
-				// Defer processing using setTimeout()
-				innerDeferred
-					? setTimeout(() => {
-							void processQueue();
-						})
-					: void processQueue();
+				void processStateQueue();
 			}
 		},
 		get() {
@@ -57,23 +40,22 @@ export function createState<GValue>(
 					: newValueOrUpdater;
 			const prevValue = this._v;
 			if (prevValue !== newValue) {
-				const { additionalData = {}, processListenerQueue = true } = setOptions;
-				additionalData.source = additionalData.source ?? SET_SOURCE_KEY;
+				const { listenerData = {}, processListenerQueue = true } = setOptions;
+				listenerData.source = listenerData.source ?? SET_SOURCE_KEY;
 				this._v = newValue;
 				this._notify({
-					additionalData,
-					processListenerQueue,
-					prevValue
+					listenerData,
+					processListenerQueue
 				});
 			}
 		},
 		listen(callback, listenOptions = {}) {
-			const { level = 0, key, callIf } = listenOptions;
-			const listener: TListener<GValue> = {
+			const { level = 0, key, queueIf: callIf } = listenOptions;
+			const listener: TListener<GValue, []> = {
 				key,
 				level,
 				callback,
-				callIf
+				queueIf: callIf
 			};
 			this._listeners.push(listener);
 
@@ -87,17 +69,14 @@ export function createState<GValue>(
 		},
 		subscribe(callback, subscribeOptions) {
 			const unbind = this.listen(callback, subscribeOptions);
-			void callback({ value: this._v, prevValue: this._v });
+			void callback({ state: this });
 			return unbind;
 		}
 	};
 }
 
-export interface TCreateStateOptions {
-	deferred?: boolean;
-}
-
-async function processQueue(): Promise<void> {
+// TODO: Referencing the state directly causes the queue to always capture latest values (and not value at time of queueing)
+export async function processStateQueue(): Promise<void> {
 	// Drain the queue
 	const queueToProcess = GLOBAL_LISTENER_QUEUE.splice(0, GLOBAL_LISTENER_QUEUE.length);
 	queueToProcess.sort((a, b) => a.level - b.level);
