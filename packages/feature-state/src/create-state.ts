@@ -1,4 +1,4 @@
-import type { TListener, TListenerQueueItem, TState } from './types';
+import type { TListener, TListenerCallbackData, TListenerQueueItem, TState } from './types';
 
 const GLOBAL_LISTENER_QUEUE: TListenerQueueItem[] = [];
 export const SET_SOURCE_KEY = 'set';
@@ -23,15 +23,14 @@ export function createState<GValue>(
 
 			// Push current state's listeners to the queue
 			for (const listener of this._listeners) {
-				if (
-					listener.callIf == null ||
-					listener.callIf({ newValue: this._v, prevValue, additionalData })
-				) {
+				const data: TListenerCallbackData<GValue> = {
+					...additionalData,
+					prevValue: prevValue as Readonly<GValue>,
+					value: this._v as Readonly<GValue>
+				};
+				if (listener.callIf == null || listener.callIf(data)) {
 					GLOBAL_LISTENER_QUEUE.push({
-						data: {
-							...additionalData,
-							value: this._v as Readonly<GValue>
-						},
+						data,
 						callback: listener.callback,
 						level: listener.level
 					});
@@ -88,7 +87,7 @@ export function createState<GValue>(
 		},
 		subscribe(callback, subscribeOptions) {
 			const unbind = this.listen(callback, subscribeOptions);
-			void callback({ value: this._v });
+			void callback({ value: this._v, prevValue: this._v });
 			return unbind;
 		}
 	};

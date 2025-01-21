@@ -33,6 +33,7 @@ A collection of open source libraries maintained by [builder.group](https://buil
 | [validatenv](https://github.com/builder-group/community/blob/develop/packages/validatenv)                         | Type-safe, straightforward, and lightweight library for validating environment variables using existing validation libraries like Zod, Valibot, and Yup.                       | [`validatenv`](https://www.npmjs.com/package/validatenv)                         |
 | [validation-adapter](https://github.com/builder-group/community/blob/develop/packages/validation-adapter)         | Universal validation adapter that integrates various validation libraries like Zod, Valibot, and Yup                                                                           | [`validation-adapter`](https://www.npmjs.com/package/validation-adapter)         |
 | [validation-adapters](https://github.com/builder-group/community/blob/develop/packages/validation-adapters)       | Pre-made validation adapters for the validation-adapter library, including adapters for Zod and Valibot                                                                        | [`validation-adapters`](https://www.npmjs.com/package/validation-adapters)       |
+| [widget-grid](https://github.com/builder-group/community/blob/develop/packages/widget-grid)                       | Framework agnostic library for creating and manipulating widget grids                                                                                                          | [`widget-grid`](https://www.npmjs.com/package/widget-grid)                       |
 | [xml-tokenizer](https://github.com/builder-group/community/blob/develop/packages/xml-tokenizer)                   | Straightforward and typesafe XML tokenizer that streams tokens through a callback mechanism                                                                                    | [`xml-tokenizer`](https://www.npmjs.com/package/xml-tokenizer)                   |
 
 ### 📚 Examples
@@ -109,3 +110,9 @@ createState({
 We currently use the "wrapper pattern" because it ensures better TypeScript type inference. Each wrapper function modifies the state's type in a specific sequence, which is harder to achieve reliably with a feature array.
 
 We're [actively exploring solutions](https://github.com/builder-group/community/blob/develop/packages/feature-state/src/_experimental) to support both patterns, combining the type safety of the wrapper pattern with the simplicity of declarative APIs. Contributions and ideas are always welcome :)
+
+### Why do feature-based libraries use Objects instead of Classes?
+
+This [Medium post](https://medium.com/@markmiro/thoughts-on-choosing-between-plain-js-objects-and-classes-6422af8aaad5) explains the key differences well.
+
+In short, we use objects because they are more flexible and allow for the kind of extensibility we need. Achieving this level of extensibility with classes isn't feasible for our use case, so using objects was the better choice.
