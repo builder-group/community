@@ -106,7 +106,7 @@ export function createForm<GFormData extends TFormData>(
 		},
 		async submit(this: TForm<GFormData, []>, options = {}) {
 			const {
-				listenerContext,
+				context,
 				assignToInitial = false,
 				onInvalidSubmit: _onInvalidSubmit,
 				onValidSubmit: _onValidSubmit,
@@ -136,18 +136,18 @@ export function createForm<GFormData extends TFormData>(
 			const submitCallbackPromises: TSubmitCallbackResponse[] = [];
 			if (data != null) {
 				for (const callback of this._validSubmitCallbacks) {
-					submitCallbackPromises.push(callback(data, listenerContext));
+					submitCallbackPromises.push(callback(data, context));
 				}
 				if (typeof _onValidSubmit === 'function') {
-					submitCallbackPromises.push(_onValidSubmit(data, listenerContext));
+					submitCallbackPromises.push(_onValidSubmit(data, context));
 				}
 			} else {
 				const errors = this.getErrors();
 				for (const callback of this._invalidSubmitCallbacks) {
-					submitCallbackPromises.push(callback(errors, listenerContext));
+					submitCallbackPromises.push(callback(errors, context));
 				}
 				if (typeof _onInvalidSubmit === 'function') {
-					submitCallbackPromises.push(_onInvalidSubmit(errors, listenerContext));
+					submitCallbackPromises.push(_onInvalidSubmit(errors, context));
 				}
 			}
 
