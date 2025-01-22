@@ -126,6 +126,7 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 			});
 
 			//  Force a reflow to ensure the initial position is applied
+			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 			element.offsetHeight;
 
 			// Enable transition and move to new position

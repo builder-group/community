@@ -28,7 +28,8 @@ const App: React.FC = () => {
 				{preset.actions.map((action, index) => (
 					<button
 						key={index}
-						onClick={() => action.action(preset.grid as any)}
+						// @ts-expect-error -- Action expects a specific generic which we don't have here
+						onClick={() => action.action(preset.grid)}
 						style={{ marginRight: '10px' }}
 					>
 						{action.label}
@@ -37,7 +38,8 @@ const App: React.FC = () => {
 			</div>
 
 			<WidgetGrid
-				widgetGrid={preset.grid as any}
+				// @ts-expect-error -- Action expects a specific generic which we don't have here
+				widgetGrid={preset.grid}
 				renderItem={(item) => {
 					return (
 						<div
