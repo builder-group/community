@@ -31,7 +31,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 
 	const widgetGrid: TWithInit<
 		TWidgetGrid<GContent, []>,
-		{ baseWidgets: TCreateWidgetGridConfig<GContent>['widgets'] }
+		{ initialWidgets: TCreateWidgetGridConfig<GContent>['widgets'] }
 	> = {
 		_features: [],
 		_widgets: {},
@@ -42,8 +42,10 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		layout: createState(layout),
 		boundingRect: createState<TBoundingRect>({ left: 0, top: 0 }),
 
-		init({ baseWidgets }) {
-			this._size.set(getGridSize(this._cells._v), { listenerContext: { source: 'init' } });
+		init({ initialWidgets }) {
+			this._size.set(getGridSize(this._cells._v), {
+				listenerContext: { source: 'widget-grid_init' }
+			});
 
 			// Create a map for O(1) lookup of regions by widget ID
 			const regions = getRegions(this._cells._v);
@@ -59,7 +61,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 			);
 
 			// Convert base widgets to full widgets with regions in one pass
-			this._widgets = baseWidgets.reduce(
+			this._widgets = initialWidgets.reduce(
 				(acc, baseWidget) => {
 					acc[baseWidget.id] = createWidget({
 						baseWidget,
@@ -112,16 +114,16 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 								start: region.start,
 								dimension: region.dimension
 							},
-							{ listenerContext: { source: 'sync-grid' } }
+							{ listenerContext: { source: 'widget-grid_sync-cells' } }
 						);
 						const regionPixels = this.getRegionPixels(region);
 						widget.position.set(
 							{ x: regionPixels.x, y: regionPixels.y },
-							{ listenerContext: { source: 'sync-grid' } }
+							{ listenerContext: { source: 'widget-grid_sync-cells' } }
 						);
 						widget.size.set(
 							{ width: regionPixels.width, height: regionPixels.height },
-							{ listenerContext: { source: 'sync-grid' } }
+							{ listenerContext: { source: 'widget-grid_sync-cells' } }
 						);
 					}
 				}
@@ -130,7 +132,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 			// Sync size
 			const gridSize = getGridSize(this._cells._v);
 			if (size && (gridSize.rows !== this._size._v.rows || gridSize.cols !== this._size._v.cols)) {
-				this._size.set(gridSize, { listenerContext: { source: 'sync-grid' } });
+				this._size.set(gridSize, { listenerContext: { source: 'widget-grid_sync-cells' } });
 			}
 		},
 
@@ -170,7 +172,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 				}
 				widget.region.set(region, {
 					listenerContext: {
-						source: 'move-widget',
+						source: 'widget-grid_move-widget',
 						isMoved: region.id === widgetId
 					}
 				});
@@ -220,7 +222,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 					const widget = widgetGrid._widgets[widgetId];
 					if (widget != null) {
 						widget.isSelected.set(false, {
-							listenerContext: { source: 'sync-selected' }
+							listenerContext: { source: 'widget-grid_sync-selected' }
 						});
 					}
 				}
@@ -232,7 +234,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 					const widget = widgetGrid._widgets[widgetId];
 					if (widget != null) {
 						widget.isSelected.set(true, {
-							listenerContext: { source: 'sync-selected' }
+							listenerContext: { source: 'widget-grid_sync-selected' }
 						});
 					}
 				}
@@ -244,7 +246,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		}
 	};
 
-	return widgetGrid.init({ baseWidgets: widgets });
+	return widgetGrid.init({ initialWidgets: widgets });
 }
 
 export interface TCreateWidgetGridConfig<GContent extends TWidgetBaseContent> {

@@ -56,7 +56,7 @@ describe('withSelector function', () => {
 		expect(callback).toHaveBeenCalledTimes(1);
 	});
 
-	it('should work with function-based selectors', async () => {
+	it('should work with function-based selectors', () => {
 		// Prepare
 		const state = withSelector(createState({ count: 0 }));
 		const callback = vi.fn();

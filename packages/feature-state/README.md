@@ -187,10 +187,10 @@ For example:
 ```ts
 const $counter = createState(0);
 
-$counter.listen((data) => {
+$counter.listen((context) => {
   // By the time this runs, state._v might be different 
   // from when the listener was queued
-  console.log(data.state._v);
+  console.log(context.state._v);
 });
 
 $counter.set(1); // Queues listener
@@ -201,9 +201,9 @@ If you want to access the state inside the listener, you can simply capture it:
 ```ts
 const $counter = createState(0);
 
-$counter.listen((data) => {
-    $counter.set(data.value + 1);
+$counter.listen(() => {
+    $counter.set((v) => v + 1);
 });
 ```
 
-While you can still reference `$counter` directly in listeners, there's no guarantee about its value since it might have changed between queueing and execution of the listener. That's why using `data.value` is the safer approach.
+While you can reference `$counter` directly in listeners, there's no guarantee about its value since it might have changed between queueing and execution of the listener. That's why using `context.value` is the safer approach.

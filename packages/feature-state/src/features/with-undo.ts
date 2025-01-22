@@ -1,4 +1,4 @@
-import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
+import { TEnforceFeatureConstraint, TFeatureDefinition, TWithInit } from '@blgc/types/features';
 import type { TState, TUndoFeature } from '../types';
 
 export function withUndo<GValue, GFeatures extends TFeatureDefinition[]>(
@@ -19,23 +19,26 @@ export function withUndo<GValue, GFeatures extends TFeatureDefinition[]>(
 	};
 
 	// Extend the base state with the undo feature
-	const extendedState = Object.assign(baseState, undoFeature) as TState<
-		GValue,
-		[TUndoFeature<GValue>]
-	>;
+	const extendedState = Object.assign(baseState, undoFeature, {
+		init(this: TState<GValue, [TUndoFeature<GValue>]>) {
+			this.listen(
+				({ value }) => {
+					// Maintaining the history stack size
+					if (this._history.length >= historyLimit) {
+						this._history.shift(); // Remove oldest state
+					}
+
+					this._history.push(value);
+				},
+				{ key: 'with-undo' }
+			);
+
+			// @ts-expect-error -- Remove init method after initialization
+			delete this.init;
+			return this;
+		}
+	}) as TWithInit<TState<GValue, [TUndoFeature<GValue>]>>;
 	extendedState._features.push('undo');
 
-	extendedState.listen(
-		({ value }) => {
-			// Maintaining the history stack size
-			if (extendedState._history.length >= historyLimit) {
-				extendedState._history.shift(); // Remove oldest state
-			}
-
-			extendedState._history.push(value);
-		},
-		{ key: 'with-undo' }
-	);
-
-	return extendedState as unknown as TState<GValue, [TUndoFeature<GValue>, ...GFeatures]>;
+	return extendedState.init() as unknown as TState<GValue, [TUndoFeature<GValue>, ...GFeatures]>;
 }

@@ -1,7 +1,7 @@
 import type { TListener, TListenerContext, TListenerQueueItem, TState } from './types';
 
 const GLOBAL_LISTENER_QUEUE: TListenerQueueItem[] = [];
-export const SET_SOURCE_KEY = 'set';
+export const SET_SOURCE_KEY = 'state_set';
 
 export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 	return {
@@ -71,7 +71,7 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 		},
 		subscribe(callback, subscribeOptions) {
 			const unbind = this.listen(callback, subscribeOptions);
-			void callback({ value: this._v });
+			void callback({ value: this._v, prevValue: this._v });
 			return unbind;
 		}
 	};
@@ -80,10 +80,9 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 export async function processStateQueue(): Promise<void> {
 	// Drain the queue
 	const toProcess = GLOBAL_LISTENER_QUEUE.splice(0, GLOBAL_LISTENER_QUEUE.length);
-	toProcess.sort((a, b) => a.level - b.level);
 
-	// Process each item in the queue sequentially
-	for (const queueItem of toProcess) {
+	// Process each item in the queue sequentially (sorted by level)
+	for (const queueItem of toProcess.sort((a, b) => a.level - b.level)) {
 		await queueItem.callback(queueItem.context);
 	}
 }
