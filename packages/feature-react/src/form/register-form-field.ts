@@ -16,7 +16,7 @@ export function registerFormField<GValue, GKey = string>(
 		onChange(event) {
 			if (hasProperty(event.target, 'value')) {
 				formField.set(event.target.value as any, {
-					listenerData: {
+					listenerContext: {
 						background: !controlled
 					}
 				});

@@ -1,4 +1,4 @@
-import type { TListener, TListenerCallbackData, TListenerQueueItem, TState } from './types';
+import type { TListener, TListenerContext, TListenerQueueItem, TState } from './types';
 
 const GLOBAL_LISTENER_QUEUE: TListenerQueueItem[] = [];
 export const SET_SOURCE_KEY = 'set';
@@ -9,17 +9,17 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 		_listeners: [],
 		_v: initialValue,
 		_notify(notifyOptions = {}) {
-			const { processListenerQueue = true, listenerData = {}, prevValue } = notifyOptions;
+			const { processListenerQueue = true, listenerContext = {}, prevValue } = notifyOptions;
 
 			// Push current state's listeners to the queue
 			for (const listener of this._listeners) {
-				const data: TListenerCallbackData<GValue> = Object.assign(listenerData, {
+				const context: TListenerContext<GValue> = Object.assign(listenerContext, {
 					value: this._v,
 					prevValue
 				});
-				if (listener.queueIf == null || listener.queueIf(data)) {
+				if (listener.queueIf == null || listener.queueIf(context)) {
 					GLOBAL_LISTENER_QUEUE.push({
-						data,
+						context,
 						callback: listener.callback,
 						level: listener.level
 					});
@@ -41,11 +41,11 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 					: newValueOrUpdater;
 			const prevValue = this._v;
 			if (prevValue !== newValue) {
-				const { listenerData = {}, processListenerQueue = true } = setOptions;
-				listenerData.source = listenerData.source ?? SET_SOURCE_KEY;
+				const { listenerContext = {}, processListenerQueue = true } = setOptions;
+				listenerContext.source = listenerContext.source ?? SET_SOURCE_KEY;
 				this._v = newValue;
 				this._notify({
-					listenerData,
+					listenerContext,
 					processListenerQueue,
 					prevValue
 				});
@@ -84,6 +84,6 @@ export async function processStateQueue(): Promise<void> {
 
 	// Process each item in the queue sequentially
 	for (const queueItem of toProcess) {
-		await queueItem.callback(queueItem.data);
+		await queueItem.callback(queueItem.context);
 	}
 }

@@ -34,9 +34,9 @@ export function createWidget<GContent extends TWidgetBaseContent>(
 
 			this.isSelected.listen(({ value }) => {
 				if (value) {
-					this.layoutMode.set('Absolute', { listenerData: { source: 'is-selected' } });
+					this.layoutMode.set('Absolute', { listenerContext: { source: 'is-selected' } });
 				} else {
-					this.layoutMode.set('Grid', { listenerData: { source: 'is-selected' } });
+					this.layoutMode.set('Grid', { listenerContext: { source: 'is-selected' } });
 				}
 			});
 

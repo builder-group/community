@@ -77,7 +77,7 @@ export function createFormField<GValue>(
 			this.isTouched = true;
 		},
 		reset(this: TFormField<GValue>) {
-			this.set(this._intialValue, { listenerData: { source: 'reset' } });
+			this.set(this._intialValue, { listenerContext: { source: 'reset' } });
 			this.isTouched = false;
 			this.isSubmitted = false;
 			this.isSubmitting = false;
@@ -92,9 +92,9 @@ export function createFormField<GValue>(
 			if (notifyOnStatusChange) {
 				this.status.listen(
 					(data) => {
-						baseState._notify({ listenerData: { source: 'status', status: data.value } });
+						baseState._notify({ listenerContext: { source: 'status', status: data.value } });
 					},
-					{ key: 'form-field' }
+					{ key: 'form-field_status-change' }
 				);
 			}
 

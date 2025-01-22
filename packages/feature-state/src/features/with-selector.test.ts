@@ -50,7 +50,7 @@ describe('withSelector function', () => {
 		// Act
 		state.listenToSelected(['user.name'], callback);
 		state._v = { user: { name: 'Jane', age: 31 } };
-		state._notify({ listenerData: { changedProperties: ['user.name'] } });
+		state._notify({ listenerContext: { changedProperties: ['user.name'] } });
 
 		// Assert
 		expect(callback).toHaveBeenCalledTimes(1);
@@ -91,7 +91,7 @@ describe('withSelector function', () => {
 		// Act
 		state.listenToSelected(['user.name'], callback);
 		state._v = { user: { name: 'Jane' } };
-		state._notify({ listenerData: { changedProperties: null as any } });
+		state._notify({ listenerContext: { changedProperties: null as any } });
 
 		// Assert
 		expect(callback).toHaveBeenCalledTimes(1);

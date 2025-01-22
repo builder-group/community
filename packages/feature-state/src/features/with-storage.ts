@@ -49,7 +49,7 @@ export function withStorage<
 
 			const persistedValue = await storage.load(key);
 			if (persistedValue !== FAILED_TO_LOAD_FROM_STORAGE_IDENTIFIER) {
-				this.set(persistedValue, { listenerData: { source: LOAD_FROM_STORAGE_SOURCE_KEY } });
+				this.set(persistedValue, { listenerContext: { source: LOAD_FROM_STORAGE_SOURCE_KEY } });
 				success = true;
 			}
 

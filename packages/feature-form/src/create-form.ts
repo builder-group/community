@@ -1,3 +1,4 @@
+import { TWithInit } from '@blgc/types/features';
 import { type TEntries } from '@blgc/types/utils';
 import { bitwiseFlag, deepCopy, type BitwiseFlag } from '@blgc/utils';
 import { createState } from 'feature-state';
@@ -32,7 +33,7 @@ export function createForm<GFormData extends TFormData>(
 		notifyOnStatusChange = true
 	} = config;
 
-	const form: TForm<GFormData, []> = {
+	const form: TWithInit<TForm<GFormData, []>> = {
 		_features: [],
 		_config: {
 			collectErrorMode,
@@ -60,6 +61,37 @@ export function createForm<GFormData extends TFormData>(
 		isValidating: createState(false),
 		isSubmitted: createState(false),
 		isSubmitting: createState(false),
+		init() {
+			// Register listener
+			for (const field of Object.values(this.fields) as TFormFields<GFormData>[keyof GFormData][]) {
+				field.listen(
+					async ({ source }) => {
+						if (source === 'set') {
+							if (
+								(field.isSubmitted &&
+									field._config.reValidateMode.has(FormFieldReValidateMode.OnChange)) ||
+								(!field.isSubmitted &&
+									field._config.validateMode.has(FormFieldValidateMode.OnChange)) ||
+								(field._config.validateMode.has(FormFieldValidateMode.OnTouched) && field.isTouched)
+							) {
+								await field.validate();
+							}
+						}
+					},
+					{ key: 'form_validate' }
+				);
+				field.status.listen(
+					async () => {
+						await form._revalidate(true);
+					},
+					{ key: 'form_revalidate' }
+				);
+			}
+
+			// @ts-expect-error -- Remove init method after initialization
+			delete this.init;
+			return this;
+		},
 		async _revalidate(this: TForm<GFormData, []>, cached = false) {
 			const formFields = Object.values(this.fields) as TFormFields<GFormData>[keyof GFormData][];
 
@@ -74,7 +106,7 @@ export function createForm<GFormData extends TFormData>(
 		},
 		async submit(this: TForm<GFormData, []>, options = {}) {
 			const {
-				listenerData,
+				listenerContext,
 				assignToInitial = false,
 				onInvalidSubmit: _onInvalidSubmit,
 				onValidSubmit: _onValidSubmit,
@@ -104,18 +136,18 @@ export function createForm<GFormData extends TFormData>(
 			const submitCallbackPromises: TSubmitCallbackResponse[] = [];
 			if (data != null) {
 				for (const callback of this._validSubmitCallbacks) {
-					submitCallbackPromises.push(callback(data, listenerData));
+					submitCallbackPromises.push(callback(data, listenerContext));
 				}
 				if (typeof _onValidSubmit === 'function') {
-					submitCallbackPromises.push(_onValidSubmit(data, listenerData));
+					submitCallbackPromises.push(_onValidSubmit(data, listenerContext));
 				}
 			} else {
 				const errors = this.getErrors();
 				for (const callback of this._invalidSubmitCallbacks) {
-					submitCallbackPromises.push(callback(errors, listenerData));
+					submitCallbackPromises.push(callback(errors, listenerContext));
 				}
 				if (typeof _onInvalidSubmit === 'function') {
-					submitCallbackPromises.push(_onInvalidSubmit(errors, listenerData));
+					submitCallbackPromises.push(_onInvalidSubmit(errors, listenerContext));
 				}
 			}
 
@@ -209,33 +241,7 @@ export function createForm<GFormData extends TFormData>(
 		}
 	};
 
-	// Register listener
-	for (const field of Object.values(form.fields) as TFormFields<GFormData>[keyof GFormData][]) {
-		field.listen(
-			async ({ source }) => {
-				if (source === 'set') {
-					if (
-						(field.isSubmitted &&
-							field._config.reValidateMode.has(FormFieldReValidateMode.OnChange)) ||
-						(!field.isSubmitted &&
-							field._config.validateMode.has(FormFieldValidateMode.OnChange)) ||
-						(field._config.validateMode.has(FormFieldValidateMode.OnTouched) && field.isTouched)
-					) {
-						await field.validate();
-					}
-				}
-			},
-			{ key: 'form' }
-		);
-		field.status.listen(
-			async () => {
-				await form._revalidate(true);
-			},
-			{ key: 'form' }
-		);
-	}
-
-	return form;
+	return form.init();
 }
 
 export interface TCreateFormConfig<GFormData extends TFormData> extends Partial<TFormConfig> {
