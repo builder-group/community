@@ -2,7 +2,7 @@ import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/featu
 import type { TApiFeature, TFetchClient } from '../../types';
 
 export function withApi<GFeatures extends TFeatureDefinition[]>(
-	fetchClient: TEnforceFeatureConstraint<TFetchClient<GFeatures>, TFetchClient<GFeatures>, []>
+	baseFetchClient: TEnforceFeatureConstraint<TFetchClient<GFeatures>, TFetchClient<GFeatures>, []>
 ): TFetchClient<[TApiFeature, ...GFeatures]> {
 	const apiFeature: TApiFeature['api'] = {
 		get(this: TFetchClient<[]>, path, options = {}) {
@@ -19,9 +19,11 @@ export function withApi<GFeatures extends TFeatureDefinition[]>(
 		}
 	};
 
-	// Merge existing features from the fetch client with the new api feature
-	const _fetchClient = Object.assign(fetchClient, apiFeature) as TFetchClient<[TApiFeature]>;
-	_fetchClient._features.push('api');
+	// Extend the base fetch client with the api feature
+	const extendedFetchClient = Object.assign(baseFetchClient, apiFeature) as TFetchClient<
+		[TApiFeature]
+	>;
+	extendedFetchClient._features.push('api');
 
-	return _fetchClient as unknown as TFetchClient<[TApiFeature, ...GFeatures]>;
+	return extendedFetchClient as unknown as TFetchClient<[TApiFeature, ...GFeatures]>;
 }

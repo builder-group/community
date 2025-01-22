@@ -1,3 +1,4 @@
+import { TWithInit } from '@blgc/types/features';
 import { createState } from 'feature-state';
 import { TGridRegion } from './helper';
 import {
@@ -6,7 +7,6 @@ import {
 	TWidget,
 	TWidgetBaseContent,
 	TWidgetGrid,
-	TWithInit,
 	TXYPosition
 } from './types';
 
@@ -34,9 +34,9 @@ export function createWidget<GContent extends TWidgetBaseContent>(
 
 			this.isSelected.listen(({ value }) => {
 				if (value) {
-					this.layoutMode.set('Absolute', { additionalData: { source: 'is-selected' } });
+					this.layoutMode.set('Absolute', { listenerContext: { source: 'widget_is-selected' } });
 				} else {
-					this.layoutMode.set('Grid', { additionalData: { source: 'is-selected' } });
+					this.layoutMode.set('Grid', { listenerContext: { source: 'widget_is-selected' } });
 				}
 			});
 

@@ -1,3 +1,4 @@
+import { TWithInit } from '@blgc/types/features';
 import { notEmpty } from '@blgc/utils';
 import { createState } from 'feature-state';
 import { createWidget } from './create-widget';
@@ -20,28 +21,31 @@ import {
 	TWidget,
 	TWidgetBaseContent,
 	TWidgetId,
-	TWithInit,
 	type TWidgetGrid
 } from './types';
 
 export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 	config: TCreateWidgetGridConfig<GContent>
 ): TWidgetGrid<GContent, []> {
+	const { cells, layout, widgets } = config;
+
 	const widgetGrid: TWithInit<
 		TWidgetGrid<GContent, []>,
-		{ baseWidgets: TCreateWidgetGridConfig<GContent>['widgets'] }
+		{ initialWidgets: TCreateWidgetGridConfig<GContent>['widgets'] }
 	> = {
 		_features: [],
 		_widgets: {},
 		_selected: createState<TWidgetId[]>([]),
-		_cells: createState<TGridCells<TWidgetId>>(config.cells),
+		_cells: createState<TGridCells<TWidgetId>>(cells),
 		_size: createState<TGridDimensions>({ rows: 0, cols: 0 }),
 		interactionMode: createState<TInteractionMode>({ type: 'None' }),
-		layout: createState(config.layout),
+		layout: createState(layout),
 		boundingRect: createState<TBoundingRect>({ left: 0, top: 0 }),
 
-		init({ baseWidgets }) {
-			this._size.set(getGridSize(this._cells._v), { additionalData: { source: 'init' } });
+		init({ initialWidgets }) {
+			this._size.set(getGridSize(this._cells._v), {
+				listenerContext: { source: 'widget-grid_init' }
+			});
 
 			// Create a map for O(1) lookup of regions by widget ID
 			const regions = getRegions(this._cells._v);
@@ -57,7 +61,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 			);
 
 			// Convert base widgets to full widgets with regions in one pass
-			this._widgets = baseWidgets.reduce(
+			this._widgets = initialWidgets.reduce(
 				(acc, baseWidget) => {
 					acc[baseWidget.id] = createWidget({
 						baseWidget,
@@ -110,16 +114,16 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 								start: region.start,
 								dimension: region.dimension
 							},
-							{ additionalData: { source: 'sync-grid' } }
+							{ listenerContext: { source: 'widget-grid_sync-cells' } }
 						);
 						const regionPixels = this.getRegionPixels(region);
 						widget.position.set(
 							{ x: regionPixels.x, y: regionPixels.y },
-							{ additionalData: { source: 'sync-grid' } }
+							{ listenerContext: { source: 'widget-grid_sync-cells' } }
 						);
 						widget.size.set(
 							{ width: regionPixels.width, height: regionPixels.height },
-							{ additionalData: { source: 'sync-grid' } }
+							{ listenerContext: { source: 'widget-grid_sync-cells' } }
 						);
 					}
 				}
@@ -128,7 +132,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 			// Sync size
 			const gridSize = getGridSize(this._cells._v);
 			if (size && (gridSize.rows !== this._size._v.rows || gridSize.cols !== this._size._v.cols)) {
-				this._size.set(gridSize, { additionalData: { source: 'sync-grid' } });
+				this._size.set(gridSize, { listenerContext: { source: 'widget-grid_sync-cells' } });
 			}
 		},
 
@@ -167,8 +171,8 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 					continue;
 				}
 				widget.region.set(region, {
-					additionalData: {
-						source: 'move-widget',
+					listenerContext: {
+						source: 'widget-grid_move-widget',
 						isMoved: region.id === widgetId
 					}
 				});
@@ -218,7 +222,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 					const widget = widgetGrid._widgets[widgetId];
 					if (widget != null) {
 						widget.isSelected.set(false, {
-							additionalData: { source: 'sync-selected' }
+							listenerContext: { source: 'widget-grid_sync-selected' }
 						});
 					}
 				}
@@ -230,7 +234,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 					const widget = widgetGrid._widgets[widgetId];
 					if (widget != null) {
 						widget.isSelected.set(true, {
-							additionalData: { source: 'sync-selected' }
+							listenerContext: { source: 'widget-grid_sync-selected' }
 						});
 					}
 				}
@@ -242,7 +246,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		}
 	};
 
-	return widgetGrid.init({ baseWidgets: config.widgets });
+	return widgetGrid.init({ initialWidgets: widgets });
 }
 
 export interface TCreateWidgetGridConfig<GContent extends TWidgetBaseContent> {

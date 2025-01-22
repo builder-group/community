@@ -20,20 +20,20 @@ export function withStorage<
 	GFeatures extends TFeatureDefinition[],
 	GStorageValue extends GValue = GValue
 >(
-	state: TEnforceFeatureConstraint<TState<GValue, GFeatures>, TState<GValue, GFeatures>, []>,
+	baseState: TEnforceFeatureConstraint<TState<GValue, GFeatures>, TState<GValue, GFeatures>, []>,
 	storage: TStorageInterface<GStorageValue>,
 	key: string
 ): TState<GValue, [TPersistFeature, ...GFeatures]> {
 	const persistFeature: TPersistFeature['api'] = {
-		async persist() {
+		async persist(this: TState<GValue, [TPersistFeature]>) {
 			// Load persisted value or store inital value
 			let success = await this.loadFormStorage();
 			if (!success) {
-				success = await storage.save(key, state._v as GStorageValue);
+				success = await storage.save(key, this._v as GStorageValue);
 			}
 
 			// Setup listener
-			state.listen(
+			this.listen(
 				async ({ value, source }) => {
 					if (source !== LOAD_FROM_STORAGE_SOURCE_KEY) {
 						await storage.save(key, value as GStorageValue);
@@ -44,12 +44,12 @@ export function withStorage<
 
 			return success;
 		},
-		async loadFormStorage() {
+		async loadFormStorage(this: TState<GValue, [TPersistFeature]>) {
 			let success = false;
 
 			const persistedValue = await storage.load(key);
 			if (persistedValue !== FAILED_TO_LOAD_FROM_STORAGE_IDENTIFIER) {
-				state.set(persistedValue, { additionalData: { source: LOAD_FROM_STORAGE_SOURCE_KEY } });
+				this.set(persistedValue, { listenerContext: { source: LOAD_FROM_STORAGE_SOURCE_KEY } });
 				success = true;
 			}
 
@@ -60,9 +60,12 @@ export function withStorage<
 		}
 	};
 
-	// Merge existing features from the state with the new persist feature
-	const _state = Object.assign(state, persistFeature) as TState<GValue, [TPersistFeature]>;
-	_state._features.push('persist');
+	// Extend the base state with the persist feature
+	const extendedState = Object.assign(baseState, persistFeature) as TState<
+		GValue,
+		[TPersistFeature]
+	>;
+	extendedState._features.push('persist');
 
-	return _state as unknown as TState<GValue, [TPersistFeature, ...GFeatures]>;
+	return extendedState as unknown as TState<GValue, [TPersistFeature, ...GFeatures]>;
 }

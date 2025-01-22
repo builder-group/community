@@ -64,7 +64,7 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 								x: (n?.x ?? 0) + deltaX,
 								y: (n?.y ?? 0) + deltaY
 							}),
-							{ additionalData: { source: 'translate' } }
+							{ listenerContext: { source: 'WidgetGrid_translate' } }
 						);
 
 						const pos = widget.position._v;

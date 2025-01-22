@@ -3,12 +3,12 @@ import { isLoggerWithFeatures } from '../is-logger-with-features';
 import { TMethodPrefixFeature, type TLogger } from '../types';
 
 export function withMethodPrefix<GFeatures extends TFeatureDefinition[]>(
-	logger: TEnforceFeatureConstraint<TLogger<GFeatures>, TLogger<GFeatures>, []>
+	baseLogger: TEnforceFeatureConstraint<TLogger<GFeatures>, TLogger<GFeatures>, []>
 ): TLogger<[TMethodPrefixFeature, ...GFeatures]> {
-	(logger as TLogger<[TMethodPrefixFeature]>)._features.push('methodPrefix');
-	const withTimestamp = isLoggerWithFeatures(logger, ['timestamp']);
+	(baseLogger as TLogger<[TMethodPrefixFeature]>)._features.push('methodPrefix');
+	const withTimestamp = isLoggerWithFeatures(baseLogger, ['timestamp']);
 
-	logger._config.middlewares.push((next) => {
+	baseLogger._config.middlewares.push((next) => {
 		return (logMethod, data) => {
 			const prefix = `${logMethod.charAt(0).toUpperCase() + logMethod.slice(1)}:`;
 			if (withTimestamp) {
@@ -19,5 +19,5 @@ export function withMethodPrefix<GFeatures extends TFeatureDefinition[]>(
 		};
 	});
 
-	return logger as TLogger<[TMethodPrefixFeature, ...GFeatures]>;
+	return baseLogger as TLogger<[TMethodPrefixFeature, ...GFeatures]>;
 }

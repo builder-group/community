@@ -23,13 +23,13 @@ import {
 } from './types';
 
 export function withEPREL<GFeatures extends TFeatureDefinition[]>(
-	fetchClient: TEnforceFeatureConstraint<
+	baseFetchClient: TEnforceFeatureConstraint<
 		TFetchClient<GFeatures>,
 		TFetchClient<GFeatures>,
 		['openapi']
 	>
 ): TFetchClient<[TEPRELFeature, ...GFeatures]> {
-	if (!isFetchClientWithFeatures<[TOpenApiFeature<paths>]>(fetchClient, ['openapi'])) {
+	if (!isFetchClientWithFeatures<[TOpenApiFeature<paths>]>(baseFetchClient, ['openapi'])) {
 		throw Error('FetchClient must have "openapi" feature to use withEPREL');
 	}
 
@@ -282,9 +282,11 @@ export function withEPREL<GFeatures extends TFeatureDefinition[]>(
 		}
 	};
 
-	// Merge existing features from the fetch client with the new eprel feature
-	const _fetchClient = Object.assign(fetchClient, eprelFeature) as TFetchClient<[TEPRELFeature]>;
-	_fetchClient._features.push('eprel');
+	// Extend the base fetch client with the eprel feature
+	const extendedFetchClient = Object.assign(baseFetchClient, eprelFeature) as TFetchClient<
+		[TEPRELFeature]
+	>;
+	extendedFetchClient._features.push('eprel');
 
-	return _fetchClient as unknown as TFetchClient<[TEPRELFeature, ...GFeatures]>;
+	return extendedFetchClient as unknown as TFetchClient<[TEPRELFeature, ...GFeatures]>;
 }

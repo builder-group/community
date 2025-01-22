@@ -1,36 +1,25 @@
-import type { TListener, TListenerCallbackData, TListenerQueueItem, TState } from './types';
+import type { TListener, TListenerContext, TListenerQueueItem, TState } from './types';
 
 const GLOBAL_LISTENER_QUEUE: TListenerQueueItem[] = [];
-export const SET_SOURCE_KEY = 'set';
+export const SET_SOURCE_KEY = 'state_set';
 
-export function createState<GValue>(
-	initialValue: GValue,
-	options: TCreateStateOptions = {}
-): TState<GValue, []> {
-	const { deferred = false } = options;
-
+export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 	return {
 		_features: [],
 		_listeners: [],
 		_v: initialValue,
 		_notify(notifyOptions = {}) {
-			const {
-				processListenerQueue = true,
-				additionalData = {},
-				deferred: innerDeferred = deferred,
-				prevValue
-			} = notifyOptions;
+			const { processListenerQueue = true, listenerContext = {}, prevValue } = notifyOptions;
 
 			// Push current state's listeners to the queue
 			for (const listener of this._listeners) {
-				const data: TListenerCallbackData<GValue> = {
-					...additionalData,
-					prevValue: prevValue as Readonly<GValue>,
-					value: this._v as Readonly<GValue>
-				};
-				if (listener.callIf == null || listener.callIf(data)) {
+				const context: TListenerContext<GValue> = Object.assign(listenerContext, {
+					value: this._v,
+					prevValue
+				});
+				if (listener.queueIf == null || listener.queueIf(context)) {
 					GLOBAL_LISTENER_QUEUE.push({
-						data,
+						context,
 						callback: listener.callback,
 						level: listener.level
 					});
@@ -39,12 +28,7 @@ export function createState<GValue>(
 
 			// Process queue
 			if (processListenerQueue) {
-				// Defer processing using setTimeout()
-				innerDeferred
-					? setTimeout(() => {
-							void processQueue();
-						})
-					: void processQueue();
+				void processStateQueue();
 			}
 		},
 		get() {
@@ -57,23 +41,23 @@ export function createState<GValue>(
 					: newValueOrUpdater;
 			const prevValue = this._v;
 			if (prevValue !== newValue) {
-				const { additionalData = {}, processListenerQueue = true } = setOptions;
-				additionalData.source = additionalData.source ?? SET_SOURCE_KEY;
+				const { listenerContext = {}, processListenerQueue = true } = setOptions;
+				listenerContext.source = listenerContext.source ?? SET_SOURCE_KEY;
 				this._v = newValue;
 				this._notify({
-					additionalData,
+					listenerContext,
 					processListenerQueue,
 					prevValue
 				});
 			}
 		},
 		listen(callback, listenOptions = {}) {
-			const { level = 0, key, callIf } = listenOptions;
+			const { level = 0, key, queueIf } = listenOptions;
 			const listener: TListener<GValue> = {
 				key,
 				level,
 				callback,
-				callIf
+				queueIf
 			};
 			this._listeners.push(listener);
 
@@ -93,17 +77,12 @@ export function createState<GValue>(
 	};
 }
 
-export interface TCreateStateOptions {
-	deferred?: boolean;
-}
-
-async function processQueue(): Promise<void> {
+export async function processStateQueue(): Promise<void> {
 	// Drain the queue
-	const queueToProcess = GLOBAL_LISTENER_QUEUE.splice(0, GLOBAL_LISTENER_QUEUE.length);
-	queueToProcess.sort((a, b) => a.level - b.level);
+	const toProcess = GLOBAL_LISTENER_QUEUE.splice(0, GLOBAL_LISTENER_QUEUE.length);
 
-	// Process each item in the queue sequentially
-	for (const queueItem of queueToProcess) {
-		await queueItem.callback(queueItem.data);
+	// Process each item in the queue sequentially (sorted by level)
+	for (const queueItem of toProcess.sort((a, b) => a.level - b.level)) {
+		await queueItem.callback(queueItem.context);
 	}
 }

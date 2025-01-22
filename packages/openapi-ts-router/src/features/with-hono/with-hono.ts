@@ -13,10 +13,10 @@ import {
 } from '../../types';
 
 export function withHono<GPaths extends object, GFeatures extends TFeatureDefinition[]>(
-	router: TEnforceFeatureConstraint<TOpenApiRouter<GFeatures>, TOpenApiRouter<GFeatures>, []>,
+	baseRouter: TEnforceFeatureConstraint<TOpenApiRouter<GFeatures>, TOpenApiRouter<GFeatures>, []>,
 	hono: Hono
 ): TOpenApiRouter<[TOpenApiHonoFeature<GPaths>, ...GFeatures]> {
-	const honoFeatures: TOpenApiHonoFeature<GPaths>['api'] = {
+	const honoFeature: TOpenApiHonoFeature<GPaths>['api'] = {
 		_hono: hono,
 		get(this: TOpenApiRouter<[TOpenApiHonoFeature<GPaths>]>, path, config) {
 			this._hono.get(
@@ -65,13 +65,13 @@ export function withHono<GPaths extends object, GFeatures extends TFeatureDefini
 		}
 	};
 
-	// Merge existing features from the router with the new hono feature
-	const _router = Object.assign(router, honoFeatures) as TOpenApiRouter<
+	// Extend the base router with the hono feature
+	const extendedRouter = Object.assign(baseRouter, honoFeature) as TOpenApiRouter<
 		[TOpenApiHonoFeature<GPaths>]
 	>;
-	_router._features.push('hono');
+	extendedRouter._features.push('hono');
 
-	return _router as unknown as TOpenApiRouter<[TOpenApiHonoFeature<GPaths>, ...GFeatures]>;
+	return extendedRouter as unknown as TOpenApiRouter<[TOpenApiHonoFeature<GPaths>, ...GFeatures]>;
 }
 
 function parseParamsMiddleware(paramsParser: TOpenApiHonoParamsParserOptions = {}): hono.Handler {

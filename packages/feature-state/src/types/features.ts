@@ -29,9 +29,9 @@ export interface TSelectorFeature<GValue> {
 	key: 'selector';
 	api: {
 		listenToSelected: (
-			callIf: TNestedPath<GValue>[] | ((value: GValue) => unknown),
+			queueIf: TNestedPath<GValue>[] | ((value: GValue) => unknown),
 			callback: TListenerCallback<GValue>,
-			options?: Omit<TListenerOptions<GValue>, 'callIf'>
+			options?: Omit<TListenerOptions<GValue>, 'queueIf'>
 		) => () => void;
 	};
 }

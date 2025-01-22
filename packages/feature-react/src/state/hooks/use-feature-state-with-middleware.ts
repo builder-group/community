@@ -1,5 +1,5 @@
 import { TFeatureDefinition } from '@blgc/types/features';
-import type { TListenerCallbackData, TState } from 'feature-state';
+import type { TListenerContext, TState } from 'feature-state';
 import React from 'react';
 
 export function useFeatureStateWithMiddleware<GValue, GFeatures extends TFeatureDefinition[]>(
@@ -29,5 +29,5 @@ export function useFeatureStateWithMiddleware<GValue, GFeatures extends TFeature
 }
 
 export type TFeatureStateMiddleware<GValue> = (
-	data: TListenerCallbackData<GValue>
-) => TListenerCallbackData<GValue>;
+	context: TListenerContext<GValue>
+) => TListenerContext<GValue>;

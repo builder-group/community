@@ -4,7 +4,7 @@ import type { TFetchClient, TGraphQLFeature } from '../../types';
 import { getQueryString } from './get-query-string';
 
 export function withGraphQL<GFeatures extends TFeatureDefinition[]>(
-	fetchClient: TEnforceFeatureConstraint<TFetchClient<GFeatures>, TFetchClient<GFeatures>, []>
+	baseFetchClient: TEnforceFeatureConstraint<TFetchClient<GFeatures>, TFetchClient<GFeatures>, []>
 ): TFetchClient<[TGraphQLFeature, ...GFeatures]> {
 	const graphqlFeature: TGraphQLFeature['api'] = {
 		async query(this: TFetchClient<[]>, query, options = {}) {
@@ -23,11 +23,11 @@ export function withGraphQL<GFeatures extends TFeatureDefinition[]>(
 		}
 	};
 
-	// Merge existing features from the fetch client with the new graphql feature
-	const _fetchClient = Object.assign(fetchClient, graphqlFeature) as TFetchClient<
+	// Extend the base fetch client with the graphql feature
+	const extendedFetchClient = Object.assign(baseFetchClient, graphqlFeature) as TFetchClient<
 		[TGraphQLFeature]
 	>;
-	_fetchClient._features.push('graphql');
+	extendedFetchClient._features.push('graphql');
 
-	return _fetchClient as unknown as TFetchClient<[TGraphQLFeature, ...GFeatures]>;
+	return extendedFetchClient as unknown as TFetchClient<[TGraphQLFeature, ...GFeatures]>;
 }

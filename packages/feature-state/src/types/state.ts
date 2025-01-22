@@ -67,18 +67,14 @@ export type TState<GValue, GFeatures extends TFeatureDefinition[]> = TWithFeatur
 	GFeatures
 >;
 
-export type TListenerCallback<GValue> = (
-	data: TListenerCallbackData<GValue>
-) => Promise<void> | void;
+export type TListenerCallback<GValue> = (context: TListenerContext<GValue>) => Promise<void> | void;
 
-// TODO: Reference state or just value, because it will be pushed into a global queue?
-// https://stackoverflow.com/questions/78645591/best-practices-for-managing-object-references-in-callbacks-javascript
-export interface TListenerCallbackData<GValue> extends TAdditionalListenerCallbackData<GValue> {
-	value: Readonly<GValue>;
-	prevValue?: Readonly<GValue>;
+export interface TListenerContext<GValue> extends TAdditionalListenerContext<GValue> {
+	value: GValue;
+	prevValue?: GValue;
 }
 
-export interface TAdditionalListenerCallbackData<GValue> {
+export interface TAdditionalListenerContext<GValue> {
 	[key: string]: unknown;
 	source?: string;
 	background?: boolean;
@@ -89,7 +85,7 @@ export interface TListener<GValue> {
 	key?: string;
 	level: number;
 	callback: TListenerCallback<GValue>;
-	callIf?: (data: TListenerCallbackData<GValue>) => boolean;
+	queueIf?: (context: TListenerContext<GValue>) => boolean;
 }
 
 export type TListenerOptions<GValue> = Partial<Omit<TListener<GValue>, 'callback'>>;
@@ -97,13 +93,12 @@ export type TListenerOptions<GValue> = Partial<Omit<TListener<GValue>, 'callback
 export interface TListenerQueueItem<GValue = any> {
 	level: TListener<GValue>['level'];
 	callback: TListener<GValue>['callback'];
-	data: TListenerCallbackData<GValue>;
+	context: TListenerContext<GValue>;
 }
 
 export interface TStateNotifyOptions<GValue> {
 	processListenerQueue?: boolean;
-	additionalData?: TAdditionalListenerCallbackData<GValue>;
-	deferred?: boolean;
+	listenerContext?: TAdditionalListenerContext<GValue>;
 	prevValue?: GValue;
 }
 

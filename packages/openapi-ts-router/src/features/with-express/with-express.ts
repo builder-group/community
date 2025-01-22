@@ -14,10 +14,10 @@ import {
 } from '../../types';
 
 export function withExpress<GPaths extends object, GFeatures extends TFeatureDefinition[]>(
-	router: TEnforceFeatureConstraint<TOpenApiRouter<GFeatures>, TOpenApiRouter<GFeatures>, []>,
+	baseRouter: TEnforceFeatureConstraint<TOpenApiRouter<GFeatures>, TOpenApiRouter<GFeatures>, []>,
 	expressRouter: express.Router
 ): TOpenApiRouter<[TOpenApiExpressFeature<GPaths>, ...GFeatures]> {
-	const expressFeatures: TOpenApiExpressFeature<GPaths>['api'] = {
+	const expressFeature: TOpenApiExpressFeature<GPaths>['api'] = {
 		_router: expressRouter,
 		get(this: TOpenApiRouter<[TOpenApiExpressFeature<GPaths>]>, path, config) {
 			this._router.get(
@@ -66,13 +66,15 @@ export function withExpress<GPaths extends object, GFeatures extends TFeatureDef
 		}
 	};
 
-	// Merge existing features from the router with the new express feature
-	const _router = Object.assign(router, expressFeatures) as TOpenApiRouter<
+	// Extend the base router with the express feature
+	const extendedRouter = Object.assign(baseRouter, expressFeature) as TOpenApiRouter<
 		[TOpenApiExpressFeature<GPaths>]
 	>;
-	_router._features.push('express');
+	extendedRouter._features.push('express');
 
-	return _router as unknown as TOpenApiRouter<[TOpenApiExpressFeature<GPaths>, ...GFeatures]>;
+	return extendedRouter as unknown as TOpenApiRouter<
+		[TOpenApiExpressFeature<GPaths>, ...GFeatures]
+	>;
 }
 
 function parseParamsMiddleware(

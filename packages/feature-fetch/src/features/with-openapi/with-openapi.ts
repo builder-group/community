@@ -2,7 +2,7 @@ import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/featu
 import type { TFetchClient, TOpenApiFeature } from '../../types';
 
 export function withOpenApi<GPaths extends object, GFeatures extends TFeatureDefinition[]>(
-	fetchClient: TEnforceFeatureConstraint<TFetchClient<GFeatures>, TFetchClient<GFeatures>, []>
+	baseFetchClient: TEnforceFeatureConstraint<TFetchClient<GFeatures>, TFetchClient<GFeatures>, []>
 ): TFetchClient<[TOpenApiFeature<GPaths>, ...GFeatures]> {
 	const openApiFeature: TOpenApiFeature<GPaths>['api'] = {
 		get(this: TFetchClient<[]>, path, options) {
@@ -25,11 +25,11 @@ export function withOpenApi<GPaths extends object, GFeatures extends TFeatureDef
 		}
 	};
 
-	// Merge existing features from the fetch client with the new openapi feature
-	const _fetchClient = Object.assign(fetchClient, openApiFeature) as TFetchClient<
+	// Extend the base fetch client with the openapi feature
+	const extendedFetchClient = Object.assign(baseFetchClient, openApiFeature) as TFetchClient<
 		[TOpenApiFeature<GPaths>]
 	>;
-	_fetchClient._features.push('openapi');
+	extendedFetchClient._features.push('openapi');
 
-	return _fetchClient as unknown as TFetchClient<[TOpenApiFeature<GPaths>, ...GFeatures]>;
+	return extendedFetchClient as unknown as TFetchClient<[TOpenApiFeature<GPaths>, ...GFeatures]>;
 }

@@ -12,17 +12,17 @@ import { isVoiceId } from './helper';
 import { TElevenLabsFeature } from './types';
 
 export function withElevenLabs<GFeatures extends TFeatureDefinition[]>(
-	fetchClient: TEnforceFeatureConstraint<
+	baseFetchClient: TEnforceFeatureConstraint<
 		TFetchClient<GFeatures>,
 		TFetchClient<GFeatures>,
 		['openapi']
 	>
 ): TFetchClient<[TElevenLabsFeature, ...GFeatures]> {
-	if (!isFetchClientWithFeatures<[TOpenApiFeature<paths>]>(fetchClient, ['openapi'])) {
+	if (!isFetchClientWithFeatures<[TOpenApiFeature<paths>]>(baseFetchClient, ['openapi'])) {
 		throw Error('FetchClient must have "openapi" feature to use withElevenLabs');
 	}
 
-	const elevenLabsFeatures: TElevenLabsFeature['api'] = {
+	const elevenLabsFeature: TElevenLabsFeature['api'] = {
 		async getVoices(this: TFetchClient<[TOpenApiFeature<paths>, TElevenLabsFeature]>) {
 			return mapOk(
 				await this.get('/v1/voices', { queryParams: { show_legacy: true } }),
@@ -118,11 +118,11 @@ export function withElevenLabs<GFeatures extends TFeatureDefinition[]>(
 		}
 	};
 
-	// Merge existing features from the fetch client with the new elevenlabs feature
-	const _fetchClient = Object.assign(fetchClient, elevenLabsFeatures) as TFetchClient<
+	// Extend the base fetch client with the elevenlabs feature
+	const extendedFetchClient = Object.assign(baseFetchClient, elevenLabsFeature) as TFetchClient<
 		[TElevenLabsFeature]
 	>;
-	_fetchClient._features.push('elevenlabs');
+	extendedFetchClient._features.push('elevenlabs');
 
-	return _fetchClient as unknown as TFetchClient<[TElevenLabsFeature, ...GFeatures]>;
+	return extendedFetchClient as unknown as TFetchClient<[TElevenLabsFeature, ...GFeatures]>;
 }
