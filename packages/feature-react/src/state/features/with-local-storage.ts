@@ -25,8 +25,8 @@ class LocalStorageInterface<GStorageValue> implements TStorageInterface<GStorage
 }
 
 export function withLocalStorage<GValue, GFeatures extends TFeatureDefinition[]>(
-	state: TEnforceFeatureConstraint<TState<GValue, GFeatures>, TState<GValue, GFeatures>, []>,
+	baseState: TEnforceFeatureConstraint<TState<GValue, GFeatures>, TState<GValue, GFeatures>, []>,
 	key: string
 ): TState<GValue, [TPersistFeature, ...GFeatures]> {
-	return withStorage(state, new LocalStorageInterface<GValue>(), key);
+	return withStorage(baseState, new LocalStorageInterface<GValue>(), key);
 }

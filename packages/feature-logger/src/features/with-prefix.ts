@@ -2,16 +2,16 @@ import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/featu
 import { TPrefixFeature, type TLogger } from '../types';
 
 export function withPrefix<GFeatures extends TFeatureDefinition[]>(
-	logger: TEnforceFeatureConstraint<TLogger<GFeatures>, TLogger<GFeatures>, []>,
+	baseLogger: TEnforceFeatureConstraint<TLogger<GFeatures>, TLogger<GFeatures>, []>,
 	prefix: string
 ): TLogger<[TPrefixFeature, ...GFeatures]> {
-	(logger as TLogger<[TPrefixFeature]>)._features.push('prefix');
+	(baseLogger as TLogger<[TPrefixFeature]>)._features.push('prefix');
 
-	logger._config.middlewares.push((next) => {
+	baseLogger._config.middlewares.push((next) => {
 		return (logMethod, data) => {
 			next(logMethod, [prefix, ...data]);
 		};
 	});
 
-	return logger as TLogger<[TPrefixFeature, ...GFeatures]>;
+	return baseLogger as TLogger<[TPrefixFeature, ...GFeatures]>;
 }

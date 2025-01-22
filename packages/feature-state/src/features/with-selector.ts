@@ -3,7 +3,7 @@ import { getNestedProperty } from '@blgc/utils';
 import { TSelectorFeature, type TState } from '../types';
 
 export function withSelector<GValue, GFeatures extends TFeatureDefinition[]>(
-	initialState: TEnforceFeatureConstraint<TState<GValue, GFeatures>, TState<GValue, GFeatures>, []>
+	baseState: TEnforceFeatureConstraint<TState<GValue, GFeatures>, TState<GValue, GFeatures>, []>
 ): TState<GValue, [TSelectorFeature<GValue>, ...GFeatures]> {
 	const selectorFeature: TSelectorFeature<GValue>['api'] = {
 		listenToSelected(
@@ -43,8 +43,8 @@ export function withSelector<GValue, GFeatures extends TFeatureDefinition[]>(
 		}
 	};
 
-	// Merge existing features from the state with the new selector feature
-	const extendedState = Object.assign(initialState, selectorFeature) as TState<
+	// Extend the base state with the selector feature
+	const extendedState = Object.assign(baseState, selectorFeature) as TState<
 		GValue,
 		[TSelectorFeature<GValue>]
 	>;

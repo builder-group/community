@@ -6,7 +6,7 @@ import {
 } from '../types';
 
 export function createStatus(initialValue: TFormFieldStatusValue): TFormFieldStatus {
-	const formFieldStatusState = createState(initialValue);
+	const baseState = createState(initialValue);
 
 	const formFieldStatusFeature: TFormFielStatusStateFeature['api'] = {
 		_nextValue: undefined,
@@ -19,12 +19,9 @@ export function createStatus(initialValue: TFormFieldStatusValue): TFormFieldSta
 		}
 	};
 
-	// Merge existing features from the state with the new form field status feature
-	const _formFieldStatus = Object.assign(
-		formFieldStatusState,
-		formFieldStatusFeature
-	) as TFormFieldStatus;
-	_formFieldStatus._features.push('form-field-status');
+	// Extend the base state with the form field status feature
+	const formFieldStatus = Object.assign(baseState, formFieldStatusFeature) as TFormFieldStatus;
+	formFieldStatus._features.push('form-field-status');
 
-	return _formFieldStatus;
+	return formFieldStatus;
 }

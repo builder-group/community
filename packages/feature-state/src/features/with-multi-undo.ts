@@ -3,13 +3,13 @@ import { isStateWithFeatures } from '../is-state-with-features';
 import type { TMultiUndoFeature, TState, TUndoFeature } from '../types';
 
 export function withMultiUndo<GValue, GFeatures extends TFeatureDefinition[]>(
-	initialState: TEnforceFeatureConstraint<
+	baseState: TEnforceFeatureConstraint<
 		TState<GValue, GFeatures>,
 		TState<GValue, GFeatures>,
 		['undo']
 	>
 ): TState<GValue, [TMultiUndoFeature, ...GFeatures]> {
-	if (!isStateWithFeatures<GValue, [TUndoFeature<GValue>]>(initialState, ['undo'])) {
+	if (!isStateWithFeatures<GValue, [TUndoFeature<GValue>]>(baseState, ['undo'])) {
 		throw Error('State must have "undo" feature to use withMultiUndo');
 	}
 
@@ -21,8 +21,8 @@ export function withMultiUndo<GValue, GFeatures extends TFeatureDefinition[]>(
 		}
 	};
 
-	// Merge existing features from the state with the new multiundo feature
-	const extendedState = Object.assign(initialState, multiUndoFeature) as TState<
+	// Extend the base state with the multiundo feature
+	const extendedState = Object.assign(baseState, multiUndoFeature) as TState<
 		GValue,
 		[TMultiUndoFeature]
 	>;

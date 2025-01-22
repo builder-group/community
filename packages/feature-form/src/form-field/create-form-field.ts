@@ -1,3 +1,4 @@
+import { TWithInit } from '@blgc/types/features';
 import { bitwiseFlag, deepCopy } from '@blgc/utils';
 import { createState } from 'feature-state';
 import { createValidator } from 'validation-adapter';
@@ -25,19 +26,7 @@ export function createFormField<GValue>(
 		collectErrorMode = 'firstError',
 		notifyOnStatusChange = true
 	} = config;
-	const formFieldState = createState(initialValue);
-
-	const status = createStatus({ type: 'UNVALIDATED' });
-
-	// Notify form field listeners if status has changed
-	if (notifyOnStatusChange) {
-		status.listen(
-			(data) => {
-				formFieldState._notify({ listenerData: { source: 'status', status: data.value } });
-			},
-			{ key: 'form-field' }
-		);
-	}
+	const baseState = createState(initialValue);
 
 	const formFieldFeature: TFormFieldStateFeature<GValue>['api'] = {
 		_config: {
@@ -46,14 +35,14 @@ export function createFormField<GValue>(
 			reValidateMode,
 			collectErrorMode
 		},
-		_intialValue: deepCopy(formFieldState._v),
+		_intialValue: deepCopy(baseState._v),
 		_validator: validator,
 		key,
 		isTouched: false,
 		isSubmitted: false,
 		isSubmitting: false,
 		isValidating: false,
-		status,
+		status: createStatus({ type: 'UNVALIDATED' }),
 		async validate(this: TFormField<GValue>) {
 			const validationContext = createFormFieldValidationContext(this);
 
@@ -96,15 +85,35 @@ export function createFormField<GValue>(
 		}
 	};
 
-	// Merge existing features from the state with the new form field feature
-	const _formField = Object.assign(formFieldState, formFieldFeature) as TFormField<GValue>;
-	_formField._features.push('form-field');
+	// Extend the base state with the form field feature
+	const formField = Object.assign(baseState, formFieldFeature, {
+		init(this: TFormField<GValue>, { notifyOnStatusChange }: TInitFormFieldConfig) {
+			// Notify form field listeners if status has changed
+			if (notifyOnStatusChange) {
+				this.status.listen(
+					(data) => {
+						baseState._notify({ listenerData: { source: 'status', status: data.value } });
+					},
+					{ key: 'form-field' }
+				);
+			}
 
-	return _formField;
+			// @ts-expect-error -- Remove init method after initialization
+			delete this.init;
+			return this;
+		}
+	}) as TWithInit<TFormField<GValue>, TInitFormFieldConfig>;
+	formField._features.push('form-field');
+
+	return formField.init({ notifyOnStatusChange });
 }
 
 export interface TCreateFormFieldConfig<GValue> extends Partial<TFormFieldStateConfig> {
 	key: string;
 	validator?: TFormFieldValidator<GValue>;
+	notifyOnStatusChange?: boolean;
+}
+
+interface TInitFormFieldConfig {
 	notifyOnStatusChange?: boolean;
 }

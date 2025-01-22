@@ -1,3 +1,4 @@
+import { TWithInit } from '@blgc/types/features';
 import { createState } from 'feature-state';
 import { TGridRegion } from './helper';
 import {
@@ -6,7 +7,6 @@ import {
 	TWidget,
 	TWidgetBaseContent,
 	TWidgetGrid,
-	TWithInit,
 	TXYPosition
 } from './types';
 

@@ -9,13 +9,13 @@ export function createFormFieldValidationContext<GValue>(
 			name: formField.key
 		},
 		value: formField.get() as Readonly<GValue>,
-		isValue: (v): v is GValue => {
+		isValue(v): v is GValue {
 			return true;
 		},
-		hasError: () => {
+		hasError() {
 			return formField.status._nextValue?.type === 'INVALID';
 		},
-		registerError(this, error) {
+		registerError(error) {
 			formField.status.registerNextError({
 				code: error.code,
 				message: error.message,

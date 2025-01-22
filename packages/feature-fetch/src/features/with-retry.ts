@@ -3,14 +3,14 @@ import { sleep } from '@blgc/utils';
 import type { TFetchClient, TFetchLike, TRequestMiddleware, TRetryFeature } from '../types';
 
 export function withRetry<GFeatures extends TFeatureDefinition[]>(
-	fetchClient: TEnforceFeatureConstraint<TFetchClient<GFeatures>, TFetchClient<GFeatures>, []>,
+	baseFetchClient: TEnforceFeatureConstraint<TFetchClient<GFeatures>, TFetchClient<GFeatures>, []>,
 	options: TRetryMiddlewareOptions = {}
 ): TFetchClient<[TRetryFeature, ...GFeatures]> {
-	(fetchClient as TFetchClient<[TRetryFeature]>)._features.push('retry');
+	(baseFetchClient as TFetchClient<[TRetryFeature]>)._features.push('retry');
 
-	fetchClient._config.requestMiddlewares.push(createRetryMiddleware(options));
+	baseFetchClient._config.requestMiddlewares.push(createRetryMiddleware(options));
 
-	return fetchClient as TFetchClient<[TRetryFeature, ...GFeatures]>;
+	return baseFetchClient as TFetchClient<[TRetryFeature, ...GFeatures]>;
 }
 
 export function createRetryMiddleware(options: TRetryMiddlewareOptions = {}): TRequestMiddleware {

@@ -20,7 +20,7 @@ export function withStorage<
 	GFeatures extends TFeatureDefinition[],
 	GStorageValue extends GValue = GValue
 >(
-	initialState: TEnforceFeatureConstraint<TState<GValue, GFeatures>, TState<GValue, GFeatures>, []>,
+	baseState: TEnforceFeatureConstraint<TState<GValue, GFeatures>, TState<GValue, GFeatures>, []>,
 	storage: TStorageInterface<GStorageValue>,
 	key: string
 ): TState<GValue, [TPersistFeature, ...GFeatures]> {
@@ -60,8 +60,8 @@ export function withStorage<
 		}
 	};
 
-	// Merge existing features from the state with the new persist feature
-	const extendedState = Object.assign(initialState, persistFeature) as TState<
+	// Extend the base state with the persist feature
+	const extendedState = Object.assign(baseState, persistFeature) as TState<
 		GValue,
 		[TPersistFeature]
 	>;

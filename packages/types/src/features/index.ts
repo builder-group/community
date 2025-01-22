@@ -123,3 +123,8 @@ export type TEnforceFeatureConstraint<
 				error: 'Missing required features';
 				missing: TMissingFeatures<GFeatureSet, GRequired>;
 			};
+
+// https://stackoverflow.com/questions/2980763/javascript-objects-get-parent
+export type TWithInit<GObject extends object, GArgs = void> = GObject & {
+	init: GArgs extends void ? () => GObject : (args: GArgs) => GObject;
+};

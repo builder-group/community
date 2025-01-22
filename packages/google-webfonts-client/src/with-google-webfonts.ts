@@ -15,13 +15,13 @@ import { TGoogleWebfontsFeature, type TFontStyle } from './types';
 const REGULAR_FONT_WEIGHT = 400;
 
 export function withGoogleWebfonts<GFeatures extends TFeatureDefinition[]>(
-	fetchClient: TEnforceFeatureConstraint<
+	baseFetchClient: TEnforceFeatureConstraint<
 		TFetchClient<GFeatures>,
 		TFetchClient<GFeatures>,
 		['openapi']
 	>
 ): TFetchClient<[TGoogleWebfontsFeature, ...GFeatures]> {
-	if (!isFetchClientWithFeatures<[TOpenApiFeature<paths>]>(fetchClient, ['openapi'])) {
+	if (!isFetchClientWithFeatures<[TOpenApiFeature<paths>]>(baseFetchClient, ['openapi'])) {
 		throw Error('FetchClient must have "openapi" feature to use withGoogleWebfonts');
 	}
 
@@ -101,13 +101,13 @@ export function withGoogleWebfonts<GFeatures extends TFeatureDefinition[]>(
 		}
 	};
 
-	// Merge existing features from the fetch client with the new google webfonts feature
-	const _fetchClient = Object.assign(fetchClient, googleWebfontsFeature) as TFetchClient<
+	// Extend the base fetch client with the google webfonts feature
+	const extendedFetchClient = Object.assign(baseFetchClient, googleWebfontsFeature) as TFetchClient<
 		[TGoogleWebfontsFeature]
 	>;
-	_fetchClient._features.push('google-webfonts');
+	extendedFetchClient._features.push('google-webfonts');
 
-	return _fetchClient as unknown as TFetchClient<[TGoogleWebfontsFeature, ...GFeatures]>;
+	return extendedFetchClient as unknown as TFetchClient<[TGoogleWebfontsFeature, ...GFeatures]>;
 }
 
 // Find closest font variant identifier key

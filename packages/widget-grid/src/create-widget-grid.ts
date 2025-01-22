@@ -1,3 +1,4 @@
+import { TWithInit } from '@blgc/types/features';
 import { notEmpty } from '@blgc/utils';
 import { createState } from 'feature-state';
 import { createWidget } from './create-widget';
@@ -20,13 +21,14 @@ import {
 	TWidget,
 	TWidgetBaseContent,
 	TWidgetId,
-	TWithInit,
 	type TWidgetGrid
 } from './types';
 
 export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 	config: TCreateWidgetGridConfig<GContent>
 ): TWidgetGrid<GContent, []> {
+	const { cells, layout, widgets } = config;
+
 	const widgetGrid: TWithInit<
 		TWidgetGrid<GContent, []>,
 		{ baseWidgets: TCreateWidgetGridConfig<GContent>['widgets'] }
@@ -34,10 +36,10 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		_features: [],
 		_widgets: {},
 		_selected: createState<TWidgetId[]>([]),
-		_cells: createState<TGridCells<TWidgetId>>(config.cells),
+		_cells: createState<TGridCells<TWidgetId>>(cells),
 		_size: createState<TGridDimensions>({ rows: 0, cols: 0 }),
 		interactionMode: createState<TInteractionMode>({ type: 'None' }),
-		layout: createState(config.layout),
+		layout: createState(layout),
 		boundingRect: createState<TBoundingRect>({ left: 0, top: 0 }),
 
 		init({ baseWidgets }) {
@@ -242,7 +244,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 		}
 	};
 
-	return widgetGrid.init({ baseWidgets: config.widgets });
+	return widgetGrid.init({ baseWidgets: widgets });
 }
 
 export interface TCreateWidgetGridConfig<GContent extends TWidgetBaseContent> {

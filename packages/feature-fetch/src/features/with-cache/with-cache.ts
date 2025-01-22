@@ -3,12 +3,12 @@ import { TCacheFeature, type TFetchClient, type TRequestMiddleware } from '../..
 import { Cache, type TCacheOptions, type TGetCacheKey, type TShouldCache } from './Cache';
 
 export function withCache<GFeatures extends TFeatureDefinition[]>(
-	fetchClient: TEnforceFeatureConstraint<TFetchClient<GFeatures>, TFetchClient<GFeatures>, []>,
+	baseFetchClient: TEnforceFeatureConstraint<TFetchClient<GFeatures>, TFetchClient<GFeatures>, []>,
 	options: TCacheOptions = {}
 ): TFetchClient<[TCacheFeature, ...GFeatures]> {
-	(fetchClient as TFetchClient<[TCacheFeature]>)._features.push('cache');
-	fetchClient._config.requestMiddlewares.push(createCacheMiddleware(options));
-	return fetchClient as TFetchClient<[TCacheFeature, ...GFeatures]>;
+	(baseFetchClient as TFetchClient<[TCacheFeature]>)._features.push('cache');
+	baseFetchClient._config.requestMiddlewares.push(createCacheMiddleware(options));
+	return baseFetchClient as TFetchClient<[TCacheFeature, ...GFeatures]>;
 }
 
 function createCacheMiddleware(options: TCacheOptions = {}): TRequestMiddleware {
