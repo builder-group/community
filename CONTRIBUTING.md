@@ -47,7 +47,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
 	},
-	"homepage": "https://Builder.Group Community/?source=github",
+	"homepage": "https://builder.group/?source=github",
 	"dependencies": {
 		// Project dependencies here
 	},
@@ -95,6 +95,6 @@ Alternatives:
 
 By contributing to Builder.Group Community, you agree that your contributions will be licensed under the license defined in [`LICENSE.md`](./LICENSE.md).
 
-## 🎉 Credits
+## 💡 Resources / References
 
 - [Docusaurus `CONTRIBUTING.md`](https://github.com/facebook/docusaurus/blob/master/CONTRIBUTING.md)
