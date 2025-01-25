@@ -8,8 +8,8 @@ export type TDefaultValueFn<GValue> = (env: NodeJS.ProcessEnv) => GValue | undef
 
 export type TEnvSpec<GValue> = {
 	/**
-	 * Optional custom environment variable key to look up in process.env
-	 * If not provided, the object property name will be used
+	 * Optional custom environment variable key to look up in process.env.
+	 * If not provided, the object property name will be used.
 	 * @example
 	 * ```ts
 	 * // Will look for process.env.DATABASE_URL instead of process.env.dbUrl
@@ -20,11 +20,22 @@ export type TEnvSpec<GValue> = {
 	 */
 	envKey?: string;
 
-	/** The validator function to validate the environment variable */
+	/**
+	 * Optional value to use instead of looking up in process.env.
+	 * @example
+	 * ```ts
+	 * value: 'https://example.com'
+	 * ```
+	 */
+	value?: string;
+
+	/**
+	 * The validator function to validate the environment variable
+	 */
 	validator: TValidator<GValue, TBaseValidationContext<GValue>>;
 
 	/**
-	 * Optional default value or function to generate default value
+	 * Optional default value or function to generate default value.
 	 * @example
 	 * ```ts
 	 * // Static default value
@@ -37,7 +48,7 @@ export type TEnvSpec<GValue> = {
 	defaultValue?: GValue | TDefaultValueFn<GValue>;
 
 	/**
-	 * Optional array of middleware functions to transform the value
+	 * Optional array of middleware functions to transform the value.
 	 * @example
 	 * ```ts
 	 * middlewares: [
@@ -49,15 +60,15 @@ export type TEnvSpec<GValue> = {
 	middlewares?: TEnvMiddleware<GValue>[];
 
 	/**
-	 * Optional description of the environment variable
-	 * Used in error messages to provide more context
+	 * Optional description of the environment variable.
+	 * Used in error messages to provide more context.
 	 * @example "The port number for the server to listen on"
 	 */
 	description?: string;
 
 	/**
-	 * Optional example of valid values
-	 * Used in error messages to help users fix invalid values
+	 * Optional example of valid values.
+	 * Used in error messages to help users fix invalid values.
 	 * @example "3000, 8080, etc."
 	 */
 	example?: string;

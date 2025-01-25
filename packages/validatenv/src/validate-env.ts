@@ -55,8 +55,7 @@ function processEnvVar<GValue>(
 	env: NodeJS.ProcessEnv
 ): { success: true; value: GValue } | { success: false; error: string } {
 	const { validator, defaultValue, middlewares = [], description, example, envKey } = spec;
-	const rawValue = env[String(envKey)];
-	let value: unknown = rawValue;
+	let value: unknown = spec.value ?? env[String(envKey)];
 
 	// Apply middlewares if any
 	if (middlewares.length > 0) {

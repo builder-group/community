@@ -177,7 +177,8 @@ describe('validators', () => {
 			const validURLs = [
 				'https://example.com',
 				'http://localhost:3000',
-				'https://sub.domain.co.uk/path?query=1'
+				'https://sub.domain.co.uk/path?query=1',
+				'http://127.0.0.1/api'
 			];
 			for (const url of validURLs) {
 				const context = createValidationContext<string>(url);

@@ -56,7 +56,7 @@ describe('validateEnv function', () => {
 		});
 	});
 
-	it('should support default value functions', () => {
+	it('should support default value function', () => {
 		const env = { NODE_ENV: 'development' };
 
 		const result = validateEnv(env, {
@@ -70,6 +70,21 @@ describe('validateEnv function', () => {
 		expect(result).toEqual({
 			PORT: 3000
 		});
+	});
+
+	it('should support value override', () => {
+		const env = {
+			PORT: '3000'
+		};
+
+		const result = validateEnv(env, {
+			PORT: {
+				value: '8080',
+				validator: createValidator<number>([]),
+				middlewares: [numberMiddleware]
+			}
+		});
+		expect(result).toEqual({ PORT: 8080 });
 	});
 
 	it('should throw error when validation fails', () => {
