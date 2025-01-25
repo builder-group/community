@@ -1,6 +1,4 @@
-import { TEnvMiddleware } from './types';
-
-export const booleanMiddleware: TEnvMiddleware<boolean> = (input) => {
+export function booleanMiddleware(input: string | undefined): boolean | undefined {
 	if (input === undefined) {
 		return undefined;
 	}
@@ -20,19 +18,19 @@ export const booleanMiddleware: TEnvMiddleware<boolean> = (input) => {
 		default:
 			return undefined;
 	}
-};
+}
 
-export const numberMiddleware: TEnvMiddleware<number> = (input) => {
+export function numberMiddleware(input: string | undefined): number | undefined {
 	if (input === undefined) {
 		return undefined;
 	}
 	const num = parseFloat(input);
 	return Number.isNaN(num) ? undefined : num;
-};
+}
 
-export const nonEmptyStringMiddleware: TEnvMiddleware<string> = (input) => {
+export function nonEmptyStringMiddleware(input: string | undefined): string | undefined {
 	if (input === undefined) {
 		return undefined;
 	}
 	return input.trim() === '' ? undefined : input;
-};
+}
