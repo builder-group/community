@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { ciDefault, devDefault, envDefault, localDefault, testDefault } from './defaults';
+import {
+	ciDefault,
+	combineDefaults,
+	devDefault,
+	envDefault,
+	localDefault,
+	testDefault
+} from './defaults';
 
 describe('defaults', () => {
 	describe('envDefault', () => {
@@ -17,6 +24,37 @@ describe('defaults', () => {
 
 			expect(fn({ NODE_ENV: 'production' })).toBeUndefined();
 			expect(fn({ NODE_ENV: 'test' })).toBeUndefined();
+		});
+	});
+
+	describe('combineDefaults', () => {
+		const defaultValue = 'test-value';
+		const ciValue = 'ci-value';
+
+		it('should try defaults in order and return first matching value', () => {
+			const combined = combineDefaults(ciDefault(ciValue), devDefault(defaultValue));
+
+			// When CI is set, should return CI value regardless of NODE_ENV
+			expect(combined({ CI: 'true', NODE_ENV: 'development' })).toBe(ciValue);
+
+			// When CI is not set but NODE_ENV is development, return dev value
+			expect(combined({ NODE_ENV: 'development' })).toBe(defaultValue);
+
+			// When neither condition is met, return undefined
+			expect(combined({ NODE_ENV: 'production' })).toBeUndefined();
+		});
+
+		it('should work with multiple defaults in priority order', () => {
+			const combined = combineDefaults(
+				ciDefault('ci-value'),
+				testDefault('test-value'),
+				devDefault('dev-value')
+			);
+
+			expect(combined({ CI: 'true' })).toBe('ci-value');
+			expect(combined({ NODE_ENV: 'test' })).toBe('test-value');
+			expect(combined({ NODE_ENV: 'development' })).toBe('dev-value');
+			expect(combined({ NODE_ENV: 'production' })).toBeUndefined();
 		});
 	});
 

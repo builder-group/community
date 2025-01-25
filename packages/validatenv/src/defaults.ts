@@ -12,6 +12,20 @@ export const envDefault = <GValue>(
 	};
 };
 
+export const combineDefaults = <GValue>(
+	...defaults: TDefaultValueFn<GValue>[]
+): TDefaultValueFn<GValue> => {
+	return (env) => {
+		for (const defaultFn of defaults) {
+			const result = defaultFn(env);
+			if (result !== undefined) {
+				return result;
+			}
+		}
+		return undefined;
+	};
+};
+
 export const devDefault = <GValue>(value: GValue): TDefaultValueFn<GValue> =>
 	envDefault(value, ['development']);
 
