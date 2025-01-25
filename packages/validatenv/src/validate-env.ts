@@ -1,12 +1,5 @@
 import { createValidationContext, TValidationError } from 'validation-adapter';
-import {
-	TDefaultValueFn,
-	TEnvData,
-	TEnvSpec,
-	TEnvSpecs,
-	TEnvSpecValue,
-	TEnvSpecWithEnvKey
-} from './types';
+import { TDefaultValueFn, TEnvData, TEnvSpec, TEnvSpecs, TEnvSpecValue } from './types';
 
 export function validateEnv<GEnvData extends TEnvData>(
 	env: NodeJS.ProcessEnv,
@@ -40,7 +33,7 @@ export function validateEnv<GEnvData extends TEnvData>(
 }
 
 export function validateEnvVar<GValue>(
-	spec: TEnvSpecWithEnvKey<GValue>,
+	spec: TEnvSpec<GValue>,
 	env: NodeJS.ProcessEnv = process.env
 ): GValue {
 	const result = processEnvVar(spec, env);
@@ -51,7 +44,7 @@ export function validateEnvVar<GValue>(
 }
 
 function processEnvVar<GValue>(
-	spec: TEnvSpecWithEnvKey<GValue>,
+	spec: TEnvSpec<GValue>,
 	env: NodeJS.ProcessEnv
 ): { success: true; value: GValue } | { success: false; error: string } {
 	const { validator, defaultValue, middlewares = [], description, example, envKey } = spec;
