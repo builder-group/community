@@ -21,5 +21,11 @@ export const localDefault = <GValue>(value: GValue): TDefaultValueFn<GValue> =>
 export const testDefault = <GValue>(value: GValue): TDefaultValueFn<GValue> =>
 	envDefault(value, ['test']);
 
-export const ciDefault = <GValue>(value: GValue): TDefaultValueFn<GValue> =>
-	envDefault(value, ['ci']);
+export const ciDefault = <GValue>(value: GValue): TDefaultValueFn<GValue> => {
+	return (env) => {
+		if (!env['CI']) {
+			return undefined;
+		}
+		return value;
+	};
+};

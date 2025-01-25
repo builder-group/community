@@ -66,13 +66,15 @@ describe('defaults', () => {
 		describe('ciDefault', () => {
 			const fn = ciDefault(defaultValue);
 
-			it('should return value when NODE_ENV is ci', () => {
-				expect(fn({ NODE_ENV: 'ci' })).toBe(defaultValue);
+			it('should return value when CI env is set', () => {
+				expect(fn({ CI: 'true' })).toBe(defaultValue);
+				expect(fn({ CI: '1' })).toBe(defaultValue);
 			});
 
-			it('should return undefined when NODE_ENV is not ci', () => {
-				expect(fn({ NODE_ENV: 'production' })).toBeUndefined();
-				expect(fn({ NODE_ENV: 'development' })).toBeUndefined();
+			it('should return undefined when CI env is not set', () => {
+				expect(fn({})).toBeUndefined();
+				expect(fn({ CI: '' })).toBeUndefined();
+				expect(fn({ CI: undefined })).toBeUndefined();
 			});
 		});
 	});
