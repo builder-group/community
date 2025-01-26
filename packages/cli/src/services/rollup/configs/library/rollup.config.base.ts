@@ -14,6 +14,7 @@ export async function createBaseRollupConfig(
 		input: paths.input,
 		output,
 		plugins: [
+			'replace',
 			// Automatically declares NodeJS built-in modules like (node:path, node:fs) as external.
 			// This prevents Rollup from trying to bundle these built-in modules,
 			// which can cause unresolved dependencies warnings.

@@ -16,6 +16,7 @@ export async function createAppRollupConfig(
 		input: paths.input,
 		output,
 		plugins: [
+			'replace',
 			'node-resolve',
 			'commonjs',
 			'resolve-typescript-paths',
@@ -29,7 +30,6 @@ export async function createAppRollupConfig(
 				minimize: isProduction,
 				sourceMap: !isProduction
 			}),
-			'replace',
 			// Inject the bundle into HTML template
 			html({
 				fileName: `${bundleName}.html`,

@@ -9,11 +9,11 @@ export function createPluginRollupConfig(
 		input: paths.input,
 		output,
 		plugins: [
+			'replace',
 			'node-resolve',
 			'commonjs',
 			'resolve-typescript-paths',
 			'esbuild',
-			'replace',
 			'rollup-plugin-license',
 			'rollup-plugin-bundle-size'
 		],

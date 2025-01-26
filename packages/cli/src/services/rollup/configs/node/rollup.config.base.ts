@@ -19,6 +19,7 @@ export async function createBaseRollupConfig(
 		input: paths.input,
 		output,
 		plugins: [
+			'replace',
 			// Resolve and bundle dependencies from node_modules
 			bundleDeps &&
 				nodeResolve({
