@@ -27,7 +27,7 @@
 	],
 	"scripts": {
 		"build": "shx rm -rf dist && tsc",
-		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint . --fix",
 		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",

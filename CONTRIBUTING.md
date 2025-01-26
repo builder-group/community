@@ -28,7 +28,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"scripts": {
 		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
 		"build:prod": "pnpm build -t prod",
-		"clean": "shx rm -rf dist && shx rm -rf node_modules && shx rm -rf .turbo",
+		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint . --fix",
 		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
