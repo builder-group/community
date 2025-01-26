@@ -1,1 +1,1 @@
-module.exports = ['packages/*/vitest.config.js'];
+module.exports = ['packages/*/vitest.config.mjs'];
