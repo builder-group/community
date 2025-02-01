@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # This script serves as a local execution wrapper for the @blgc/cli tool.
 # We are using this approach because we couldn't figure out how to

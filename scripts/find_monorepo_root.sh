@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Function to check if a directory is a monorepo root
 is_monorepo_root() {
