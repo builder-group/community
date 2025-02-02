@@ -80,12 +80,9 @@ describe('createState function', () => {
 
 		// Act
 		state.set(20);
-		await new Promise((resolve) => {
-			setTimeout(resolve, 0);
-		});
 
 		// Assert
-		expect(listener).toHaveBeenCalledWith({ source: 'set', value: 20 });
+		expect(listener).toHaveBeenCalledWith({ source: 'state_set', value: 20, prevValue: 10 });
 	});
 
 	it('should not call listeners when set with the same value', () => {
@@ -149,6 +146,6 @@ describe('createState function', () => {
 		state.subscribe(listener);
 
 		// Assert
-		expect(listener).toHaveBeenCalledWith({ value: initialState });
+		expect(listener).toHaveBeenCalledWith({ value: initialState, prevValue: initialState });
 	});
 });

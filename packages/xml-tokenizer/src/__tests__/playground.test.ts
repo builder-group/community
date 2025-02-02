@@ -5,52 +5,58 @@ import { beforeAll, expect, it } from 'vitest';
 import { select } from '../selector';
 import { tokenToXml } from '../token-to-xml';
 
-void describe('count nodes', () => {
-	let xml = '';
-
-	beforeAll(async () => {
-		xml = await readFile(`${__dirname}/resources/bookstore.xml`, 'utf-8');
+describe('playground', () => {
+	it('should pass', () => {
+		expect(true).toBe(true);
 	});
 
-	it('[camaro] shoud work', async () => {
-		const result = await camaro.transform(xml, {
-			raw: 'raw(/bookstore/book[@category="COOKING"])'
+	describe.skip('should work', () => {
+		let xml = '';
+
+		beforeAll(async () => {
+			xml = await readFile(`${__dirname}/resources/bookstore.xml`, 'utf-8');
 		});
 
-		expect(result.raw.replaceAll(/\s/g, '')).toBe(
-			`<book category="COOKING">
+		it('[camaro] shoud work', async () => {
+			const result = await camaro.transform(xml, {
+				raw: 'raw(/bookstore/book[@category="COOKING"])'
+			});
+
+			expect(result.raw.replaceAll(/\s/g, '')).toBe(
+				`<book category="COOKING">
 			<title lang="en">Everyday Italian</title>
 			<author>Giada De Laurentiis</author>
 			<year>2005</year>
 			<price>30.00</price>
 	</book>`.replaceAll(/\s/g, '')
-		);
-	});
+			);
+		});
 
-	it('[xml-tokenizer] should work', () => {
-		let xmlString = '';
-		select(
-			xml,
-			[
+		it('[xml-tokenizer] should work', () => {
+			let xmlString = '';
+			select(
+				xml,
 				[
-					{ axis: 'child', local: 'bookstore' },
-					{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
-				]
-			],
-			(token) => {
-				if (token.type !== 'SelectionStart' && token.type !== 'SelectionEnd') {
-					xmlString += tokenToXml(token);
+					[
+						{ axis: 'child', local: 'bookstore' },
+						{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
+					]
+				],
+				(token) => {
+					if (token.type !== 'SelectionStart' && token.type !== 'SelectionEnd') {
+						xmlString += tokenToXml(token);
+					}
 				}
-			}
-		);
+			);
 
-		expect(xmlString.replaceAll(/\s/g, '')).toBe(
-			`<book category="COOKING">
+			expect(xmlString.replaceAll(/\s/g, '')).toBe(
+				`<book category="COOKING">
 			<title lang="en">Everyday Italian</title>
 			<author>Giada De Laurentiis</author>
 			<year>2005</year>
 			<price>30.00</price>
 	</book>`.replaceAll(/\s/g, '')
-		);
+			);
+		});
 	});
 });

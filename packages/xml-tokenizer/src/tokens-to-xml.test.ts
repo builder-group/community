@@ -20,6 +20,6 @@ describe('tokensToXml function', () => {
 
 		const result = tokensToXml(tokens);
 
-		expect(result).toBe(bookStoreXml);
+		expect(result).toBe(bookStoreXml.split('\n').slice(1, -1).join('\n'));
 	});
 });

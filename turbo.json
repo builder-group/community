@@ -22,6 +22,9 @@
 		"clean": {
 			"cache": false
 		},
+		"test": {
+			"cache": false
+		},
 		"update:latest": {
 			"cache": false
 		}

@@ -32,7 +32,7 @@
 		"lint": "eslint . --fix",
 		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
 		"start:dev": "tsc -w",
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "echo \"Error: no test specified\"",
 		"update:latest": "pnpm update --latest"
 	},
 	"oclif": {

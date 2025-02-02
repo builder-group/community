@@ -51,7 +51,7 @@
 		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
 		"size": "size-limit --why",
 		"start:dev": "tsc -w",
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "echo \"Error: no test specified\"",
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {

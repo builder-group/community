@@ -25,6 +25,7 @@
 		"packages:change": "changeset",
 		"packages:publish": "changeset publish",
 		"packages:version": "changeset version",
+		"test": "turbo run test",
 		"update:latest": "turbo run update:latest"
 	},
 	"devDependencies": {
