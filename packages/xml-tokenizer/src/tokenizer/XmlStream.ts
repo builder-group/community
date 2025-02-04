@@ -503,7 +503,6 @@ export class XmlStream {
 	}
 }
 
-// TODO: Should XMLStream be owner of this config although it doesn't use it
 export interface TXmlStreamConfig {
 	strict: boolean;
 	allowDtd: boolean;
