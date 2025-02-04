@@ -33,11 +33,20 @@ export class XmlStream {
 	public readonly config: TXmlStreamConfig;
 
 	public constructor(text: string, options: TXmlStreamOptions = {}) {
-		const { pos = 0, strict = true, allowDtd = true } = options;
+		const {
+			pos = 0,
+			strictDocument = true,
+			allowDtd = true,
+			allowBooleanAttributes = false
+		} = options;
 		this._text = text;
 		this._pos = pos;
 		this._end = this._text.length;
-		this.config = { strict, allowDtd };
+		this.config = {
+			strictDocument,
+			allowDtd,
+			allowBooleanAttributes
+		};
 	}
 
 	/**
@@ -504,7 +513,31 @@ export class XmlStream {
 }
 
 export interface TXmlStreamConfig {
-	strict: boolean;
+	/**
+	 * Whether to enforce strict XML document structure rules.
+	 * When true:
+	 * - Document must have exactly one root element
+	 * - No text nodes at document level (outside root element)
+	 * - Only comments and processing instructions allowed outside root element
+	 * When false:
+	 * - Multiple root elements allowed
+	 * - Text nodes allowed at document level
+	 * - More HTML-like permissive parsing
+	 * @default true
+	 */
+	strictDocument: boolean;
+
+	/**
+	 * Whether to allow HTML-style boolean attributes (e.g., <div hidden>).
+	 * When true, attributes without values are treated as having their name as the value.
+	 * @default false
+	 */
+	allowBooleanAttributes: boolean;
+
+	/**
+	 * Whether to allow DOCTYPE declarations.
+	 * @default true
+	 */
 	allowDtd: boolean;
 }
 

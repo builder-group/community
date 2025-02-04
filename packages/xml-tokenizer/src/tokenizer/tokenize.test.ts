@@ -1235,6 +1235,22 @@ describe('tokenize function', () => {
 			]);
 		});
 
+		it('element_09', () => {
+			assertTokens('<a>', [
+				{
+					type: 'ElementStart',
+					prefix: '',
+					local: 'a',
+					start: 0
+				},
+				{
+					type: 'ElementEnd',
+					end: { type: 'Open' },
+					range: { start: 2, end: 3 }
+				}
+			]);
+		});
+
 		it('element_err_01', () => {
 			assertTokens('<>', [
 				{
@@ -1653,7 +1669,7 @@ describe('tokenize function', () => {
 			]);
 		});
 
-		it('[!strict] attribute_08', () => {
+		it('[allowBooleanAttributes] attribute_08', () => {
 			assertTokens(
 				'<c a>',
 				[
@@ -1676,11 +1692,11 @@ describe('tokenize function', () => {
 						range: { start: 4, end: 5 }
 					}
 				],
-				{ strict: false }
+				{ allowBooleanAttributes: true }
 			);
 		});
 
-		it('[!strict] attribute_09', () => {
+		it('[allowBooleanAttributes] attribute_09', () => {
 			assertTokens(
 				'<c a/>',
 				[
@@ -1703,11 +1719,11 @@ describe('tokenize function', () => {
 						range: { start: 4, end: 6 }
 					}
 				],
-				{ strict: false }
+				{ allowBooleanAttributes: true }
 			);
 		});
 
-		it('[!strict] attribute_10', () => {
+		it('[allowBooleanAttributes] attribute_10', () => {
 			assertTokens(
 				"<c a='b' q b:x />",
 				[
@@ -1744,7 +1760,7 @@ describe('tokenize function', () => {
 						range: { start: 15, end: 17 }
 					}
 				],
-				{ strict: false }
+				{ allowBooleanAttributes: true }
 			);
 		});
 

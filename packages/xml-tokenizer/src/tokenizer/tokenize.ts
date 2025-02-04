@@ -78,7 +78,7 @@ export function tokenizeXmlStream(s: XmlStream, tokenCallback: TTokenCallback): 
 
 	s.skipSpaces();
 
-	if (s.config.strict) {
+	if (s.config.strictDocument) {
 		if (!s.atEnd() && s.currCodeUnit() === LESS_THAN) {
 			parseElement(s, tokenCallback);
 		}
@@ -487,14 +487,14 @@ function parseAttribute(s: XmlStream): [string, string, string] {
 		const quote = s.consumeQuote();
 		value = s.consumeCodeUnitsWhile((c) => c !== quote && c !== LESS_THAN);
 		s.consumeCodeUnit(quote);
-	} else if (s.config.strict) {
+	} else if (s.config.allowBooleanAttributes) {
+		s.goTo(start);
+		value = 'true';
+	} else {
 		throw new XmlError(
 			{ type: 'InvalidChar', expected: EQUALS, actual: s.currCodeUnit() },
 			s.genTextPos()
 		);
-	} else {
-		s.goTo(start);
-		value = 'true';
 	}
 
 	return [prefix, local, value];
