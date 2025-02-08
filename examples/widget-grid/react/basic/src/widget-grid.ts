@@ -2,12 +2,12 @@ import {
 	createWidgetGrid,
 	TBaseWidget,
 	TGridCells,
-	TWidgetBaseContent,
+	TWidgetBaseData,
 	TWidgetGrid,
 	TWidgetId
 } from 'widget-grid';
 
-const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
+const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundData> => {
 	const initialCells: TGridCells<TWidgetId> = [
 		['A', 'B', 'B'],
 		['A', 'C', 'D'],
@@ -18,17 +18,17 @@ const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
 	];
 
 	return {
-		grid: createWidgetGrid<TPlaygroundContent>({
+		grid: createWidgetGrid<TPlaygroundData>({
 			cells: initialCells,
 			widgets: [
-				{ id: 'A', content: { type: 'item1' } },
-				{ id: 'B', content: { type: 'item2' } },
-				{ id: 'C', content: { type: 'item3' } },
-				{ id: 'D', content: { type: 'item2' } },
-				{ id: 'E', content: { type: 'item1' } },
-				{ id: 'F', content: { type: 'item2' } },
-				{ id: 'G', content: { type: 'item3' } },
-				{ id: 'H', content: { type: 'item2' } }
+				{ id: 'A', data: { type: 'item1' } },
+				{ id: 'B', data: { type: 'item2' } },
+				{ id: 'C', data: { type: 'item3' } },
+				{ id: 'D', data: { type: 'item2' } },
+				{ id: 'E', data: { type: 'item1' } },
+				{ id: 'F', data: { type: 'item2' } },
+				{ id: 'G', data: { type: 'item3' } },
+				{ id: 'H', data: { type: 'item2' } }
 			],
 			layout: { cell: { width: 96, height: 96 }, gap: { width: 0, height: 0 } }
 		}),
@@ -53,27 +53,27 @@ const createPlaygroundPreset = (): TWidgetGridPreset<TPlaygroundContent> => {
 	};
 };
 
-interface TWidgetContent1 {
+interface TWidgetData1 {
 	type: 'item1';
 }
 
-interface TWidgetContent2 {
+interface TWidgetData2 {
 	type: 'item2';
 }
 
-interface TWidgetContent3 {
+interface TWidgetData3 {
 	type: 'item3';
 }
 
-type TPlaygroundContent = TWidgetContent1 | TWidgetContent2 | TWidgetContent3;
+type TPlaygroundData = TWidgetData1 | TWidgetData2 | TWidgetData3;
 
-const createPerformancePreset = (cols = 50, rows = 50): TWidgetGridPreset<TPerformanceContent> => {
+const createPerformancePreset = (cols = 50, rows = 50): TWidgetGridPreset<TPerformanceData> => {
 	function generateTestGrid(
 		rows: number,
 		columns: number
 	): {
 		cells: TGridCells<TWidgetId>;
-		widgets: TBaseWidget<TPerformanceContent>[];
+		widgets: TBaseWidget<TPerformanceData>[];
 	} {
 		const cells: TGridCells<TWidgetId> = Array(rows)
 			.fill(null)
@@ -83,11 +83,11 @@ const createPerformancePreset = (cols = 50, rows = 50): TWidgetGridPreset<TPerfo
 					.map((_, col) => `w${row * columns + col}`)
 			);
 
-		const widgets: TBaseWidget<TPerformanceContent>[] = Array(rows * columns)
+		const widgets: TBaseWidget<TPerformanceData>[] = Array(rows * columns)
 			.fill(null)
 			.map((_, index) => ({
 				id: `w${index}`,
-				content: {
+				data: {
 					type: 'test',
 					data: `Widget ${index}`
 				}
@@ -121,7 +121,7 @@ const createPerformancePreset = (cols = 50, rows = 50): TWidgetGridPreset<TPerfo
 	const { cells, widgets } = generateTestGrid(cols, rows);
 
 	return {
-		grid: createWidgetGrid<TPerformanceContent>({
+		grid: createWidgetGrid<TPerformanceData>({
 			cells,
 			widgets,
 			layout: { cell: { width: 100, height: 100 }, gap: { width: 0, height: 0 } }
@@ -145,17 +145,17 @@ export const widgetGridPresets = {
 
 export type TWidgetGridPresetKey = keyof typeof widgetGridPresets;
 
-interface TPerformanceContent extends TWidgetBaseContent {
+interface TPerformanceData extends TWidgetBaseData {
 	type: 'test';
 	data: string;
 }
 
-interface TPresetAction<T extends TWidgetBaseContent> {
+interface TPresetAction<T extends TWidgetBaseData> {
 	label: string;
 	action: (widgetGrid: TWidgetGrid<T, []>) => void;
 }
 
-interface TWidgetGridPreset<T extends TWidgetBaseContent> {
+interface TWidgetGridPreset<T extends TWidgetBaseData> {
 	grid: TWidgetGrid<T, []>;
 	actions: TPresetAction<T>[];
 }

@@ -9,15 +9,15 @@ import {
 	TRegionPixels
 } from '../helper';
 import { TBoundingRect, TXYPosition } from './utils';
-import { TWidget, TWidgetBaseContent, TWidgetId } from './widget';
+import { TWidget, TWidgetBaseData, TWidgetId } from './widget';
 
 export type TWidgetGrid<
-	GContent extends TWidgetBaseContent,
+	GData extends TWidgetBaseData,
 	GFeatures extends TFeatureDefinition[]
 > = TWithFeatures<
 	{
 		// Stores the widgets within the grid, each identified by a unique ID
-		_widgets: Record<TWidgetId, TWidget<GContent>>;
+		_widgets: Record<TWidgetId, TWidget<GData>>;
 		// List of currently selected widget IDs
 		_selected: TState<TWidgetId[], []>;
 		// 2D array representing the grid layout
@@ -33,9 +33,9 @@ export type TWidgetGrid<
 		setCells: (cells: (string | null)[][]) => void;
 		syncCells: (options?: { size?: boolean; regions?: boolean }) => void;
 
-		getWidgetAt: (position: TGridPosition) => TWidget<GContent> | null;
-		getWidgetById: (id: string) => TWidget<GContent> | null;
-		getSelectedWidgets: () => TWidget<GContent>[];
+		getWidgetAt: (position: TGridPosition) => TWidget<GData> | null;
+		getWidgetById: (id: string) => TWidget<GData> | null;
+		getSelectedWidgets: () => TWidget<GData>[];
 		getWidgetRegions: () => TGridRegion[];
 		getRegionPixels: (region: TGridRegion) => TRegionPixels;
 		moveWidget: (widgetId: string, newPosition: TGridPosition) => void;

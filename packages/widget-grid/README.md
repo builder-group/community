@@ -28,20 +28,20 @@
 ## 📖 Usage
 
 ```ts
-const widgetGrid = createWidgetGrid<TPlaygroundContent>({
+const widgetGrid = createWidgetGrid<TPlaygroundData>({
 	cells: [
 		['A', 'B', 'B'],
 		['A', 'C', 'D'],
 		['E', 'F', 'G']
 	],
 	widgets: [
-		{ id: 'A', content: { type: 'item1' } },
-		{ id: 'B', content: { type: 'item2' } },
-		{ id: 'C', content: { type: 'item3' } },
-		{ id: 'D', content: { type: 'item2' } },
-		{ id: 'E', content: { type: 'item1' } },
-		{ id: 'F', content: { type: 'item2' } },
-		{ id: 'G', content: { type: 'item3' } }
+		{ id: 'A', data: { type: 'item1' } },
+		{ id: 'B', data: { type: 'item2' } },
+		{ id: 'C', data: { type: 'item3' } },
+		{ id: 'D', data: { type: 'item2' } },
+		{ id: 'E', data: { type: 'item1' } },
+		{ id: 'F', data: { type: 'item2' } },
+		{ id: 'G', data: { type: 'item3' } }
 	]
 });
 ```

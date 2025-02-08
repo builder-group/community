@@ -1,18 +1,10 @@
 import { useFeatureState, useListener } from 'feature-react/state';
 import React from 'react';
-import {
-	gridToString,
-	TGridPosition,
-	TWidgetBaseContent,
-	TWidgetGrid,
-	TWidgetId
-} from 'widget-grid';
+import { gridToString, TGridPosition, TWidgetBaseData, TWidgetGrid, TWidgetId } from 'widget-grid';
 import { useBoundingRectObserver } from '../hooks';
 import { TWidgetWrapperProps, WidgetWrapper } from './WidgetWrapper';
 
-export const WidgetGrid = <GContent extends TWidgetBaseContent>(
-	props: TWidgetGridProps<GContent>
-) => {
+export const WidgetGrid = <GData extends TWidgetBaseData>(props: TWidgetGridProps<GData>) => {
 	const { widgetGrid, renderItem } = props;
 	const { rows, cols } = useFeatureState(widgetGrid._size);
 	const { cell, gap } = useFeatureState(widgetGrid.layout);
@@ -158,7 +150,7 @@ export const WidgetGrid = <GContent extends TWidgetBaseContent>(
 	);
 };
 
-interface TWidgetGridProps<GContent> {
-	widgetGrid: TWidgetGrid<GContent, []>;
-	renderItem: TWidgetWrapperProps<GContent>['renderItem'];
+interface TWidgetGridProps<GData> {
+	widgetGrid: TWidgetGrid<GData, []>;
+	renderItem: TWidgetWrapperProps<GData>['renderItem'];
 }

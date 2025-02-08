@@ -1,11 +1,9 @@
 import { useFeatureState, useListener } from 'feature-react/state';
 import React from 'react';
-import { TWidget, TWidgetBaseContent } from 'widget-grid';
+import { TWidget, TWidgetBaseData } from 'widget-grid';
 import { useRenderCount } from '../hooks';
 
-export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
-	props: TWidgetWrapperProps<GContent>
-) => {
+export const WidgetWrapper = <GData extends TWidgetBaseData>(props: TWidgetWrapperProps<GData>) => {
 	const { renderItem, index, widget } = props;
 	const widgetGrid = React.useMemo(() => widget._widgetGrid, [widget]);
 	const isSelected = useFeatureState(widget.isSelected);
@@ -202,8 +200,8 @@ export const WidgetWrapper = <GContent extends TWidgetBaseContent>(
 	);
 };
 
-export interface TWidgetWrapperProps<GContent> {
-	renderItem: (widget: TWidget<GContent>) => React.ReactNode;
+export interface TWidgetWrapperProps<GData> {
+	renderItem: (widget: TWidget<GData>) => React.ReactNode;
 	index: number;
-	widget: TWidget<GContent>;
+	widget: TWidget<GData>;
 }

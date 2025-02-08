@@ -5,18 +5,18 @@ import {
 	TBaseWidget,
 	TDimensions,
 	TWidget,
-	TWidgetBaseContent,
+	TWidgetBaseData,
 	TWidgetGrid,
 	TXYPosition
 } from './types';
 
-export function createWidget<GContent extends TWidgetBaseContent>(
-	config: TCreateWidgetConfig<GContent>
-): TWidget<GContent> {
-	const widget: TWithInit<TWidget<GContent>> = {
+export function createWidget<GData extends TWidgetBaseData>(
+	config: TCreateWidgetConfig<GData>
+): TWidget<GData> {
+	const widget: TWithInit<TWidget<GData>> = {
 		_widgetGrid: config.widgetGrid,
 		id: config.baseWidget.id,
-		content: createState(config.baseWidget.content as GContent),
+		data: createState(config.baseWidget.data as GData),
 		region: createState(config.region ?? null),
 		layoutMode: createState<'Grid' | 'Absolute'>('Grid'),
 		position: createState<TXYPosition | null>(null),
@@ -67,8 +67,8 @@ export function createWidget<GContent extends TWidgetBaseContent>(
 	return widget.init();
 }
 
-export interface TCreateWidgetConfig<GContent extends TWidgetBaseContent> {
-	baseWidget: TBaseWidget<GContent>;
-	widgetGrid: TWidgetGrid<GContent, []>;
+export interface TCreateWidgetConfig<GData extends TWidgetBaseData> {
+	baseWidget: TBaseWidget<GData>;
+	widgetGrid: TWidgetGrid<GData, []>;
 	region?: TGridRegion;
 }

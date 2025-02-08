@@ -19,19 +19,19 @@ import {
 	TBoundingRect,
 	TInteractionMode,
 	TWidget,
-	TWidgetBaseContent,
+	TWidgetBaseData,
 	TWidgetId,
 	type TWidgetGrid
 } from './types';
 
-export function createWidgetGrid<GContent extends TWidgetBaseContent>(
-	config: TCreateWidgetGridConfig<GContent>
-): TWidgetGrid<GContent, []> {
+export function createWidgetGrid<GData extends TWidgetBaseData>(
+	config: TCreateWidgetGridConfig<GData>
+): TWidgetGrid<GData, []> {
 	const { cells, layout, widgets } = config;
 
 	const widgetGrid: TWithInit<
-		TWidgetGrid<GContent, []>,
-		{ initialWidgets: TCreateWidgetGridConfig<GContent>['widgets'] }
+		TWidgetGrid<GData, []>,
+		{ initialWidgets: TCreateWidgetGridConfig<GData>['widgets'] }
 	> = {
 		_features: [],
 		_widgets: {},
@@ -70,7 +70,7 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 					});
 					return acc;
 				},
-				{} as Record<TWidgetId, TWidget<GContent>>
+				{} as Record<TWidgetId, TWidget<GData>>
 			);
 
 			// TODO: Should I work with side effects? Or update e.g. region, position, size, etc. more directly?
@@ -249,8 +249,8 @@ export function createWidgetGrid<GContent extends TWidgetBaseContent>(
 	return widgetGrid.init({ initialWidgets: widgets });
 }
 
-export interface TCreateWidgetGridConfig<GContent extends TWidgetBaseContent> {
+export interface TCreateWidgetGridConfig<GData extends TWidgetBaseData> {
 	cells: TGridCells<TWidgetId>;
-	widgets: TBaseWidget<GContent>[];
+	widgets: TBaseWidget<GData>[];
 	layout: TGridLayout;
 }
