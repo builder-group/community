@@ -12,6 +12,7 @@ export * from './find-region';
 export * from './get-bounding-region';
 export * from './get-cell';
 export * from './get-cell-key';
+export * from './get-cells';
 export * from './get-complementary-regions';
 export * from './get-empty-cells';
 export * from './get-grid-size';
