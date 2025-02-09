@@ -15,9 +15,7 @@ import { getEmptyCells } from './get-empty-cells';
 import { getGridSize } from './get-grid-size';
 import { getOccupyingRegions } from './get-occupying-regions';
 import { getRegionArea } from './get-region-area';
-import { getRegionBetweenRegions } from './get-region-between-regions';
 import { getRegionGap } from './get-region-gap';
-import { isRegionEmpty } from './is-region-empty';
 import { isRegionOutOfBounds } from './is-region-out-of-bounds';
 import { iterateRegion } from './iterate-region';
 import { mergeAdjacentRegions } from './merge-adjacent-regions';
@@ -193,10 +191,10 @@ function findBestSwapMove<GGridCellId extends TGridCellId>(
 
 	for (const [index, region] of boundingRegions.entries()) {
 		// Skip if there is no free space between the freed region and the bounding region
-		const regionBetweenRegion = getRegionBetweenRegions(freedRegion, region);
-		if (regionBetweenRegion != null && !isRegionEmpty(cells, regionBetweenRegion)) {
-			continue;
-		}
+		// const regionBetweenRegion = getRegionBetweenRegions(freedRegion, region);
+		// if (regionBetweenRegion != null && !isRegionEmpty(cells, regionBetweenRegion)) {
+		// 	continue;
+		// }
 
 		// Check all possible positions within freed region
 		iterateRegion(freedRegion, (freedPos) => {
