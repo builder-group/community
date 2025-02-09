@@ -5,6 +5,7 @@ import { createWidget } from './create-widget';
 import {
 	cascadeMove,
 	getCell,
+	getCells,
 	getGridSize,
 	getRegionPixels,
 	getRegions,
@@ -12,7 +13,8 @@ import {
 	TGridCells,
 	TGridDimensions,
 	TGridLayout,
-	TGridRegion
+	TGridRegion,
+	TGridRegionWithId
 } from './helper';
 import {
 	TBaseWidget,
@@ -27,29 +29,31 @@ import {
 export function createWidgetGrid<GData extends TWidgetBaseData>(
 	config: TCreateWidgetGridConfig<GData>
 ): TWidgetGrid<GData, []> {
-	const { cells, layout, widgets } = config;
+	const { regions, layout, widgets } = config;
 
 	const widgetGrid: TWithInit<
 		TWidgetGrid<GData, []>,
-		{ initialWidgets: TCreateWidgetGridConfig<GData>['widgets'] }
+		{
+			initialWidgets: TCreateWidgetGridConfig<GData>['widgets'];
+			initialRegions: TCreateWidgetGridConfig<GData>['regions'];
+		}
 	> = {
 		_features: [],
 		_widgets: {},
 		_selected: createState<TWidgetId[]>([]),
-		_cells: createState<TGridCells<TWidgetId>>(cells),
+		_cells: createState<TGridCells<TWidgetId>>(getCells(regions)),
 		_size: createState<TGridDimensions>({ rows: 0, cols: 0 }),
 		interactionMode: createState<TInteractionMode>({ type: 'None' }),
 		layout: createState(layout),
 		boundingRect: createState<TBoundingRect>({ left: 0, top: 0 }),
 
-		init({ initialWidgets }) {
+		init({ initialWidgets, initialRegions }) {
 			this._size.set(getGridSize(this._cells._v), {
 				listenerContext: { source: 'widget-grid_init' }
 			});
 
 			// Create a map for O(1) lookup of regions by widget ID
-			const regions = getRegions(this._cells._v);
-			const regionsByWidgetId = regions.reduce(
+			const regionsByWidgetId = initialRegions.reduce(
 				(acc, region) => {
 					acc[region.id] = {
 						start: region.start,
@@ -246,11 +250,11 @@ export function createWidgetGrid<GData extends TWidgetBaseData>(
 		}
 	};
 
-	return widgetGrid.init({ initialWidgets: widgets });
+	return widgetGrid.init({ initialWidgets: widgets, initialRegions: regions });
 }
 
 export interface TCreateWidgetGridConfig<GData extends TWidgetBaseData> {
-	cells: TGridCells<TWidgetId>;
+	regions: TGridRegionWithId<TWidgetId>[];
 	widgets: TBaseWidget<GData>[];
 	layout: TGridLayout;
 }

@@ -4,7 +4,6 @@ import { canRegionBeMovedToPos } from './can-region-be-moved-to-pos';
 import { clearRegion } from './clear-region';
 import { createCellsSnapshot } from './create-cells-snapshot';
 import { doRegionsOverlap } from './do-regions-overlap';
-import { doesRegionContainCells } from './does-region-contain-cells';
 import { expandGrid } from './expand-grid';
 import { fillRegion } from './fill-region';
 import { getBoundingRegion } from './get-bounding-region';
@@ -30,7 +29,7 @@ import { TGridCellId, TGridCells, TGridPosition, TGridRegion, TGridRegionWithId 
  *
  * Strategy Steps:
  * 1. Clear the source region
- * 2. Fill freed region with adjacent regions that fit, only applied if fully filled
+ * 2. Fill freed region with adjacent regions that fit
  * 3. Push down regions that block the target position
  * 4. Place the region at target position
  * 5. Bubble up regions where possible to fill gaps
@@ -159,10 +158,11 @@ export function fillSourceRegionBySwapping<GGridCellId extends TGridCellId>(
 		mergeAdjacentRegions(freedRegions);
 	}
 
+	// TODO: Then we can't swap a 1x2 with a 1x1 (Test: "should move 1x1 region in east direction and swap with 1x2 region")
 	// If source region was not fully filled (contains empty cell), return
-	if (complementaryRegions.some((r) => doesRegionContainCells(cellsSnapshot, r, [null]))) {
-		return [];
-	}
+	// if (complementaryRegions.some((r) => doesRegionContainCells(cellsSnapshot, r, [null]))) {
+	// 	return [];
+	// }
 
 	// Apply snapshot to cells
 	applyCells(cells, cellsSnapshot, cellsSnapshotStart);
