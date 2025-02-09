@@ -35,6 +35,18 @@ import { TGridCellId, TGridCells, TGridPosition, TGridRegion, TGridRegionWithId 
  * 3. Push down regions that block the target position
  * 4. Place the region at target position
  * 5. Bubble up regions where possible to fill gaps
+ *
+ * TODO: This implementation does not feel as I've imagined.
+ * e.g. Sometimes it does funky diagonal jump moves that don't feel "natural"
+ * although it theoretically aligns with the "Strategy Steps".
+ * Because sometimes a element partially fills the source (freed) region (Step 2)
+ * but then gets additionally pushed down (Step 3) or bubbles up (Step 5).
+ * like in Test: "[2] should move 1x2 region in east direction and trigger cascade"
+ * - B B | - B B | - - - | - A - | C A -
+ * - C D | C - D | C - - | C A - | E A -
+ * E F G | E F G | E B B | E B B | - B B
+ *      |       | - - D | - - D | - F D
+ *      |       | - F G | - F G | - - G
  */
 export function cascadeMove<GGridCellId extends TGridCellId>(
 	cells: TGridCells<GGridCellId>,
@@ -168,12 +180,6 @@ export function fillSourceRegionBySwapping<GGridCellId extends TGridCellId>(
 		);
 		mergeAdjacentRegions(freedRegions);
 	}
-
-	// TODO: Then we can't swap a 1x2 with a 1x1 (Test: "should move 1x1 region in east direction and swap with 1x2 region")
-	// If source region was not fully filled (contains empty cell), return
-	// if (complementaryRegions.some((r) => doesRegionContainCells(cellsSnapshot, r, [null]))) {
-	// 	return [];
-	// }
 
 	// Apply snapshot to cells
 	applyCells(cells, cellsSnapshot, cellsSnapshotStart);
