@@ -1,3 +1,4 @@
+export * from './align-strings';
 export * from './apply-mat3-to-point';
 export * from './array-to-mat3';
 export * from './assert-value';

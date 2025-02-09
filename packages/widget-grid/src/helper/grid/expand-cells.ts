@@ -4,7 +4,7 @@ import { TGridCellId, TGridCells } from './types';
 /**
  * Expands the grid using the specified strategy and dimensions
  */
-export function expandGrid<GGridCellId extends TGridCellId>(
+export function expandCells<GGridCellId extends TGridCellId>(
 	cells: TGridCells<GGridCellId>,
 	options: TExpandGridMethodOptions = {}
 ): void {

@@ -1,4 +1,4 @@
-import { expandGrid } from './expand-grid';
+import { expandCells } from './expand-cells';
 import { getGridSize } from './get-grid-size';
 import { getOccupyingRegions } from './get-occupying-regions';
 import { overrideMove } from './override-move';
@@ -72,7 +72,7 @@ function pushRegionsSouth<GGridCellId extends TGridCellId>(
 		if (!allowOutOfBounds) {
 			return [];
 		}
-		expandGrid(cells, { rows: maxRowNeeded, strategy: 'Set' });
+		expandCells(cells, { rows: maxRowNeeded, strategy: 'Set' });
 	}
 
 	// Move each region

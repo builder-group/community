@@ -1,10 +1,12 @@
+import { alignStrings } from '@blgc/utils';
 import { applyCells } from './apply-cells';
 import { bubbleRegionsUp } from './bubble-regions-up';
 import { canRegionBeMovedToPos } from './can-region-be-moved-to-pos';
+import { cellsToString } from './cells-to-string';
 import { clearRegion } from './clear-region';
 import { createCellsSnapshot } from './create-cells-snapshot';
 import { doRegionsOverlap } from './do-regions-overlap';
-import { expandGrid } from './expand-grid';
+import { expandCells } from './expand-cells';
 import { fillRegion } from './fill-region';
 import { getBoundingRegion } from './get-bounding-region';
 import { getCell } from './get-cell';
@@ -13,13 +15,15 @@ import { getEmptyCells } from './get-empty-cells';
 import { getGridSize } from './get-grid-size';
 import { getOccupyingRegions } from './get-occupying-regions';
 import { getRegionArea } from './get-region-area';
+import { getRegionBetweenRegions } from './get-region-between-regions';
 import { getRegionGap } from './get-region-gap';
+import { isRegionEmpty } from './is-region-empty';
 import { isRegionOutOfBounds } from './is-region-out-of-bounds';
 import { iterateRegion } from './iterate-region';
 import { mergeAdjacentRegions } from './merge-adjacent-regions';
 import { overrideMove } from './override-move';
 import { pushRegions } from './push-regions';
-import { trimGrid } from './trim-grid';
+import { trimCells } from './trim-cells';
 import { TGridCellId, TGridCells, TGridPosition, TGridRegion, TGridRegionWithId } from './types';
 
 /**
@@ -61,14 +65,19 @@ export function cascadeMove<GGridCellId extends TGridCellId>(
 
 	// TODO: Snapshot cells to avoid applying invalid moves
 
+	const debugStringCells: string[] = [];
+
 	// 1. Clear source region
 	clearRegion(cells, sourceRegion);
+	debugStringCells.push(cellsToString(cells));
 
-	// 2. Fill freed region with adjacent regions that fit, only applied if fully filled
+	// 2. Fill freed region with adjacent regions that fit
 	movedRegions.push(...fillSourceRegionBySwapping(cells, sourceRegion, targetRegion));
+	debugStringCells.push(cellsToString(cells));
 
 	// 3. Push down regions that block the target position
 	movedRegions.push(...pushDownOccupyingRegions(cells, targetRegion));
+	debugStringCells.push(cellsToString(cells));
 
 	// TODO: Return if target region is still occupied?
 	// But then we need to undo all applied moves
@@ -82,7 +91,7 @@ export function cascadeMove<GGridCellId extends TGridCellId>(
 			directionsToCheck: { north: false, east: true, south: true, west: false }
 		})
 	) {
-		expandGrid(cells, {
+		expandCells(cells, {
 			strategy: 'Set',
 			rows: targetPosition.row + sourceRegion.dimension.rows,
 			cols: targetPosition.col + sourceRegion.dimension.cols
@@ -90,12 +99,16 @@ export function cascadeMove<GGridCellId extends TGridCellId>(
 	}
 	fillRegion(cells, targetRegion, cell);
 	movedRegions.push({ id: cell, ...targetRegion });
+	debugStringCells.push(cellsToString(cells));
 
 	// 5. Bubble up regions where possible to fill gaps
 	movedRegions.push(...bubbleRegionsUp(cells, { fixedRegionIds: new Set([cell]) }));
+	debugStringCells.push(cellsToString(cells));
 
 	// Trim empty rows and columns
-	trimGrid(cells);
+	trimCells(cells);
+
+	console.log(alignStrings(debugStringCells, { separator: ' | ' }));
 
 	return movedRegions;
 }
@@ -179,6 +192,12 @@ function findBestSwapMove<GGridCellId extends TGridCellId>(
 	const possibleMoves: TSwapMove<GGridCellId>[] = [];
 
 	for (const [index, region] of boundingRegions.entries()) {
+		// Skip if there is no free space between the freed region and the bounding region
+		const regionBetweenRegion = getRegionBetweenRegions(freedRegion, region);
+		if (regionBetweenRegion != null && !isRegionEmpty(cells, regionBetweenRegion)) {
+			continue;
+		}
+
 		// Check all possible positions within freed region
 		iterateRegion(freedRegion, (freedPos) => {
 			// Try each cell of the region as an anchor point

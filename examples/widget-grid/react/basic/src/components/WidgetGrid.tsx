@@ -1,6 +1,6 @@
 import { useFeatureState, useListener } from 'feature-react/state';
 import React from 'react';
-import { gridToString, TGridPosition, TWidgetBaseData, TWidgetGrid, TWidgetId } from 'widget-grid';
+import { cellsToString, TGridPosition, TWidgetBaseData, TWidgetGrid, TWidgetId } from 'widget-grid';
 import { useBoundingRectObserver } from '../hooks';
 import { TWidgetWrapperProps, WidgetWrapper } from './WidgetWrapper';
 
@@ -23,7 +23,7 @@ export const WidgetGrid = <GData extends TWidgetBaseData>(props: TWidgetGridProp
 		console.log(`[selectedWidgets] s: ${source}${background ? ' b: true' : ''}`, value);
 	});
 	useListener(widgetGrid._cells, () => {
-		console.log(gridToString(widgetGrid._cells._v));
+		console.log(cellsToString(widgetGrid._cells._v));
 	});
 
 	// TODO: REMOVE

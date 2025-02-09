@@ -5,7 +5,7 @@ import { TGridCellId, TGridCells } from './types';
  * A row is considered empty if all its cells are null.
  * Will not remove rows that contain any non-null cells.
  */
-export function trimGrid<GGridCellId extends TGridCellId>(cells: TGridCells<GGridCellId>): number {
+export function trimCells<GGridCellId extends TGridCellId>(cells: TGridCells<GGridCellId>): number {
 	let rowsRemoved = 0;
 
 	// Start from bottom, remove rows until we find non-empty row

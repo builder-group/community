@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { trimGrid } from './trim-grid';
+import { trimCells } from './trim-cells';
 import { TGridCells } from './types';
 
-describe('trimGrid', () => {
+describe('trimCells', () => {
 	it('should remove empty rows from bottom', () => {
 		const cells: TGridCells<string> = [
 			['A', 'B'],
@@ -10,7 +10,7 @@ describe('trimGrid', () => {
 			[null, null]
 		];
 
-		const result = trimGrid(cells);
+		const result = trimCells(cells);
 
 		expect(cells).toEqual([['A', 'B']]);
 		expect(result).toBe(2);
@@ -23,7 +23,7 @@ describe('trimGrid', () => {
 			[null, null]
 		];
 
-		const result = trimGrid(cells);
+		const result = trimCells(cells);
 
 		expect(cells).toEqual([
 			['A', null],
@@ -38,7 +38,7 @@ describe('trimGrid', () => {
 			[null, null]
 		];
 
-		const result = trimGrid(cells);
+		const result = trimCells(cells);
 
 		expect(cells).toEqual([]);
 		expect(result).toBe(2);
@@ -50,7 +50,7 @@ describe('trimGrid', () => {
 			['C', null]
 		];
 
-		const result = trimGrid(cells);
+		const result = trimCells(cells);
 
 		expect(cells).toEqual([
 			['A', 'B'],

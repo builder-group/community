@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { gridToString } from './grid-to-string';
+import { cellsToString } from './cells-to-string';
 import { TGridCells } from './types';
 
-describe('gridToString', () => {
+describe('cellsToString', () => {
 	it('should return empty string for empty grid', () => {
 		const cells: TGridCells<string> = [];
 
-		const result = gridToString(cells);
+		const result = cellsToString(cells);
 
 		expect(result).toBe('');
 	});
@@ -14,7 +14,7 @@ describe('gridToString', () => {
 	it('should format single row grid correctly', () => {
 		const cells: TGridCells<string> = [['1', '2', '3']];
 
-		const result = gridToString(cells);
+		const result = cellsToString(cells);
 
 		expect(result).toBe('1 2 3');
 	});
@@ -25,7 +25,7 @@ describe('gridToString', () => {
 			['3', '4']
 		];
 
-		const result = gridToString(cells);
+		const result = cellsToString(cells);
 
 		expect(result).toBe('1 2\n3 4');
 	});
@@ -36,7 +36,7 @@ describe('gridToString', () => {
 			[null, '2']
 		];
 
-		const result = gridToString(cells);
+		const result = cellsToString(cells);
 
 		expect(result).toBe('1 -\n- 2');
 	});

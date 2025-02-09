@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { expandGrid } from './expand-grid';
+import { expandCells } from './expand-cells';
 import { TGridCells } from './types';
 
-describe('expandGrid', () => {
+describe('expandCells', () => {
 	describe('set strategy', () => {
 		it('should expand to specified size', () => {
 			const cells: TGridCells<string> = [
@@ -10,7 +10,7 @@ describe('expandGrid', () => {
 				['B', 'B']
 			];
 
-			expandGrid(cells, { strategy: 'Set', rows: 3, cols: 4 });
+			expandCells(cells, { strategy: 'Set', rows: 3, cols: 4 });
 
 			expect(cells).toEqual([
 				['A', 'A', null, null],
@@ -25,7 +25,7 @@ describe('expandGrid', () => {
 				['B', 'B', 'B']
 			];
 
-			expandGrid(cells, { strategy: 'Set', rows: 1, cols: 2 });
+			expandCells(cells, { strategy: 'Set', rows: 1, cols: 2 });
 
 			expect(cells).toEqual([
 				['A', 'A', 'A'],
@@ -41,7 +41,7 @@ describe('expandGrid', () => {
 				['B', 'B']
 			];
 
-			expandGrid(cells, { strategy: 'Add', rows: 1, cols: 2 });
+			expandCells(cells, { strategy: 'Add', rows: 1, cols: 2 });
 
 			expect(cells).toEqual([
 				['A', 'A', null, null],
@@ -56,7 +56,7 @@ describe('expandGrid', () => {
 				['B', 'B']
 			];
 
-			expandGrid(cells, { strategy: 'Add', rows: 0, cols: 0 });
+			expandCells(cells, { strategy: 'Add', rows: 0, cols: 0 });
 
 			expect(cells).toEqual([
 				['A', 'A'],

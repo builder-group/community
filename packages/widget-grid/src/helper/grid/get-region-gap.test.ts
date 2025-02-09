@@ -33,6 +33,23 @@ describe('getRegionGap', () => {
 		expect(getRegionGap(regionB, regionA)).toBe(0);
 	});
 
+	it('should return 0 for adjacent regions with different sizes', () => {
+		// A
+		// A
+		// B
+		const regionA: TGridRegion = {
+			start: { row: 0, col: 0 },
+			dimension: { rows: 2, cols: 1 }
+		};
+		const regionB: TGridRegion = {
+			start: { row: 0, col: 1 },
+			dimension: { rows: 2, cols: 1 }
+		};
+
+		expect(getRegionGap(regionA, regionB)).toBe(0);
+		expect(getRegionGap(regionB, regionA)).toBe(0);
+	});
+
 	it('should return correct distance for non-adjacent diagonal regions', () => {
 		// A 1 2 3
 		// 1 - - 4

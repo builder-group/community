@@ -1,4 +1,4 @@
-import { expandGrid } from './expand-grid';
+import { expandCells } from './expand-cells';
 import { fillRegion } from './fill-region';
 import { getBoundingRegion } from './get-bounding-region';
 import { TGridCellId, TGridCells, TGridRegionWithId } from './types';
@@ -19,7 +19,7 @@ export function getCells<GGridCellId extends TGridCellId>(
 	const cells: TGridCells<GGridCellId> = [];
 
 	// Initialize grid with minimum size
-	expandGrid(cells, {
+	expandCells(cells, {
 		strategy: 'Set',
 		rows: boundingRegion.dimension.rows,
 		cols: boundingRegion.dimension.cols

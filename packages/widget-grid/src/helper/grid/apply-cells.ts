@@ -1,4 +1,4 @@
-import { expandGrid } from './expand-grid';
+import { expandCells } from './expand-cells';
 import { getGridSize } from './get-grid-size';
 import { TGridCellId, TGridCells, TGridPosition } from './types';
 
@@ -24,7 +24,7 @@ export function applyCells<GGridCellId extends TGridCellId>(
 
 	// Expand if needed
 	if (requiredRows > sourceSize.rows || requiredCols > sourceSize.cols) {
-		expandGrid(source, {
+		expandCells(source, {
 			strategy: 'Set',
 			rows: requiredRows,
 			cols: requiredCols

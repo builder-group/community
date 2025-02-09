@@ -1,6 +1,6 @@
 import { canRegionBeMovedToPos, TCanRegionBeMovedToPosOptions } from './can-region-be-moved-to-pos';
 import { clearRegion } from './clear-region';
-import { expandGrid } from './expand-grid';
+import { expandCells } from './expand-cells';
 import { fillRegion } from './fill-region';
 import { getCell } from './get-cell';
 import { isRegionOutOfBounds } from './is-region-out-of-bounds';
@@ -41,7 +41,7 @@ export function overrideMove<GGridCellId extends TGridCellId>(
 			directionsToCheck: { north: false, east: true, south: true, west: false }
 		})
 	) {
-		expandGrid(cells, {
+		expandCells(cells, {
 			strategy: 'Set',
 			rows: targetPosition.row + sourceRegion.dimension.rows,
 			cols: targetPosition.col + sourceRegion.dimension.cols
