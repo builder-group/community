@@ -190,12 +190,6 @@ function findBestSwapMove<GGridCellId extends TGridCellId>(
 	const possibleMoves: TSwapMove<GGridCellId>[] = [];
 
 	for (const [index, region] of boundingRegions.entries()) {
-		// Skip if there is no free space between the freed region and the bounding region
-		// const regionBetweenRegion = getRegionBetweenRegions(freedRegion, region);
-		// if (regionBetweenRegion != null && !isRegionEmpty(cells, regionBetweenRegion)) {
-		// 	continue;
-		// }
-
 		// Check all possible positions within freed region
 		iterateRegion(freedRegion, (freedPos) => {
 			// Try each cell of the region as an anchor point
