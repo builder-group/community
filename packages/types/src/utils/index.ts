@@ -41,3 +41,6 @@ export type TIsAny<T> = boolean extends (T extends never ? true : false) ? true 
 
 // https://stackoverflow.com/questions/51808160/keyof-inferring-string-number-when-key-is-only-a-string
 export type TExtractString<T> = Extract<T, string>;
+
+// https://stackoverflow.com/questions/43159887/make-a-single-property-optional-in-typescript
+export type TOptional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
