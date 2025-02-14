@@ -7,6 +7,7 @@
 		"dev": "vite"
 	},
 	"dependencies": {
+		"@blgc/utils": "workspace:*",
 		"feature-react": "workspace:*",
 		"feature-state": "workspace:*",
 		"react": "^19.0.0",

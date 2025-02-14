@@ -6,6 +6,7 @@ export * from './BitwiseFlag';
 export * from './calculate-bytes';
 export * from './ContinuousId';
 export * from './deep-copy';
+export * from './deep-equal';
 export * from './deep-replace-var';
 export * from './define-config';
 export * from './deg-to-rad';

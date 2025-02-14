@@ -133,6 +133,9 @@ importers:
 
   examples/feature-state/react/counter:
     dependencies:
+      '@blgc/utils':
+        specifier: workspace:*
+        version: link:../../../../packages/utils
       feature-react:
         specifier: workspace:*
         version: link:../../../../packages/feature-react

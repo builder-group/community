@@ -1,4 +1,5 @@
-import { useFeatureState, useSelector } from 'feature-react/state';
+import { deepEqual } from '@blgc/utils';
+import { useCombinedCompute, useCompute, useFeatureState, useSelector } from 'feature-react/state';
 import React from 'react';
 import { $counter, $persistentSettings, $userState } from './store';
 import { useRenderCount } from './use-render-count';
@@ -22,6 +23,18 @@ export default function App() {
 			<section style={{ marginBottom: '20px', padding: '1rem', border: '1px solid #ccc' }}>
 				<h2>Example 3: Local Storage</h2>
 				<PersistentSettingsExample />
+			</section>
+
+			{/* Example 4: Computed state */}
+			<section style={{ marginBottom: '20px', padding: '1rem', border: '1px solid #ccc' }}>
+				<h2>Example 4: Computed State</h2>
+				<ComputedStateExample />
+			</section>
+
+			{/* Example 5: Combined Computed State */}
+			<section style={{ marginBottom: '20px', padding: '1rem', border: '1px solid #ccc' }}>
+				<h2>Example 5: Combined Computed State</h2>
+				<CombinedComputeExample />
 			</section>
 		</div>
 	);
@@ -105,6 +118,75 @@ function PersistentSettingsExample() {
 				Reset Settings
 			</button>
 			<button onClick={() => $persistentSettings.deleteFormStorage()}>Delete from Storage</button>
+			<p>Render Count: {renderCount}</p>
+		</div>
+	);
+}
+
+// Example 4: Demonstrating computed state
+function ComputedStateExample() {
+	const renderCount = useRenderCount();
+
+	// Compute doubled count value
+	const doubledCount = useCompute($counter, (count) => {
+		if (count > 5) {
+			return count * 2;
+		}
+		return 0;
+	});
+
+	return (
+		<div>
+			<p>Original Count: {$counter.get()}</p>
+			<p>Doubled Count: {doubledCount}</p>
+			<button onClick={() => $counter.set((c) => c + 1)}>Increment Original</button>
+			<p>Render Count: {renderCount}</p>
+		</div>
+	);
+}
+
+// Example 5: Demonstrating combined computed state
+function CombinedComputeExample() {
+	const renderCount = useRenderCount();
+
+	// Combine counter and user theme for a dynamic message
+	const combinedState = useCombinedCompute(
+		[$counter, $userState] as const,
+		([count, userState]) => {
+			if (count > 5) {
+				return {
+					message: `Count is ${count} and theme is ${userState.settings.theme}`,
+					isDarkWithHighCount: userState.settings.theme === 'dark'
+				};
+			}
+			return {
+				message: `Count is smaller than 5`,
+				isDarkWithHighCount: false
+			};
+		},
+		{ compare: deepEqual }
+	);
+
+	return (
+		<div>
+			<p>{combinedState.message}</p>
+			<p>Dark theme with high count: {combinedState.isDarkWithHighCount ? 'Yes' : 'No'}</p>
+			<div>
+				<button onClick={() => $counter.set((c) => c + 1)}>Increment Count</button>
+				<button
+					onClick={() =>
+						$userState.set((state) => ({
+							...state,
+							settings: {
+								...state.settings,
+								theme: state.settings.theme === 'dark' ? 'light' : 'dark'
+							}
+						}))
+					}
+				>
+					Toggle Theme
+				</button>
+			</div>
 			<p>Render Count: {renderCount}</p>
 		</div>
 	);
