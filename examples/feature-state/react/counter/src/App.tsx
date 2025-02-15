@@ -164,7 +164,7 @@ function CombinedComputeExample() {
 				isDarkWithHighCount: false
 			};
 		},
-		{ compare: deepEqual }
+		{ isEqual: deepEqual }
 	);
 
 	return (

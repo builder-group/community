@@ -97,7 +97,7 @@ export function useCombinedCompute<
 	options: TCombinedComputeOptions<GComputed> = {},
 	deps: unknown[] = []
 ): GComputed {
-	const { compare = Object.is } = options;
+	const { isEqual = Object.is } = options;
 	const [, forceRender] = React.useReducer((s) => s + 1, 0);
 
 	const currentValuesRef = React.useRef<[V1, V2, V3, V4, V5]>(
@@ -119,14 +119,10 @@ export function useCombinedCompute<
 			const newComputed = compute(currentValuesRef.current);
 
 			// Only trigger re-render if computed value changed and not in background
-			if (!background && !compare(newComputed, lastComputedRef.current)) {
-				lastComputedRef.current = newComputed;
+			if (!background && !isEqual(newComputed, lastComputedRef.current)) {
 				forceRender();
 			}
-			// Still update the ref in background, but don't trigger render
-			else if (background) {
-				lastComputedRef.current = newComputed;
-			}
+			lastComputedRef.current = newComputed;
 		};
 
 		const unbinds = (
@@ -150,5 +146,5 @@ export function useCombinedCompute<
 }
 
 interface TCombinedComputeOptions<GComputed> {
-	compare?: (a: GComputed, b: GComputed) => boolean;
+	isEqual?: (a: GComputed, b: GComputed) => boolean;
 }

@@ -8,7 +8,7 @@ export function useCompute<GValue, GFeatures extends TFeatureDefinition[], GComp
 	options: TComputeOptions<GComputed> = {},
 	deps: unknown[] = []
 ): GComputed {
-	const { compare = Object.is } = options;
+	const { isEqual = Object.is } = options;
 	const [, forceRender] = React.useReducer((s: number) => s + 1, 0);
 
 	const lastComputedRef = React.useRef<GComputed>(compute(state._v));
@@ -19,14 +19,10 @@ export function useCompute<GValue, GFeatures extends TFeatureDefinition[], GComp
 				const newComputed = compute(value);
 
 				// Only trigger re-render if computed value changed and not in background
-				if (!background && !compare(newComputed, lastComputedRef.current)) {
-					lastComputedRef.current = newComputed;
+				if (!background && !isEqual(newComputed, lastComputedRef.current)) {
 					forceRender();
 				}
-				// Still update the ref in background, but don't trigger render
-				else if (background) {
-					lastComputedRef.current = newComputed;
-				}
+				lastComputedRef.current = newComputed;
 			},
 			{ key: 'use-compute' }
 		);
@@ -40,5 +36,5 @@ export function useCompute<GValue, GFeatures extends TFeatureDefinition[], GComp
 }
 
 interface TComputeOptions<GComputed> {
-	compare?: (a: GComputed, b: GComputed) => boolean;
+	isEqual?: (a: GComputed, b: GComputed) => boolean;
 }
