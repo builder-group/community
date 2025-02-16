@@ -184,13 +184,14 @@ state.multiUndo(2);
 When passing the state object directly into the listener queue, any subsequent state changes before the queue is processed will affect the state reference in the queued listeners. This means listeners would always capture the latest state value rather than the value at the time they were queued.
 
 For example:
+
 ```ts
 const $counter = createState(0);
 
 $counter.listen((context) => {
-  // By the time this runs, state._v might be different 
-  // from when the listener was queued
-  console.log(context.state._v);
+	// By the time this runs, state._v might be different
+	// from when the listener was queued
+	console.log(context.state._v);
 });
 
 $counter.set(1); // Queues listener
@@ -198,11 +199,12 @@ $counter.set(2); // Changes state before queue processes
 ```
 
 If you want to access the state inside the listener, you can simply capture it:
+
 ```ts
 const $counter = createState(0);
 
 $counter.listen(() => {
-    $counter.set((v) => v + 1);
+	$counter.set((v) => v + 1);
 });
 ```
 

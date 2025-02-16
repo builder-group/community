@@ -81,26 +81,24 @@ export type TOperationRequestBodyMediaContent<
 
 export type TRequestBody<GPathOperation> = TOperationRequestBodyMediaContent<GPathOperation>;
 
-/** Return first 2XX response from a response object, allowing any media type  */
-export type TSuccessResponseMediaContent<
-	GResponse,
+/** Return response content/s for a specific status code/s from an operation object, allowing any media type */
+export type TOperationResponseContent<
+	GPathOperation,
+	GStatus extends keyof TOperationResponses<GPathOperation>,
 	GMediaType extends TMediaType = TMediaType
-> = TFilterKeys<TOperationContent<TFilterKeys<GResponse, TOkStatus>>, GMediaType>;
+> = TFilterKeys<
+	TOperationContent<TFilterKeys<TOperationResponses<GPathOperation>, GStatus>>,
+	GMediaType
+>;
 
-/** Return first 5XX or 4XX response from a response object, allowing any media type  */
-export type TErrorResponseMediaContent<
-	GResponse,
-	GMediaType extends TMediaType = TMediaType
-> = TFilterKeys<TOperationContent<TFilterKeys<GResponse, TErrorStatus>>, GMediaType>;
-
-/** Return first 2XX response from a operation object, allowing any media type  */
+/** Return 2XX response/s from a operation object, allowing any media type  */
 export type TOperationSuccessResponseContent<
 	GPathOperation,
 	GMediaType extends TMediaType = TMediaType
-> = TSuccessResponseMediaContent<TOperationResponses<GPathOperation>, GMediaType>;
+> = TOperationResponseContent<GPathOperation, TOkStatus, GMediaType>;
 
-/** Return first 5XX or 4XX response from a operation object, allowing any media type  */
+/** Return 5XX or 4XX response/s from a operation object, allowing any media type  */
 export type TOperationErrorResponseContent<
 	GPathOperation,
 	GMediaType extends TMediaType = TMediaType
-> = TErrorResponseMediaContent<TOperationResponses<GPathOperation>, GMediaType>;
+> = TOperationResponseContent<GPathOperation, TErrorStatus, GMediaType>;

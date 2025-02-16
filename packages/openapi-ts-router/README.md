@@ -92,7 +92,7 @@ openApiRouter.post('/pet', {
 > - Types verify your code matches the OpenAPI spec during development
 > - Validators ensure incoming requests match the spec at runtime
 
-> **Note**: Hono's TypeScript integration provides type suggestions for `c.json()` based on generically defined response types, but doesn't enforce these types at compile-time. For example, `c.json('')` won't raise a type error even if the expected type is `{someType: string}`. This is due to Hono's internal use of `TypedResponse<T>`, which infers but doesn't strictly enforce the passed generic type. [Hono Discussion](https://github.com/orgs/honojs/discussions/3331)
+> **Note**: Hono's TypeScript integration provides type suggestions for `c.json()` based on generically defined response types, but it doesn't enforce these types at compile-time. For example, `c.json('')` won't raise a type error even if the expected type is `{ someType: string }`. This is due to Hono's internal use of `TypedResponse<T>`, which infers but doesn't strictly enforce the passed generic type. [Hono Discussion](https://github.com/orgs/honojs/discussions/3331)
 
 ```ts
 import { Hono } from 'hono';
@@ -132,3 +132,55 @@ openApiRouter.post('/pet', {
 ```
 
 [Full example](https://github.com/builder-group/community/tree/develop/examples/openapi-ts-router/hono/petstore)
+
+## ❓ FAQ
+
+### **Why are error types not supported in the response type?**
+
+We intentionally **only type success responses (2xx)** while leaving error responses out. Here’s why:
+
+- **Errors should be handled via exceptions & middleware**  
+   Instead of typing every possible error response inline, we believe that handling errors globally in middleware provides **clearer, more maintainable code**.  
+   👉 Example: [Hono Example](https://github.com/builder-group/community/blob/develop/examples/openapi-ts-router/hono/petstore/src/handlers/error-handler.ts) ([Docs](https://hono.dev/docs/api/exception)) & [Express Example](https://github.com/builder-group/community/blob/develop/examples/openapi-ts-router/express/petstore/src/middlewares/error-middleware.ts) ([Docs](https://expressjs.com/en/guide/error-handling.html))
+
+- **Inline error responses require `as any`**  
+   Since `.send()` only expects success types, **explicit casting** is required to enforce an error response:
+  ```ts
+  res.status(500).send({
+  	code: '#ERR_XYZ',
+  	message: 'Error Message'
+  } satisfies TOperationResponseContent<paths['/pet/{petId}']['get'], 500> as any);
+  ```
+
+### **Why is the Status Code not inferred?**
+
+- **Express and Hono don't infer status codes for `res.send()` / `c.json()`**  
+   Since we can’t infer the value of the `res.status()` / `c.json()` method call, `res.send()` / `c.json()` is typed as a union of success response types. For example, it could be:
+
+  ```ts
+  { message: 'Success Body of 200' } | { message: 'Success Body of 201' }
+  ```
+
+- **To enforce a specific success type, use `satisfies`**  
+   Example of explicitly enforcing a **201 response type**:
+  ```ts
+  res.status(201).send({
+  	id: 123
+  } satisfies TOperationResponseContent<paths['/pet/{petId}']['get'], 201>);
+  ```
+
+### **Hono `c.json()` not typesafe?**
+
+Hono's TypeScript integration provides type suggestions for `c.json()` based on generically defined response types, but it doesn't enforce these types at compile-time. For example, `c.json('')` won't raise a type error even if the expected type is `{ someType: string }`. This is due to Hono's internal use of `TypedResponse<T>`, which infers but doesn't strictly enforce the passed generic type. [Hono Discussion](https://github.com/orgs/honojs/discussions/3331)
+
+**To enforce a specific success type, use `satisfies`**  
+Example of explicitly enforcing a **201 response type**:
+
+```ts
+c.json(
+	{
+		id: 123
+	} satisfies TOperationResponseContent<paths['/pet/{petId}']['get'], 201>,
+	201
+);
+```

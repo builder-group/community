@@ -1,4 +1,4 @@
-/** Find first match of multiple keys */
+/** Extracts the value/s of an object whose key/s match a given pattern. */
 export type TFilterKeys<GObject, GMatchers> = GObject[keyof GObject & GMatchers];
 
 export type TUnarray<T> = T extends (infer U)[] ? U : T;
