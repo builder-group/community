@@ -139,35 +139,37 @@ openApiRouter.post('/pet', {
 
 We intentionally **only type success responses (2xx)** while leaving error responses out. Here’s why:
 
-- **Errors should be handled via exceptions & middleware**  
-   Instead of typing every possible error response inline, we believe that handling errors globally in middleware provides **clearer, more maintainable code**.  
-   👉 Example: [Hono Example](https://github.com/builder-group/community/blob/develop/examples/openapi-ts-router/hono/petstore/src/handlers/error-handler.ts) ([Docs](https://hono.dev/docs/api/exception)) & [Express Example](https://github.com/builder-group/community/blob/develop/examples/openapi-ts-router/express/petstore/src/middlewares/error-middleware.ts) ([Docs](https://expressjs.com/en/guide/error-handling.html))
+**Errors should be handled via exceptions & middleware**  
+Instead of typing every possible error response inline, we believe that handling errors globally in middleware provides **clearer, more maintainable code**.  
+👉 Example: [Hono Example](https://github.com/builder-group/community/blob/develop/examples/openapi-ts-router/hono/petstore/src/handlers/error-handler.ts) ([Docs](https://hono.dev/docs/api/exception)) & [Express Example](https://github.com/builder-group/community/blob/develop/examples/openapi-ts-router/express/petstore/src/middlewares/error-middleware.ts) ([Docs](https://expressjs.com/en/guide/error-handling.html))
 
-- **Inline error responses require `as any`**  
-   Since `.send()` only expects success types, **explicit casting** is required to enforce an error response:
-  ```ts
-  res.status(500).send({
-  	code: '#ERR_XYZ',
-  	message: 'Error Message'
-  } satisfies TOperationResponseContent<paths['/pet/{petId}']['get'], 500> as any);
-  ```
+**Inline error responses require `as any`**  
+Since `.send()` only expects success types, **explicit casting** is required to enforce an error response:
+
+```ts
+res.status(500).send({
+	code: '#ERR_XYZ',
+	message: 'Error Message'
+} satisfies TOperationResponseContent<paths['/pet/{petId}']['get'], 500> as any);
+```
 
 ### **Why is the Status Code not inferred?**
 
-- **Express and Hono don't infer status codes for `res.send()` / `c.json()`**  
-   Since we can’t infer the value of the `res.status()` / `c.json()` method call, `res.send()` / `c.json()` is typed as a union of success response types. For example, it could be:
+**Express and Hono don't infer status codes for `res.send()` / `c.json()`**  
+Since we can’t infer the value of the `res.status()` / `c.json()` method call, `res.send()` / `c.json()` is typed as a union of success response types. For example, it could be:
 
-  ```ts
-  { message: 'Success Body of 200' } | { message: 'Success Body of 201' }
-  ```
+```ts
+{ message: 'Success Body of 200' } | { message: 'Success Body of 201' }
+```
 
-- **To enforce a specific success type, use `satisfies`**  
-   Example of explicitly enforcing a **201 response type**:
-  ```ts
-  res.status(201).send({
-  	id: 123
-  } satisfies TOperationResponseContent<paths['/pet/{petId}']['get'], 201>);
-  ```
+**To enforce a specific success type, use `satisfies`**  
+Example of explicitly enforcing a **201 response type**:
+
+```ts
+res.status(201).send({
+	id: 123
+} satisfies TOperationResponseContent<paths['/pet/{petId}']['get'], 201>);
+```
 
 ### **Hono `c.json()` not typesafe?**
 
