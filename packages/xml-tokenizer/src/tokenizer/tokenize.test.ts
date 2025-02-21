@@ -2342,6 +2342,164 @@ describe('tokenize function', () => {
 			]);
 		});
 	});
+
+	describe('allowRawTextElements', () => {
+		it('raw_text_01', () => {
+			assertTokens(
+				'<script>const x = a < b;</script>',
+				[
+					{
+						type: 'ElementStart',
+						prefix: '',
+						local: 'script',
+						start: 0
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Open' },
+						range: { start: 7, end: 8 }
+					},
+					{
+						type: 'Text',
+						text: 'const x = a < b;',
+						range: { start: 8, end: 24 }
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Close', prefix: '', local: 'script' },
+						range: { start: 24, end: 33 }
+					}
+				],
+				{ rawTextElements: ['script'] }
+			);
+		});
+
+		it('raw_text_02', () => {
+			assertTokens(
+				'<script><not-an-element>text</not-an-element></script>',
+				[
+					{ type: 'ElementStart', prefix: '', local: 'script', start: 0 },
+					{
+						type: 'ElementEnd',
+						end: { type: 'Open' },
+						range: { start: 7, end: 8 }
+					},
+					{
+						type: 'Text',
+						text: '<not-an-element>text</not-an-element>',
+						range: { start: 8, end: 45 }
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Close', prefix: '', local: 'script' },
+						range: { start: 45, end: 54 }
+					}
+				],
+				{ rawTextElements: ['script'] }
+			);
+		});
+
+		it('raw_text_03', () => {
+			assertTokens(
+				'<style>a > b { color: blue; }</style>',
+				[
+					{ type: 'ElementStart', prefix: '', local: 'style', start: 0 },
+					{
+						type: 'ElementEnd',
+						end: { type: 'Open' },
+						range: { start: 6, end: 7 }
+					},
+					{
+						type: 'Text',
+						text: 'a > b { color: blue; }',
+						range: { start: 7, end: 29 }
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Close', prefix: '', local: 'style' },
+						range: { start: 29, end: 37 }
+					}
+				],
+
+				{ rawTextElements: ['style'] }
+			);
+		});
+
+		it('raw_text_04', () => {
+			assertTokens(
+				'<script>if (a && b) { return <div>text</div>; }</script>',
+				[
+					{ type: 'ElementStart', prefix: '', local: 'script', start: 0 },
+					{
+						type: 'ElementEnd',
+						end: { type: 'Open' },
+						range: { start: 7, end: 8 }
+					},
+					{
+						type: 'Text',
+						text: 'if (a && b) { return <div>text</div>; }',
+						range: { start: 8, end: 47 }
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Close', prefix: '', local: 'script' },
+						range: { start: 47, end: 56 }
+					}
+				],
+				{ rawTextElements: ['script'] }
+			);
+		});
+
+		it('raw_text_05', () => {
+			assertTokens(
+				'<script><!-- not a comment --></script>',
+				[
+					{ type: 'ElementStart', prefix: '', local: 'script', start: 0 },
+					{
+						type: 'ElementEnd',
+						end: { type: 'Open' },
+						range: { start: 7, end: 8 }
+					},
+					{
+						type: 'Text',
+						text: '<!-- not a comment -->',
+						range: { start: 8, end: 30 }
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Close', prefix: '', local: 'script' },
+						range: { start: 30, end: 39 }
+					}
+				],
+				{ rawTextElements: ['script'] }
+			);
+		});
+
+		it('raw_text_06', () => {
+			assertTokens(
+				'<custom-raw>< not < an > element ></custom-raw>',
+				[
+					{ type: 'ElementStart', prefix: '', local: 'custom-raw', start: 0 },
+					{
+						type: 'ElementEnd',
+						end: { type: 'Open' },
+						range: { start: 11, end: 12 }
+					},
+					{
+						type: 'Text',
+						text: '< not < an > element >',
+						range: { start: 12, end: 34 }
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Close', prefix: '', local: 'custom-raw' },
+						range: { start: 34, end: 47 }
+					}
+				],
+				{ rawTextElements: ['custom-raw'] }
+			);
+		});
+	});
 });
 
 type TToken = TXmlToken | TErrorToken;

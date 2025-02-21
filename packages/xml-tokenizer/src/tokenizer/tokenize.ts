@@ -1,3 +1,4 @@
+import { getQName } from '../get-q-name';
 import {
 	CLOSE_SQUARE_BRACKET,
 	DOUBLE_QUOTE,
@@ -67,7 +68,7 @@ export function tokenizeXmlStream(s: XmlStream, tokenCallback: TTokenCallback): 
 	parseMisc(s, tokenCallback);
 
 	s.skipSpaces();
-	if (s.startsWith(DOCTYPE_START)) {
+	if (s.startsWith(DOCTYPE_START) || s.startsWith(DOCTYPE_START.toLowerCase())) {
 		if (!s.config.allowDtd) {
 			throw new XmlError({ type: 'DtdDetected' });
 		}
@@ -463,6 +464,13 @@ function parseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 	}
 
 	if (open) {
+		if (s.config.rawTextElements != null) {
+			const qName = getQName(local, prefix);
+			if (s.config.rawTextElements.includes(qName)) {
+				parseContent(s, tokenCallback, `</${qName}>`);
+				return;
+			}
+		}
 		parseContent(s, tokenCallback);
 	}
 }
@@ -507,10 +515,17 @@ function parseAttribute(s: XmlStream): [string, string, string] {
  *
  * https://www.w3.org/TR/xml/#NT-content
  */
-function parseContent(s: XmlStream, tokenCallback: TTokenCallback): void {
+function parseContent(
+	s: XmlStream,
+	tokenCallback: TTokenCallback,
+	parseContentUntil: string | number = LESS_THAN
+): void {
 	while (!s.atEnd()) {
-		const currCodeUnit = s.currCodeUnit();
-		if (currCodeUnit === LESS_THAN) {
+		if (
+			typeof parseContentUntil === 'number'
+				? s.currCodeUnit() === parseContentUntil
+				: s.startsWith(parseContentUntil)
+		) {
 			const nextCodeUnit = s.nextCodeUnit();
 			if (nextCodeUnit === EXCLAMATION_MARK) {
 				if (s.startsWith(COMMENT_START)) {
@@ -532,7 +547,7 @@ function parseContent(s: XmlStream, tokenCallback: TTokenCallback): void {
 				parseElement(s, tokenCallback);
 			}
 		} else {
-			parseText(s, tokenCallback);
+			parseText(s, tokenCallback, parseContentUntil);
 		}
 	}
 }
@@ -580,9 +595,16 @@ function parseCloseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 /**
  * Parses text content.
  */
-function parseText(s: XmlStream, tokenCallback: TTokenCallback): void {
+function parseText(
+	s: XmlStream,
+	tokenCallback: TTokenCallback,
+	parseTextUntil: string | number = LESS_THAN
+): void {
 	const start = s.getPos();
-	const text = s.consumeCodeUnitsWhile((c) => c !== LESS_THAN);
+	const text =
+		typeof parseTextUntil === 'number'
+			? s.consumeCodeUnitsWhile((c) => c !== parseTextUntil)
+			: s.consumeCodeUnitsWhile((_, _s) => !_s.startsWith(parseTextUntil));
 
 	// According to the spec, `]]>` must not appear inside a Text node.
 	// https://www.w3.org/TR/xml/#syntax

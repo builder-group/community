@@ -37,7 +37,8 @@ export class XmlStream {
 			pos = 0,
 			strictDocument = true,
 			allowDtd = true,
-			allowBooleanAttributes = false
+			allowBooleanAttributes = false,
+			rawTextElements = null
 		} = options;
 		this._text = text;
 		this._pos = pos;
@@ -45,7 +46,8 @@ export class XmlStream {
 		this.config = {
 			strictDocument,
 			allowDtd,
-			allowBooleanAttributes
+			allowBooleanAttributes,
+			rawTextElements
 		};
 	}
 
@@ -526,6 +528,14 @@ export interface TXmlStreamConfig {
 	 * @default true
 	 */
 	strictDocument: boolean;
+
+	/**
+	 * List of element names that should be treated as raw text elements.
+	 * Their content will be parsed as text rather than XML.
+	 * Common examples are 'script' and 'style' for HTML-like documents.
+	 * @default null
+	 */
+	rawTextElements: string[] | null;
 
 	/**
 	 * Whether to allow HTML-style boolean attributes (e.g., <div hidden>).
