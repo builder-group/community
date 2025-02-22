@@ -4,13 +4,32 @@ import * as camaro from 'camaro';
 import { beforeAll, expect, it } from 'vitest';
 import { select } from '../selector';
 import { tokenToXml } from '../token-to-xml';
+import { xmlToSimplifiedObject } from '../xml-to-simplified-object';
 
 describe('playground', () => {
 	it('should pass', () => {
 		expect(true).toBe(true);
 	});
 
-	describe.skip('should work', () => {
+	describe.skip('HTML should work', () => {
+		let html = '';
+
+		beforeAll(async () => {
+			html = await readFile(`${__dirname}/resources/google.html`, 'utf-8');
+		});
+
+		it('[xml-tokenizer] shoud work', async () => {
+			const result = await xmlToSimplifiedObject(html, {
+				allowDtd: true,
+				rawTextElements: ['script', 'style'],
+				strictDocument: false
+			});
+
+			console.log(result);
+		});
+	});
+
+	describe.skip('XML should work', () => {
 		let xml = '';
 
 		beforeAll(async () => {

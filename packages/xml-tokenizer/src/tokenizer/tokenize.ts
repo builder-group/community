@@ -16,6 +16,7 @@ import {
 	UPPERCASE_S
 } from './ascii-constants';
 import { type TTokenCallback } from './types';
+import { isXmlSpaceByte } from './utils';
 import { XmlError } from './XmlError';
 import { XmlStream, type TXmlStreamOptions } from './XmlStream';
 
@@ -492,10 +493,27 @@ function parseAttribute(s: XmlStream): [string, string, string] {
 	s.skipSpaces();
 	if (s.tryConsumeCodeUnit(EQUALS)) {
 		s.skipSpaces();
-		const quote = s.consumeQuote();
-		value = s.consumeCodeUnitsWhile((c) => c !== quote && c !== LESS_THAN);
-		s.consumeCodeUnit(quote);
-	} else if (s.config.allowBooleanAttributes) {
+		const currCodeUnit = s.currCodeUnit();
+
+		if (currCodeUnit === SINGLE_QUOTE || currCodeUnit === DOUBLE_QUOTE) {
+			const quote = s.consumeQuote();
+			value = s.consumeCodeUnitsWhile((c) => c !== quote && c !== LESS_THAN);
+			s.consumeCodeUnit(quote);
+		}
+		// In non-strict mode, consume until whitespace or closing tag
+		else if (!s.config.strictDocument) {
+			value = s.consumeCodeUnitsWhile(
+				(c) => !isXmlSpaceByte(c) && c !== GREATER_THAN && c !== SLASH && c !== LESS_THAN
+			);
+		} else {
+			throw new XmlError(
+				{ type: 'InvalidChar', expected: 'a quote', actual: currCodeUnit },
+				s.genTextPos()
+			);
+		}
+	}
+	// In strict mode, if there's no Eq (equal sign), the value is interpreted as "true"
+	else if (!s.config.strictDocument) {
 		s.goTo(start);
 		value = 'true';
 	} else {

@@ -1669,101 +1669,6 @@ describe('tokenize function', () => {
 			]);
 		});
 
-		it('[allowBooleanAttributes] attribute_08', () => {
-			assertTokens(
-				'<c a>',
-				[
-					{
-						type: 'ElementStart',
-						prefix: '',
-						local: 'c',
-						start: 0
-					},
-					{
-						type: 'Attribute',
-						prefix: '',
-						local: 'a',
-						value: 'true',
-						range: { start: 3, end: 4 }
-					},
-					{
-						type: 'ElementEnd',
-						end: { type: 'Open' },
-						range: { start: 4, end: 5 }
-					}
-				],
-				{ allowBooleanAttributes: true }
-			);
-		});
-
-		it('[allowBooleanAttributes] attribute_09', () => {
-			assertTokens(
-				'<c a/>',
-				[
-					{
-						type: 'ElementStart',
-						prefix: '',
-						local: 'c',
-						start: 0
-					},
-					{
-						type: 'Attribute',
-						prefix: '',
-						local: 'a',
-						value: 'true',
-						range: { start: 3, end: 4 }
-					},
-					{
-						type: 'ElementEnd',
-						end: { type: 'Empty' },
-						range: { start: 4, end: 6 }
-					}
-				],
-				{ allowBooleanAttributes: true }
-			);
-		});
-
-		it('[allowBooleanAttributes] attribute_10', () => {
-			assertTokens(
-				"<c a='b' q b:x />",
-				[
-					{
-						type: 'ElementStart',
-						prefix: '',
-						local: 'c',
-						start: 0
-					},
-					{
-						type: 'Attribute',
-						prefix: '',
-						local: 'a',
-						value: 'b',
-						range: { start: 3, end: 8 }
-					},
-					{
-						type: 'Attribute',
-						prefix: '',
-						local: 'q',
-						value: 'true',
-						range: { start: 9, end: 10 }
-					},
-					{
-						type: 'Attribute',
-						prefix: 'b',
-						local: 'x',
-						value: 'true',
-						range: { start: 11, end: 14 }
-					},
-					{
-						type: 'ElementEnd',
-						end: { type: 'Empty' },
-						range: { start: 15, end: 17 }
-					}
-				],
-				{ allowBooleanAttributes: true }
-			);
-		});
-
 		it('attribute_err_01', () => {
 			assertTokens('<c az=test>', [
 				{
@@ -2340,6 +2245,226 @@ describe('tokenize function', () => {
 					message: "a non-XML character '\\u{000C}' found at 1:4"
 				}
 			]);
+		});
+	});
+
+	describe('strictDocument', () => {
+		it('boolean_attr_01', () => {
+			assertTokens(
+				'<c a>',
+				[
+					{
+						type: 'ElementStart',
+						prefix: '',
+						local: 'c',
+						start: 0
+					},
+					{
+						type: 'Attribute',
+						prefix: '',
+						local: 'a',
+						value: 'true',
+						range: { start: 3, end: 4 }
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Open' },
+						range: { start: 4, end: 5 }
+					}
+				],
+				{ strictDocument: false }
+			);
+		});
+
+		it('boolean_attr_02', () => {
+			assertTokens(
+				'<c a/>',
+				[
+					{
+						type: 'ElementStart',
+						prefix: '',
+						local: 'c',
+						start: 0
+					},
+					{
+						type: 'Attribute',
+						prefix: '',
+						local: 'a',
+						value: 'true',
+						range: { start: 3, end: 4 }
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Empty' },
+						range: { start: 4, end: 6 }
+					}
+				],
+				{ strictDocument: false }
+			);
+		});
+
+		it('boolean_attr_03', () => {
+			assertTokens(
+				"<c a='b' q b:x />",
+				[
+					{
+						type: 'ElementStart',
+						prefix: '',
+						local: 'c',
+						start: 0
+					},
+					{
+						type: 'Attribute',
+						prefix: '',
+						local: 'a',
+						value: 'b',
+						range: { start: 3, end: 8 }
+					},
+					{
+						type: 'Attribute',
+						prefix: '',
+						local: 'q',
+						value: 'true',
+						range: { start: 9, end: 10 }
+					},
+					{
+						type: 'Attribute',
+						prefix: 'b',
+						local: 'x',
+						value: 'true',
+						range: { start: 11, end: 14 }
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Empty' },
+						range: { start: 15, end: 17 }
+					}
+				],
+				{ strictDocument: false }
+			);
+		});
+
+		it('unquoted_attr_01', () => {
+			assertTokens(
+				'<c x=a>',
+				[
+					{ type: 'ElementStart', prefix: '', local: 'c', start: 0 },
+					{
+						type: 'Attribute',
+						prefix: '',
+						local: 'x',
+						value: 'a',
+						range: { start: 3, end: 6 }
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Open' },
+						range: { start: 6, end: 7 }
+					}
+				],
+				{ strictDocument: false }
+			);
+		});
+
+		it('unquoted_attr_02', () => {
+			assertTokens(
+				'<c x=a/>',
+				[
+					{ type: 'ElementStart', prefix: '', local: 'c', start: 0 },
+					{
+						type: 'Attribute',
+						prefix: '',
+						local: 'x',
+						value: 'a',
+						range: { start: 3, end: 6 }
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Empty' },
+						range: { start: 6, end: 8 }
+					}
+				],
+				{ strictDocument: false }
+			);
+		});
+
+		it('unquoted_attr_03', () => {
+			assertTokens(
+				'<c a=x b=y-z c=w.v d=m_n>',
+				[
+					{ type: 'ElementStart', prefix: '', local: 'c', start: 0 },
+					{
+						type: 'Attribute',
+						range: { start: 3, end: 6 },
+						prefix: '',
+						local: 'a',
+						value: 'x'
+					},
+					{
+						type: 'Attribute',
+						range: { start: 7, end: 12 },
+						prefix: '',
+						local: 'b',
+						value: 'y-z'
+					},
+					{
+						type: 'Attribute',
+						range: { start: 13, end: 18 },
+						prefix: '',
+						local: 'c',
+						value: 'w.v'
+					},
+					{
+						type: 'Attribute',
+						range: { start: 19, end: 24 },
+						prefix: '',
+						local: 'd',
+						value: 'm_n'
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Open' },
+						range: { start: 24, end: 25 }
+					}
+				],
+				{ strictDocument: false }
+			);
+		});
+
+		it('boolean_attr_04', () => {
+			assertTokens(
+				"<c a='b' q=b b:x=b />",
+				[
+					{ type: 'ElementStart', prefix: '', local: 'c', start: 0 },
+					{
+						type: 'Attribute',
+						range: { start: 3, end: 8 },
+						prefix: '',
+						local: 'a',
+						value: 'b'
+					},
+					{
+						type: 'Attribute',
+						range: { start: 9, end: 12 },
+						prefix: '',
+						local: 'q',
+						value: 'b'
+					},
+					{
+						type: 'Attribute',
+						range: { start: 13, end: 18 },
+						prefix: 'b',
+						local: 'x',
+						value: 'b'
+					},
+					{
+						type: 'ElementEnd',
+						end: { type: 'Empty' },
+						range: { start: 19, end: 21 }
+					}
+				],
+				{ strictDocument: false }
+			);
 		});
 	});
 
