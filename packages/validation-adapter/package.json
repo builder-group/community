@@ -1,6 +1,6 @@
 {
 	"name": "validation-adapter",
-	"version": "0.0.16",
+	"version": "0.0.18",
 	"private": false,
 	"description": "Universal validation adapter that integrates various validation libraries like Zod, Valibot, and Yup",
 	"keywords": [],
@@ -39,7 +39,7 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.10.2"
+		"@types/node": "^22.13.5"
 	},
 	"size-limit": [
 		{

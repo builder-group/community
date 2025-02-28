@@ -279,14 +279,14 @@ importers:
   packages/cli:
     dependencies:
       '@oclif/core':
-        specifier: ^4.2.0
+        specifier: ^4.2.8
         version: 4.2.8
       '@rollup/plugin-commonjs':
         specifier: ^28.0.2
         version: 28.0.2(rollup@4.34.8)
       '@rollup/plugin-html':
-        specifier: ^1.1.0
-        version: 1.1.0(rollup@4.34.8)
+        specifier: ^2.0.0
+        version: 2.0.0(rollup@4.34.8)
       '@rollup/plugin-json':
         specifier: ^6.1.0
         version: 6.1.0(rollup@4.34.8)
@@ -315,16 +315,16 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       rollup:
-        specifier: ^4.29.1
+        specifier: ^4.34.8
         version: 4.34.8
       rollup-plugin-bundle-size:
         specifier: ^1.0.3
         version: 1.0.3
       rollup-plugin-esbuild:
-        specifier: ^6.1.1
-        version: 6.2.0(esbuild@0.25.0)(rollup@4.34.8)
+        specifier: ^6.2.1
+        version: 6.2.1(esbuild@0.25.0)(rollup@4.34.8)
       rollup-plugin-license:
-        specifier: ^3.5.3
+        specifier: ^3.6.0
         version: 3.6.0(picomatch@4.0.2)(rollup@4.34.8)
       rollup-plugin-node-externals:
         specifier: ^5.1.3
@@ -340,13 +340,13 @@ importers:
         specifier: ^1.7.0
         version: 1.7.0
       '@types/lodash':
-        specifier: ^4.17.13
+        specifier: ^4.17.15
         version: 4.17.15
       '@types/node':
-        specifier: ^22.10.2
+        specifier: ^22.13.5
         version: 22.13.5
       type-fest:
-        specifier: ^4.30.2
+        specifier: ^4.35.0
         version: 4.35.0
 
   packages/config:
@@ -355,8 +355,8 @@ importers:
         specifier: ^4.4.1
         version: 4.4.1(prettier@3.5.2)
       '@next/eslint-plugin-next':
-        specifier: ^15.1.7
-        version: 15.1.7
+        specifier: ^15.2.0
+        version: 15.2.0
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.25.0
         version: 8.25.0(@typescript-eslint/parser@8.25.0(eslint@9.21.0(jiti@2.4.2))(typescript@5.7.3))(eslint@9.21.0(jiti@2.4.2))(typescript@5.7.3)
@@ -364,8 +364,8 @@ importers:
         specifier: ^8.25.0
         version: 8.25.0(eslint@9.21.0(jiti@2.4.2))(typescript@5.7.3)
       eslint-config-prettier:
-        specifier: ^10.0.1
-        version: 10.0.1(eslint@9.21.0(jiti@2.4.2))
+        specifier: ^10.0.2
+        version: 10.0.2(eslint@9.21.0(jiti@2.4.2))
       eslint-plugin-only-warn:
         specifier: ^1.1.0
         version: 1.1.0
@@ -423,13 +423,13 @@ importers:
         specifier: workspace:*
         version: link:../config
       '@types/node':
-        specifier: ^22.10.2
+        specifier: ^22.13.5
         version: 22.13.5
       dotenv:
         specifier: ^16.4.7
         version: 16.4.7
       openapi-typescript:
-        specifier: ^7.4.4
+        specifier: ^7.6.1
         version: 7.6.1(typescript@5.7.3)
 
   packages/eprel-client:
@@ -448,19 +448,19 @@ importers:
         specifier: workspace:*
         version: link:../config
       '@types/node':
-        specifier: ^22.10.2
+        specifier: ^22.13.5
         version: 22.13.5
       dotenv:
         specifier: ^16.4.7
         version: 16.4.7
       openapi-typescript:
-        specifier: ^7.4.4
+        specifier: ^7.6.1
         version: 7.6.1(typescript@5.7.3)
 
   packages/feature-fetch:
     dependencies:
       '@0no-co/graphql.web':
-        specifier: ^1.0.12
+        specifier: ^1.1.1
         version: 1.1.1(graphql@16.10.0)
       '@blgc/types':
         specifier: workspace:*
@@ -473,13 +473,13 @@ importers:
         specifier: workspace:*
         version: link:../config
       '@types/node':
-        specifier: ^22.10.2
+        specifier: ^22.13.5
         version: 22.13.5
       '@types/url-parse':
         specifier: ^1.4.11
         version: 1.4.11
       msw:
-        specifier: ^2.7.0
+        specifier: ^2.7.3
         version: 2.7.3(@types/node@22.13.5)(typescript@5.7.3)
 
   packages/feature-form:
@@ -501,7 +501,7 @@ importers:
         specifier: workspace:*
         version: link:../config
       '@types/node':
-        specifier: ^22.10.2
+        specifier: ^22.13.5
         version: 22.13.5
 
   packages/feature-logger:
@@ -517,7 +517,7 @@ importers:
         specifier: workspace:*
         version: link:../config
       '@types/node':
-        specifier: ^22.10.2
+        specifier: ^22.13.5
         version: 22.13.5
 
   packages/feature-react:
@@ -533,10 +533,10 @@ importers:
         specifier: workspace:*
         version: link:../config
       '@types/node':
-        specifier: ^22.10.2
+        specifier: ^22.13.5
         version: 22.13.5
       '@types/react':
-        specifier: ^19.0.2
+        specifier: ^19.0.10
         version: 19.0.10
       feature-form:
         specifier: workspace:*
@@ -556,15 +556,12 @@ importers:
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
-      flatqueue:
-        specifier: ^2.0.3
-        version: 2.0.3
     devDependencies:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
       '@types/node':
-        specifier: ^22.10.2
+        specifier: ^22.13.5
         version: 22.13.5
 
   packages/figma-connect:
@@ -577,10 +574,10 @@ importers:
         specifier: workspace:*
         version: link:../config
       '@figma/plugin-typings':
-        specifier: ^1.106.0
+        specifier: ^1.108.0
         version: 1.108.0
       '@types/node':
-        specifier: ^22.10.2
+        specifier: ^22.13.5
         version: 22.13.5
 
   packages/google-webfonts-client:
@@ -599,13 +596,13 @@ importers:
         specifier: workspace:*
         version: link:../config
       '@types/node':
-        specifier: ^22.10.2
+        specifier: ^22.13.5
         version: 22.13.5
       dotenv:
         specifier: ^16.4.7
         version: 16.4.7
       openapi-typescript:
-        specifier: ^7.4.4
+        specifier: ^7.6.1
         version: 7.6.1(typescript@5.7.3)
 
   packages/openapi-ts-router:
@@ -624,20 +621,20 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0
       '@types/express-serve-static-core':
-        specifier: ^5.0.5
+        specifier: ^5.0.6
         version: 5.0.6
       '@types/node':
-        specifier: ^22.10.7
+        specifier: ^22.13.5
         version: 22.13.5
       express:
         specifier: ^4.21.2
         version: 4.21.2
       hono:
-        specifier: ^4.6.16
+        specifier: ^4.7.2
         version: 4.7.2
       valibot:
-        specifier: 1.0.0-beta.12
-        version: 1.0.0-beta.12(typescript@5.7.3)
+        specifier: 1.0.0-rc.2
+        version: 1.0.0-rc.2(typescript@5.7.3)
       validation-adapters:
         specifier: workspace:*
         version: link:../validation-adapters
@@ -654,7 +651,7 @@ importers:
         specifier: workspace:*
         version: link:../config
       '@types/node':
-        specifier: ^22.10.2
+        specifier: ^22.13.5
         version: 22.13.5
 
   packages/validatenv:
@@ -670,7 +667,7 @@ importers:
         specifier: workspace:*
         version: link:../config
       '@types/node':
-        specifier: ^22.10.2
+        specifier: ^22.13.5
         version: 22.13.5
 
   packages/validation-adapter:
@@ -683,7 +680,7 @@ importers:
         specifier: workspace:*
         version: link:../config
       '@types/node':
-        specifier: ^22.10.2
+        specifier: ^22.13.5
         version: 22.13.5
 
   packages/validation-adapters:
@@ -696,16 +693,16 @@ importers:
         specifier: workspace:*
         version: link:../config
       '@types/node':
-        specifier: ^22.10.2
+        specifier: ^22.13.5
         version: 22.13.5
       valibot:
-        specifier: 1.0.0-beta.9
-        version: 1.0.0-beta.9(typescript@5.7.3)
+        specifier: 1.0.0-rc.2
+        version: 1.0.0-rc.2(typescript@5.7.3)
       yup:
         specifier: ^1.6.1
         version: 1.6.1
       zod:
-        specifier: ^3.24.1
+        specifier: ^3.24.2
         version: 3.24.2
 
   packages/xml-tokenizer:
@@ -714,7 +711,7 @@ importers:
         specifier: workspace:*
         version: link:../config
       '@types/node':
-        specifier: ^22.10.2
+        specifier: ^22.13.5
         version: 22.13.5
       '@types/sax':
         specifier: ^1.2.7
@@ -726,8 +723,8 @@ importers:
         specifier: ^6.2.3
         version: 6.2.3
       fast-xml-parser:
-        specifier: ^4.5.1
-        version: 4.5.3
+        specifier: ^5.0.8
+        version: 5.0.8
       sax:
         specifier: ^1.4.1
         version: 1.4.1
@@ -1336,8 +1333,8 @@ packages:
     resolution: {integrity: sha512-AAwRb5vXFcY4L+FvZ7LZusDuZ0vEe0Zm8ohn1FM6/X7A3bj4mqmkAcGRWuvC2JwSygNwHAAmMnAI73vPHeqsHA==}
     engines: {node: '>=18'}
 
-  '@next/eslint-plugin-next@15.1.7':
-    resolution: {integrity: sha512-kRP7RjSxfTO13NE317ek3mSGzoZlI33nc/i5hs1KaWpK+egs85xg0DJ4p32QEiHnR0mVjuUfhRIun7awqfL7pQ==}
+  '@next/eslint-plugin-next@15.2.0':
+    resolution: {integrity: sha512-jHFUG2OwmAuOASqq253RAEG/5BYcPHn27p1NoWZDCf4OdvdK0yRYWX92YKkL+Mk2s+GyJrmd/GATlL5b2IySpw==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -1387,8 +1384,8 @@ packages:
       rollup:
         optional: true
 
-  '@rollup/plugin-html@1.1.0':
-    resolution: {integrity: sha512-MTJDgMp83fB0kFRU95wAUqboUTcl1O1oXg7KLZNjNXfgPKTV0crek1k2vBUgM6Nmuvl/koqea7OrnUzzQdWT7w==}
+  '@rollup/plugin-html@2.0.0':
+    resolution: {integrity: sha512-6S0ezKfDRw5FvHk3xm1T/eXP9IlLf82zmV+z2V1/yQL5hXwIUL/Gl2RrNMMIe2rt85rk6+0smvSAtjfTLGylDQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
@@ -2350,8 +2347,8 @@ packages:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
 
-  eslint-config-prettier@10.0.1:
-    resolution: {integrity: sha512-lZBts941cyJyeaooiKxAtzoPHTN+GbQTJFAIdQbRhA4/8whaAraEh47Whw/ZFfrjNSnlAxqfm9i0XVAEkULjCw==}
+  eslint-config-prettier@10.0.2:
+    resolution: {integrity: sha512-1105/17ZIMjmCOJOPNfVdbXafLCLj3hPmkmB7dLgt7XsQ/zkxSuDerE/xgO3RxoHysR1N1whmquY0lSn2O0VLg==}
     hasBin: true
     peerDependencies:
       eslint: '>=7.0.0'
@@ -2489,6 +2486,10 @@ packages:
     resolution: {integrity: sha512-RKihhV+SHsIUGXObeVy9AXiBbFwkVk7Syp8XgwN5U3JV416+Gwp/GO9i0JYKmikykgz/UHRrrV4ROuZEo/T0ig==}
     hasBin: true
 
+  fast-xml-parser@5.0.8:
+    resolution: {integrity: sha512-qY8NiI5L8ff00F2giyICiJxSSKHO52tC36LJqx2JtvGyAd5ZfehC/l4iUVVHpmpIa6sM9N5mneSLHQG2INGoHA==}
+    hasBin: true
+
   fastq@1.19.0:
     resolution: {integrity: sha512-7SFSRCNjBQIZH/xZR3iy5iQYR8aGBE0h3VG6/cwlbrpdciNYBMotQav8c1XI3HjHH+NikUpP53nPdlZSdWmFzA==}
 
@@ -2539,10 +2540,6 @@ packages:
   flat-cache@4.0.1:
     resolution: {integrity: sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw==}
     engines: {node: '>=16'}
-
-  flatqueue@2.0.3:
-    resolution: {integrity: sha512-RZCWZNkmxzUOh8jqEcEGZCycb3B8KAfpPwg3H//cURasunYxsg1eIvE+QDSjX+ZPHTIVfINfK1aLTrVKKO0i4g==}
-    engines: {node: '>= 12.17.0'}
 
   flatted@3.3.3:
     resolution: {integrity: sha512-GX+ysw4PBCz0PzosHDepZGANEuFCMLrnRTiEy9McGjmkCQYwRq4A/X786G/fjM/+OjsWSU1ZrY5qyARZmO/uwg==}
@@ -3896,8 +3893,8 @@ packages:
   rollup-plugin-bundle-size@1.0.3:
     resolution: {integrity: sha512-aWj0Pvzq90fqbI5vN1IvUrlf4utOqy+AERYxwWjegH1G8PzheMnrRIgQ5tkwKVtQMDP0bHZEACW/zLDF+XgfXQ==}
 
-  rollup-plugin-esbuild@6.2.0:
-    resolution: {integrity: sha512-LbkHaCahA6ceyWzAd6md2yajNS+HfZmZ5o58ShkZp0cQeZOnZECG2D2xWFNBq5SF6X6pfMK2udkZ+wRtvpzyVQ==}
+  rollup-plugin-esbuild@6.2.1:
+    resolution: {integrity: sha512-jTNOMGoMRhs0JuueJrJqbW8tOwxumaWYq+V5i+PD+8ecSCVkuX27tGW7BXqDgoULQ55rO7IdNxPcnsWtshz3AA==}
     engines: {node: '>=14.18.0'}
     peerDependencies:
       esbuild: '>=0.18.0'
@@ -4168,6 +4165,9 @@ packages:
 
   strnum@1.1.2:
     resolution: {integrity: sha512-vrN+B7DBIoTTZjnPNewwhx6cBA/H+IS7rfW68n7XxC1y7uoiGQBxaKzqucGUgavX15dJgiGztLJ8vxuEzwqBdA==}
+
+  strnum@2.0.5:
+    resolution: {integrity: sha512-YAT3K/sgpCUxhxNMrrdhtod3jckkpYwH6JAuwmUdXZsmzH1wUyzTMrrK2wYCEEqlKwrWDd35NeuUkbBy/1iK+Q==}
 
   style-inject@0.3.0:
     resolution: {integrity: sha512-IezA2qp+vcdlhJaVm5SOdPPTUu0FCEqfNSli2vRuSIBbu5Nq5UvygTk/VzeCqfLz2Atj3dVII5QBKGZRZ0edzw==}
@@ -4461,6 +4461,14 @@ packages:
 
   valibot@1.0.0-beta.9:
     resolution: {integrity: sha512-yEX8gMAZ2R1yI2uwOO4NCtVnJQx36zn3vD0omzzj9FhcoblvPukENIiRZXKZwCnqSeV80bMm8wNiGhQ0S8fiww==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  valibot@1.0.0-rc.2:
+    resolution: {integrity: sha512-Tnnp7dydpihvoUbJiaxuYfsCAgAFKuFMex7PTaI25XSjRWkU70DmJPlAO1W6sF1/WUx4RNWyM2hdmBSMIUSZFA==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
@@ -5316,7 +5324,7 @@ snapshots:
       outvariant: 1.4.3
       strict-event-emitter: 0.5.1
 
-  '@next/eslint-plugin-next@15.1.7':
+  '@next/eslint-plugin-next@15.2.0':
     dependencies:
       fast-glob: 3.3.1
 
@@ -5346,7 +5354,7 @@ snapshots:
       is-wsl: 2.2.0
       lilconfig: 3.1.3
       minimatch: 9.0.5
-      semver: 7.6.3
+      semver: 7.7.1
       string-width: 4.2.3
       supports-color: 8.1.1
       widest-line: 3.1.0
@@ -5399,7 +5407,7 @@ snapshots:
     optionalDependencies:
       rollup: 4.34.8
 
-  '@rollup/plugin-html@1.1.0(rollup@4.34.8)':
+  '@rollup/plugin-html@2.0.0(rollup@4.34.8)':
     optionalDependencies:
       rollup: 4.34.8
 
@@ -6507,7 +6515,7 @@ snapshots:
 
   escape-string-regexp@4.0.0: {}
 
-  eslint-config-prettier@10.0.1(eslint@9.21.0(jiti@2.4.2)):
+  eslint-config-prettier@10.0.2(eslint@9.21.0(jiti@2.4.2)):
     dependencies:
       eslint: 9.21.0(jiti@2.4.2)
 
@@ -6717,6 +6725,10 @@ snapshots:
     dependencies:
       strnum: 1.1.2
 
+  fast-xml-parser@5.0.8:
+    dependencies:
+      strnum: 2.0.5
+
   fastq@1.19.0:
     dependencies:
       reusify: 1.1.0
@@ -6774,8 +6786,6 @@ snapshots:
     dependencies:
       flatted: 3.3.3
       keyv: 4.5.4
-
-  flatqueue@2.0.3: {}
 
   flatted@3.3.3: {}
 
@@ -7995,7 +8005,7 @@ snapshots:
       chalk: 1.1.3
       maxmin: 2.1.0
 
-  rollup-plugin-esbuild@6.2.0(esbuild@0.25.0)(rollup@4.34.8):
+  rollup-plugin-esbuild@6.2.1(esbuild@0.25.0)(rollup@4.34.8):
     dependencies:
       debug: 4.4.0
       es-module-lexer: 1.6.0
@@ -8364,6 +8374,8 @@ snapshots:
 
   strnum@1.1.2: {}
 
+  strnum@2.0.5: {}
+
   style-inject@0.3.0: {}
 
   stylehacks@5.1.1(postcss@8.5.3):
@@ -8636,6 +8648,10 @@ snapshots:
       typescript: 5.7.3
 
   valibot@1.0.0-beta.9(typescript@5.7.3):
+    optionalDependencies:
+      typescript: 5.7.3
+
+  valibot@1.0.0-rc.2(typescript@5.7.3):
     optionalDependencies:
       typescript: 5.7.3
 

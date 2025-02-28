@@ -1,6 +1,6 @@
 {
 	"name": "feature-form",
-	"version": "0.0.35",
+	"version": "0.0.37",
 	"private": false,
 	"description": "Straightforward, typesafe, and feature-based form library for ReactJs",
 	"keywords": [],
@@ -42,7 +42,7 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.10.2"
+		"@types/node": "^22.13.5"
 	},
 	"size-limit": [
 		{

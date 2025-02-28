@@ -1,6 +1,6 @@
 {
 	"name": "@blgc/config",
-	"version": "0.0.29",
+	"version": "0.0.31",
 	"private": false,
 	"description": "Builder.Group's engineering style guide",
 	"keywords": [],
@@ -39,10 +39,10 @@
 	},
 	"dependencies": {
 		"@ianvs/prettier-plugin-sort-imports": "^4.4.1",
-		"@next/eslint-plugin-next": "^15.1.7",
+		"@next/eslint-plugin-next": "^15.2.0",
 		"@typescript-eslint/eslint-plugin": "^8.25.0",
 		"@typescript-eslint/parser": "^8.25.0",
-		"eslint-config-prettier": "^10.0.1",
+		"eslint-config-prettier": "^10.0.2",
 		"eslint-plugin-only-warn": "^1.1.0",
 		"eslint-plugin-react": "^7.37.4",
 		"eslint-plugin-react-hooks": "^5.1.0",

@@ -1,6 +1,6 @@
 {
 	"name": "validatenv",
-	"version": "0.0.28",
+	"version": "0.0.30",
 	"private": false,
 	"description": "Validate environment variables",
 	"keywords": [],
@@ -40,7 +40,7 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.10.2"
+		"@types/node": "^22.13.5"
 	},
 	"size-limit": [
 		{

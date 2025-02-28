@@ -1,6 +1,6 @@
 {
 	"name": "feature-logger",
-	"version": "0.0.29",
+	"version": "0.0.31",
 	"private": false,
 	"description": "Straightforward, typesafe, and feature-based logging library",
 	"keywords": [],
@@ -40,7 +40,7 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.10.2"
+		"@types/node": "^22.13.5"
 	},
 	"size-limit": [
 		{

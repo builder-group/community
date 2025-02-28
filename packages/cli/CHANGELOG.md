@@ -1,5 +1,17 @@
 # @blgc/cli
 
+## 0.0.26
+
+### Patch Changes
+
+- updated deps
+
+## 0.0.25
+
+### Patch Changes
+
+- updated deps
+
 ## 0.0.23
 
 ### Patch Changes

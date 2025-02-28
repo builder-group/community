@@ -1,4 +1,4 @@
-import FlatQueue from 'flatqueue';
+import { FlatQueue } from './FlatQueue';
 import type { TListener, TListenerContext, TListenerQueueItem, TState } from './types';
 
 const GLOBAL_LISTENER_QUEUE = new FlatQueue<TListenerQueueItem>();
@@ -87,7 +87,7 @@ export enum EStateListenerQueuePriority {
 }
 
 export async function processStateQueue(): Promise<void> {
-	let item: TListenerQueueItem | undefined;
+	let item: TListenerQueueItem | null;
 	while ((item = GLOBAL_LISTENER_QUEUE.pop()) != null) {
 		await item.callback(item.context);
 	}

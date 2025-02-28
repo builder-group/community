@@ -1,6 +1,6 @@
 {
 	"name": "validation-adapters",
-	"version": "0.0.18",
+	"version": "0.0.20",
 	"private": false,
 	"description": "Pre-made validation adapters for the validation-adapter library, including adapters for Zod and Valibot",
 	"keywords": [],
@@ -78,10 +78,10 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.10.2",
-		"valibot": "1.0.0-beta.9",
+		"@types/node": "^22.13.5",
+		"valibot": "1.0.0-rc.2",
 		"yup": "^1.6.1",
-		"zod": "^3.24.1"
+		"zod": "^3.24.2"
 	},
 	"size-limit": [
 		{

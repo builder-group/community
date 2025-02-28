@@ -1,5 +1,25 @@
 # feature-logger
 
+## 0.0.31
+
+### Patch Changes
+
+- updated deps
+
+- Updated dependencies []:
+  - @blgc/types@0.0.14
+  - @blgc/utils@0.0.35
+
+## 0.0.30
+
+### Patch Changes
+
+- updated deps
+
+- Updated dependencies []:
+  - @blgc/types@0.0.13
+  - @blgc/utils@0.0.34
+
 ## 0.0.28
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
 	"name": "feature-react",
-	"version": "0.0.39",
+	"version": "0.0.41",
 	"private": false,
 	"description": "ReactJs extension features for feature-state",
 	"keywords": [],
@@ -60,8 +60,8 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.10.2",
-		"@types/react": "^19.0.2",
+		"@types/node": "^22.13.5",
+		"@types/react": "^19.0.10",
 		"feature-form": "workspace:*",
 		"feature-state": "workspace:*",
 		"react": "^19.0.0"
