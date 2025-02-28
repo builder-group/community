@@ -1,5 +1,15 @@
 # feature-react
 
+## 0.0.42
+
+### Patch Changes
+
+- updated deps
+
+- Updated dependencies []:
+  - @blgc/types@0.0.15
+  - @blgc/utils@0.0.36
+
 ## 0.0.41
 
 ### Patch Changes

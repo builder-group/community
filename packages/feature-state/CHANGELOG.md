@@ -1,5 +1,15 @@
 # feature-state
 
+## 0.0.45
+
+### Patch Changes
+
+- updated deps
+
+- Updated dependencies []:
+  - @blgc/types@0.0.15
+  - @blgc/utils@0.0.36
+
 ## 0.0.44
 
 ### Patch Changes
