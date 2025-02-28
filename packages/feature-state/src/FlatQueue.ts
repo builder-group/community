@@ -14,7 +14,7 @@ export class FlatQueue<GItem> {
 	/**
 	 * Number of items in the queue.
 	 */
-	get length(): number {
+	public get length(): number {
 		return this._length;
 	}
 
@@ -25,7 +25,7 @@ export class FlatQueue<GItem> {
 	 * high priority. Multiple items with the same priority value can be added
 	 * to the queue, but there is no guaranteed order between these items.
 	 */
-	push(id: GItem, priority: number): void {
+	public push(id: GItem, priority: number): void {
 		let pos = this._length++;
 
 		while (pos > 0) {
@@ -48,7 +48,7 @@ export class FlatQueue<GItem> {
 	 * the items with the lowest priority. If this queue is empty, returns
 	 * `null`.
 	 */
-	pop(): GItem | null {
+	public pop(): GItem | null {
 		if (!this._length) {
 			return null;
 		}
