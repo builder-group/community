@@ -1,14 +1,13 @@
 import { TFeatureDefinition } from '@blgc/types/features';
-import type { TState } from 'feature-state';
+import type { TListenerOptions, TState } from 'feature-state';
 import React from 'react';
 
 export function useCompute<GValue, GFeatures extends TFeatureDefinition[], GComputed>(
 	state: TState<GValue, GFeatures>,
 	compute: (value: Readonly<GValue>) => GComputed,
-	options: TComputeOptions<GComputed> = {},
-	deps: unknown[] = []
+	options: TUseComputeOptions<GValue, GComputed> = {}
 ): GComputed {
-	const { isEqual = Object.is } = options;
+	const { isEqual = Object.is, deps = [], ...listenerOptions } = options;
 	const [, forceRender] = React.useReducer((s: number) => s + 1, 0);
 
 	const lastComputedRef = React.useRef<GComputed>(compute(state._v));
@@ -24,7 +23,7 @@ export function useCompute<GValue, GFeatures extends TFeatureDefinition[], GComp
 				}
 				lastComputedRef.current = newComputed;
 			},
-			{ key: 'use-compute' }
+			{ key: 'use-compute', ...listenerOptions }
 		);
 
 		return () => {
@@ -35,6 +34,7 @@ export function useCompute<GValue, GFeatures extends TFeatureDefinition[], GComp
 	return lastComputedRef.current;
 }
 
-interface TComputeOptions<GComputed> {
+interface TUseComputeOptions<GValue, GComputed> extends TListenerOptions<GValue> {
 	isEqual?: (a: GComputed, b: GComputed) => boolean;
+	deps?: React.DependencyList;
 }

@@ -1,13 +1,12 @@
 import { TFeatureDefinition } from '@blgc/types/features';
-import { TState } from 'feature-state';
+import { TListenerOptions, TState } from 'feature-state';
 import React from 'react';
 
 // 1 state
 export function useCombinedCompute<V1, F1 extends TFeatureDefinition[], GComputed>(
 	states: readonly [TState<V1, F1>],
 	compute: (values: readonly [V1]) => GComputed,
-	options?: TCombinedComputeOptions<GComputed>,
-	deps?: unknown[]
+	options?: TUseCombinedComputeOptions<V1, GComputed>
 ): GComputed;
 
 // 2 states
@@ -20,8 +19,7 @@ export function useCombinedCompute<
 >(
 	states: readonly [TState<V1, F1>, TState<V2, F2>],
 	compute: (values: readonly [V1, V2]) => GComputed,
-	options?: TCombinedComputeOptions<GComputed>,
-	deps?: unknown[]
+	options?: TUseCombinedComputeOptions<V1 | V2, GComputed>
 ): GComputed;
 
 // 3 states
@@ -36,8 +34,7 @@ export function useCombinedCompute<
 >(
 	states: readonly [TState<V1, F1>, TState<V2, F2>, TState<V3, F3>],
 	compute: (values: readonly [V1, V2, V3]) => GComputed,
-	options?: TCombinedComputeOptions<GComputed>,
-	deps?: unknown[]
+	options?: TUseCombinedComputeOptions<V1 | V2 | V3, GComputed>
 ): GComputed;
 
 // 4 states
@@ -54,8 +51,7 @@ export function useCombinedCompute<
 >(
 	states: readonly [TState<V1, F1>, TState<V2, F2>, TState<V3, F3>, TState<V4, F4>],
 	compute: (values: readonly [V1, V2, V3, V4]) => GComputed,
-	options?: TCombinedComputeOptions<GComputed>,
-	deps?: unknown[]
+	options?: TUseCombinedComputeOptions<V1 | V2 | V3 | V4, GComputed>
 ): GComputed;
 
 // 5 states
@@ -74,8 +70,7 @@ export function useCombinedCompute<
 >(
 	states: readonly [TState<V1, F1>, TState<V2, F2>, TState<V3, F3>, TState<V4, F4>, TState<V5, F5>],
 	compute: (values: readonly [V1, V2, V3, V4, V5]) => GComputed,
-	options?: TCombinedComputeOptions<GComputed>,
-	deps?: unknown[]
+	options?: TUseCombinedComputeOptions<V1 | V2 | V3 | V4 | V5, GComputed>
 ): GComputed;
 
 // Implementation
@@ -94,10 +89,9 @@ export function useCombinedCompute<
 >(
 	states: any,
 	compute: (values: any) => GComputed,
-	options: TCombinedComputeOptions<GComputed> = {},
-	deps: unknown[] = []
+	options: TUseCombinedComputeOptions<V1 | V2 | V3 | V4 | V5, GComputed> = {}
 ): GComputed {
-	const { isEqual = Object.is } = options;
+	const { isEqual = Object.is, deps = [], ...listenerOptions } = options;
 	const [, forceRender] = React.useReducer((s) => s + 1, 0);
 
 	const currentValuesRef = React.useRef<[V1, V2, V3, V4, V5]>(
@@ -135,7 +129,8 @@ export function useCombinedCompute<
 			]
 		).map((state, index) =>
 			state.listen(({ background, value }) => updateValue(index, value, background), {
-				key: `use-combined-compute-${index}`
+				key: `use-combined-compute-${index}`,
+				...listenerOptions
 			})
 		);
 
@@ -145,6 +140,7 @@ export function useCombinedCompute<
 	return lastComputedRef.current;
 }
 
-interface TCombinedComputeOptions<GComputed> {
+interface TUseCombinedComputeOptions<GValue, GComputed> extends TListenerOptions<GValue> {
 	isEqual?: (a: GComputed, b: GComputed) => boolean;
+	deps?: React.DependencyList;
 }

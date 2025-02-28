@@ -2,21 +2,21 @@ import { TFeatureDefinition } from '@blgc/types/features';
 import type { TListenerCallback, TListenerOptions, TState } from 'feature-state';
 import React from 'react';
 
-export function useListener<GValue, GFeatures extends TFeatureDefinition[]>(
+export function useSubscriber<GValue, GFeatures extends TFeatureDefinition[]>(
 	state: TState<GValue, GFeatures> | null | undefined,
 	callback: TListenerCallback<GValue>,
-	options: TUseListenerOptions<GValue> = {}
+	options: TUseSubscriberOptions<GValue> = {}
 ): void {
 	const { deps = [], ...listenerOptions } = options;
 
 	React.useEffect(() => {
-		const unbind = state?.listen(callback, { key: 'use-listener', ...listenerOptions });
+		const unbind = state?.subscribe(callback, { key: 'use-subscriber', ...listenerOptions });
 		return () => {
 			unbind?.();
 		};
 	}, [state, ...deps]);
 }
 
-export interface TUseListenerOptions<GValue> extends TListenerOptions<GValue> {
+export interface TUseSubscriberOptions<GValue> extends TListenerOptions<GValue> {
 	deps?: React.DependencyList;
 }

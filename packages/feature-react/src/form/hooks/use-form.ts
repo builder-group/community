@@ -23,7 +23,7 @@ export function useForm<GFormData extends TFormData, GFeatures extends TFeatureD
 						forceRender();
 					}
 				},
-				{ key: 'use-form' }
+				{ key: `use-form_${formField.key}` }
 			);
 			unbindCallbacks.push(unbind);
 		}

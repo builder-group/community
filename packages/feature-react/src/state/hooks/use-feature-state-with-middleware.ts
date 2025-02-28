@@ -1,11 +1,13 @@
 import { TFeatureDefinition } from '@blgc/types/features';
-import type { TListenerContext, TState } from 'feature-state';
+import type { TListenerContext, TListenerOptions, TState } from 'feature-state';
 import React from 'react';
 
 export function useFeatureStateWithMiddleware<GValue, GFeatures extends TFeatureDefinition[]>(
 	state: TState<GValue, GFeatures>,
-	middleware: TFeatureStateMiddleware<GValue>[] = []
+	middleware: TFeatureStateMiddleware<GValue>[] = [],
+	options: TUseFeatureStateMiddlewareOptions<GValue> = {}
 ): Readonly<GValue> {
+	const { deps = [], ...listenerOptions } = options;
 	const [, forceRender] = React.useReducer((s: number) => s + 1, 0);
 
 	React.useEffect(() => {
@@ -17,13 +19,13 @@ export function useFeatureStateWithMiddleware<GValue, GFeatures extends TFeature
 					forceRender();
 				}
 			},
-			{ key: 'use-feature-state-with-middleware' }
+			{ key: 'use-feature-state-with-middleware', ...listenerOptions }
 		);
 
 		return () => {
 			unbind();
 		};
-	}, [state, middleware]);
+	}, [state, ...deps]);
 
 	return state._v;
 }
@@ -31,3 +33,7 @@ export function useFeatureStateWithMiddleware<GValue, GFeatures extends TFeature
 export type TFeatureStateMiddleware<GValue> = (
 	context: TListenerContext<GValue>
 ) => TListenerContext<GValue>;
+
+export interface TUseFeatureStateMiddlewareOptions<GValue> extends TListenerOptions<GValue> {
+	deps?: React.DependencyList;
+}
