@@ -1,6 +1,6 @@
 {
 	"name": "feature-state",
-	"version": "0.0.41",
+	"version": "0.0.42",
 	"private": false,
 	"description": "Straightforward, typesafe, and feature-based state management library for ReactJs",
 	"keywords": [],
@@ -36,7 +36,8 @@
 	},
 	"dependencies": {
 		"@blgc/types": "workspace:*",
-		"@blgc/utils": "workspace:*"
+		"@blgc/utils": "workspace:*",
+		"flatqueue": "^2.0.3"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",

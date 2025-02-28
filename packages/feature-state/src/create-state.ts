@@ -1,6 +1,7 @@
+import FlatQueue from 'flatqueue';
 import type { TListener, TListenerContext, TListenerQueueItem, TState } from './types';
 
-const GLOBAL_LISTENER_QUEUE: TListenerQueueItem[] = [];
+const GLOBAL_LISTENER_QUEUE = new FlatQueue<TListenerQueueItem>();
 export const SET_SOURCE_KEY = 'state_set';
 
 export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
@@ -18,11 +19,13 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 					prevValue
 				});
 				if (listener.queueIf == null || listener.queueIf(context)) {
-					GLOBAL_LISTENER_QUEUE.push({
-						context,
-						callback: listener.callback,
-						level: listener.level
-					});
+					GLOBAL_LISTENER_QUEUE.push(
+						{
+							context,
+							callback: listener.callback
+						},
+						listener.priority
+					);
 				}
 			}
 
@@ -52,10 +55,10 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 			}
 		},
 		listen(callback, listenOptions = {}) {
-			const { level = 0, key, queueIf } = listenOptions;
+			const { priority = EStateListenerQueuePriority.DEFAULT, key, queueIf } = listenOptions;
 			const listener: TListener<GValue> = {
 				key,
-				level,
+				priority,
 				callback,
 				queueIf
 			};
@@ -77,12 +80,15 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 	};
 }
 
-export async function processStateQueue(): Promise<void> {
-	// Drain the queue
-	const toProcess = GLOBAL_LISTENER_QUEUE.splice(0, GLOBAL_LISTENER_QUEUE.length);
+export enum EStateListenerQueuePriority {
+	EARLY = 50,
+	DEFAULT = 100,
+	LATE = 200
+}
 
-	// Process each item in the queue sequentially (sorted by level)
-	for (const queueItem of toProcess.sort((a, b) => a.level - b.level)) {
-		await queueItem.callback(queueItem.context);
+export async function processStateQueue(): Promise<void> {
+	let item: TListenerQueueItem | undefined;
+	while ((item = GLOBAL_LISTENER_QUEUE.pop()) != null) {
+		await item.callback(item.context);
 	}
 }

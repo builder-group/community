@@ -83,7 +83,7 @@ export interface TAdditionalListenerContext<GValue> {
 
 export interface TListener<GValue> {
 	key?: string;
-	level: number;
+	priority: number;
 	callback: TListenerCallback<GValue>;
 	queueIf?: (context: TListenerContext<GValue>) => boolean;
 }
@@ -91,7 +91,6 @@ export interface TListener<GValue> {
 export type TListenerOptions<GValue> = Partial<Omit<TListener<GValue>, 'callback'>>;
 
 export interface TListenerQueueItem<GValue = any> {
-	level: TListener<GValue>['level'];
 	callback: TListener<GValue>['callback'];
 	context: TListenerContext<GValue>;
 }
