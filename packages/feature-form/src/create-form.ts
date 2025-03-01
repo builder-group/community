@@ -64,22 +64,6 @@ export function createForm<GFormData extends TFormData>(
 		init() {
 			// Register listener
 			for (const field of Object.values(this.fields) as TFormFields<GFormData>[keyof GFormData][]) {
-				field.listen(
-					async ({ source }) => {
-						if (source === 'set') {
-							if (
-								(field.isSubmitted &&
-									field._config.reValidateMode.has(FormFieldReValidateMode.OnChange)) ||
-								(!field.isSubmitted &&
-									field._config.validateMode.has(FormFieldValidateMode.OnChange)) ||
-								(field._config.validateMode.has(FormFieldValidateMode.OnTouched) && field.isTouched)
-							) {
-								await field.validate();
-							}
-						}
-					},
-					{ key: 'form_validate' }
-				);
 				field.status.listen(
 					async () => {
 						await form._revalidate(true);
@@ -130,6 +114,10 @@ export function createForm<GFormData extends TFormData>(
 				}
 			}
 			await Promise.all(validationPromises);
+
+			// Note: We can't rely on the form field status listener to revalidate the form on time
+			// since the state queue is processed asynchronously
+			this._revalidate(true);
 
 			// Execute submit callbacks
 			const data = this.getValidData();
@@ -237,7 +225,7 @@ export function createForm<GFormData extends TFormData>(
 				formField.reset();
 			}
 			this.isSubmitted.set(false);
-			// isValid is reset by form field (_revalidate is called in form field status listener)
+			this._revalidate(true);
 		}
 	};
 

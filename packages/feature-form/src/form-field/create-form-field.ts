@@ -100,6 +100,21 @@ export function createFormField<GValue>(
 				);
 			}
 
+			// Validate on change
+			this.listen(
+				async () => {
+					if (
+						(this.isSubmitted &&
+							this._config.reValidateMode.has(FormFieldReValidateMode.OnChange)) ||
+						(!this.isSubmitted && this._config.validateMode.has(FormFieldValidateMode.OnChange)) ||
+						(this._config.validateMode.has(FormFieldValidateMode.OnTouched) && this.isTouched)
+					) {
+						await this.validate();
+					}
+				},
+				{ key: 'form-field_validate' }
+			);
+
 			// @ts-expect-error -- Remove init method after initialization
 			delete this.init;
 			return this;

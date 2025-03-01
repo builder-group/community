@@ -209,3 +209,26 @@ $counter.listen(() => {
 ```
 
 While you can reference `$counter` directly in listeners, there's no guarantee about its value since it might have changed between queueing and execution of the listener. That's why using `context.value` is the safer approach.
+
+### Why are all listeners processed asynchronously?
+
+All listeners are processed asynchronously through a priority queue to maintain a consistent execution order. Adding sync listeners would:
+
+1. Disrupt the priority-based execution order
+2. Add complexity to the mental model (sync vs async execution paths)
+3. Make state updates less predictable
+
+If you need immediate listener processing, you can disable automatic queue processing and handle it manually:
+
+```ts
+// Disable automatic queue processing
+$counter.set(1, { processListenerQueue: false });
+$counter.set(2, { processListenerQueue: false });
+
+// Process the queue when you're ready
+await processStateQueue();
+```
+
+This approach preserves the priority order while giving you control over when listeners execute.
+
+> Should we move from an async to a sync listener queue?
