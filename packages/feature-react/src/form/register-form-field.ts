@@ -8,7 +8,7 @@ export function registerFormField<GValue, GKey = string>(
 ): TRegisterFormFieldResponse<GKey, GValue> {
 	return {
 		name: formField.key,
-		defaultValue: formField._intialValue,
+		defaultValue: controlled ? undefined : formField._intialValue,
 		value: controlled ? formField._v : undefined,
 		onBlur: () => {
 			formField.blur();
