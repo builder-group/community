@@ -212,7 +212,7 @@ While you can reference `$counter` directly in listeners, there's no guarantee a
 
 ### Why are all listeners processed asynchronously?
 
-All listeners are processed asynchronously through a priority queue to maintain a consistent execution order. Adding sync listeners would:
+All listeners are processed asynchronously through a priority queue to maintain a consistent execution order. Adding a separate sync listener queue would:
 
 1. Disrupt the priority-based execution order
 2. Add complexity to the mental model (sync vs async execution paths)
@@ -229,6 +229,4 @@ $counter.set(2, { processListenerQueue: false });
 await processStateQueue();
 ```
 
-This approach preserves the priority order while giving you control over when listeners execute.
-
-> Should we move from an async to a sync listener queue?
+Alternatively, we could switch to a fully sync listener queue. However, this would compromise the benefits of asynchronous processing.
