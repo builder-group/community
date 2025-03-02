@@ -15,10 +15,10 @@ export interface TFormFieldStateFeature<GValue> {
 		_intialValue: GValue | undefined;
 		_validator: TFormFieldValidator<GValue>;
 		key: string;
-		isTouched: boolean;
-		isSubmitted: boolean;
-		isSubmitting: boolean;
-		isValidating: boolean;
+		isTouched: TState<boolean, []>;
+		isSubmitted: TState<boolean, []>;
+		isSubmitting: TState<boolean, []>;
+		isValidating: TState<boolean, []>;
 		status: TFormFieldStatus;
 		validate: () => Promise<boolean>;
 		isValid: () => boolean;

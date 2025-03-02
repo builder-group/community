@@ -2,10 +2,12 @@ import { TWithInit } from '@blgc/types/features';
 import { type TEntries } from '@blgc/types/utils';
 import { bitwiseFlag, deepCopy, type BitwiseFlag } from '@blgc/utils';
 import { createState } from 'feature-state';
-import { createFormField } from './form-field';
+import { TCollectErrorMode } from 'validation-adapter';
+import { createFormField, isFormField } from './form-field';
 import {
 	FormFieldReValidateMode,
 	FormFieldValidateMode,
+	TFormField,
 	type TForm,
 	type TFormConfig,
 	type TFormData,
@@ -36,24 +38,28 @@ export function createForm<GFormData extends TFormData>(
 	const form: TWithInit<TForm<GFormData, []>> = {
 		_features: [],
 		_config: {
-			collectErrorMode,
 			disabled
 		},
 		_validSubmitCallbacks: onValidSubmit != null ? [onValidSubmit] : [],
 		_invalidSubmitCallbacks: onInvalidSubmit != null ? [onInvalidSubmit] : [],
 		fields: Object.fromEntries(
 			Object.entries(fields).map(
-				([fieldKey, field]: [string, TCreateFormConfigFormField<unknown>]) => [
+				([fieldKey, field]: [
+					string,
+					TCreateFormConfigFormField<unknown> | TFormField<unknown>
+				]) => [
 					fieldKey,
-					createFormField(field.defaultValue, {
-						key: fieldKey,
-						validator: field.validator,
-						collectErrorMode: field.collectErrorMode ?? collectErrorMode,
-						validateMode: field.validateMode ?? validateMode,
-						reValidateMode: field.reValidateMode ?? reValidateMode,
-						editable: field.editable ?? true,
-						notifyOnStatusChange
-					})
+					isFormField(field)
+						? field
+						: createFormField(field.defaultValue, {
+								key: fieldKey,
+								validator: field.validator,
+								collectErrorMode: field.collectErrorMode ?? collectErrorMode,
+								validateMode: field.validateMode ?? validateMode,
+								reValidateMode: field.reValidateMode ?? reValidateMode,
+								editable: field.editable ?? true,
+								notifyOnStatusChange
+							})
 				]
 			)
 		) as TFormFields<GFormData>,
@@ -61,12 +67,12 @@ export function createForm<GFormData extends TFormData>(
 		isValidating: createState(false),
 		isSubmitted: createState(false),
 		isSubmitting: createState(false),
-		init() {
-			// Register listener
+		init(this: TForm<GFormData, []>) {
+			// Revalidate form on status change
 			for (const field of Object.values(this.fields) as TFormFields<GFormData>[keyof GFormData][]) {
 				field.status.listen(
 					async () => {
-						await form._revalidate(true);
+						await this._revalidate(true);
 					},
 					{ key: 'form_revalidate' }
 				);
@@ -103,11 +109,11 @@ export function createForm<GFormData extends TFormData>(
 			for (const formField of Object.values(
 				this.fields
 			) as TFormFields<GFormData>[keyof GFormData][]) {
-				formField.isSubmitting = true;
+				formField.isSubmitting.set(true);
 				if (
-					(formField.isSubmitted &&
+					(formField.isSubmitted.get() &&
 						formField._config.reValidateMode.has(FormFieldReValidateMode.OnSubmit)) ||
-					(!formField.isSubmitted &&
+					(!formField.isSubmitted.get() &&
 						formField._config.validateMode.has(FormFieldValidateMode.OnSubmit))
 				) {
 					validationPromises.push(formField.validate());
@@ -160,8 +166,8 @@ export function createForm<GFormData extends TFormData>(
 						formField._intialValue = deepCopy(data[fieldKey]);
 					}
 				}
-				formField.isSubmitted = true;
-				formField.isSubmitting = false;
+				formField.isSubmitted.set(true);
+				formField.isSubmitting.set(false);
 			}
 
 			this.isSubmitted.set(true);
@@ -238,6 +244,10 @@ export interface TCreateFormConfig<GFormData extends TFormData> extends Partial<
 	 */
 	fields: TCreateFormConfigFormFields<GFormData>;
 	/**
+	 * Error collection mode. 'firstError' gathers only the first error per field, 'all' gathers all errors.
+	 */
+	collectErrorMode: TCollectErrorMode;
+	/**
 	 * Validation strategy **before** submitting.
 	 */
 	validateMode?: BitwiseFlag<FormFieldValidateMode>;
@@ -255,7 +265,7 @@ export interface TCreateFormConfig<GFormData extends TFormData> extends Partial<
 }
 
 export type TCreateFormConfigFormFields<GFormData extends TFormData> = {
-	[Key in keyof GFormData]: TCreateFormConfigFormField<GFormData[Key]>;
+	[Key in keyof GFormData]: TCreateFormConfigFormField<GFormData[Key]> | TFormField<GFormData[Key]>;
 };
 
 export interface TCreateFormConfigFormField<GValue> extends Partial<TFormFieldStateConfig> {

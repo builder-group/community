@@ -10,9 +10,14 @@ import React from 'react';
 import { registerFormField, type TRegisterFormFieldResponse } from '../register-form-field';
 
 export function useForm<GFormData extends TFormData, GFeatures extends TFeatureDefinition[]>(
-	form: TForm<GFormData, GFeatures>
+	formOrFactory: TForm<GFormData, GFeatures> | (() => TForm<GFormData, GFeatures>),
+	deps: React.DependencyList = []
 ): TUseFormResponse<GFormData, GFeatures> {
 	const [, forceRender] = React.useReducer((s: number) => s + 1, 0);
+	const form = React.useMemo(
+		() => (typeof formOrFactory === 'function' ? formOrFactory() : formOrFactory),
+		deps
+	);
 
 	React.useEffect(() => {
 		const unbindCallbacks: (() => void)[] = [];
@@ -32,9 +37,10 @@ export function useForm<GFormData extends TFormData, GFeatures extends TFeatureD
 				callback();
 			});
 		};
-	}, [form.fields]);
+	}, [form]);
 
 	return {
+		form,
 		register<GKey extends keyof GFormData>(formFieldKey: GKey, controlled = false) {
 			return registerFormField<GFormData[GKey], GKey>(form.getField(formFieldKey), controlled);
 		},
@@ -67,6 +73,7 @@ export interface TUseFormResponse<
 	GFormData extends TFormData,
 	GFeatures extends TFeatureDefinition[]
 > {
+	form: TForm<GFormData, GFeatures>;
 	handleSubmit: (
 		options?: THandleSubmitOptions<GFormData, GFeatures>
 	) => (event?: React.BaseSyntheticEvent) => Promise<boolean>;

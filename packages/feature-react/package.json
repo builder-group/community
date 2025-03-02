@@ -1,6 +1,6 @@
 {
 	"name": "feature-react",
-	"version": "0.0.45",
+	"version": "0.0.46",
 	"private": false,
 	"description": "ReactJs extension features for feature-state",
 	"keywords": [],

@@ -38,17 +38,17 @@ export function createFormField<GValue>(
 		_intialValue: deepCopy(baseState._v),
 		_validator: validator,
 		key,
-		isTouched: false,
-		isSubmitted: false,
-		isSubmitting: false,
-		isValidating: false,
+		isTouched: createState(false),
+		isSubmitted: createState(false),
+		isSubmitting: createState(false),
+		isValidating: createState(false),
 		status: createStatus({ type: 'UNVALIDATED' }),
 		async validate(this: TFormField<GValue>) {
 			const validationContext = createFormFieldValidationContext(this);
 
-			this.isValidating = true;
+			this.isValidating.set(true);
 			await this._validator.validate(validationContext);
-			this.isValidating = false;
+			this.isValidating.set(false);
 
 			// If no error was registered we assume its valid
 			if (this.status._nextValue == null) {
@@ -66,21 +66,23 @@ export function createFormField<GValue>(
 		},
 		blur(this: TFormField<GValue>) {
 			if (
-				(this.isSubmitted && this._config.reValidateMode.has(FormFieldReValidateMode.OnBlur)) ||
-				(!this.isSubmitted &&
+				(this.isSubmitted.get() &&
+					this._config.reValidateMode.has(FormFieldReValidateMode.OnBlur)) ||
+				(!this.isSubmitted.get() &&
 					(this._config.validateMode.has(FormFieldValidateMode.OnBlur) ||
-						(this._config.validateMode.has(FormFieldValidateMode.OnTouched) && !this.isTouched)))
+						(this._config.validateMode.has(FormFieldValidateMode.OnTouched) &&
+							!this.isTouched.get())))
 			) {
 				void this.validate();
 			}
 
-			this.isTouched = true;
+			this.isTouched.set(true);
 		},
 		reset(this: TFormField<GValue>) {
 			this.set(this._intialValue, { listenerContext: { source: 'form-field_reset' } });
-			this.isTouched = false;
-			this.isSubmitted = false;
-			this.isSubmitting = false;
+			this.isTouched.set(false);
+			this.isSubmitted.set(false);
+			this.isSubmitting.set(false);
 			this.status.set({ type: 'UNVALIDATED' });
 		}
 	};
@@ -104,10 +106,11 @@ export function createFormField<GValue>(
 			this.listen(
 				async () => {
 					if (
-						(this.isSubmitted &&
+						(this.isSubmitted.get() &&
 							this._config.reValidateMode.has(FormFieldReValidateMode.OnChange)) ||
-						(!this.isSubmitted && this._config.validateMode.has(FormFieldValidateMode.OnChange)) ||
-						(this._config.validateMode.has(FormFieldValidateMode.OnTouched) && this.isTouched)
+						(!this.isSubmitted.get() &&
+							this._config.validateMode.has(FormFieldValidateMode.OnChange)) ||
+						(this._config.validateMode.has(FormFieldValidateMode.OnTouched) && this.isTouched.get())
 					) {
 						await this.validate();
 					}

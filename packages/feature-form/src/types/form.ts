@@ -1,6 +1,5 @@
 import { TFeatureDefinition, TWithFeatures } from '@blgc/types/features';
 import { type TState } from 'feature-state';
-import { type TCollectErrorMode } from 'validation-adapter';
 import { type TFormField, type TInvalidFormFieldError } from './form-field';
 
 // Note: TForm is not itself a state because of type issues mainly because GFormData is the main generic,
@@ -82,8 +81,4 @@ export interface TFormConfig {
 	 * Indicates if the form is disabled.
 	 */
 	disabled: boolean;
-	/**
-	 * Error collection mode. 'firstError' gathers only the first error per field, 'all' gathers all errors.
-	 */
-	collectErrorMode: TCollectErrorMode;
 }
