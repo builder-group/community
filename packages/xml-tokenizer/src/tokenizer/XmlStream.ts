@@ -38,7 +38,8 @@ export class XmlStream {
 			strictDocument = true,
 			allowDtd = true,
 			rawTextElements = null,
-			contextSliceSize = 30
+			implicitSelfClosingElements = null,
+			contextSliceSize = false
 		} = options;
 		this._text = text;
 		this._pos = pos;
@@ -47,6 +48,7 @@ export class XmlStream {
 			strictDocument,
 			allowDtd,
 			rawTextElements,
+			implicitSelfClosingElements,
 			contextSliceSize
 		};
 	}
@@ -567,6 +569,13 @@ export interface TXmlStreamConfig {
 	 * @default null
 	 */
 	rawTextElements: string[] | null;
+
+	/**
+	 * List of element names that should be treated as self-closing without requiring '/>' syntax.
+	 * Common examples are 'meta' and 'link' for HTML-like documents.
+	 * @default null
+	 */
+	implicitSelfClosingElements: string[] | null;
 
 	/**
 	 * Whether to allow DOCTYPE declarations.

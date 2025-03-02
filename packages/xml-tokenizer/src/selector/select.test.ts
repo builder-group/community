@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { htmlConfig } from '../config';
 import { tokenize, TXmlStreamOptions, type TXmlToken } from '../tokenizer';
 import { tokensToXml } from '../tokens-to-xml';
 import { select } from './select';
@@ -61,16 +62,12 @@ describe('select function', () => {
 		expect(recorded).not.toBeNull();
 	});
 
-	// TODO: Can't handle self-closing tags (e.g. <meta property="x" content="y">) without '/>'
 	it('should match //head', () => {
 		assertSelection(
 			sampleHtml,
 			[[{ axis: 'self-or-descendant', local: 'head' }]],
 			'<head><metacharset="UTF-8"/><metaname="viewport"content="width=device-width,initial-scale=1.0"/><title>SamplePage</title><linkrel="stylesheet"href="styles.css"/></head>',
-			{
-				strictDocument: false,
-				rawTextElements: ['script', 'style']
-			}
+			htmlConfig
 		);
 	});
 

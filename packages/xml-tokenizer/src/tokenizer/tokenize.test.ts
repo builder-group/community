@@ -2468,7 +2468,7 @@ describe('tokenize function', () => {
 		});
 	});
 
-	describe('allowRawTextElements', () => {
+	describe('rawTextElements', () => {
 		it('raw_text_01', () => {
 			assertTokens(
 				'<script>const x = a < b;</script>',
@@ -2622,6 +2622,53 @@ describe('tokenize function', () => {
 					}
 				],
 				{ rawTextElements: ['custom-raw'] }
+			);
+		});
+	});
+
+	describe('implicitSelfClosingElements', () => {
+		it('meta_1', () => {
+			assertTokens(
+				'<meta property="x" content="y">',
+				[
+					{
+						type: 'ElementStart',
+						prefix: '',
+						local: 'meta',
+						start: 0
+					},
+					{
+						local: 'property',
+						prefix: '',
+						range: {
+							end: 18,
+							start: 6
+						},
+						type: 'Attribute',
+						value: 'x'
+					},
+					{
+						local: 'content',
+						prefix: '',
+						range: {
+							end: 30,
+							start: 19
+						},
+						type: 'Attribute',
+						value: 'y'
+					},
+					{
+						end: {
+							type: 'Empty'
+						},
+						range: {
+							end: 31,
+							start: 30
+						},
+						type: 'ElementEnd'
+					}
+				],
+				{ implicitSelfClosingElements: ['meta'] }
 			);
 		});
 	});

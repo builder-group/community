@@ -443,9 +443,18 @@ function parseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 		} else if (currCodeUnit === GREATER_THAN) {
 			s.advance(1);
 			const range = s.rangeFrom(_start);
-			tokenCallback({ type: 'ElementEnd', end: { type: 'Open' }, range }, s);
-			open = true;
-			break;
+
+			if (
+				s.config.implicitSelfClosingElements != null &&
+				s.config.implicitSelfClosingElements.includes(getQName(local, prefix))
+			) {
+				tokenCallback({ type: 'ElementEnd', end: { type: 'Empty' }, range }, s);
+				break;
+			} else {
+				tokenCallback({ type: 'ElementEnd', end: { type: 'Open' }, range }, s);
+				open = true;
+				break;
+			}
 		} else {
 			// An attribute must be preceded with a whitespace
 			if (!hasSpace) {
