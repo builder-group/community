@@ -11,9 +11,9 @@ export function select(
 	const selector = new TokenSelector(tokenSelectPaths);
 	tokenize(
 		xml,
-		(token) => {
+		(token, stream) => {
 			selector.pipeToken(token, (recordedToken) => {
-				callback(recordedToken);
+				callback(recordedToken, stream);
 			});
 		},
 		options

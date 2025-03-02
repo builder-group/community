@@ -1,6 +1,6 @@
 import { XmlStream } from './XmlStream';
 
-export type TTokenCallback = (token: TXmlToken, s: XmlStream) => void;
+export type TTokenCallback = (token: TXmlToken, stream: XmlStream) => void;
 
 /**
  * A Processing Instruction token.

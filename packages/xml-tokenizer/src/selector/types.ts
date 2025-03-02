@@ -1,4 +1,4 @@
-import { type TXmlToken } from '../tokenizer';
+import { XmlStream, type TXmlToken } from '../tokenizer';
 
 export type TSelectedXmlToken = (
 	| TXmlToken
@@ -6,7 +6,7 @@ export type TSelectedXmlToken = (
 	| { type: 'SelectionEnd' }
 ) & { key?: string };
 
-export type TSelectedTokenCallback = (token: TSelectedXmlToken) => void;
+export type TSelectedTokenCallback = (token: TSelectedXmlToken, stream: XmlStream) => void;
 
 /**
  * A limited segment of an XPath expression in an object-oriented manner.
