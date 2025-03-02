@@ -246,7 +246,7 @@ export interface TCreateFormConfig<GFormData extends TFormData> extends Partial<
 	/**
 	 * Error collection mode. 'firstError' gathers only the first error per field, 'all' gathers all errors.
 	 */
-	collectErrorMode: TCollectErrorMode;
+	collectErrorMode?: TCollectErrorMode;
 	/**
 	 * Validation strategy **before** submitting.
 	 */
