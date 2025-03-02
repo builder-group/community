@@ -59,7 +59,7 @@ export class TokenSelector {
 			recorder(token);
 		}
 
-		if (stopRecording) {
+		if (stopRecording && this._isRecording) {
 			recorder({ type: 'SelectionEnd' });
 			this._isRecording = false;
 		}
@@ -146,6 +146,10 @@ export class TokenSelector {
 	private handleElementEnd(token: TElementEndToken): boolean {
 		if (token.end.type === 'Close' || token.end.type === 'Empty') {
 			this._currentDepth -= 1;
+
+			// if (token.end.type === 'Close' && token.end.local === 'head') {
+			// 	console.log({ token });
+			// }
 
 			let isFinalState = false;
 

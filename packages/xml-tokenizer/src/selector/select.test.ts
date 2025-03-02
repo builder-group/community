@@ -1,15 +1,17 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { type TXmlToken } from '../tokenizer';
+import { tokenize, TXmlStreamOptions, type TXmlToken } from '../tokenizer';
 import { tokensToXml } from '../tokens-to-xml';
 import { select } from './select';
+import { TokenSelector } from './TokenSelector';
 import { type TSelectedXmlToken, type TTokenSelectPath } from './types';
 
 describe('select function', () => {
 	let bookStoreXml = '';
 	let inceptionXml = '';
 	let namespaceXml = '';
+	let sampleHtml = '';
 
 	beforeAll(async () => {
 		bookStoreXml = await readFile(
@@ -24,37 +26,53 @@ describe('select function', () => {
 			path.join(__dirname, '../__tests__/resources/namespace.xml'),
 			'utf-8'
 		);
+		sampleHtml = await readFile(
+			path.join(__dirname, '../__tests__/resources/sample.html'),
+			'utf-8'
+		);
 	});
 
-	// TODO: Remove playground
-	// it('should work', () => {
-	// 	const selector = new TokenSelector([
-	// 		[{ axis: 'self-or-descendant', local: 'title', textContains: 'Imposter' }]
-	// 		// [
-	// 		// 	{ axis: 'child', local: 'bookstore' },
-	// 		// 	{ axis: 'child', local: 'book' },
-	// 		// 	{ axis: 'child', local: 'title', textContains: 'Everyday Italian' }
-	// 		// ]
-	// 		// [
-	// 		// 	{ axis: 'child', local: 'bookstore' },
-	// 		// 	{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'CHILDREN' }] }
-	// 		// ],
-	// 		// [
-	// 		// 	{ axis: 'child', local: 'bookstore' },
-	// 		// 	{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
-	// 		// ]
-	// 	]);
-	// 	const recorded: TXmlToken[] = [];
+	it.skip('should work', () => {
+		const selector = new TokenSelector([
+			[{ axis: 'self-or-descendant', local: 'title', text: 'Imposter' }]
+			// [
+			// 	{ axis: 'child', local: 'bookstore' },
+			// 	{ axis: 'child', local: 'book' },
+			// 	{ axis: 'child', local: 'title', textContains: 'Everyday Italian' }
+			// ]
+			// [
+			// 	{ axis: 'child', local: 'bookstore' },
+			// 	{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'CHILDREN' }] }
+			// ],
+			// [
+			// 	{ axis: 'child', local: 'bookstore' },
+			// 	{ axis: 'child', local: 'book', attributes: [{ local: 'category', value: 'COOKING' }] }
+			// ]
+		]);
+		const recorded: TSelectedXmlToken[] = [];
 
-	// 	tokenize(bookStoreXml, (token) => {
-	// 		selector.pipeToken(token, (recordedToken) => {
-	// 			recorded.push(recordedToken);
-	// 		});
-	// 	});
+		tokenize(bookStoreXml, (token) => {
+			selector.pipeToken(token, (recordedToken) => {
+				recorded.push(recordedToken);
+			});
+		});
 
-	// 	console.log(tokensToXml(recorded));
-	// 	expect(recorded).not.toBeNull();
-	// });
+		console.log(tokensToXml(recorded as TXmlToken[]));
+		expect(recorded).not.toBeNull();
+	});
+
+	// TODO: Can't handle self-closing tags (e.g. <meta property="x" content="y">) without '/>'
+	it('should match //head', () => {
+		assertSelection(
+			sampleHtml,
+			[[{ axis: 'self-or-descendant', local: 'head' }]],
+			'<head><metacharset="UTF-8"/><metaname="viewport"content="width=device-width,initial-scale=1.0"/><title>SamplePage</title><linkrel="stylesheet"href="styles.css"/></head>',
+			{
+				strictDocument: false,
+				rawTextElements: ['script', 'style']
+			}
+		);
+	});
 
 	it('should match /bookstore', () => {
 		assertSelection(
@@ -348,19 +366,33 @@ describe('select function', () => {
 
 function collectRecordedTokens(
 	text: string,
-	tokenSelectPaths: TTokenSelectPath[]
+	tokenSelectPaths: TTokenSelectPath[],
+	options: TXmlStreamOptions = {}
 ): TSelectedXmlToken[] {
 	const recordedTokens: TSelectedXmlToken[] = [];
-	select(text, tokenSelectPaths, (recordedToken) => {
-		recordedTokens.push(recordedToken);
-	});
+	select(
+		text,
+		tokenSelectPaths,
+		(recordedToken) => {
+			recordedTokens.push(recordedToken);
+		},
+		options
+	);
 	return recordedTokens;
 }
 
 // Results where validated via xpather.com
-function assertSelection(text: string, tokenSelectPaths: TTokenSelectPath[], result: string): void {
+function assertSelection(
+	text: string,
+	tokenSelectPaths: TTokenSelectPath[],
+	result: string,
+	options: TXmlStreamOptions = {}
+): void {
 	// console.log(tokensToXml(collectRecordedTokens(text, tokenSelectPaths)));
 	expect(
-		tokensToXml(collectRecordedTokens(text, tokenSelectPaths) as TXmlToken[]).replaceAll(/\s/g, '')
+		tokensToXml(collectRecordedTokens(text, tokenSelectPaths, options) as TXmlToken[]).replaceAll(
+			/\s/g,
+			''
+		)
 	).toBe(result.replaceAll(/\s/g, ''));
 }
