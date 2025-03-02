@@ -1,4 +1,6 @@
-export type TTokenCallback = (token: TXmlToken) => void;
+import { XmlStream } from './XmlStream';
+
+export type TTokenCallback = (token: TXmlToken, s: XmlStream) => void;
 
 /**
  * A Processing Instruction token.
@@ -118,6 +120,7 @@ export interface TRange {
 export interface TTextPos {
 	row: number;
 	col: number;
+	contextSlice?: string;
 }
 
 /**

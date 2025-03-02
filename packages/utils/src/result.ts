@@ -106,3 +106,31 @@ export function unwrapOr<T, E>(result: TResult<T, E>, defaultValue: T): T {
 	}
 	return defaultValue;
 }
+
+// Convert a server result to a Result type
+export function fromServerResult<T, E>(result: TServerResult<T, E>): TResult<T, E> {
+	return result._type === 'Ok' ? Ok(result.value) : Err(result.error);
+}
+
+// Convert a Result type to a server result format
+export function toServerResult<T, E>(result: TResult<T, E>): TServerResult<T, E> {
+	return result.isOk()
+		? {
+				_type: 'Ok',
+				value: result.value
+			}
+		: {
+				_type: 'Err',
+				error: result.error
+			};
+}
+
+export type TServerResult<T, E> =
+	| {
+			_type: 'Ok';
+			value: T;
+	  }
+	| {
+			_type: 'Err';
+			error: E;
+	  };

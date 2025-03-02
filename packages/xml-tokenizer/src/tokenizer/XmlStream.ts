@@ -33,14 +33,21 @@ export class XmlStream {
 	public readonly config: TXmlStreamConfig;
 
 	public constructor(text: string, options: TXmlStreamOptions = {}) {
-		const { pos = 0, strictDocument = true, allowDtd = true, rawTextElements = null } = options;
+		const {
+			pos = 0,
+			strictDocument = true,
+			allowDtd = true,
+			rawTextElements = null,
+			contextSliceSize = 30
+		} = options;
 		this._text = text;
 		this._pos = pos;
 		this._end = this._text.length;
 		this.config = {
 			strictDocument,
 			allowDtd,
-			rawTextElements
+			rawTextElements,
+			contextSliceSize
 		};
 	}
 
@@ -188,6 +195,13 @@ export class XmlStream {
 	 */
 	public goTo(pos: number): void {
 		this._pos = pos;
+	}
+
+	/**
+	 * Go to the end of the stream.
+	 */
+	public goToEnd(): void {
+		this._pos = this._end;
 	}
 
 	/**
@@ -475,6 +489,23 @@ export class XmlStream {
 	}
 
 	/**
+	 * Returns a slice of text centered around the specified position.
+	 *
+	 * @param pos - The center position for the slice.
+	 * @param size - The total size of the slice (will extend size/2 in each direction).
+	 * @returns A string containing the text around the position.
+	 */
+	public getTextAround(pos: number, size: number): string {
+		const halfSize = Math.floor(size / 2);
+
+		// Calculate start and end positions with bounds checking
+		const start = Math.max(0, pos - halfSize);
+		const end = Math.min(this._end, pos + halfSize + (size % 2));
+
+		return this._text.slice(start, end);
+	}
+
+	/**
 	 * Calculates the current absolute position.
 	 * This operation is very expensive. Use only for errors.
 	 *
@@ -503,7 +534,13 @@ export class XmlStream {
 				col++;
 			}
 		}
-		return { row, col };
+		return {
+			row,
+			col,
+			...(this.config.contextSliceSize
+				? { contextSlice: this.getTextAround(pos, this.config.contextSliceSize) }
+				: {})
+		};
 	}
 }
 
@@ -536,6 +573,15 @@ export interface TXmlStreamConfig {
 	 * @default true
 	 */
 	allowDtd: boolean;
+
+	/**
+	 * Controls the inclusion and size of context slices in error positions.
+	 * When set to a number, error positions will include a text slice of that size
+	 * centered around the error location for better debugging context.
+	 * When set to false, no context slices will be included in error positions.
+	 * @default 30
+	 */
+	contextSliceSize: number | false;
 }
 
 export type TXmlStreamOptions = { pos?: number } & Partial<TXmlStreamConfig>;

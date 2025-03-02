@@ -181,7 +181,7 @@ function parseComment(s: XmlStream, tokenCallback: TTokenCallback): void {
 		throw new XmlError({ type: 'InvalidComment' }, s.genTextPosFrom(start));
 	}
 
-	tokenCallback({ type: 'Comment', text, range: s.rangeFrom(start) });
+	tokenCallback({ type: 'Comment', text, range: s.rangeFrom(start) }, s);
 }
 
 /**
@@ -207,12 +207,15 @@ function parsePi(s: XmlStream, tokenCallback: TTokenCallback): void {
 
 	s.skipString(PI_END);
 
-	tokenCallback({
-		type: 'ProcessingInstruction',
-		target,
-		content: content.length === 0 ? undefined : content,
-		range: s.rangeFrom(start)
-	});
+	tokenCallback(
+		{
+			type: 'ProcessingInstruction',
+			target,
+			content: content.length === 0 ? undefined : content,
+			range: s.rangeFrom(start)
+		},
+		s
+	);
 }
 
 /**
@@ -351,7 +354,7 @@ function parseEntityDecl(s: XmlStream, tokenCallback: TTokenCallback): void {
 	s.consumeSpaces();
 	const definition = parseEntityDef(s, isGe);
 	if (definition !== null) {
-		tokenCallback({ type: 'EntityDeclaration', name, definition });
+		tokenCallback({ type: 'EntityDeclaration', name, definition }, s);
 	}
 	s.skipSpaces();
 	s.consumeCodeUnit(GREATER_THAN);
@@ -422,7 +425,7 @@ function parseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 	const start = s.getPos();
 	s.advance(1); // '<'
 	const [prefix, local] = s.consumeQName();
-	tokenCallback({ type: 'ElementStart', prefix, local, start });
+	tokenCallback({ type: 'ElementStart', prefix, local, start }, s);
 
 	let open = false;
 	while (!s.atEnd()) {
@@ -435,12 +438,12 @@ function parseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 			s.advance(1);
 			s.consumeCodeUnit(GREATER_THAN);
 			const range = s.rangeFrom(_start);
-			tokenCallback({ type: 'ElementEnd', end: { type: 'Empty' }, range });
+			tokenCallback({ type: 'ElementEnd', end: { type: 'Empty' }, range }, s);
 			break;
 		} else if (currCodeUnit === GREATER_THAN) {
 			s.advance(1);
 			const range = s.rangeFrom(_start);
-			tokenCallback({ type: 'ElementEnd', end: { type: 'Open' }, range });
+			tokenCallback({ type: 'ElementEnd', end: { type: 'Open' }, range }, s);
 			open = true;
 			break;
 		} else {
@@ -454,13 +457,16 @@ function parseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 
 			const [_prefix, _local, value] = parseAttribute(s);
 			const end = s.getPos();
-			tokenCallback({
-				type: 'Attribute',
-				range: { start: _start, end },
-				prefix: _prefix,
-				local: _local,
-				value
-			});
+			tokenCallback(
+				{
+					type: 'Attribute',
+					range: { start: _start, end },
+					prefix: _prefix,
+					local: _local,
+					value
+				},
+				s
+			);
 		}
 	}
 
@@ -588,7 +594,7 @@ function parseCdata(s: XmlStream, tokenCallback: TTokenCallback): void {
 	);
 	s.skipString(CDATA_END);
 	const range = s.rangeFrom(start);
-	tokenCallback({ type: 'Cdata', text, range });
+	tokenCallback({ type: 'Cdata', text, range }, s);
 }
 
 /**
@@ -607,7 +613,7 @@ function parseCloseElement(s: XmlStream, tokenCallback: TTokenCallback): void {
 	s.consumeCodeUnit(GREATER_THAN);
 
 	const range = s.rangeFrom(start);
-	tokenCallback({ type: 'ElementEnd', end: { type: 'Close', prefix, local }, range });
+	tokenCallback({ type: 'ElementEnd', end: { type: 'Close', prefix, local }, range }, s);
 }
 
 /**
@@ -630,5 +636,5 @@ function parseText(
 		throw new XmlError({ type: 'InvalidCharacterData' }, s.genTextPos());
 	}
 
-	tokenCallback({ type: 'Text', text, range: s.rangeFrom(start) });
+	tokenCallback({ type: 'Text', text, range: s.rangeFrom(start) }, s);
 }

@@ -77,7 +77,7 @@ export class XmlError extends Error {
 }
 
 function formatPos(pos: TTextPos): string {
-	return `${pos.row.toString()}:${pos.col.toString()}`;
+	return `${pos.row.toString()}:${pos.col.toString()}${pos.contextSlice != null ? ` (${pos.contextSlice})` : ''}`;
 }
 
 function toUnicodeEscape(codePoint: number | string): string {
