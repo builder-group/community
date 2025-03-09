@@ -2,6 +2,7 @@ import path from 'node:path';
 import pc from 'picocolors';
 import type { Plugin, RollupOptions } from 'rollup';
 import type { PackageJson } from 'type-fest';
+import { VIRTUAL_ENTRY_ID, virtualEntryPlugin } from '../../plugins';
 import { getExeca } from '../cached-imports';
 import { resolvePkgJsonBundlePaths } from '../path';
 
@@ -27,18 +28,12 @@ export function createRollupDtsConfig(
 	}
 
 	return {
-		input: dtsPath.input,
-		output: {
-			dir: dtsPath.output,
-			preserveModules
-		},
-		plugins: [createGenerateDtsPlugin({ tsConfigPath })]
+		input: VIRTUAL_ENTRY_ID,
+		logLevel: 'silent',
+		plugins: [virtualEntryPlugin(), createGenerateDtsPlugin({ tsConfigPath })]
 	};
 }
 
-/**
- * Creates a rollup plugin that generates TypeScript declaration files
- */
 function createGenerateDtsPlugin(options: { tsConfigPath: string }): Plugin {
 	const { tsConfigPath } = options;
 

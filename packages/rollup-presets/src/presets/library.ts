@@ -14,7 +14,7 @@ import {
 	readJsonFile,
 	resolvePkgJsonBundlePaths
 } from '../lib';
-import { typescriptPaths } from '../plugins';
+import { typescriptPathsPlugin } from '../plugins';
 
 /**
  * Creates a library build configuration for rollup.
@@ -26,10 +26,11 @@ export async function libraryPreset(config: TLibraryPresetConfig): Promise<Rollu
 
 	// Read and validate package.json
 	const packageJson = await readPackageJson();
+	console.log(`--------------------------------`);
 	console.log(`Rollup Preset: ${pc.yellowBright('Library')}`);
 	console.log(`Package: ${pc.greenBright(packageJson.name)}`);
 	console.log(`Environment: ${pc.blueBright(isProduction ? 'Production' : 'Development')}`);
-	console.log(`\n`);
+	console.log(`--------------------------------`);
 
 	// Get tsconfig path
 	const tsConfigPath = getTsConfigPath(isProduction ? ['prod', null] : [null]);
@@ -91,7 +92,7 @@ export async function libraryPreset(config: TLibraryPresetConfig): Promise<Rollu
 					// Convert CommonJS modules (from node_modules) into ES modules targeted by this app
 					commonjs(),
 					// Automatically resolve path aliases set in the compilerOptions section of tsconfig.json
-					typescriptPaths({
+					typescriptPathsPlugin({
 						tsConfigPath,
 						shouldResolveRelativeToImporter: false,
 						resolveDTsSource: true

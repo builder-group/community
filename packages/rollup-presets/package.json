@@ -14,10 +14,9 @@
 	},
 	"license": "MIT",
 	"author": "@bennobuilder",
-	"main": "./dist/cjs/index.js",
-	"module": "./dist/esm/index.js",
+	"main": "./dist/index.js",
 	"source": "./src/index.ts",
-	"types": "./dist/types/index.d.ts",
+	"types": "./dist/index.d.ts",
 	"files": [
 		"dist",
 		"README.md"
