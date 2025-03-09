@@ -1,12 +1,13 @@
 import commonjs from '@rollup/plugin-commonjs';
-import picocolors from 'picocolors';
+import pc from 'picocolors';
 import type { RollupOptions } from 'rollup';
 import esbuild from 'rollup-plugin-esbuild';
 import nodeExternals from 'rollup-plugin-node-externals';
 import { PackageJson } from 'type-fest';
 import {
-	createCjsRollupOutputConfig,
-	createEsmRollupOutputConfig,
+	createRollupCjsOutputConfig,
+	createRollupDtsConfig,
+	createRollupEsmOutputConfig,
 	createRollupExternalConfig,
 	getPkgJsonPath,
 	getTsConfigPath,
@@ -21,18 +22,19 @@ import { typescriptPaths } from '../plugins';
  */
 export async function libraryPreset(config: TLibraryPresetConfig): Promise<RollupOptions[]> {
 	const { isProduction = true, preserveModules = true, sourcemap = true } = config;
+	const rollupOptions: RollupOptions[] = [];
 
 	// Read and validate package.json
 	const packageJson = await readPackageJson();
-	console.log(`Rollup Preset: ${picocolors.yellowBright('Library')}`);
-	console.log(`Package: ${picocolors.greenBright(packageJson.name)}`);
-	console.log(`Environment: ${picocolors.blueBright(isProduction ? 'Production' : 'Development')}`);
+	console.log(`Rollup Preset: ${pc.yellowBright('Library')}`);
+	console.log(`Package: ${pc.greenBright(packageJson.name)}`);
+	console.log(`Environment: ${pc.blueBright(isProduction ? 'Production' : 'Development')}`);
 	console.log(`\n`);
 
 	// Get tsconfig path
 	const tsConfigPath = getTsConfigPath(isProduction ? ['prod', null] : [null]);
 	if (tsConfigPath == null) {
-		console.log(`No tsconfig.json file found at ${picocolors.underline(process.cwd())}`);
+		console.log(`No tsconfig.json file found at ${pc.underline(process.cwd())}`);
 		process.exit(1);
 	}
 
@@ -56,72 +58,85 @@ export async function libraryPreset(config: TLibraryPresetConfig): Promise<Rollu
 		}))
 	];
 
-	// Create a config for each bundle path
-	return bundlePaths.map((bundlePath) => {
-		const { input: inputPath, output: outputPath, format } = bundlePath;
-		return {
-			input: inputPath,
-			output:
-				format === 'esm'
-					? createEsmRollupOutputConfig({
-							outputPath,
-							outputOptions: {
-								name: packageJson.name,
-								preserveModules,
-								sourcemap
-							}
-						})
-					: createCjsRollupOutputConfig({
-							outputPath,
-							outputOptions: {
-								name: packageJson.name,
-								preserveModules,
-								sourcemap
-							}
-						}),
-			plugins: [
-				// Automatically declares NodeJS built-in modules like (node:path, node:fs) as external.
-				// This prevents Rollup from trying to bundle these built-in modules,
-				// which can cause unresolved dependencies warnings.
-				nodeExternals(),
-				// Convert CommonJS modules (from node_modules) into ES modules targeted by this app
-				commonjs(),
-				// Automatically resolve path aliases set in the compilerOptions section of tsconfig.json
-				typescriptPaths({
-					tsConfigPath,
-					shouldResolveRelativeToImporter: false,
-					resolveDTsSource: true
-				}),
-				// Transpile TypeScript code to JavaScript (ES6), and minify in production
-				esbuild({
-					tsconfig: tsConfigPath,
-					minify: isProduction,
-					target: 'es6',
-					exclude: [/node_modules/],
-					loaders: {
-						'.json': 'json' // Requires @rollup/plugin-commonjs
-					},
-					sourceMap: false // Configured in rollup 'output' object
+	// Create a Rollup config for each bundle path
+	rollupOptions.push(
+		...bundlePaths.map((bundlePath) => {
+			const { input: inputPath, output: outputPath, format } = bundlePath;
+
+			return {
+				input: inputPath,
+				output:
+					format === 'esm'
+						? createRollupEsmOutputConfig({
+								outputPath,
+								outputOptions: {
+									name: packageJson.name,
+									preserveModules,
+									sourcemap
+								}
+							})
+						: createRollupCjsOutputConfig({
+								outputPath,
+								outputOptions: {
+									name: packageJson.name,
+									preserveModules,
+									sourcemap
+								}
+							}),
+				plugins: [
+					// Automatically declares NodeJS built-in modules like (node:path, node:fs) as external.
+					// This prevents Rollup from trying to bundle these built-in modules,
+					// which can cause unresolved dependencies warnings.
+					nodeExternals(),
+					// Convert CommonJS modules (from node_modules) into ES modules targeted by this app
+					commonjs(),
+					// Automatically resolve path aliases set in the compilerOptions section of tsconfig.json
+					typescriptPaths({
+						tsConfigPath,
+						shouldResolveRelativeToImporter: false,
+						resolveDTsSource: true
+					}),
+					// Transpile TypeScript code to JavaScript (ES6), and minify in production
+					esbuild({
+						tsconfig: tsConfigPath,
+						minify: isProduction,
+						target: 'es6',
+						exclude: [/node_modules/],
+						loaders: {
+							'.json': 'json' // Requires @rollup/plugin-commonjs
+						},
+						sourceMap: false // Configured in rollup 'output' object
+					})
+				],
+				external: createRollupExternalConfig(packageJson, {
+					fileTypesAsExternal: [],
+					pkgJsonDepsAsExternal: true
 				})
-			],
-			external: createRollupExternalConfig(packageJson, {
-				fileTypesAsExternal: [],
-				pkgJsonDepsAsExternal: true
-			})
-		};
-	});
+			};
+		})
+	);
+
+	// Create a Rollup config for generating TypeScript declaration files
+	rollupOptions.push(
+		createRollupDtsConfig(packageJson, {
+			tsConfigPath,
+			preserveModules
+		})
+	);
+
+	return rollupOptions;
 }
 
 function readPackageJson(): Promise<PackageJson> {
 	const packageJsonPath = getPkgJsonPath();
 	if (packageJsonPath == null) {
-		console.log(`No package.json file found at ${picocolors.underline(process.cwd())}`);
+		console.log(`No package.json file found at ${pc.underline(process.cwd())}`);
 		process.exit(1);
 	}
 
 	return readJsonFile<PackageJson>(packageJsonPath).then((packageJson) => {
 		if (packageJson == null) {
-			console.log(`Invalid package.json file found at ${picocolors.underline(packageJsonPath)}`);
+			console.log(`Invalid package.json file found at ${pc.underline(packageJsonPath)}`);
 			process.exit(1);
 		}
 		return packageJson;

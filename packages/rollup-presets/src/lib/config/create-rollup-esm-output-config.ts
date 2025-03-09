@@ -1,6 +1,6 @@
 import { OutputOptions } from 'rollup';
 
-export function createCjsRollupOutputConfig(config: {
+export function createRollupEsmOutputConfig(config: {
 	outputPath: string;
 	outputOptions: OutputOptions;
 }): OutputOptions {
@@ -10,8 +10,7 @@ export function createCjsRollupOutputConfig(config: {
 	return {
 		...outputOptions,
 		[preserveModules ? 'dir' : 'file']: outputPath,
-		format: 'cjs',
-		exports: 'named',
+		format: 'esm',
 		preserveModules,
 		inlineDynamicImports: !preserveModules
 	};
