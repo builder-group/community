@@ -11,13 +11,13 @@ import { resolvePkgJsonBundlePaths } from '../path';
  * Uses tsc to generate declarations and handles output paths based on package.json.
  */
 export function createRollupDtsConfig(
-	packageJson: PackageJson,
+	pkgJson: PackageJson,
 	options: TRollupDtsConfig = {}
 ): RollupOptions {
 	const { tsConfigPath = 'tsconfig.json', preserveModules = true } = options;
 
 	// Get declaration file output paths from package.json
-	const [dtsPath] = resolvePkgJsonBundlePaths(packageJson, {
+	const [dtsPath] = resolvePkgJsonBundlePaths(pkgJson, {
 		format: 'types',
 		preserveModules,
 		resolvePath: true

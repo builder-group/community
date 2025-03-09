@@ -28,15 +28,15 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 	const rollupOptions: RollupOptions[] = [];
 
 	// Get package.json
-	const packageJson = await getPkgJson();
-	if (packageJson == null) {
+	const pkgJson = await getPkgJson();
+	if (pkgJson == null) {
 		console.log(`No or invalid package.json file found at ${pc.underline(process.cwd())}`);
 		process.exit(1);
 	}
 
 	console.log(`--------------------------------`);
 	console.log(`Rollup Preset: ${pc.yellowBright('Library')}`);
-	console.log(`Package: ${pc.greenBright(packageJson.name)}`);
+	console.log(`Package: ${pc.greenBright(pkgJson.name)}`);
 	console.log(`Environment: ${pc.blueBright(environment)}`);
 	console.log(`--------------------------------`);
 
@@ -51,7 +51,7 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 
 	// Get bundle paths for specified formats
 	const bundlePaths = formats.flatMap((format) =>
-		resolvePkgJsonBundlePaths(packageJson, {
+		resolvePkgJsonBundlePaths(pkgJson, {
 			format,
 			preserveModules,
 			resolvePath: true
@@ -74,7 +74,7 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 						? createRollupEsmOutputConfig({
 								outputPath,
 								outputOptions: {
-									name: packageJson.name,
+									name: pkgJson.name,
 									preserveModules,
 									sourcemap
 								}
@@ -82,7 +82,7 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 						: createRollupCjsOutputConfig({
 								outputPath,
 								outputOptions: {
-									name: packageJson.name,
+									name: pkgJson.name,
 									preserveModules,
 									sourcemap
 								}
@@ -125,7 +125,7 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 					// Stage 4: Post-processing
 					...(additionalPlugins.post ?? [])
 				],
-				external: createRollupExternalConfig(packageJson, {
+				external: createRollupExternalConfig(pkgJson, {
 					fileTypesAsExternal: [],
 					pkgJsonDepsAsExternal: true
 				})
@@ -137,7 +137,7 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 
 	// Create a Rollup config for generating TypeScript declaration files
 	rollupOptions.push(
-		createRollupDtsConfig(packageJson, {
+		createRollupDtsConfig(pkgJson, {
 			tsConfigPath,
 			preserveModules
 		})

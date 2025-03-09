@@ -35,14 +35,14 @@ import type { PackageJson } from 'type-fest';
  * ```
  */
 export function resolvePkgJsonBundlePaths(
-	packageJson: PackageJson,
+	pkgJson: PackageJson,
 	config: TResolvePkgJsonBundlePathConfig
 ): TBundlePath[] {
 	const paths: TBundlePath[] = [];
 
 	// Handle exports field (conditional exports)
-	if (packageJson.exports != null) {
-		const exports = packageJson.exports;
+	if (pkgJson.exports != null) {
+		const exports = pkgJson.exports;
 
 		// Handle object exports
 		if (isExportConditions(exports)) {
@@ -74,9 +74,9 @@ export function resolvePkgJsonBundlePaths(
 	}
 
 	// Fallback to standard fields if no paths found
-	if (paths.length === 0 && isExportConditions(packageJson)) {
+	if (paths.length === 0 && isExportConditions(pkgJson)) {
 		paths.push(
-			resolveBundlePath(packageJson, {
+			resolveBundlePath(pkgJson, {
 				...config,
 				fieldMap: FORMAT_FIELD_MAP.standard
 			})
