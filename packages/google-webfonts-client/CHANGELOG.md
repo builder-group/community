@@ -1,5 +1,16 @@
 # google-webfonts-client
 
+## 0.0.30
+
+### Patch Changes
+
+- migrated to `rollup-presets` and updated deps
+
+- Updated dependencies []:
+  - feature-fetch@0.0.39
+  - @blgc/types@0.0.16
+  - @blgc/utils@0.0.39
+
 ## 0.0.29
 
 ### Patch Changes

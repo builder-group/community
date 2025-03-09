@@ -1,5 +1,15 @@
 # feature-state
 
+## 0.0.48
+
+### Patch Changes
+
+- migrated to `rollup-presets` and updated deps
+
+- Updated dependencies []:
+  - @blgc/types@0.0.16
+  - @blgc/utils@0.0.39
+
 ## 0.0.45
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # validation-adapters
 
+## 0.0.22
+
+### Patch Changes
+
+- migrated to `rollup-presets` and updated deps
+
+- Updated dependencies []:
+  - validation-adapter@0.0.20
+
 ## 0.0.21
 
 ### Patch Changes
