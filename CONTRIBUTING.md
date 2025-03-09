@@ -26,8 +26,8 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"version": "0.0.1",
 	"private": true, // Or false if package should be published to NPM
 	"scripts": {
-		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
-		"build:prod": "pnpm build -t prod",
+		"build": "shx rm -rf dist && rollup -c rollup.config.js",
+		"build:prod": "export NODE_ENV=production && pnpm build",
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint . --fix",
