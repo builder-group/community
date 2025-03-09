@@ -46,16 +46,16 @@ First, configure your package.json to define the bundle paths. You can use eithe
 
 ```json
 {
-  "name": "my-library",
-  "version": "1.0.0",
-  "exports": {
-    ".": {
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js",
-      "types": "./dist/types/index.d.ts",
-      "source": "./src/index.ts"
-    }
-  }
+	"name": "my-library",
+	"version": "1.0.0",
+	"exports": {
+		".": {
+			"import": "./dist/esm/index.js",
+			"require": "./dist/cjs/index.js",
+			"types": "./dist/types/index.d.ts",
+			"source": "./src/index.ts"
+		}
+	}
 }
 ```
 
@@ -63,12 +63,12 @@ Or using standard fields:
 
 ```json
 {
-  "name": "my-library",
-  "version": "1.0.0",
-  "main": "./dist/cjs/index.js",
-  "module": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
-  "source": "./src/index.ts"
+	"name": "my-library",
+	"version": "1.0.0",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"types": "./dist/types/index.d.ts",
+	"source": "./src/index.ts"
 }
 ```
 
@@ -81,6 +81,7 @@ export default libraryPreset();
 ```
 
 That's it! This will automatically:
+
 - Build ESM and CJS formats
 - Generate TypeScript declarations
 - Support path aliases from tsconfig.json
@@ -90,32 +91,32 @@ That's it! This will automatically:
 
 ```ts
 libraryPreset({
-  // Build environment
-  environment: 'production',
-  // Keep directory structure
-  preserveModules: true,
-  // Output formats to generate
-  formats: ['esm', 'cjs'],
-  // Plugin stages for maximum control
-  plugins: {
-    // Stage 1: Pre-processing
-    // Perfect for file replacements, virtual modules, or environment setup
-    pre: [replacePlugin()],
-    
-    // Stage 2: Path-aware Transformations
-    // Runs after TypeScript paths are resolved
-    // Perfect for CSS imports, asset handling, or any path-dependent plugins
-    transform: [cssPlugin()],
-    
-    // Stage 3: Post-processing
-    // Perfect for bundle analysis, compression, or final optimizations
-    post: [analyzePlugin()]
-  },
-  // Customize esbuild options
-  esbuildOptions: {
-    target: 'es2020'
-  },
-  // Modify final config for each bundle
-  onCreateConfig: (config, bundlePath) => config
+	// Build environment
+	environment: 'production',
+	// Keep directory structure
+	preserveModules: true,
+	// Output formats to generate
+	formats: ['esm', 'cjs'],
+	// Plugin stages for maximum control
+	plugins: {
+		// Stage 1: Pre-processing
+		// Perfect for file replacements, virtual modules, or environment setup
+		pre: [replacePlugin()],
+
+		// Stage 2: Path-aware Transformations
+		// Runs after TypeScript paths are resolved
+		// Perfect for CSS imports, asset handling, or any path-dependent plugins
+		transform: [cssPlugin()],
+
+		// Stage 3: Post-processing
+		// Perfect for bundle analysis, compression, or final optimizations
+		post: [analyzePlugin()]
+	},
+	// Customize esbuild options
+	esbuildOptions: {
+		target: 'es2020'
+	},
+	// Modify final config for each bundle
+	onCreateConfig: (config, bundlePath) => config
 });
 ```
