@@ -53,8 +53,8 @@
 		"README.md"
 	],
 	"scripts": {
-		"build": "shx rm -rf dist && ../../scripts/cli.sh bundle -b typesonly",
-		"build:prod": "pnpm build -t prod",
+		"build": "shx rm -rf dist && rollup -c rollup.config.js",
+		"build:prod": "export NODE_ENV=production && pnpm build",
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint . --fix",
@@ -62,6 +62,7 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"devDependencies": {
-		"@blgc/config": "workspace:*"
+		"@blgc/config": "workspace:*",
+		"rollup-presets": "workspace:*"
 	}
 }
