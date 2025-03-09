@@ -63,7 +63,7 @@
 	],
 	"scripts": {
 		"build": "shx rm -rf dist && rollup -c rollup.config.js",
-		"build:prod": "pnpm build -t prod",
+		"build:prod": "export NODE_ENV=production && pnpm build",
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint . --fix",

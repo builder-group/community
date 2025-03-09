@@ -18,9 +18,9 @@ import { typescriptPathsPlugin } from '../plugins';
 
 export async function libraryPreset(options: TLibraryPresetOptions = {}): Promise<RollupOptions[]> {
 	const {
-		environment = (process.env['NODE_ENV'] as TEnvironment) ?? 'production',
+		environment = (process.env['NODE_ENV'] as TEnvironment) ?? 'development',
 		preserveModules = true,
-		sourcemap = environment === 'production',
+		sourcemap = environment === 'development',
 		formats = ['esm', 'cjs'],
 		plugins: additionalPlugins = {},
 		esbuildOptions = {},
@@ -160,7 +160,7 @@ function readPackageJson(): Promise<PackageJson> {
 export interface TLibraryPresetOptions {
 	/**
 	 * Build environment
-	 * @default 'production'
+	 * @default 'development'
 	 */
 	environment?: TEnvironment;
 
@@ -172,7 +172,7 @@ export interface TLibraryPresetOptions {
 
 	/**
 	 * Whether to generate source maps
-	 * @default true in production
+	 * @default true in development, false in production
 	 */
 	sourcemap?: boolean;
 
