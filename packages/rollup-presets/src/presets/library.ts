@@ -2,16 +2,14 @@ import commonjs from '@rollup/plugin-commonjs';
 import pc from 'picocolors';
 import type { Plugin, RollupOptions } from 'rollup';
 import esbuild from 'rollup-plugin-esbuild';
-import { PackageJson } from 'type-fest';
 import {
 	createRollupCjsOutputConfig,
 	createRollupDtsConfig,
 	createRollupEsmOutputConfig,
 	createRollupExternalConfig,
-	getPkgJsonPath,
+	getPkgJson,
 	getRollupPluginNodeExternals,
 	getTsConfigPath,
-	readJsonFile,
 	resolvePkgJsonBundlePaths
 } from '../lib';
 import { typescriptPathsPlugin } from '../plugins';
@@ -29,8 +27,13 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 
 	const rollupOptions: RollupOptions[] = [];
 
-	// Read and validate package.json
-	const packageJson = await readPackageJson();
+	// Get package.json
+	const packageJson = await getPkgJson();
+	if (packageJson == null) {
+		console.log(`No or invalid package.json file found at ${pc.underline(process.cwd())}`);
+		process.exit(1);
+	}
+
 	console.log(`--------------------------------`);
 	console.log(`Rollup Preset: ${pc.yellowBright('Library')}`);
 	console.log(`Package: ${pc.greenBright(packageJson.name)}`);
@@ -141,22 +144,6 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 	);
 
 	return rollupOptions;
-}
-
-function readPackageJson(): Promise<PackageJson> {
-	const packageJsonPath = getPkgJsonPath();
-	if (packageJsonPath == null) {
-		console.log(`No package.json file found at ${pc.underline(process.cwd())}`);
-		process.exit(1);
-	}
-
-	return readJsonFile<PackageJson>(packageJsonPath).then((packageJson) => {
-		if (packageJson == null) {
-			console.log(`Invalid package.json file found at ${pc.underline(packageJsonPath)}`);
-			process.exit(1);
-		}
-		return packageJson;
-	});
 }
 
 export interface TLibraryPresetOptions {
