@@ -35,13 +35,13 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@0no-co/graphql.web": "^1.1.1",
+		"@0no-co/graphql.web": "^1.1.2",
 		"@blgc/types": "workspace:*",
 		"@blgc/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.13.5",
+		"@types/node": "^22.13.10",
 		"@types/url-parse": "^1.4.11",
 		"msw": "^2.7.3",
 		"rollup-presets": "workspace:*"

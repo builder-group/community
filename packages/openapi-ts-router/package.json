@@ -42,7 +42,7 @@
 		"@blgc/types": "workspace:*",
 		"@types/express": "^5.0.0",
 		"@types/express-serve-static-core": "^5.0.6",
-		"@types/node": "^22.13.9",
+		"@types/node": "^22.13.10",
 		"express": "^4.21.2",
 		"hono": "^4.7.4",
 		"rollup-presets": "workspace:*",

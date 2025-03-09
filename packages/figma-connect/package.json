@@ -60,7 +60,7 @@
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@figma/plugin-typings": "^1.108.0",
-		"@types/node": "^22.13.5",
+		"@types/node": "^22.13.10",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [

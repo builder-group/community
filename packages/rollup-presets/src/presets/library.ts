@@ -2,7 +2,6 @@ import commonjs from '@rollup/plugin-commonjs';
 import pc from 'picocolors';
 import type { Plugin, RollupOptions } from 'rollup';
 import esbuild from 'rollup-plugin-esbuild';
-import nodeExternals from 'rollup-plugin-node-externals';
 import { PackageJson } from 'type-fest';
 import {
 	createRollupCjsOutputConfig,
@@ -10,6 +9,7 @@ import {
 	createRollupEsmOutputConfig,
 	createRollupExternalConfig,
 	getPkgJsonPath,
+	getRollupPluginNodeExternals,
 	getTsConfigPath,
 	readJsonFile,
 	resolvePkgJsonBundlePaths
@@ -57,6 +57,8 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 			format
 		}))
 	);
+
+	const { default: nodeExternals } = await getRollupPluginNodeExternals();
 
 	// Create a Rollup config for each bundle path
 	rollupOptions.push(

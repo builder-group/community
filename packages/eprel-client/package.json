@@ -42,7 +42,7 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.13.5",
+		"@types/node": "^22.13.10",
 		"dotenv": "^16.4.7",
 		"openapi-typescript": "^7.6.1",
 		"rollup-presets": "workspace:*"

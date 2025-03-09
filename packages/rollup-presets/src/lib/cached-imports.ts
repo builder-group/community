@@ -6,6 +6,9 @@
  */
 
 export const getExeca = createCachedImport<typeof import('execa')>('execa');
+export const getRollupPluginNodeExternals = createCachedImport<
+	typeof import('rollup-plugin-node-externals')
+>('rollup-plugin-node-externals');
 
 function createCachedImport<T>(moduleName: string): () => Promise<T> {
 	let cachedModule: Promise<T>;
