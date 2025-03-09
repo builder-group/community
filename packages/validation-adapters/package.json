@@ -62,7 +62,7 @@
 		"README.md"
 	],
 	"scripts": {
-		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
+		"build": "shx rm -rf dist && rollup -c rollup.config.js",
 		"build:prod": "pnpm build -t prod",
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
@@ -79,6 +79,7 @@
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@types/node": "^22.13.5",
+		"rollup-presets": "workspace:*",
 		"valibot": "1.0.0-rc.2",
 		"yup": "^1.6.1",
 		"zod": "^3.24.2"

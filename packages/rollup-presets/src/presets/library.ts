@@ -1,6 +1,6 @@
 import commonjs from '@rollup/plugin-commonjs';
 import pc from 'picocolors';
-import type { RollupOptions } from 'rollup';
+import type { Plugin, RollupOptions } from 'rollup';
 import esbuild from 'rollup-plugin-esbuild';
 import nodeExternals from 'rollup-plugin-node-externals';
 import { PackageJson } from 'type-fest';
@@ -16,12 +16,17 @@ import {
 } from '../lib';
 import { typescriptPathsPlugin } from '../plugins';
 
-/**
- * Creates a library build configuration for rollup.
- * Supports both ESM and CJS output formats with TypeScript path resolution.
- */
-export async function libraryPreset(config: TLibraryPresetConfig): Promise<RollupOptions[]> {
-	const { isProduction = true, preserveModules = true, sourcemap = true } = config;
+export async function libraryPreset(options: TLibraryPresetOptions = {}): Promise<RollupOptions[]> {
+	const {
+		environment = (process.env['NODE_ENV'] as TEnvironment) ?? 'production',
+		preserveModules = true,
+		sourcemap = environment === 'production',
+		formats = ['esm', 'cjs'],
+		plugins: additionalPlugins = {},
+		esbuildOptions = {},
+		onCreateConfig
+	} = options;
+
 	const rollupOptions: RollupOptions[] = [];
 
 	// Read and validate package.json
@@ -29,42 +34,35 @@ export async function libraryPreset(config: TLibraryPresetConfig): Promise<Rollu
 	console.log(`--------------------------------`);
 	console.log(`Rollup Preset: ${pc.yellowBright('Library')}`);
 	console.log(`Package: ${pc.greenBright(packageJson.name)}`);
-	console.log(`Environment: ${pc.blueBright(isProduction ? 'Production' : 'Development')}`);
+	console.log(`Environment: ${pc.blueBright(environment)}`);
 	console.log(`--------------------------------`);
 
 	// Get tsconfig path
-	const tsConfigPath = getTsConfigPath(isProduction ? ['prod', null] : [null]);
+	const tsConfigPath = getTsConfigPath(
+		environment === 'production' ? ['prod', null] : ['dev', null]
+	);
 	if (tsConfigPath == null) {
 		console.log(`No tsconfig.json file found at ${pc.underline(process.cwd())}`);
 		process.exit(1);
 	}
 
-	// Get bundle paths for both ESM and CJS formats
-	const bundlePaths = [
-		...resolvePkgJsonBundlePaths(packageJson, {
-			format: 'esm',
+	// Get bundle paths for specified formats
+	const bundlePaths = formats.flatMap((format) =>
+		resolvePkgJsonBundlePaths(packageJson, {
+			format,
 			preserveModules,
 			resolvePath: true
 		}).map((bundlePath) => ({
 			...bundlePath,
-			format: 'esm'
-		})),
-		...resolvePkgJsonBundlePaths(packageJson, {
-			format: 'cjs',
-			preserveModules,
-			resolvePath: true
-		}).map((bundlePath) => ({
-			...bundlePath,
-			format: 'cjs'
+			format
 		}))
-	];
+	);
 
 	// Create a Rollup config for each bundle path
 	rollupOptions.push(
 		...bundlePaths.map((bundlePath) => {
 			const { input: inputPath, output: outputPath, format } = bundlePath;
-
-			return {
+			const baseConfig: RollupOptions = {
 				input: inputPath,
 				output:
 					format === 'esm'
@@ -85,35 +83,50 @@ export async function libraryPreset(config: TLibraryPresetConfig): Promise<Rollu
 								}
 							}),
 				plugins: [
-					// Automatically declares NodeJS built-in modules like (node:path, node:fs) as external.
-					// This prevents Rollup from trying to bundle these built-in modules,
-					// which can cause unresolved dependencies warnings.
+					// Stage 1: Pre-processing
+					...(additionalPlugins.pre ?? []),
+
+					// Marks Node.js built-in modules (node:*) as external to prevent bundling
+					// and avoid unresolved dependency warnings
 					nodeExternals(),
-					// Convert CommonJS modules (from node_modules) into ES modules targeted by this app
+
+					// Transforms CommonJS modules from node_modules into ES modules for compatibility
 					commonjs(),
-					// Automatically resolve path aliases set in the compilerOptions section of tsconfig.json
+
+					// Resolves TypeScript path aliases from tsconfig.json for proper module imports
 					typescriptPathsPlugin({
 						tsConfigPath,
 						shouldResolveRelativeToImporter: false,
 						resolveDTsSource: true
 					}),
-					// Transpile TypeScript code to JavaScript (ES6), and minify in production
+
+					// Stage 3: Path-aware Transformations
+					...(additionalPlugins.transform ?? []),
+
+					// Handles TypeScript compilation, minification, and JSON imports
+					// Uses esbuild for fast builds while maintaining compatibility
 					esbuild({
 						tsconfig: tsConfigPath,
-						minify: isProduction,
+						minify: environment === 'production',
 						target: 'es6',
 						exclude: [/node_modules/],
 						loaders: {
-							'.json': 'json' // Requires @rollup/plugin-commonjs
+							'.json': 'json' // Enables JSON imports via commonjs
 						},
-						sourceMap: false // Configured in rollup 'output' object
-					})
+						sourceMap: false, // Handled by rollup output config
+						...esbuildOptions
+					}),
+
+					// Stage 4: Post-processing
+					...(additionalPlugins.post ?? [])
 				],
 				external: createRollupExternalConfig(packageJson, {
 					fileTypesAsExternal: [],
 					pkgJsonDepsAsExternal: true
 				})
 			};
+
+			return onCreateConfig != null ? onCreateConfig(baseConfig, bundlePath) : baseConfig;
 		})
 	);
 
@@ -144,12 +157,12 @@ function readPackageJson(): Promise<PackageJson> {
 	});
 }
 
-export interface TLibraryPresetConfig {
+export interface TLibraryPresetOptions {
 	/**
-	 * Whether to build for production (enables minification)
-	 * @default true
+	 * Build environment
+	 * @default 'production'
 	 */
-	isProduction?: boolean;
+	environment?: TEnvironment;
 
 	/**
 	 * Whether to preserve the module structure in output
@@ -159,7 +172,42 @@ export interface TLibraryPresetConfig {
 
 	/**
 	 * Whether to generate source maps
-	 * @default true
+	 * @default true in production
 	 */
 	sourcemap?: boolean;
+
+	/**
+	 * Output formats to generate
+	 * @default ['esm', 'cjs']
+	 */
+	formats?: Array<'esm' | 'cjs'>;
+
+	/**
+	 * Additional plugins for each build stage:
+	 * - pre: Runs before any resolution (e.g., file replacements, virtual modules)
+	 * - transform: Runs after TS paths resolved (e.g., css/asset imports)
+	 * - post: Runs after bundling (e.g., bundle analysis, compression)
+	 */
+	plugins?: {
+		pre?: Plugin[];
+		transform?: Plugin[];
+		post?: Plugin[];
+	};
+
+	/**
+	 * Options to pass to the esbuild plugin
+	 */
+	esbuildOptions?: Record<string, unknown>;
+
+	/**
+	 * Callback to modify the rollup config for each bundle
+	 * @param config The base rollup config
+	 * @param bundlePath The current bundle path being processed
+	 */
+	onCreateConfig?: (
+		config: RollupOptions,
+		bundlePath: { input: string; output: string; format: string }
+	) => RollupOptions;
 }
+
+type TEnvironment = 'development' | 'production';

@@ -687,6 +687,9 @@ importers:
       '@types/node':
         specifier: ^22.13.5
         version: 22.13.9
+      rollup-presets:
+        specifier: workspace:*
+        version: link:../rollup-presets
 
   packages/validatenv:
     dependencies:
@@ -729,6 +732,9 @@ importers:
       '@types/node':
         specifier: ^22.13.5
         version: 22.13.9
+      rollup-presets:
+        specifier: workspace:*
+        version: link:../rollup-presets
       valibot:
         specifier: 1.0.0-rc.2
         version: 1.0.0-rc.2(typescript@5.8.2)

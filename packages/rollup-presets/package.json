@@ -1,8 +1,8 @@
 {
 	"name": "rollup-presets",
-	"version": "0.0.3",
+	"version": "0.0.5",
 	"private": false,
-	"description": "Collection of Rollup presets",
+	"description": "A collection of opinionated, production-ready Rollup presets",
 	"keywords": [],
 	"homepage": "https://builder.group/?source=package-json",
 	"bugs": {
@@ -23,11 +23,10 @@
 	],
 	"scripts": {
 		"build": "shx rm -rf dist && tsc",
-		"build:prod": "pnpm build -t prod",
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint . --fix",
-		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"publish:patch": "pnpm build && pnpm version patch && pnpm publish --no-git-checks --access=public",
 		"start:dev": "tsc -w",
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest"
