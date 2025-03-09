@@ -1,5 +1,15 @@
 # validatenv
 
+## 0.0.32
+
+### Patch Changes
+
+- migrated to `rollup-presets` and updated deps
+
+- Updated dependencies []:
+  - validation-adapter@0.0.20
+  - @blgc/utils@0.0.39
+
 ## 0.0.31
 
 ### Patch Changes

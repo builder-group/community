@@ -1,5 +1,11 @@
 # xml-tokenizer
 
+## 0.0.32
+
+### Patch Changes
+
+- migrated to `rollup-presets` and updated deps
+
 ## 0.0.26
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
 	"name": "elevenlabs-client",
-	"version": "0.0.16",
+	"version": "0.0.17",
 	"private": false,
 	"description": "Typesafe and straightforward fetch client for interacting with the ElevenLabs API using feature-fetch",
 	"keywords": [],
@@ -23,8 +23,8 @@
 		"README.md"
 	],
 	"scripts": {
-		"build": "shx rm -rf dist && chmod +x ../../scripts/cli.sh && ../../scripts/cli.sh bundle",
-		"build:prod": "pnpm build -t prod",
+		"build": "shx rm -rf dist && rollup -c rollup.config.js",
+		"build:prod": "export NODE_ENV=production && pnpm build",
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint . --fix",
@@ -42,9 +42,10 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.13.5",
+		"@types/node": "^22.13.10",
 		"dotenv": "^16.4.7",
-		"openapi-typescript": "^7.6.1"
+		"openapi-typescript": "^7.6.1",
+		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [
 		{

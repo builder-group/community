@@ -1,5 +1,14 @@
 # figma-connect
 
+## 0.0.24
+
+### Patch Changes
+
+- migrated to `rollup-presets` and updated deps
+
+- Updated dependencies []:
+  - @blgc/utils@0.0.39
+
 ## 0.0.23
 
 ### Patch Changes

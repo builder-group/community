@@ -1,5 +1,11 @@
 # @blgc/config
 
+## 0.0.33
+
+### Patch Changes
+
+- migrated to `rollup-presets` and updated deps
+
 ## 0.0.32
 
 ### Patch Changes

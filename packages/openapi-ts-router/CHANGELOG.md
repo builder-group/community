@@ -1,5 +1,14 @@
 # openapi-ts-router
 
+## 0.2.8
+
+### Patch Changes
+
+- migrated to `rollup-presets` and updated deps
+
+- Updated dependencies []:
+  - validation-adapter@0.0.20
+
 ## 0.2.5
 
 ### Patch Changes
