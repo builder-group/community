@@ -1,3 +1,4 @@
+import path from 'path';
 import commonjs from '@rollup/plugin-commonjs';
 import pc from 'picocolors';
 import type { Plugin, RollupOptions } from 'rollup';
@@ -55,10 +56,7 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 			format,
 			preserveModules,
 			resolvePath: true
-		}).map((bundlePath) => ({
-			...bundlePath,
-			format
-		}))
+		})
 	);
 
 	const { default: nodeExternals } = await getRollupPluginNodeExternals();
@@ -66,13 +64,14 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 	// Create a Rollup config for each bundle path
 	rollupOptions.push(
 		...bundlePaths.map((bundlePath) => {
-			const { input: inputPath, output: outputPath, format } = bundlePath;
+			const { input: inputPath, output: outputPath, format, extension } = bundlePath;
 			const baseConfig: RollupOptions = {
 				input: inputPath,
 				output:
 					format === 'esm'
 						? createRollupEsmOutputConfig({
 								outputPath,
+								extension,
 								outputOptions: {
 									name: pkgJson.name,
 									preserveModules,
@@ -81,6 +80,7 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 							})
 						: createRollupCjsOutputConfig({
 								outputPath,
+								extension,
 								outputOptions: {
 									name: pkgJson.name,
 									preserveModules,
@@ -130,18 +130,37 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 					pkgJsonDepsAsExternal: true
 				})
 			};
-
 			return onCreateConfig != null ? onCreateConfig(baseConfig, bundlePath) : baseConfig;
 		})
 	);
 
-	// Create a Rollup config for generating TypeScript declaration files
-	rollupOptions.push(
-		createRollupDtsConfig(pkgJson, {
-			tsConfigPath,
-			preserveModules
-		})
-	);
+	const typesPaths = new Set<string>();
+	for (const bundlePath of bundlePaths) {
+		if (bundlePath.types != null) {
+			typesPaths.add(bundlePath.types);
+		}
+	}
+
+	// Add type declaration configs
+	if (typesPaths.size > 0) {
+		rollupOptions.push(
+			...Array.from(typesPaths).map((typesPath) =>
+				createRollupDtsConfig({
+					tsConfigPath,
+					outDir: path.dirname(typesPath),
+					extension: `.d${path.extname(typesPath)}` as '.d.ts' | '.d.mts' | '.d.cts'
+				})
+			)
+		);
+	}
+	// Fallback to default types location if no type paths specified
+	else {
+		rollupOptions.push(
+			createRollupDtsConfig({
+				tsConfigPath
+			})
+		);
+	}
 
 	return rollupOptions;
 }
