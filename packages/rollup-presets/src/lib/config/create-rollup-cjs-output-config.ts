@@ -1,10 +1,8 @@
 import { OutputOptions } from 'rollup';
 
-export function createRollupCjsOutputConfig(config: {
-	outputPath: string;
-	extension?: `.${string}`;
-	outputOptions: OutputOptions;
-}): OutputOptions {
+export function createRollupCjsOutputConfig(
+	config: TCreateRollupCjsOutputConfigConfig
+): OutputOptions {
 	const { outputOptions, outputPath, extension = '.cjs' } = config;
 	const { preserveModules = true } = outputOptions;
 
@@ -17,4 +15,10 @@ export function createRollupCjsOutputConfig(config: {
 		inlineDynamicImports: !preserveModules,
 		entryFileNames: `[name]${extension}`
 	};
+}
+
+interface TCreateRollupCjsOutputConfigConfig {
+	outputPath: string;
+	extension?: `.${string}`;
+	outputOptions: OutputOptions;
 }

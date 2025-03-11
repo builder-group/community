@@ -1,10 +1,8 @@
 import { OutputOptions } from 'rollup';
 
-export function createRollupEsmOutputConfig(config: {
-	outputPath: string;
-	extension?: `.${string}`;
-	outputOptions: OutputOptions;
-}): OutputOptions {
+export function createRollupEsmOutputConfig(
+	config: TCreateRollupEsmOutputConfigConfig
+): OutputOptions {
 	const { outputOptions, outputPath, extension = '.mjs' } = config;
 	const { preserveModules = true } = outputOptions;
 
@@ -16,4 +14,10 @@ export function createRollupEsmOutputConfig(config: {
 		inlineDynamicImports: !preserveModules,
 		entryFileNames: `[name]${extension}`
 	};
+}
+
+interface TCreateRollupEsmOutputConfigConfig {
+	outputPath: string;
+	extension?: `.${string}`;
+	outputOptions: OutputOptions;
 }

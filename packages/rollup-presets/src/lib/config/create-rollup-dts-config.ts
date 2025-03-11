@@ -1,51 +1,58 @@
 import path from 'node:path';
-import pc from 'picocolors';
+import * as pc from 'picocolors';
 import type { Plugin, RollupOptions } from 'rollup';
+import { dts } from 'rollup-plugin-dts';
+import type { CompilerOptions } from 'typescript';
 import { VIRTUAL_ENTRY_ID, virtualEntryPlugin } from '../../plugins';
 import { getExeca } from '../cached-imports';
 
-/**
- * Creates a rollup config for generating TypeScript declaration files.
- * Uses tsc to generate declarations and handles output paths based on package.json.
- *
- * @example Basic usage (outputs .d.ts files)
- * ```ts
- * createRollupDtsConfig({
- *   outDir: './dist/types'
- * });
- * ```
- *
- * @example With specific extension
- * ```ts
- * createRollupDtsConfig({
- *   extension: '.d.mts', // or '.d.cts' or '.d.ts'
- *   outDir: './dist/types'
- * });
- * ```
- */
-export function createRollupDtsConfig(options: TRollupDtsConfig = {}): RollupOptions {
-	const { tsConfigPath = 'tsconfig.json', extension = '.d.ts', outDir = './dist/types' } = options;
+export function createRollupDtsConfig(config: TRollupDtsConfig): RollupOptions {
+	const {
+		tsConfigPath,
+		outputPath,
+		inputPath,
+		format = 'esm',
+		preserveModules = true,
+		compilerOptions = {}
+	} = config;
+
+	if (preserveModules) {
+		return {
+			input: VIRTUAL_ENTRY_ID,
+			logLevel: 'silent',
+			plugins: [
+				virtualEntryPlugin(),
+				createGenerateDtsPlugin({
+					tsConfigPath,
+					outDir: path.dirname(outputPath)
+				})
+			]
+		};
+	}
 
 	return {
-		input: VIRTUAL_ENTRY_ID,
-		logLevel: 'silent',
+		input: inputPath,
+		output: {
+			file: outputPath,
+			format
+		},
 		plugins: [
-			virtualEntryPlugin(),
-			createGenerateDtsPlugin({
-				tsConfigPath,
-				extension,
-				outDir
+			dts({
+				respectExternal: true,
+				tsconfig: tsConfigPath,
+				compilerOptions: {
+					outDir: path.dirname(outputPath),
+					declarationDir: path.dirname(outputPath),
+					...compilerOptions
+				}
 			})
 		]
 	};
 }
 
-function createGenerateDtsPlugin(options: {
-	tsConfigPath: string;
-	extension: '.d.ts' | '.d.mts' | '.d.cts';
-	outDir: string;
-}): Plugin {
-	const { tsConfigPath, extension, outDir } = options;
+// TODO: Replace with 'rollup-plugin-ts-declarations'
+function createGenerateDtsPlugin(options: { tsConfigPath: string; outDir: string }): Plugin {
+	const { tsConfigPath, outDir } = options;
 
 	return {
 		name: 'generate-dts',
@@ -65,24 +72,7 @@ function createGenerateDtsPlugin(options: {
 					outDir
 				]);
 
-				// Only rename files if a non-standard extension is requested
-				if (extension !== '.d.ts') {
-					await execa('find', [
-						outDir,
-						'-name',
-						'*.d.ts',
-						'-exec',
-						'sh',
-						'-c',
-						`for f do mv "$f" "\${f%.d.ts}${extension}"; done`,
-						'_',
-						'{}',
-						'+'
-					]);
-					console.log(pc.green(`✓ TypeScript declarations generated with ${extension} extension`));
-				} else {
-					console.log(pc.green('✓ TypeScript declarations generated'));
-				}
+				console.log(pc.green('✓ TypeScript declarations generated'));
 			} catch (error) {
 				console.error(pc.red('Failed to generate TypeScript declarations:'));
 				console.error(error);
@@ -94,20 +84,38 @@ function createGenerateDtsPlugin(options: {
 
 export interface TRollupDtsConfig {
 	/**
+	 * Path to the input TypeScript file
+	 * @example './src/index.ts'
+	 */
+	inputPath: string;
+
+	/**
+	 * Path where declaration files will be output
+	 * @example './dist/types/index.d.ts'
+	 */
+	outputPath: string;
+
+	/**
 	 * Path to tsconfig.json file
-	 * @default 'tsconfig.json'
+	 * @example './tsconfig.json'
 	 */
-	tsConfigPath?: string;
+	tsConfigPath: string;
 
 	/**
-	 * Extension for declaration files
-	 * @default '.d.ts'
+	 * Format for the output file
+	 * @default 'esm'
 	 */
-	extension?: '.d.ts' | '.d.mts' | '.d.cts';
+	format?: 'esm' | 'cjs';
 
 	/**
-	 * Output directory for type declarations
-	 * @default './dist/types'
+	 * Whether to preserve the module structure
+	 * @default true
 	 */
-	outDir?: string;
+	preserveModules?: boolean;
+
+	/**
+	 * Additional TypeScript compiler options that will be merged with
+	 * the ones from tsconfig.json
+	 */
+	compilerOptions?: CompilerOptions;
 }

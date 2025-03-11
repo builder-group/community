@@ -607,6 +607,9 @@ importers:
       picocolors:
         specifier: ^1.1.1
         version: 1.1.1
+      rollup-plugin-dts:
+        specifier: ^6.1.1
+        version: 6.1.1(rollup@4.35.0)(typescript@5.8.2)
       rollup-plugin-esbuild:
         specifier: ^6.2.1
         version: 6.2.1(esbuild@0.25.0)(rollup@4.35.0)
@@ -3347,6 +3350,13 @@ packages:
   reusify@1.1.0:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
+
+  rollup-plugin-dts@6.1.1:
+    resolution: {integrity: sha512-aSHRcJ6KG2IHIioYlvAOcEq6U99sVtqDDKVhnwt70rW6tsz3tv5OSjEiWcgzfsHdLyGXZ/3b/7b/+Za3Y6r1XA==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      rollup: ^3.29.4 || ^4
+      typescript: ^4.5 || ^5.0
 
   rollup-plugin-esbuild@6.2.1:
     resolution: {integrity: sha512-jTNOMGoMRhs0JuueJrJqbW8tOwxumaWYq+V5i+PD+8ecSCVkuX27tGW7BXqDgoULQ55rO7IdNxPcnsWtshz3AA==}
@@ -6777,6 +6787,14 @@ snapshots:
       supports-preserve-symlinks-flag: 1.0.0
 
   reusify@1.1.0: {}
+
+  rollup-plugin-dts@6.1.1(rollup@4.35.0)(typescript@5.8.2):
+    dependencies:
+      magic-string: 0.30.17
+      rollup: 4.35.0
+      typescript: 5.8.2
+    optionalDependencies:
+      '@babel/code-frame': 7.26.2
 
   rollup-plugin-esbuild@6.2.1(esbuild@0.25.0)(rollup@4.35.0):
     dependencies:

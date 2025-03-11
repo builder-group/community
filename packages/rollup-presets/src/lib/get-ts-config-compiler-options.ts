@@ -1,14 +1,15 @@
 import pc from 'picocolors';
 import * as ts from 'typescript';
-import { getTsConfigPath } from '../../lib';
+import { getTsConfigPath } from '.';
 
 /**
  * Parses and returns the compiler options from a TypeScript configuration file.
  * Falls back to default options if the file cannot be parsed.
  */
-export function getTsConfigCompilerOptions(tsConfigPath = getTsConfigPath()): ts.CompilerOptions {
-	const defaultOptions: ts.CompilerOptions = { outDir: '.' };
-
+export function getTsConfigCompilerOptions(
+	tsConfigPath = getTsConfigPath(),
+	defaultOptions: ts.CompilerOptions = { outDir: '.' }
+): ts.CompilerOptions {
 	if (typeof tsConfigPath !== 'string') {
 		return defaultOptions;
 	}

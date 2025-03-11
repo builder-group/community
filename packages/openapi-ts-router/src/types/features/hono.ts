@@ -7,7 +7,7 @@ import {
 } from '@blgc/types/openapi';
 import { type TFilterKeys } from '@blgc/types/utils';
 import type { Hono } from 'hono';
-import type hono from 'hono/types';
+import type * as hono from 'hono/types';
 import { type TValidator } from 'validation-adapter';
 import { type TParseParams } from '../utils';
 

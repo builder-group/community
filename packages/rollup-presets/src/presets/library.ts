@@ -1,8 +1,8 @@
-import path from 'path';
 import commonjs from '@rollup/plugin-commonjs';
 import pc from 'picocolors';
 import type { Plugin, RollupOptions } from 'rollup';
 import esbuild from 'rollup-plugin-esbuild';
+import * as ts from 'typescript';
 import {
 	createRollupCjsOutputConfig,
 	createRollupDtsConfig,
@@ -11,9 +11,10 @@ import {
 	getPkgJson,
 	getRollupPluginNodeExternals,
 	getTsConfigPath,
-	resolvePkgJsonBundlePaths
+	resolvePkgJsonBundlePaths,
+	TBundlePath
 } from '../lib';
-import { typescriptPathsPlugin } from '../plugins';
+import { tsPathsPlugin } from '../plugins';
 
 export async function libraryPreset(options: TLibraryPresetOptions = {}): Promise<RollupOptions[]> {
 	const {
@@ -23,6 +24,7 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 		formats = ['esm', 'cjs'],
 		plugins: additionalPlugins = {},
 		esbuildOptions = {},
+		compilerOptions = {},
 		onCreateConfig
 	} = options;
 
@@ -99,10 +101,9 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 					commonjs(),
 
 					// Resolves TypeScript path aliases from tsconfig.json for proper module imports
-					typescriptPathsPlugin({
+					tsPathsPlugin({
 						tsConfigPath,
-						shouldResolveRelativeToImporter: false,
-						resolveDTsSource: true
+						compilerOptions
 					}),
 
 					// Stage 3: Path-aware Transformations
@@ -134,32 +135,26 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 		})
 	);
 
-	const typesPaths = new Set<string>();
+	// Create Rollup configs for type declaration files
+	const bundlePathsWithTypes = new Map<string, TBundlePath>();
 	for (const bundlePath of bundlePaths) {
 		if (bundlePath.types != null) {
-			typesPaths.add(bundlePath.types);
+			bundlePathsWithTypes.set(bundlePath.types, bundlePath);
 		}
 	}
-
-	// Add type declaration configs
-	if (typesPaths.size > 0) {
-		rollupOptions.push(
-			...Array.from(typesPaths).map((typesPath) =>
+	if (bundlePathsWithTypes.size > 0) {
+		for (const [typesPath, bundlePath] of bundlePathsWithTypes) {
+			rollupOptions.push(
 				createRollupDtsConfig({
 					tsConfigPath,
-					outDir: path.dirname(typesPath),
-					extension: `.d${path.extname(typesPath)}` as '.d.ts' | '.d.mts' | '.d.cts'
+					inputPath: bundlePath.input,
+					outputPath: typesPath,
+					format: bundlePath.format,
+					preserveModules,
+					compilerOptions
 				})
-			)
-		);
-	}
-	// Fallback to default types location if no type paths specified
-	else {
-		rollupOptions.push(
-			createRollupDtsConfig({
-				tsConfigPath
-			})
-		);
+			);
+		}
 	}
 
 	return rollupOptions;
@@ -206,6 +201,11 @@ export interface TLibraryPresetOptions {
 	 * Options to pass to the esbuild plugin
 	 */
 	esbuildOptions?: Record<string, unknown>;
+
+	/**
+	 * Additional compiler options to pass to the TypeScript compiler
+	 */
+	compilerOptions?: ts.CompilerOptions;
 
 	/**
 	 * Callback to modify the rollup config for each bundle
