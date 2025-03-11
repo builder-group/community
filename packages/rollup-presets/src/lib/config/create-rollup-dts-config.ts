@@ -11,7 +11,6 @@ export function createRollupDtsConfig(config: TRollupDtsConfig): RollupOptions {
 		tsConfigPath,
 		outputPath,
 		inputPath,
-		format = 'esm',
 		preserveModules = true,
 		compilerOptions = {}
 	} = config;
@@ -33,8 +32,7 @@ export function createRollupDtsConfig(config: TRollupDtsConfig): RollupOptions {
 	return {
 		input: inputPath,
 		output: {
-			file: outputPath,
-			format
+			file: outputPath
 		},
 		plugins: [
 			dts({
@@ -100,12 +98,6 @@ export interface TRollupDtsConfig {
 	 * @example './tsconfig.json'
 	 */
 	tsConfigPath: string;
-
-	/**
-	 * Format for the output file
-	 * @default 'esm'
-	 */
-	format?: 'esm' | 'cjs';
 
 	/**
 	 * Whether to preserve the module structure

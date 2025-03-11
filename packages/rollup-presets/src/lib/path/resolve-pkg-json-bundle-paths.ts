@@ -85,9 +85,9 @@ function resolveExports(
 	if (Array.isArray(exports)) {
 		exports.forEach((entry) => {
 			if (hasExportConditions(entry)) {
-				const bundlePath = resolveExportEntry('.', entry, config);
-				if (bundlePath != null) {
-					paths.push(bundlePath);
+				const bundlePaths = resolveExportEntry('.', entry, config);
+				if (bundlePaths != null) {
+					paths.push(...bundlePaths);
 				}
 			}
 		});
@@ -98,9 +98,9 @@ function resolveExports(
 	if (typeof exports === 'object' && exports != null) {
 		Object.entries(exports).forEach(([key, entry]) => {
 			if (hasExportConditions(entry)) {
-				const bundlePath = resolveExportEntry(key, entry, config);
-				if (bundlePath != null) {
-					paths.push(bundlePath);
+				const bundlePaths = resolveExportEntry(key, entry, config);
+				if (bundlePaths != null) {
+					paths.push(...bundlePaths);
 				}
 			}
 		});
@@ -113,29 +113,55 @@ function resolveExportEntry(
 	key: string,
 	conditions: PackageJson.ExportConditions,
 	config: TResolvePkgJsonBundlePathConfig
-): TBundlePath | null {
+): TBundlePath[] {
 	const formatKey = FORMAT_FIELD_MAP.exports[config.format];
 	const formatCondition = conditions[formatKey];
 
 	// Handle nested format with types
 	if (hasSubpathConditions(formatCondition)) {
-		return resolveBundlePath(formatCondition, {
-			...config,
-			key,
-			fieldMap: FORMAT_FIELD_MAP.exportsSubpath
-		});
+		return [
+			resolveBundlePath(formatCondition, {
+				...config,
+				key,
+				fieldMap: FORMAT_FIELD_MAP.exportsSubpath
+			})
+		];
 	}
 
 	// Handle direct format path
 	if (typeof formatCondition === 'string') {
-		return resolveBundlePath(conditions, {
-			...config,
-			key,
-			fieldMap: FORMAT_FIELD_MAP.exports
-		});
+		return [
+			resolveBundlePath(conditions, {
+				...config,
+				key,
+				fieldMap: FORMAT_FIELD_MAP.exports
+			})
+		];
 	}
 
-	return null;
+	// Handle special case for types format in subpaths
+	if (formatKey === 'types') {
+		const exportEntries: TBundlePath[] = [];
+
+		const getExportEntry = (format: 'esm' | 'cjs') => {
+			const formatCondition = conditions[FORMAT_FIELD_MAP.exports[format]];
+			if (!hasSubpathConditions(formatCondition)) {
+				return null;
+			}
+			return resolveExportEntry(key, formatCondition, config)?.[0] ?? null;
+		};
+
+		['esm', 'cjs'].forEach((format) => {
+			const entry = getExportEntry(format as 'esm' | 'cjs');
+			if (entry != null) {
+				exportEntries.push({ ...entry, format: 'types', extension: '.ts' });
+			}
+		});
+
+		return exportEntries;
+	}
+
+	return [];
 }
 
 function resolveBundlePath(
@@ -148,7 +174,6 @@ function resolveBundlePath(
 		key: config.key,
 		input: resolveInputPath(conditions, config),
 		output,
-		types: resolveTypesPath(conditions, config) ?? undefined,
 		format: config.format,
 		extension
 	};
@@ -196,22 +221,6 @@ function resolveOutputPath(
 	};
 }
 
-function resolveTypesPath(
-	conditions: PackageJson.ExportConditions,
-	config: TResolveBundlePathConfig
-): string | null {
-	const { resolvePath, fieldMap } = config;
-
-	// Get path from conditions using provided field map
-	let typesPath: string | null = null;
-	const configuredPath = conditions[fieldMap.types];
-	if (typeof configuredPath === 'string') {
-		typesPath = resolvePath ? path.resolve(process.cwd(), configuredPath) : configuredPath;
-	}
-
-	return typesPath;
-}
-
 /**
  * Checks if the value has top-level package.json fields (main, module, types)
  */
@@ -238,6 +247,7 @@ function hasExportConditions(value: unknown): value is PackageJson.ExportConditi
 	return (
 		typeof obj['import'] === 'string' ||
 		typeof obj['require'] === 'string' ||
+		typeof obj['types'] === 'string' ||
 		hasSubpathConditions(obj['import']) ||
 		hasSubpathConditions(obj['require'])
 	);
@@ -266,19 +276,14 @@ export interface TBundlePath {
 	output: string;
 
 	/**
-	 * Type declaration file path
-	 */
-	types?: string;
-
-	/**
 	 * Export key (e.g. '.' or './utils') when using exports field
 	 */
 	key?: string;
 
 	/**
-	 * Format of the bundle (esm or cjs)
+	 * Format of the bundle (esm, cjs or types)
 	 */
-	format: 'esm' | 'cjs';
+	format: 'esm' | 'cjs' | 'types';
 
 	/**
 	 * File extension of the output file (e.g. '.mjs', '.cjs', '.js')
@@ -287,7 +292,7 @@ export interface TBundlePath {
 }
 
 export interface TResolvePkgJsonBundlePathConfig {
-	format: 'esm' | 'cjs';
+	format: 'esm' | 'cjs' | 'types';
 	preserveModules: boolean;
 	resolvePath: boolean;
 }

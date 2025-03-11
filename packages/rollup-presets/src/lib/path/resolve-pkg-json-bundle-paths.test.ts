@@ -26,7 +26,6 @@ describe('resolvePkgJsonBundlePaths', () => {
 				{
 					input: './src/index.ts',
 					output: './dist/index.mjs',
-					types: './dist/index.d.ts',
 					format: 'esm',
 					extension: '.mjs'
 				}
@@ -39,9 +38,20 @@ describe('resolvePkgJsonBundlePaths', () => {
 				{
 					input: './src/index.ts',
 					output: './dist/index.cjs',
-					types: './dist/index.d.ts',
 					format: 'cjs',
 					extension: '.cjs'
+				}
+			]);
+		});
+
+		it('should resolve Types format', () => {
+			const paths = resolvePkgJsonBundlePaths(pkgJson, { ...defaultConfig, format: 'types' });
+			expect(paths).toEqual([
+				{
+					input: './src/index.ts',
+					output: './dist/index.d.ts',
+					format: 'types',
+					extension: '.ts'
 				}
 			]);
 		});
@@ -52,7 +62,6 @@ describe('resolvePkgJsonBundlePaths', () => {
 				{
 					input: './src/index.ts',
 					output: './dist',
-					types: './dist/index.d.ts',
 					format: 'esm',
 					extension: '.mjs'
 				}
@@ -84,7 +93,6 @@ describe('resolvePkgJsonBundlePaths', () => {
 				{
 					input: './src/index.ts',
 					output: './dist/index.mjs',
-					types: './dist/index.d.ts',
 					key: '.',
 					format: 'esm',
 					extension: '.mjs'
@@ -92,7 +100,6 @@ describe('resolvePkgJsonBundlePaths', () => {
 				{
 					input: './src/utils.ts',
 					output: './dist/utils.mjs',
-					types: './dist/utils.d.ts',
 					key: './utils',
 					format: 'esm',
 					extension: '.mjs'
@@ -106,7 +113,6 @@ describe('resolvePkgJsonBundlePaths', () => {
 				{
 					input: './src/index.ts',
 					output: './dist/index.cjs',
-					types: './dist/index.d.ts',
 					key: '.',
 					format: 'cjs',
 					extension: '.cjs'
@@ -114,10 +120,29 @@ describe('resolvePkgJsonBundlePaths', () => {
 				{
 					input: './src/utils.ts',
 					output: './dist/utils.cjs',
-					types: './dist/utils.d.ts',
 					key: './utils',
 					format: 'cjs',
 					extension: '.cjs'
+				}
+			]);
+		});
+
+		it('should resolve Types format with keys', () => {
+			const paths = resolvePkgJsonBundlePaths(pkgJson, { ...defaultConfig, format: 'types' });
+			expect(paths).toEqual([
+				{
+					input: './src/index.ts',
+					output: './dist/index.d.ts',
+					key: '.',
+					format: 'types',
+					extension: '.ts'
+				},
+				{
+					input: './src/utils.ts',
+					output: './dist/utils.d.ts',
+					key: './utils',
+					format: 'types',
+					extension: '.ts'
 				}
 			]);
 		});
@@ -147,7 +172,6 @@ describe('resolvePkgJsonBundlePaths', () => {
 				{
 					input: './src/index.ts',
 					output: './dist/index.mjs',
-					types: './dist/types/index.d.mts',
 					key: '.',
 					format: 'esm',
 					extension: '.mjs'
@@ -161,10 +185,29 @@ describe('resolvePkgJsonBundlePaths', () => {
 				{
 					input: './src/index.ts',
 					output: './dist/index.cjs',
-					types: './dist/types/index.d.cts',
 					key: '.',
 					format: 'cjs',
 					extension: '.cjs'
+				}
+			]);
+		});
+
+		it('should resolve Types format with types and key', () => {
+			const paths = resolvePkgJsonBundlePaths(pkgJson, { ...defaultConfig, format: 'types' });
+			expect(paths).toEqual([
+				{
+					extension: '.ts',
+					format: 'types',
+					input: './src/index.ts',
+					key: '.',
+					output: './dist/types/index.d.mts'
+				},
+				{
+					extension: '.ts',
+					format: 'types',
+					input: './src/index.ts',
+					key: '.',
+					output: './dist/types/index.d.cts'
 				}
 			]);
 		});
@@ -194,7 +237,6 @@ describe('resolvePkgJsonBundlePaths', () => {
 				{
 					input: './src/a.ts',
 					output: './dist/a.mjs',
-					types: './dist/a.d.ts',
 					key: '.',
 					format: 'esm',
 					extension: '.mjs'
@@ -202,47 +244,7 @@ describe('resolvePkgJsonBundlePaths', () => {
 				{
 					input: './src/b.ts',
 					output: './dist/b.mjs',
-					types: './dist/b.d.ts',
 					key: '.',
-					format: 'esm',
-					extension: '.mjs'
-				}
-			]);
-		});
-	});
-
-	describe('fallbacks and edge cases', () => {
-		it('should use default source path if not specified', () => {
-			const paths = resolvePkgJsonBundlePaths(
-				{
-					module: './dist/index.mjs'
-				},
-				defaultConfig
-			);
-			expect(paths).toEqual([
-				{
-					input: './src/index.ts',
-					output: './dist/index.mjs',
-					types: undefined,
-					format: 'esm',
-					extension: '.mjs'
-				}
-			]);
-		});
-
-		it('should handle missing types', () => {
-			const paths = resolvePkgJsonBundlePaths(
-				{
-					module: './dist/index.mjs',
-					source: './src/index.ts'
-				},
-				defaultConfig
-			);
-			expect(paths).toEqual([
-				{
-					input: './src/index.ts',
-					output: './dist/index.mjs',
-					types: undefined,
 					format: 'esm',
 					extension: '.mjs'
 				}

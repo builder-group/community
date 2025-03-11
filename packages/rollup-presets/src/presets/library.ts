@@ -11,8 +11,7 @@ import {
 	getPkgJson,
 	getRollupPluginNodeExternals,
 	getTsConfigPath,
-	resolvePkgJsonBundlePaths,
-	TBundlePath
+	resolvePkgJsonBundlePaths
 } from '../lib';
 import { tsPathsPlugin } from '../plugins';
 
@@ -21,7 +20,7 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 		environment = (process.env['NODE_ENV'] as TEnvironment) ?? 'development',
 		preserveModules = true,
 		sourcemap = environment === 'development',
-		formats = ['esm', 'cjs'],
+		formats = ['esm', 'cjs', 'types'],
 		plugins: additionalPlugins = {},
 		esbuildOptions = {},
 		compilerOptions = {},
@@ -61,99 +60,101 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 		})
 	);
 
+	console.log('\n');
+	console.log(pc.yellowBright('Bundle paths:'), bundlePaths);
+	console.log('\n');
+
 	const { default: nodeExternals } = await getRollupPluginNodeExternals();
 
 	// Create a Rollup config for each bundle path
-	rollupOptions.push(
-		...bundlePaths.map((bundlePath) => {
-			const { input: inputPath, output: outputPath, format, extension } = bundlePath;
-			const baseConfig: RollupOptions = {
-				input: inputPath,
-				output:
-					format === 'esm'
-						? createRollupEsmOutputConfig({
-								outputPath,
-								extension,
-								outputOptions: {
-									name: pkgJson.name,
-									preserveModules,
-									sourcemap
-								}
-							})
-						: createRollupCjsOutputConfig({
-								outputPath,
-								extension,
-								outputOptions: {
-									name: pkgJson.name,
-									preserveModules,
-									sourcemap
-								}
-							}),
-				plugins: [
-					// Stage 1: Pre-processing
-					...(additionalPlugins.pre ?? []),
-
-					// Marks Node.js built-in modules (node:*) as external to prevent bundling
-					// and avoid unresolved dependency warnings
-					nodeExternals(),
-
-					// Transforms CommonJS modules from node_modules into ES modules for compatibility
-					commonjs(),
-
-					// Resolves TypeScript path aliases from tsconfig.json for proper module imports
-					tsPathsPlugin({
-						tsConfigPath,
-						compilerOptions
-					}),
-
-					// Stage 3: Path-aware Transformations
-					...(additionalPlugins.transform ?? []),
-
-					// Handles TypeScript compilation, minification, and JSON imports
-					// Uses esbuild for fast builds while maintaining compatibility
-					esbuild({
-						tsconfig: tsConfigPath,
-						minify: environment === 'production',
-						target: 'es6',
-						exclude: [/node_modules/],
-						loaders: {
-							'.json': 'json' // Enables JSON imports via commonjs
-						},
-						sourceMap: false, // Handled by rollup output config
-						...esbuildOptions
-					}),
-
-					// Stage 4: Post-processing
-					...(additionalPlugins.post ?? [])
-				],
-				external: createRollupExternalConfig(pkgJson, {
-					fileTypesAsExternal: [],
-					pkgJsonDepsAsExternal: true
-				})
-			};
-			return onCreateConfig != null ? onCreateConfig(baseConfig, bundlePath) : baseConfig;
-		})
-	);
-
-	// Create Rollup configs for type declaration files
-	const bundlePathsWithTypes = new Map<string, TBundlePath>();
 	for (const bundlePath of bundlePaths) {
-		if (bundlePath.types != null) {
-			bundlePathsWithTypes.set(bundlePath.types, bundlePath);
-		}
-	}
-	if (bundlePathsWithTypes.size > 0) {
-		for (const [typesPath, bundlePath] of bundlePathsWithTypes) {
-			rollupOptions.push(
-				createRollupDtsConfig({
-					tsConfigPath,
-					inputPath: bundlePath.input,
-					outputPath: typesPath,
-					format: bundlePath.format,
-					preserveModules,
-					compilerOptions
-				})
-			);
+		switch (bundlePath.format) {
+			case 'esm':
+			case 'cjs': {
+				const { input: inputPath, output: outputPath, format, extension } = bundlePath;
+				const baseConfig: RollupOptions = {
+					input: inputPath,
+					output:
+						format === 'esm'
+							? createRollupEsmOutputConfig({
+									outputPath,
+									extension,
+									outputOptions: {
+										name: pkgJson.name,
+										preserveModules,
+										sourcemap
+									}
+								})
+							: createRollupCjsOutputConfig({
+									outputPath,
+									extension,
+									outputOptions: {
+										name: pkgJson.name,
+										preserveModules,
+										sourcemap
+									}
+								}),
+					plugins: [
+						// Stage 1: Pre-processing
+						...(additionalPlugins.pre ?? []),
+
+						// Marks Node.js built-in modules (node:*) as external to prevent bundling
+						// and avoid unresolved dependency warnings
+						nodeExternals(),
+
+						// Transforms CommonJS modules from node_modules into ES modules for compatibility
+						commonjs(),
+
+						// Resolves TypeScript path aliases from tsconfig.json for proper module imports
+						tsPathsPlugin({
+							tsConfigPath,
+							compilerOptions
+						}),
+
+						// Stage 3: Path-aware Transformations
+						...(additionalPlugins.transform ?? []),
+
+						// Handles TypeScript compilation, minification, and JSON imports
+						// Uses esbuild for fast builds while maintaining compatibility
+						esbuild({
+							tsconfig: tsConfigPath,
+							minify: environment === 'production',
+							target: 'es6',
+							exclude: [/node_modules/],
+							loaders: {
+								'.json': 'json' // Enables JSON imports via commonjs
+							},
+							sourceMap: false, // Handled by rollup output config
+							...esbuildOptions
+						}),
+
+						// Stage 4: Post-processing
+						...(additionalPlugins.post ?? [])
+					],
+					external: createRollupExternalConfig(pkgJson, {
+						fileTypesAsExternal: [],
+						pkgJsonDepsAsExternal: true
+					})
+				};
+				rollupOptions.push(
+					onCreateConfig != null ? onCreateConfig(baseConfig, bundlePath) : baseConfig
+				);
+				break;
+			}
+			case 'types': {
+				rollupOptions.push(
+					createRollupDtsConfig({
+						tsConfigPath,
+						inputPath: bundlePath.input,
+						outputPath: bundlePath.output,
+						preserveModules,
+						compilerOptions
+					})
+				);
+				break;
+			}
+			default:
+			// do nothing
 		}
 	}
 
@@ -183,7 +184,7 @@ export interface TLibraryPresetOptions {
 	 * Output formats to generate
 	 * @default ['esm', 'cjs']
 	 */
-	formats?: Array<'esm' | 'cjs'>;
+	formats?: Array<'esm' | 'cjs' | 'types'>;
 
 	/**
 	 * Additional plugins for each build stage:
