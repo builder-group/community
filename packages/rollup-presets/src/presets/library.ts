@@ -226,7 +226,7 @@ export interface TLibraryPresetOptions {
 	formats?: Array<'esm' | 'cjs' | 'types'>;
 
 	/**
-	 * Force using the tsc command for type generation instead of the resolved bundle paths,
+	 * Force using the tsc command for type declaration generation instead of the resolved bundle paths,
 	 * because currently the 'rollup-plugin-ts-declarations' can't preserve the module structure with cross-imports.
 	 *
 	 * This is required when your package has multiple entry points with internal cross-imports.
