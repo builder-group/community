@@ -40,8 +40,8 @@ export function tsDeclarationsPlugin(config: TTsDeclarationsPluginConfig): Plugi
 					declaration: true,
 					emitDeclarationOnly: true,
 					outDir,
-					declarationDir: outDir
-					// rootDir: path.dirname(inputPath)
+					declarationDir: outDir,
+					rootDir: path.dirname(inputPath)
 				},
 				...customCompilerOptions
 			};
