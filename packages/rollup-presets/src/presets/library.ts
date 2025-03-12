@@ -1,3 +1,4 @@
+import path from 'node:path';
 import commonjs from '@rollup/plugin-commonjs';
 import pc from 'picocolors';
 import type { Plugin, RollupOptions } from 'rollup';
@@ -8,18 +9,20 @@ import {
 	createRollupDtsConfig,
 	createRollupEsmOutputConfig,
 	createRollupExternalConfig,
+	getExeca,
 	getPkgJson,
 	getRollupPluginNodeExternals,
 	getTsConfigPath,
 	resolvePkgJsonBundlePaths
 } from '../lib';
-import { tsPathsPlugin } from '../plugins';
+import { tsPathsPlugin, VIRTUAL_ENTRY_ID, virtualEntryPlugin } from '../plugins';
 
 export async function libraryPreset(options: TLibraryPresetOptions = {}): Promise<RollupOptions[]> {
 	const {
 		environment = (process.env['NODE_ENV'] as TEnvironment) ?? 'development',
 		preserveModules = true,
 		sourcemap = environment === 'development',
+		useTsc = true,
 		formats = ['esm', 'cjs', 'types'],
 		plugins: additionalPlugins = {},
 		esbuildOptions = {},
@@ -144,6 +147,17 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 				break;
 			}
 			case 'types': {
+				if (useTsc) {
+					if (debug) {
+						console.log(
+							pc.dim(
+								`Skipping TypeScript declaration generation for ${path.relative(process.cwd(), bundlePath.input)} in favor of tsc`
+							)
+						);
+					}
+					break;
+				}
+
 				const baseConfig = createRollupDtsConfig({
 					tsConfigPath,
 					inputPath: bundlePath.input,
@@ -161,6 +175,26 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 			default:
 			// do nothing
 		}
+	}
+
+	// Generate Typescript declarations using the tsc command
+	if (useTsc && formats.includes('types')) {
+		rollupOptions.push({
+			input: VIRTUAL_ENTRY_ID,
+			plugins: [
+				virtualEntryPlugin(),
+				{
+					name: 'tsc',
+					async generateBundle() {
+						const { execa } = await getExeca();
+						await execa('pnpm', ['tsc', '--emitDeclarationOnly', '--project', tsConfigPath]);
+						console.log(
+							pc.green(`✓ TypeScript declarations generated using ${pc.underline('tsc')}`)
+						);
+					}
+				}
+			]
+		});
 	}
 
 	return rollupOptions;
@@ -190,6 +224,38 @@ export interface TLibraryPresetOptions {
 	 * @default ['esm', 'cjs']
 	 */
 	formats?: Array<'esm' | 'cjs' | 'types'>;
+
+	/**
+	 * Force using the tsc command for type generation instead of the resolved bundle paths,
+	 * because currently the 'rollup-plugin-ts-declarations' can't preserve the module structure with cross-imports.
+	 *
+	 * This is required when your package has multiple entry points with internal cross-imports.
+	 *
+	 * @example
+	 * Consider a package structure like:
+	 * ```
+	 * src/
+	 *   api/
+	 *     index.ts    -> imports from ../shared
+	 *   utils/
+	 *     index.ts    -> imports from ../shared
+	 *   shared/
+	 *     index.ts
+	 * ```
+	 * With exports:
+	 * ```json
+	 * {
+	 *   "exports": {
+	 *     "./api": "./dist/api/index.js",
+	 *     "./utils": "./dist/utils/index.js"
+	 *   }
+	 * }
+	 * ```
+	 * Here, useTsc: true ensures correct type generation with preserved module structure.
+	 *
+	 * @default true
+	 */
+	useTsc?: boolean;
 
 	/**
 	 * Additional plugins for each build stage:

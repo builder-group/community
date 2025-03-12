@@ -4,6 +4,8 @@ import type { Plugin } from 'rollup';
 import * as ts from 'typescript';
 import { getTsConfigCompilerOptions } from '../../lib';
 
+// TODO: Can't preserve the module structure for multiple entry points with internal cross-imports.
+// TODO: Can we load .d.ts files into the Rollup pipeline or do we need to work around Rollup?
 export function tsDeclarationsPlugin(config: TTsDeclarationsPluginConfig): Plugin {
 	const {
 		tsConfigPath,
@@ -34,17 +36,16 @@ export function tsDeclarationsPlugin(config: TTsDeclarationsPluginConfig): Plugi
 
 		async generateBundle(options, bundle) {
 			const outDir = options.dir ?? path.dirname(options.file as string);
+			const rootDir = path.dirname(inputPath);
 			const compilerOptions = {
 				...getTsConfigCompilerOptions(tsConfigPath),
 				...customCompilerOptions,
 				...{
 					declaration: true,
-					emitDeclarationOnly: true
-					// Not enforcing outDir & declarationDir to preserve the ./src structure.
-					// If outDir & declarationDir are ./dist and rootDir is ./src, shared modules stay in ./dist/shared.
-					// However, e.g. setting them to ./dist/api with rootDir as ./src/api causes shared modules to be emitted to ./dist/api/src/shared instead of ./dist/api/shared.
-					// outDir,
-					// declarationDir: outDir
+					emitDeclarationOnly: true,
+					outDir,
+					declarationDir: outDir,
+					rootDir
 				}
 			};
 
