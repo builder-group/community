@@ -63,10 +63,7 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 
 	if (debug) {
 		console.log('\n');
-		console.log(pc.dim(`--------------------------------`));
-		console.log(pc.dim('Bundle paths:'));
-		console.log(pc.dim(JSON.stringify(bundlePaths, null, 2)));
-		console.log(pc.dim(`--------------------------------`));
+		console.log(pc.dim(`Bundle paths: ${JSON.stringify(bundlePaths, null, 2)}`));
 	}
 
 	const { default: nodeExternals } = await getRollupPluginNodeExternals();
@@ -153,7 +150,8 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 					outputPath: bundlePath.output,
 					preserveModules,
 					compilerOptions,
-					extension: bundlePath.extension
+					extension: bundlePath.extension,
+					debug
 				});
 				rollupOptions.push(
 					onCreateConfig != null ? onCreateConfig(baseConfig, bundlePath) : baseConfig

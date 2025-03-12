@@ -9,7 +9,8 @@ export function tsDeclarationsPlugin(config: TTsDeclarationsPluginConfig): Plugi
 		tsConfigPath,
 		compilerOptions: customCompilerOptions = {},
 		extension = '.ts',
-		diagnosticsLevel = 'warn'
+		diagnosticsLevel = 'warn',
+		debug = false
 	} = config;
 	let inputPath: string;
 
@@ -40,9 +41,16 @@ export function tsDeclarationsPlugin(config: TTsDeclarationsPluginConfig): Plugi
 					emitDeclarationOnly: true,
 					outDir,
 					declarationDir: outDir
+					// rootDir: path.dirname(inputPath)
 				},
 				...customCompilerOptions
 			};
+
+			if (debug) {
+				console.log(
+					pc.dim(`[ts-declarations] Compiler options: ${JSON.stringify(compilerOptions)}`)
+				);
+			}
 
 			// Remove any JavasScript files from the bundle (e.g. entry point)
 			for (const fileName in bundle) {
@@ -69,6 +77,10 @@ export function tsDeclarationsPlugin(config: TTsDeclarationsPluginConfig): Plugi
 							.split(path.sep)
 							.filter((segment) => segment !== '..' && segment !== '.')
 							.join('/');
+
+						if (debug) {
+							console.log(pc.dim(`[ts-declarations] Emitting ${normalizedPath}`));
+						}
 
 						this.emitFile({
 							type: 'asset',
@@ -136,4 +148,10 @@ export interface TTsDeclarationsPluginConfig {
 	 * @default '.ts'
 	 */
 	extension?: '.ts' | '.cts' | '.mts' | `.${string}`;
+
+	/**
+	 * Whether to log debug information
+	 * @default false
+	 */
+	debug?: boolean;
 }

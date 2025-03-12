@@ -11,7 +11,8 @@ export function createRollupDtsConfig(config: TRollupDtsConfig): RollupOptions {
 		inputPath,
 		preserveModules = true,
 		compilerOptions = {},
-		extension = '.ts'
+		extension = '.ts',
+		debug = false
 	} = config;
 
 	if (preserveModules) {
@@ -25,7 +26,8 @@ export function createRollupDtsConfig(config: TRollupDtsConfig): RollupOptions {
 					tsConfigPath,
 					compilerOptions,
 					extension,
-					diagnosticsLevel: 'warn'
+					diagnosticsLevel: 'warn',
+					debug
 				})
 			]
 		};
@@ -86,4 +88,10 @@ export interface TRollupDtsConfig {
 	 * @default '.ts'
 	 */
 	extension?: '.ts' | '.cts' | '.mts' | `.${string}`;
+
+	/**
+	 * Whether to log debug information
+	 * @default false
+	 */
+	debug?: boolean;
 }
