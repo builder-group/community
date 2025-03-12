@@ -196,14 +196,14 @@ describe('resolvePkgJsonBundlePaths', () => {
 			const paths = resolvePkgJsonBundlePaths(pkgJson, { ...defaultConfig, format: 'types' });
 			expect(paths).toEqual([
 				{
-					extension: '.ts',
+					extension: '.mts',
 					format: 'types',
 					input: './src/index.ts',
 					key: '.',
 					output: './dist/types/index.d.mts'
 				},
 				{
-					extension: '.ts',
+					extension: '.cts',
 					format: 'types',
 					input: './src/index.ts',
 					key: '.',

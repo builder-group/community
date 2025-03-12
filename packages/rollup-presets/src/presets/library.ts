@@ -147,14 +147,16 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 				break;
 			}
 			case 'types': {
+				const baseConfig = createRollupDtsConfig({
+					tsConfigPath,
+					inputPath: bundlePath.input,
+					outputPath: bundlePath.output,
+					preserveModules,
+					compilerOptions,
+					extension: bundlePath.extension
+				});
 				rollupOptions.push(
-					createRollupDtsConfig({
-						tsConfigPath,
-						inputPath: bundlePath.input,
-						outputPath: bundlePath.output,
-						preserveModules,
-						compilerOptions
-					})
+					onCreateConfig != null ? onCreateConfig(baseConfig, bundlePath) : baseConfig
 				);
 				break;
 			}

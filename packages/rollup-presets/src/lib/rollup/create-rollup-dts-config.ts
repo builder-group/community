@@ -10,7 +10,8 @@ export function createRollupDtsConfig(config: TRollupDtsConfig): RollupOptions {
 		outputPath,
 		inputPath,
 		preserveModules = true,
-		compilerOptions = {}
+		compilerOptions = {},
+		extension = '.ts'
 	} = config;
 
 	if (preserveModules) {
@@ -22,7 +23,9 @@ export function createRollupDtsConfig(config: TRollupDtsConfig): RollupOptions {
 			plugins: [
 				tsDeclarationsPlugin({
 					tsConfigPath,
-					compilerOptions
+					compilerOptions,
+					extension,
+					diagnosticsLevel: 'warn'
 				})
 			]
 		};
@@ -77,4 +80,10 @@ export interface TRollupDtsConfig {
 	 * the ones from tsconfig.json
 	 */
 	compilerOptions?: CompilerOptions;
+
+	/**
+	 * File extension to emit
+	 * @default 'd.ts'
+	 */
+	extension?: '.ts' | '.cts' | '.mts' | `.${string}`;
 }

@@ -151,10 +151,10 @@ function resolveExportEntry(
 			return resolveExportEntry(key, formatCondition, config)?.[0] ?? null;
 		};
 
-		['esm', 'cjs'].forEach((format) => {
-			const entry = getExportEntry(format as 'esm' | 'cjs');
+		(['esm', 'cjs'] as const).forEach((format) => {
+			const entry = getExportEntry(format);
 			if (entry != null) {
-				exportEntries.push({ ...entry, format: 'types', extension: '.ts' });
+				exportEntries.push(entry);
 			}
 		});
 

@@ -8,6 +8,7 @@ export function tsDeclarationsPlugin(config: TTsDeclarationsPluginConfig): Plugi
 	const {
 		tsConfigPath,
 		compilerOptions: customCompilerOptions = {},
+		extension = '.ts',
 		diagnosticsLevel = 'warn'
 	} = config;
 	let inputPath: string;
@@ -71,7 +72,7 @@ export function tsDeclarationsPlugin(config: TTsDeclarationsPluginConfig): Plugi
 
 						this.emitFile({
 							type: 'asset',
-							fileName: normalizedPath,
+							fileName: normalizedPath.replace('.ts', extension),
 							source: text
 						});
 					}
@@ -129,4 +130,10 @@ export interface TTsDeclarationsPluginConfig {
 	 * - 'ignore': Silent mode
 	 */
 	diagnosticsLevel?: 'error' | 'warn' | 'ignore';
+
+	/**
+	 * File extension to emit
+	 * @default 'd.ts'
+	 */
+	extension?: '.ts' | '.cts' | '.mts' | `.${string}`;
 }
