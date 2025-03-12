@@ -36,19 +36,21 @@ export function tsDeclarationsPlugin(config: TTsDeclarationsPluginConfig): Plugi
 			const outDir = options.dir ?? path.dirname(options.file as string);
 			const compilerOptions = {
 				...getTsConfigCompilerOptions(tsConfigPath),
+				...customCompilerOptions,
 				...{
 					declaration: true,
-					emitDeclarationOnly: true,
-					outDir,
-					declarationDir: outDir,
-					rootDir: path.dirname(inputPath)
-				},
-				...customCompilerOptions
+					emitDeclarationOnly: true
+					// Not enforcing outDir & declarationDir to preserve the ./src structure.
+					// If outDir & declarationDir are ./dist and rootDir is ./src, shared modules stay in ./dist/shared.
+					// However, e.g. setting them to ./dist/api with rootDir as ./src/api causes shared modules to be emitted to ./dist/api/src/shared instead of ./dist/api/shared.
+					// outDir,
+					// declarationDir: outDir
+				}
 			};
 
 			if (debug) {
 				console.log(
-					pc.dim(`[ts-declarations] Compiler options: ${JSON.stringify(compilerOptions)}`)
+					pc.dim(`[ts-declarations] Compiler options: ${JSON.stringify(compilerOptions, null, 2)}`)
 				);
 			}
 
