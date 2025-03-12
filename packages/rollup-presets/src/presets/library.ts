@@ -9,13 +9,14 @@ import {
 	createRollupDtsConfig,
 	createRollupEsmOutputConfig,
 	createRollupExternalConfig,
+	createRollupVirtualConfig,
 	getExeca,
 	getPkgJson,
 	getRollupPluginNodeExternals,
 	getTsConfigPath,
 	resolvePkgJsonBundlePaths
 } from '../lib';
-import { tsPathsPlugin, VIRTUAL_ENTRY_ID, virtualEntryPlugin } from '../plugins';
+import { tsPathsPlugin } from '../plugins';
 
 export async function libraryPreset(options: TLibraryPresetOptions = {}): Promise<RollupOptions[]> {
 	const {
@@ -177,24 +178,18 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 		}
 	}
 
-	// Generate Typescript declarations using the tsc command
+	// Generate Typescript declarations using the tsc CLI
 	if (useTsc && formats.includes('types')) {
-		rollupOptions.push({
-			input: VIRTUAL_ENTRY_ID,
-			plugins: [
-				virtualEntryPlugin(),
-				{
-					name: 'tsc',
-					async generateBundle() {
-						const { execa } = await getExeca();
-						await execa('pnpm', ['tsc', '--emitDeclarationOnly', '--project', tsConfigPath]);
-						console.log(
-							pc.green(`✓ TypeScript declarations generated using ${pc.underline('tsc')}`)
-						);
-					}
+		rollupOptions.push(
+			createRollupVirtualConfig({
+				name: 'tsc',
+				execute: async () => {
+					const { execa } = await getExeca();
+					await execa('tsc', ['--emitDeclarationOnly', '--project', tsConfigPath]);
+					console.log(pc.green(`✓ TypeScript declarations generated using ${pc.underline('tsc')}`));
 				}
-			]
-		});
+			})
+		);
 	}
 
 	return rollupOptions;
@@ -226,10 +221,16 @@ export interface TLibraryPresetOptions {
 	formats?: Array<'esm' | 'cjs' | 'types'>;
 
 	/**
-	 * Force using the tsc command for type declaration generation instead of the resolved bundle paths,
-	 * because currently the 'rollup-plugin-ts-declarations' can't preserve the module structure with cross-imports.
+	 * Whether to use `tsc` CLI for generating type declarations instead of Rollup plugins.
 	 *
-	 * This is required when your package has multiple entry points with internal cross-imports.
+	 * Recommended when `preserveModules` is `true`, especially for packages with multiple
+	 * entry points and cross-imports, as Rollup plugins do not handle module preservation well.
+	 *
+	 * Our own attempt (`rollup-plugin-ts-declarations`) works more around Rollup than with it,
+	 * is very barebone, and struggles with cross-imports, making `tsc` CLI a more reliable choice
+	 * even though we need to run a CLI command from code.
+	 *
+	 * If `preserveModules` is `false`, this option is unnecessary.
 	 *
 	 * @example
 	 * Consider a package structure like:

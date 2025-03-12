@@ -15,39 +15,32 @@ export function createRollupDtsConfig(config: TRollupDtsConfig): RollupOptions {
 		debug = false
 	} = config;
 
-	if (preserveModules) {
-		return {
-			input: inputPath,
-			output: {
-				dir: path.dirname(outputPath)
-			},
-			plugins: [
-				tsDeclarationsPlugin({
-					tsConfigPath,
-					compilerOptions,
-					extension,
-					diagnosticsLevel: 'warn',
-					debug
-				})
-			]
-		};
-	}
-
 	return {
 		input: inputPath,
 		output: {
 			file: outputPath
 		},
 		plugins: [
-			dts({
-				respectExternal: true,
-				tsconfig: tsConfigPath,
-				compilerOptions: {
-					outDir: path.dirname(outputPath),
-					declarationDir: path.dirname(outputPath),
-					...compilerOptions
-				}
-			})
+			...(preserveModules
+				? [
+						tsDeclarationsPlugin({
+							tsConfigPath,
+							compilerOptions,
+							extension,
+							diagnosticsLevel: 'warn',
+							debug
+						})
+					]
+				: [
+						dts({
+							tsconfig: tsConfigPath,
+							compilerOptions: {
+								outDir: path.dirname(outputPath),
+								declarationDir: path.dirname(outputPath),
+								...compilerOptions
+							}
+						})
+					])
 		]
 	};
 }
