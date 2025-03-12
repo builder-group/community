@@ -5,67 +5,112 @@ import * as ts from 'typescript';
 import { getTsConfigCompilerOptions } from '../../lib';
 
 export function tsDeclarationsPlugin(config: TTsDeclarationsPluginConfig): Plugin {
-	const { outputPath, inputPath, tsConfigPath } = config;
-	const compilerOptions = {
-		...getTsConfigCompilerOptions(tsConfigPath, {
-			declaration: true,
-			emitDeclarationOnly: true,
-			outDir: path.dirname(outputPath)
-		}),
-		...config.compilerOptions
-	};
+	const {
+		tsConfigPath,
+		compilerOptions: customCompilerOptions = {},
+		diagnosticsLevel = 'warn'
+	} = config;
+	let inputPath: string;
 
 	return {
 		name: 'ts-declarations',
-		async generateBundle() {
-			console.log(
-				`Generating TypeScript declarations from ${pc.green(inputPath)} to ${pc.green(outputPath)}...`
-			);
 
-			const files = [inputPath];
-			const program = ts.createProgram(files, compilerOptions);
-			const createdFiles: Record<string, string> = {};
+		options(options) {
+			if (typeof options.input === 'string') {
+				inputPath = options.input;
+			} else {
+				throw new Error(pc.red('[ts-declarations] Rollup input must be a string'));
+			}
+		},
 
-			const host = ts.createCompilerHost(compilerOptions);
-			host.writeFile = (fileName, contents) => {
-				createdFiles[fileName] = contents;
+		load(id) {
+			if (id === inputPath) {
+				return 'export {}';
+			}
+			return null;
+		},
+
+		async generateBundle(options, bundle) {
+			const outDir = options.dir ?? path.dirname(options.file as string);
+			const compilerOptions = {
+				...getTsConfigCompilerOptions(tsConfigPath, {
+					declaration: true,
+					emitDeclarationOnly: true,
+					outDir,
+					declarationDir: outDir
+				}),
+				...customCompilerOptions
 			};
 
-			const emitResult = program.emit(undefined, host.writeFile);
-			const diagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
-
-			if (diagnostics.length > 0) {
-				diagnostics.forEach((diagnostic) => {
-					const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-					console.error(pc.red(`TypeScript Error: ${message}`));
-				});
-				process.exit(1);
+			// Remove any JavasScript files from the bundle (e.g. entry point)
+			for (const fileName in bundle) {
+				if (fileName.endsWith('.js')) {
+					delete bundle[fileName];
+				}
 			}
 
-			for (const [filePath, content] of Object.entries(createdFiles)) {
-				this.emitFile({
-					type: 'asset',
-					fileName: path.relative(process.cwd(), filePath),
-					source: content
-				});
-			}
+			const program = ts.createProgram([inputPath], compilerOptions);
+
+			// Check for errors before emitting
+			const preEmitDiagnostics = ts.getPreEmitDiagnostics(program);
+			logDiagnostics(preEmitDiagnostics, diagnosticsLevel);
+
+			// Emit declarations
+			const emitResult = program.emit(
+				undefined,
+				(fileName, text) => {
+					if (fileName.endsWith('.d.ts')) {
+						const relativePath = path.relative(outDir, fileName);
+
+						// Rollup requires chunk names to be neither absolute nor relative paths—normalize to a valid format.
+						const normalizedPath = relativePath
+							.split(path.sep)
+							.filter((segment) => segment !== '..' && segment !== '.')
+							.join('/');
+
+						this.emitFile({
+							type: 'asset',
+							fileName: normalizedPath,
+							source: text
+						});
+					}
+				},
+				undefined,
+				true // emitOnlyDtsFiles
+			);
+
+			// Check for emit errors
+			logDiagnostics(emitResult.diagnostics, diagnosticsLevel);
 		}
 	};
 }
 
-interface TTsDeclarationsPluginConfig {
-	/**
-	 * Path to the input TypeScript file
-	 * @example './src/index.ts'
-	 */
-	inputPath: string;
+function logDiagnostics(
+	diagnostics: readonly ts.Diagnostic[],
+	diagnosticsLevel: 'error' | 'warn' | 'ignore'
+) {
+	if (diagnosticsLevel === 'ignore' || diagnostics.length === 0) {
+		return;
+	}
 
-	/**
-	 * Path where declaration files will be output
-	 * @example './dist/types/index.d.ts'
-	 */
-	outputPath: string;
+	const formatHost: ts.FormatDiagnosticsHost = {
+		getCanonicalFileName: (path) => path,
+		getCurrentDirectory: ts.sys.getCurrentDirectory,
+		getNewLine: () => ts.sys.newLine
+	};
 
+	const message = ts.formatDiagnostics(diagnostics, formatHost);
+
+	if (diagnosticsLevel === 'warn') {
+		console.warn(pc.yellow('[ts-declarations] TypeScript warnings:'));
+		console.warn(pc.yellow(message));
+		return;
+	}
+
+	throw new Error(pc.red('[ts-declarations] TypeScript errors:\n' + message));
+}
+
+export interface TTsDeclarationsPluginConfig {
 	/**
 	 * Path to tsconfig.json file
 	 */
@@ -75,4 +120,12 @@ interface TTsDeclarationsPluginConfig {
 	 * Compiler options that override tsconfig.json
 	 */
 	compilerOptions?: ts.CompilerOptions;
+
+	/**
+	 * How to handle TypeScript diagnostics
+	 * - 'error': Throw error and stop build (default)
+	 * - 'warn': Log warning in yellow and continue
+	 * - 'ignore': Silent mode
+	 */
+	diagnosticsLevel?: 'error' | 'warn' | 'ignore';
 }

@@ -1,6 +1,6 @@
 import pc from 'picocolors';
 import * as ts from 'typescript';
-import { getTsConfigPath } from '.';
+import { getTsConfigPath } from '..';
 
 /**
  * Parses and returns the compiler options from a TypeScript configuration file.
@@ -18,8 +18,9 @@ export function getTsConfigCompilerOptions(
 	const parsedConfig = ts.getParsedCommandLineOfConfigFile(tsConfigPath, {}, host);
 
 	if (parsedConfig == null) {
-		console.log(`Failed to parse TypeScript configuration file: ${pc.underline(tsConfigPath)}`);
-		process.exit(1);
+		throw new Error(
+			pc.red(`Failed to parse TypeScript configuration file: ${pc.underline(tsConfigPath)}`)
+		);
 	}
 
 	return { ...defaultOptions, ...parsedConfig.options };
@@ -33,10 +34,11 @@ function createConfigFileHost(): ts.ParseConfigFileHost {
 		useCaseSensitiveFileNames: ts.sys.useCaseSensitiveFileNames,
 		getCurrentDirectory: ts.sys.getCurrentDirectory,
 		onUnRecoverableConfigFileDiagnostic: (diagnostic) => {
-			console.log(
-				`Unrecoverable error in config file: ${pc.red(pc.underline(diagnostic.messageText as string))}`
+			throw new Error(
+				pc.red(
+					`Unrecoverable error in config file: ${pc.underline(diagnostic.messageText as string)}`
+				)
 			);
-			process.exit(1);
 		}
 	};
 }

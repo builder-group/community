@@ -1,7 +1,7 @@
 import path from 'node:path';
 import type { Plugin } from 'rollup';
 import * as ts from 'typescript';
-import { getTsConfigCompilerOptions } from '../../lib';
+import { getTsConfigCompilerOptions, resolveWithTs } from '../../lib';
 
 export function tsPathsPlugin(options: TTsPathsPluginOptions = {}): Plugin {
 	const {
@@ -45,7 +45,7 @@ export function tsPathsPlugin(options: TTsPathsPluginOptions = {}): Plugin {
 			}
 
 			// Resolve the file using TypeScript's resolution
-			let resolvedFile = resolveWithTypeScript(importPath, importerPath, compilerOptions);
+			let resolvedFile = resolveWithTs(importPath, importerPath, compilerOptions);
 			if (resolvedFile == null) {
 				return null;
 			}
@@ -64,28 +64,6 @@ export function tsPathsPlugin(options: TTsPathsPluginOptions = {}): Plugin {
 			return transform != null ? transform(resolvedFile) : resolvedFile;
 		}
 	};
-}
-
-/**
- * Resolves an import using TypeScript's module resolution algorithm
- */
-function resolveWithTypeScript(
-	importPath: string,
-	importerPath: string | undefined,
-	compilerOptions: ts.CompilerOptions
-): string | null {
-	if (typeof importerPath !== 'string') {
-		return null;
-	}
-
-	const { resolvedModule } = ts.nodeModuleNameResolver(
-		importPath,
-		importerPath,
-		compilerOptions,
-		ts.sys
-	);
-
-	return resolvedModule?.resolvedFileName ?? null;
 }
 
 /**

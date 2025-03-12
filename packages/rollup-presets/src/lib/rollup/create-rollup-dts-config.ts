@@ -1,10 +1,8 @@
 import path from 'node:path';
-import * as pc from 'picocolors';
-import type { Plugin, RollupOptions } from 'rollup';
+import type { RollupOptions } from 'rollup';
 import { dts } from 'rollup-plugin-dts';
 import type { CompilerOptions } from 'typescript';
-import { VIRTUAL_ENTRY_ID, virtualEntryPlugin } from '../../plugins';
-import { getExeca } from '../cached-imports';
+import { tsDeclarationsPlugin } from '../../plugins';
 
 export function createRollupDtsConfig(config: TRollupDtsConfig): RollupOptions {
 	const {
@@ -17,13 +15,14 @@ export function createRollupDtsConfig(config: TRollupDtsConfig): RollupOptions {
 
 	if (preserveModules) {
 		return {
-			input: VIRTUAL_ENTRY_ID,
-			logLevel: 'silent',
+			input: inputPath,
+			output: {
+				dir: path.dirname(outputPath)
+			},
 			plugins: [
-				virtualEntryPlugin(),
-				createGenerateDtsPlugin({
+				tsDeclarationsPlugin({
 					tsConfigPath,
-					outDir: path.dirname(outputPath)
+					compilerOptions
 				})
 			]
 		};
@@ -45,38 +44,6 @@ export function createRollupDtsConfig(config: TRollupDtsConfig): RollupOptions {
 				}
 			})
 		]
-	};
-}
-
-// TODO: Replace with 'rollup-plugin-ts-declarations'
-function createGenerateDtsPlugin(options: { tsConfigPath: string; outDir: string }): Plugin {
-	const { tsConfigPath, outDir } = options;
-
-	return {
-		name: 'generate-dts',
-		async buildStart() {
-			try {
-				console.log(`Generating TypeScript declarations in ${pc.underline(outDir)}`);
-
-				const { execa } = await getExeca();
-				await execa('pnpm', [
-					'tsc',
-					'--emitDeclarationOnly',
-					'--project',
-					path.resolve(process.cwd(), tsConfigPath),
-					'--outDir',
-					outDir,
-					'--declarationDir',
-					outDir
-				]);
-
-				console.log(pc.green('✓ TypeScript declarations generated'));
-			} catch (error) {
-				console.error(pc.red('Failed to generate TypeScript declarations:'));
-				console.error(error);
-				process.exit(1);
-			}
-		}
 	};
 }
 

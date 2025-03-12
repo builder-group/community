@@ -24,7 +24,8 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 		plugins: additionalPlugins = {},
 		esbuildOptions = {},
 		compilerOptions = {},
-		onCreateConfig
+		onCreateConfig,
+		debug = false
 	} = options;
 
 	const rollupOptions: RollupOptions[] = [];
@@ -32,8 +33,9 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 	// Get package.json
 	const pkgJson = await getPkgJson();
 	if (pkgJson == null) {
-		console.log(`No or invalid package.json file found at ${pc.underline(process.cwd())}`);
-		process.exit(1);
+		throw new Error(
+			pc.red(`No or invalid package.json file found at ${pc.underline(process.cwd())}`)
+		);
 	}
 
 	console.log(`--------------------------------`);
@@ -47,8 +49,7 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 		environment === 'production' ? ['prod', null] : ['dev', null]
 	);
 	if (tsConfigPath == null) {
-		console.log(`No tsconfig.json file found at ${pc.underline(process.cwd())}`);
-		process.exit(1);
+		throw new Error(pc.red(`No tsconfig.json file found at ${pc.underline(process.cwd())}`));
 	}
 
 	// Get bundle paths for specified formats
@@ -60,9 +61,13 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 		})
 	);
 
-	console.log('\n');
-	console.log(pc.yellowBright('Bundle paths:'), bundlePaths);
-	console.log('\n');
+	if (debug) {
+		console.log('\n');
+		console.log(pc.dim(`--------------------------------`));
+		console.log(pc.dim('Bundle paths:'));
+		console.log(pc.dim(JSON.stringify(bundlePaths, null, 2)));
+		console.log(pc.dim(`--------------------------------`));
+	}
 
 	const { default: nodeExternals } = await getRollupPluginNodeExternals();
 
@@ -217,6 +222,12 @@ export interface TLibraryPresetOptions {
 		config: RollupOptions,
 		bundlePath: { input: string; output: string; format: string }
 	) => RollupOptions;
+
+	/**
+	 * Whether to log debug information
+	 * @default false
+	 */
+	debug?: boolean;
 }
 
 type TEnvironment = 'development' | 'production';

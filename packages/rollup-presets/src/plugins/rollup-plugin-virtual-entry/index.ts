@@ -1,6 +1,6 @@
 import type { Plugin } from 'rollup';
 
-export const VIRTUAL_ENTRY_ID = 'virtual-entry';
+const VIRTUAL_ENTRY_ID = '\0virtual:entry';
 
 export function virtualEntryPlugin(): Plugin {
 	return {
