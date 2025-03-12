@@ -33,12 +33,13 @@ export function tsDeclarationsPlugin(config: TTsDeclarationsPluginConfig): Plugi
 		async generateBundle(options, bundle) {
 			const outDir = options.dir ?? path.dirname(options.file as string);
 			const compilerOptions = {
-				...getTsConfigCompilerOptions(tsConfigPath, {
+				...getTsConfigCompilerOptions(tsConfigPath),
+				...{
 					declaration: true,
 					emitDeclarationOnly: true,
 					outDir,
 					declarationDir: outDir
-				}),
+				},
 				...customCompilerOptions
 			};
 

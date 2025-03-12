@@ -50,7 +50,7 @@ export function tsPathsPlugin(options: TTsPathsPluginOptions = {}): Plugin {
 				return null;
 			}
 
-			// Handle .d.ts source files if enabled
+			// Resolve .d.ts source files if enabled
 			if (resolveDTsSource) {
 				resolvedFile = resolveSourceFromDts(resolvedFile);
 			}
