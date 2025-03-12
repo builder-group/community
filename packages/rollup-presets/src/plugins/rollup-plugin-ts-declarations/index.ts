@@ -69,7 +69,7 @@ export function tsDeclarationsPlugin(config: TTsDeclarationsPluginConfig): Plugi
 			const emitResult = program.emit(
 				undefined,
 				(fileName, text) => {
-					if (fileName.endsWith('.d.ts')) {
+					if (fileName.endsWith('.d.ts') || fileName.endsWith('.d.ts.map')) {
 						const relativePath = path.relative(outDir, fileName);
 
 						// Rollup requires chunk names to be neither absolute nor relative paths—normalize to a valid format.
@@ -78,13 +78,18 @@ export function tsDeclarationsPlugin(config: TTsDeclarationsPluginConfig): Plugi
 							.filter((segment) => segment !== '..' && segment !== '.')
 							.join('/');
 
+						// Apply the extension replacement
+						const finalPath = fileName.endsWith('.d.ts')
+							? normalizedPath.replace('.ts', extension)
+							: normalizedPath.replace('.ts.map', `${extension}.map`);
+
 						if (debug) {
-							console.log(pc.dim(`[ts-declarations] Emitting ${normalizedPath}`));
+							console.log(pc.dim(`[ts-declarations] Emitting ${finalPath}`));
 						}
 
 						this.emitFile({
 							type: 'asset',
-							fileName: normalizedPath.replace('.ts', extension),
+							fileName: finalPath,
 							source: text
 						});
 					}
