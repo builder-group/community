@@ -83,7 +83,7 @@ export interface TRollupDtsConfig {
 
 	/**
 	 * File extension to emit
-	 * @default 'd.ts'
+	 * @default '.ts'
 	 */
 	extension?: '.ts' | '.cts' | '.mts' | `.${string}`;
 }
