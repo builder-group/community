@@ -67,7 +67,7 @@ export type TOpenApiExpressPatch<GPaths extends object> = <
 // Request Handler
 // =============================================================================
 
-export type TOpenApiExpressRequestHandler<GPathOperation, GResponseLocals = Record<string, any>> = (
+export type TOpenApiExpressRequestHandler<GPathOperation, GResponseLocals extends Record<string, any> = Record<string, any>> = (
 	req: TOpenApiExpressRequest<GPathOperation>,
 	res: TOpenApiExpressResponse<GPathOperation, GResponseLocals>,
 	next: express.NextFunction
@@ -92,7 +92,7 @@ export type TOpenApiExpressPathParams<GPathOperation> =
 
 export type TOpenApiExpressRequestBody<GPathOperation> = TRequestBody<GPathOperation>;
 
-export type TOpenApiExpressResponse<GPathOperation, GResponseLocals = Record<string, any>> = express.Response<
+export type TOpenApiExpressResponse<GPathOperation, GResponseLocals extends Record<string, any> = Record<string, any>> = express.Response<
 	TOperationSuccessResponseContent<GPathOperation>,
 	GResponseLocals
 >;
