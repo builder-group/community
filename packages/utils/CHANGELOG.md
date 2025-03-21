@@ -1,5 +1,11 @@
 # @blgc/utils
 
+## 0.0.47
+
+### Patch Changes
+
+- with-new utility
+
 ## 0.0.39
 
 ### Patch Changes

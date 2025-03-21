@@ -1,5 +1,13 @@
 # feature-fetch
 
+## 0.0.40
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @blgc/types@0.0.17
+  - @blgc/utils@0.0.47
+
 ## 0.0.39
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # figma-connect
 
+## 0.0.25
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @blgc/utils@0.0.47
+
 ## 0.0.24
 
 ### Patch Changes

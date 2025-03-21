@@ -1,5 +1,15 @@
 # feature-state
 
+## 0.0.49
+
+### Patch Changes
+
+- with-new utility
+
+- Updated dependencies []:
+  - @blgc/types@0.0.17
+  - @blgc/utils@0.0.47
+
 ## 0.0.48
 
 ### Patch Changes

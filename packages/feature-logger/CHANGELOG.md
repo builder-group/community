@@ -1,5 +1,13 @@
 # feature-logger
 
+## 0.0.36
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @blgc/types@0.0.17
+  - @blgc/utils@0.0.47
+
 ## 0.0.33
 
 ### Patch Changes

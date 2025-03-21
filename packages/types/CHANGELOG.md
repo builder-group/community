@@ -1,5 +1,11 @@
 # @blgc/types
 
+## 0.0.17
+
+### Patch Changes
+
+- with-new utility
+
 ## 0.0.16
 
 ### Patch Changes

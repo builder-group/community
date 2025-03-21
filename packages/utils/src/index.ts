@@ -43,3 +43,4 @@ export * from './to-hex';
 export * from './to-hex-color';
 export * from './to-rgb-color';
 export * from './types';
+export * from './with-new';

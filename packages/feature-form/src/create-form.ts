@@ -1,6 +1,5 @@
-import { TWithInit } from '@blgc/types/features';
 import { type TEntries } from '@blgc/types/utils';
-import { bitwiseFlag, deepCopy, type BitwiseFlag } from '@blgc/utils';
+import { bitwiseFlag, deepCopy, withNew, type BitwiseFlag } from '@blgc/utils';
 import { createState } from 'feature-state';
 import { TCollectErrorMode } from 'validation-adapter';
 import { createFormField, isFormField } from './form-field';
@@ -35,7 +34,7 @@ export function createForm<GFormData extends TFormData>(
 		notifyOnStatusChange = true
 	} = config;
 
-	const form: TWithInit<TForm<GFormData, []>> = {
+	return withNew<TForm<GFormData, []>>({
 		_features: [],
 		_config: {
 			disabled
@@ -67,9 +66,9 @@ export function createForm<GFormData extends TFormData>(
 		isValidating: createState(false),
 		isSubmitted: createState(false),
 		isSubmitting: createState(false),
-		init(this: TForm<GFormData, []>) {
+		_new(this: TForm<GFormData, []>) {
 			// Revalidate form on status change
-			for (const field of Object.values(this.fields) as TFormFields<GFormData>[keyof GFormData][]) {
+			for (const field of Object.values(this.fields)) {
 				field.status.listen(
 					async () => {
 						await this._revalidate(true);
@@ -77,10 +76,6 @@ export function createForm<GFormData extends TFormData>(
 					{ key: 'form_revalidate' }
 				);
 			}
-
-			// @ts-expect-error -- Remove init method after initialization
-			delete this.init;
-			return this;
 		},
 		async _revalidate(this: TForm<GFormData, []>, cached = false) {
 			const formFields = Object.values(this.fields) as TFormFields<GFormData>[keyof GFormData][];
@@ -233,9 +228,7 @@ export function createForm<GFormData extends TFormData>(
 			this.isSubmitted.set(false);
 			this._revalidate(true);
 		}
-	};
-
-	return form.init();
+	});
 }
 
 export interface TCreateFormConfig<GFormData extends TFormData> extends Partial<TFormConfig> {

@@ -1,5 +1,13 @@
 # openapi-ts-router
 
+## 0.2.12
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @blgc/types@0.0.17
+  - validation-adapter@0.0.21
+
 ## 0.2.8
 
 ### Patch Changes

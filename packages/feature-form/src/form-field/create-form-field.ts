@@ -1,5 +1,4 @@
-import { TWithInit } from '@blgc/types/features';
-import { bitwiseFlag, deepCopy } from '@blgc/utils';
+import { bitwiseFlag, deepCopy, withNew } from '@blgc/utils';
 import { createState } from 'feature-state';
 import { createValidator } from 'validation-adapter';
 import {
@@ -88,52 +87,48 @@ export function createFormField<GValue>(
 	};
 
 	// Extend the base state with the form field feature
-	const formField = Object.assign(baseState, formFieldFeature, {
-		init(this: TFormField<GValue>, { notifyOnStatusChange }: TInitFormFieldConfig) {
-			// Notify form field listeners if status has changed
-			if (notifyOnStatusChange) {
-				this.status.listen(
-					(data) => {
-						baseState._notify({
-							listenerContext: { source: 'form-field_status-change', status: data.value }
-						});
-					},
-					{ key: 'form-field_status-change' }
-				);
-			}
-
-			// Validate on change
-			this.listen(
-				async () => {
-					if (
-						(this.isSubmitted.get() &&
-							this._config.reValidateMode.has(FormFieldReValidateMode.OnChange)) ||
-						(!this.isSubmitted.get() &&
-							this._config.validateMode.has(FormFieldValidateMode.OnChange)) ||
-						(this._config.validateMode.has(FormFieldValidateMode.OnTouched) && this.isTouched.get())
-					) {
-						await this.validate();
-					}
-				},
-				{ key: 'form-field_validate' }
-			);
-
-			// @ts-expect-error -- Remove init method after initialization
-			delete this.init;
-			return this;
-		}
-	}) as TWithInit<TFormField<GValue>, TInitFormFieldConfig>;
+	const formField = Object.assign(baseState, formFieldFeature) as TFormField<GValue>;
 	formField._features.push('form-field');
 
-	return formField.init({ notifyOnStatusChange });
+	return withNew<TFormField<GValue>, [boolean]>(
+		Object.assign(formField, {
+			_new(this: TFormField<GValue>, notifyOnStatusChange: boolean) {
+				// Notify form field listeners if status has changed
+				if (notifyOnStatusChange) {
+					this.status.listen(
+						(data) => {
+							baseState._notify({
+								listenerContext: { source: 'form-field_status-change', status: data.value }
+							});
+						},
+						{ key: 'form-field_status-change' }
+					);
+				}
+
+				// Validate on change
+				this.listen(
+					async () => {
+						if (
+							(this.isSubmitted.get() &&
+								this._config.reValidateMode.has(FormFieldReValidateMode.OnChange)) ||
+							(!this.isSubmitted.get() &&
+								this._config.validateMode.has(FormFieldValidateMode.OnChange)) ||
+							(this._config.validateMode.has(FormFieldValidateMode.OnTouched) &&
+								this.isTouched.get())
+						) {
+							await this.validate();
+						}
+					},
+					{ key: 'form-field_validate' }
+				);
+			}
+		}),
+		notifyOnStatusChange
+	);
 }
 
 export interface TCreateFormFieldConfig<GValue> extends Partial<TFormFieldStateConfig> {
 	key: string;
 	validator?: TFormFieldValidator<GValue>;
-	notifyOnStatusChange?: boolean;
-}
-
-interface TInitFormFieldConfig {
 	notifyOnStatusChange?: boolean;
 }
