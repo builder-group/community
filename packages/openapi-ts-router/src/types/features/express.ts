@@ -93,7 +93,8 @@ export type TOpenApiExpressPathParams<GPathOperation> =
 export type TOpenApiExpressRequestBody<GPathOperation> = TRequestBody<GPathOperation>;
 
 export type TOpenApiExpressResponse<GPathOperation> = express.Response<
-	TOperationSuccessResponseContent<GPathOperation>
+	TOperationSuccessResponseContent<GPathOperation>,
+	Express.Locals
 >;
 
 // =============================================================================
