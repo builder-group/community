@@ -6,6 +6,7 @@ import React from 'react';
 export function useCombinedCompute<V1, F1 extends TFeatureDefinition[], GComputed>(
 	states: readonly [TState<V1, F1>],
 	compute: (values: readonly [V1]) => GComputed,
+	deps?: React.DependencyList,
 	options?: TUseCombinedComputeOptions<V1, GComputed>
 ): GComputed;
 
@@ -19,6 +20,7 @@ export function useCombinedCompute<
 >(
 	states: readonly [TState<V1, F1>, TState<V2, F2>],
 	compute: (values: readonly [V1, V2]) => GComputed,
+	deps?: React.DependencyList,
 	options?: TUseCombinedComputeOptions<V1 | V2, GComputed>
 ): GComputed;
 
@@ -34,6 +36,7 @@ export function useCombinedCompute<
 >(
 	states: readonly [TState<V1, F1>, TState<V2, F2>, TState<V3, F3>],
 	compute: (values: readonly [V1, V2, V3]) => GComputed,
+	deps?: React.DependencyList,
 	options?: TUseCombinedComputeOptions<V1 | V2 | V3, GComputed>
 ): GComputed;
 
@@ -51,6 +54,7 @@ export function useCombinedCompute<
 >(
 	states: readonly [TState<V1, F1>, TState<V2, F2>, TState<V3, F3>, TState<V4, F4>],
 	compute: (values: readonly [V1, V2, V3, V4]) => GComputed,
+	deps?: React.DependencyList,
 	options?: TUseCombinedComputeOptions<V1 | V2 | V3 | V4, GComputed>
 ): GComputed;
 
@@ -70,6 +74,7 @@ export function useCombinedCompute<
 >(
 	states: readonly [TState<V1, F1>, TState<V2, F2>, TState<V3, F3>, TState<V4, F4>, TState<V5, F5>],
 	compute: (values: readonly [V1, V2, V3, V4, V5]) => GComputed,
+	deps?: React.DependencyList,
 	options?: TUseCombinedComputeOptions<V1 | V2 | V3 | V4 | V5, GComputed>
 ): GComputed;
 
@@ -89,9 +94,10 @@ export function useCombinedCompute<
 >(
 	states: any,
 	compute: (values: any) => GComputed,
+	deps: React.DependencyList = [],
 	options: TUseCombinedComputeOptions<V1 | V2 | V3 | V4 | V5, GComputed> = {}
 ): GComputed {
-	const { isEqual = Object.is, deps = [], ...listenerOptions } = options;
+	const { isEqual = Object.is, ...listenerOptions } = options;
 	const [, forceRender] = React.useReducer((s) => s + 1, 0);
 
 	const currentValuesRef = React.useRef<[V1, V2, V3, V4, V5]>(
@@ -142,5 +148,4 @@ export function useCombinedCompute<
 
 interface TUseCombinedComputeOptions<GValue, GComputed> extends TListenerOptions<GValue> {
 	isEqual?: (a: GComputed, b: GComputed) => boolean;
-	deps?: React.DependencyList;
 }

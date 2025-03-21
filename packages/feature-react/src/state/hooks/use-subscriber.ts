@@ -5,9 +5,10 @@ import React from 'react';
 export function useSubscriber<GValue, GFeatures extends TFeatureDefinition[]>(
 	state: TState<GValue, GFeatures> | null | undefined,
 	callback: TListenerCallback<GValue>,
+	deps: React.DependencyList = [],
 	options: TUseSubscriberOptions<GValue> = {}
 ): void {
-	const { deps = [], ...listenerOptions } = options;
+	const { ...listenerOptions } = options;
 
 	React.useEffect(() => {
 		const unbind = state?.subscribe(callback, { key: 'use-subscriber', ...listenerOptions });
@@ -17,6 +18,4 @@ export function useSubscriber<GValue, GFeatures extends TFeatureDefinition[]>(
 	}, [state, ...deps]);
 }
 
-export interface TUseSubscriberOptions<GValue> extends TListenerOptions<GValue> {
-	deps?: React.DependencyList;
-}
+export interface TUseSubscriberOptions<GValue> extends TListenerOptions<GValue> {}

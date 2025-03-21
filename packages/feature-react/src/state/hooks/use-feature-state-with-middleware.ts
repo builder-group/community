@@ -5,9 +5,10 @@ import React from 'react';
 export function useFeatureStateWithMiddleware<GValue, GFeatures extends TFeatureDefinition[]>(
 	state: TState<GValue, GFeatures>,
 	middleware: TFeatureStateMiddleware<GValue>[] = [],
+	deps: React.DependencyList = [],
 	options: TUseFeatureStateMiddlewareOptions<GValue> = {}
 ): Readonly<GValue> {
-	const { deps = [], ...listenerOptions } = options;
+	const { ...listenerOptions } = options;
 	const [, forceRender] = React.useReducer((s: number) => s + 1, 0);
 
 	React.useEffect(() => {
@@ -34,6 +35,4 @@ export type TFeatureStateMiddleware<GValue> = (
 	context: TListenerContext<GValue>
 ) => TListenerContext<GValue>;
 
-export interface TUseFeatureStateMiddlewareOptions<GValue> extends TListenerOptions<GValue> {
-	deps?: React.DependencyList;
-}
+export interface TUseFeatureStateMiddlewareOptions<GValue> extends TListenerOptions<GValue> {}

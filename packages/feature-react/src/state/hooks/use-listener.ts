@@ -5,9 +5,10 @@ import React from 'react';
 export function useListener<GValue, GFeatures extends TFeatureDefinition[]>(
 	state: TState<GValue, GFeatures> | null | undefined,
 	callback: TListenerCallback<GValue>,
+	deps: React.DependencyList = [],
 	options: TUseListenerOptions<GValue> = {}
 ): void {
-	const { deps = [], ...listenerOptions } = options;
+	const { ...listenerOptions } = options;
 
 	React.useEffect(() => {
 		const unbind = state?.listen(callback, { key: 'use-listener', ...listenerOptions });
@@ -17,6 +18,4 @@ export function useListener<GValue, GFeatures extends TFeatureDefinition[]>(
 	}, [state, ...deps]);
 }
 
-export interface TUseListenerOptions<GValue> extends TListenerOptions<GValue> {
-	deps?: React.DependencyList;
-}
+export interface TUseListenerOptions<GValue> extends TListenerOptions<GValue> {}
