@@ -1,6 +1,6 @@
 {
 	"name": "feature-logger",
-	"version": "0.0.36",
+	"version": "0.0.38",
 	"private": false,
 	"description": "Straightforward, typesafe, and feature-based logging library",
 	"keywords": [],

@@ -1,6 +1,6 @@
-import { type TInvokeConsole, type TLogger, type TLoggerOptions, type TLogMethod } from './types';
+import { TLoggerMiddleware, type TInvokeConsole, type TLogger, type TLogMethod } from './types';
 
-export function createLogger(options: TLoggerOptions = {}): TLogger<[]> {
+export function createLogger(options: TCreateLoggerOptions = {}): TLogger<[]> {
 	const { active = true, level = 0, middlewares = [] } = options;
 
 	let invokeConsole: TInvokeConsole;
@@ -14,15 +14,13 @@ export function createLogger(options: TLoggerOptions = {}): TLogger<[]> {
 
 	return {
 		_features: [],
-		_config: {
-			active,
-			level,
-			middlewares
-		},
+		active,
+		level,
+		middlewares,
 		_invokeConsole: invokeConsole,
 		_baseLog(category, data) {
-			if (this._config.active && category.level >= this._config.level) {
-				this._config.middlewares
+			if (this.active && category.level >= this.level) {
+				this.middlewares
 					.concat(category.middlewares ?? [])
 					.reduceRight((acc, middleware) => middleware(acc), invokeConsole)(
 					category.logMethod,
@@ -32,6 +30,9 @@ export function createLogger(options: TLoggerOptions = {}): TLogger<[]> {
 		},
 		trace(message, ...optionalParams) {
 			this._baseLog({ logMethod: 'trace', level: LOG_LEVEL.TRACE }, [message, ...optionalParams]);
+		},
+		debug(message, ...optionalParams) {
+			this._baseLog({ logMethod: 'debug', level: LOG_LEVEL.DEBUG }, [message, ...optionalParams]);
 		},
 		log(message, ...optionalParams) {
 			this._baseLog({ logMethod: 'log', level: LOG_LEVEL.LOG }, [message, ...optionalParams]);
@@ -48,9 +49,16 @@ export function createLogger(options: TLoggerOptions = {}): TLogger<[]> {
 	};
 }
 
+export interface TCreateLoggerOptions {
+	active?: boolean;
+	level?: number;
+	middlewares?: TLoggerMiddleware[];
+	invokeConsole?: TInvokeConsole;
+}
+
 function defaultInvokeConsole(logMethod: TLogMethod, data: unknown[]): void {
 	if (logMethod in console && typeof console[logMethod] === 'function') {
-		// @ts-expect-error
+		// @ts-expect-error -- We verify that the method exists in the console object
 		console[logMethod](...data);
 	} else {
 		throw Error(`Failed to invoke console.${logMethod}!`);
@@ -58,9 +66,10 @@ function defaultInvokeConsole(logMethod: TLogMethod, data: unknown[]): void {
 }
 
 export enum LOG_LEVEL {
-	TRACE = 2,
-	LOG = 5,
-	INFO = 10,
-	WARN = 20,
-	ERROR = 50
+	TRACE = 4,
+	DEBUG = 8,
+	LOG = 16,
+	INFO = 32,
+	WARN = 64,
+	ERROR = 128
 }

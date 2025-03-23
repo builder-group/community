@@ -6,21 +6,27 @@ export interface TPrefixFeature {
 }
 
 export interface TTimestampFeature {
-	key: 'timestamp';
+	key: 'timestamp-prefix';
 	api: {};
 }
 
 export interface TMethodPrefixFeature {
-	key: 'methodPrefix';
+	key: 'log-method-prefix';
+	api: {};
+}
+
+export interface TStyleFeature {
+	key: 'style';
 	api: {};
 }
 
 export interface TLogIdFeature {
-	key: 'logId';
+	key: 'log-id';
 	api: {
 		_baseLogWithId: (category: TLoggerCategory, data: unknown[]) => string;
-		logWithId: (message: unknown, ...optionalParams: unknown[]) => string;
 		traceWithId: (message: unknown, ...optionalParams: unknown[]) => string;
+		debugWithId: (message: unknown, ...optionalParams: unknown[]) => string;
+		logWithId: (message: unknown, ...optionalParams: unknown[]) => string;
 		infoWithId: (message: unknown, ...optionalParams: unknown[]) => string;
 		warnWithId: (message: unknown, ...optionalParams: unknown[]) => string;
 		errorWithId: (message: unknown, ...optionalParams: unknown[]) => string;

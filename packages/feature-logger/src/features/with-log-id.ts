@@ -12,17 +12,28 @@ export function withLogId<GFeatures extends TFeatureDefinition[]>(
 	const logIdFeature: TLogIdFeature['api'] = {
 		_baseLogWithId(this: TLogger<[TLogIdFeature]>, category, data) {
 			const id = generateId();
-			this._baseLog(category, [formatId(id, category), ...data]);
+			if (typeof data[0] === 'string') {
+				data[0] = `${formatId(id, category)} ${data[0]}`;
+			} else {
+				data.unshift(formatId(id, category));
+			}
+			this._baseLog(category, data);
 			return id;
 		},
-		logWithId(this: TLogger<[TLogIdFeature]>, message, ...optionalParams) {
-			return this._baseLogWithId({ logMethod: 'log', level: LOG_LEVEL.LOG }, [
+		traceWithId(this: TLogger<[TLogIdFeature]>, message, ...optionalParams) {
+			return this._baseLogWithId({ logMethod: 'trace', level: LOG_LEVEL.TRACE }, [
 				message,
 				...optionalParams
 			]);
 		},
-		traceWithId(this: TLogger<[TLogIdFeature]>, message, ...optionalParams) {
-			return this._baseLogWithId({ logMethod: 'trace', level: LOG_LEVEL.TRACE }, [
+		debugWithId(this: TLogger<[TLogIdFeature]>, message, ...optionalParams) {
+			return this._baseLogWithId({ logMethod: 'debug', level: LOG_LEVEL.DEBUG }, [
+				message,
+				...optionalParams
+			]);
+		},
+		logWithId(this: TLogger<[TLogIdFeature]>, message, ...optionalParams) {
+			return this._baseLogWithId({ logMethod: 'log', level: LOG_LEVEL.LOG }, [
 				message,
 				...optionalParams
 			]);
@@ -49,7 +60,7 @@ export function withLogId<GFeatures extends TFeatureDefinition[]>(
 
 	// Extend the base logger with the logId feature
 	const extendedLogger = Object.assign(baseLogger, logIdFeature) as TLogger<[TLogIdFeature]>;
-	extendedLogger._features.push('logId');
+	extendedLogger._features.push('log-id');
 
 	return extendedLogger as unknown as TLogger<[TLogIdFeature, ...GFeatures]>;
 }
