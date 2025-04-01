@@ -44,4 +44,33 @@ describe('withPrefix function', () => {
 		prefixedLogger.error('error message');
 		expect(consoleSpies.error).toHaveBeenCalledWith('PREFIX error message');
 	});
+
+	describe('multi-line message handling', () => {
+		const message = 'first line\nsecond line\nthird line';
+
+		it('should indent subsequent lines by default', () => {
+			const logger = createLogger();
+			const prefixedLogger = withPrefix(logger, '[Test]');
+			prefixedLogger.info(message);
+			expect(consoleSpies.info).toHaveBeenCalledWith(
+				'[Test] first line\n       second line\n       third line'
+			);
+		});
+
+		it('should prefix each line when newLineBehavior is prefix', () => {
+			const logger = createLogger();
+			const prefixedLogger = withPrefix(logger, '[Test]', { newLineBehavior: 'prefix' });
+			prefixedLogger.info(message);
+			expect(consoleSpies.info).toHaveBeenCalledWith(
+				'[Test] first line\n[Test] second line\n[Test] third line'
+			);
+		});
+
+		it('should ignore newlines when newLineBehavior is ignore', () => {
+			const logger = createLogger();
+			const prefixedLogger = withPrefix(logger, '[Test]', { newLineBehavior: 'ignore' });
+			prefixedLogger.info(message);
+			expect(consoleSpies.info).toHaveBeenCalledWith('[Test] first line\nsecond line\nthird line');
+		});
+	});
 });

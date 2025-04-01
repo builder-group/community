@@ -115,3 +115,7 @@ We're [actively exploring solutions](https://github.com/builder-group/community/
 This [Medium post](https://medium.com/@markmiro/thoughts-on-choosing-between-plain-js-objects-and-classes-6422af8aaad5) explains the key differences well.
 
 In short, we use objects because they are more flexible and allow for the kind of extensibility we need. Achieving this level of extensibility with classes isn't feasible for our use case, so using objects was the better choice.
+
+### What Features?
+
+Think of features like components in an Entity Component System (ECS). Every feature based object (e.g., feature-state) has base functionality, and additional components (features) can be added to extend it. Unlike traditional ECS, we only adopt the concept of Components, without Systems or Entities. Each component contains the necessary functions to interact with the feature based object.
