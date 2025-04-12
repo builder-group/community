@@ -1,5 +1,13 @@
 # elevenlabs-client
 
+## 0.0.19
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @blgc/utils@0.0.48
+  - feature-fetch@0.0.41
+
 ## 0.0.18
 
 ### Patch Changes
