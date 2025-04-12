@@ -21,7 +21,7 @@
 		"install:clean": "pnpm clean && pnpm install && pnpm build",
 		"lint": "turbo run lint",
 		"packages:change": "changeset",
-		"packages:publish": "changeset publish",
+		"packages:publish": "pnpm build:prod && changeset publish",
 		"packages:version": "changeset version",
 		"test": "turbo run test",
 		"update:latest": "turbo run update:latest"

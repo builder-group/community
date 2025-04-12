@@ -1,5 +1,12 @@
 # openapi-ts-router
 
+## 0.2.14
+
+### Patch Changes
+
+- Updated dependencies []:
+  - validation-adapter@0.0.23
+
 ## 0.2.13
 
 ### Patch Changes
