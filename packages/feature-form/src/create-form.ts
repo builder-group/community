@@ -28,7 +28,7 @@ export function createForm<GFormData extends TFormData>(
 		collectErrorMode = 'firstError',
 		disabled = false,
 		validateMode = bitwiseFlag(FormFieldValidateMode.OnSubmit),
-		reValidateMode = bitwiseFlag(FormFieldReValidateMode.OnBlur),
+		reValidateMode = bitwiseFlag(FormFieldReValidateMode.OnBlur, FormFieldReValidateMode.OnSubmit),
 		onValidSubmit,
 		onInvalidSubmit,
 		notifyOnStatusChange = true
