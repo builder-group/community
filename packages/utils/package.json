@@ -1,6 +1,6 @@
 {
 	"name": "@blgc/utils",
-	"version": "0.0.50",
+	"version": "0.0.51",
 	"private": false,
 	"description": "Straightforward, typesafe, and tree-shakable collection of utility functions",
 	"keywords": [],

@@ -1,5 +1,5 @@
-import { isIPv4 } from 'net';
 import { getHostname } from './get-hostname';
+import { isIPv4 } from './is-ip';
 
 /**
  * Extracts the root hostname from a URL.
