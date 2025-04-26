@@ -43,7 +43,7 @@ export interface TFetchClientConfig {
 	requestMiddlewares: TRequestMiddleware[];
 }
 
-export type TFetchClientOptions = Partial<Omit<TFetchClientConfig, 'headers' | 'middlewares'>> & {
+export type TFetchClientOptions = Partial<Omit<TFetchClientConfig, 'headers'>> & {
 	headers?: RequestInit['headers'] | FetchHeaders;
 	fetch?: TFetchLike;
 };
@@ -96,6 +96,7 @@ export interface TFetchOptions<GParseAs extends TParseAs> {
 	prefixUrl?: string;
 	fetchProps?: Omit<RequestInit, 'body' | 'method' | 'headers'>;
 	middlewareProps?: unknown;
+	requestMiddlewares?: TRequestMiddleware[];
 	pathParams?: TPathParams;
 	queryParams?: TQueryParams;
 	pathSerializer?: TPathSerializer;

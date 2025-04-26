@@ -61,6 +61,7 @@ export function createFetchClient(options: TFetchClientOptions = {}): TFetchClie
 				prefixUrl = this._config.prefixUrl,
 				fetchProps = {},
 				middlewareProps,
+				requestMiddlewares = [],
 				pathParams = {},
 				queryParams = {}
 			} = baseFetchOptions;
@@ -118,10 +119,9 @@ export function createFetchClient(options: TFetchClientOptions = {}): TFetchClie
 			});
 
 			// Process request middlewares
-			const baseFetch = this._config.requestMiddlewares.reduceRight(
-				(acc, middleware) => middleware(acc),
-				this._fetchLike
-			);
+			const baseFetch = this._config.requestMiddlewares
+				.concat(requestMiddlewares)
+				.reduceRight((acc, middleware) => middleware(acc), this._fetchLike);
 
 			// Send request
 			let response: Response;
