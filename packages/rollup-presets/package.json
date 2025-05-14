@@ -33,16 +33,16 @@
 	},
 	"dependencies": {
 		"@rollup/plugin-commonjs": "^28.0.3",
-		"execa": "9.5.2",
+		"execa": "9.5.3",
 		"picocolors": "^1.1.1",
-		"rollup-plugin-dts": "^6.1.1",
+		"rollup-plugin-dts": "^6.2.1",
 		"rollup-plugin-esbuild": "^6.2.1",
 		"rollup-plugin-node-externals": "8.0.0"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.13.10",
-		"rollup": "^4.35.0",
-		"type-fest": "^4.37.0"
+		"@types/node": "^22.15.18",
+		"rollup": "^4.40.2",
+		"type-fest": "^4.41.0"
 	}
 }

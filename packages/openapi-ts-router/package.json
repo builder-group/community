@@ -40,13 +40,13 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/express": "^5.0.0",
+		"@types/express": "^5.0.1",
 		"@types/express-serve-static-core": "^5.0.6",
-		"@types/node": "^22.13.10",
-		"express": "^4.21.2",
-		"hono": "^4.7.4",
+		"@types/node": "^22.15.18",
+		"express": "^5.1.0",
+		"hono": "^4.7.9",
 		"rollup-presets": "workspace:*",
-		"valibot": "1.0.0-rc.3",
+		"valibot": "1.1.0",
 		"validation-adapters": "workspace:*"
 	},
 	"size-limit": [

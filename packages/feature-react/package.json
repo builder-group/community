@@ -60,11 +60,11 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.13.10",
-		"@types/react": "^19.0.10",
+		"@types/node": "^22.15.18",
+		"@types/react": "^19.1.4",
 		"feature-form": "workspace:*",
 		"feature-state": "workspace:*",
-		"react": "^19.0.0",
+		"react": "^19.1.0",
 		"rollup-presets": "workspace:*"
 	},
 	"peerDependencies": {
