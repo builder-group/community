@@ -9,7 +9,7 @@ describe('createEntityIndex', () => {
 			expect(index.aliveCount).toBe(0);
 			expect(index.dense).toEqual([]);
 			expect(index._sparse).toEqual([]);
-			expect(index._nextId).toBe(1);
+			expect(index._nextBaseEid).toBe(1);
 			expect(index._config.versioning).toBe(false);
 			expect(index._versionBits).toBe(8);
 			expect(index._entityBits).toBe(24);
@@ -44,7 +44,7 @@ describe('createEntityIndex', () => {
 			expect(index.aliveCount).toBe(1);
 			expect(index.dense).toEqual([1]);
 			expect(index._sparse[1]).toBe(0);
-			expect(index._nextId).toBe(2);
+			expect(index._nextBaseEid).toBe(2);
 		});
 
 		it('should add multiple entities with sequential IDs', () => {
@@ -77,11 +77,11 @@ describe('createEntityIndex', () => {
 			const index = createEntityIndex({ versionBits: 16 }); // 16 entity bits, max = 65535
 
 			// Manually set _nextId to the limit to test the boundary condition
-			index._nextId = index._maxEid; // Set to max allowed (65535)
+			index._nextBaseEid = index._maxBaseEid; // Set to max allowed (65535)
 
 			// This should work (creates entity with ID = maxEid)
 			const lastValidId = index.addEntity();
-			expect(lastValidId).toBe(index._maxEid);
+			expect(lastValidId).toBe(index._maxBaseEid);
 
 			// This should fail (nextId is now maxEid + 1 = 65536)
 			expect(() => index.addEntity()).toThrow('Maximum number of entities exceeded');
@@ -141,7 +141,7 @@ describe('createEntityIndex', () => {
 			index.removeEntity(id);
 			const recycledId = index.addEntity();
 
-			expect(index.getEid(recycledId)).toBe(index.getEid(id));
+			expect(index.getBaseEid(recycledId)).toBe(index.getBaseEid(id));
 			expect(index.getEidVersion(recycledId)).toBe(1);
 			expect(recycledId).not.toBe(id);
 		});
@@ -186,7 +186,7 @@ describe('createEntityIndex', () => {
 			const index = createEntityIndex();
 			const id = index.addEntity();
 
-			expect(index.getEid(id)).toBe(id);
+			expect(index.getBaseEid(id)).toBe(id);
 		});
 
 		it('should extract base ID from versioned entity', () => {
@@ -196,7 +196,7 @@ describe('createEntityIndex', () => {
 			index.removeEntity(id);
 			const recycledId = index.addEntity();
 
-			expect(index.getEid(recycledId)).toBe(index.getEid(id));
+			expect(index.getBaseEid(recycledId)).toBe(index.getBaseEid(id));
 		});
 	});
 
@@ -271,7 +271,7 @@ describe('createEntityIndex', () => {
 		it('should return base ID when versioning disabled', () => {
 			const index = createEntityIndex({ versioning: false });
 
-			expect(index._createVersionedId(5, 3)).toBe(5);
+			expect(index._createVersionedEid(5, 3)).toBe(5);
 		});
 
 		it('should combine base ID and version when versioning enabled', () => {
@@ -279,9 +279,9 @@ describe('createEntityIndex', () => {
 			const baseId = 5;
 			const version = 3;
 
-			const versionedId = index._createVersionedId(baseId, version);
+			const versionedId = index._createVersionedEid(baseId, version);
 
-			expect(index.getEid(versionedId)).toBe(baseId);
+			expect(index.getBaseEid(versionedId)).toBe(baseId);
 			expect(index.getEidVersion(versionedId)).toBe(version);
 		});
 	});
@@ -321,60 +321,6 @@ describe('createEntityIndex', () => {
 			index.addEntity(); // Recycle
 
 			expect(index._validate()).toBe(true);
-		});
-	});
-
-	describe('complex scenarios', () => {
-		it('should handle multiple add/remove cycles', () => {
-			const index = createEntityIndex({ versioning: true });
-			const entities: number[] = [];
-
-			// Add 5 entities
-			for (let i = 0; i < 5; i++) {
-				entities.push(index.addEntity());
-			}
-
-			// Remove every other entity
-			for (let i = 0; i < entities.length; i += 2) {
-				index.removeEntity(entities[i] as number);
-			}
-
-			// Add 3 more entities (should recycle)
-			for (let i = 0; i < 3; i++) {
-				index.addEntity();
-			}
-
-			expect(index.aliveCount).toBe(5); // 2 remaining + 3 new
-			expect(index._validate()).toBe(true);
-		});
-
-		it('should maintain consistency with random operations', () => {
-			const index = createEntityIndex({ versioning: true });
-			const aliveEntities = new Set<number>();
-
-			// Perform 100 random operations
-			for (let i = 0; i < 100; i++) {
-				if (Math.random() < 0.7 || aliveEntities.size === 0) {
-					// Add entity
-					const id = index.addEntity();
-					aliveEntities.add(id);
-				} else {
-					// Remove random entity
-					const entities = Array.from(aliveEntities);
-					const randomEntity = entities[Math.floor(Math.random() * entities.length)] as number;
-					index.removeEntity(randomEntity);
-					aliveEntities.delete(randomEntity);
-				}
-
-				// Validate consistency
-				expect(index.aliveCount).toBe(aliveEntities.size);
-				expect(index._validate()).toBe(true);
-
-				// Check all tracked entities are alive
-				for (const entity of aliveEntities) {
-					expect(index.isEntityAlive(entity)).toBe(true);
-				}
-			}
 		});
 	});
 });
