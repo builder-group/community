@@ -58,11 +58,11 @@ export function createEntityIndex(options: TCreateEntityIndexOptions = {}): TEnt
 		_entityMask: entityMask,
 		_versionMask: versionMask,
 
-		getBaseEid(eid: number): number {
+		getBaseEid(eid) {
 			return eid & this._entityMask;
 		},
 
-		getEidVersion(eid: number): number {
+		getEidVersion(eid) {
 			return this._config.versioning
 				? (eid >>> this._entityBits) & ((1 << this._versionBits) - 1)
 				: 0;
@@ -96,7 +96,7 @@ export function createEntityIndex(options: TCreateEntityIndexOptions = {}): TEnt
 		// After:      sparse: [_, 0, 2, 1, 3]  dense: [1, 3, 2v1, 4]  aliveCount: 4
 		//                                            └───alive────┘   nextBaseEid: 5
 		//             Returns: 4 (new entity with version 0)
-		addEntity(): number {
+		addEntity() {
 			// Try to recycle a removed entity first
 			if (this._aliveCount < this._dense.length) {
 				const recycledEid = this._dense[this._aliveCount] as number;
@@ -140,7 +140,7 @@ export function createEntityIndex(options: TCreateEntityIndexOptions = {}): TEnt
 		// Later:      Recycle entity 2v1
 		//             sparse: [_, 0, 2, 1]     dense: [1, 3, 2v1]  aliveCount: 3
 		//                                            └──alive───┘
-		removeEntity(eid: number): boolean {
+		removeEntity(eid) {
 			const baseEid = this.getBaseEid(eid);
 			const denseIndex = this._sparse[baseEid];
 
@@ -175,23 +175,23 @@ export function createEntityIndex(options: TCreateEntityIndexOptions = {}): TEnt
 			return true;
 		},
 
-		isEntityAlive(eid: number): boolean {
+		isEntityAlive(eid) {
 			const baseEid = this.getBaseEid(eid);
 			const denseIndex = this._sparse[baseEid];
 			return denseIndex != null && denseIndex < this._aliveCount && this._dense[denseIndex] === eid;
 		},
 
-		getAliveEntities(): number[] {
+		getAliveEntities() {
 			return this._dense.slice(0, this._aliveCount);
 		},
 
-		formatEid(eid: number): string {
+		formatEid(eid) {
 			const baseEid = this.getBaseEid(eid);
 			const version = this.getEidVersion(eid);
 			return this._config.versioning ? `${baseEid}v${version}` : `${baseEid}`;
 		},
 
-		debugState(): string {
+		debugState() {
 			const aliveEntities = this._dense
 				.slice(0, this._aliveCount)
 				.map((eid) => this.formatEid(eid));
@@ -215,7 +215,14 @@ export function createEntityIndex(options: TCreateEntityIndexOptions = {}): TEnt
 			].join('\n');
 		},
 
-		validate(): boolean {
+		reset() {
+			this._sparse.length = 0;
+			this._dense.length = 0;
+			this._aliveCount = 0;
+			this._nextBaseEid = 1;
+		},
+
+		validate() {
 			// Check that all alive entities have correct sparse mappings (Dense -> Sparse)
 			for (let i = 0; i < this._aliveCount; i++) {
 				const eid = this._dense[i] as number;
@@ -245,25 +252,19 @@ export function createEntityIndex(options: TCreateEntityIndexOptions = {}): TEnt
 			return true;
 		},
 
-		_createVersionedEid(baseEid: number, version: number): number {
+		_createVersionedEid(baseEid, version) {
 			return this._config.versioning ? baseEid | (version << this._entityBits) : baseEid;
 		}
 	};
 }
 
-/**
- * Configuration options for creating an entity index.
- */
-interface TCreateEntityIndexOptions {
+export interface TCreateEntityIndexOptions {
 	/** Enable versioning to prevent stale entity references. Default: false */
 	versioning?: boolean;
 	/** Number of bits reserved for version information. Default: 8 (allows 256 versions) */
 	versionBits?: number;
 }
 
-/**
- * Entity index interface providing efficient entity ID management.
- */
 export interface TEntityIndex {
 	_config: {
 		/** Whether versioning is enabled */
@@ -294,7 +295,7 @@ export interface TEntityIndex {
 	 * Creates a new entity ID or recycles a previously removed one.
 	 * @returns A unique entity ID (potentially versioned)
 	 */
-	addEntity(): number;
+	addEntity(): TEntityId;
 
 	/**
 	 * Removes an entity from the index, making its ID available for recycling.
@@ -302,41 +303,41 @@ export interface TEntityIndex {
 	 * @param eid - The entity ID to remove
 	 * @returns True if the entity was removed, false if it wasn't alive
 	 */
-	removeEntity(eid: number): boolean;
+	removeEntity(eid: TEntityId): boolean;
 
 	/**
 	 * Checks if an entity ID is currently alive.
 	 * @param eid - The entity ID to check
 	 * @returns True if the entity is alive, false otherwise
 	 */
-	isEntityAlive(eid: number): boolean;
+	isEntityAlive(eid: TEntityId): boolean;
 
 	/**
 	 * Extracts the base entity ID without version information.
 	 * @param eid - The potentially versioned entity ID
 	 * @returns The base entity ID (without version bits)
 	 */
-	getBaseEid(eid: number): number;
+	getBaseEid(eid: TEntityId): number;
 
 	/**
 	 * Extracts the version from an entity ID.
 	 * @param eid - The entity ID
 	 * @returns The version number (0 if versioning is disabled)
 	 */
-	getEidVersion(eid: number): number;
+	getEidVersion(eid: TEntityId): number;
 
 	/**
 	 * Gets all alive entity IDs for iteration.
 	 * @returns Array of alive entity IDs
 	 */
-	getAliveEntities(): number[];
+	getAliveEntities(): TEntityId[];
 
 	/**
 	 * Formats an entity ID as a human-readable string.
 	 * @param eid - The entity ID to format
 	 * @returns Formatted string like "1v0", "2v3", or just "1" if versioning disabled
 	 */
-	formatEid(eid: number): string;
+	formatEid(eid: TEntityId): string;
 
 	/**
 	 * Returns a human-readable debug representation of the entity index state.
@@ -344,6 +345,11 @@ export interface TEntityIndex {
 	 * @returns Multi-line string with formatted state information
 	 */
 	debugState(): string;
+
+	/**
+	 * Resets the entity index to its initial empty state.
+	 */
+	reset(): void;
 
 	/**
 	 * Validates the internal data structure integrity.
@@ -360,3 +366,5 @@ export interface TEntityIndex {
 	 */
 	_createVersionedEid(baseEid: number, version: number): number;
 }
+
+export type TEntityId = number;

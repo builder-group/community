@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createEntityIndex } from './create-entity-index';
+import { createEntityIndex } from './entity-index';
 
 describe('createEntityIndex', () => {
 	describe('initialization', () => {
@@ -348,6 +348,31 @@ describe('createEntityIndex', () => {
 		});
 	});
 
+	describe('reset', () => {
+		it('should reset to initial state and allow reuse', () => {
+			const index = createEntityIndex({ versioning: true });
+
+			// Create complex state: entities, removal, recycling
+			const id1 = index.addEntity();
+			const id2 = index.addEntity();
+			index.removeEntity(id1);
+			const recycled = index.addEntity();
+
+			index.reset();
+
+			// Verify clean state and reusable
+			expect(index._aliveCount).toBe(0);
+			expect(index._dense).toEqual([]);
+			expect(index._sparse).toEqual([]);
+			expect(index._nextBaseEid).toBe(1);
+			expect(index.validate()).toBe(true);
+
+			const newId = index.addEntity();
+			expect(newId).toBe(1);
+			expect(index.isEntityAlive(newId)).toBe(true);
+		});
+	});
+
 	describe('validate', () => {
 		it('should return true for valid empty index', () => {
 			const index = createEntityIndex();
@@ -381,6 +406,17 @@ describe('createEntityIndex', () => {
 
 			index.removeEntity(id1);
 			index.addEntity(); // Recycle
+
+			expect(index.validate()).toBe(true);
+		});
+
+		it('should return true after reset', () => {
+			const index = createEntityIndex();
+			index.addEntity();
+			index.addEntity();
+			index.removeEntity(index.addEntity());
+
+			index.reset();
 
 			expect(index.validate()).toBe(true);
 		});
