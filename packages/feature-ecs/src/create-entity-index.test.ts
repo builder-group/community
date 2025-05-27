@@ -6,8 +6,8 @@ describe('createEntityIndex', () => {
 		it('should create index with default options', () => {
 			const index = createEntityIndex();
 
-			expect(index.aliveCount).toBe(0);
-			expect(index.dense).toEqual([]);
+			expect(index._aliveCount).toBe(0);
+			expect(index._dense).toEqual([]);
 			expect(index._sparse).toEqual([]);
 			expect(index._nextBaseEid).toBe(1);
 			expect(index._config.versioning).toBe(false);
@@ -41,8 +41,8 @@ describe('createEntityIndex', () => {
 			const id = index.addEntity();
 
 			expect(id).toBe(1);
-			expect(index.aliveCount).toBe(1);
-			expect(index.dense).toEqual([1]);
+			expect(index._aliveCount).toBe(1);
+			expect(index._dense).toEqual([1]);
 			expect(index._sparse[1]).toBe(0);
 			expect(index._nextBaseEid).toBe(2);
 		});
@@ -56,8 +56,8 @@ describe('createEntityIndex', () => {
 			expect(id1).toBe(1);
 			expect(id2).toBe(2);
 			expect(id3).toBe(3);
-			expect(index.aliveCount).toBe(3);
-			expect(index.dense).toEqual([1, 2, 3]);
+			expect(index._aliveCount).toBe(3);
+			expect(index._dense).toEqual([1, 2, 3]);
 		});
 
 		it('should recycle removed entity IDs', () => {
@@ -69,7 +69,7 @@ describe('createEntityIndex', () => {
 			const recycledId = index.addEntity();
 
 			expect(recycledId).toBe(id1);
-			expect(index.aliveCount).toBe(2);
+			expect(index._aliveCount).toBe(2);
 		});
 
 		it('should throw error when exceeding max entities', () => {
@@ -96,7 +96,7 @@ describe('createEntityIndex', () => {
 			const result = index.removeEntity(id);
 
 			expect(result).toBe(true);
-			expect(index.aliveCount).toBe(0);
+			expect(index._aliveCount).toBe(0);
 			expect(index.isEntityAlive(id)).toBe(false);
 		});
 
@@ -106,7 +106,7 @@ describe('createEntityIndex', () => {
 			const result = index.removeEntity(999);
 
 			expect(result).toBe(false);
-			expect(index.aliveCount).toBe(0);
+			expect(index._aliveCount).toBe(0);
 		});
 
 		it('should return false for already removed entity', () => {
@@ -127,9 +127,9 @@ describe('createEntityIndex', () => {
 
 			index.removeEntity(id2); // Remove middle entity
 
-			expect(index.aliveCount).toBe(2);
-			expect(index.dense[0]).toBe(id1);
-			expect(index.dense[1]).toBe(id3); // id3 moved to position 1
+			expect(index._aliveCount).toBe(2);
+			expect(index._dense[0]).toBe(id1);
+			expect(index._dense[1]).toBe(id3); // id3 moved to position 1
 			expect(index._sparse[1]).toBe(0); // id1 at position 0
 			expect(index._sparse[3]).toBe(1); // id3 at position 1
 		});
@@ -267,6 +267,125 @@ describe('createEntityIndex', () => {
 		});
 	});
 
+	describe('formatEid', () => {
+		it('should format entity ID without version when versioning disabled', () => {
+			const index = createEntityIndex({ versioning: false });
+			const id1 = index.addEntity();
+			const id2 = index.addEntity();
+
+			expect(index.formatEid(id1)).toBe('1');
+			expect(index.formatEid(id2)).toBe('2');
+		});
+
+		it('should format entity ID with version when versioning enabled', () => {
+			const index = createEntityIndex({ versioning: true });
+			const id1 = index.addEntity();
+			const id2 = index.addEntity();
+
+			expect(index.formatEid(id1)).toBe('1v0');
+			expect(index.formatEid(id2)).toBe('2v0');
+		});
+
+		it('should format recycled entity with incremented version', () => {
+			const index = createEntityIndex({ versioning: true, versionBits: 4 });
+			let currentId = index.addEntity();
+
+			// Cycle through multiple versions
+			for (let i = 0; i < 10; i++) {
+				index.removeEntity(currentId);
+				currentId = index.addEntity();
+				expect(index.formatEid(currentId)).toBe(`1v${i + 1}`);
+			}
+		});
+
+		it('should format entity after version overflow', () => {
+			const index = createEntityIndex({ versioning: true, versionBits: 2 }); // Max version 3
+			let currentId = index.addEntity();
+
+			// Cycle through versions 0, 1, 2, 3, then back to 0
+			for (let i = 0; i < 4; i++) {
+				index.removeEntity(currentId);
+				currentId = index.addEntity();
+			}
+
+			expect(index.formatEid(currentId)).toBe('1v0'); // Wrapped around
+		});
+	});
+
+	describe('debugState', () => {
+		it('should show empty state for new index', () => {
+			const index = createEntityIndex({ versioning: true });
+			const state = index.debugState();
+
+			expect(state).toContain('Alive (0): []');
+			expect(state).toContain('Dead (0): []');
+			expect(state).toContain('Sparse: {}');
+			expect(state).toContain('NextBaseEid: 1');
+			expect(state).toContain('Versioning: enabled');
+		});
+
+		it('should show alive entities', () => {
+			const index = createEntityIndex({ versioning: true });
+			index.addEntity();
+			index.addEntity();
+			const state = index.debugState();
+
+			expect(state).toContain('Alive (2): [1v0, 2v0]');
+			expect(state).toContain('Dead (0): []');
+			expect(state).toContain('Sparse: {1→0, 2→1}');
+		});
+
+		it('should show dead entities after removal', () => {
+			const index = createEntityIndex({ versioning: true });
+			const id1 = index.addEntity();
+			const id2 = index.addEntity();
+			index.removeEntity(id1);
+			const state = index.debugState();
+
+			expect(state).toContain('Alive (1): [2v0]');
+			expect(state).toContain('Dead (1): [1v1]');
+			expect(state).toContain('Sparse: {2→0}');
+		});
+	});
+
+	describe('validate', () => {
+		it('should return true for valid empty index', () => {
+			const index = createEntityIndex();
+
+			expect(index.validate()).toBe(true);
+		});
+
+		it('should return true for valid index with entities', () => {
+			const index = createEntityIndex();
+			index.addEntity();
+			index.addEntity();
+			index.addEntity();
+
+			expect(index.validate()).toBe(true);
+		});
+
+		it('should return true after remove operations', () => {
+			const index = createEntityIndex();
+			const id1 = index.addEntity();
+			const id2 = index.addEntity();
+			const id3 = index.addEntity();
+
+			index.removeEntity(id2);
+
+			expect(index.validate()).toBe(true);
+		});
+
+		it('should return true after recycling', () => {
+			const index = createEntityIndex({ versioning: true });
+			const id1 = index.addEntity();
+
+			index.removeEntity(id1);
+			index.addEntity(); // Recycle
+
+			expect(index.validate()).toBe(true);
+		});
+	});
+
 	describe('_createVersionedId', () => {
 		it('should return base ID when versioning disabled', () => {
 			const index = createEntityIndex({ versioning: false });
@@ -283,44 +402,6 @@ describe('createEntityIndex', () => {
 
 			expect(index.getBaseEid(versionedId)).toBe(baseId);
 			expect(index.getEidVersion(versionedId)).toBe(version);
-		});
-	});
-
-	describe('_validate', () => {
-		it('should return true for valid empty index', () => {
-			const index = createEntityIndex();
-
-			expect(index._validate()).toBe(true);
-		});
-
-		it('should return true for valid index with entities', () => {
-			const index = createEntityIndex();
-			index.addEntity();
-			index.addEntity();
-			index.addEntity();
-
-			expect(index._validate()).toBe(true);
-		});
-
-		it('should return true after remove operations', () => {
-			const index = createEntityIndex();
-			const id1 = index.addEntity();
-			const id2 = index.addEntity();
-			const id3 = index.addEntity();
-
-			index.removeEntity(id2);
-
-			expect(index._validate()).toBe(true);
-		});
-
-		it('should return true after recycling', () => {
-			const index = createEntityIndex({ versioning: true });
-			const id1 = index.addEntity();
-
-			index.removeEntity(id1);
-			index.addEntity(); // Recycle
-
-			expect(index._validate()).toBe(true);
 		});
 	});
 });

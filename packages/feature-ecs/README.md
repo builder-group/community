@@ -16,7 +16,7 @@ Sparse Array:  [_, 0, _, 2, 1, _, _]  ← Maps entity ID → dense index
 
 Dense Array:   [2, 5, 4, 7, 3]        ← Alive entities (cache-friendly)
                [0, 1, 2, 3, 4]        ← Indices
-               └─ alive ─┘ └ dead ┘
+               └─alive─┘ └dead┘
 
 aliveCount: 3  ← First 3 elements are alive
 ```

@@ -47,10 +47,10 @@ export function createEntityIndex(options: TCreateEntityIndexOptions = {}): TEnt
 			versioning
 		},
 
-		_sparse: [] as number[], // Maps base entity ID -> dense array index
-		_nextBaseEid: 1, // Next base entity ID to assign (start from 1)
-		dense: [] as number[], // Dense array of entity IDs for iteration
-		aliveCount: 0, // Number of currently alive entities
+		_sparse: [] as number[],
+		_nextBaseEid: 1,
+		_dense: [] as number[],
+		_aliveCount: 0,
 
 		_versionBits: versionBits,
 		_entityBits: entityBits,
@@ -68,15 +68,43 @@ export function createEntityIndex(options: TCreateEntityIndexOptions = {}): TEnt
 				: 0;
 		},
 
+		// Recycling Flow
+		// Before:     sparse: [_, 0, _, 1]    dense: [1, 3,   2v1]  aliveCount: 2
+		//                                            └─alive─┘└dead┘
+		//             addEntity() - Recycling Path ↓
+		//
+		// Step 1:     Check: 2 < 3 ✓ (dead entities available)
+		// Step 2:     Get recycled entity: dense[2] = 2v1, baseEid = 2
+		// Step 3:     Restore mapping: _sparse[2] = 2
+		// Step 4:     Expand alive section: aliveCount = 3
+		//
+		// After:      sparse: [_, 0, 2, 1]     dense: [1, 3, 2v1]  aliveCount: 3
+		//                                            └──alive───┘
+		//             Returns: 2v1 (recycled entity with incremented version)
+		//
+		//
+		// New Entity Flow
+		// Before:     sparse: [_, 0, 2, 1]     dense: [1, 3, 2v1]  aliveCount: 3
+		//                                            └──alive───┘  nextBaseEid: 4
+		//             addEntity() - New Entity Path ↓
+		//
+		// Step 1:     Check: 3 < 3 ❌ (no dead entities)
+		// Step 2:     Check: 4 <= maxBaseEid ✓ (within limits)
+		// Step 3:     Create: baseEid = 4, eid = 4v0, _nextBaseEid = 5
+		// Step 4:     Add to arrays: push to dense, set sparse mapping
+		//
+		// After:      sparse: [_, 0, 2, 1, 3]  dense: [1, 3, 2v1, 4]  aliveCount: 4
+		//                                            └───alive────┘   nextBaseEid: 5
+		//             Returns: 4 (new entity with version 0)
 		addEntity(): number {
 			// Try to recycle a removed entity first
-			if (this.aliveCount < this.dense.length) {
-				const recycledEid = this.dense[this.aliveCount] as number;
+			if (this._aliveCount < this._dense.length) {
+				const recycledEid = this._dense[this._aliveCount] as number;
 				const baseEid = this.getBaseEid(recycledEid);
 
 				// Restore the sparse mapping and increment alive count
-				this._sparse[baseEid] = this.aliveCount;
-				this.aliveCount++;
+				this._sparse[baseEid] = this._aliveCount;
+				this._aliveCount++;
 				return recycledEid;
 			}
 
@@ -90,30 +118,45 @@ export function createEntityIndex(options: TCreateEntityIndexOptions = {}): TEnt
 			const eid = this._createVersionedEid(baseEid, 0);
 
 			// Add to both dense and sparse arrays
-			this.dense.push(eid);
-			this._sparse[baseEid] = this.aliveCount;
-			this.aliveCount++;
+			this._dense.push(eid);
+			this._sparse[baseEid] = this._aliveCount;
+			this._aliveCount++;
 
 			return eid;
 		},
 
+		// Initial:    sparse: [_, 0, 1, 2]    dense: [1, 2, 3]    aliveCount: 3
+		//             Remove entity 2 ↓
+		//
+		// Step 1:     Find entity 2 at index 1
+		// Step 2:     Swap entity 3 to index 1
+		//             sparse: [_, 0, 1, 1]    dense: [1, 3, 3]    aliveCount: 3
+		//
+		// Step 3:     Create recycled entity 2v1
+		// Step 4:     Place in dead section, clean up sparse
+		//             sparse: [_, 0, _, 1]     dense: [1, 3,    2v1]  aliveCount: 2
+		//                                            └─alive─┘└dead┘
+		//
+		// Later:      Recycle entity 2v1
+		//             sparse: [_, 0, 2, 1]     dense: [1, 3, 2v1]  aliveCount: 3
+		//                                            └──alive───┘
 		removeEntity(eid: number): boolean {
 			const baseEid = this.getBaseEid(eid);
 			const denseIndex = this._sparse[baseEid];
 
 			// Check if entity exists and is alive
-			if (denseIndex == null || denseIndex >= this.aliveCount || this.dense[denseIndex] !== eid) {
+			if (denseIndex == null || denseIndex >= this._aliveCount || this._dense[denseIndex] !== eid) {
 				return false;
 			}
 
-			const lastIndex = this.aliveCount - 1;
+			const lastIndex = this._aliveCount - 1;
 
 			// Swap-and-pop: move the last alive entity to fill the gap
 			if (denseIndex !== lastIndex) {
-				const lastEid = this.dense[lastIndex] as number;
+				const lastEid = this._dense[lastIndex] as number;
 				const lastBaseEid = this.getBaseEid(lastEid);
 
-				this.dense[denseIndex] = lastEid;
+				this._dense[denseIndex] = lastEid;
 				this._sparse[lastBaseEid] = denseIndex;
 			}
 
@@ -125,9 +168,9 @@ export function createEntityIndex(options: TCreateEntityIndexOptions = {}): TEnt
 			const recycledEid = this._createVersionedEid(baseEid, newVersion);
 
 			// Place recycled entity in the "dead" section and clean up
-			this.dense[lastIndex] = recycledEid;
+			this._dense[lastIndex] = recycledEid;
 			delete this._sparse[baseEid];
-			this.aliveCount--;
+			this._aliveCount--;
 
 			return true;
 		},
@@ -135,34 +178,64 @@ export function createEntityIndex(options: TCreateEntityIndexOptions = {}): TEnt
 		isEntityAlive(eid: number): boolean {
 			const baseEid = this.getBaseEid(eid);
 			const denseIndex = this._sparse[baseEid];
-			return denseIndex != null && denseIndex < this.aliveCount && this.dense[denseIndex] === eid;
+			return denseIndex != null && denseIndex < this._aliveCount && this._dense[denseIndex] === eid;
 		},
 
 		getAliveEntities(): number[] {
-			return this.dense.slice(0, this.aliveCount);
+			return this._dense.slice(0, this._aliveCount);
 		},
 
-		_validate(): boolean {
-			// Check that all alive entities have correct sparse mappings
-			for (let i = 0; i < this.aliveCount; i++) {
-				const eid = this.dense[i] as number;
+		formatEid(eid: number): string {
+			const baseEid = this.getBaseEid(eid);
+			const version = this.getEidVersion(eid);
+			return this._config.versioning ? `${baseEid}v${version}` : `${baseEid}`;
+		},
+
+		debugState(): string {
+			const aliveEntities = this._dense
+				.slice(0, this._aliveCount)
+				.map((eid) => this.formatEid(eid));
+			const deadEntities = this._dense.slice(this._aliveCount).map((eid) => this.formatEid(eid));
+
+			const sparseEntries = [];
+			for (let baseEid = 1; baseEid < this._nextBaseEid; baseEid++) {
+				const denseIndex = this._sparse[baseEid];
+				if (denseIndex != null) {
+					sparseEntries.push(`${baseEid}→${denseIndex}`);
+				}
+			}
+
+			return [
+				`EntityIndex State:`,
+				`  Alive (${this._aliveCount}): [${aliveEntities.join(', ')}]`,
+				`  Dead (${this._dense.length - this._aliveCount}): [${deadEntities.join(', ')}]`,
+				`  Sparse: {${sparseEntries.join(', ')}}`,
+				`  NextBaseEid: ${this._nextBaseEid}`,
+				`  Versioning: ${this._config.versioning ? 'enabled' : 'disabled'}`
+			].join('\n');
+		},
+
+		validate(): boolean {
+			// Check that all alive entities have correct sparse mappings (Dense -> Sparse)
+			for (let i = 0; i < this._aliveCount; i++) {
+				const eid = this._dense[i] as number;
 				const baseEid = this.getBaseEid(eid);
 				if (this._sparse[baseEid] !== i) {
 					return false;
 				}
 			}
 
-			// Check that all entities in sparse array point to valid positions
+			// Check that all entities in sparse array point to valid positions (Sparse -> Dense)
 			for (let baseEid = 1; baseEid < this._nextBaseEid; baseEid++) {
 				const denseIndex = this._sparse[baseEid];
 				if (denseIndex != null) {
 					// Check bounds
-					if (denseIndex >= this.dense.length || denseIndex < 0) {
+					if (denseIndex >= this._dense.length || denseIndex < 0) {
 						return false;
 					}
 
 					// Check that the entity at this position has the correct base ID
-					const storedEid = this.dense[denseIndex] as number;
+					const storedEid = this._dense[denseIndex] as number;
 					if (this.getBaseEid(storedEid) !== baseEid) {
 						return false;
 					}
@@ -202,9 +275,9 @@ export interface TEntityIndex {
 	/** The next base entity ID to be assigned */
 	_nextBaseEid: number;
 	/** Dense array of entity IDs for efficient iteration */
-	dense: number[];
+	_dense: number[];
 	/** Number of currently alive entities */
-	aliveCount: number;
+	_aliveCount: number;
 
 	/** Number of bits reserved for version information */
 	_versionBits: number;
@@ -259,11 +332,25 @@ export interface TEntityIndex {
 	getAliveEntities(): number[];
 
 	/**
+	 * Formats an entity ID as a human-readable string.
+	 * @param eid - The entity ID to format
+	 * @returns Formatted string like "1v0", "2v3", or just "1" if versioning disabled
+	 */
+	formatEid(eid: number): string;
+
+	/**
+	 * Returns a human-readable debug representation of the entity index state.
+	 * Shows alive entities, dead entities, sparse mappings, and configuration.
+	 * @returns Multi-line string with formatted state information
+	 */
+	debugState(): string;
+
+	/**
 	 * Validates the internal data structure integrity.
 	 * Useful for debugging and testing.
 	 * @returns True if the data structure is valid, false otherwise
 	 */
-	_validate(): boolean;
+	validate(): boolean;
 
 	/**
 	 * Creates a versioned entity ID by combining base ID and version.
