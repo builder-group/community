@@ -133,3 +133,37 @@ versionBits: 4; // 16 versions, ~256M entities max
 
 - Iteration over alive entities is cache-friendly (contiguous memory)
 - Sparse lookups may cause cache misses but are O(1)
+
+
+## Component Registry
+
+https://en.wikipedia.org/wiki/AoS_and_SoA
+
+## 📚 Good to Know
+
+### Sparse vs Dense Arrays
+
+JavaScript sparse arrays store only assigned indices, making them memory-efficient:
+
+```ts
+const sparse = [];
+sparse[1000] = 5;  // [<1000 empty items>, 5]
+
+console.log(sparse.length);  // 1001
+console.log(sparse[500]);    // undefined (no memory used)
+```
+
+In contrast, dense arrays allocate memory for every element, even if unused:
+
+```ts
+const dense = new Array(1001).fill(0);  // Allocates 1001 × 4 bytes = ~4KB
+
+console.log(dense.length);  // 1001
+console.log(dense[500]);    // 0
+```
+
+Use sparse arrays for large, mostly empty datasets. Use dense arrays when you need consistent iteration and performance.
+
+## 💡 Resources / References
+
+- [BitECS](https://github.com/NateTheGreatt/bitECS) - High-performance ECS library that inspired our implementation
