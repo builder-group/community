@@ -11,47 +11,6 @@
  * - Cache-friendly iteration patterns
  * - Unlimited components via generation system
  * - Flexible component structure - supports multiple patterns
- *
- * ## Supported Component Patterns
- *
- * ### 1. Object with Array Properties (AoS)
- * Best for components with multiple properties. Each property is stored in a separate array
- * for maximum cache efficiency and performance.
- * ```typescript
- * type TPosition = { x: number[]; y: number[] };
- * const Position: TPosition = { x: [], y: [] };
- *
- * // Usage: Position.x[eid] = 10; Position.y[eid] = 20;
- * ```
- *
- * ### 2. Array of Objects (SoA)
- * Easier to understand but less cache-friendly. Good for prototyping or when performance
- * isn't critical.
- * ```typescript
- * type TTransform = { x: number; y: number; rotation: number }[];
- * const Transform: TTransform = [];
- *
- * // Usage: Transform[eid] = { x: 10, y: 20, rotation: 0 };
- * ```
- *
- * ### 3. Single Value Array
- * For components that store a single value per entity.
- * ```typescript
- * type THealth = number[];
- * const Health: THealth = [];
- *
- * // Usage: Health[eid] = 100;
- * ```
- *
- * ### 4. Tag Components (Markers)
- * For components that just mark entities as having a certain property.
- * No data storage needed.
- * ```typescript
- * type TPlayer = {};
- * const Player: TPlayer = {};
- *
- * // Usage: registry.addComponent(eid, Player); // Just marks entity as player
- * ```
  */
 
 import { TEntityId } from './entity-index';
