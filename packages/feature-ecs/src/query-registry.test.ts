@@ -102,10 +102,10 @@ describe('createQueryRegistry', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
 			// Create entities with components
-			const eid1 = world.addEntity();
-			const eid2 = world.addEntity();
-			world._componentRegistry.addComponent(eid1, Position);
-			world._componentRegistry.addComponent(eid2, Position);
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
+			world.addComponent(eid1, Position);
+			world.addComponent(eid2, Position);
 
 			// None filter should return no entities
 			const emptyResult = world.query(None());
@@ -118,19 +118,19 @@ describe('createQueryRegistry', () => {
 			const Health = [] as number[];
 
 			// Create entities
-			const eid1 = world.addEntity();
-			const eid2 = world.addEntity();
-			const eid3 = world.addEntity();
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
+			const eid3 = world.createEntity();
 
 			// Add components
-			world._componentRegistry.addComponent(eid1, Position);
-			world._componentRegistry.addComponent(eid1, Velocity);
+			world.addComponent(eid1, Position);
+			world.addComponent(eid1, Velocity);
 
-			world._componentRegistry.addComponent(eid2, Position);
-			world._componentRegistry.addComponent(eid2, Health);
+			world.addComponent(eid2, Position);
+			world.addComponent(eid2, Health);
 
-			world._componentRegistry.addComponent(eid3, Velocity);
-			world._componentRegistry.addComponent(eid3, Health);
+			world.addComponent(eid3, Velocity);
+			world.addComponent(eid3, Health);
 
 			// Test basic WITH queries
 			const positionAndVelocity = world.query(And(With(Position), With(Velocity)));
@@ -144,12 +144,12 @@ describe('createQueryRegistry', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = world.addEntity();
-			const eid2 = world.addEntity();
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
 
-			world._componentRegistry.addComponent(eid1, Position);
-			world._componentRegistry.addComponent(eid2, Position);
-			world._componentRegistry.addComponent(eid2, Health);
+			world.addComponent(eid1, Position);
+			world.addComponent(eid2, Position);
+			world.addComponent(eid2, Health);
 
 			// Test WITHOUT filter
 			const hasPositionButNotHealth = world.query(And(With(Position), Without(Health)));
@@ -160,12 +160,12 @@ describe('createQueryRegistry', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = world.addEntity();
-			const eid2 = world.addEntity();
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
 
-			world._componentRegistry.addComponent(eid1, Position);
-			world._componentRegistry.addComponent(eid2, Position);
-			world._componentRegistry.addComponent(eid2, Health);
+			world.addComponent(eid1, Position);
+			world.addComponent(eid2, Position);
+			world.addComponent(eid2, Health);
 
 			// Test explicit AND filter
 			const explicitAnd = world.query(And(With(Position), With(Health)));
@@ -176,14 +176,14 @@ describe('createQueryRegistry', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = world.addEntity();
-			const eid2 = world.addEntity();
-			const eid3 = world.addEntity();
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
+			const eid3 = world.createEntity();
 
-			world._componentRegistry.addComponent(eid1, Position);
-			world._componentRegistry.addComponent(eid2, Health);
-			world._componentRegistry.addComponent(eid3, Position);
-			world._componentRegistry.addComponent(eid3, Health);
+			world.addComponent(eid1, Position);
+			world.addComponent(eid2, Health);
+			world.addComponent(eid3, Position);
+			world.addComponent(eid3, Health);
 
 			// Test OR filter
 			const positionOrHealth = world.query(Or(With(Position), With(Health)));
@@ -198,23 +198,23 @@ describe('createQueryRegistry', () => {
 			const Paralyzed = {};
 
 			// Create entities
-			const eid1 = world.addEntity();
-			const eid2 = world.addEntity();
-			const eid3 = world.addEntity();
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
+			const eid3 = world.createEntity();
 
 			// Setup entity 1: Position + Health + Stunned
-			world._componentRegistry.addComponent(eid1, Position);
-			world._componentRegistry.addComponent(eid1, Health);
-			world._componentRegistry.addComponent(eid1, Stunned);
+			world.addComponent(eid1, Position);
+			world.addComponent(eid1, Health);
+			world.addComponent(eid1, Stunned);
 
 			// Setup entity 2: Position + Shield
-			world._componentRegistry.addComponent(eid2, Position);
-			world._componentRegistry.addComponent(eid2, Shield);
+			world.addComponent(eid2, Position);
+			world.addComponent(eid2, Shield);
 
 			// Setup entity 3: Position + Health + Paralyzed
-			world._componentRegistry.addComponent(eid3, Position);
-			world._componentRegistry.addComponent(eid3, Health);
-			world._componentRegistry.addComponent(eid3, Paralyzed);
+			world.addComponent(eid3, Position);
+			world.addComponent(eid3, Health);
+			world.addComponent(eid3, Paralyzed);
 
 			// Complex query: Position + (Health OR Shield) + WITHOUT(Stunned) + WITHOUT(Paralyzed)
 			const complexQuery = world.query(
@@ -229,9 +229,9 @@ describe('createQueryRegistry', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Velocity = { x: [] as number[], y: [] as number[] };
 
-			const eid = world.addEntity();
-			world._componentRegistry.addComponent(eid, Position);
-			world._componentRegistry.addComponent(eid, Velocity);
+			const eid = world.createEntity();
+			world.addComponent(eid, Position);
+			world.addComponent(eid, Velocity);
 
 			// Execute same query multiple times
 			const filter = And(With(Position), With(Velocity));
@@ -264,8 +264,8 @@ describe('createQueryRegistry', () => {
 		it('should execute queries without committing removals', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const eid = world.addEntity();
-			world._componentRegistry.addComponent(eid, Position);
+			const eid = world.createEntity();
+			world.addComponent(eid, Position);
 
 			// Inner query should work the same as regular query for now
 			const result = world.innerQuery(With(Position));
@@ -278,12 +278,12 @@ describe('createQueryRegistry', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = world.addEntity();
-			const eid2 = world.addEntity();
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
 
-			world._componentRegistry.addComponent(eid1, Position);
-			world._componentRegistry.addComponent(eid1, Health);
-			world._componentRegistry.addComponent(eid2, Position);
+			world.addComponent(eid1, Position);
+			world.addComponent(eid1, Health);
+			world.addComponent(eid2, Position);
 
 			const queryData = world._queryRegistry.registerQuery(And(With(Position), With(Health)));
 
@@ -297,14 +297,14 @@ describe('createQueryRegistry', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = world.addEntity();
-			const eid2 = world.addEntity();
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
 
 			// Add Position to eid1 (should be tracked as added)
-			world._componentRegistry.addComponent(eid1, Position);
+			world.addComponent(eid1, Position);
 
 			// Add Health to eid2 (should be tracked as added)
-			world._componentRegistry.addComponent(eid2, Health);
+			world.addComponent(eid2, Health);
 
 			// Query for entities with added Position
 			const addedPosition = world.query(Added(Position));
@@ -315,7 +315,7 @@ describe('createQueryRegistry', () => {
 			expect(addedHealth).toEqual([eid2]);
 
 			// Clear frame changes
-			world.clear();
+			world._componentRegistry.clear();
 
 			// After clearing, no entities should have added components
 			const addedPositionAfter = world.query(Added(Position));
@@ -328,18 +328,18 @@ describe('createQueryRegistry', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = world.addEntity();
-			const eid2 = world.addEntity();
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
 
 			// Add components first
-			world._componentRegistry.addComponent(eid1, Position);
-			world._componentRegistry.addComponent(eid2, Health);
+			world.addComponent(eid1, Position);
+			world.addComponent(eid2, Health);
 
 			// Clear initial "added" tracking
-			world.clear();
+			world._componentRegistry.clear();
 
 			// Mark Position as changed for eid1
-			world.markChanged(eid1, Position);
+			world._componentRegistry.markChanged(eid1, Position);
 
 			// Query for entities with changed Position
 			const changedPosition = world.query(Changed(Position));
@@ -354,19 +354,19 @@ describe('createQueryRegistry', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = world.addEntity();
-			const eid2 = world.addEntity();
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
 
 			// Add components first
-			world._componentRegistry.addComponent(eid1, Position);
-			world._componentRegistry.addComponent(eid1, Health);
-			world._componentRegistry.addComponent(eid2, Position);
+			world.addComponent(eid1, Position);
+			world.addComponent(eid1, Health);
+			world.addComponent(eid2, Position);
 
 			// Clear initial "added" tracking
-			world.clear();
+			world._componentRegistry.clear();
 
 			// Remove Health from eid1
-			world._componentRegistry.removeComponent(eid1, Health);
+			world.removeComponent(eid1, Health);
 
 			// Query for entities with removed Health
 			const removedHealth = world.query(Removed(Health));
@@ -382,27 +382,27 @@ describe('createQueryRegistry', () => {
 			const Health = [] as number[];
 			const Shield = [] as number[];
 
-			const eid1 = world.addEntity();
-			const eid2 = world.addEntity();
-			const eid3 = world.addEntity();
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
+			const eid3 = world.createEntity();
 
 			// Setup initial state
-			world._componentRegistry.addComponent(eid1, Position);
-			world._componentRegistry.addComponent(eid1, Health);
+			world.addComponent(eid1, Position);
+			world.addComponent(eid1, Health);
 
-			world._componentRegistry.addComponent(eid2, Position);
-			world._componentRegistry.addComponent(eid2, Shield);
+			world.addComponent(eid2, Position);
+			world.addComponent(eid2, Shield);
 
 			// Clear initial "added" tracking
-			world.clear();
+			world._componentRegistry.clear();
 
-			// Frame changes:
-			// - Add Shield to eid1
+			// Trigger changes:
+			// - Add Shield to eid1 (new component)
 			// - Mark Position as changed for eid2
 			// - Add Position to eid3 (new entity)
-			world._componentRegistry.addComponent(eid1, Shield);
-			world.markChanged(eid2, Position);
-			world._componentRegistry.addComponent(eid3, Position);
+			world.addComponent(eid1, Shield);
+			world._componentRegistry.markChanged(eid2, Position);
+			world.addComponent(eid3, Position);
 
 			// Query: Entities with Position AND (Added Shield OR Changed Position)
 			const complexQuery = world.query(And(With(Position), Or(Added(Shield), Changed(Position))));
@@ -416,24 +416,24 @@ describe('createQueryRegistry', () => {
 			const Health = [] as number[];
 			const Enemy = {};
 
-			const eid1 = world.addEntity();
-			const eid2 = world.addEntity();
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
 
 			// Setup: Both entities have Position and Health
-			world._componentRegistry.addComponent(eid1, Position);
-			world._componentRegistry.addComponent(eid1, Health);
-			world._componentRegistry.addComponent(eid2, Position);
-			world._componentRegistry.addComponent(eid2, Health);
+			world.addComponent(eid1, Position);
+			world.addComponent(eid1, Health);
+			world.addComponent(eid2, Position);
+			world.addComponent(eid2, Health);
 
-			// Only eid2 is an enemy
-			world._componentRegistry.addComponent(eid2, Enemy);
+			// Mark eid2 as Enemy (should be tracked as added)
+			world.addComponent(eid2, Enemy);
 
 			// Clear initial "added" tracking
-			world.clear();
+			world._componentRegistry.clear();
 
-			// Mark Health as changed for both entities
-			world.markChanged(eid1, Health);
-			world.markChanged(eid2, Health);
+			// Mark components as changed
+			world._componentRegistry.markChanged(eid1, Health);
+			world._componentRegistry.markChanged(eid2, Health);
 
 			// Query: Entities with changed Health but WITHOUT Enemy tag
 			const nonEnemiesWithChangedHealth = world.query(And(Changed(Health), Without(Enemy)));
@@ -446,8 +446,8 @@ describe('createQueryRegistry', () => {
 	describe('reset', () => {
 		it('should reset to initial state', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
-			const eid = world.addEntity();
-			world._componentRegistry.addComponent(eid, Position);
+			const eid = world.createEntity();
+			world.addComponent(eid, Position);
 
 			// Execute query to populate cache
 			world.query(With(Position));
@@ -468,8 +468,8 @@ describe('createQueryRegistry', () => {
 
 		it('should return true after query operations', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
-			const eid = world.addEntity();
-			world._componentRegistry.addComponent(eid, Position);
+			const eid = world.createEntity();
+			world.addComponent(eid, Position);
 
 			world.query(With(Position));
 			expect(world._queryRegistry.validate()).toBe(true);

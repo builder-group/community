@@ -1,112 +1,325 @@
 import { TComponentRef } from './component-registry';
-
-export type TGetComponentId = (component: TComponentRef) => number;
+import { TEntityId } from './entity-index';
+import { TWorld } from './world';
 
 /**
- * A query filter represents a condition used to select entities in ECS queries.
- * Query filters can be simple conditions (With, Without) or complex combinations (And, Or, Not).
+ * Checks if entity has component using bitmask
  */
+export function With<T extends TComponentRef>(component: T): TQueryFilter {
+	return {
+		type: 'With',
+		component,
+
+		evaluate(world: TWorld, eid: TEntityId): boolean {
+			const registry = world._componentRegistry;
+			const componentData = registry._componentMap.get(component);
+
+			if (componentData == null) {
+				return false;
+			}
+
+			const { generationId, bitflag } = componentData;
+			const entityMask = registry._entityMasks[generationId]?.[eid] ?? 0;
+			return (entityMask & bitflag) !== 0;
+		},
+
+		getComponents(): TComponentRef[] {
+			return [component];
+		},
+
+		register(world: TWorld, queryData: TQueryData): void {
+			const registry = world._componentRegistry;
+			const componentData = registry._componentMap.get(component);
+
+			if (componentData != null) {
+				const { generationId, bitflag } = componentData;
+				queryData.withMasks[generationId] = (queryData.withMasks[generationId] ?? 0) | bitflag;
+			}
+		},
+
+		getHash(world: TWorld): string {
+			const componentId = getComponentId(world, component);
+			return `with(${componentId})`;
+		}
+	};
+}
+
+/**
+ * Checks if entity lacks component using bitmask
+ */
+export function Without<T extends TComponentRef>(component: T): TQueryFilter {
+	return {
+		type: 'Without',
+		component,
+
+		evaluate(world: TWorld, eid: TEntityId): boolean {
+			const registry = world._componentRegistry;
+			const componentData = registry._componentMap.get(component);
+
+			if (componentData == null) {
+				return true;
+			}
+
+			const { generationId, bitflag } = componentData;
+			const entityMask = registry._entityMasks[generationId]?.[eid] ?? 0;
+			return (entityMask & bitflag) === 0;
+		},
+
+		getComponents(): TComponentRef[] {
+			return [component];
+		},
+
+		register(world: TWorld, queryData: TQueryData): void {
+			const registry = world._componentRegistry;
+			const componentData = registry._componentMap.get(component);
+
+			if (componentData != null) {
+				const { generationId, bitflag } = componentData;
+				queryData.withoutMasks[generationId] =
+					(queryData.withoutMasks[generationId] ?? 0) | bitflag;
+			}
+		},
+
+		getHash(world: TWorld): string {
+			const componentId = getComponentId(world, component);
+			return `without(${componentId})`;
+		}
+	};
+}
+
+/**
+ * Checks if component was added this frame
+ */
+export function Added<T extends TComponentRef>(component: T): TQueryFilter {
+	return {
+		type: 'Added',
+		component,
+
+		evaluate(world: TWorld, eid: TEntityId): boolean {
+			return world._componentRegistry.wasAdded(eid, component);
+		},
+
+		getComponents(): TComponentRef[] {
+			return [component];
+		},
+
+		getHash(world: TWorld): string {
+			const componentId = getComponentId(world, component);
+			return `added(${componentId})`;
+		}
+	};
+}
+
+/**
+ * Checks if component was changed this frame
+ */
+export function Changed<T extends TComponentRef>(component: T): TQueryFilter {
+	return {
+		type: 'Changed',
+		component,
+
+		evaluate(world: TWorld, eid: TEntityId): boolean {
+			return world._componentRegistry.wasChanged(eid, component);
+		},
+
+		getComponents(): TComponentRef[] {
+			return [component];
+		},
+
+		getHash(world: TWorld): string {
+			const componentId = getComponentId(world, component);
+			return `changed(${componentId})`;
+		}
+	};
+}
+
+/**
+ * Checks if component was removed this frame
+ */
+export function Removed<T extends TComponentRef>(component: T): TQueryFilter {
+	return {
+		type: 'Removed',
+		component,
+
+		evaluate(world: TWorld, eid: TEntityId): boolean {
+			return world._componentRegistry.wasRemoved(eid, component);
+		},
+
+		getComponents(): TComponentRef[] {
+			return [component];
+		},
+
+		getHash(world: TWorld): string {
+			const componentId = getComponentId(world, component);
+			return `removed(${componentId})`;
+		}
+	};
+}
+
+/**
+ * All filters must match (uses batched bitmask checking when possible)
+ */
+export function And(...filters: TQueryFilter[]): TQueryFilter {
+	return {
+		type: 'And',
+		filters,
+
+		evaluate(world: TWorld, eid: TEntityId, queryData: TQueryData): boolean {
+			// Use batched bitmask checking if all filters are With/Without
+			const allSimple = filters.every((f) => f.type === 'With' || f.type === 'Without');
+
+			if (
+				allSimple &&
+				(Object.keys(queryData.withMasks).length > 0 ||
+					Object.keys(queryData.withoutMasks).length > 0)
+			) {
+				const registry = world._componentRegistry;
+
+				// Check all required components in batches
+				for (const [generationId, withMask] of Object.entries(queryData.withMasks)) {
+					const entityMask = registry._entityMasks[+generationId]?.[eid] ?? 0;
+					if ((entityMask & withMask) !== withMask) {
+						return false;
+					}
+				}
+
+				// Check all forbidden components in batches
+				for (const [generationId, withoutMask] of Object.entries(queryData.withoutMasks)) {
+					const entityMask = registry._entityMasks[+generationId]?.[eid] ?? 0;
+					if ((entityMask & withoutMask) !== 0) {
+						return false;
+					}
+				}
+
+				return true;
+			}
+
+			// Fallback to individual filter evaluation
+			return filters.every((filter) => filter.evaluate(world, eid, queryData));
+		},
+
+		getComponents(): TComponentRef[] {
+			return filters.flatMap((filter) => filter.getComponents());
+		},
+
+		register(world: TWorld, queryData: TQueryData): void {
+			// Let child filters register their bitmasks
+			for (const filter of filters) {
+				if (filter.register) {
+					filter.register(world, queryData);
+				}
+			}
+		},
+
+		getHash(world: TWorld): string {
+			const childHashes = filters
+				.map((f) => f.getHash(world))
+				.sort()
+				.join(',');
+			return `and(${childHashes})`;
+		}
+	};
+}
+
+/**
+ * Any filter must match (requires individual evaluation)
+ */
+export function Or(...filters: TQueryFilter[]): TQueryFilter {
+	return {
+		type: 'Or',
+		filters,
+
+		evaluate(world: TWorld, eid: TEntityId, queryData: TQueryData): boolean {
+			return filters.some((filter) => filter.evaluate(world, eid, queryData));
+		},
+
+		getComponents(): TComponentRef[] {
+			return filters.flatMap((filter) => filter.getComponents());
+		},
+
+		register(world: TWorld, queryData: TQueryData): void {
+			for (const filter of filters) {
+				if (filter.register) {
+					filter.register(world, queryData);
+				}
+			}
+		},
+
+		getHash(world: TWorld): string {
+			const childHashes = filters
+				.map((f) => f.getHash(world))
+				.sort()
+				.join(',');
+			return `or(${childHashes})`;
+		}
+	};
+}
+
+/**
+ * No filter must match (requires individual evaluation)
+ */
+export function Not(...filters: TQueryFilter[]): TQueryFilter {
+	return {
+		type: 'Not',
+		filters,
+
+		evaluate(world: TWorld, eid: TEntityId, queryData: TQueryData): boolean {
+			return !filters.some((filter) => filter.evaluate(world, eid, queryData));
+		},
+
+		getComponents(): TComponentRef[] {
+			return filters.flatMap((filter) => filter.getComponents());
+		},
+
+		getHash(world: TWorld): string {
+			const childHashes = filters
+				.map((f) => f.getHash(world))
+				.sort()
+				.join(',');
+			return `not(${childHashes})`;
+		}
+	};
+}
+
+// Aliases for convenience
+export const All = And;
+export const Any = Or;
+export const None = Not;
+
+export interface TQueryData {
+	hash: string;
+	cachedResult: TEntityId[] | null;
+	isDirty: boolean;
+	allComponents: TComponentRef[];
+	withMasks: Record<number, number>;
+	withoutMasks: Record<number, number>;
+}
+
+export interface TBaseQueryFilter {
+	type: string;
+	evaluate(world: TWorld, eid: TEntityId, queryData: TQueryData): boolean;
+	getComponents(): TComponentRef[];
+	register?(world: TWorld, queryData: TQueryData): void;
+	getHash(world: TWorld): string;
+}
+
 export type TQueryFilter =
-	| { type: 'With'; component: TComponentRef; toString(getComponentId: TGetComponentId): string }
-	| { type: 'Without'; component: TComponentRef; toString(getComponentId: TGetComponentId): string }
-	| { type: 'Added'; component: TComponentRef; toString(getComponentId: TGetComponentId): string }
-	| { type: 'Changed'; component: TComponentRef; toString(getComponentId: TGetComponentId): string }
-	| { type: 'Removed'; component: TComponentRef; toString(getComponentId: TGetComponentId): string }
-	| { type: 'And'; filters: TQueryFilter[]; toString(getComponentId: TGetComponentId): string }
-	| { type: 'Or'; filters: TQueryFilter[]; toString(getComponentId: TGetComponentId): string }
-	| { type: 'Not'; filters: TQueryFilter[]; toString(getComponentId: TGetComponentId): string }
-	| { type: 'None'; toString(): string };
-
-export const With = <T extends TComponentRef>(component: T): TQueryFilter => ({
-	type: 'With',
-	component,
-	toString(getComponentId) {
-		return `with(${getComponentId(component)})`;
-	}
-});
-
-export const Without = <T extends TComponentRef>(component: T): TQueryFilter => ({
-	type: 'Without',
-	component,
-	toString(getComponentId) {
-		return `without(${getComponentId(component)})`;
-	}
-});
-
-export const Added = <T extends TComponentRef>(component: T): TQueryFilter => ({
-	type: 'Added',
-	component,
-	toString(getComponentId) {
-		return `added(${getComponentId(component)})`;
-	}
-});
-
-export const Changed = <T extends TComponentRef>(component: T): TQueryFilter => ({
-	type: 'Changed',
-	component,
-	toString(getComponentId) {
-		return `changed(${getComponentId(component)})`;
-	}
-});
-
-export const Removed = <T extends TComponentRef>(component: T): TQueryFilter => ({
-	type: 'Removed',
-	component,
-	toString(getComponentId) {
-		return `removed(${getComponentId(component)})`;
-	}
-});
-
-export const And = (...filters: TQueryFilter[]): TQueryFilter => ({
-	type: 'And',
-	filters,
-	toString(getComponentId) {
-		return `and(${filters.map((f) => f.toString(getComponentId)).join(',')})`;
-	}
-});
-
-export const All = And; // Alias for And
-
-export const Or = (...filters: TQueryFilter[]): TQueryFilter => ({
-	type: 'Or',
-	filters,
-	toString(getComponentId) {
-		return `or(${filters.map((f) => f.toString(getComponentId)).join(',')})`;
-	}
-});
-
-export const Any = Or; // Alias for Or
-
-export const Not = (...filters: TQueryFilter[]): TQueryFilter => ({
-	type: 'Not',
-	filters,
-	toString(getComponentId: TGetComponentId) {
-		return `not(${filters.map((f) => f.toString(getComponentId)).join(',')})`;
-	}
-});
-
-export const None = (): TQueryFilter => ({
-	type: 'None',
-	toString() {
-		return 'none()';
-	}
-});
-
-// Special entity symbol for queries
-// TODO: Put into query-data or so?
-export const Entity = Symbol('Entity');
+	| (TBaseQueryFilter & { type: 'With'; component: TComponentRef })
+	| (TBaseQueryFilter & { type: 'Without'; component: TComponentRef })
+	| (TBaseQueryFilter & { type: 'Added'; component: TComponentRef })
+	| (TBaseQueryFilter & { type: 'Changed'; component: TComponentRef })
+	| (TBaseQueryFilter & { type: 'Removed'; component: TComponentRef })
+	| (TBaseQueryFilter & { type: 'And'; filters: TQueryFilter[] })
+	| (TBaseQueryFilter & { type: 'Or'; filters: TQueryFilter[] })
+	| (TBaseQueryFilter & { type: 'Not'; filters: TQueryFilter[] });
 
 /**
- * Type guard to check if a value is a query filter.
+ * Helper to get component ID, registering if needed
  */
-export function isQueryFilter(value: any): value is TQueryFilter {
-	return (
-		typeof value === 'object' &&
-		value !== null &&
-		'type' in value &&
-		typeof value.type === 'string' &&
-		['With', 'Without', 'Added', 'Changed', 'Removed', 'And', 'Or', 'Not', 'None'].includes(
-			value.type
-		)
-	);
+function getComponentId(world: TWorld, component: TComponentRef): number {
+	const registry = world._componentRegistry;
+	if (!registry._componentMap.has(component)) {
+		registry.registerComponent(component);
+	}
+	return registry._componentMap.get(component)!.id;
 }

@@ -1,101 +1,142 @@
-import { withNew } from '@blgc/utils';
 import { createComponentRegistry, TComponentRef, TComponentRegistry } from './component-registry';
 import { createEntityIndex, TEntityId, TEntityIndex } from './entity-index';
 import { TQueryFilter } from './query-filter';
 import { createQueryRegistry, TQueryRegistry } from './query-registry';
 
+/**
+ * Creates a new ECS world.
+ *
+ * @returns A new world instance with component registry, entity index, and query registry
+ *
+ * @example
+ * ```typescript
+ * const world = createWorld();
+ *
+ * // Create entities and add components
+ * const entity = world.createEntity();
+ * world.addComponent(entity, Position);
+ * world.addComponent(entity, Velocity);
+ *
+ * // Query entities
+ * const entities = world.query(And(With(Position), With(Velocity)));
+ * ```
+ */
 export function createWorld(): TWorld {
-	return withNew({
-		_entityIndex: createEntityIndex(),
-		_componentRegistry: createComponentRegistry(),
-		_queryRegistry: null as unknown as TQueryRegistry,
+	const componentRegistry = createComponentRegistry();
+	const entityIndex = createEntityIndex();
 
-		_new() {
-			this._queryRegistry = createQueryRegistry(this);
+	const world: TWorld = {
+		_componentRegistry: componentRegistry,
+		_entityIndex: entityIndex,
+		_queryRegistry: null as any, // Will be set below
+
+		createEntity() {
+			const eid = this._entityIndex.addEntity();
+			return eid;
 		},
 
-		addEntity() {
-			return this._entityIndex.addEntity();
-		},
-
-		removeEntity(eid) {
-			if (!this._entityIndex.isEntityAlive(eid)) {
-				return false;
-			}
-
-			// Remove all components from entity
+		destroyEntity(eid) {
 			this._componentRegistry.removeAllComponents(eid);
-
-			// Remove entity from index
-			return this._entityIndex.removeEntity(eid);
+			this._entityIndex.removeEntity(eid);
 		},
 
-		doesEntityExist(eid) {
-			return this._entityIndex.isEntityAlive(eid);
+		addComponent(eid, component) {
+			this._componentRegistry.addComponent(eid, component);
 		},
 
-		markChanged(eid: TEntityId, component: TComponentRef) {
-			return this._componentRegistry.markChanged(eid, component);
+		removeComponent(eid, component) {
+			const result = this._componentRegistry.removeComponent(eid, component);
+			return result;
 		},
 
-		clear() {
-			this._componentRegistry.clear();
+		hasComponent(eid, component) {
+			return this._componentRegistry.hasComponent(eid, component);
 		},
 
 		query(filter) {
 			return this._queryRegistry.executeQuery(filter);
 		},
 
-		innerQuery(filter) {
-			return this._queryRegistry.executeInnerQuery(filter);
+		reset() {
+			this._componentRegistry.reset();
+			this._entityIndex.reset();
+			this._queryRegistry.reset();
 		},
 
-		reset() {
-			this._entityIndex.reset();
-			this._componentRegistry.reset();
-			this._queryRegistry.reset();
+		validate() {
+			return (
+				this._componentRegistry.validate() &&
+				this._entityIndex.validate() &&
+				this._queryRegistry.validate()
+			);
 		}
-	});
+	};
+
+	// Create query registry with the world reference
+	const queryRegistry = createQueryRegistry(world);
+	world._queryRegistry = queryRegistry;
+
+	return world;
 }
 
 export interface TWorld {
-	_entityIndex: TEntityIndex;
+	/** Component registry for managing component data */
 	_componentRegistry: TComponentRegistry;
+	/** Entity index for managing entity lifecycle */
+	_entityIndex: TEntityIndex;
+	/** Query registry for efficient entity queries */
 	_queryRegistry: TQueryRegistry;
 
-	addEntity(): TEntityId;
-	removeEntity(eid: TEntityId): boolean;
-	doesEntityExist(eid: TEntityId): boolean;
+	/**
+	 * Creates a new entity and returns its ID.
+	 * @returns The new entity ID
+	 */
+	createEntity(): TEntityId;
 
 	/**
-	 * Marks a component as changed for the current frame.
+	 * Destroys an entity and removes all its components.
+	 * @param eid - The entity ID to destroy
+	 */
+	destroyEntity(eid: TEntityId): void;
+
+	/**
+	 * Adds a component to an entity.
 	 * @param eid - The entity ID
-	 * @param component - The component to mark as changed
-	 * @returns True if component was marked as changed, false if entity didn't have it
+	 * @param component - The component to add
 	 */
-	markChanged(eid: TEntityId, component: TComponentRef): boolean;
+	addComponent(eid: TEntityId, component: TComponentRef): void;
 
 	/**
-	 * Clears all change tracking for the current frame.
-	 * Should be called at the end of each frame/update cycle.
+	 * Removes a component from an entity.
+	 * @param eid - The entity ID
+	 * @param component - The component to remove
+	 * @returns True if component was removed, false if entity didn't have it
 	 */
-	clear(): void;
+	removeComponent(eid: TEntityId, component: TComponentRef): boolean;
 
 	/**
-	 * Execute a query and return matching entities.
-	 * Commits pending removals before execution.
+	 * Checks if an entity has a specific component.
+	 * @param eid - The entity ID
+	 * @param component - The component to check
+	 * @returns True if entity has the component
+	 */
+	hasComponent(eid: TEntityId, component: TComponentRef): boolean;
+
+	/**
+	 * Executes a query and returns matching entities.
 	 * @param filter - The query filter
 	 * @returns Array of matching entity IDs
 	 */
 	query(filter: TQueryFilter): TEntityId[];
 
 	/**
-	 * Execute a query without committing removals.
-	 * Used for nested queries during iteration.
-	 * @param filter - The query filter
-	 * @returns Array of matching entity IDs
+	 * Resets the world to its initial state.
 	 */
-	innerQuery(filter: TQueryFilter): TEntityId[];
-
 	reset(): void;
+
+	/**
+	 * Validates the world integrity.
+	 * @returns True if the world is valid
+	 */
+	validate(): boolean;
 }
