@@ -2,18 +2,22 @@ import { TComponentRef } from './component-registry';
 
 export type TGetComponentId = (component: TComponentRef) => number;
 
-export type TFilter =
+/**
+ * A query filter represents a condition used to select entities in ECS queries.
+ * Query filters can be simple conditions (With, Without) or complex combinations (And, Or, Not).
+ */
+export type TQueryFilter =
 	| { type: 'With'; component: TComponentRef; toString(getComponentId: TGetComponentId): string }
 	| { type: 'Without'; component: TComponentRef; toString(getComponentId: TGetComponentId): string }
 	| { type: 'Added'; component: TComponentRef; toString(getComponentId: TGetComponentId): string }
 	| { type: 'Changed'; component: TComponentRef; toString(getComponentId: TGetComponentId): string }
 	| { type: 'Removed'; component: TComponentRef; toString(getComponentId: TGetComponentId): string }
-	| { type: 'And'; filters: TFilter[]; toString(getComponentId: TGetComponentId): string }
-	| { type: 'Or'; filters: TFilter[]; toString(getComponentId: TGetComponentId): string }
-	| { type: 'Not'; filters: TFilter[]; toString(getComponentId: TGetComponentId): string }
+	| { type: 'And'; filters: TQueryFilter[]; toString(getComponentId: TGetComponentId): string }
+	| { type: 'Or'; filters: TQueryFilter[]; toString(getComponentId: TGetComponentId): string }
+	| { type: 'Not'; filters: TQueryFilter[]; toString(getComponentId: TGetComponentId): string }
 	| { type: 'None'; toString(): string };
 
-export const With = <T extends TComponentRef>(component: T): TFilter => ({
+export const With = <T extends TComponentRef>(component: T): TQueryFilter => ({
 	type: 'With',
 	component,
 	toString(getComponentId) {
@@ -21,7 +25,7 @@ export const With = <T extends TComponentRef>(component: T): TFilter => ({
 	}
 });
 
-export const Without = <T extends TComponentRef>(component: T): TFilter => ({
+export const Without = <T extends TComponentRef>(component: T): TQueryFilter => ({
 	type: 'Without',
 	component,
 	toString(getComponentId) {
@@ -29,7 +33,7 @@ export const Without = <T extends TComponentRef>(component: T): TFilter => ({
 	}
 });
 
-export const Added = <T extends TComponentRef>(component: T): TFilter => ({
+export const Added = <T extends TComponentRef>(component: T): TQueryFilter => ({
 	type: 'Added',
 	component,
 	toString(getComponentId) {
@@ -37,7 +41,7 @@ export const Added = <T extends TComponentRef>(component: T): TFilter => ({
 	}
 });
 
-export const Changed = <T extends TComponentRef>(component: T): TFilter => ({
+export const Changed = <T extends TComponentRef>(component: T): TQueryFilter => ({
 	type: 'Changed',
 	component,
 	toString(getComponentId) {
@@ -45,7 +49,7 @@ export const Changed = <T extends TComponentRef>(component: T): TFilter => ({
 	}
 });
 
-export const Removed = <T extends TComponentRef>(component: T): TFilter => ({
+export const Removed = <T extends TComponentRef>(component: T): TQueryFilter => ({
 	type: 'Removed',
 	component,
 	toString(getComponentId) {
@@ -53,7 +57,7 @@ export const Removed = <T extends TComponentRef>(component: T): TFilter => ({
 	}
 });
 
-export const And = (...filters: TFilter[]): TFilter => ({
+export const And = (...filters: TQueryFilter[]): TQueryFilter => ({
 	type: 'And',
 	filters,
 	toString(getComponentId) {
@@ -63,7 +67,7 @@ export const And = (...filters: TFilter[]): TFilter => ({
 
 export const All = And; // Alias for And
 
-export const Or = (...filters: TFilter[]): TFilter => ({
+export const Or = (...filters: TQueryFilter[]): TQueryFilter => ({
 	type: 'Or',
 	filters,
 	toString(getComponentId) {
@@ -73,7 +77,7 @@ export const Or = (...filters: TFilter[]): TFilter => ({
 
 export const Any = Or; // Alias for Or
 
-export const Not = (...filters: TFilter[]): TFilter => ({
+export const Not = (...filters: TQueryFilter[]): TQueryFilter => ({
 	type: 'Not',
 	filters,
 	toString(getComponentId: TGetComponentId) {
@@ -81,7 +85,7 @@ export const Not = (...filters: TFilter[]): TFilter => ({
 	}
 });
 
-export const None = (): TFilter => ({
+export const None = (): TQueryFilter => ({
 	type: 'None',
 	toString() {
 		return 'none()';
@@ -89,12 +93,13 @@ export const None = (): TFilter => ({
 });
 
 // Special entity symbol for queries
+// TODO: Put into query-data or so?
 export const Entity = Symbol('Entity');
 
 /**
- * Type guard to check if a value is a filter.
+ * Type guard to check if a value is a query filter.
  */
-export function isFilter(value: any): value is TFilter {
+export function isQueryFilter(value: any): value is TQueryFilter {
 	return (
 		typeof value === 'object' &&
 		value !== null &&
