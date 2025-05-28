@@ -34,7 +34,9 @@
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"@blgc/utils": "^0.0.52"
+	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@types/node": "^22.15.21",

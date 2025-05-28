@@ -59,6 +59,12 @@ export function createComponentRegistry(): TComponentRegistry {
 		_componentCount: 0,
 		_currentBitflag: 1,
 
+		_addedMasks: [[]],
+		_changedMasks: [[]],
+		_removedMasks: [[]],
+
+		_callbacks: new Map(),
+
 		registerComponent(component) {
 			if (this._componentMap.has(component)) {
 				return this._componentMap.get(component) as TComponentData;
@@ -78,6 +84,9 @@ export function createComponentRegistry(): TComponentRegistry {
 			if (this._currentBitflag >= 2 ** 31) {
 				this._currentBitflag = 1;
 				this._entityMasks.push([]);
+				this._addedMasks.push([]);
+				this._changedMasks.push([]);
+				this._removedMasks.push([]);
 			}
 
 			return componentData;
@@ -125,6 +134,19 @@ export function createComponentRegistry(): TComponentRegistry {
 			// We don't prefill arrays to create sparse arrays for memory efficiency
 			// @ts-expect-error - generationId exists because we ensure it when registering the component
 			this._entityMasks[generationId][eid] = currentMask | bitflag;
+
+			// Track that this component was added this frame
+			const currentAddedMask = this._addedMasks[generationId]?.[eid] ?? 0;
+			// @ts-expect-error - generationId exists because we ensure it when registering the component
+			this._addedMasks[generationId][eid] = currentAddedMask | bitflag;
+
+			// Fire callbacks if registered
+			const callbacks = this._callbacks.get(component);
+			if (callbacks?.onAdd != null) {
+				for (const callback of callbacks.onAdd) {
+					callback(eid);
+				}
+			}
 		},
 
 		// Component Removal Flow
@@ -151,6 +173,19 @@ export function createComponentRegistry(): TComponentRegistry {
 				return false;
 			}
 
+			// Track that this component was removed this frame
+			const currentRemovedMask = this._removedMasks[generationId]?.[eid] ?? 0;
+			// @ts-expect-error - generationId exists because we ensure it when registering the component
+			this._removedMasks[generationId][eid] = currentRemovedMask | bitflag;
+
+			// Fire callbacks if registered
+			const callbacks = this._callbacks.get(component);
+			if (callbacks?.onRemove != null) {
+				for (const callback of callbacks.onRemove) {
+					callback(eid);
+				}
+			}
+
 			// Clear component bit
 			// @ts-expect-error - generationId exists because we ensure it when registering the component
 			this._entityMasks[generationId][eid] = currentMask & ~bitflag;
@@ -172,9 +207,146 @@ export function createComponentRegistry(): TComponentRegistry {
 		},
 
 		removeAllComponents(eid) {
-			// Use removeComponent to reuse logic and ensure consistency
 			for (const component of this._componentMap.keys()) {
 				this.removeComponent(eid, component);
+			}
+		},
+
+		markChanged(eid, component) {
+			const componentData = this._componentMap.get(component);
+			if (componentData == null) {
+				return false;
+			}
+
+			const { generationId, bitflag } = componentData;
+
+			// Only mark as changed if entity actually has this component
+			const currentMask = this._entityMasks[generationId]?.[eid] ?? 0;
+			if ((currentMask & bitflag) === 0) {
+				return false;
+			}
+
+			// Track that this component was changed this frame
+			const currentChangedMask = this._changedMasks[generationId]?.[eid] ?? 0;
+			// @ts-expect-error - generationId exists because we ensure it when registering the component
+			this._changedMasks[generationId][eid] = currentChangedMask | bitflag;
+
+			// Fire callbacks if registered
+			const callbacks = this._callbacks.get(component);
+			if (callbacks?.onChange != null) {
+				for (const callback of callbacks.onChange) {
+					callback(eid);
+				}
+			}
+
+			return true;
+		},
+
+		wasAdded(eid, component) {
+			const componentData = this._componentMap.get(component);
+			if (componentData == null) {
+				return false;
+			}
+
+			const { generationId, bitflag } = componentData;
+			const mask = this._addedMasks[generationId]?.[eid] ?? 0;
+			return (mask & bitflag) !== 0;
+		},
+
+		wasChanged(eid, component) {
+			const componentData = this._componentMap.get(component);
+			if (componentData == null) {
+				return false;
+			}
+
+			const { generationId, bitflag } = componentData;
+			const mask = this._changedMasks[generationId]?.[eid] ?? 0;
+			return (mask & bitflag) !== 0;
+		},
+
+		wasRemoved(eid, component) {
+			const componentData = this._componentMap.get(component);
+			if (componentData == null) {
+				return false;
+			}
+
+			const { generationId, bitflag } = componentData;
+			const mask = this._removedMasks[generationId]?.[eid] ?? 0;
+			return (mask & bitflag) !== 0;
+		},
+
+		onComponentAdd(component, callback) {
+			if (!this._callbacks.has(component)) {
+				this._callbacks.set(component, {});
+			}
+			const componentCallbacks = this._callbacks.get(component) as TComponentCallbacks;
+			if (componentCallbacks.onAdd == null) {
+				componentCallbacks.onAdd = [];
+			}
+			componentCallbacks.onAdd.push(callback);
+
+			// Return unregister function
+			return () => {
+				const index = componentCallbacks.onAdd?.indexOf(callback);
+				if (index != null && index !== -1) {
+					componentCallbacks.onAdd?.splice(index, 1);
+				}
+			};
+		},
+
+		onComponentChange(component, callback) {
+			if (!this._callbacks.has(component)) {
+				this._callbacks.set(component, {});
+			}
+			const componentCallbacks = this._callbacks.get(component) as TComponentCallbacks;
+			if (componentCallbacks.onChange == null) {
+				componentCallbacks.onChange = [];
+			}
+			componentCallbacks.onChange.push(callback);
+
+			// Return unregister function
+			return () => {
+				const index = componentCallbacks.onChange?.indexOf(callback);
+				if (index != null && index !== -1) {
+					componentCallbacks.onChange?.splice(index, 1);
+				}
+			};
+		},
+
+		onComponentRemove(component, callback) {
+			if (!this._callbacks.has(component)) {
+				this._callbacks.set(component, {});
+			}
+			const componentCallbacks = this._callbacks.get(component) as TComponentCallbacks;
+			if (componentCallbacks.onRemove == null) {
+				componentCallbacks.onRemove = [];
+			}
+			componentCallbacks.onRemove.push(callback);
+
+			// Return unregister function
+			return () => {
+				const index = componentCallbacks.onRemove?.indexOf(callback);
+				if (index != null && index !== -1) {
+					componentCallbacks.onRemove?.splice(index, 1);
+				}
+			};
+		},
+
+		clear() {
+			// Clear all change tracking for the current frame
+			for (let generationId = 0; generationId < this._addedMasks.length; generationId++) {
+				if (this._addedMasks[generationId] != null) {
+					// @ts-expect-error - generationId exists because we checked above
+					this._addedMasks[generationId].length = 0;
+				}
+				if (this._changedMasks[generationId] != null) {
+					// @ts-expect-error - generationId exists because we checked above
+					this._changedMasks[generationId].length = 0;
+				}
+				if (this._removedMasks[generationId] != null) {
+					// @ts-expect-error - generationId exists because we checked above
+					this._removedMasks[generationId].length = 0;
+				}
 			}
 		},
 
@@ -196,14 +368,30 @@ export function createComponentRegistry(): TComponentRegistry {
 
 			this._componentMap.clear();
 			this._entityMasks.length = 0;
-			this._entityMasks.push([]); // Start with one generation
+			this._entityMasks.push([]);
+			this._addedMasks.length = 0;
+			this._addedMasks.push([]);
+			this._changedMasks.length = 0;
+			this._changedMasks.push([]);
+			this._removedMasks.length = 0;
+			this._removedMasks.push([]);
 			this._componentCount = 0;
 			this._currentBitflag = 1;
+			this._callbacks.clear();
 		},
 
 		validate() {
 			// Validate generation structure
 			if (this._entityMasks.length === 0) {
+				return false;
+			}
+
+			// Validate change tracking arrays match entity masks
+			if (
+				this._addedMasks.length !== this._entityMasks.length ||
+				this._changedMasks.length !== this._entityMasks.length ||
+				this._removedMasks.length !== this._entityMasks.length
+			) {
 				return false;
 			}
 
@@ -245,6 +433,14 @@ export interface TComponentRegistry {
 	_componentCount: number;
 	/** Current bitflag value for next component */
 	_currentBitflag: number;
+	/** Array of added component masks by generation */
+	_addedMasks: number[][];
+	/** Array of changed component masks by generation */
+	_changedMasks: number[][];
+	/** Array of removed component masks by generation */
+	_removedMasks: number[][];
+	/** Optional callback system for real-time reactions */
+	_callbacks: Map<TComponentRef, TComponentCallbacks>;
 
 	/**
 	 * Registers a component and returns its metadata.
@@ -285,6 +481,64 @@ export interface TComponentRegistry {
 	removeAllComponents(eid: TEntityId): void;
 
 	/**
+	 * Marks a component as changed for the current frame.
+	 * @param eid - The entity ID
+	 * @param component - The component to mark as changed
+	 * @returns True if component was marked as changed, false if entity didn't have it
+	 */
+	markChanged(eid: TEntityId, component: TComponentRef): boolean;
+
+	/**
+	 * Checks if a component was added to an entity in the current frame.
+	 * @param eid - The entity ID
+	 * @param component - The component to check
+	 * @returns True if component was added to the entity in the current frame
+	 */
+	wasAdded(eid: TEntityId, component: TComponentRef): boolean;
+
+	/**
+	 * Checks if a component was changed for an entity in the current frame.
+	 * @param eid - The entity ID
+	 * @param component - The component to check
+	 * @returns True if component was changed for the entity in the current frame
+	 */
+	wasChanged(eid: TEntityId, component: TComponentRef): boolean;
+
+	/**
+	 * Checks if a component was removed from an entity in the current frame.
+	 * @param eid - The entity ID
+	 * @param component - The component to check
+	 * @returns True if component was removed from the entity in the current frame
+	 */
+	wasRemoved(eid: TEntityId, component: TComponentRef): boolean;
+
+	/**
+	 * Registers a callback for when a component is added to an entity.
+	 * @param component - The component to register the callback for
+	 * @param callback - The callback function to register
+	 */
+	onComponentAdd(component: TComponentRef, callback: (eid: TEntityId) => void): () => void;
+
+	/**
+	 * Registers a callback for when a component is changed for an entity.
+	 * @param component - The component to register the callback for
+	 * @param callback - The callback function to register
+	 */
+	onComponentChange(component: TComponentRef, callback: (eid: TEntityId) => void): () => void;
+
+	/**
+	 * Registers a callback for when a component is removed from an entity.
+	 * @param component - The component to register the callback for
+	 * @param callback - The callback function to register
+	 */
+	onComponentRemove(component: TComponentRef, callback: (eid: TEntityId) => void): () => void;
+
+	/**
+	 * Clears all change tracking for the current frame.
+	 */
+	clear(): void;
+
+	/**
 	 * Resets the registry to its initial empty state.
 	 */
 	reset(): void;
@@ -308,3 +562,9 @@ export interface TComponentData {
 }
 
 export type TComponentRef = any; // Can be array or object with arrays
+
+export interface TComponentCallbacks {
+	onAdd?: ((eid: TEntityId) => void)[];
+	onChange?: ((eid: TEntityId) => void)[];
+	onRemove?: ((eid: TEntityId) => void)[];
+}

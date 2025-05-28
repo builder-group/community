@@ -391,6 +391,10 @@ importers:
         version: link:../rollup-presets
 
   packages/feature-ecs:
+    dependencies:
+      '@blgc/utils':
+        specifier: ^0.0.52
+        version: 0.0.52
     devDependencies:
       '@blgc/config':
         specifier: workspace:*
@@ -866,6 +870,9 @@ packages:
   '@babel/types@7.27.1':
     resolution: {integrity: sha512-+EzkxvLNfiUeKMgy/3luqfsCWFRXLb7U6wNQTk60tovuckwB15B191tJWvpp4HjiQWdJkCxO3Wbvc6jlk3Xb2Q==}
     engines: {node: '>=6.9.0'}
+
+  '@blgc/utils@0.0.52':
+    resolution: {integrity: sha512-wshoO58fjGVbsVw8Y24vMKAHCwUdL7052/q/iESONDPd9s+Q8dEHGQTL7RGSPWFtpc8nTIeW69G8pUd1wM0ZLg==}
 
   '@bundled-es-modules/cookie@2.0.1':
     resolution: {integrity: sha512-8o+5fRPLNbjbdGRRmJj3h6Hh1AQJf2dk3qQ/5ZFb+PXkRNiSoMGGUKlsgLfrxneb72axVJyIYji64E2+nNfYyw==}
@@ -4534,6 +4541,8 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.27.1
+
+  '@blgc/utils@0.0.52': {}
 
   '@bundled-es-modules/cookie@2.0.1':
     dependencies:
