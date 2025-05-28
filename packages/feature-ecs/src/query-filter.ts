@@ -23,10 +23,6 @@ export function With<T extends TComponentRef>(component: T): TQueryFilter {
 			return (entityMask & bitflag) !== 0;
 		},
 
-		getComponents(): TComponentRef[] {
-			return [component];
-		},
-
 		register(world: TWorld, queryData: TQueryData): void {
 			const registry = world._componentRegistry;
 			const componentData = registry._componentMap.get(component);
@@ -65,10 +61,6 @@ export function Without<T extends TComponentRef>(component: T): TQueryFilter {
 			return (entityMask & bitflag) === 0;
 		},
 
-		getComponents(): TComponentRef[] {
-			return [component];
-		},
-
 		register(world: TWorld, queryData: TQueryData): void {
 			const registry = world._componentRegistry;
 			const componentData = registry._componentMap.get(component);
@@ -99,10 +91,6 @@ export function Added<T extends TComponentRef>(component: T): TQueryFilter {
 			return world._componentRegistry.wasAdded(eid, component);
 		},
 
-		getComponents(): TComponentRef[] {
-			return [component];
-		},
-
 		register(world: TWorld, queryData: TQueryData): void {
 			// Register callback to invalidate this query when components are added
 			world._componentRegistry.onComponentAdd(component, () => {
@@ -127,10 +115,6 @@ export function Changed<T extends TComponentRef>(component: T): TQueryFilter {
 
 		evaluate(world: TWorld, eid: TEntityId): boolean {
 			return world._componentRegistry.wasChanged(eid, component);
-		},
-
-		getComponents(): TComponentRef[] {
-			return [component];
 		},
 
 		register(world: TWorld, queryData: TQueryData): void {
@@ -159,10 +143,6 @@ export function Removed<T extends TComponentRef>(component: T): TQueryFilter {
 			return world._componentRegistry.wasRemoved(eid, component);
 		},
 
-		getComponents(): TComponentRef[] {
-			return [component];
-		},
-
 		register(world: TWorld, queryData: TQueryData): void {
 			// Register callback to invalidate this query when components are removed
 			world._componentRegistry.onComponentRemove(component, () => {
@@ -187,13 +167,7 @@ export function And(...filters: TQueryFilter[]): TQueryFilter {
 
 		evaluate(world: TWorld, eid: TEntityId, queryData: TQueryData): boolean {
 			// Use batched bitmask checking if all filters are With/Without
-			const allSimple = filters.every((f) => f.type === 'With' || f.type === 'Without');
-
-			if (
-				allSimple &&
-				(Object.keys(queryData.withMasks).length > 0 ||
-					Object.keys(queryData.withoutMasks).length > 0)
-			) {
+			if (filters.every((f) => f.type === 'With' || f.type === 'Without')) {
 				const registry = world._componentRegistry;
 
 				// Check all required components in batches
@@ -217,10 +191,6 @@ export function And(...filters: TQueryFilter[]): TQueryFilter {
 
 			// Fallback to individual filter evaluation
 			return filters.every((filter) => filter.evaluate(world, eid, queryData));
-		},
-
-		getComponents(): TComponentRef[] {
-			return filters.flatMap((filter) => filter.getComponents());
 		},
 
 		register(world: TWorld, queryData: TQueryData): void {
@@ -254,10 +224,6 @@ export function Or(...filters: TQueryFilter[]): TQueryFilter {
 			return filters.some((filter) => filter.evaluate(world, eid, queryData));
 		},
 
-		getComponents(): TComponentRef[] {
-			return filters.flatMap((filter) => filter.getComponents());
-		},
-
 		register(world: TWorld, queryData: TQueryData): void {
 			for (const filter of filters) {
 				if (filter.register) {
@@ -288,10 +254,6 @@ export function Not(...filters: TQueryFilter[]): TQueryFilter {
 			return !filters.some((filter) => filter.evaluate(world, eid, queryData));
 		},
 
-		getComponents(): TComponentRef[] {
-			return filters.flatMap((filter) => filter.getComponents());
-		},
-
 		getHash(world: TWorld): string {
 			const childHashes = filters
 				.map((f) => f.getHash(world))
@@ -313,10 +275,6 @@ export function None(): TQueryFilter {
 			return false;
 		},
 
-		getComponents(): TComponentRef[] {
-			return [];
-		},
-
 		getHash(): string {
 			return 'none()';
 		}
@@ -332,7 +290,6 @@ export interface TQueryData {
 	filter: TQueryFilter;
 	cachedResult: TEntityId[] | null;
 	isDirty: boolean;
-	allComponents: TComponentRef[];
 	withMasks: Record<number, number>;
 	withoutMasks: Record<number, number>;
 }
@@ -340,7 +297,6 @@ export interface TQueryData {
 export interface TBaseQueryFilter {
 	type: string;
 	evaluate(world: TWorld, eid: TEntityId, queryData: TQueryData): boolean;
-	getComponents(): TComponentRef[];
 	register?(world: TWorld, queryData: TQueryData): void;
 	getHash(world: TWorld): string;
 }

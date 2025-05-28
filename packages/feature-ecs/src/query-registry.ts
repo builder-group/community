@@ -25,11 +25,20 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 				return queryData.cachedResult;
 			}
 
-			// Calculate fresh results and cache them
-			queryData.cachedResult = this._findMatchingEntities(queryData, filter);
+			// Find matching entities
+			const matchingEntities: TEntityId[] = [];
+			const aliveEntities = this._world._entityIndex.getAliveEntities();
+			for (const eid of aliveEntities) {
+				if (filter.evaluate(this._world, eid, queryData)) {
+					matchingEntities.push(eid);
+				}
+			}
+
+			// Cache results
+			queryData.cachedResult = matchingEntities;
 			queryData.isDirty = false;
 
-			return queryData.cachedResult;
+			return matchingEntities;
 		},
 
 		getOrCreateQuery(filter) {
@@ -46,13 +55,12 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 				filter,
 				cachedResult: null,
 				isDirty: true,
-				allComponents: filter.getComponents(),
 				withMasks: {},
 				withoutMasks: {}
 			};
 
-			// Let filter register its bitmasks
-			if (filter.register) {
+			// Let filter register
+			if (filter.register != null) {
 				filter.register(this._world, queryData);
 			}
 
@@ -88,24 +96,6 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 
 		validate() {
 			return this._queryCache.size >= 0;
-		},
-
-		_findMatchingEntities(queryData, filter) {
-			const matchingEntities: TEntityId[] = [];
-			const aliveEntities = this._world._entityIndex.getAliveEntities();
-
-			for (const eid of aliveEntities) {
-				if (filter.evaluate(this._world, eid, queryData)) {
-					matchingEntities.push(eid);
-				}
-			}
-
-			return matchingEntities;
-		},
-
-		_getFilterFromQueryData(queryData) {
-			// Return the stored filter
-			return queryData.filter;
 		}
 	};
 }
@@ -155,7 +145,4 @@ export interface TQueryRegistry {
 	 * Validates the query registry integrity
 	 */
 	validate(): boolean;
-
-	_findMatchingEntities(queryData: TQueryData, filter: TQueryFilter): TEntityId[];
-	_getFilterFromQueryData(queryData: TQueryData): TQueryFilter;
 }
