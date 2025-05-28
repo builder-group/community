@@ -103,6 +103,13 @@ export function Added<T extends TComponentRef>(component: T): TQueryFilter {
 			return [component];
 		},
 
+		register(world: TWorld, queryData: TQueryData): void {
+			// Register callback to invalidate this query when components are added
+			world._componentRegistry.onComponentAdd(component, () => {
+				queryData.isDirty = true;
+			});
+		},
+
 		getHash(world: TWorld): string {
 			const componentId = getComponentId(world, component);
 			return `added(${componentId})`;
@@ -126,6 +133,13 @@ export function Changed<T extends TComponentRef>(component: T): TQueryFilter {
 			return [component];
 		},
 
+		register(world: TWorld, queryData: TQueryData): void {
+			// Register callback to invalidate this query when components are changed
+			world._componentRegistry.onComponentChange(component, () => {
+				queryData.isDirty = true;
+			});
+		},
+
 		getHash(world: TWorld): string {
 			const componentId = getComponentId(world, component);
 			return `changed(${componentId})`;
@@ -147,6 +161,13 @@ export function Removed<T extends TComponentRef>(component: T): TQueryFilter {
 
 		getComponents(): TComponentRef[] {
 			return [component];
+		},
+
+		register(world: TWorld, queryData: TQueryData): void {
+			// Register callback to invalidate this query when components are removed
+			world._componentRegistry.onComponentRemove(component, () => {
+				queryData.isDirty = true;
+			});
 		},
 
 		getHash(world: TWorld): string {
@@ -281,13 +302,34 @@ export function Not(...filters: TQueryFilter[]): TQueryFilter {
 	};
 }
 
+/**
+ * Special filter that matches no entities
+ */
+export function None(): TQueryFilter {
+	return {
+		type: 'None',
+
+		evaluate(): boolean {
+			return false;
+		},
+
+		getComponents(): TComponentRef[] {
+			return [];
+		},
+
+		getHash(): string {
+			return 'none()';
+		}
+	};
+}
+
 // Aliases for convenience
 export const All = And;
 export const Any = Or;
-export const None = Not;
 
 export interface TQueryData {
 	hash: string;
+	filter: TQueryFilter;
 	cachedResult: TEntityId[] | null;
 	isDirty: boolean;
 	allComponents: TComponentRef[];
@@ -311,7 +353,8 @@ export type TQueryFilter =
 	| (TBaseQueryFilter & { type: 'Removed'; component: TComponentRef })
 	| (TBaseQueryFilter & { type: 'And'; filters: TQueryFilter[] })
 	| (TBaseQueryFilter & { type: 'Or'; filters: TQueryFilter[] })
-	| (TBaseQueryFilter & { type: 'Not'; filters: TQueryFilter[] });
+	| (TBaseQueryFilter & { type: 'Not'; filters: TQueryFilter[] })
+	| (TBaseQueryFilter & { type: 'None' });
 
 /**
  * Helper to get component ID, registering if needed

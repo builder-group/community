@@ -332,7 +332,7 @@ export function createComponentRegistry(): TComponentRegistry {
 			};
 		},
 
-		clear() {
+		flush() {
 			// Clear all change tracking for the current frame
 			for (let generationId = 0; generationId < this._addedMasks.length; generationId++) {
 				if (this._addedMasks[generationId] != null) {
@@ -536,7 +536,7 @@ export interface TComponentRegistry {
 	/**
 	 * Clears all change tracking for the current frame.
 	 */
-	clear(): void;
+	flush(): void;
 
 	/**
 	 * Resets the registry to its initial empty state.

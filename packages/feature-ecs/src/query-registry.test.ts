@@ -315,7 +315,7 @@ describe('createQueryRegistry', () => {
 			expect(addedHealth).toEqual([eid2]);
 
 			// Clear frame changes
-			world._componentRegistry.clear();
+			world.flush();
 
 			// After clearing, no entities should have added components
 			const addedPositionAfter = world.query(Added(Position));
@@ -336,7 +336,7 @@ describe('createQueryRegistry', () => {
 			world.addComponent(eid2, Health);
 
 			// Clear initial "added" tracking
-			world._componentRegistry.clear();
+			world.flush();
 
 			// Mark Position as changed for eid1
 			world._componentRegistry.markChanged(eid1, Position);
@@ -363,7 +363,7 @@ describe('createQueryRegistry', () => {
 			world.addComponent(eid2, Position);
 
 			// Clear initial "added" tracking
-			world._componentRegistry.clear();
+			world.flush();
 
 			// Remove Health from eid1
 			world.removeComponent(eid1, Health);
@@ -394,7 +394,7 @@ describe('createQueryRegistry', () => {
 			world.addComponent(eid2, Shield);
 
 			// Clear initial "added" tracking
-			world._componentRegistry.clear();
+			world.flush();
 
 			// Trigger changes:
 			// - Add Shield to eid1 (new component)
@@ -429,7 +429,7 @@ describe('createQueryRegistry', () => {
 			world.addComponent(eid2, Enemy);
 
 			// Clear initial "added" tracking
-			world._componentRegistry.clear();
+			world.flush();
 
 			// Mark components as changed
 			world._componentRegistry.markChanged(eid1, Health);

@@ -57,6 +57,14 @@ export function createWorld(): TWorld {
 			return this._queryRegistry.executeQuery(filter);
 		},
 
+		innerQuery(filter) {
+			return this._queryRegistry.executeQuery(filter);
+		},
+
+		flush() {
+			this._componentRegistry.flush();
+		},
+
 		reset() {
 			this._componentRegistry.reset();
 			this._entityIndex.reset();
@@ -128,6 +136,18 @@ export interface TWorld {
 	 * @returns Array of matching entity IDs
 	 */
 	query(filter: TQueryFilter): TEntityId[];
+
+	/**
+	 * Executes a query and returns matching entities.
+	 * @param filter - The query filter
+	 * @returns Array of matching entity IDs
+	 */
+	innerQuery(filter: TQueryFilter): TEntityId[];
+
+	/**
+	 * Clears the world.
+	 */
+	flush(): void;
 
 	/**
 	 * Resets the world to its initial state.

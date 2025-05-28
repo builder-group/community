@@ -1,11 +1,10 @@
 /**
  * Query Registry for ECS
  *
- * Manages compiled queries with bitmask optimizations and smart cache invalidation.
- * Uses the new filter system for maximum performance.
+ * Simple and fast query registry with bitmask optimizations.
+ * Follows KISS principle - Keep It Simple, Stupid.
  */
 
-import { TComponentRef } from './component-registry';
 import { TEntityId } from './entity-index';
 import { TQueryData, TQueryFilter } from './query-filter';
 import { TWorld } from './world';
@@ -17,26 +16,34 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 	return {
 		_world: world,
 		_queryCache: new Map(),
-		_componentCallbacks: new Map(),
 
 		executeQuery(filter) {
-			const query = this.getOrCreateQuery(filter);
+			const queryData = this.getOrCreateQuery(filter);
 
 			// Return cached result if available and not dirty
-			if (!query.isDirty && query.cachedResult) {
-				return query.cachedResult;
+			if (!queryData.isDirty && queryData.cachedResult != null) {
+				return queryData.cachedResult;
 			}
 
 			// Calculate fresh results and cache them
-			query.cachedResult = this._findMatchingEntities(query, filter);
-			query.isDirty = false;
+			queryData.cachedResult = this._findMatchingEntities(queryData, filter);
+			queryData.isDirty = false;
 
-			return query.cachedResult;
+			return queryData.cachedResult;
 		},
 
 		getOrCreateQuery(filter) {
+			const hash = filter.getHash(this._world);
+
+			// Return cached query if exists
+			if (this._queryCache.has(hash)) {
+				return this._queryCache.get(hash)!;
+			}
+
+			// Create new query data
 			const queryData: TQueryData = {
-				hash: filter.getHash(world),
+				hash,
+				filter,
 				cachedResult: null,
 				isDirty: true,
 				allComponents: filter.getComponents(),
@@ -44,28 +51,38 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 				withoutMasks: {}
 			};
 
+			// Let filter register its bitmasks
 			if (filter.register) {
-				filter.register(world, queryData);
+				filter.register(this._world, queryData);
 			}
 
-			if (this._queryCache.has(queryData.hash)) {
-				return this._queryCache.get(queryData.hash)!;
-			}
-
-			this._queryCache.set(queryData.hash, queryData);
-
-			// Register component callbacks for smart invalidation
-			this._registerComponentCallbacks(queryData);
+			// Cache the query
+			this._queryCache.set(hash, queryData);
 
 			return queryData;
 		},
 
-		reset() {
-			// Unregister all component callbacks
-			for (const [component, unregisterFn] of this._componentCallbacks) {
-				unregisterFn();
+		registerQuery(filter) {
+			return this.getOrCreateQuery(filter);
+		},
+
+		generateQueryHash(filter) {
+			return filter.getHash(this._world);
+		},
+
+		checkEntity(queryData, eid) {
+			// Use the stored filter's evaluate method with the query data
+			return queryData.filter.evaluate(this._world, eid, queryData);
+		},
+
+		invalidateQueries() {
+			// Mark all queries as dirty
+			for (const queryData of this._queryCache.values()) {
+				queryData.isDirty = true;
 			}
-			this._componentCallbacks.clear();
+		},
+
+		reset() {
 			this._queryCache.clear();
 		},
 
@@ -86,43 +103,9 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 			return matchingEntities;
 		},
 
-		/**
-		 * Registers component callbacks for smart cache invalidation
-		 */
-		_registerComponentCallbacks(queryData) {
-			const components = queryData.allComponents;
-
-			for (const component of components) {
-				// Skip if already registered for this component
-				if (this._componentCallbacks.has(component)) continue;
-
-				// Register callback to invalidate queries when component changes
-				const unregisterAdd = this._world._componentRegistry.onComponentAdd(component, () => {
-					this._invalidateQueriesForComponent(component);
-				});
-
-				const unregisterRemove = this._world._componentRegistry.onComponentRemove(component, () => {
-					this._invalidateQueriesForComponent(component);
-				});
-
-				// Store combined unregister function
-				this._componentCallbacks.set(component, () => {
-					unregisterAdd();
-					unregisterRemove();
-				});
-			}
-		},
-
-		/**
-		 * Invalidates all queries that use a specific component
-		 */
-		_invalidateQueriesForComponent(component) {
-			for (const queryData of this._queryCache.values()) {
-				const queryComponents = queryData.allComponents;
-				if (queryComponents.includes(component)) {
-					queryData.isDirty = true;
-				}
-			}
+		_getFilterFromQueryData(queryData) {
+			// Return the stored filter
+			return queryData.filter;
 		}
 	};
 }
@@ -132,8 +115,6 @@ export interface TQueryRegistry {
 	_world: TWorld;
 	/** Cache of compiled queries by hash */
 	_queryCache: Map<string, TQueryData>;
-	/** Map of component callbacks for smart cache invalidation */
-	_componentCallbacks: Map<TComponentRef, () => void>;
 
 	/**
 	 * Executes a query and returns matching entities
@@ -146,6 +127,26 @@ export interface TQueryRegistry {
 	getOrCreateQuery(filter: TQueryFilter): TQueryData;
 
 	/**
+	 * Registers a query (alias for getOrCreateQuery)
+	 */
+	registerQuery(filter: TQueryFilter): TQueryData;
+
+	/**
+	 * Generates a hash for a query filter
+	 */
+	generateQueryHash(filter: TQueryFilter): string;
+
+	/**
+	 * Checks if an entity matches a query
+	 */
+	checkEntity(queryData: TQueryData, eid: TEntityId): boolean;
+
+	/**
+	 * Invalidates all cached queries
+	 */
+	invalidateQueries(): void;
+
+	/**
 	 * Resets the query registry to its initial state
 	 */
 	reset(): void;
@@ -156,6 +157,5 @@ export interface TQueryRegistry {
 	validate(): boolean;
 
 	_findMatchingEntities(queryData: TQueryData, filter: TQueryFilter): TEntityId[];
-	_registerComponentCallbacks(queryData: TQueryData): void;
-	_invalidateQueriesForComponent(component: TComponentRef): void;
+	_getFilterFromQueryData(queryData: TQueryData): TQueryFilter;
 }
