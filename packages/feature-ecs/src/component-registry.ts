@@ -64,6 +64,7 @@ export function createComponentRegistry(): TComponentRegistry {
 		_removedMasks: [[]],
 
 		_callbacks: new Map(),
+		_componentsToFlush: new Set(),
 
 		registerComponent(component) {
 			if (this._componentMap.has(component)) {
@@ -147,6 +148,7 @@ export function createComponentRegistry(): TComponentRegistry {
 					callback(eid);
 				}
 			}
+			this._componentsToFlush.add(component);
 		},
 
 		// Component Removal Flow
@@ -185,6 +187,7 @@ export function createComponentRegistry(): TComponentRegistry {
 					callback(eid);
 				}
 			}
+			this._componentsToFlush.add(component);
 
 			// Clear component bit
 			// @ts-expect-error - generationId exists because we ensure it when registering the component
@@ -238,6 +241,7 @@ export function createComponentRegistry(): TComponentRegistry {
 					callback(eid);
 				}
 			}
+			this._componentsToFlush.add(component);
 
 			return true;
 		},
@@ -332,8 +336,27 @@ export function createComponentRegistry(): TComponentRegistry {
 			};
 		},
 
+		onComponentFlush(component, callback) {
+			if (!this._callbacks.has(component)) {
+				this._callbacks.set(component, {});
+			}
+			const componentCallbacks = this._callbacks.get(component) as TComponentCallbacks;
+			if (componentCallbacks.onFlush == null) {
+				componentCallbacks.onFlush = [];
+			}
+			componentCallbacks.onFlush.push(callback);
+
+			// Return unregister function
+			return () => {
+				const index = componentCallbacks.onFlush?.indexOf(callback);
+				if (index != null && index !== -1) {
+					componentCallbacks.onFlush?.splice(index, 1);
+				}
+			};
+		},
+
 		flush() {
-			// Clear all change tracking for the current frame
+			// Clear all change tracking for the next frame
 			for (let generationId = 0; generationId < this._addedMasks.length; generationId++) {
 				if (this._addedMasks[generationId] != null) {
 					// @ts-expect-error - generationId exists because we checked above
@@ -348,6 +371,19 @@ export function createComponentRegistry(): TComponentRegistry {
 					this._removedMasks[generationId].length = 0;
 				}
 			}
+
+			// Call flush callbacks for components that had changes
+			for (const component of this._componentsToFlush) {
+				const callbacks = this._callbacks.get(component);
+				if (callbacks?.onFlush != null) {
+					for (const callback of callbacks.onFlush) {
+						callback();
+					}
+				}
+			}
+
+			// Clear the set for next frame
+			this._componentsToFlush.clear();
 		},
 
 		reset() {
@@ -378,6 +414,7 @@ export function createComponentRegistry(): TComponentRegistry {
 			this._componentCount = 0;
 			this._currentBitflag = 1;
 			this._callbacks.clear();
+			this._componentsToFlush.clear();
 		},
 
 		validate() {
@@ -433,14 +470,18 @@ export interface TComponentRegistry {
 	_componentCount: number;
 	/** Current bitflag value for next component */
 	_currentBitflag: number;
+
 	/** Array of added component masks by generation */
 	_addedMasks: number[][];
 	/** Array of changed component masks by generation */
 	_changedMasks: number[][];
 	/** Array of removed component masks by generation */
 	_removedMasks: number[][];
+
 	/** Optional callback system for real-time reactions */
 	_callbacks: Map<TComponentRef, TComponentCallbacks>;
+	/** Set of components that need to be flushed for the next frame */
+	_componentsToFlush: Set<TComponentRef>;
 
 	/**
 	 * Registers a component and returns its metadata.
@@ -534,6 +575,13 @@ export interface TComponentRegistry {
 	onComponentRemove(component: TComponentRef, callback: (eid: TEntityId) => void): () => void;
 
 	/**
+	 * Registers a callback for when a component is flushed for an entity.
+	 * @param component - The component to register the callback for
+	 * @param callback - The callback function to register
+	 */
+	onComponentFlush(component: TComponentRef, callback: () => void): () => void;
+
+	/**
 	 * Clears all change tracking for the current frame.
 	 */
 	flush(): void;
@@ -567,4 +615,5 @@ export interface TComponentCallbacks {
 	onAdd?: ((eid: TEntityId) => void)[];
 	onChange?: ((eid: TEntityId) => void)[];
 	onRemove?: ((eid: TEntityId) => void)[];
+	onFlush?: (() => void)[];
 }

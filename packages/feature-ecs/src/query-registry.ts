@@ -5,12 +5,7 @@
  */
 
 import { TEntityId } from './entity-index';
-import {
-	categorizeEvaluationStrategy,
-	hasChangeDetectionFilter,
-	TQueryData,
-	TQueryFilter
-} from './query-filter';
+import { categorizeEvaluationStrategy, TQueryData, TQueryFilter } from './query-filter';
 import { TWorld } from './world';
 
 /**
@@ -21,11 +16,12 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 		_world: world,
 		_queryCache: new Map(),
 
-		executeQuery(filter) {
-			const queryData = this.getQuery(filter);
+		executeQuery(filter, options = {}) {
+			const { cache = true, ...getQueryOptions } = options;
+			const queryData = this.getQuery(filter, getQueryOptions);
 
 			// Return cached result if available and not dirty
-			if (!queryData.isDirty) {
+			if (!queryData.isDirty && cache) {
 				return queryData.cachedResult;
 			}
 
@@ -52,22 +48,22 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 			return matchingEntities;
 		},
 
-		getQuery(filter) {
+		getQuery(filter, options = {}) {
+			const { evaluationStrategy = categorizeEvaluationStrategy(filter) } = options;
 			const hash = filter.getHash(this._world);
 
 			// Return cached query if exists
 			if (this._queryCache.has(hash)) {
-				return this._queryCache.get(hash)!;
+				return this._queryCache.get(hash) as TQueryData;
 			}
 
 			// Create new query data
 			const queryData: TQueryData = {
 				hash,
 				filter,
-				evaluationStrategy: categorizeEvaluationStrategy(filter),
+				evaluationStrategy,
 				cachedResult: [],
 				isDirty: true,
-				needsFlushInvalidation: hasChangeDetectionFilter(filter),
 				generations: []
 			};
 
@@ -95,22 +91,6 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 			return queryData.filter.evaluate(this._world, eid, queryData);
 		},
 
-		invalidateQueries() {
-			// Mark all queries as dirty
-			for (const queryData of this._queryCache.values()) {
-				queryData.isDirty = true;
-			}
-		},
-
-		flush() {
-			// Invalidate queries that were pre-marked as needing flush invalidation during registration.
-			for (const queryData of this._queryCache.values()) {
-				if (queryData.needsFlushInvalidation) {
-					queryData.isDirty = true;
-				}
-			}
-		},
-
 		reset() {
 			this._queryCache.clear();
 		},
@@ -130,12 +110,12 @@ export interface TQueryRegistry {
 	/**
 	 * Executes a query and returns matching entities
 	 */
-	executeQuery(filter: TQueryFilter): TEntityId[];
+	executeQuery(filter: TQueryFilter, options?: TExecuteQueryOptions): TEntityId[];
 
 	/**
 	 * Gets or creates a compiled query
 	 */
-	getQuery(filter: TQueryFilter): TQueryData;
+	getQuery(filter: TQueryFilter, options?: TGetQueryOptions): TQueryData;
 
 	/**
 	 * Registers a query (alias for getOrCreateQuery)
@@ -153,16 +133,6 @@ export interface TQueryRegistry {
 	checkEntity(queryData: TQueryData, eid: TEntityId): boolean;
 
 	/**
-	 * Invalidates all cached queries
-	 */
-	invalidateQueries(): void;
-
-	/**
-	 * Flushes the query registry
-	 */
-	flush(): void;
-
-	/**
 	 * Resets the query registry to its initial state
 	 */
 	reset(): void;
@@ -171,4 +141,14 @@ export interface TQueryRegistry {
 	 * Validates the query registry integrity
 	 */
 	validate(): boolean;
+}
+
+export interface TGetQueryOptions {
+	/** Evaluation strategy to use for the query */
+	evaluationStrategy?: 'bitmask' | 'individual';
+}
+
+export interface TExecuteQueryOptions extends TGetQueryOptions {
+	/** Whether to cache the query result */
+	cache?: boolean;
 }

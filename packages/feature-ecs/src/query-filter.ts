@@ -2,6 +2,9 @@ import { TComponentRef } from './component-registry';
 import { TEntityId } from './entity-index';
 import { TWorld } from './world';
 
+// TODO: Add option to disable bitmask evaluation and cache
+// TODO: Add performance tests using vite comparing performance between bitmask and individual evaluation
+
 /**
  * Requires entity to have component
  */
@@ -24,6 +27,14 @@ export function With<T extends TComponentRef>(component: T): TQueryFilter {
 		},
 
 		register(world: TWorld, queryData: TQueryData): void {
+			// Register callbacks to invalidate this query when components are added/removed
+			world._componentRegistry.onComponentAdd(component, () => {
+				queryData.isDirty = true;
+			});
+			world._componentRegistry.onComponentRemove(component, () => {
+				queryData.isDirty = true;
+			});
+
 			const registry = world._componentRegistry;
 			const componentData = registry._componentMap.get(component);
 
@@ -78,6 +89,14 @@ export function Without<T extends TComponentRef>(component: T): TQueryFilter {
 		},
 
 		register(world: TWorld, queryData: TQueryData): void {
+			// Register callbacks to invalidate this query when components are added/removed
+			world._componentRegistry.onComponentAdd(component, () => {
+				queryData.isDirty = true;
+			});
+			world._componentRegistry.onComponentRemove(component, () => {
+				queryData.isDirty = true;
+			});
+
 			const registry = world._componentRegistry;
 			const componentData = registry._componentMap.get(component);
 
@@ -126,6 +145,11 @@ export function Added<T extends TComponentRef>(component: T): TQueryFilter {
 		register(world: TWorld, queryData: TQueryData): void {
 			// Register callback to invalidate this query when components are added
 			world._componentRegistry.onComponentAdd(component, () => {
+				queryData.isDirty = true;
+			});
+
+			// Register callback to invalidate when change tracking is flushed
+			world._componentRegistry.onComponentFlush(component, () => {
 				queryData.isDirty = true;
 			});
 
@@ -179,6 +203,11 @@ export function Changed<T extends TComponentRef>(component: T): TQueryFilter {
 				queryData.isDirty = true;
 			});
 
+			// Register callback to invalidate when change tracking is flushed
+			world._componentRegistry.onComponentFlush(component, () => {
+				queryData.isDirty = true;
+			});
+
 			// Register in change detection masks for potential bitmask evaluation
 			const registry = world._componentRegistry;
 			const componentData = registry._componentMap.get(component);
@@ -227,6 +256,11 @@ export function Removed<T extends TComponentRef>(component: T): TQueryFilter {
 		register(world: TWorld, queryData: TQueryData): void {
 			// Register callback to invalidate this query when components are removed
 			world._componentRegistry.onComponentRemove(component, () => {
+				queryData.isDirty = true;
+			});
+
+			// Register callback to invalidate when change tracking is flushed
+			world._componentRegistry.onComponentFlush(component, () => {
 				queryData.isDirty = true;
 			});
 
@@ -588,11 +622,6 @@ export interface TQueryData {
 	cachedResult: TEntityId[];
 	/** True when cached results are stale and need re-evaluation */
 	isDirty: boolean;
-	/**
-	 * True if this query contains Added/Changed/Removed filters and needs
-	 * cache invalidation when world.flush() clears change tracking masks.
-	 */
-	needsFlushInvalidation: boolean;
 
 	/** Pre-computed generations array for optimal bitmask iteration */
 	generations: number[];
@@ -651,7 +680,7 @@ function getComponentId(world: TWorld, component: TComponentRef): number {
 }
 
 /**
- * Pre-categorizes a query's evaluation strategy for optimal performance.
+ * Pre-categorizes a query's evaluation strategy.
  *
  * Strategies:
  * - 'bitmask': All filters can use bitwise operations (With/Without/Added/Changed/Removed)
@@ -699,27 +728,8 @@ export function categorizeEvaluationStrategy(filter: TQueryFilter): 'bitmask' | 
 }
 
 /**
- * Checks if a filter contains change detection filters (Added/Changed/Removed).
- * Used to pre-compute needsFlushInvalidation flag for O(1) flush performance.
- */
-export function hasChangeDetectionFilter(filter: TQueryFilter): boolean {
-	// Direct change detection filters
-	if (filter.type === 'Added' || filter.type === 'Changed' || filter.type === 'Removed') {
-		return true;
-	}
-
-	// Check composite filters recursively
-	if ('filters' in filter && Array.isArray(filter.filters)) {
-		return filter.filters.some((f) => hasChangeDetectionFilter(f));
-	}
-
-	return false;
-}
-
-/**
  * Can a component change affect this query?
  * Returns false if query definitely doesn't care about this component.
- * Used to skip expensive query re-evaluation when possible.
  */
 export function canComponentAffectQuery(
 	queryData: TQueryData,

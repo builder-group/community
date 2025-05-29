@@ -1,7 +1,7 @@
 import { createComponentRegistry, TComponentRef, TComponentRegistry } from './component-registry';
 import { createEntityIndex, TEntityId, TEntityIndex } from './entity-index';
 import { TQueryFilter } from './query-filter';
-import { createQueryRegistry, TQueryRegistry } from './query-registry';
+import { createQueryRegistry, TExecuteQueryOptions, TQueryRegistry } from './query-registry';
 
 /**
  * Creates a new ECS world.
@@ -53,17 +53,12 @@ export function createWorld(): TWorld {
 			return this._componentRegistry.hasComponent(eid, component);
 		},
 
-		query(filter) {
-			return this._queryRegistry.executeQuery(filter);
-		},
-
-		innerQuery(filter) {
-			return this._queryRegistry.executeQuery(filter);
+		query(filter, options) {
+			return this._queryRegistry.executeQuery(filter, options);
 		},
 
 		flush() {
 			this._componentRegistry.flush();
-			this._queryRegistry.flush();
 		},
 
 		reset() {
@@ -134,16 +129,10 @@ export interface TWorld {
 	/**
 	 * Executes a query and returns matching entities.
 	 * @param filter - The query filter
+	 * @param options - Query execution options
 	 * @returns Array of matching entity IDs
 	 */
-	query(filter: TQueryFilter): TEntityId[];
-
-	/**
-	 * Executes a query and returns matching entities.
-	 * @param filter - The query filter
-	 * @returns Array of matching entity IDs
-	 */
-	innerQuery(filter: TQueryFilter): TEntityId[];
+	query(filter: TQueryFilter, options?: TExecuteQueryOptions): TEntityId[];
 
 	/**
 	 * Clears the world.
