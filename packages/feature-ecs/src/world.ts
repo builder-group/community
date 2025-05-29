@@ -63,6 +63,7 @@ export function createWorld(): TWorld {
 
 		flush() {
 			this._componentRegistry.flush();
+			this._queryRegistry.flush();
 		},
 
 		reset() {

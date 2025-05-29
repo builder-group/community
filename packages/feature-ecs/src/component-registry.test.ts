@@ -628,7 +628,7 @@ describe('createComponentRegistry', () => {
 			expect(registry.wasRemoved(eid, Health)).toBe(true);
 
 			// Clear frame changes
-			registry.clear();
+			registry.flush();
 
 			// Changes should be cleared
 			expect(registry.wasAdded(eid, Position)).toBe(false);

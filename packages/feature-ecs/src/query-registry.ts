@@ -2,11 +2,15 @@
  * Query Registry for ECS
  *
  * Simple and fast query registry with bitmask optimizations.
- * Follows KISS principle - Keep It Simple, Stupid.
  */
 
 import { TEntityId } from './entity-index';
-import { TQueryData, TQueryFilter } from './query-filter';
+import {
+	categorizeEvaluationStrategy,
+	hasChangeDetectionFilter,
+	TQueryData,
+	TQueryFilter
+} from './query-filter';
 import { TWorld } from './world';
 
 /**
@@ -18,16 +22,23 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 		_queryCache: new Map(),
 
 		executeQuery(filter) {
-			const queryData = this.getOrCreateQuery(filter);
+			const queryData = this.getQuery(filter);
 
 			// Return cached result if available and not dirty
-			if (!queryData.isDirty && queryData.cachedResult != null) {
+			if (!queryData.isDirty) {
 				return queryData.cachedResult;
+			}
+
+			// Exit if no entities exist
+			const aliveEntities = this._world._entityIndex.getAliveEntities();
+			if (aliveEntities.length === 0) {
+				queryData.cachedResult = [];
+				queryData.isDirty = false;
+				return [];
 			}
 
 			// Find matching entities
 			const matchingEntities: TEntityId[] = [];
-			const aliveEntities = this._world._entityIndex.getAliveEntities();
 			for (const eid of aliveEntities) {
 				if (filter.evaluate(this._world, eid, queryData)) {
 					matchingEntities.push(eid);
@@ -41,7 +52,7 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 			return matchingEntities;
 		},
 
-		getOrCreateQuery(filter) {
+		getQuery(filter) {
 			const hash = filter.getHash(this._world);
 
 			// Return cached query if exists
@@ -53,10 +64,15 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 			const queryData: TQueryData = {
 				hash,
 				filter,
-				cachedResult: null,
+				cachedResult: [],
 				isDirty: true,
+				needsFlushInvalidation: hasChangeDetectionFilter(filter),
+				evaluationStrategy: categorizeEvaluationStrategy(filter),
+				generations: [],
 				withMasks: {},
-				withoutMasks: {}
+				withoutMasks: {},
+				notMasks: {},
+				orMasks: {}
 			};
 
 			// Let filter register
@@ -71,7 +87,7 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 		},
 
 		registerQuery(filter) {
-			return this.getOrCreateQuery(filter);
+			return this.getQuery(filter);
 		},
 
 		generateQueryHash(filter) {
@@ -87,6 +103,15 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 			// Mark all queries as dirty
 			for (const queryData of this._queryCache.values()) {
 				queryData.isDirty = true;
+			}
+		},
+
+		flush() {
+			// Invalidate queries that were pre-marked as needing flush invalidation during registration.
+			for (const queryData of this._queryCache.values()) {
+				if (queryData.needsFlushInvalidation) {
+					queryData.isDirty = true;
+				}
 			}
 		},
 
@@ -114,7 +139,7 @@ export interface TQueryRegistry {
 	/**
 	 * Gets or creates a compiled query
 	 */
-	getOrCreateQuery(filter: TQueryFilter): TQueryData;
+	getQuery(filter: TQueryFilter): TQueryData;
 
 	/**
 	 * Registers a query (alias for getOrCreateQuery)
@@ -135,6 +160,11 @@ export interface TQueryRegistry {
 	 * Invalidates all cached queries
 	 */
 	invalidateQueries(): void;
+
+	/**
+	 * Flushes the query registry
+	 */
+	flush(): void;
 
 	/**
 	 * Resets the query registry to its initial state
