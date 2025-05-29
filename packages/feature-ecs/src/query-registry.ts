@@ -64,15 +64,11 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 			const queryData: TQueryData = {
 				hash,
 				filter,
+				evaluationStrategy: categorizeEvaluationStrategy(filter),
 				cachedResult: [],
 				isDirty: true,
 				needsFlushInvalidation: hasChangeDetectionFilter(filter),
-				evaluationStrategy: categorizeEvaluationStrategy(filter),
-				generations: [],
-				withMasks: {},
-				withoutMasks: {},
-				notMasks: {},
-				orMasks: {}
+				generations: []
 			};
 
 			// Let filter register

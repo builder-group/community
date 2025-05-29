@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { Added, And, Changed, None, Or, Removed, With, Without } from './query-filter';
+import { Added, And, Changed, Or, Removed, With, Without } from './query-filter';
 import { createWorld, TWorld } from './world';
 
 describe('createQueryRegistry', () => {
@@ -86,32 +86,9 @@ describe('createQueryRegistry', () => {
 			expect(queryData.filter).toBe(filter);
 			expect(queryData.filter.type).toBe('With');
 		});
-
-		it('should handle None filter', () => {
-			const filter = None();
-			const queryData = world._queryRegistry.registerQuery(filter);
-
-			// Should store the None filter
-			expect(queryData.filter).toBe(filter);
-			expect(queryData.filter.type).toBe('None');
-		});
 	});
 
 	describe('executeQuery', () => {
-		it('should return no entities for None filter', () => {
-			const Position = { x: [] as number[], y: [] as number[] };
-
-			// Create entities with components
-			const eid1 = world.createEntity();
-			const eid2 = world.createEntity();
-			world.addComponent(eid1, Position);
-			world.addComponent(eid2, Position);
-
-			// None filter should return no entities
-			const emptyResult = world.query(None());
-			expect(emptyResult).toEqual([]);
-		});
-
 		it('should execute basic With queries', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Velocity = { x: [] as number[], y: [] as number[] };
