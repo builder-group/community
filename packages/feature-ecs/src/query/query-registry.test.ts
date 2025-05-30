@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { createWorld, TWorld } from '../world';
 import { Added, And, Changed, Or, Removed, With, Without } from './query-filter';
-import { createWorld, TWorld } from './world';
 
 describe('createQueryRegistry', () => {
 	let world: TWorld;
@@ -321,31 +321,6 @@ describe('createQueryRegistry', () => {
 			const queryData = world._queryRegistry.getQuery(With(Position));
 			expect(queryData.filter.type).toBe('With');
 			expect(world._queryRegistry._queryCache.size).toBe(1);
-		});
-	});
-
-	describe('validate', () => {
-		it('should return true for new registry', () => {
-			expect(world._queryRegistry.validate()).toBe(true);
-		});
-
-		it('should return true after query operations', () => {
-			const Position = { x: [] as number[], y: [] as number[] };
-
-			world._queryRegistry.getQuery(With(Position));
-			world._queryRegistry.executeQuery(With(Position));
-			world._queryRegistry.generateQueryHash(With(Position));
-
-			expect(world._queryRegistry.validate()).toBe(true);
-		});
-
-		it('should return true after reset', () => {
-			const Position = { x: [] as number[], y: [] as number[] };
-
-			world._queryRegistry.getQuery(With(Position));
-			world._queryRegistry.reset();
-
-			expect(world._queryRegistry.validate()).toBe(true);
 		});
 	});
 });

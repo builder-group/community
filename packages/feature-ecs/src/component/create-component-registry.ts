@@ -13,7 +13,8 @@
  * - Flexible component structure - supports multiple patterns
  */
 
-import { TEntityId } from './entity-index';
+import { TEntityId } from '../entity';
+import { TComponentCallbacks, TComponentData, TComponentRef } from './types';
 
 /**
  * Creates a new component registry.
@@ -415,48 +416,6 @@ export function createComponentRegistry(): TComponentRegistry {
 			this._currentBitflag = 1;
 			this._callbacks.clear();
 			this._componentsToFlush.clear();
-		},
-
-		validate() {
-			// Validate generation structure
-			if (this._entityMasks.length === 0) {
-				return false;
-			}
-
-			// Validate change tracking arrays match entity masks
-			if (
-				this._addedMasks.length !== this._entityMasks.length ||
-				this._changedMasks.length !== this._entityMasks.length ||
-				this._removedMasks.length !== this._entityMasks.length
-			) {
-				return false;
-			}
-
-			// Validate bitflag consistency within generations
-			const generationCounts = new Array(this._entityMasks.length).fill(0);
-
-			for (const componentData of this._componentMap.values()) {
-				const { generationId, bitflag } = componentData;
-
-				// Check generation ID is valid
-				if (generationId >= this._entityMasks.length || generationId < 0) return false;
-
-				// Check bitflag is a power of 2 and within valid range
-				if (bitflag <= 0 || bitflag >= 2 ** 31 || (bitflag & (bitflag - 1)) !== 0) return false;
-
-				generationCounts[generationId]++;
-			}
-
-			// Validate current bitflag matches expected value for current generation
-			const currentGeneration = this._entityMasks.length - 1;
-			const componentsInCurrentGen = generationCounts[currentGeneration] || 0;
-			const expectedBitflag = componentsInCurrentGen === 0 ? 1 : 2 ** (componentsInCurrentGen % 31);
-
-			if (this._currentBitflag !== expectedBitflag) {
-				return false;
-			}
-
-			return true;
 		}
 	};
 }
@@ -590,30 +549,4 @@ export interface TComponentRegistry {
 	 * Resets the registry to its initial empty state.
 	 */
 	reset(): void;
-
-	/**
-	 * Validates the internal data structure integrity.
-	 * @returns True if the data structure is valid, false otherwise
-	 */
-	validate(): boolean;
-}
-
-export interface TComponentData {
-	/** Unique component ID */
-	id: number;
-	/** Generation ID (which mask array this component uses) */
-	generationId: number;
-	/** Bitflag for this component (power of 2) */
-	bitflag: number;
-	/** Reference to the component object */
-	ref: TComponentRef;
-}
-
-export type TComponentRef = any; // Can be array or object with arrays
-
-export interface TComponentCallbacks {
-	onAdd?: ((eid: TEntityId) => void)[];
-	onChange?: ((eid: TEntityId) => void)[];
-	onRemove?: ((eid: TEntityId) => void)[];
-	onFlush?: (() => void)[];
 }

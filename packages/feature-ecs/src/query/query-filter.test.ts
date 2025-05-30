@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { createWorld, TWorld } from '../world';
 import { Added, And, Changed, Or, Removed, With, Without } from './query-filter';
-import { createWorld, TWorld } from './world';
 
 describe('Query Filters', () => {
 	let world: TWorld;

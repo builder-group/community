@@ -4,9 +4,10 @@
  * Simple and fast query registry with bitmask optimizations.
  */
 
-import { TEntityId } from './entity-index';
-import { categorizeEvaluationStrategy, TQueryData, TQueryFilter } from './query-filter';
-import { TWorld } from './world';
+import { TEntityId } from '../entity';
+import { TWorld } from '../world';
+import { categorizeEvaluationStrategy } from './categorize-evaluation-strategy';
+import { TQueryData, TQueryFilter } from './types';
 
 /**
  * Creates a new query registry
@@ -93,10 +94,6 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 
 		reset() {
 			this._queryCache.clear();
-		},
-
-		validate() {
-			return this._queryCache.size >= 0;
 		}
 	};
 }
@@ -136,11 +133,6 @@ export interface TQueryRegistry {
 	 * Resets the query registry to its initial state
 	 */
 	reset(): void;
-
-	/**
-	 * Validates the query registry integrity
-	 */
-	validate(): boolean;
 }
 
 export interface TGetQueryOptions {

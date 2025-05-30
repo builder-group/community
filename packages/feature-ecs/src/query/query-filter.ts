@@ -1,6 +1,7 @@
-import { TComponentRef } from './component-registry';
-import { TEntityId } from './entity-index';
-import { TWorld } from './world';
+import { TComponentRef } from '../component';
+import { TEntityId } from '../entity';
+import { TWorld } from '../world';
+import { TQueryData, TQueryFilter } from './types';
 
 /**
  * Requires entity to have component
@@ -615,68 +616,6 @@ export function Or(...filters: TQueryFilter[]): TQueryFilter {
 export const All = And;
 export const Any = Or;
 
-export interface TQueryData {
-	/** Unique hash identifying this query filter combination */
-	hash: string;
-	/** The original query filter that was compiled into this data */
-	filter: TQueryFilter;
-	/**
-	 * Pre-computed evaluation strategy for optimal performance:
-	 * - 'bitmask': Fast bitwise operations for component/change filters
-	 * - 'individual': Filter-by-filter evaluation for complex queries
-	 */
-	evaluationStrategy: 'bitmask' | 'individual';
-
-	/** Cached array of entity IDs that match this query */
-	cachedResult: TEntityId[];
-	/** True when cached results are stale and need re-evaluation */
-	isDirty: boolean;
-
-	/** Pre-computed generations array for optimal bitmask iteration */
-	generations: number[];
-
-	/** Bitmasks for required components (AND logic: entity must have ALL) */
-	withMasks?: Record<number, number>;
-	/** Bitmasks for forbidden components (AND logic: entity must have NONE) */
-	withoutMasks?: Record<number, number>;
-
-	/** Combined OR masks for all filter types (OR logic: entity must satisfy AT LEAST ONE per type) */
-	orMasks?: Record<
-		number,
-		{
-			with?: number; // Components entity must HAVE (any)
-			without?: number; // Components entity must LACK (any)
-			added?: number; // Components entity ADDED this frame (any)
-			changed?: number; // Components entity CHANGED this frame (any)
-			removed?: number; // Components entity REMOVED this frame (any)
-		}
-	>;
-
-	/** Bitmasks for change detection (AND logic: entity must have ALL changed) */
-	addedMasks?: Record<number, number>;
-	changedMasks?: Record<number, number>;
-	removedMasks?: Record<number, number>;
-
-	/** Components that can affect this query - enables O(1) invalidation checks */
-	affectedMasks?: Record<number, number>;
-}
-
-export interface TBaseQueryFilter {
-	type: string;
-	evaluate(world: TWorld, eid: TEntityId, queryData: TQueryData): boolean;
-	register?(world: TWorld, queryData: TQueryData): void;
-	getHash(world: TWorld): string;
-}
-
-export type TQueryFilter =
-	| (TBaseQueryFilter & { type: 'With'; component: TComponentRef })
-	| (TBaseQueryFilter & { type: 'Without'; component: TComponentRef })
-	| (TBaseQueryFilter & { type: 'Added'; component: TComponentRef })
-	| (TBaseQueryFilter & { type: 'Changed'; component: TComponentRef })
-	| (TBaseQueryFilter & { type: 'Removed'; component: TComponentRef })
-	| (TBaseQueryFilter & { type: 'And'; filters: TQueryFilter[] })
-	| (TBaseQueryFilter & { type: 'Or'; filters: TQueryFilter[] });
-
 /**
  * Helper to get component ID, registering if needed
  */
@@ -686,79 +625,4 @@ function getComponentId(world: TWorld, component: TComponentRef): number {
 		registry.registerComponent(component);
 	}
 	return registry._componentMap.get(component)?.id as number;
-}
-
-/**
- * Pre-categorizes a query's evaluation strategy.
- *
- * Strategies:
- * - 'bitmask': All filters can use bitwise operations (With/Without/Added/Changed/Removed)
- * - 'individual': Contains complex nested filters requiring individual evaluation
- */
-export function categorizeEvaluationStrategy(filter: TQueryFilter): 'bitmask' | 'individual' {
-	switch (filter.type) {
-		case 'With':
-		case 'Without':
-		case 'Added':
-		case 'Changed':
-		case 'Removed':
-			// Simple component and change detection filters are bitmask-compatible
-			return 'bitmask';
-
-		case 'And':
-			// And is bitmask-compatible if ALL children are bitmask-compatible
-			// Nested And filters work because And(And(A,B),C) === And(A,B,C) logically
-			return filter.filters.every((f) => categorizeEvaluationStrategy(f) === 'bitmask')
-				? 'bitmask'
-				: 'individual';
-
-		case 'Or':
-			// Or is bitmask-compatible ONLY for simple component/change filters
-			//
-			// Why Or doesn't support nested And/Or:
-			// - Or(And(A,B), C) cannot be flattened to simple bitmasks
-			// - Would require complex mask structures: { andGroups: [..], .. }
-			// - The performance benefit diminishes while code complexity explodes
-			return filter.filters.every(
-				(f) =>
-					f.type === 'With' ||
-					f.type === 'Without' ||
-					f.type === 'Added' ||
-					f.type === 'Changed' ||
-					f.type === 'Removed'
-			)
-				? 'bitmask'
-				: 'individual';
-
-		default:
-			// Unknown filter types default to individual evaluation
-			return 'individual';
-	}
-}
-
-/**
- * Can a component change affect this query?
- * Returns false if query definitely doesn't care about this component.
- */
-export function canComponentAffectQuery(
-	queryData: TQueryData,
-	component: TComponentRef,
-	world: TWorld
-): boolean {
-	const registry = world._componentRegistry;
-	const componentData = registry._componentMap.get(component);
-
-	if (componentData == null) {
-		return false;
-	}
-
-	const { generationId, bitflag } = componentData;
-
-	// Check if affectedMasks exists and has this generation
-	if (queryData.affectedMasks == null) {
-		return false;
-	}
-
-	const affectedMask = queryData.affectedMasks[generationId];
-	return affectedMask != null && (affectedMask & bitflag) !== 0;
 }

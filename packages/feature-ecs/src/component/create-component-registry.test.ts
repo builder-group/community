@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { createComponentRegistry, TComponentRegistry } from './component-registry';
-import { createEntityIndex, TEntityIndex } from './entity-index';
+import { createEntityIndex, TEntityIndex } from '../entity/create-entity-index';
+import { createComponentRegistry, TComponentRegistry } from './create-component-registry';
 
 describe('createComponentRegistry', () => {
 	let registry: TComponentRegistry;
@@ -478,76 +478,6 @@ describe('createComponentRegistry', () => {
 
 			// Registry should be empty
 			expect(registry.hasComponent(eid, Position)).toBe(false);
-			expect(registry.validate()).toBe(true);
-		});
-	});
-
-	describe('validate', () => {
-		it('should return true for valid empty registry', () => {
-			expect(registry.validate()).toBe(true);
-		});
-
-		it('should return true for valid registry with components', () => {
-			const Position: TPosition = { x: [], y: [] };
-			const Health: THealth = [];
-
-			registry.registerComponent(Position);
-			registry.registerComponent(Health);
-
-			expect(registry.validate()).toBe(true);
-		});
-
-		it('should return true after component operations', () => {
-			const Position: TPosition = { x: [], y: [] };
-			const Health: THealth = [];
-
-			registry.registerComponent(Position);
-			registry.registerComponent(Health);
-
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
-
-			registry.addComponent(eid1, Position);
-			registry.addComponent(eid1, Health);
-			registry.addComponent(eid2, Position);
-
-			expect(registry.validate()).toBe(true);
-
-			registry.removeComponent(eid1, Health);
-			expect(registry.validate()).toBe(true);
-
-			registry.removeAllComponents(eid2);
-			expect(registry.validate()).toBe(true);
-		});
-
-		it('should return true with generation system', () => {
-			// Register 35 components to test generation overflow
-			const components = [];
-			for (let i = 0; i < 35; i++) {
-				const component = {};
-				components.push(component);
-				registry.registerComponent(component);
-			}
-
-			expect(registry.validate()).toBe(true);
-
-			const eid = entityIndex.addEntity();
-			registry.addComponent(eid, components[0]!); // Gen 0
-			registry.addComponent(eid, components[31]!); // Gen 1
-
-			expect(registry.validate()).toBe(true);
-		});
-
-		it('should return true after reset', () => {
-			const Position: TPosition = { x: [], y: [] };
-			registry.registerComponent(Position);
-
-			const eid = entityIndex.addEntity();
-			registry.addComponent(eid, Position);
-
-			registry.reset();
-
-			expect(registry.validate()).toBe(true);
 		});
 	});
 

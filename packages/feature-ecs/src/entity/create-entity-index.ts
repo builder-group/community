@@ -12,6 +12,8 @@
  * - Dense array for cache-friendly iteration
  */
 
+import { TEntityId } from './types';
+
 /**
  * Creates a new entity index with the specified configuration.
  *
@@ -191,65 +193,11 @@ export function createEntityIndex(options: TCreateEntityIndexOptions = {}): TEnt
 			return this._config.versioning ? `${baseEid}v${version}` : `${baseEid}`;
 		},
 
-		debugState() {
-			const aliveEntities = this._dense
-				.slice(0, this._aliveCount)
-				.map((eid) => this.formatEid(eid));
-			const deadEntities = this._dense.slice(this._aliveCount).map((eid) => this.formatEid(eid));
-
-			const sparseEntries = [];
-			for (let baseEid = 1; baseEid < this._nextBaseEid; baseEid++) {
-				const denseIndex = this._sparse[baseEid];
-				if (denseIndex != null) {
-					sparseEntries.push(`${baseEid}→${denseIndex}`);
-				}
-			}
-
-			return [
-				`EntityIndex State:`,
-				`  Alive (${this._aliveCount}): [${aliveEntities.join(', ')}]`,
-				`  Dead (${this._dense.length - this._aliveCount}): [${deadEntities.join(', ')}]`,
-				`  Sparse: {${sparseEntries.join(', ')}}`,
-				`  NextBaseEid: ${this._nextBaseEid}`,
-				`  Versioning: ${this._config.versioning ? 'enabled' : 'disabled'}`
-			].join('\n');
-		},
-
 		reset() {
 			this._sparse.length = 0;
 			this._dense.length = 0;
 			this._aliveCount = 0;
 			this._nextBaseEid = 1;
-		},
-
-		validate() {
-			// Check that all alive entities have correct sparse mappings (Dense -> Sparse)
-			for (let i = 0; i < this._aliveCount; i++) {
-				const eid = this._dense[i] as number;
-				const baseEid = this.getBaseEid(eid);
-				if (this._sparse[baseEid] !== i) {
-					return false;
-				}
-			}
-
-			// Check that all entities in sparse array point to valid positions (Sparse -> Dense)
-			for (let baseEid = 1; baseEid < this._nextBaseEid; baseEid++) {
-				const denseIndex = this._sparse[baseEid];
-				if (denseIndex != null) {
-					// Check bounds
-					if (denseIndex >= this._dense.length || denseIndex < 0) {
-						return false;
-					}
-
-					// Check that the entity at this position has the correct base ID
-					const storedEid = this._dense[denseIndex] as number;
-					if (this.getBaseEid(storedEid) !== baseEid) {
-						return false;
-					}
-				}
-			}
-
-			return true;
 		},
 
 		_createVersionedEid(baseEid, version) {
@@ -340,23 +288,9 @@ export interface TEntityIndex {
 	formatEid(eid: TEntityId): string;
 
 	/**
-	 * Returns a human-readable debug representation of the entity index state.
-	 * Shows alive entities, dead entities, sparse mappings, and configuration.
-	 * @returns Multi-line string with formatted state information
-	 */
-	debugState(): string;
-
-	/**
 	 * Resets the entity index to its initial empty state.
 	 */
 	reset(): void;
-
-	/**
-	 * Validates the internal data structure integrity.
-	 * Useful for debugging and testing.
-	 * @returns True if the data structure is valid, false otherwise
-	 */
-	validate(): boolean;
 
 	/**
 	 * Creates a versioned entity ID by combining base ID and version.
@@ -366,5 +300,3 @@ export interface TEntityIndex {
 	 */
 	_createVersionedEid(baseEid: number, version: number): number;
 }
-
-export type TEntityId = number;

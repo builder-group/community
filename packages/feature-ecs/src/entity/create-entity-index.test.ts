@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createEntityIndex } from './entity-index';
+import { createEntityIndex } from './create-entity-index';
 
 describe('createEntityIndex', () => {
 	describe('initialization', () => {
@@ -312,42 +312,6 @@ describe('createEntityIndex', () => {
 		});
 	});
 
-	describe('debugState', () => {
-		it('should show empty state for new index', () => {
-			const index = createEntityIndex({ versioning: true });
-			const state = index.debugState();
-
-			expect(state).toContain('Alive (0): []');
-			expect(state).toContain('Dead (0): []');
-			expect(state).toContain('Sparse: {}');
-			expect(state).toContain('NextBaseEid: 1');
-			expect(state).toContain('Versioning: enabled');
-		});
-
-		it('should show alive entities', () => {
-			const index = createEntityIndex({ versioning: true });
-			index.addEntity();
-			index.addEntity();
-			const state = index.debugState();
-
-			expect(state).toContain('Alive (2): [1v0, 2v0]');
-			expect(state).toContain('Dead (0): []');
-			expect(state).toContain('Sparse: {1→0, 2→1}');
-		});
-
-		it('should show dead entities after removal', () => {
-			const index = createEntityIndex({ versioning: true });
-			const id1 = index.addEntity();
-			const id2 = index.addEntity();
-			index.removeEntity(id1);
-			const state = index.debugState();
-
-			expect(state).toContain('Alive (1): [2v0]');
-			expect(state).toContain('Dead (1): [1v1]');
-			expect(state).toContain('Sparse: {2→0}');
-		});
-	});
-
 	describe('reset', () => {
 		it('should reset to initial state and allow reuse', () => {
 			const index = createEntityIndex({ versioning: true });
@@ -365,60 +329,10 @@ describe('createEntityIndex', () => {
 			expect(index._dense).toEqual([]);
 			expect(index._sparse).toEqual([]);
 			expect(index._nextBaseEid).toBe(1);
-			expect(index.validate()).toBe(true);
 
 			const newId = index.addEntity();
 			expect(newId).toBe(1);
 			expect(index.isEntityAlive(newId)).toBe(true);
-		});
-	});
-
-	describe('validate', () => {
-		it('should return true for valid empty index', () => {
-			const index = createEntityIndex();
-
-			expect(index.validate()).toBe(true);
-		});
-
-		it('should return true for valid index with entities', () => {
-			const index = createEntityIndex();
-			index.addEntity();
-			index.addEntity();
-			index.addEntity();
-
-			expect(index.validate()).toBe(true);
-		});
-
-		it('should return true after remove operations', () => {
-			const index = createEntityIndex();
-			const id1 = index.addEntity();
-			const id2 = index.addEntity();
-			const id3 = index.addEntity();
-
-			index.removeEntity(id2);
-
-			expect(index.validate()).toBe(true);
-		});
-
-		it('should return true after recycling', () => {
-			const index = createEntityIndex({ versioning: true });
-			const id1 = index.addEntity();
-
-			index.removeEntity(id1);
-			index.addEntity(); // Recycle
-
-			expect(index.validate()).toBe(true);
-		});
-
-		it('should return true after reset', () => {
-			const index = createEntityIndex();
-			index.addEntity();
-			index.addEntity();
-			index.removeEntity(index.addEntity());
-
-			index.reset();
-
-			expect(index.validate()).toBe(true);
 		});
 	});
 

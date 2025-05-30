@@ -1,5 +1,9 @@
-import { createComponentRegistry, TComponentRef, TComponentRegistry } from './component-registry';
-import { createEntityIndex, TEntityId, TEntityIndex } from './entity-index';
+import {
+	createComponentRegistry,
+	TComponentRef,
+	TComponentRegistry
+} from './component/create-component-registry';
+import { createEntityIndex, TEntityId, TEntityIndex } from './entity/create-entity-index';
 import { TQueryFilter } from './query-filter';
 import { createQueryRegistry, TExecuteQueryOptions, TQueryRegistry } from './query-registry';
 
