@@ -22,10 +22,17 @@ export interface TQueryData {
 	/** Pre-computed generations array for optimal bitmask iteration */
 	generations: number[];
 
-	/** Bitmasks for required components (AND logic: entity must have ALL) */
-	withMasks?: Record<number, number>;
-	/** Bitmasks for forbidden components (AND logic: entity must have NONE) */
-	withoutMasks?: Record<number, number>;
+	/** Combined AND masks for all filter types (AND logic: entity must satisfy ALL requirements) */
+	andMasks?: Record<
+		number,
+		{
+			with?: number; // Components entity must HAVE (all)
+			without?: number; // Components entity must LACK (all)
+			added?: number; // Components entity ADDED this frame (all)
+			changed?: number; // Components entity CHANGED this frame (all)
+			removed?: number; // Components entity REMOVED this frame (all)
+		}
+	>;
 
 	/** Combined OR masks for all filter types (OR logic: entity must satisfy AT LEAST ONE per type) */
 	orMasks?: Record<
@@ -39,11 +46,6 @@ export interface TQueryData {
 		}
 	>;
 
-	/** Bitmasks for change detection (AND logic: entity must have ALL changed) */
-	addedMasks?: Record<number, number>;
-	changedMasks?: Record<number, number>;
-	removedMasks?: Record<number, number>;
-
 	/** Components that can affect this query - enables O(1) invalidation checks */
 	affectedMasks?: Record<number, number>;
 }
@@ -51,9 +53,11 @@ export interface TQueryData {
 export interface TBaseQueryFilter {
 	type: string;
 	evaluate(world: TWorld, eid: TEntityId, queryData: TQueryData): boolean;
-	register?(world: TWorld, queryData: TQueryData): void;
+	register?(world: TWorld, queryData: TQueryData, parentType?: TQueryParentType): void;
 	getHash(world: TWorld): string;
 }
+
+export type TQueryParentType = Extract<TQueryFilter['type'], 'And' | 'Or'>;
 
 export type TQueryFilter =
 	| (TBaseQueryFilter & { type: 'With'; component: TComponentRef })
