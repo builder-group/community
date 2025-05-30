@@ -91,7 +91,7 @@ describe('ECS Performance Comparison', () => {
 		}
 
 		bench('FeatureEcs - Query Position components', () => {
-			const entities = featureEcsWorld.query(With(FeatureEcsPosition));
+			const entities = featureEcsWorld.queryEntities(With(FeatureEcsPosition));
 			expect(entities.length).toBeGreaterThan(0);
 		});
 
@@ -101,7 +101,7 @@ describe('ECS Performance Comparison', () => {
 		});
 
 		bench('FeatureEcs - Query Position + Velocity', () => {
-			const entities = featureEcsWorld.query(
+			const entities = featureEcsWorld.queryEntities(
 				And(With(FeatureEcsPosition), With(FeatureEcsVelocity))
 			);
 			expect(entities.length).toBeGreaterThanOrEqual(0);
@@ -142,7 +142,7 @@ describe('ECS Performance Comparison', () => {
 		bench('FeatureEcs - Movement system iteration', () => {
 			let updateCount = 0;
 
-			for (const eid of featureEcsWorld.query(
+			for (const eid of featureEcsWorld.queryEntities(
 				And(With(FeatureEcsPosition), With(FeatureEcsVelocity))
 			)) {
 				const velX = FeatureEcsVelocity.x[eid] ?? 0;

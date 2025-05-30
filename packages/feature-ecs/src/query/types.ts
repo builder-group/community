@@ -2,6 +2,12 @@ import { TComponentRef } from '../component';
 import { TEntityId } from '../entity';
 import { TWorld } from '../world';
 
+/**
+ * Special entity symbol for component queries
+ */
+export const Entity = Symbol('Entity');
+export type TEntity = typeof Entity;
+
 export interface TQueryData {
 	/** Unique hash identifying this query filter combination */
 	hash: string;
@@ -67,3 +73,15 @@ export type TQueryFilter =
 	| (TBaseQueryFilter & { type: 'Removed'; component: TComponentRef })
 	| (TBaseQueryFilter & { type: 'And'; filters: TQueryFilter[] })
 	| (TBaseQueryFilter & { type: 'Or'; filters: TQueryFilter[] });
+
+export type InferComponentType<T> = T extends TEntity
+	? TEntityId
+	: T extends readonly (infer U)[] // Array of components (AoS)
+		? U
+		: T extends Record<string, any[]> // Object with arrays (SoA)
+			? {
+					[K in keyof T]: T[K] extends Array<infer V> ? V : never;
+				}
+			: T extends {} // Empty object (tag component)
+				? true
+				: never;

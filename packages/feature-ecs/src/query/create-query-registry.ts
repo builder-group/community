@@ -4,10 +4,17 @@
  * Simple and fast query registry with bitmask optimizations.
  */
 
+import { TComponentRef } from '../component';
 import { TEntityId } from '../entity';
 import { TWorld } from '../world';
 import { categorizeEvaluationStrategy } from './categorize-evaluation-strategy';
-import { TQueryData, TQueryFilter } from './types';
+import {
+	Entity,
+	TEntity,
+	InferComponentType as TInferComponentType,
+	TQueryData,
+	TQueryFilter
+} from './types';
 
 /**
  * Creates a new query registry
@@ -17,7 +24,7 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 		_world: world,
 		_queryCache: new Map(),
 
-		executeQuery(filter, options = {}) {
+		queryEntities(filter, options = {}) {
 			const { cache = true, ...getQueryOptions } = options;
 			const queryData = this.getQuery(filter, getQueryOptions);
 
@@ -47,6 +54,70 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 			queryData.isDirty = false;
 
 			return matchingEntities;
+		},
+
+		queryComponents<T extends readonly (TComponentRef | TEntity)[]>(
+			components: T,
+			filter?: TQueryFilter
+		): TComponentDataTuple<T>[] {
+			// Get entities that match the filter (or all alive entities if no filter)
+			const matchingEntities = filter
+				? this.queryEntities(filter)
+				: this._world._entityIndex.getAliveEntities();
+
+			// For each entity, check if it has all components and get their data
+			const results: TComponentDataTuple<T>[] = [];
+			for (const eid of matchingEntities) {
+				const row: unknown[] = [];
+				let hasAllComponents = true;
+
+				for (const comp of components) {
+					if (comp === Entity) {
+						row.push(eid);
+					} else {
+						// Check if entity has this component
+						if (!this._world._componentRegistry.hasComponent(eid, comp)) {
+							hasAllComponents = false;
+							break;
+						}
+
+						// Get component data directly from the component array/object
+						let componentData;
+						if (Array.isArray(comp)) {
+							// Single array component: Health[eid]
+							componentData = comp[eid];
+						} else if (typeof comp === 'object' && comp !== null) {
+							// Object with arrays (SoA): Position.x[eid], Position.y[eid]
+							componentData = {} as Record<string, any>;
+							let hasArrayProperties = false;
+							for (const key in comp) {
+								if (Array.isArray((comp as Record<string, any>)[key])) {
+									componentData[key] = (comp as Record<string, any>)[key][eid];
+									hasArrayProperties = true;
+								}
+							}
+
+							// If no array properties found, it's a tag component
+							if (!hasArrayProperties) {
+								componentData = true;
+							}
+						} else {
+							// Unsupported component
+							hasAllComponents = false;
+							break;
+						}
+
+						row.push(componentData);
+					}
+				}
+
+				// Only include entities that have all requested components
+				if (hasAllComponents) {
+					results.push(row as TComponentDataTuple<T>);
+				}
+			}
+
+			return results;
 		},
 
 		getQuery(filter, options = {}) {
@@ -105,9 +176,46 @@ export interface TQueryRegistry {
 	_queryCache: Map<string, TQueryData>;
 
 	/**
-	 * Executes a query and returns matching entities
+	 * Queries entities that match the specified filter and returns only entity IDs.
+	 *
+	 * @param filter - The query filter to match entities against
+	 * @param options - Query execution options
+	 * @returns Array of entity IDs that match the filter
+	 *
+	 * @example
+	 * ```typescript
+	 * // Simple component query
+	 * const entities = queryRegistry.queryEntities(With(Position));
+	 *
+	 * // Complex query with multiple conditions
+	 * const movingEntities = queryRegistry.queryEntities(
+	 *   And(With(Position), With(Velocity), Without(Dead))
+	 * );
+	 * ```
 	 */
-	executeQuery(filter: TQueryFilter, options?: TExecuteQueryOptions): TEntityId[];
+	queryEntities(filter: TQueryFilter, options?: TExecuteQueryOptions): TEntityId[];
+
+	/**
+	 * Queries components and returns matching entities with component data.
+	 *
+	 * @param components Components to retrieve data from (include Entity for entity ID)
+	 * @param filter Optional filter to restrict results
+	 * @returns Array of component data tuples. Entities without all requested components are excluded.
+	 * @example
+	 * ```ts
+	 * // Query for entities with both Position and Velocity, include entity ID
+	 * const results = queryRegistry.queryComponents([Entity, Position, Velocity]);
+	 * // Returns: [[eid1, {x: 10, y: 5}, {x: 2, y: 1}], [eid2, {x: 20, y: 15}, {x: 1, y: -1}]]
+	 *
+	 * // Query with filter
+	 * const playerResults = queryRegistry.queryComponents([Entity, Health], With(Player));
+	 * // Returns: [[eid1, 100], [eid3, 75]]
+	 * ```
+	 */
+	queryComponents<T extends readonly (TComponentRef | TEntity)[]>(
+		components: T,
+		filter?: TQueryFilter
+	): TComponentDataTuple<T>[];
 
 	/**
 	 * Gets or creates a compiled query
@@ -144,3 +252,7 @@ export interface TExecuteQueryOptions extends TGetQueryOptions {
 	/** Whether to cache the query result */
 	cache?: boolean;
 }
+
+export type TComponentDataTuple<T extends readonly unknown[]> = {
+	[K in keyof T]: TInferComponentType<T[K]>;
+};

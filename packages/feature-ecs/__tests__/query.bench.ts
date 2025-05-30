@@ -36,7 +36,7 @@ describe('Query Performance', () => {
 
 	describe('With(Position)', () => {
 		bench('bitmask + cached', () => {
-			const entities = world.query(With(Position), {
+			const entities = world.queryEntities(With(Position), {
 				evaluationStrategy: 'bitmask',
 				cache: true
 			});
@@ -44,7 +44,7 @@ describe('Query Performance', () => {
 		});
 
 		bench('bitmask + no cache', () => {
-			const entities = world.query(With(Position), {
+			const entities = world.queryEntities(With(Position), {
 				evaluationStrategy: 'bitmask',
 				cache: false
 			});
@@ -52,7 +52,7 @@ describe('Query Performance', () => {
 		});
 
 		bench('individual + cached', () => {
-			const entities = world.query(With(Position), {
+			const entities = world.queryEntities(With(Position), {
 				evaluationStrategy: 'individual',
 				cache: true
 			});
@@ -60,7 +60,7 @@ describe('Query Performance', () => {
 		});
 
 		bench('individual + no cache', () => {
-			const entities = world.query(With(Position), {
+			const entities = world.queryEntities(With(Position), {
 				evaluationStrategy: 'individual',
 				cache: false
 			});
@@ -70,7 +70,7 @@ describe('Query Performance', () => {
 
 	describe('And(With(Position), With(Velocity))', () => {
 		bench('bitmask + cached', () => {
-			const entities = world.query(And(With(Position), With(Velocity)), {
+			const entities = world.queryEntities(And(With(Position), With(Velocity)), {
 				evaluationStrategy: 'bitmask',
 				cache: true
 			});
@@ -78,7 +78,7 @@ describe('Query Performance', () => {
 		});
 
 		bench('bitmask + no cache', () => {
-			const entities = world.query(And(With(Position), With(Velocity)), {
+			const entities = world.queryEntities(And(With(Position), With(Velocity)), {
 				evaluationStrategy: 'bitmask',
 				cache: false
 			});
@@ -86,7 +86,7 @@ describe('Query Performance', () => {
 		});
 
 		bench('individual + cached', () => {
-			const entities = world.query(And(With(Position), With(Velocity)), {
+			const entities = world.queryEntities(And(With(Position), With(Velocity)), {
 				evaluationStrategy: 'individual',
 				cache: true
 			});
@@ -94,7 +94,7 @@ describe('Query Performance', () => {
 		});
 
 		bench('individual + no cache', () => {
-			const entities = world.query(And(With(Position), With(Velocity)), {
+			const entities = world.queryEntities(And(With(Position), With(Velocity)), {
 				evaluationStrategy: 'individual',
 				cache: false
 			});
@@ -104,7 +104,7 @@ describe('Query Performance', () => {
 
 	describe('And(With(Position), Without(Health))', () => {
 		bench('bitmask + cached', () => {
-			const entities = world.query(And(With(Position), Without(Health)), {
+			const entities = world.queryEntities(And(With(Position), Without(Health)), {
 				evaluationStrategy: 'bitmask',
 				cache: true
 			});
@@ -112,7 +112,7 @@ describe('Query Performance', () => {
 		});
 
 		bench('bitmask + no cache', () => {
-			const entities = world.query(And(With(Position), Without(Health)), {
+			const entities = world.queryEntities(And(With(Position), Without(Health)), {
 				evaluationStrategy: 'bitmask',
 				cache: false
 			});
@@ -120,7 +120,7 @@ describe('Query Performance', () => {
 		});
 
 		bench('individual + cached', () => {
-			const entities = world.query(And(With(Position), Without(Health)), {
+			const entities = world.queryEntities(And(With(Position), Without(Health)), {
 				evaluationStrategy: 'individual',
 				cache: true
 			});
@@ -128,7 +128,7 @@ describe('Query Performance', () => {
 		});
 
 		bench('individual + no cache', () => {
-			const entities = world.query(And(With(Position), Without(Health)), {
+			const entities = world.queryEntities(And(With(Position), Without(Health)), {
 				evaluationStrategy: 'individual',
 				cache: false
 			});

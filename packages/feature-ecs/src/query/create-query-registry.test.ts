@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createWorld, TWorld } from '../world';
 import { Added, And, Changed, Or, Removed, With, Without } from './query-filters';
+import { Entity } from './types';
 
 describe('createQueryRegistry', () => {
 	let world: TWorld;
@@ -9,7 +10,7 @@ describe('createQueryRegistry', () => {
 		world = createWorld();
 	});
 
-	describe('executeQuery', () => {
+	describe('queryEntities', () => {
 		it('should return matching entities', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
@@ -18,14 +19,14 @@ describe('createQueryRegistry', () => {
 
 			world.addComponent(eid1, Position);
 
-			const result = world._queryRegistry.executeQuery(With(Position));
+			const result = world._queryRegistry.queryEntities(With(Position));
 			expect(result).toEqual([eid1]);
 		});
 
 		it('should return empty array when no entities match', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const result = world._queryRegistry.executeQuery(With(Position));
+			const result = world._queryRegistry.queryEntities(With(Position));
 			expect(result).toEqual([]);
 		});
 
@@ -40,7 +41,7 @@ describe('createQueryRegistry', () => {
 			world.addComponent(eid1, Health);
 			world.addComponent(eid2, Position);
 
-			const result = world._queryRegistry.executeQuery(And(With(Position), With(Health)));
+			const result = world._queryRegistry.queryEntities(And(With(Position), With(Health)));
 			expect(result).toEqual([eid1]);
 		});
 
@@ -51,11 +52,11 @@ describe('createQueryRegistry', () => {
 			world.addComponent(eid, Position);
 
 			// First execution should cache result
-			const result1 = world._queryRegistry.executeQuery(With(Position));
+			const result1 = world._queryRegistry.queryEntities(With(Position));
 			expect(result1).toEqual([eid]);
 
 			// Second execution should use cache
-			const result2 = world._queryRegistry.executeQuery(With(Position));
+			const result2 = world._queryRegistry.queryEntities(With(Position));
 			expect(result2).toEqual([eid]);
 		});
 
@@ -66,7 +67,7 @@ describe('createQueryRegistry', () => {
 			world.addComponent(eid1, Position);
 
 			// First execution
-			const result1 = world._queryRegistry.executeQuery(With(Position));
+			const result1 = world._queryRegistry.queryEntities(With(Position));
 			expect(result1).toEqual([eid1]);
 
 			// Add another entity (makes cache dirty)
@@ -74,7 +75,7 @@ describe('createQueryRegistry', () => {
 			world.addComponent(eid2, Position);
 
 			// Should rebuild with new entity
-			const result2 = world._queryRegistry.executeQuery(With(Position));
+			const result2 = world._queryRegistry.queryEntities(With(Position));
 			expect(result2.sort()).toEqual([eid1, eid2].sort());
 		});
 
@@ -85,7 +86,7 @@ describe('createQueryRegistry', () => {
 			world.addComponent(eid, Position);
 
 			// Query with cache enabled
-			const result1 = world._queryRegistry.executeQuery(With(Position));
+			const result1 = world._queryRegistry.queryEntities(With(Position));
 			expect(result1).toEqual([eid]);
 
 			// Add another entity
@@ -93,7 +94,7 @@ describe('createQueryRegistry', () => {
 			world.addComponent(eid2, Position);
 
 			// Query with cache disabled - should always rebuild
-			const result2 = world._queryRegistry.executeQuery(With(Position), { cache: false });
+			const result2 = world._queryRegistry.queryEntities(With(Position), { cache: false });
 			expect(result2.sort()).toEqual([eid, eid2].sort());
 		});
 
@@ -108,18 +109,160 @@ describe('createQueryRegistry', () => {
 			const filter = And(With(Position), With(Health));
 
 			// Force individual evaluation
-			const individualResult = world._queryRegistry.executeQuery(filter, {
+			const individualResult = world._queryRegistry.queryEntities(filter, {
 				evaluationStrategy: 'individual'
 			});
 
 			// Force bitmask evaluation
-			const bitmaskResult = world._queryRegistry.executeQuery(filter, {
+			const bitmaskResult = world._queryRegistry.queryEntities(filter, {
 				evaluationStrategy: 'bitmask'
 			});
 
 			expect(individualResult).toEqual([eid]);
 			expect(bitmaskResult).toEqual([eid]);
 			expect(individualResult).toEqual(bitmaskResult);
+		});
+	});
+
+	describe('queryComponents', () => {
+		it('should query components with Entity ID', () => {
+			// Create components with proper typing
+			const Position = { x: [] as number[], y: [] as number[] };
+			const Velocity = [] as { x: number; y: number }[];
+			const Health = [] as number[];
+			const Player = {};
+
+			// Create entities
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
+			const eid3 = world.createEntity();
+
+			// Add components
+			world.addComponent(eid1, Position);
+			world.addComponent(eid1, Velocity);
+			world.addComponent(eid1, Health);
+			world.addComponent(eid1, Player);
+			Position.x[eid1] = 10;
+			Position.y[eid1] = 5;
+			Velocity[eid1] = { x: 0, y: 0 };
+			Health[eid1] = 100;
+
+			world.addComponent(eid2, Position);
+			world.addComponent(eid2, Velocity);
+			world.addComponent(eid2, Health);
+			Position.x[eid2] = 20;
+			Position.y[eid2] = 15;
+			Velocity[eid2] = { x: 10, y: 0 };
+			Health[eid2] = 75;
+
+			world.addComponent(eid3, Health);
+			Health[eid3] = 50;
+
+			// Query with Entity ID
+			const results = world._queryRegistry.queryComponents([
+				Entity,
+				Position,
+				Velocity,
+				Health
+			] as const);
+
+			expect(results).toHaveLength(2);
+			expect(results[0]).toEqual([eid1, { x: 10, y: 5 }, { x: 0, y: 0 }, 100]);
+			expect(results[1]).toEqual([eid2, { x: 20, y: 15 }, { x: 10, y: 0 }, 75]);
+		});
+
+		it('should query with filters', () => {
+			const Health = [] as number[];
+			const Player = {};
+			const Enemy = {};
+
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
+			const eid3 = world.createEntity();
+
+			world.addComponent(eid1, Health);
+			world.addComponent(eid1, Player);
+			Health[eid1] = 100;
+
+			world.addComponent(eid2, Health);
+			world.addComponent(eid2, Enemy);
+			Health[eid2] = 75;
+
+			world.addComponent(eid3, Health);
+			Health[eid3] = 50;
+
+			// Query only players
+			const playerResults = world._queryRegistry.queryComponents([Entity, Health], With(Player));
+			expect(playerResults).toHaveLength(1);
+			expect(playerResults[0]).toEqual([eid1, 100]);
+
+			// Query entities without Player tag
+			const nonPlayerResults = world._queryRegistry.queryComponents(
+				[Entity, Health],
+				Without(Player)
+			);
+			expect(nonPlayerResults).toHaveLength(2);
+			expect(nonPlayerResults).toContainEqual([eid2, 75]);
+			expect(nonPlayerResults).toContainEqual([eid3, 50]);
+		});
+
+		it('should handle single array components', () => {
+			const Health = [] as number[];
+
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
+
+			world.addComponent(eid1, Health);
+			world.addComponent(eid2, Health);
+			Health[eid1] = 100;
+			Health[eid2] = 75;
+
+			const results = world._queryRegistry.queryComponents([Entity, Health]);
+
+			expect(results).toHaveLength(2);
+			expect(results[0]).toEqual([eid1, 100]);
+			expect(results[1]).toEqual([eid2, 75]);
+		});
+
+		it('should handle tag components', () => {
+			const Player = {};
+
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
+
+			world.addComponent(eid1, Player);
+
+			const results = world._queryRegistry.queryComponents([Entity, Player]);
+
+			expect(results).toHaveLength(1);
+			expect(results[0]).toEqual([eid1, true]);
+		});
+
+		it('should exclude entities without all components', () => {
+			const Position = { x: [] as number[], y: [] as number[] };
+			const Velocity = { x: [] as number[], y: [] as number[] };
+
+			const eid1 = world.createEntity();
+			const eid2 = world.createEntity();
+
+			// eid1 has both Position and Velocity
+			world.addComponent(eid1, Position);
+			world.addComponent(eid1, Velocity);
+			Position.x[eid1] = 10;
+			Position.y[eid1] = 5;
+			Velocity.x[eid1] = 2;
+			Velocity.y[eid1] = 1;
+
+			// eid2 has only Position
+			world.addComponent(eid2, Position);
+			Position.x[eid2] = 20;
+			Position.y[eid2] = 15;
+
+			const results = world._queryRegistry.queryComponents([Entity, Position, Velocity]);
+
+			// Only eid1 should be included
+			expect(results).toHaveLength(1);
+			expect(results[0]).toEqual([eid1, { x: 10, y: 5 }, { x: 2, y: 1 }]);
 		});
 	});
 

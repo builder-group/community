@@ -39,7 +39,7 @@ describe('playground', () => {
 			}
 		}
 
-		const entities = world.query(With(Position), {
+		const entities = world.queryEntities(With(Position), {
 			evaluationStrategy: 'bitmask',
 			cache: true
 		});

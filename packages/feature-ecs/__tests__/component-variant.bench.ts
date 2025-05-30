@@ -139,22 +139,22 @@ describe('Component Variants Performance', () => {
 		}
 
 		bench('AoS - Position', () => {
-			const entities = worldAoS.query(With(Position));
+			const entities = worldAoS.queryEntities(With(Position));
 			expect(entities.length).toBeGreaterThan(0);
 		});
 
 		bench('SoA - Transform', () => {
-			const entities = worldSoA.query(With(Transform));
+			const entities = worldSoA.queryEntities(With(Transform));
 			expect(entities.length).toBeGreaterThan(0);
 		});
 
 		bench('Single Array - Health', () => {
-			const entities = worldSingle.query(With(Health));
+			const entities = worldSingle.queryEntities(With(Health));
 			expect(entities.length).toBeGreaterThan(0);
 		});
 
 		bench('Tag - Player', () => {
-			const entities = worldTag.query(With(Player));
+			const entities = worldTag.queryEntities(With(Player));
 			expect(entities.length).toBeGreaterThan(0);
 		});
 	});

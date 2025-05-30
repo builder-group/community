@@ -1,7 +1,14 @@
 import { withNew } from '@blgc/utils';
 import { createComponentRegistry, TComponentRef, TComponentRegistry } from './component';
 import { createEntityIndex, TEntityId, TEntityIndex } from './entity';
-import { createQueryRegistry, TExecuteQueryOptions, TQueryFilter, TQueryRegistry } from './query';
+import {
+	createQueryRegistry,
+	TComponentDataTuple,
+	TExecuteQueryOptions,
+	TQueryFilter,
+	TQueryRegistry
+} from './query';
+import { TEntity } from './query/types';
 
 // TODO:
 // Events
@@ -60,8 +67,12 @@ export function createWorld(): TWorld {
 			return this._componentRegistry.hasComponent(eid, component);
 		},
 
-		query(filter, options) {
-			return this._queryRegistry.executeQuery(filter, options);
+		queryEntities(filter, options) {
+			return this._queryRegistry.queryEntities(filter, options);
+		},
+
+		queryComponents(components, filter) {
+			return this._queryRegistry.queryComponents(components, filter);
 		},
 
 		flush() {
@@ -120,12 +131,46 @@ export interface TWorld {
 	hasComponent(eid: TEntityId, component: TComponentRef): boolean;
 
 	/**
-	 * Executes a query and returns matching entities.
-	 * @param filter - The query filter
+	 * Queries entities that match the specified filter and returns only entity IDs.
+	 *
+	 * @param filter - The query filter to match entities against
 	 * @param options - Query execution options
-	 * @returns Array of matching entity IDs
+	 * @returns Array of entity IDs that match the filter
+	 *
+	 * @example
+	 * ```typescript
+	 * // Simple component query
+	 * const entities = world.queryEntities(With(Position));
+	 *
+	 * // Complex query with multiple conditions
+	 * const movingEntities = world.queryEntities(
+	 *   And(With(Position), With(Velocity), Without(Dead))
+	 * );
+	 * ```
 	 */
-	query(filter: TQueryFilter, options?: TExecuteQueryOptions): TEntityId[];
+	queryEntities(filter: TQueryFilter, options?: TExecuteQueryOptions): TEntityId[];
+
+	/**
+	 * Queries components and returns matching entities with component data.
+	 *
+	 * @param components Components to retrieve data from (include Entity for entity ID)
+	 * @param filter Optional filter to restrict results
+	 * @returns Array of component data tuples. Entities without all requested components are excluded.
+	 * @example
+	 * ```ts
+	 * // Query for entities with both Position and Velocity, include entity ID
+	 * const results = world.queryComponents([Entity, Position, Velocity]);
+	 * // Returns: [[eid1, {x: 10, y: 5}, {x: 2, y: 1}], [eid2, {x: 20, y: 15}, {x: 1, y: -1}]]
+	 *
+	 * // Query with filter
+	 * const playerResults = world.queryComponents([Entity, Health], With(Player));
+	 * // Returns: [[eid1, 100], [eid3, 75]]
+	 * ```
+	 */
+	queryComponents<T extends readonly (TComponentRef | TEntity)[]>(
+		components: T,
+		filter?: TQueryFilter
+	): TComponentDataTuple<T>[];
 
 	/**
 	 * Clears the world.
