@@ -200,14 +200,21 @@ export function And(...filters: TQueryFilter[]): TQueryFilter {
 				case 'bitmask': {
 					const { orMasks, andMasks, generations } = queryData;
 
-					// Check AND requirements
+					// An And filter requires ALL children to be true, which means:
+					// 1. All AND requirements must be satisfied (component filters in And contexts)
+					// 2. All OR requirements must be satisfied (component filters in Or contexts)
+					// Example: And(With(Position), Or(With(Player), With(Enemy)))
+					//   → andMasks: Position must be true
+					//   → orMasks: (Player OR Enemy) must be true
+
+					// Check AND requirements (from component filters in And contexts)
 					if (andMasks != null) {
 						if (!evaluateAndMasks(world, eid, andMasks, generations)) {
 							return false;
 						}
 					}
 
-					// Check OR requirements
+					// Check OR requirements (from component filters in Or contexts)
 					if (orMasks != null) {
 						if (!evaluateOrMasks(world, eid, orMasks, generations)) {
 							return false;
