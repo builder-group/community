@@ -2,13 +2,13 @@
 
 TODO
 
-## Entity Index
+## Architecture
 
-The entity index provides efficient entity ID management with optional versioning support using a sparse-dense array pattern. This component handles O(1) entity operations while maintaining cache-friendly iteration.
+### Entity Index
 
-### Architecture Overview
+Efficient entity ID management using sparse-dense array pattern with optional versioning. Provides O(1) operations while maintaining cache-friendly iteration.
 
-The entity index uses a **sparse-dense array pattern** that provides O(1) operations while maintaining cache-friendly iteration:
+#### Sparse-Dense Pattern
 
 ```
 Sparse Array:  [_, 0, _, 2, 1, _, _]  ← Maps entity ID → dense index
@@ -21,13 +21,12 @@ Dense Array:   [2, 5, 4, 7, 3]        ← Alive entities (cache-friendly)
 aliveCount: 3  ← First 3 elements are alive
 ```
 
-#### Core Data Structures
+**Core Data:**
+- **Sparse Array**: Maps base entity IDs to dense array positions
+- **Dense Array**: Contiguous alive entities, with dead entities at end
+- **Alive Count**: Boundary between alive/dead entities
 
-1. **Sparse Array** (`_sparse`): Maps base entity IDs to their position in the dense array
-2. **Dense Array** (`dense`): Contiguous array of entity IDs, split into alive and dead sections
-3. **Alive Count** (`aliveCount`): Boundary between alive and dead entities in dense array
-
-#### Entity ID Format (with versioning)
+#### Entity ID Format
 
 ```
 32-bit Entity ID = [Version Bits | Entity ID Bits]
@@ -39,105 +38,169 @@ Example with 8 version bits:
 └─ Version 1          └─ Base Entity ID 1
 ```
 
-### Why This Architecture?
+#### Why This Design?
 
-#### 1. **Performance Requirements**
-
-ECS systems need to handle thousands of entities efficiently in game loops that run 60+ times per second.
-
-**Our solution:**
-
-- **O(1) entity creation/removal**: No searching or shifting arrays
-- **Cache-friendly iteration**: Dense array keeps alive entities contiguous
-- **Minimal memory allocation**: Recycles entity IDs instead of growing indefinitely
-
-#### 2. **Memory Safety with Versioning**
-
-Without versioning, stale entity references can cause bugs:
-
+**Problem: Stale References**
 ```typescript
-const enemy = entityIndex.addEntity();
-const enemyRef = enemy; // Store reference
-
-// Later...
-entityIndex.removeEntity(enemy);
-const newEntity = entityIndex.addEntity(); // Might reuse same ID!
-
-// BUG: enemyRef might accidentally refer to newEntity
-if (entityIndex.isEntityAlive(enemyRef)) {
-	// This could be true for the wrong entity!
-}
+const entity = addEntity();     // Returns ID 5
+removeEntity(entity);           // Removes ID 5
+const newEntity = addEntity();  // Might reuse ID 5!
+// Bug: old reference to ID 5 now points to wrong entity
 ```
 
-**Our solution with versioning:**
-
+**Solution: Versioning**
 ```typescript
-const enemy = entityIndex.addEntity(); // Returns ID with version 0
-entityIndex.removeEntity(enemy); // Increments version to 1
-const newEntity = entityIndex.addEntity(); // Reuses base ID but with version 1
-
-// Safe: old reference (version 0) won't match new entity (version 1)
-entityIndex.isEntityAlive(enemy); // false - version mismatch
+const entity = addEntity();     // Returns 5v0 (ID 5, version 0)
+removeEntity(entity);           // Increments to 5v1
+const newEntity = addEntity();  // Reuses base ID 5 but as 5v1
+// Safe: old reference (5v0) won't match new entity (5v1)
 ```
 
-#### 3. **Swap-and-Pop for Efficient Removal**
-
-Traditional array removal requires shifting elements (O(n)):
-
+**Swap-and-Pop for O(1) Removal**
 ```typescript
-// Traditional approach - O(n)
-array = [1, 2, 3, 4, 5];
-array.splice(1, 1); // Remove element at index 1
-// Result: [1, 3, 4, 5] - had to shift 3 elements
-```
-
-Our swap-and-pop approach achieves O(1) removal:
-
-```typescript
-// Our approach - O(1)
+// Remove entity at index 1:
 dense = [1, 2, 3, 4, 5];
-// Remove element at index 1:
-// 1. Swap with last element: [1, 5, 3, 4, 2]
-// 2. Decrease alive count: aliveCount = 4
+// 1. Swap with last: [1, 5, 3, 4, 2]
+// 2. Decrease alive count
 // Result: [1, 5, 3, 4 | 2] - only alive section matters
 ```
 
-#### 4. **Configurable Bit Allocation**
+**Performance:** O(1) all operations, ~8 bytes per entity, cache-friendly iteration.
 
-Different applications have different needs:
+### Query System
+
+Entity filtering with two strategies: bitmask optimization for simple queries, individual evaluation for complex queries.
+
+#### Query Filters
 
 ```typescript
-// Game with many short-lived entities (bullets, particles)
-versionBits: 12; // 4096 versions, ~1M entities max
+// Component filters
+With(Position)          // Entity must have component
+Without(Dead)           // Entity must not have component
 
-// Simulation with fewer, long-lived entities
-versionBits: 4; // 16 versions, ~256M entities max
+// Change detection
+Added(Position)         // Component added this frame
+Changed(Health)         // Component modified this frame
+Removed(Velocity)       // Component removed this frame
+
+// Logical operators
+And(With(Position), With(Velocity))    // All must match
+Or(With(Player), With(Enemy))          // Any must match
 ```
 
-### Performance Characteristics
+#### Evaluation Strategies
 
-| Operation     | Time Complexity            | Space Complexity |
-| ------------- | -------------------------- | ---------------- |
-| Add Entity    | O(1)                       | O(1)             |
-| Remove Entity | O(1)                       | O(1)             |
-| Check Alive   | O(1)                       | O(1)             |
-| Iterate Alive | O(n) where n = alive count | O(1)             |
+**Bitmask Strategy** - Fast bitwise operations:
+```typescript
+// Components get bit positions
+Position: bitflag=0b001, Velocity: bitflag=0b010, Health: bitflag=0b100
 
-**Memory Usage:**
+// Entity masks show what components each entity has
+entity1: 0b011  // Has Position + Velocity
+entity2: 0b101  // Has Position + Health
 
-- Sparse array: 4 bytes × max entities ever created
-- Dense array: 4 bytes × max entities ever created
-- Total: ~8 bytes per entity slot
+// Query: And(With(Position), With(Velocity)) → withMask = 0b011
+// Check: (entityMask & 0b011) === 0b011
+entity1: (0b011 & 0b011) === 0b011  ✓ true
+entity2: (0b101 & 0b011) === 0b011  ✗ false
+```
 
-**Cache Performance:**
+**Individual Strategy** - Per-filter evaluation for complex queries:
+```typescript
+// Complex queries like Or(With(Position), Changed(Health))
+// Fall back to: filters.some(filter => filter.evaluate(world, eid))
+```
 
-- Iteration over alive entities is cache-friendly (contiguous memory)
-- Sparse lookups may cause cache misses but are O(1)
+#### Performance (10,000 entities)
 
+| Query Type                              | Bitmask + Cache | Individual + Cache | Notes                     |
+| --------------------------------------- | --------------- | ------------------ | ------------------------- |
+| `And(With(Position), With(Velocity))`   | 224,388 Hz      | 219,211 Hz         | Minimal difference (~2%)  |
 
-## Component Registry
+**Key Insight:** Caching matters most (13-14x faster than no cache). Bitmask vs individual evaluation shows minimal difference.
 
-https://en.wikipedia.org/wiki/AoS_and_SoA
+### Component Registry
+
+Component management with direct array access, unlimited components via generations, and flexible storage patterns.
+
+#### Component Patterns
+
+```typescript
+// Structure of Arrays (SoA) - cache-friendly for bulk operations
+const Position = { x: [], y: [] };
+Position.x[eid] = 10;
+Position.y[eid] = 20;
+
+// Array of Structures (AoS) - good for complete entity data  
+const Transform = [];
+Transform[eid] = { x: 10, y: 20 };
+
+// Single arrays and tag components
+const Health = [];        // Health[eid] = 100
+const Player = {};        // Just presence/absence
+```
+
+#### Generation System
+
+Unlimited components beyond 31-bit limit:
+
+**Why Generations?** Bitmasks need one bit per component for fast O(1) checks. JavaScript integers are 32-bit, giving us only 31 usable bits (0 - 30, bit 31 is sign). So we can only track 31 components per bitmask.
+
+```typescript
+// Problem: Only 31 components fit in one integer bitmask
+// Bits:  31 30 29 28 ... 3  2  1  0
+// Components: ❌ ✓  ✓  ✓ ... ✓  ✓  ✓  ✓  (31 components max)
+
+// Solution: Multiple generations, each with 31 components
+// Generation 0: Components 0-30 (bitflags 1, 2, 4, ..., 2^30)
+Position: { generationId: 0, bitflag: 0b001 }
+Velocity: { generationId: 0, bitflag: 0b010 }
+
+// Generation 1: Components 31+ (bitflags restart)
+Armor:    { generationId: 1, bitflag: 0b001 }
+Weapon:   { generationId: 1, bitflag: 0b010 }
+
+// Entity masks stored per generation
+_entityMasks[0][eid] = 0b011;  // Has Position + Velocity
+_entityMasks[1][eid] = 0b001;  // Has Armor
+```
+
+#### Bitmask Operations
+
+```typescript
+// Adding component: OR with bitflag
+entityMask |= 0b010;           // Add Velocity
+
+// Removing component: AND with inverted bitflag  
+entityMask &= ~0b010;          // Remove Velocity
+
+// Checking component: AND with bitflag
+const hasVelocity = (entityMask & 0b010) !== 0;
+```
+
+#### Change Tracking
+
+```typescript
+// Separate masks track changes per frame
+_addedMasks[0][eid] |= bitflag;    // Component added
+_changedMasks[0][eid] |= bitflag;  // Component changed
+_removedMasks[0][eid] |= bitflag;  // Component removed
+
+// Clear at frame end
+flush() { /* clear all change masks */ }
+```
+
+#### Why These Decisions?
+
+**Sparse Arrays:** Memory-efficient with large entity IDs - only allocated indices use memory.
+
+**Direct Array Access:** No function call overhead - `Health[eid] = 100` is fastest possible.
+
+**Flexible Patterns:** Physics systems benefit from SoA cache locality, UI systems need complete AoS objects.
+
+**Generations:** JavaScript 32-bit integers limit us to 31 components - generations provide unlimited components.
+
+**Performance:** O(1) operations, 4 bytes per entity per generation, direct memory access.
 
 ## 📚 Good to Know
 

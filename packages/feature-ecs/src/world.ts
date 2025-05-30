@@ -1,6 +1,12 @@
+import { withNew } from '@blgc/utils';
 import { createComponentRegistry, TComponentRef, TComponentRegistry } from './component';
 import { createEntityIndex, TEntityId, TEntityIndex } from './entity';
 import { createQueryRegistry, TExecuteQueryOptions, TQueryFilter, TQueryRegistry } from './query';
+
+// TODO:
+// Events
+// Systems
+// Resources
 
 /**
  * Creates a new ECS world.
@@ -21,10 +27,15 @@ import { createQueryRegistry, TExecuteQueryOptions, TQueryFilter, TQueryRegistry
  * ```
  */
 export function createWorld(): TWorld {
-	const world: TWorld = {
+	return withNew({
 		_componentRegistry: createComponentRegistry(),
 		_entityIndex: createEntityIndex(),
-		_queryRegistry: null as any, // Will be set below
+		_queryRegistry: null as any, // Will be set in _new
+
+		_new() {
+			const queryRegistry = createQueryRegistry(this);
+			this._queryRegistry = queryRegistry;
+		},
 
 		createEntity() {
 			const eid = this._entityIndex.addEntity();
@@ -62,13 +73,7 @@ export function createWorld(): TWorld {
 			this._entityIndex.reset();
 			this._queryRegistry.reset();
 		}
-	};
-
-	// Create query registry with the world reference
-	const queryRegistry = createQueryRegistry(world);
-	world._queryRegistry = queryRegistry;
-
-	return world;
+	});
 }
 
 export interface TWorld {
