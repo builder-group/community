@@ -113,11 +113,19 @@ entity2: (0b101 & 0b011) === 0b011  ✗ false
 
 #### Performance (10,000 entities)
 
-| Query Type                              | Bitmask + Cache | Individual + Cache | Notes                     |
-| --------------------------------------- | --------------- | ------------------ | ------------------------- |
-| `And(With(Position), With(Velocity))`   | 224,388 Hz      | 219,211 Hz         | Minimal difference (~2%)  |
+```
+  individual + cached - __tests__/query.bench.ts > Query Performance > With(Position)
+    1.04x faster than bitmask + cached
+    7.50x faster than bitmask + no cache
+    7.83x faster than individual + no cache
 
-**Key Insight:** Caching matters most (13-14x faster than no cache). Bitmask vs individual evaluation shows minimal difference.
+  bitmask + cached - __tests__/query.bench.ts > Query Performance > And(With(Position), With(Velocity))
+    1.01x faster than individual + cached
+    13.58x faster than bitmask + no cache
+    13.72x faster than individual + no cache
+```
+
+**Key Insight:** Caching matters most (7-14x faster than no cache). Bitmask vs individual evaluation shows minimal difference.
 
 ### Component Registry
 
