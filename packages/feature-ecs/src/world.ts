@@ -45,8 +45,7 @@ export function createWorld(): TWorld {
 		},
 
 		createEntity() {
-			const eid = this._entityIndex.addEntity();
-			return eid;
+			return this._entityIndex.addEntity();
 		},
 
 		destroyEntity(eid) {
@@ -59,8 +58,7 @@ export function createWorld(): TWorld {
 		},
 
 		removeComponent(eid, component) {
-			const result = this._componentRegistry.removeComponent(eid, component);
-			return result;
+			return this._componentRegistry.removeComponent(eid, component);
 		},
 
 		hasComponent(eid, component) {
