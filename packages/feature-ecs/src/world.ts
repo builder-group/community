@@ -1,11 +1,6 @@
-import {
-	createComponentRegistry,
-	TComponentRef,
-	TComponentRegistry
-} from './component/create-component-registry';
-import { createEntityIndex, TEntityId, TEntityIndex } from './entity/create-entity-index';
-import { TQueryFilter } from './query-filter';
-import { createQueryRegistry, TExecuteQueryOptions, TQueryRegistry } from './query-registry';
+import { createComponentRegistry, TComponentRef, TComponentRegistry } from './component';
+import { createEntityIndex, TEntityId, TEntityIndex } from './entity';
+import { createQueryRegistry, TExecuteQueryOptions, TQueryFilter, TQueryRegistry } from './query';
 
 /**
  * Creates a new ECS world.
@@ -26,12 +21,9 @@ import { createQueryRegistry, TExecuteQueryOptions, TQueryRegistry } from './que
  * ```
  */
 export function createWorld(): TWorld {
-	const componentRegistry = createComponentRegistry();
-	const entityIndex = createEntityIndex();
-
 	const world: TWorld = {
-		_componentRegistry: componentRegistry,
-		_entityIndex: entityIndex,
+		_componentRegistry: createComponentRegistry(),
+		_entityIndex: createEntityIndex(),
 		_queryRegistry: null as any, // Will be set below
 
 		createEntity() {
@@ -69,14 +61,6 @@ export function createWorld(): TWorld {
 			this._componentRegistry.reset();
 			this._entityIndex.reset();
 			this._queryRegistry.reset();
-		},
-
-		validate() {
-			return (
-				this._componentRegistry.validate() &&
-				this._entityIndex.validate() &&
-				this._queryRegistry.validate()
-			);
 		}
 	};
 
@@ -147,10 +131,4 @@ export interface TWorld {
 	 * Resets the world to its initial state.
 	 */
 	reset(): void;
-
-	/**
-	 * Validates the world integrity.
-	 * @returns True if the world is valid
-	 */
-	validate(): boolean;
 }
