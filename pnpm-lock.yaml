@@ -402,6 +402,9 @@ importers:
       '@types/node':
         specifier: ^22.15.21
         version: 22.15.21
+      bitecs:
+        specifier: github:NateTheGreatt/bitECS#rc-0-4-0
+        version: https://codeload.github.com/NateTheGreatt/bitECS/tar.gz/caa1f58be2ccc304c1f0a085de34ca5904b3b80f
       rollup-presets:
         specifier: workspace:*
         version: link:../rollup-presets
@@ -2011,6 +2014,10 @@ packages:
   binary-extensions@2.3.0:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
     engines: {node: '>=8'}
+
+  bitecs@https://codeload.github.com/NateTheGreatt/bitECS/tar.gz/caa1f58be2ccc304c1f0a085de34ca5904b3b80f:
+    resolution: {tarball: https://codeload.github.com/NateTheGreatt/bitECS/tar.gz/caa1f58be2ccc304c1f0a085de34ca5904b3b80f}
+    version: 0.4.0
 
   body-parser@1.20.3:
     resolution: {integrity: sha512-7rAxByjUMqQ3/bHJy7D6OGXvx/MMc4IqBn/X0fcM1QUcAItpZrBEYhWGem+tzXH90c+G01ypMcYJBO9Y30203g==}
@@ -5611,6 +5618,8 @@ snapshots:
       is-windows: 1.0.2
 
   binary-extensions@2.3.0: {}
+
+  bitecs@https://codeload.github.com/NateTheGreatt/bitECS/tar.gz/caa1f58be2ccc304c1f0a085de34ca5904b3b80f: {}
 
   body-parser@1.20.3:
     dependencies:

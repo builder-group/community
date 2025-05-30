@@ -40,6 +40,7 @@
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@types/node": "^22.15.21",
+		"bitecs": "github:NateTheGreatt/bitECS#rc-0-4-0",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [

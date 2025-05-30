@@ -2,9 +2,6 @@ import { TComponentRef } from './component-registry';
 import { TEntityId } from './entity-index';
 import { TWorld } from './world';
 
-// TODO: Add option to disable bitmask evaluation and cache
-// TODO: Add performance tests using vite comparing performance between bitmask and individual evaluation
-
 /**
  * Requires entity to have component
  */
@@ -306,111 +303,120 @@ export function And(...filters: TQueryFilter[]): TQueryFilter {
 		filters,
 
 		evaluate(world: TWorld, eid: TEntityId, queryData: TQueryData): boolean {
-			if (queryData.evaluationStrategy === 'bitmask') {
-				const {
-					withMasks,
-					withoutMasks,
-					orMasks,
-					addedMasks,
-					changedMasks,
-					removedMasks,
-					generations
-				} = queryData;
-				const entityMasks = world._componentRegistry._entityMasks;
-				const registryAddedMasks = world._componentRegistry._addedMasks;
-				const registryChangedMasks = world._componentRegistry._changedMasks;
-				const registryRemovedMasks = world._componentRegistry._removedMasks;
+			switch (queryData.evaluationStrategy) {
+				case 'bitmask': {
+					const {
+						withMasks,
+						withoutMasks,
+						orMasks,
+						addedMasks,
+						changedMasks,
+						removedMasks,
+						generations
+					} = queryData;
+					const entityMasks = world._componentRegistry._entityMasks;
+					const registryAddedMasks = world._componentRegistry._addedMasks;
+					const registryChangedMasks = world._componentRegistry._changedMasks;
+					const registryRemovedMasks = world._componentRegistry._removedMasks;
 
-				// Check each generation for any AND match
-				for (let i = 0; i < generations.length; i++) {
-					const generationId = generations[i] as number;
-					const entityMask = entityMasks[generationId]?.[eid] ?? 0;
+					// Check each generation for any AND match
+					for (let i = 0; i < generations.length; i++) {
+						const generationId = generations[i] as number;
+						const entityMask = entityMasks[generationId]?.[eid] ?? 0;
 
-					// WITH check: entity must have ALL required components
-					const withMask = withMasks?.[generationId];
-					if (withMask != null && (entityMask & withMask) !== withMask) {
-						return false;
-					}
-
-					// WITHOUT check: entity must have NONE of the forbidden components
-					const withoutMask = withoutMasks?.[generationId];
-					if (withoutMask != null && (entityMask & withoutMask) !== 0) {
-						return false;
-					}
-
-					// OR check: entity must satisfy AT LEAST ONE OR requirement
-					const orMask = orMasks?.[generationId];
-					if (orMask != null) {
-						let hasOrMatch = false;
-
-						// OR WITH: entity has AT LEAST ONE of the OR components
-						if (orMask.with != null && (entityMask & orMask.with) !== 0) {
-							hasOrMatch = true;
+						// WITH check: entity must have ALL required components
+						const withMask = withMasks?.[generationId];
+						if (withMask != null && (entityMask & withMask) !== withMask) {
+							return false;
 						}
 
-						// OR WITHOUT: entity lacks AT LEAST ONE of the OR-forbidden components
-						if (
-							!hasOrMatch &&
-							orMask.without != null &&
-							(entityMask & orMask.without) !== orMask.without
-						) {
-							hasOrMatch = true;
+						// WITHOUT check: entity must have NONE of the forbidden components
+						const withoutMask = withoutMasks?.[generationId];
+						if (withoutMask != null && (entityMask & withoutMask) !== 0) {
+							return false;
 						}
 
-						// OR change detection checks
-						if (!hasOrMatch && orMask.added != null) {
+						// OR check: entity must satisfy AT LEAST ONE OR requirement
+						const orMask = orMasks?.[generationId];
+						if (orMask != null) {
+							let hasOrMatch = false;
+
+							// OR WITH: entity has AT LEAST ONE of the OR components
+							if (orMask.with != null && (entityMask & orMask.with) !== 0) {
+								hasOrMatch = true;
+							}
+
+							// OR WITHOUT: entity lacks AT LEAST ONE of the OR-forbidden components
+							if (
+								!hasOrMatch &&
+								orMask.without != null &&
+								(entityMask & orMask.without) !== orMask.without
+							) {
+								hasOrMatch = true;
+							}
+
+							// OR change detection checks
+							if (!hasOrMatch && orMask.added != null) {
+								const entityAddedMask = registryAddedMasks[generationId]?.[eid] ?? 0;
+								if ((entityAddedMask & orMask.added) !== 0) {
+									hasOrMatch = true;
+								}
+							}
+
+							if (!hasOrMatch && orMask.changed != null) {
+								const entityChangedMask = registryChangedMasks[generationId]?.[eid] ?? 0;
+								if ((entityChangedMask & orMask.changed) !== 0) {
+									hasOrMatch = true;
+								}
+							}
+
+							if (!hasOrMatch && orMask.removed != null) {
+								const entityRemovedMask = registryRemovedMasks[generationId]?.[eid] ?? 0;
+								if ((entityRemovedMask & orMask.removed) !== 0) {
+									hasOrMatch = true;
+								}
+							}
+
+							if (!hasOrMatch) {
+								return false;
+							}
+						}
+
+						// ADDED check: entity must have ALL added components
+						const addedMask = addedMasks?.[generationId];
+						if (addedMask != null) {
 							const entityAddedMask = registryAddedMasks[generationId]?.[eid] ?? 0;
-							if ((entityAddedMask & orMask.added) !== 0) hasOrMatch = true;
+							if ((entityAddedMask & addedMask) !== addedMask) {
+								return false;
+							}
 						}
 
-						if (!hasOrMatch && orMask.changed != null) {
+						// CHANGED check: entity must have ALL changed components
+						const changedMask = changedMasks?.[generationId];
+						if (changedMask != null) {
 							const entityChangedMask = registryChangedMasks[generationId]?.[eid] ?? 0;
-							if ((entityChangedMask & orMask.changed) !== 0) hasOrMatch = true;
+							if ((entityChangedMask & changedMask) !== changedMask) {
+								return false;
+							}
 						}
 
-						if (!hasOrMatch && orMask.removed != null) {
+						// REMOVED check: entity must have ALL removed components
+						const removedMask = removedMasks?.[generationId];
+						if (removedMask != null) {
 							const entityRemovedMask = registryRemovedMasks[generationId]?.[eid] ?? 0;
-							if ((entityRemovedMask & orMask.removed) !== 0) hasOrMatch = true;
-						}
-
-						if (!hasOrMatch) {
-							return false;
+							if ((entityRemovedMask & removedMask) !== removedMask) {
+								return false;
+							}
 						}
 					}
 
-					// ADDED check: entity must have ALL added components
-					const addedMask = addedMasks?.[generationId];
-					if (addedMask != null) {
-						const entityAddedMask = registryAddedMasks[generationId]?.[eid] ?? 0;
-						if ((entityAddedMask & addedMask) !== addedMask) {
-							return false;
-						}
-					}
-
-					// CHANGED check: entity must have ALL changed components
-					const changedMask = changedMasks?.[generationId];
-					if (changedMask != null) {
-						const entityChangedMask = registryChangedMasks[generationId]?.[eid] ?? 0;
-						if ((entityChangedMask & changedMask) !== changedMask) {
-							return false;
-						}
-					}
-
-					// REMOVED check: entity must have ALL removed components
-					const removedMask = removedMasks?.[generationId];
-					if (removedMask != null) {
-						const entityRemovedMask = registryRemovedMasks[generationId]?.[eid] ?? 0;
-						if ((entityRemovedMask & removedMask) !== removedMask) {
-							return false;
-						}
-					}
+					return true;
 				}
 
-				return true;
+				// Individual filter evaluation for more complex queries
+				case 'individual':
+					return filters.every((filter) => filter.evaluate(world, eid, queryData));
 			}
-
-			// Individual filter evaluation for more complex queries
-			return filters.every((filter) => filter.evaluate(world, eid, queryData));
 		},
 
 		register(world: TWorld, queryData: TQueryData): void {
@@ -440,68 +446,71 @@ export function Or(...filters: TQueryFilter[]): TQueryFilter {
 		filters,
 
 		evaluate(world: TWorld, eid: TEntityId, queryData: TQueryData): boolean {
-			if (queryData.evaluationStrategy === 'bitmask') {
-				const { orMasks, generations } = queryData;
+			switch (queryData.evaluationStrategy) {
+				case 'bitmask': {
+					const { orMasks, generations } = queryData;
 
-				if (orMasks == null) {
+					if (orMasks == null) {
+						return false;
+					}
+
+					const entityMasks = world._componentRegistry._entityMasks;
+					const registryAddedMasks = world._componentRegistry._addedMasks;
+					const registryChangedMasks = world._componentRegistry._changedMasks;
+					const registryRemovedMasks = world._componentRegistry._removedMasks;
+
+					// Check each generation for any OR match
+					for (let i = 0; i < generations.length; i++) {
+						const generationId = generations[i] as number;
+						const entityMask = entityMasks[generationId]?.[eid] ?? 0;
+						const orMask = orMasks[generationId];
+
+						if (orMask == null) {
+							continue;
+						}
+
+						// OR WITH: entity has AT LEAST ONE of the OR components
+						if (orMask.with != null && (entityMask & orMask.with) !== 0) {
+							return true;
+						}
+
+						// OR WITHOUT: entity lacks AT LEAST ONE of the OR-forbidden components
+						if (orMask.without != null && (entityMask & orMask.without) !== orMask.without) {
+							return true;
+						}
+
+						// OR ADDED: entity has AT LEAST ONE OR-added component
+						if (orMask.added != null) {
+							const entityAddedMask = registryAddedMasks[generationId]?.[eid] ?? 0;
+							if ((entityAddedMask & orMask.added) !== 0) {
+								return true;
+							}
+						}
+
+						// OR CHANGED: entity has AT LEAST ONE OR-changed component
+						if (orMask.changed != null) {
+							const entityChangedMask = registryChangedMasks[generationId]?.[eid] ?? 0;
+							if ((entityChangedMask & orMask.changed) !== 0) {
+								return true;
+							}
+						}
+
+						// OR REMOVED: entity has AT LEAST ONE OR-removed component
+						if (orMask.removed != null) {
+							const entityRemovedMask = registryRemovedMasks[generationId]?.[eid] ?? 0;
+							if ((entityRemovedMask & orMask.removed) !== 0) {
+								return true;
+							}
+						}
+					}
+
 					return false;
 				}
 
-				const entityMasks = world._componentRegistry._entityMasks;
-				const registryAddedMasks = world._componentRegistry._addedMasks;
-				const registryChangedMasks = world._componentRegistry._changedMasks;
-				const registryRemovedMasks = world._componentRegistry._removedMasks;
-
-				// Check each generation for any OR match
-				for (let i = 0; i < generations.length; i++) {
-					const generationId = generations[i] as number;
-					const entityMask = entityMasks[generationId]?.[eid] ?? 0;
-					const orMask = orMasks[generationId];
-
-					if (orMask == null) {
-						continue;
-					}
-
-					// OR WITH: entity has AT LEAST ONE of the OR components
-					if (orMask.with != null && (entityMask & orMask.with) !== 0) {
-						return true;
-					}
-
-					// OR WITHOUT: entity lacks AT LEAST ONE of the OR-forbidden components
-					if (orMask.without != null && (entityMask & orMask.without) !== orMask.without) {
-						return true;
-					}
-
-					// OR ADDED: entity has AT LEAST ONE OR-added component
-					if (orMask.added != null) {
-						const entityAddedMask = registryAddedMasks[generationId]?.[eid] ?? 0;
-						if ((entityAddedMask & orMask.added) !== 0) {
-							return true;
-						}
-					}
-
-					// OR CHANGED: entity has AT LEAST ONE OR-changed component
-					if (orMask.changed != null) {
-						const entityChangedMask = registryChangedMasks[generationId]?.[eid] ?? 0;
-						if ((entityChangedMask & orMask.changed) !== 0) {
-							return true;
-						}
-					}
-
-					// OR REMOVED: entity has AT LEAST ONE OR-removed component
-					if (orMask.removed != null) {
-						const entityRemovedMask = registryRemovedMasks[generationId]?.[eid] ?? 0;
-						if ((entityRemovedMask & orMask.removed) !== 0) {
-							return true;
-						}
-					}
-				}
-
-				return false;
+				// Individual filter evaluation for more complex queries
+				case 'individual':
+					return filters.some((filter) => filter.evaluate(world, eid, queryData));
 			}
-
-			// Individual filter evaluation for more complex queries
-			return filters.some((filter) => filter.evaluate(world, eid, queryData));
 		},
 
 		register(world: TWorld, queryData: TQueryData): void {
