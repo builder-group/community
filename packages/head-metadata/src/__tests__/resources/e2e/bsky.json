@@ -1,0 +1,29 @@
+{
+	"meta": {
+		"charset": "UTF-8",
+		"viewport": "width=device-width, initial-scale=1, minimum-scale=1, viewport-fit=cover",
+		"referrer": "origin-when-cross-origin",
+		"application-name": "Bluesky",
+		"generator": "bskyweb",
+		"og:site_name": "Bluesky Social",
+		"og:type": "profile",
+		"profile:username": "bennobuilder.bsky.social",
+		"og:url": "https://bsky.app/profile/bennobuilder.bsky.social",
+		"og:title": "Benno Builder (@bennobuilder.bsky.social)",
+		"description": "passionate builder :)",
+		"og:description": "passionate builder :)",
+		"twitter:card": "summary",
+		"twitter:label1": "Account DID",
+		"twitter:value1": "did:plc:hs2ktvfcphpglp6dami7cpxg"
+	},
+	"link": {
+		"preconnect": "https://bsky.social",
+		"preload": "https://web-cdn.bsky.app/static/media/InterVariable.c504db5c06caaf7cdfba.woff2",
+		"stylesheet": "https://web-cdn.bsky.app/static/css/main.b583bf74.css",
+		"apple-touch-icon": "https://web-cdn.bsky.app/static/apple-touch-icon.png",
+		"icon": "https://web-cdn.bsky.app/static/favicon-16x16.png",
+		"mask-icon": "https://web-cdn.bsky.app/static/safari-pinned-tab.svg",
+		"alternate": "at://did:plc:hs2ktvfcphpglp6dami7cpxg/app.bsky.actor.profile/self"
+	},
+	"title": "@bennobuilder.bsky.social on Bluesky"
+}

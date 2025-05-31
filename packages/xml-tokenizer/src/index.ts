@@ -1,4 +1,5 @@
 export * from './config';
+export * from './extract';
 export * from './get-q-name';
 export * from './selector';
 export * from './token-to-xml';

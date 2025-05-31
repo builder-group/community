@@ -1,0 +1,20 @@
+{
+	"link": {
+		"canonical": "https://www.paddle.com",
+		"preload": "https://js.hsforms.net/forms/v2.js",
+		"stylesheet": "/_next/static/css/9200dd3d7924dc8e.css"
+	},
+	"meta": {
+		"description": "We are the merchant of record for B2B &amp; B2C software businesses. Helping increase global conversions, reducing churn, staying compliant, and scaling up fast.",
+		"og:description": "We are the merchant of record for B2B &amp; B2C software businesses. Helping increase global conversions, reducing churn, staying compliant, and scaling up fast.",
+		"og:image": "https://images.prismic.io/paddle/a01787c4-75fa-408c-8b63-16a85b255826_paddle-share-image.png?auto=compress,format&amp;rect=0,19,1200,591&amp;w=1280&amp;h=630",
+		"og:title": "Paddle - Payments, tax and subscription management for SaaS and digital products",
+		"robots": "index",
+		"twitter:card": "summary_large_image",
+		"twitter:description": "We are the merchant of record for B2B &amp; B2C software businesses. Helping increase global conversions, reducing churn, staying compliant, and scaling up fast.",
+		"twitter:image": "https://images.prismic.io/paddle/a01787c4-75fa-408c-8b63-16a85b255826_paddle-share-image.png?auto=compress,format&amp;rect=0,14,1200,600&amp;w=1024&amp;h=512",
+		"twitter:title": "Paddle - Payments, tax and subscription management for SaaS and digital products",
+		"viewport": "width=device-width, initial-scale=1, maximum-scale=5"
+	},
+	"title": "Paddle - Payments, tax and subscription management for SaaS and digital products"
+}

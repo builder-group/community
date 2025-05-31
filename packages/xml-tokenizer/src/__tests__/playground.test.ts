@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import { describe } from 'node:test';
 import * as camaro from 'camaro';
 import { beforeAll, expect, it } from 'vitest';
+import { htmlConfig } from '../config';
 import { select } from '../selector';
 import { tokenToXml } from '../token-to-xml';
 import { xmlToSimplifiedObject } from '../xml-to-simplified-object';
@@ -15,15 +16,11 @@ describe('playground', () => {
 		let html = '';
 
 		beforeAll(async () => {
-			html = await readFile(`${__dirname}/resources/google.html`, 'utf-8');
+			html = await readFile(`${__dirname}/resources/kleinanzeigen.html`, 'utf-8');
 		});
 
 		it('[xml-tokenizer] shoud work', async () => {
-			const result = await xmlToSimplifiedObject(html, {
-				allowDtd: true,
-				rawTextElements: ['script', 'style'],
-				strictDocument: false
-			});
+			const result = await xmlToSimplifiedObject(html, htmlConfig);
 
 			console.log(result);
 		});
