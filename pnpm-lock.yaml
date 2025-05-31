@@ -581,12 +581,15 @@ importers:
   packages/head-metadata:
     dependencies:
       xml-tokenizer:
-        specifier: ^0.0.32
-        version: 0.0.32
+        specifier: workspace:*
+        version: link:../xml-tokenizer
     devDependencies:
       '@types/node':
         specifier: ^22.15.21
         version: 22.15.21
+      rollup-presets:
+        specifier: workspace:*
+        version: link:../rollup-presets
 
   packages/kleinanzeigen-client:
     dependencies:
@@ -4395,9 +4398,6 @@ packages:
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
-  xml-tokenizer@0.0.32:
-    resolution: {integrity: sha512-0f86fWVZUrxLrFxs3ZIgmtmPKVHm0Wc0J2TBZbivBE+cSPjgg2p4bAb246xKEfNbvjsGg37cFJuXsVRoE3OlHQ==}
-
   xml2js@0.6.2:
     resolution: {integrity: sha512-T4rieHaC1EXcES0Kxxj4JWgaUQHDk+qwHcYOCFHfiwKz7tOVPLq7Hjq9dM1WCMhylqMEfP7hMcOIChvotiZegA==}
     engines: {node: '>=4.0.0'}
@@ -8192,8 +8192,6 @@ snapshots:
       strip-ansi: 6.0.1
 
   wrappy@1.0.2: {}
-
-  xml-tokenizer@0.0.32: {}
 
   xml2js@0.6.2:
     dependencies:
