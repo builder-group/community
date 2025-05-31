@@ -177,40 +177,11 @@ export interface TQueryRegistry {
 
 	/**
 	 * Queries entities that match the specified filter and returns only entity IDs.
-	 *
-	 * @param filter - The query filter to match entities against
-	 * @param options - Query execution options
-	 * @returns Array of entity IDs that match the filter
-	 *
-	 * @example
-	 * ```typescript
-	 * // Simple component query
-	 * const entities = queryRegistry.queryEntities(With(Position));
-	 *
-	 * // Complex query with multiple conditions
-	 * const movingEntities = queryRegistry.queryEntities(
-	 *   And(With(Position), With(Velocity), Without(Dead))
-	 * );
-	 * ```
 	 */
 	queryEntities(filter: TQueryFilter, options?: TExecuteQueryOptions): TEntityId[];
 
 	/**
 	 * Queries components and returns matching entities with component data.
-	 *
-	 * @param components Components to retrieve data from (include Entity for entity ID)
-	 * @param filter Optional filter to restrict results
-	 * @returns Array of component data tuples. Entities without all requested components are excluded.
-	 * @example
-	 * ```ts
-	 * // Query for entities with both Position and Velocity, include entity ID
-	 * const results = queryRegistry.queryComponents([Entity, Position, Velocity]);
-	 * // Returns: [[eid1, {x: 10, y: 5}, {x: 2, y: 1}], [eid2, {x: 20, y: 15}, {x: 1, y: -1}]]
-	 *
-	 * // Query with filter
-	 * const playerResults = queryRegistry.queryComponents([Entity, Health], With(Player));
-	 * // Returns: [[eid1, 100], [eid3, 75]]
-	 * ```
 	 */
 	queryComponents<T extends readonly (TComponentRef | TEntity)[]>(
 		components: T,

@@ -11,6 +11,7 @@ import {
 import { TEntity } from './query/types';
 
 // TODO:
+// Pass component data directly into addComponent (optional)
 // Events
 // Systems
 // Resources
@@ -40,8 +41,7 @@ export function createWorld(): TWorld {
 		_queryRegistry: null as any, // Will be set in _new
 
 		_new() {
-			const queryRegistry = createQueryRegistry(this);
-			this._queryRegistry = queryRegistry;
+			this._queryRegistry = createQueryRegistry(this);
 		},
 
 		createEntity() {
