@@ -1,8 +1,8 @@
 {
 	"name": "head-metadata",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"private": false,
-	"description": "Extracts metadata from the head of a HTML document",
+	"description": "Typesafe and straightforward utility for extracting structured metadata (like `<meta>`, `<title>`, and `<link>`) from the `<head>` of an HTML document",
 	"keywords": [],
 	"homepage": "https://builder.group/?source=package-json",
 	"bugs": {

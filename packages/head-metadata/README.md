@@ -1,30 +1,32 @@
 <h1 align="center">
-  <img src="https://raw.githubusercontent.com/your-org/head-metadata/main/.github/banner.svg" alt="head-metadata banner">
+    <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/head-metadata/.github/banner.svg" alt="head-metadata banner">
 </h1>
 
 <p align="left">
-  <a href="https://github.com/your-org/head-metadata/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/your-org/head-metadata?label=license&style=flat&colorA=293140&colorB=00C896" alt="GitHub License"/>
-  </a>
-  <a href="https://www.npmjs.com/package/head-metadata">
-    <img src="https://img.shields.io/bundlephobia/minzip/head-metadata?label=minzipped%20size&style=flat&colorA=293140&colorB=00C896" alt="NPM bundle minzipped size"/>
-  </a>
-  <a href="https://www.npmjs.com/package/head-metadata">
-    <img src="https://img.shields.io/npm/dt/head-metadata.svg?label=downloads&style=flat&colorA=293140&colorB=00C896" alt="NPM total downloads"/>
-  </a>
+    <a href="https://github.com/builder-group/community/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/community.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
+    </a>
+    <a href="https://www.npmjs.com/package/head-metadata">
+        <img src="https://img.shields.io/bundlephobia/minzip/head-metadata.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
+    </a>
+    <a href="https://www.npmjs.com/package/head-metadata">
+        <img src="https://img.shields.io/npm/dt/featuer-state.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>
+    </a>
+    <a href="https://discord.gg/w4xE3bSjhQ">
+        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=FDE200" alt="Join Discord"/>
+    </a>
 </p>
 
 > Status: Experimental
 
-`head-metadata` is a utility for extracting structured metadata (like `<meta>`, `<title>`, and `<link>`) from the `<head>` of an HTML document. 
+`head-metadata` is a typesafe and straightforward utility for extracting structured metadata (like `<meta>`, `<title>`, and `<link>`) from the `<head>` of an HTML document. 
 
 ## 📖 Usage
 
 ### Extract Metadata from `<head>`
 
 ```ts
-import { extractHeadMetadata } from 'head-metadata';
-import { metaExtractor, titleExtractor, linkExtractor } from 'head-metadata/extractors';
+import { extractHeadMetadata, metaExtractor, titleExtractor, linkExtractor } from 'head-metadata';
 
 const html = `
   <html>
