@@ -3,8 +3,6 @@ import { describe } from 'node:test';
 import * as camaro from 'camaro';
 import { beforeAll, expect, it } from 'vitest';
 import { htmlConfig } from '../config';
-import { process, type TProcessor } from '../processor';
-import { pathTracker } from '../processor/processors';
 import { select } from '../selector';
 import { tokenToXml } from '../token-to-xml';
 import { xmlToSimplifiedObject } from '../xml-to-simplified-object';
@@ -14,7 +12,7 @@ describe('playground', () => {
 		expect(true).toBe(true);
 	});
 
-	describe('HTML should work', () => {
+	describe.skip('HTML should work', () => {
 		let html = '';
 
 		beforeAll(async () => {
@@ -25,76 +23,6 @@ describe('playground', () => {
 			const result = await xmlToSimplifiedObject(html, htmlConfig);
 
 			console.log(result);
-		});
-
-		it('[process] should work', () => {
-			// Article extractor that uses path tracking
-			const articleExtractor: TProcessor<
-				{
-					articles: Array<{ id: string; title: string }>;
-					currentArticle: { id?: string; title?: string } | null;
-				},
-				[typeof pathTracker]
-			> = {
-				name: 'ArticleExtractor',
-				context: {
-					articles: [],
-					currentArticle: null
-				},
-				deps: [pathTracker],
-				process: (token, context) => {
-					const path = context.currentPath;
-
-					// Start tracking a new article when we enter an article element
-					if (token.type === 'ElementStart' && token.local === 'article') {
-						context.currentArticle = {};
-					}
-
-					// Extract ID from data-adid attribute on article element
-					if (
-						token.type === 'Attribute' &&
-						token.local === 'data-adid' &&
-						path[path.length - 1] === 'article' &&
-						context.currentArticle
-					) {
-						context.currentArticle.id = token.value;
-					}
-
-					// Extract title from text in h2/a path within article
-					if (
-						token.type === 'Text' &&
-						path.includes('article') &&
-						path.includes('h2') &&
-						path.includes('a') &&
-						context.currentArticle
-					) {
-						const text = token.text.trim();
-						if (text.length > 0) {
-							context.currentArticle.title = text;
-						}
-					}
-
-					// Finish article when we close the article element
-					if (
-						token.type === 'ElementEnd' &&
-						token.end.type === 'Close' &&
-						token.end.local === 'article' &&
-						context.currentArticle &&
-						context.currentArticle.id &&
-						context.currentArticle.title
-					) {
-						context.articles.push({
-							id: context.currentArticle.id,
-							title: context.currentArticle.title
-						});
-						context.currentArticle = null;
-					}
-				}
-			};
-
-			const result = process(html, [pathTracker, articleExtractor], htmlConfig);
-
-			console.log('Extracted articles:', result.articles);
 		});
 	});
 

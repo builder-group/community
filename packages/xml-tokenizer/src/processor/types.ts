@@ -4,12 +4,15 @@ export interface TProcessor<GContext = unknown, GDeps extends readonly TProcesso
 	name?: string;
 	context: GContext;
 	deps?: GDeps;
-	process?: TTokenCallback<GContext & TMergeProcessorContexts<GDeps>>;
+	process?: TProcessorTokenCallback<GContext & TMergeProcessorContexts<GDeps>>;
 }
 
 export type TProcessorAny = TProcessor<any, any>;
 
-export type TTokenCallback<GContext = unknown> = (token: TXmlToken, context: GContext) => void;
+export type TProcessorTokenCallback<GContext = unknown> = (
+	token: TXmlToken,
+	context: GContext
+) => void;
 
 export type TMergeProcessorContexts<GProcessors extends readonly TProcessorAny[]> =
 	GProcessors extends [infer Head, ...infer Tail]
