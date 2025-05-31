@@ -54,7 +54,7 @@ describe('playground', () => {
 					if (
 						token.type === 'Attribute' &&
 						token.local === 'data-adid' &&
-						path.endsWith('article') &&
+						path[path.length - 1] === 'article' &&
 						context.currentArticle
 					) {
 						context.currentArticle.id = token.value;
