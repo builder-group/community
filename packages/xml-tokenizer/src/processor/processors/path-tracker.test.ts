@@ -11,8 +11,7 @@ describe('pathTracker processor', () => {
 		const result = process(simpleXml, [pathTracker], htmlConfig);
 
 		// After processing, should be back to empty path
-		expect(result.currentPath).toBe('');
-		expect(result.currentPathArray).toEqual([]);
+		expect(result.currentPath).toEqual([]);
 	});
 
 	it('should work with dependent processor that uses path', () => {
@@ -23,7 +22,7 @@ describe('pathTracker processor', () => {
 			deps: [pathTracker],
 			process: (token, context) => {
 				if (token.type === 'ElementStart' && context.currentPath) {
-					context.visitedPaths.push(context.currentPath);
+					context.visitedPaths.push(context.currentPath.join('/'));
 				}
 			}
 		};
