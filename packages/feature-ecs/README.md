@@ -119,7 +119,7 @@ const moving = world.queryEntities(And(With(Position), With(Velocity)));
 const damaged = world.queryEntities(Changed(Health));
 
 // Query with component data
-for (const [eid, pos, health] of world.queryComponents([Entity, Position, Health])) {
+for (const [eid, pos, health] of world.queryComponents([Entity, Position, Health] as const)) {
 	console.log(`Entity ${eid} at (${pos.x}, ${pos.y}) with ${health} health`);
 }
 ```
@@ -129,7 +129,7 @@ for (const [eid, pos, health] of world.queryComponents([Entity, Position, Health
 ```ts
 function update(deltaTime: number) {
 	// Movement system
-	for (const [eid, pos, vel] of world.queryComponents([Entity, Position, Velocity])) {
+	for (const [eid, pos, vel] of world.queryComponents([Entity, Position, Velocity] as const)) {
 		world.updateComponent(eid, Position, {
 			x: pos.x + vel.dx * deltaTime,
 			y: pos.y + vel.dy * deltaTime
