@@ -29,11 +29,11 @@
 
 ### 📚 Examples
 
-- [Basic](https://github.com/builder-group/community/tree/develop/examples/feature-ecs/bsic)
+- [Basic](https://github.com/builder-group/community/tree/develop/examples/feature-ecs/vanilla/basic)
 
 ### 🌟 Motivation
 
-Create a modern, typesafe ECS library that embraces TypeScript's type system while maintaining the performance characteristics that make ECS powerful. While there are some promising ECS libraries like bitECS with great performance, they often lack TypeScript support and advanced query features like `Added()`, `Removed()`, `Changed()` filters for reactive systems. `feature-ecs` aims to provide the best of both worlds: high performance with full TypeScript integration and powerful querying capabilities, following the KISS principle to keep the API simple yet comprehensive.
+Build a modern, type-safe ECS library that fully leverages TypeScript's type system without compromising performance. While libraries like [bitECS](https://github.com/NateTheGreatt/bitECS) offer good speed, they often lack robust TypeScript support and more advanced queries like `Added()`, `Removed()`, or `Changed()`. `feature-ecs` bridges this gap—combining high performance, full TypeScript integration, and powerful query capabilities—all while adhering to the KISS principle for a clean, intuitive API.
 
 ### ⚖️ Alternatives
 
