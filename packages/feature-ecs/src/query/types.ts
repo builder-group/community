@@ -1,0 +1,78 @@
+import { TComponentRef, TComponentValue } from '../component';
+import { TEntityId } from '../entity';
+import { TWorld } from '../world';
+
+/**
+ * Special entity symbol for component queries
+ */
+export const Entity = Symbol('Entity');
+export type TEntity = typeof Entity;
+
+export interface TQueryData {
+	/** Unique hash identifying this query filter combination */
+	hash: string;
+	/** The original query filter that was compiled into this data */
+	filter: TQueryFilter;
+	/**
+	 * Pre-computed evaluation strategy for optimal performance:
+	 * - 'bitmask': Fast bitwise operations for component/change filters
+	 * - 'individual': Filter-by-filter evaluation for complex queries
+	 */
+	evaluationStrategy: 'bitmask' | 'individual';
+
+	/** Cached array of entity IDs that match this query */
+	cachedResult: TEntityId[];
+	/** True when cached results are stale and need re-evaluation */
+	isDirty: boolean;
+
+	/** Pre-computed generations array for optimal bitmask iteration */
+	generations: number[];
+
+	/** Combined AND masks for all filter types (AND logic: entity must satisfy ALL requirements) */
+	andMasks?: Record<
+		number,
+		{
+			with?: number; // Components entity must HAVE (all)
+			without?: number; // Components entity must LACK (all)
+			added?: number; // Components entity ADDED this frame (all)
+			changed?: number; // Components entity CHANGED this frame (all)
+			removed?: number; // Components entity REMOVED this frame (all)
+		}
+	>;
+
+	/** Combined OR masks for all filter types (OR logic: entity must satisfy AT LEAST ONE per type) */
+	orMasks?: Record<
+		number,
+		{
+			with?: number; // Components entity must HAVE (any)
+			without?: number; // Components entity must LACK (any)
+			added?: number; // Components entity ADDED this frame (any)
+			changed?: number; // Components entity CHANGED this frame (any)
+			removed?: number; // Components entity REMOVED this frame (any)
+		}
+	>;
+
+	/** Components that can affect this query - enables O(1) invalidation checks */
+	affectedMasks?: Record<number, number>;
+}
+
+export interface TBaseQueryFilter {
+	type: string;
+	evaluate(world: TWorld, eid: TEntityId, queryData: TQueryData): boolean;
+	register?(world: TWorld, queryData: TQueryData, parentType?: TQueryParentType): void;
+	getHash(world: TWorld): string;
+}
+
+export type TQueryParentType = Extract<TQueryFilter['type'], 'And' | 'Or'>;
+
+export type TQueryFilter =
+	| (TBaseQueryFilter & { type: 'With'; component: TComponentRef })
+	| (TBaseQueryFilter & { type: 'Without'; component: TComponentRef })
+	| (TBaseQueryFilter & { type: 'Added'; component: TComponentRef })
+	| (TBaseQueryFilter & { type: 'Changed'; component: TComponentRef })
+	| (TBaseQueryFilter & { type: 'Removed'; component: TComponentRef })
+	| (TBaseQueryFilter & { type: 'And'; filters: TQueryFilter[] })
+	| (TBaseQueryFilter & { type: 'Or'; filters: TQueryFilter[] });
+
+export type TQueryComponentValue<GComponent extends TComponentRef | TEntity> =
+	GComponent extends TEntity ? TEntityId : TComponentValue<GComponent>;

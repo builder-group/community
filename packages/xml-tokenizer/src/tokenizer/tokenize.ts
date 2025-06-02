@@ -641,7 +641,7 @@ function parseText(
 
 	// According to the spec, `]]>` must not appear inside a Text node.
 	// https://www.w3.org/TR/xml/#syntax
-	if (text.includes(CDATA_END)) {
+	if (s.config.strictDocument && text.includes(CDATA_END)) {
 		throw new XmlError({ type: 'InvalidCharacterData' }, s.genTextPos());
 	}
 

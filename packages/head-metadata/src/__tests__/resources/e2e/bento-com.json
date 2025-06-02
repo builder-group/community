@@ -1,0 +1,22 @@
+{
+	"link": {
+		"alternate": "http://bento.com/bentonews.xml",
+		"apple-touch-icon-precomposed": "/apple-touch-icon-120x120.png",
+		"icon": "/favicon-16x16.png",
+		"search": "bentotokyosearch.xml",
+		"stylesheet": "css/bento-front-grid.css"
+	},
+	"meta": {
+		"bitly-verification": "0bcee6f100be",
+		"charset": "sjis",
+		"description": "The Tokyo Food Page is a complete guide to Japanese food and restaurants in Tokyo, featuring recipes, articles on Japanese cooking, restaurant listings, culinary travel tips and more.",
+		"google-site-verification": "eOJ2O8Jr70PfyLxj7o-KkvXxl8oJKTB-YIFYyOPcgMQ",
+		"og:image": "http://bento.com/pix/icon-1000-400-tokyo2.jpg",
+		"og:site_name": "Bento.com",
+		"og:title": "Bento.com Japanese cuisine and restaurant guide",
+		"og:url": "http://bento.com/tokyofood.html",
+		"theme-color": "#000000",
+		"viewport": "width=device-width, initial-scale=1.0"
+	},
+	"title": "Bento.com Japanese cuisine and restaurant guide"
+}
