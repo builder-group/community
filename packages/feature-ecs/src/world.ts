@@ -17,7 +17,6 @@ import {
 import { TEntity } from './query/types';
 
 // TODO:
-// Pass component data directly into addComponent (optional)
 // Events
 // Systems
 // Resources
@@ -94,6 +93,10 @@ export function createWorld(): TWorld {
 
 		hasComponent(eid, component) {
 			return this._componentRegistry.hasComponent(eid, component);
+		},
+
+		markComponentChanged(eid, component) {
+			return this._componentRegistry.markChanged(eid, component);
 		},
 
 		queryEntities(filter, options) {
@@ -187,6 +190,13 @@ export interface TWorld {
 	 * @returns True if entity has the component
 	 */
 	hasComponent(eid: TEntityId, component: TComponentRef): boolean;
+
+	/**
+	 * Marks a component as changed for the current frame.
+	 * @param eid - The entity ID
+	 * @param component - The component to mark as changed
+	 */
+	markComponentChanged(eid: TEntityId, component: TComponentRef): void;
 
 	/**
 	 * Queries entities that match the specified filter and returns only entity IDs.

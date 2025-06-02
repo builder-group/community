@@ -19,14 +19,14 @@
 
 > Status: Experimental
 
-`head-metadata` is a typesafe and straightforward utility for extracting structured metadata (like `<meta>`, `<title>`, and `<link>`) from the `<head>` of an HTML document. 
+`head-metadata` is a typesafe and straightforward utility for extracting structured metadata (like `<meta>`, `<title>`, and `<link>`) from the `<head>` of an HTML document.
 
 ## 📖 Usage
 
 ### Extract Metadata from `<head>`
 
 ```ts
-import { extractHeadMetadata, metaExtractor, titleExtractor, linkExtractor } from 'head-metadata';
+import { extractHeadMetadata, linkExtractor, metaExtractor, titleExtractor } from 'head-metadata';
 
 const html = `
   <html>
@@ -39,9 +39,9 @@ const html = `
 `;
 
 const metadata = extractHeadMetadata(html, {
-  meta: metaExtractor,
-  title: titleExtractor,
-  link: linkExtractor
+	meta: metaExtractor,
+	title: titleExtractor,
+	link: linkExtractor
 });
 
 console.log(metadata);

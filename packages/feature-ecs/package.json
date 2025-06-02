@@ -2,7 +2,7 @@
 	"name": "feature-ecs",
 	"version": "0.0.1",
 	"private": false,
-	"description": "Straightforward, typesafe, and feature-based Entity Component System (ECS)",
+	"description": "A flexible, typesafe, and performance-focused Entity Component System (ECS) library for TypeScript.",
 	"keywords": [],
 	"homepage": "https://builder.group/?source=github",
 	"bugs": {
