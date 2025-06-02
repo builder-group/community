@@ -207,7 +207,7 @@ describe('createComponentRegistry', () => {
 			expect(Health[eid2]).toBe(80);
 		});
 
-		it('should support tag component pattern', () => {
+		it('should support marker component pattern', () => {
 			const Player: TPlayer = {};
 			const Enemy: TEnemy = {};
 			const Frozen: TFrozen = {};
@@ -220,7 +220,7 @@ describe('createComponentRegistry', () => {
 			const eid2 = entityIndex.addEntity();
 			const eid3 = entityIndex.addEntity();
 
-			// Add tag components (no data, just flags)
+			// Add marker components (no data, just flags)
 			registry.addComponent(eid1, Player);
 			registry.addComponent(eid1, Frozen);
 			registry.addComponent(eid2, Enemy);
@@ -299,6 +299,114 @@ describe('createComponentRegistry', () => {
 			expect(registry.hasComponent(eid, components[30]!)).toBe(true);
 			expect(registry.hasComponent(eid, components[31]!)).toBe(true);
 			expect(registry.hasComponent(eid, components[34]!)).toBe(true);
+		});
+	});
+
+	describe('updateComponent', () => {
+		it('should update array components and mark as changed by default', () => {
+			const Health: THealth = [];
+			const eid = entityIndex.addEntity();
+
+			registry.addComponent(eid, Health);
+			registry.updateComponent(eid, Health, 100);
+
+			expect(Health[eid]).toBe(100);
+			expect(registry.wasChanged(eid, Health)).toBe(true);
+		});
+
+		it('should update array components without marking as changed when explicitly false', () => {
+			const Health: THealth = [];
+			const eid = entityIndex.addEntity();
+
+			registry.addComponent(eid, Health);
+			registry.updateComponent(eid, Health, 75, false);
+
+			expect(Health[eid]).toBe(75);
+			expect(registry.wasChanged(eid, Health)).toBe(false);
+		});
+
+		it('should update object with arrays (AoS) and mark as changed by default', () => {
+			const Position: TPosition = { x: [], y: [] };
+			const eid = entityIndex.addEntity();
+
+			registry.addComponent(eid, Position);
+			registry.updateComponent(eid, Position, { x: 10, y: 20 });
+
+			expect(Position.x[eid]).toBe(10);
+			expect(Position.y[eid]).toBe(20);
+			expect(registry.wasChanged(eid, Position)).toBe(true);
+		});
+
+		it('should update object with arrays without marking as changed when explicitly false', () => {
+			const Position: TPosition = { x: [], y: [] };
+			const eid = entityIndex.addEntity();
+
+			registry.addComponent(eid, Position);
+			registry.updateComponent(eid, Position, { x: 15, y: 25 }, false);
+
+			expect(Position.x[eid]).toBe(15);
+			expect(Position.y[eid]).toBe(25);
+			expect(registry.wasChanged(eid, Position)).toBe(false);
+		});
+
+		it('should add marker component when value is true', () => {
+			const Player: TPlayer = {};
+			const eid = entityIndex.addEntity();
+
+			registry.updateComponent(eid, Player, true);
+
+			expect(registry.hasComponent(eid, Player)).toBe(true);
+			expect(registry.wasAdded(eid, Player)).toBe(true);
+		});
+
+		it('should remove marker component when value is false', () => {
+			const Player: TPlayer = {};
+			const eid = entityIndex.addEntity();
+
+			registry.addComponent(eid, Player);
+			registry.updateComponent(eid, Player, false);
+
+			expect(registry.hasComponent(eid, Player)).toBe(false);
+			expect(registry.wasRemoved(eid, Player)).toBe(true);
+		});
+
+		it('should not add marker component if already present', () => {
+			const Player: TPlayer = {};
+			const eid = entityIndex.addEntity();
+
+			registry.addComponent(eid, Player);
+			const wasAddedBefore = registry.wasAdded(eid, Player);
+
+			registry.flush(); // Clear tracking
+			registry.updateComponent(eid, Player, true);
+
+			expect(registry.hasComponent(eid, Player)).toBe(true);
+			expect(registry.wasAdded(eid, Player)).toBe(false); // Should not be marked as added again
+		});
+
+		it('should handle partial object updates', () => {
+			const Position: TPosition = { x: [], y: [] };
+			const eid = entityIndex.addEntity();
+
+			registry.addComponent(eid, Position);
+			Position.x[eid] = 100;
+			Position.y[eid] = 200;
+
+			registry.updateComponent(eid, Position, { x: 50 }, false);
+
+			expect(Position.x[eid]).toBe(50);
+			expect(Position.y[eid]).toBe(200); // Should remain unchanged
+		});
+
+		it('should handle mixed array types in objects', () => {
+			const Mixed = { numbers: [] as number[], strings: [] as string[] };
+			const eid = entityIndex.addEntity();
+
+			registry.addComponent(eid, Mixed);
+			registry.updateComponent(eid, Mixed, { numbers: 42, strings: 'test' }, false);
+
+			expect(Mixed.numbers[eid]).toBe(42);
+			expect(Mixed.strings[eid]).toBe('test');
 		});
 	});
 

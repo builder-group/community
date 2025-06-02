@@ -14,7 +14,7 @@
  */
 
 import { TEntityId } from '../entity';
-import { TComponentCallbacks, TComponentData, TComponentRef } from './types';
+import { TComponentCallbacks, TComponentData, TComponentRef, TUpdateComponentValue } from './types';
 
 /**
  * Creates a new component registry.
@@ -29,7 +29,7 @@ import { TComponentCallbacks, TComponentData, TComponentRef } from './types';
  * const Position: { x: number[]; y: number[] } = { x: [], y: [] };     // Object with arrays (AoS)
  * const Transform: { x: number; y: number }[] = [];                    // Array of objects (SoA)
  * const Health: number[] = [];                                         // Single value array
- * const Player: {} = {};                                               // Tag component
+ * const Player: {} = {};                                               // Marker component
  *
  * // Register all components
  * registry.registerComponent(Position);
@@ -117,7 +117,11 @@ export function createComponentRegistry(): TComponentRegistry {
 		// Step 3:     Store new mask: entityMasks[1][5] = 1
 		//
 		// After:      entityMasks: [[<1 empty>, 5, <3 empty>, 2], [<5 empty>, 1]]  (entity 5 has Armor)
-		addComponent(eid, component) {
+		addComponent<GComponent extends TComponentRef>(
+			eid: TEntityId,
+			component: GComponent,
+			value?: TUpdateComponentValue<GComponent>
+		): void {
 			// Auto-register component if not already registered
 			if (!this._componentMap.has(component)) {
 				this.registerComponent(component);
@@ -142,6 +146,11 @@ export function createComponentRegistry(): TComponentRegistry {
 			// @ts-expect-error - generationId exists because we ensure it when registering the component
 			this._addedMasks[generationId][eid] = currentAddedMask | bitflag;
 
+			// Set component data if value is provided
+			if (value !== undefined) {
+				this.updateComponent(eid, component, value, false);
+			}
+
 			// Fire callbacks if registered
 			const callbacks = this._callbacks.get(component);
 			if (callbacks?.onAdd != null) {
@@ -150,6 +159,51 @@ export function createComponentRegistry(): TComponentRegistry {
 				}
 			}
 			this._componentsToFlush.add(component);
+		},
+
+		updateComponent<GComponent extends TComponentRef>(
+			eid: TEntityId,
+			component: GComponent,
+			value: TUpdateComponentValue<GComponent>,
+			markAsChanged = true
+		): void {
+			// Array component (SoA): Health[eid] = 100
+			if (Array.isArray(component)) {
+				component[eid] = value;
+				if (markAsChanged) {
+					this.markChanged(eid, component);
+				}
+				return;
+			}
+
+			// Marker component (empty object): add/remove based on boolean
+			if (
+				typeof component === 'object' &&
+				component !== null &&
+				Object.keys(component).length === 0
+			) {
+				if (value === true && !this.hasComponent(eid, component)) {
+					this.addComponent(eid, component);
+				} else if (value === false) {
+					this.removeComponent(eid, component);
+				}
+				return;
+			}
+
+			// Object component (AoS): Position.x[eid] = value.x
+			if (typeof component === 'object' && component !== null) {
+				const valueObj = value as Record<string, any>;
+				for (const [key, val] of Object.entries(valueObj)) {
+					const targetArray = (component as Record<string, any[]>)[key];
+					if (Array.isArray(targetArray)) {
+						targetArray[eid] = val;
+					}
+				}
+				if (markAsChanged) {
+					this.markChanged(eid, component);
+				}
+				return;
+			}
 		},
 
 		// Component Removal Flow
@@ -464,7 +518,11 @@ export interface TComponentRegistry {
 	 * @param eid - The entity ID
 	 * @param component - The component to add
 	 */
-	addComponent(eid: TEntityId, component: TComponentRef): void;
+	addComponent<GComponent extends TComponentRef>(
+		eid: TEntityId,
+		component: GComponent,
+		value?: TUpdateComponentValue<GComponent>
+	): void;
 
 	/**
 	 * Removes a component from an entity and clears its data.
@@ -549,4 +607,18 @@ export interface TComponentRegistry {
 	 * Resets the registry to its initial empty state.
 	 */
 	reset(): void;
+
+	/**
+	 * Updates component values with type safety.
+	 * - For arrays: sets value directly
+	 * - For marker components (empty objects): true adds component, false removes it
+	 * - For objects with arrays: sets each property value
+	 * @param markAsChanged - Whether to mark the component as changed (default: true)
+	 */
+	updateComponent<GComponent extends TComponentRef>(
+		eid: TEntityId,
+		component: GComponent,
+		value: TUpdateComponentValue<GComponent>,
+		markAsChanged?: boolean
+	): void;
 }

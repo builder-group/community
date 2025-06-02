@@ -143,7 +143,7 @@ Position.y[eid] = 20;
 const Transform = [];
 Transform[eid] = { x: 10, y: 20 };
 
-// Single arrays and tag components
+// Single arrays and marker components
 const Health = [];        // Health[eid] = 100
 const Player = {};        // Just presence/absence
 ```

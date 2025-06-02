@@ -1,4 +1,4 @@
-import { TComponentRef } from '../component';
+import { TComponentRef, TComponentValue } from '../component';
 import { TEntityId } from '../entity';
 import { TWorld } from '../world';
 
@@ -74,14 +74,5 @@ export type TQueryFilter =
 	| (TBaseQueryFilter & { type: 'And'; filters: TQueryFilter[] })
 	| (TBaseQueryFilter & { type: 'Or'; filters: TQueryFilter[] });
 
-export type InferComponentType<T> = T extends TEntity
-	? TEntityId
-	: T extends readonly (infer U)[] // Array of components (AoS)
-		? U
-		: T extends Record<string, any[]> // Object with arrays (SoA)
-			? {
-					[K in keyof T]: T[K] extends Array<infer V> ? V : never;
-				}
-			: T extends {} // Empty object (tag component)
-				? true
-				: never;
+export type TQueryComponentValue<GComponent extends TComponentRef | TEntity> =
+	GComponent extends TEntity ? TEntityId : TComponentValue<GComponent>;

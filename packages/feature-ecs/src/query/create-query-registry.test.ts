@@ -192,13 +192,16 @@ describe('createQueryRegistry', () => {
 			Health[eid3] = 50;
 
 			// Query only players
-			const playerResults = world._queryRegistry.queryComponents([Entity, Health], With(Player));
+			const playerResults = world._queryRegistry.queryComponents(
+				[Entity, Health] as const,
+				With(Player)
+			);
 			expect(playerResults).toHaveLength(1);
 			expect(playerResults[0]).toEqual([eid1, 100]);
 
-			// Query entities without Player tag
+			// Query entities without Player marker
 			const nonPlayerResults = world._queryRegistry.queryComponents(
-				[Entity, Health],
+				[Entity, Health] as const,
 				Without(Player)
 			);
 			expect(nonPlayerResults).toHaveLength(2);
@@ -217,14 +220,14 @@ describe('createQueryRegistry', () => {
 			Health[eid1] = 100;
 			Health[eid2] = 75;
 
-			const results = world._queryRegistry.queryComponents([Entity, Health]);
+			const results = world._queryRegistry.queryComponents([Entity, Health] as const);
 
 			expect(results).toHaveLength(2);
 			expect(results[0]).toEqual([eid1, 100]);
 			expect(results[1]).toEqual([eid2, 75]);
 		});
 
-		it('should handle tag components', () => {
+		it('should handle marker components', () => {
 			const Player = {};
 
 			const eid1 = world.createEntity();
@@ -232,7 +235,7 @@ describe('createQueryRegistry', () => {
 
 			world.addComponent(eid1, Player);
 
-			const results = world._queryRegistry.queryComponents([Entity, Player]);
+			const results = world._queryRegistry.queryComponents([Entity, Player] as const);
 
 			expect(results).toHaveLength(1);
 			expect(results[0]).toEqual([eid1, true]);
@@ -258,7 +261,7 @@ describe('createQueryRegistry', () => {
 			Position.x[eid2] = 20;
 			Position.y[eid2] = 15;
 
-			const results = world._queryRegistry.queryComponents([Entity, Position, Velocity]);
+			const results = world._queryRegistry.queryComponents([Entity, Position, Velocity] as const);
 
 			// Only eid1 should be included
 			expect(results).toHaveLength(1);

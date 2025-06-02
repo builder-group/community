@@ -1,5 +1,11 @@
 import { withNew } from '@blgc/utils';
-import { createComponentRegistry, TComponentRef, TComponentRegistry } from './component';
+import {
+	createComponentRegistry,
+	TComponentRef,
+	TComponentRegistry,
+	TUpdateComponentValue
+} from './component';
+import type { TComponentValue } from './component/types';
 import { createEntityIndex, TEntityId, TEntityIndex } from './entity';
 import {
 	createQueryRegistry,
@@ -25,13 +31,25 @@ import { TEntity } from './query/types';
  * ```typescript
  * const world = createWorld();
  *
- * // Create entities and add components
+ * // Define components
+ * const Position = { x: [], y: [] };    // AoS pattern
+ * const Health = [];                    // Single value array
+ * const Player = {};                    // Marker component
+ *
+ * // Create entities and add components with values
  * const entity = world.createEntity();
- * world.addComponent(entity, Position);
- * world.addComponent(entity, Velocity);
+ * world.addComponent(entity, Position, { x: 10, y: 20 });
+ * world.addComponent(entity, Health, 100);
+ * world.addComponent(entity, Player, true);
+ *
+ * // Update component values
+ * world.updateComponent(entity, Position, { x: 15 });               // Partial AoS update (y unchanged)
+ * world.updateComponent(entity, Health, 90, true);                  // Update & mark changed
+ * world.updateComponent(entity, Player, false);                     // Remove marker component
+ * world.updateComponent(entity, Player, true);                      // Add marker component back
  *
  * // Query entities
- * const entities = world.query(And(With(Position), With(Velocity)));
+ * const entities = world.queryEntities(And(With(Position), With(Health)));
  * ```
  */
 export function createWorld(): TWorld {
@@ -53,8 +71,21 @@ export function createWorld(): TWorld {
 			this._entityIndex.removeEntity(eid);
 		},
 
-		addComponent(eid, component) {
-			this._componentRegistry.addComponent(eid, component);
+		addComponent<GComponent extends TComponentRef>(
+			eid: TEntityId,
+			component: GComponent,
+			value?: TComponentValue<GComponent>
+		): void {
+			this._componentRegistry.addComponent(eid, component, value);
+		},
+
+		updateComponent<GComponent extends TComponentRef>(
+			eid: TEntityId,
+			component: GComponent,
+			value: TUpdateComponentValue<GComponent>,
+			markAsChanged?: boolean
+		): void {
+			this._componentRegistry.updateComponent(eid, component, value, markAsChanged);
 		},
 
 		removeComponent(eid, component) {
@@ -111,6 +142,35 @@ export interface TWorld {
 	 * @param component - The component to add
 	 */
 	addComponent(eid: TEntityId, component: TComponentRef): void;
+
+	/**
+	 * Adds a component to an entity with initial data.
+	 * @param eid - The entity ID
+	 * @param component - The component to add
+	 * @param value - Initial component data
+	 */
+	addComponent<GComponent>(
+		eid: TEntityId,
+		component: GComponent,
+		value: TComponentValue<GComponent>
+	): void;
+
+	/**
+	 * Updates a component for an entity.
+	 * - For arrays: sets value directly
+	 * - For marker components (empty objects): true adds component, false removes it
+	 * - For objects with arrays: sets each property value (supports partial updates)
+	 * @param eid - The entity ID
+	 * @param component - The component to update
+	 * @param value - New component data (partial for AoS, boolean for marker components)
+	 * @param markAsChanged - Whether to mark the component as changed (default: true)
+	 */
+	updateComponent<T>(
+		eid: TEntityId,
+		component: T,
+		value: TUpdateComponentValue<T>,
+		markAsChanged?: boolean
+	): void;
 
 	/**
 	 * Removes a component from an entity.

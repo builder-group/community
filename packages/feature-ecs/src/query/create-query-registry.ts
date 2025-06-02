@@ -8,13 +8,7 @@ import { TComponentRef } from '../component';
 import { TEntityId } from '../entity';
 import { TWorld } from '../world';
 import { categorizeEvaluationStrategy } from './categorize-evaluation-strategy';
-import {
-	Entity,
-	TEntity,
-	InferComponentType as TInferComponentType,
-	TQueryData,
-	TQueryFilter
-} from './types';
+import { Entity, TEntity, TQueryComponentValue, TQueryData, TQueryFilter } from './types';
 
 /**
  * Creates a new query registry
@@ -56,17 +50,17 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 			return matchingEntities;
 		},
 
-		queryComponents<T extends readonly (TComponentRef | TEntity)[]>(
-			components: T,
+		queryComponents<GComponents extends readonly (TComponentRef | TEntity)[]>(
+			components: GComponents,
 			filter?: TQueryFilter
-		): TComponentDataTuple<T>[] {
+		): TComponentDataTuple<GComponents>[] {
 			// Get entities that match the filter (or all alive entities if no filter)
 			const matchingEntities = filter
 				? this.queryEntities(filter)
 				: this._world._entityIndex.getAliveEntities();
 
 			// For each entity, check if it has all components and get their data
-			const results: TComponentDataTuple<T>[] = [];
+			const results: TComponentDataTuple<GComponents>[] = [];
 			for (const eid of matchingEntities) {
 				const row: unknown[] = [];
 				let hasAllComponents = true;
@@ -97,7 +91,7 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 								}
 							}
 
-							// If no array properties found, it's a tag component
+							// If no array properties found, it's a marker component
 							if (!hasArrayProperties) {
 								componentData = true;
 							}
@@ -113,7 +107,7 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 
 				// Only include entities that have all requested components
 				if (hasAllComponents) {
-					results.push(row as TComponentDataTuple<T>);
+					results.push(row as TComponentDataTuple<GComponents>);
 				}
 			}
 
@@ -183,10 +177,10 @@ export interface TQueryRegistry {
 	/**
 	 * Queries components and returns matching entities with component data.
 	 */
-	queryComponents<T extends readonly (TComponentRef | TEntity)[]>(
-		components: T,
+	queryComponents<GComponents extends readonly (TComponentRef | TEntity)[]>(
+		components: GComponents,
 		filter?: TQueryFilter
-	): TComponentDataTuple<T>[];
+	): TComponentDataTuple<GComponents>[];
 
 	/**
 	 * Gets or creates a compiled query
@@ -224,6 +218,6 @@ export interface TExecuteQueryOptions extends TGetQueryOptions {
 	cache?: boolean;
 }
 
-export type TComponentDataTuple<T extends readonly unknown[]> = {
-	[K in keyof T]: TInferComponentType<T[K]>;
+export type TComponentDataTuple<GComponents extends readonly (TComponentRef | TEntity)[]> = {
+	[K in keyof GComponents]: TQueryComponentValue<GComponents[K]>;
 };

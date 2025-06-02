@@ -10,7 +10,7 @@ describe('Component Variants Performance', () => {
 	const Position: { x: number[]; y: number[] } = { x: [], y: [] }; // Object with arrays (AoS)
 	const Transform: { x: number; y: number }[] = []; // Array of objects (SoA)
 	const Health: number[] = []; // Single value array
-	const Player: {} = {}; // Tag component
+	const Player: {} = {}; // Marker component
 
 	describe('Add Component', () => {
 		bench('AoS - Position', () => {
