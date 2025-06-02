@@ -21,6 +21,9 @@ const Color: { value: string[] } = { value: [] };
 // Create world
 const world = createWorld();
 
+// @ts-ignore
+// globalThis['__world'] = world;
+
 // Create entities
 for (let i = 0; i < 100; i++) {
 	const entity = world.createEntity();
