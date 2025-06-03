@@ -8,11 +8,11 @@
  * Creates a new system registry
  */
 export function createSystemRegistry<GSystemSets extends string = string, GContext = any>(
-	systemSets: readonly GSystemSets[]
+	systemSets: GSystemSets[]
 ): TSystemRegistry<GSystemSets, GContext> {
 	return {
 		_systems: [],
-		_systemSets: [...systemSets],
+		_systemSets: systemSets,
 
 		addSystem(fn, options = {}) {
 			const { set = this._systemSets[0] as GSystemSets, before, after } = options;
