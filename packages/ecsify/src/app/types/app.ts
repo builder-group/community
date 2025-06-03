@@ -14,6 +14,7 @@ import {
 	TQueryRegistry
 } from '../../query';
 import { TSystemRegistry } from '../../system';
+import { TExtractField } from '../../types';
 import { TAnyPlugin } from '../types';
 import { TMergePlugins } from './plugin';
 
@@ -190,6 +191,3 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	 */
 	reset(): void;
 };
-
-export type TExtractField<GObject, GKey extends keyof any, GDefault> =
-	GObject extends Record<GKey, infer GValue> ? GValue : GDefault;

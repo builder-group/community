@@ -1,5 +1,6 @@
 import { TComponentRef } from '../../component';
-import { TApp, TExtractField, TInnerAppContext } from './app';
+import { TExtractField } from '../../types';
+import { TApp, TInnerAppContext } from './app';
 
 export type TPluginComponents = Record<string, TComponentRef>;
 export type TPluginResources = Record<string, unknown>;
