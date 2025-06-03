@@ -1,15 +1,15 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/feature-ecs/.github/banner.svg" alt="feature-ecs banner">
+    <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/ecsify/.github/banner.svg" alt="ecsify banner">
 </h1>
 
 <p align="left">
     <a href="https://github.com/builder-group/community/blob/develop/LICENSE">
         <img src="https://img.shields.io/github/license/builder-group/community.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
-    <a href="https://www.npmjs.com/package/feature-ecs">
-        <img src="https://img.shields.io/bundlephobia/minzip/feature-ecs.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
+    <a href="https://www.npmjs.com/package/ecsify">
+        <img src="https://img.shields.io/bundlephobia/minzip/ecsify.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
     </a>
-    <a href="https://www.npmjs.com/package/feature-ecs">
+    <a href="https://www.npmjs.com/package/ecsify">
         <img src="https://img.shields.io/npm/dt/featuer-state.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>
     </a>
     <a href="https://discord.gg/w4xE3bSjhQ">
@@ -17,7 +17,7 @@
     </a>
 </p>
 
-`feature-ecs` is a flexible, typesafe, and performance-focused Entity Component System (ECS) library for TypeScript.
+`ecsify` is a flexible, typesafe, and performance-focused Entity Component System (ECS) library for TypeScript.
 
 - **🔮 Simple, declarative API**: Intuitive component patterns with full type safety
 - **🍃 Lightweight & Tree Shakable**: Function-based and modular design
@@ -29,11 +29,11 @@
 
 ### 📚 Examples
 
-- [Basic](https://github.com/builder-group/community/tree/develop/examples/feature-ecs/vanilla/basic)
+- [Basic](https://github.com/builder-group/community/tree/develop/examples/ecsify/vanilla/basic)
 
 ### 🌟 Motivation
 
-Build a modern, type-safe ECS library that fully leverages TypeScript's type system without compromising performance. While libraries like [bitECS](https://github.com/NateTheGreatt/bitECS) offer good speed, they often lack robust TypeScript support and more advanced queries like `Added()`, `Removed()`, or `Changed()`. `feature-ecs` bridges this gap—combining high performance, full TypeScript integration, and powerful query capabilities—all while adhering to the KISS principle for a clean, intuitive API.
+Build a modern, type-safe ECS library that fully leverages TypeScript's type system without compromising performance. While libraries like [bitECS](https://github.com/NateTheGreatt/bitECS) offer good speed, they often lack robust TypeScript support and more advanced queries like `Added()`, `Removed()`, or `Changed()`. `ecsify` bridges this gap—combining high performance, full TypeScript integration, and powerful query capabilities—all while adhering to the KISS principle for a clean, intuitive API.
 
 ### ⚖️ Alternatives
 
@@ -42,7 +42,7 @@ Build a modern, type-safe ECS library that fully leverages TypeScript's type sys
 
 ## 📖 Usage
 
-`feature-ecs` offers core ECS concepts without imposing strict rules onto your architecture:
+`ecsify` offers core ECS concepts without imposing strict rules onto your architecture:
 
 - **Entities** are numerical IDs representing game objects
 - **Components** are data containers that can follow different storage patterns
@@ -57,7 +57,7 @@ For optimal performance:
 ### Basic Setup
 
 ```ts
-import { And, createWorld, With } from 'feature-ecs';
+import { And, createWorld, With } from 'ecsify';
 
 // Define components - no registration needed!
 const Position = { x: [], y: [] }; // AoS pattern
@@ -111,7 +111,7 @@ if (world.hasComponent(entity, Player)) {
 ### Querying
 
 ```ts
-import { Added, And, Changed, Or, Removed, With, Without } from 'feature-ecs';
+import { Added, And, Changed, Or, Removed, With, Without } from 'ecsify';
 
 // Query entity IDs
 const players = world.queryEntities(With(Player));

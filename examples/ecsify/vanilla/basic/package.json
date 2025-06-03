@@ -9,7 +9,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"feature-ecs": "workspace:*"
+		"ecsify": "workspace:*"
 	},
 	"devDependencies": {
 		"typescript": "~5.8.3",

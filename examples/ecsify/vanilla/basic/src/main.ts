@@ -1,4 +1,4 @@
-import { createWorld, Entity } from 'feature-ecs';
+import { createWorld, Entity } from 'ecsify';
 import './style.css';
 
 // Get canvas and context

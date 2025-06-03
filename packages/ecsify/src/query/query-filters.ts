@@ -1,5 +1,5 @@
 import { TComponentRef } from '../component';
-import { TWorld } from '../world';
+import { TWorld } from '../create-world';
 import { TQueryData, TQueryFilter, TQueryParentType } from './types';
 
 /**

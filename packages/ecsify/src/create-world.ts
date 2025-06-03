@@ -17,8 +17,6 @@ import {
 import { TEntity } from './query/types';
 
 // TODO:
-// Events
-// Systems
 // Resources
 
 /**

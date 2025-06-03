@@ -1,6 +1,6 @@
 import { TComponentRef, TComponentValue } from '../component';
+import { TWorld } from '../create-world';
 import { TEntityId } from '../entity';
-import { TWorld } from '../world';
 
 /**
  * Special entity symbol for component queries

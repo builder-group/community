@@ -5,8 +5,8 @@
  */
 
 import { TComponentRef } from '../component';
+import { TWorld } from '../create-world';
 import { TEntityId } from '../entity';
-import { TWorld } from '../world';
 import { categorizeEvaluationStrategy } from './categorize-evaluation-strategy';
 import { Entity, TEntity, TQueryComponentValue, TQueryData, TQueryFilter } from './types';
 
