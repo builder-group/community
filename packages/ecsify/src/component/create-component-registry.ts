@@ -525,6 +525,20 @@ export interface TComponentRegistry {
 	): void;
 
 	/**
+	 * Updates component values with type safety.
+	 * - For arrays: sets value directly
+	 * - For marker components (empty objects): true adds component, false removes it
+	 * - For objects with arrays: sets each property value
+	 * @param markAsChanged - Whether to mark the component as changed (default: true)
+	 */
+	updateComponent<GComponent extends TComponentRef>(
+		eid: TEntityId,
+		component: GComponent,
+		value: TUpdateComponentValue<GComponent>,
+		markAsChanged?: boolean
+	): void;
+
+	/**
 	 * Removes a component from an entity and clears its data.
 	 * @param eid - The entity ID
 	 * @param component - The component to remove
@@ -607,18 +621,4 @@ export interface TComponentRegistry {
 	 * Resets the registry to its initial empty state.
 	 */
 	reset(): void;
-
-	/**
-	 * Updates component values with type safety.
-	 * - For arrays: sets value directly
-	 * - For marker components (empty objects): true adds component, false removes it
-	 * - For objects with arrays: sets each property value
-	 * @param markAsChanged - Whether to mark the component as changed (default: true)
-	 */
-	updateComponent<GComponent extends TComponentRef>(
-		eid: TEntityId,
-		component: GComponent,
-		value: TUpdateComponentValue<GComponent>,
-		markAsChanged?: boolean
-	): void;
 }

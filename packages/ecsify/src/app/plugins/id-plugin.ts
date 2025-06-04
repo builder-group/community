@@ -1,9 +1,13 @@
+import { TEntityId } from '../../entity';
 import { TPlugin } from '../types';
 
 export function createIdPlugin(): TIdPlugin {
 	return {
 		name: 'Id',
-		deps: []
+		deps: [],
+		components: {
+			IdMixin: []
+		}
 	};
 }
 
@@ -13,6 +17,9 @@ export type TIdPlugin = TPlugin<
 		components: {
 			// Mixins
 			IdMixin: TCIdMixin[];
+		};
+		appExtensions: {
+			getEntityById(id: TCIdMixinId): TEntityId | null;
 		};
 	},
 	[]

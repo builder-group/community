@@ -1,5 +1,4 @@
 import { TComponentRef } from '../../component';
-import { TExtractField } from '../../types';
 import { TApp, TInnerAppContext } from './app';
 
 export type TPluginComponents = Record<string, TComponentRef>;
@@ -81,11 +80,16 @@ export type TShapeFromPlugin<GPlugin extends TAnyPlugin> =
 	GPlugin extends TPlugin<infer GShape, any> ? GShape : never;
 
 export type TMergeTwoPluginShapes<A, B> = {
-	components: TExtractField<A, 'components', {}> & TExtractField<B, 'components', {}>;
-	resources: TExtractField<A, 'resources', {}> & TExtractField<B, 'resources', {}>;
-	events: TExtractField<A, 'events', {}> & TExtractField<B, 'events', {}>;
-	appExtensions: TExtractField<A, 'appExtensions', {}> & TExtractField<B, 'appExtensions', {}>;
-	systemSets: TExtractField<A, 'systemSets', never> | TExtractField<B, 'systemSets', never>;
+	components: (A extends { components: infer AC } ? AC : {}) &
+		(B extends { components: infer BC } ? BC : {});
+	resources: (A extends { resources: infer AR } ? AR : {}) &
+		(B extends { resources: infer BR } ? BR : {});
+	events: (A extends { events: infer AE } ? AE : {}) & (B extends { events: infer BE } ? BE : {});
+	appExtensions: (A extends { appExtensions: infer AA } ? AA : {}) &
+		(B extends { appExtensions: infer BA } ? BA : {});
+	systemSets:
+		| (A extends { systemSets: infer AS } ? AS : never)
+		| (B extends { systemSets: infer BS } ? BS : never);
 };
 
 /**

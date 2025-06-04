@@ -85,11 +85,7 @@ export interface TSystemRegistry<GSystemSets extends string = string, GContext =
 	 */
 	addSystem(
 		fn: TSystemFn<GSystemSets, GContext>,
-		options?: {
-			before?: TSystemFn<GSystemSets, GContext>;
-			after?: TSystemFn<GSystemSets, GContext>;
-			set?: GSystemSets;
-		}
+		options?: TAddSystemOptions<GSystemSets, GContext>
 	): void;
 
 	/**
@@ -115,3 +111,9 @@ export type TSystemFn<GSystemSets extends string = string, GContext = any> = ((
 	set?: GSystemSets;
 	setup?: (registry: TSystemRegistry<GSystemSets, GContext>) => void;
 };
+
+export interface TAddSystemOptions<GSystemSets extends string = string, GContext = any> {
+	before?: TSystemFn<GSystemSets, GContext>;
+	after?: TSystemFn<GSystemSets, GContext>;
+	set?: GSystemSets;
+}

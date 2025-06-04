@@ -1,12 +1,34 @@
 import { TEntityId } from '../../entity';
-import { TPlugin } from '../types';
+import { With } from '../../query';
+import { TApp, TAppContext, TPlugin, TPluginSystemFn } from '../types';
 
 export function createDefaultPlugin(): TDefaultPlugin {
 	return {
 		name: 'Default',
-		deps: []
+		deps: [],
+		components: {
+			Removed: {}
+		},
+		appExtensions: {
+			markEntityForRemoval(this: TApp<TAppContext<[TDefaultPlugin]>>, eid: TEntityId) {
+				this.addComponent(eid, this.c.Removed);
+			}
+		},
+		setup: (app) => {
+			app.addSystem(cleanupSystem, { set: 'Last' });
+		}
 	};
 }
+
+const cleanupSystem: TPluginSystemFn<TDefaultPlugin> = (app) => {
+	// Remove entities marked for removal
+	for (const eid of app.queryEntities(With(app.c.Removed))) {
+		app.destroyEntity(eid);
+	}
+
+	// Flush the app (e.g. to clear changes from this frame)
+	app.flush();
+};
 
 export type TDefaultPlugin = TPlugin<
 	{
@@ -14,10 +36,13 @@ export type TDefaultPlugin = TPlugin<
 		components: {
 			// Markers
 			Removed: TCRemoved;
-
-			// Mixins
-			ParentMixin: TCParentMixin[];
-			ChildrenMixin: TChildrenMixin[];
+		};
+		appExtensions: {
+			/**
+			 * Mark an entity for removal.
+			 * @param eid - The entity ID to mark for removal
+			 */
+			markEntityForRemoval(eid: TEntityId): void;
 		};
 		systemSets: 'First' | 'Update' | 'Last';
 	},
@@ -25,11 +50,3 @@ export type TDefaultPlugin = TPlugin<
 >;
 
 export type TCRemoved = {};
-
-export interface TCParentMixin {
-	parent: TEntityId;
-}
-
-export interface TChildrenMixin {
-	children: TEntityId[];
-}

@@ -5,7 +5,7 @@ import {
 	TUpdateComponentValue
 } from '../../component';
 import { TEntityId, TEntityIndex } from '../../entity';
-import { TEventRegistry } from '../../event';
+import { TEvent, TEventRegistry } from '../../event';
 import {
 	TComponentDataTuple,
 	TEntity,
@@ -13,31 +13,12 @@ import {
 	TQueryFilter,
 	TQueryRegistry
 } from '../../query';
-import { TSystemRegistry } from '../../system';
-import { TExtractField } from '../../types';
+import { TAddSystemOptions, TSystemFn, TSystemRegistry } from '../../system';
 import { TAnyPlugin } from '../types';
-import { TMergePlugins } from './plugin';
-
-export type TAppContext<GPlugins extends TAnyPlugin[] = []> = TInnerAppContext<
-	TMergePlugins<GPlugins>
->;
-
-export interface TInnerAppContext<GMergedPlugins extends Record<string, unknown> = {}> {
-	components: TExtractField<GMergedPlugins, 'components', {}>;
-	resources: TExtractField<GMergedPlugins, 'resources', {}>;
-	events: TExtractField<GMergedPlugins, 'events', {}>;
-	systemSets: TExtractField<GMergedPlugins, 'systemSets', never>;
-	appExtensions: TExtractField<GMergedPlugins, 'appExtensions', {}>;
-}
-
-type TPluginsFromAppContext<GAppContext extends TAppContext> =
-	GAppContext extends TAppContext<infer GPlugins> ? GPlugins : never;
+import { TMergePlugins, TPlugin } from './plugin';
 
 export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['appExtensions'] & {
 	_pluginNames: string[];
-
-	c: GAppContext['components'];
-	r: GAppContext['resources'];
 
 	/** Component registry for managing component data */
 	_componentRegistry: TComponentRegistry;
@@ -46,9 +27,12 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	/** Query registry for efficient entity queries */
 	_queryRegistry: TQueryRegistry;
 	/** System registry for managing system data */
-	_systemRegistry: TSystemRegistry<GAppContext['systemSets'], GAppContext>;
+	_systemRegistry: TSystemRegistry<GAppContext['systemSets'], TApp<GAppContext>>;
 	/** Event registry for managing event data */
 	_eventRegistry: TEventRegistry<GAppContext['events']>;
+
+	c: GAppContext['components'];
+	r: GAppContext['resources'];
 
 	/**
 	 * Add a plugin to the app
@@ -182,6 +166,41 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	): TComponentDataTuple<T>[];
 
 	/**
+	 * Add a system with optional ordering
+	 */
+	addSystem(
+		fn: TSystemFn<GAppContext['systemSets'], TApp<GAppContext>>,
+		options?: TAddSystemOptions<GAppContext['systemSets'], TApp<GAppContext>>
+	): void;
+
+	/**
+	 * Push a new event of a specific type
+	 */
+	pushEvent<GType extends keyof GAppContext['events']>(
+		type: GType,
+		data: GAppContext['events'][GType]
+	): void;
+
+	/**
+	 * Read all events of a specific type without consuming them
+	 */
+	readEvent<GType extends keyof GAppContext['events']>(
+		type: GType
+	): TEvent<GAppContext['events'][GType]>[];
+
+	/**
+	 * Read and consume all events of a specific type
+	 */
+	consumeEvent<GType extends keyof GAppContext['events']>(
+		type: GType
+	): TEvent<GAppContext['events'][GType]>[];
+
+	/**
+	 * Update the world.
+	 */
+	update(delta?: number): void;
+
+	/**
 	 * Clears the world.
 	 */
 	flush(): void;
@@ -191,3 +210,46 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	 */
 	reset(): void;
 };
+
+export type TAppContext<GPlugins extends TAnyPlugin[] = []> = TInnerAppContext<
+	TMergePlugins<GPlugins>
+>;
+
+export interface TInnerAppContext<GMergedPlugins extends Record<string, any> = {}> {
+	components: GMergedPlugins extends { components: infer GComponents }
+		? GComponents extends Record<string, any>
+			? GComponents
+			: {}
+		: {};
+	resources: GMergedPlugins extends { resources: infer GResources }
+		? GResources extends Record<string, any>
+			? GResources
+			: {}
+		: {};
+	events: GMergedPlugins extends { events: infer GEvents }
+		? GEvents extends Record<string, any>
+			? GEvents
+			: {}
+		: {};
+	appExtensions: GMergedPlugins extends { appExtensions: infer GAppExtensions }
+		? GAppExtensions extends Record<string, any>
+			? GAppExtensions
+			: {}
+		: {};
+	systemSets: GMergedPlugins extends { systemSets: infer GSystemSets }
+		? GSystemSets extends string
+			? GSystemSets
+			: string
+		: string;
+}
+
+export type TPluginsFromAppContext<GAppContext extends TAppContext> =
+	GAppContext extends TAppContext<infer GPlugins> ? GPlugins : never;
+
+export type TAppContextFromPlugin<GPlugin extends TAnyPlugin> =
+	GPlugin extends TPlugin<any, any, infer GAppContext> ? GAppContext : never;
+
+export type TPluginSystemFn<
+	GPlugin extends TAnyPlugin,
+	GAppContext extends TAppContextFromPlugin<GPlugin> = TAppContextFromPlugin<GPlugin>
+> = TSystemFn<GAppContext['systemSets'], TApp<GAppContext>>;
