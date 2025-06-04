@@ -33,8 +33,8 @@ describe('validateComponentRegistry', () => {
 		registry.registerComponent(Position);
 		registry.registerComponent(Health);
 
-		const eid1 = entityIndex.addEntity();
-		const eid2 = entityIndex.addEntity();
+		const eid1 = entityIndex.createEntity();
+		const eid2 = entityIndex.createEntity();
 
 		registry.addComponent(eid1, Position);
 		registry.addComponent(eid1, Health);
@@ -60,7 +60,7 @@ describe('validateComponentRegistry', () => {
 
 		expect(validateComponentRegistry(registry)).toBe(true);
 
-		const eid = entityIndex.addEntity();
+		const eid = entityIndex.createEntity();
 		registry.addComponent(eid, components[0]!); // Gen 0
 		registry.addComponent(eid, components[31]!); // Gen 1
 
@@ -71,7 +71,7 @@ describe('validateComponentRegistry', () => {
 		const Position: TPosition = { x: [], y: [] };
 		registry.registerComponent(Position);
 
-		const eid = entityIndex.addEntity();
+		const eid = entityIndex.createEntity();
 		registry.addComponent(eid, Position);
 
 		registry.reset();

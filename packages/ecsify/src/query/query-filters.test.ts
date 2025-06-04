@@ -20,9 +20,9 @@ describe('Query Filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
-			const eid3 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
+			const eid3 = entityIndex.createEntity();
 
 			// eid1: Position only
 			componentRegistry.addComponent(eid1, Position);
@@ -61,9 +61,9 @@ describe('Query Filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
-			const eid3 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
+			const eid3 = entityIndex.createEntity();
 
 			// eid1: Position only
 			componentRegistry.addComponent(eid1, Position);
@@ -84,8 +84,8 @@ describe('Query Filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const NonExistent = { value: [] as number[] };
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
 
 			componentRegistry.addComponent(eid1, Position);
 
@@ -99,8 +99,8 @@ describe('Query Filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
 
 			// Add Position to eid1 (should be tracked as added)
 			componentRegistry.addComponent(eid1, Position);
@@ -118,7 +118,7 @@ describe('Query Filters', () => {
 		it('should return empty after flush clears tracking', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 			componentRegistry.addComponent(eid, Position);
 
 			// Before flush: should find the entity
@@ -134,9 +134,9 @@ describe('Query Filters', () => {
 		it('should track multiple adds in same frame', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
-			const eid3 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
+			const eid3 = entityIndex.createEntity();
 
 			componentRegistry.addComponent(eid1, Position);
 			componentRegistry.addComponent(eid2, Position);
@@ -152,8 +152,8 @@ describe('Query Filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
 
 			// Add components first
 			componentRegistry.addComponent(eid1, Position);
@@ -175,7 +175,7 @@ describe('Query Filters', () => {
 		it('should clear tracking after flush', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 			componentRegistry.addComponent(eid, Position);
 			componentRegistry.flush();
 
@@ -197,8 +197,8 @@ describe('Query Filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
 
 			// Add components first
 			componentRegistry.addComponent(eid1, Position);
@@ -221,7 +221,7 @@ describe('Query Filters', () => {
 		it('should clear tracking after flush', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 			componentRegistry.addComponent(eid, Position);
 			componentRegistry.flush();
 
@@ -244,9 +244,9 @@ describe('Query Filters', () => {
 			const Velocity = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
-			const eid3 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
+			const eid3 = entityIndex.createEntity();
 
 			// eid1: Position + Velocity
 			componentRegistry.addComponent(eid1, Position);
@@ -275,7 +275,7 @@ describe('Query Filters', () => {
 			const Velocity = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 			componentRegistry.addComponent(eid, Position);
 			componentRegistry.addComponent(eid, Velocity);
 			componentRegistry.addComponent(eid, Health);
@@ -292,8 +292,8 @@ describe('Query Filters', () => {
 			const Health = [] as number[];
 			const Enemy = {};
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
 
 			// eid1: Position + Health
 			componentRegistry.addComponent(eid1, Position);
@@ -314,8 +314,8 @@ describe('Query Filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
 
 			// Add components
 			componentRegistry.addComponent(eid1, Position);
@@ -341,10 +341,10 @@ describe('Query Filters', () => {
 			const Health = [] as number[];
 			const Shield = [] as number[];
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
-			const eid3 = entityIndex.addEntity();
-			const eid4 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
+			const eid3 = entityIndex.createEntity();
+			const eid4 = entityIndex.createEntity();
 
 			// eid1: Position only
 			componentRegistry.addComponent(eid1, Position);
@@ -372,9 +372,9 @@ describe('Query Filters', () => {
 			const Enemy = {};
 			const Ally = {};
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
-			const eid3 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
+			const eid3 = entityIndex.createEntity();
 
 			// eid1: Position + Enemy
 			componentRegistry.addComponent(eid1, Position);
@@ -399,9 +399,9 @@ describe('Query Filters', () => {
 			const Health = [] as number[];
 			const Shield = [] as number[];
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
-			const eid3 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
+			const eid3 = entityIndex.createEntity();
 
 			// Setup initial state
 			componentRegistry.addComponent(eid1, Position);
@@ -427,7 +427,7 @@ describe('Query Filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 			// Entity has no components
 
 			const result = queryRegistry.queryEntities(Or(With(Position), With(Health)));
@@ -442,10 +442,10 @@ describe('Query Filters', () => {
 			const Shield = [] as number[];
 			const Alive = {};
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
-			const eid3 = entityIndex.addEntity();
-			const eid4 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
+			const eid3 = entityIndex.createEntity();
+			const eid4 = entityIndex.createEntity();
 
 			// eid1: Position + Health + Alive
 			componentRegistry.addComponent(eid1, Position);
@@ -478,9 +478,9 @@ describe('Query Filters', () => {
 			const Velocity = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
-			const eid3 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
+			const eid3 = entityIndex.createEntity();
 
 			// eid1: Position + Velocity
 			componentRegistry.addComponent(eid1, Position);
@@ -506,7 +506,7 @@ describe('Query Filters', () => {
 			const C = {};
 			const D = {};
 
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 			componentRegistry.addComponent(eid, A);
 			componentRegistry.addComponent(eid, B);
 			componentRegistry.addComponent(eid, C);
@@ -525,9 +525,9 @@ describe('Query Filters', () => {
 			const Shield = [] as number[];
 			const Enemy = {};
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
-			const eid3 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
+			const eid3 = entityIndex.createEntity();
 
 			// Setup initial state
 			componentRegistry.addComponent(eid1, Position);
@@ -572,7 +572,7 @@ describe('Query Filters', () => {
 		it('should handle single filter in And', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 			componentRegistry.addComponent(eid, Position);
 
 			const result = queryRegistry.queryEntities(And(With(Position)));
@@ -582,7 +582,7 @@ describe('Query Filters', () => {
 		it('should handle single filter in Or', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 			componentRegistry.addComponent(eid, Position);
 
 			const result = queryRegistry.queryEntities(Or(With(Position)));
@@ -593,7 +593,7 @@ describe('Query Filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const NonExistent = { value: [] as number[] };
 
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 			componentRegistry.addComponent(eid, Position);
 
 			// With non-existent should return empty
@@ -611,7 +611,7 @@ describe('Query Filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 			componentRegistry.addComponent(eid, Position);
 			componentRegistry.addComponent(eid, Health);
 
@@ -633,8 +633,8 @@ describe('Query Filters', () => {
 		it('should invalidate cache when components change', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
 
 			componentRegistry.addComponent(eid1, Position);
 
@@ -655,8 +655,8 @@ describe('Query Filters', () => {
 			const Health = [] as number[];
 			const Velocity = { x: [] as number[], y: [] as number[] };
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
 
 			// Add Position and Health to eid1
 			componentRegistry.addComponent(eid1, Position);
@@ -704,7 +704,7 @@ describe('Query Filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const eid1 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
 			componentRegistry.addComponent(eid1, Health);
 
 			// Create multiple queries that depend on Position
@@ -766,9 +766,9 @@ describe('Query Filters', () => {
 			const Health = [] as number[];
 			const Shield = [] as number[];
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
-			const eid3 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
+			const eid3 = entityIndex.createEntity();
 
 			// eid1: Position + Health
 			componentRegistry.addComponent(eid1, Position);

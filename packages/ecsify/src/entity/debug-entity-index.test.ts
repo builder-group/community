@@ -16,8 +16,8 @@ describe('debugEntityIndex', () => {
 
 	it('should show alive entities', () => {
 		const index = createEntityIndex({ versioning: true });
-		index.addEntity();
-		index.addEntity();
+		index.createEntity();
+		index.createEntity();
 		const state = debugEntityIndex(index);
 
 		expect(state).toContain('Alive (2): [1v0, 2v0]');
@@ -27,8 +27,8 @@ describe('debugEntityIndex', () => {
 
 	it('should show dead entities after removal', () => {
 		const index = createEntityIndex({ versioning: true });
-		const id1 = index.addEntity();
-		const id2 = index.addEntity();
+		const id1 = index.createEntity();
+		const id2 = index.createEntity();
 		index.removeEntity(id1);
 		const state = debugEntityIndex(index);
 

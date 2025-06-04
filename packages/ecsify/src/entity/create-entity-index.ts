@@ -98,7 +98,7 @@ export function createEntityIndex(options: TCreateEntityIndexOptions = {}): TEnt
 		// After:      sparse: [_, 0, 2, 1, 3]  dense: [1, 3, 2v1, 4]  aliveCount: 4
 		//                                            └───alive────┘   nextBaseEid: 5
 		//             Returns: 4 (new entity with version 0)
-		addEntity() {
+		createEntity() {
 			// Try to recycle a removed entity first
 			if (this._aliveCount < this._dense.length) {
 				const recycledEid = this._dense[this._aliveCount] as number;
@@ -243,7 +243,7 @@ export interface TEntityIndex {
 	 * Creates a new entity ID or recycles a previously removed one.
 	 * @returns A unique entity ID (potentially versioned)
 	 */
-	addEntity(): TEntityId;
+	createEntity(): TEntityId;
 
 	/**
 	 * Removes an entity from the index, making its ID available for recycling.

@@ -38,7 +38,7 @@ describe('createEntityIndex', () => {
 	describe('addEntity', () => {
 		it('should add first entity with ID 1', () => {
 			const index = createEntityIndex();
-			const id = index.addEntity();
+			const id = index.createEntity();
 
 			expect(id).toBe(1);
 			expect(index._aliveCount).toBe(1);
@@ -49,9 +49,9 @@ describe('createEntityIndex', () => {
 
 		it('should add multiple entities with sequential IDs', () => {
 			const index = createEntityIndex();
-			const id1 = index.addEntity();
-			const id2 = index.addEntity();
-			const id3 = index.addEntity();
+			const id1 = index.createEntity();
+			const id2 = index.createEntity();
+			const id3 = index.createEntity();
 
 			expect(id1).toBe(1);
 			expect(id2).toBe(2);
@@ -62,11 +62,11 @@ describe('createEntityIndex', () => {
 
 		it('should recycle removed entity IDs', () => {
 			const index = createEntityIndex();
-			const id1 = index.addEntity();
-			const id2 = index.addEntity();
+			const id1 = index.createEntity();
+			const id2 = index.createEntity();
 
 			index.removeEntity(id1);
-			const recycledId = index.addEntity();
+			const recycledId = index.createEntity();
 
 			expect(recycledId).toBe(id1);
 			expect(index._aliveCount).toBe(2);
@@ -80,18 +80,18 @@ describe('createEntityIndex', () => {
 			index._nextBaseEid = index._maxBaseEid; // Set to max allowed (65535)
 
 			// This should work (creates entity with ID = maxEid)
-			const lastValidId = index.addEntity();
+			const lastValidId = index.createEntity();
 			expect(lastValidId).toBe(index._maxBaseEid);
 
 			// This should fail (nextId is now maxEid + 1 = 65536)
-			expect(() => index.addEntity()).toThrow('Maximum number of entities exceeded');
+			expect(() => index.createEntity()).toThrow('Maximum number of entities exceeded');
 		});
 	});
 
 	describe('removeEntity', () => {
 		it('should remove existing entity', () => {
 			const index = createEntityIndex();
-			const id = index.addEntity();
+			const id = index.createEntity();
 
 			const result = index.removeEntity(id);
 
@@ -111,7 +111,7 @@ describe('createEntityIndex', () => {
 
 		it('should return false for already removed entity', () => {
 			const index = createEntityIndex();
-			const id = index.addEntity();
+			const id = index.createEntity();
 
 			index.removeEntity(id);
 			const result = index.removeEntity(id);
@@ -121,9 +121,9 @@ describe('createEntityIndex', () => {
 
 		it('should handle swap-and-pop correctly', () => {
 			const index = createEntityIndex();
-			const id1 = index.addEntity();
-			const id2 = index.addEntity();
-			const id3 = index.addEntity();
+			const id1 = index.createEntity();
+			const id2 = index.createEntity();
+			const id3 = index.createEntity();
 
 			index.removeEntity(id2); // Remove middle entity
 
@@ -136,10 +136,10 @@ describe('createEntityIndex', () => {
 
 		it('should increment version when versioning enabled', () => {
 			const index = createEntityIndex({ versioning: true });
-			const id = index.addEntity();
+			const id = index.createEntity();
 
 			index.removeEntity(id);
-			const recycledId = index.addEntity();
+			const recycledId = index.createEntity();
 
 			expect(index.getBaseEid(recycledId)).toBe(index.getBaseEid(id));
 			expect(index.getEidVersion(recycledId)).toBe(1);
@@ -150,14 +150,14 @@ describe('createEntityIndex', () => {
 	describe('isEntityAlive', () => {
 		it('should return true for alive entity', () => {
 			const index = createEntityIndex();
-			const id = index.addEntity();
+			const id = index.createEntity();
 
 			expect(index.isEntityAlive(id)).toBe(true);
 		});
 
 		it('should return false for removed entity', () => {
 			const index = createEntityIndex();
-			const id = index.addEntity();
+			const id = index.createEntity();
 
 			index.removeEntity(id);
 
@@ -172,10 +172,10 @@ describe('createEntityIndex', () => {
 
 		it('should return false for stale versioned entity', () => {
 			const index = createEntityIndex({ versioning: true });
-			const id = index.addEntity();
+			const id = index.createEntity();
 
 			index.removeEntity(id);
-			index.addEntity(); // Recycle with new version
+			index.createEntity(); // Recycle with new version
 
 			expect(index.isEntityAlive(id)).toBe(false); // Old version should be dead
 		});
@@ -184,17 +184,17 @@ describe('createEntityIndex', () => {
 	describe('getEid', () => {
 		it('should return entity ID without version', () => {
 			const index = createEntityIndex();
-			const id = index.addEntity();
+			const id = index.createEntity();
 
 			expect(index.getBaseEid(id)).toBe(id);
 		});
 
 		it('should extract base ID from versioned entity', () => {
 			const index = createEntityIndex({ versioning: true });
-			const id = index.addEntity();
+			const id = index.createEntity();
 
 			index.removeEntity(id);
-			const recycledId = index.addEntity();
+			const recycledId = index.createEntity();
 
 			expect(index.getBaseEid(recycledId)).toBe(index.getBaseEid(id));
 		});
@@ -203,36 +203,36 @@ describe('createEntityIndex', () => {
 	describe('getEidVersion', () => {
 		it('should return 0 when versioning disabled', () => {
 			const index = createEntityIndex({ versioning: false });
-			const id = index.addEntity();
+			const id = index.createEntity();
 
 			expect(index.getEidVersion(id)).toBe(0);
 		});
 
 		it('should return 0 for new entity when versioning enabled', () => {
 			const index = createEntityIndex({ versioning: true });
-			const id = index.addEntity();
+			const id = index.createEntity();
 
 			expect(index.getEidVersion(id)).toBe(0);
 		});
 
 		it('should return incremented version for recycled entity', () => {
 			const index = createEntityIndex({ versioning: true });
-			const id = index.addEntity();
+			const id = index.createEntity();
 
 			index.removeEntity(id);
-			const recycledId = index.addEntity();
+			const recycledId = index.createEntity();
 
 			expect(index.getEidVersion(recycledId)).toBe(1);
 		});
 
 		it('should handle version overflow', () => {
 			const index = createEntityIndex({ versioning: true, versionBits: 2 }); // Max version 3
-			let currentId = index.addEntity();
+			let currentId = index.createEntity();
 
 			// Cycle through versions 0, 1, 2, 3, then back to 0
 			for (let i = 0; i < 4; i++) {
 				index.removeEntity(currentId);
-				currentId = index.addEntity();
+				currentId = index.createEntity();
 			}
 
 			expect(index.getEidVersion(currentId)).toBe(0); // Wrapped around
@@ -248,18 +248,18 @@ describe('createEntityIndex', () => {
 
 		it('should return all alive entities', () => {
 			const index = createEntityIndex();
-			const id1 = index.addEntity();
-			const id2 = index.addEntity();
-			const id3 = index.addEntity();
+			const id1 = index.createEntity();
+			const id2 = index.createEntity();
+			const id3 = index.createEntity();
 
 			expect(index.getAliveEntities()).toEqual([id1, id2, id3]);
 		});
 
 		it('should not include removed entities', () => {
 			const index = createEntityIndex();
-			const id1 = index.addEntity();
-			const id2 = index.addEntity();
-			const id3 = index.addEntity();
+			const id1 = index.createEntity();
+			const id2 = index.createEntity();
+			const id3 = index.createEntity();
 
 			index.removeEntity(id2);
 
@@ -270,8 +270,8 @@ describe('createEntityIndex', () => {
 	describe('formatEid', () => {
 		it('should format entity ID without version when versioning disabled', () => {
 			const index = createEntityIndex({ versioning: false });
-			const id1 = index.addEntity();
-			const id2 = index.addEntity();
+			const id1 = index.createEntity();
+			const id2 = index.createEntity();
 
 			expect(index.formatEid(id1)).toBe('1');
 			expect(index.formatEid(id2)).toBe('2');
@@ -279,8 +279,8 @@ describe('createEntityIndex', () => {
 
 		it('should format entity ID with version when versioning enabled', () => {
 			const index = createEntityIndex({ versioning: true });
-			const id1 = index.addEntity();
-			const id2 = index.addEntity();
+			const id1 = index.createEntity();
+			const id2 = index.createEntity();
 
 			expect(index.formatEid(id1)).toBe('1v0');
 			expect(index.formatEid(id2)).toBe('2v0');
@@ -288,24 +288,24 @@ describe('createEntityIndex', () => {
 
 		it('should format recycled entity with incremented version', () => {
 			const index = createEntityIndex({ versioning: true, versionBits: 4 });
-			let currentId = index.addEntity();
+			let currentId = index.createEntity();
 
 			// Cycle through multiple versions
 			for (let i = 0; i < 10; i++) {
 				index.removeEntity(currentId);
-				currentId = index.addEntity();
+				currentId = index.createEntity();
 				expect(index.formatEid(currentId)).toBe(`1v${i + 1}`);
 			}
 		});
 
 		it('should format entity after version overflow', () => {
 			const index = createEntityIndex({ versioning: true, versionBits: 2 }); // Max version 3
-			let currentId = index.addEntity();
+			let currentId = index.createEntity();
 
 			// Cycle through versions 0, 1, 2, 3, then back to 0
 			for (let i = 0; i < 4; i++) {
 				index.removeEntity(currentId);
-				currentId = index.addEntity();
+				currentId = index.createEntity();
 			}
 
 			expect(index.formatEid(currentId)).toBe('1v0'); // Wrapped around
@@ -317,10 +317,10 @@ describe('createEntityIndex', () => {
 			const index = createEntityIndex({ versioning: true });
 
 			// Create complex state: entities, removal, recycling
-			const id1 = index.addEntity();
-			const id2 = index.addEntity();
+			const id1 = index.createEntity();
+			const id2 = index.createEntity();
 			index.removeEntity(id1);
-			const recycled = index.addEntity();
+			const recycled = index.createEntity();
 
 			index.reset();
 
@@ -330,7 +330,7 @@ describe('createEntityIndex', () => {
 			expect(index._sparse).toEqual([]);
 			expect(index._nextBaseEid).toBe(1);
 
-			const newId = index.addEntity();
+			const newId = index.createEntity();
 			expect(newId).toBe(1);
 			expect(index.isEntityAlive(newId)).toBe(true);
 		});

@@ -63,7 +63,7 @@ export function createApp<
 		},
 
 		createEntity() {
-			return this._entityIndex.addEntity();
+			return this._entityIndex.createEntity();
 		},
 
 		destroyEntity(eid) {

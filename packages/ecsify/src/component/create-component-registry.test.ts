@@ -77,8 +77,8 @@ describe('createComponentRegistry', () => {
 			registry.registerComponent(Position);
 			registry.registerComponent(Health);
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
 
 			registry.addComponent(eid1, Position);
 			registry.addComponent(eid1, Health);
@@ -92,7 +92,7 @@ describe('createComponentRegistry', () => {
 
 		it('should return false for unregistered components', () => {
 			const Position: TPosition = { x: [], y: [] };
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			expect(registry.hasComponent(eid, Position)).toBe(false);
 		});
@@ -106,8 +106,8 @@ describe('createComponentRegistry', () => {
 			registry.registerComponent(Position);
 			registry.registerComponent(Velocity);
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
 
 			// Add components
 			registry.addComponent(eid1, Position);
@@ -144,8 +144,8 @@ describe('createComponentRegistry', () => {
 			registry.registerComponent(Transform);
 			registry.registerComponent(RenderInfo);
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
 
 			// Add components
 			registry.addComponent(eid1, Transform);
@@ -178,8 +178,8 @@ describe('createComponentRegistry', () => {
 			registry.registerComponent(Mana);
 			registry.registerComponent(Level);
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
 
 			// Add components
 			registry.addComponent(eid1, Health);
@@ -216,9 +216,9 @@ describe('createComponentRegistry', () => {
 			registry.registerComponent(Enemy);
 			registry.registerComponent(Frozen);
 
-			const eid1 = entityIndex.addEntity();
-			const eid2 = entityIndex.addEntity();
-			const eid3 = entityIndex.addEntity();
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
+			const eid3 = entityIndex.createEntity();
 
 			// Add marker components (no data, just flags)
 			registry.addComponent(eid1, Player);
@@ -238,7 +238,7 @@ describe('createComponentRegistry', () => {
 
 		it('should auto-register components when adding', () => {
 			const Position: TPosition = { x: [], y: [] };
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			// Component should be auto-registered when adding
 			registry.addComponent(eid, Position);
@@ -253,7 +253,7 @@ describe('createComponentRegistry', () => {
 
 		it('should handle duplicate component addition as idempotent', () => {
 			const Position: TPosition = { x: [], y: [] };
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			// Add component multiple times
 			registry.addComponent(eid, Position);
@@ -278,7 +278,7 @@ describe('createComponentRegistry', () => {
 		});
 
 		it('should work across multiple generations', () => {
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			// Register 35 components to test generation overflow
 			const components = [];
@@ -305,7 +305,7 @@ describe('createComponentRegistry', () => {
 	describe('updateComponent', () => {
 		it('should update array components and mark as changed by default', () => {
 			const Health: THealth = [];
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			registry.addComponent(eid, Health);
 			registry.updateComponent(eid, Health, 100);
@@ -316,7 +316,7 @@ describe('createComponentRegistry', () => {
 
 		it('should update array components without marking as changed when explicitly false', () => {
 			const Health: THealth = [];
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			registry.addComponent(eid, Health);
 			registry.updateComponent(eid, Health, 75, false);
@@ -327,7 +327,7 @@ describe('createComponentRegistry', () => {
 
 		it('should update object with arrays (AoS) and mark as changed by default', () => {
 			const Position: TPosition = { x: [], y: [] };
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			registry.addComponent(eid, Position);
 			registry.updateComponent(eid, Position, { x: 10, y: 20 });
@@ -339,7 +339,7 @@ describe('createComponentRegistry', () => {
 
 		it('should update object with arrays without marking as changed when explicitly false', () => {
 			const Position: TPosition = { x: [], y: [] };
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			registry.addComponent(eid, Position);
 			registry.updateComponent(eid, Position, { x: 15, y: 25 }, false);
@@ -351,7 +351,7 @@ describe('createComponentRegistry', () => {
 
 		it('should add marker component when value is true', () => {
 			const Player: TPlayer = {};
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			registry.updateComponent(eid, Player, true);
 
@@ -361,7 +361,7 @@ describe('createComponentRegistry', () => {
 
 		it('should remove marker component when value is false', () => {
 			const Player: TPlayer = {};
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			registry.addComponent(eid, Player);
 			registry.updateComponent(eid, Player, false);
@@ -372,7 +372,7 @@ describe('createComponentRegistry', () => {
 
 		it('should not add marker component if already present', () => {
 			const Player: TPlayer = {};
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			registry.addComponent(eid, Player);
 			const wasAddedBefore = registry.wasAdded(eid, Player);
@@ -386,7 +386,7 @@ describe('createComponentRegistry', () => {
 
 		it('should handle partial object updates', () => {
 			const Position: TPosition = { x: [], y: [] };
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			registry.addComponent(eid, Position);
 			Position.x[eid] = 100;
@@ -400,7 +400,7 @@ describe('createComponentRegistry', () => {
 
 		it('should handle mixed array types in objects', () => {
 			const Mixed = { numbers: [] as number[], strings: [] as string[] };
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			registry.addComponent(eid, Mixed);
 			registry.updateComponent(eid, Mixed, { numbers: 42, strings: 'test' }, false);
@@ -420,7 +420,7 @@ describe('createComponentRegistry', () => {
 			registry.registerComponent(Transform);
 			registry.registerComponent(Health);
 
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			// Add components and set data
 			registry.addComponent(eid, Position);
@@ -447,14 +447,14 @@ describe('createComponentRegistry', () => {
 
 		it('should return false for non-existent components', () => {
 			const Position: TPosition = { x: [], y: [] };
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			expect(registry.removeComponent(eid, Position)).toBe(false);
 		});
 
 		it('should return false for already removed components', () => {
 			const Position: TPosition = { x: [], y: [] };
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			registry.addComponent(eid, Position);
 			expect(registry.removeComponent(eid, Position)).toBe(true);
@@ -481,7 +481,7 @@ describe('createComponentRegistry', () => {
 			registry.registerComponent(Health);
 			registry.registerComponent(Player);
 
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			// Add components from both generations
 			registry.addComponent(eid, gen0Components[0]!);
@@ -524,7 +524,7 @@ describe('createComponentRegistry', () => {
 			registry.registerComponent(Health);
 			registry.registerComponent(Player);
 
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			// Add components and set data
 			registry.addComponent(eid, Position);
@@ -568,7 +568,7 @@ describe('createComponentRegistry', () => {
 
 			registry.registerComponent(Position);
 
-			const eid = entityIndex.addEntity();
+			const eid = entityIndex.createEntity();
 
 			registry.addComponent(eid, gen0Components[0]!);
 			registry.addComponent(eid, Position);
