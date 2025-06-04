@@ -1,21 +1,16 @@
 import { TComponentRef } from '../../component';
-import { TApp, TInnerAppContext } from './app';
-
-export type TPluginComponents = Record<string, TComponentRef>;
-export type TPluginResources = Record<string, unknown>;
-export type TPluginEvents = Record<string, unknown>;
+import { TApp } from './app';
 
 // =============================================================================
 // Plugin
 // =============================================================================
 
-export type TPlugin<
-	GShape extends TPluginShape,
-	GDeps extends TAnyPlugin[] = [],
-	GAppContext extends TInnerAppContext = TInnerAppContext<
-		TMergeTwoPluginShapes<GShape, TMergePlugins<GDeps>>
-	>
-> = {
+export type TPlugin<GShape extends TPluginShape, GDeps extends TAnyPlugin[] = []> = {
+	/**
+	 * Internal marker to preserve generic type information during TypeScript's type flattening.
+	 * Without this, TypeScript cannot infer GShape from TPlugin instances.
+	 */
+	__brand?: [GShape, GDeps];
 	name: GShape['name'];
 	deps: {
 		[K in keyof GDeps]: GDeps[K]['name'];
@@ -23,7 +18,13 @@ export type TPlugin<
 	components?: GShape['components'];
 	resources?: GShape['resources'];
 	appExtensions?: GShape['appExtensions'];
-	setup?: (app: TApp<GAppContext>) => void;
+	/**
+	 * Setup function called when the plugin is added to the app.
+	 *
+	 * Uses `TApp<any>` instead of the exact app context type to break circular type dependency.
+	 * See: https://github.com/builder-group/community/issues/107
+	 */
+	setup?: (app: TApp<any>) => void;
 };
 
 export interface TPluginShape {
@@ -35,17 +36,17 @@ export interface TPluginShape {
 	/**
 	 * ECS components added by the plugin.
 	 */
-	components?: TPluginComponents;
+	components?: Record<string, TComponentRef>;
 
 	/**
 	 * Global resources shared in the app.
 	 */
-	resources?: TPluginResources;
+	resources?: Record<string, unknown>;
 
 	/**
 	 * Event types emitted or handled by the plugin.
 	 */
-	events?: TPluginEvents;
+	events?: Record<string, unknown>;
 
 	/**
 	 * ECS system execution order sets.
@@ -59,62 +60,45 @@ export interface TPluginShape {
 }
 
 /**
- * A "top type" that can represent any plugin regardless of its specific shape, dependencies, or app context.
- *
- * All generic parameters MUST be `any` to avoid TypeScript compatibility issues:
- *
- * **Why `any` is required:**
- * - Specific plugins have precise setup function signatures: `(app: TApp<SpecificContext>) => void`
- * - If TAnyPlugin used specific types, TypeScript would reject assignments like:
- *   `TPlugin<ShapeA, DepsB, ContextC>` → `TAnyPlugin`
- * - The error occurs because setup functions are contravariant in their parameter types
- *
- * **Example of the error without `any`:**
- * ```
- * Type 'TPlugin<SpecificShape, SpecificDeps, SpecificContext>' is not assignable to type 'TAnyPlugin'
- *   Types of property 'setup' are incompatible
- *     Type '(app: TApp<SpecificContext>) => void' is not assignable to type '(app: TApp<OtherContext>) => void'
- * ```
+ * Type that represents any plugin regardless of its specific shape or dependencies.
  */
-export type TAnyPlugin = TPlugin<any, any, any>;
+export type TAnyPlugin = TPlugin<any, any>;
 
 /**
- * Extracts the `GShape` type from any variation of a TPlugin.
+ * Extracts the shape type from a TPlugin.
  *
  * Note: TypeScript's `infer` in conditional types only works when the matched type
  *     has the *same number of generic parameters* as the one you're checking against.
  *     That means:
- *       - `TPlugin<A>` ≠ `TPlugin<A, any, any>`
- *       - `TPlugin<A, B>` ≠ `TPlugin<A, B, any>`
- *     If you don't account for all generic arities, inference will silently fail.
+ *       - `TPlugin<A>` ≠ `TPlugin<A, any>`
+ *     If you don't account for all generic arities, inference will resolve to `never`.
  */
 export type TShapeFromPlugin<GPlugin> =
-	GPlugin extends TPlugin<infer GShape, any, any>
+	GPlugin extends TPlugin<infer GShape, any>
 		? GShape
-		: GPlugin extends TPlugin<infer GShape, any>
+		: GPlugin extends TPlugin<infer GShape>
 			? GShape
-			: GPlugin extends TPlugin<infer GShape>
-				? GShape
-				: never;
+			: never;
 
+/**
+ * Merges two plugin shapes by combining their properties.
+ */
 export type TMergeTwoPluginShapes<A, B> = {
-	components: (A extends { components: infer AC } ? AC : {}) &
-		(B extends { components: infer BC } ? BC : {});
-	resources: (A extends { resources: infer AR } ? AR : {}) &
-		(B extends { resources: infer BR } ? BR : {});
-	events: (A extends { events: infer AE } ? AE : {}) & (B extends { events: infer BE } ? BE : {});
-	appExtensions: (A extends { appExtensions: infer AA } ? AA : {}) &
-		(B extends { appExtensions: infer BA } ? BA : {});
+	components: (A extends { components: infer GComponents } ? GComponents : {}) &
+		(B extends { components: infer GComponents } ? GComponents : {});
+	resources: (A extends { resources: infer GResources } ? GResources : {}) &
+		(B extends { resources: infer GResources } ? GResources : {});
+	events: (A extends { events: infer GEvents } ? GEvents : {}) &
+		(B extends { events: infer GEvents } ? GEvents : {});
+	appExtensions: (A extends { appExtensions: infer GAppExtensions } ? GAppExtensions : {}) &
+		(B extends { appExtensions: infer GAppExtensions } ? GAppExtensions : {});
 	systemSets:
-		| (A extends { systemSets: infer AS } ? AS : never)
-		| (B extends { systemSets: infer BS } ? BS : never);
+		| (A extends { systemSets: infer GSystemSets } ? GSystemSets : never)
+		| (B extends { systemSets: infer GSystemSets } ? GSystemSets : never);
 };
 
 /**
- * Recursively merges plugin *shapes* (not full plugin types).
- *
- * This avoids TypeScript recursion limits and circular type constraints
- * caused by merging plugin objects directly (e.g., with `setup` functions).
+ * Recursively merges plugin shapes from an array of plugins.
  */
 export type TMergePlugins<GPlugins extends TAnyPlugin[]> = GPlugins extends readonly [
 	infer GFirst,

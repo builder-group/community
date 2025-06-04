@@ -15,27 +15,10 @@ import {
 } from '../../query';
 import { TAddSystemOptions, TSystemFn, TSystemRegistry } from '../../system';
 import { TAnyPlugin } from '../types';
-import { TMergePlugins, TPlugin } from './plugin';
+import { TMergePlugins } from './plugin';
 
 /**
  * The core App type that represents an ECS application instance.
- *
- * NOTE: Due to circular type dependencies, this type cannot be fully resolved at module level:
- * 1. TApp depends on GAppContext
- * 2. GAppContext (TAppContext<GPlugins>) depends on merging plugin shapes
- * 3. Each plugin's setup function takes a TApp<GAppContext>
- *
- * This creates an unresolvable circular dependency at module level:
- * TApp -> TAppContext -> TMergePlugins -> TPlugin -> TApp
- *
- * The type system can only resolve this within function scope where it can:
- * - Defer type resolution until the function is analyzed
- * - Use control flow analysis to track relationships
- * - Build a complete type graph before resolving generics
- *
- * At module level, TypeScript must resolve types during the initial pass,
- * before it has full context, causing it to resolve to 'never' when it hits
- * the circular constraint.
  */
 export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['appExtensions'] & {
 	_pluginNames: string[];
@@ -265,11 +248,3 @@ export interface TInnerAppContext<GMergedPlugins extends Record<string, any> = {
 
 export type TPluginsFromAppContext<GAppContext extends TAppContext> =
 	GAppContext extends TAppContext<infer GPlugins> ? GPlugins : never;
-
-export type TAppContextFromPlugin<GPlugin extends TAnyPlugin> =
-	GPlugin extends TPlugin<any, any, infer GAppContext> ? GAppContext : never;
-
-export type TPluginSystemFn<
-	GPlugin extends TAnyPlugin,
-	GAppContext extends TAppContextFromPlugin<GPlugin> = TAppContextFromPlugin<GPlugin>
-> = TSystemFn<GAppContext['systemSets'], TApp<GAppContext>>;

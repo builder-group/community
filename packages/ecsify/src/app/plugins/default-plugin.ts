@@ -1,6 +1,6 @@
 import { TEntityId } from '../../entity';
 import { With } from '../../query';
-import { TApp, TAppContext, TPlugin, TPluginSystemFn } from '../types';
+import { TApp, TAppContext, TPlugin } from '../types';
 
 export function createDefaultPlugin(): TDefaultPlugin {
 	return {
@@ -14,13 +14,13 @@ export function createDefaultPlugin(): TDefaultPlugin {
 				this.addComponent(eid, this.c.Removed);
 			}
 		},
-		setup: (app) => {
+		setup: (app: TApp<TAppContext<[TDefaultPlugin]>>) => {
 			app.addSystem(cleanupSystem, { set: 'Last' });
 		}
 	};
 }
 
-const cleanupSystem: TPluginSystemFn<TDefaultPlugin> = (app) => {
+const cleanupSystem = (app: TApp<TAppContext<[TDefaultPlugin]>>) => {
 	// Remove entities marked for removal
 	for (const eid of app.queryEntities(With(app.c.Removed))) {
 		app.destroyEntity(eid);
