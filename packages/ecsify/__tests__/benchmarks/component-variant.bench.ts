@@ -1,6 +1,6 @@
+import { createSeededRandom } from '@blgc/utils';
 import { bench, describe, expect } from 'vitest';
 import { createApp, With } from '../../src';
-import { createSeededRandom } from '../utils';
 
 describe('Component Variants Performance', () => {
 	const seed = Math.random() * 1000000;
@@ -14,7 +14,7 @@ describe('Component Variants Performance', () => {
 
 	describe('Add Component', () => {
 		bench('AoS - Position', () => {
-			const app = createApp();
+			const app = createApp({ plugins: [], systemSets: [] });
 			const eid = app.createEntity();
 
 			app.addComponent(eid, Position);
@@ -25,7 +25,7 @@ describe('Component Variants Performance', () => {
 		});
 
 		bench('SoA - Transform', () => {
-			const app = createApp();
+			const app = createApp({ plugins: [], systemSets: [] });
 			const eid = app.createEntity();
 
 			app.addComponent(eid, Transform);
@@ -35,7 +35,7 @@ describe('Component Variants Performance', () => {
 		});
 
 		bench('Single Array - Health', () => {
-			const app = createApp();
+			const app = createApp({ plugins: [], systemSets: [] });
 			const eid = app.createEntity();
 
 			app.addComponent(eid, Health);
@@ -45,7 +45,7 @@ describe('Component Variants Performance', () => {
 		});
 
 		bench('Marker - Player', () => {
-			const app = createApp();
+			const app = createApp({ plugins: [], systemSets: [] });
 			const eid = app.createEntity();
 
 			app.addComponent(eid, Player);
@@ -56,7 +56,7 @@ describe('Component Variants Performance', () => {
 
 	describe('Remove Component', () => {
 		bench('AoS - Position', () => {
-			const app = createApp();
+			const app = createApp({ plugins: [], systemSets: [] });
 			const eid = app.createEntity();
 			app.addComponent(eid, Position);
 			Position.x[eid] = 100;
@@ -67,7 +67,7 @@ describe('Component Variants Performance', () => {
 		});
 
 		bench('SoA - Transform', () => {
-			const app = createApp();
+			const app = createApp({ plugins: [], systemSets: [] });
 			const eid = app.createEntity();
 			app.addComponent(eid, Transform);
 			Transform[eid] = { x: 100, y: 200 };
@@ -77,7 +77,7 @@ describe('Component Variants Performance', () => {
 		});
 
 		bench('Single Array - Health', () => {
-			const app = createApp();
+			const app = createApp({ plugins: [], systemSets: [] });
 			const eid = app.createEntity();
 			app.addComponent(eid, Health);
 			Health[eid] = 100;
@@ -87,7 +87,7 @@ describe('Component Variants Performance', () => {
 		});
 
 		bench('Marker - Player', () => {
-			const app = createApp();
+			const app = createApp({ plugins: [], systemSets: [] });
 			const eid = app.createEntity();
 			app.addComponent(eid, Player);
 
@@ -97,10 +97,10 @@ describe('Component Variants Performance', () => {
 	});
 
 	describe('Query Component', () => {
-		const appAoS = createApp();
-		const appSoA = createApp();
-		const appSingle = createApp();
-		const appMarker = createApp();
+		const appAoS = createApp({ plugins: [], systemSets: [] });
+		const appSoA = createApp({ plugins: [], systemSets: [] });
+		const appSingle = createApp({ plugins: [], systemSets: [] });
+		const appMarker = createApp({ plugins: [], systemSets: [] });
 
 		// AoS setup
 		for (let i = 0; i < 500; i++) {

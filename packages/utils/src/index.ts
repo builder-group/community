@@ -5,6 +5,7 @@ export * from './assert-value';
 export * from './BitwiseFlag';
 export * from './calculate-bytes';
 export * from './ContinuousId';
+export * from './create-seeded-random';
 export * from './deep-copy';
 export * from './deep-equal';
 export * from './deep-replace-var';

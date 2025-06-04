@@ -34,23 +34,23 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	c: GAppContext['components'];
 	r: GAppContext['resources'];
 
-	// /**
-	//  * Add a plugin to the app
-	//  * @param plugin - The plugin to add
-	//  * @returns The new app with the plugin added
-	//  */
-	// addPlugin<GNewPlugin extends TAnyPlugin>(
-	// 	plugin: GNewPlugin
-	// ): TApp<TAppContext<[GNewPlugin, ...TPluginsFromAppContext<GAppContext>]>>;
+	/**
+	 * Add a plugin to the app
+	 * @param plugin - The plugin to add
+	 * @returns The new app with the plugin added
+	 */
+	addPlugin<GNewPlugin extends TAnyPlugin>(
+		plugin: GNewPlugin
+	): TApp<TAppContext<[GNewPlugin, ...TPluginsFromAppContext<GAppContext>]>>;
 
-	// /**
-	//  * Add multiple plugins to the app
-	//  * @param plugins - The plugins to add
-	//  * @returns The new app with the plugins added
-	//  */
-	// addPlugins<GNewPlugins extends TAnyPlugin[]>(
-	// 	...plugins: GNewPlugins
-	// ): TApp<TAppContext<[...GNewPlugins, ...TPluginsFromAppContext<GAppContext>]>>;
+	/**
+	 * Add multiple plugins to the app
+	 * @param plugins - The plugins to add
+	 * @returns The new app with the plugins added
+	 */
+	addPlugins<GNewPlugins extends TAnyPlugin[]>(
+		plugins: GNewPlugins
+	): TApp<TAppContext<[...GNewPlugins, ...TPluginsFromAppContext<GAppContext>]>>;
 
 	/**
 	 * Creates a new entity and returns its ID.

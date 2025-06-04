@@ -350,8 +350,8 @@ importers:
   packages/ecsify:
     dependencies:
       '@blgc/utils':
-        specifier: ^0.0.52
-        version: 0.0.52
+        specifier: workspace:*
+        version: link:../utils
     devDependencies:
       '@blgc/config':
         specifier: workspace:*
@@ -362,6 +362,9 @@ importers:
       bitecs:
         specifier: github:NateTheGreatt/bitECS#rc-0-4-0
         version: https://codeload.github.com/NateTheGreatt/bitECS/tar.gz/caa1f58be2ccc304c1f0a085de34ca5904b3b80f
+      elics:
+        specifier: ^2.3.0
+        version: 2.3.0
       rollup-presets:
         specifier: workspace:*
         version: link:../rollup-presets
@@ -899,9 +902,6 @@ packages:
   '@babel/types@7.27.1':
     resolution: {integrity: sha512-+EzkxvLNfiUeKMgy/3luqfsCWFRXLb7U6wNQTk60tovuckwB15B191tJWvpp4HjiQWdJkCxO3Wbvc6jlk3Xb2Q==}
     engines: {node: '>=6.9.0'}
-
-  '@blgc/utils@0.0.52':
-    resolution: {integrity: sha512-wshoO58fjGVbsVw8Y24vMKAHCwUdL7052/q/iESONDPd9s+Q8dEHGQTL7RGSPWFtpc8nTIeW69G8pUd1wM0ZLg==}
 
   '@bundled-es-modules/cookie@2.0.1':
     resolution: {integrity: sha512-8o+5fRPLNbjbdGRRmJj3h6Hh1AQJf2dk3qQ/5ZFb+PXkRNiSoMGGUKlsgLfrxneb72axVJyIYji64E2+nNfYyw==}
@@ -1737,6 +1737,9 @@ packages:
     resolution: {integrity: sha512-YRx7tFgLkrpFkDAzVSV5sUJydmf2ZDrW+O3IbQ1JyeMW7B0FiWroFJTnR4/fD9CsusnAn4qRUcbb5jFnZSd6uw==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
+  '@preact/signals-core@1.9.0':
+    resolution: {integrity: sha512-uUgFHJLWxb33rfCtb1g+1e3Rg7Jl5EALhGTHlQ5Y0w37OF+fdidYdYEE6crbpUOYDOjlmelIWf0ulXr1ggfUkg==}
+
   '@redocly/ajv@8.11.2':
     resolution: {integrity: sha512-io1JpnwtIcvojV7QKDUSIuMN/ikdOUd1ReEnUnMKGfDVridQZ31J0MmIuqwuRjWDZfmvr+Q0MqCcfHM2gTivOg==}
 
@@ -2496,6 +2499,10 @@ packages:
 
   electron-to-chromium@1.5.152:
     resolution: {integrity: sha512-xBOfg/EBaIlVsHipHl2VdTPJRSvErNUaqW8ejTq5OlOlIYx1wOllCHsAvAIrr55jD1IYEfdR86miUEt8H5IeJg==}
+
+  elics@2.3.0:
+    resolution: {integrity: sha512-J6hnuxg7592jYkF1mJU0d4tSefWW5j27KE3tsceURbV5Fmu4bNqUrtt7gGpzt0xFWIM3PrqOeKezS2E0uz/nBw==}
+    engines: {node: '>=16.0.0'}
 
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
@@ -4752,8 +4759,6 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.27.1
 
-  '@blgc/utils@0.0.52': {}
-
   '@bundled-es-modules/cookie@2.0.1':
     dependencies:
       cookie: 0.7.2
@@ -5400,6 +5405,8 @@ snapshots:
   '@open-draft/until@2.1.0': {}
 
   '@pkgr/core@0.2.5': {}
+
+  '@preact/signals-core@1.9.0': {}
 
   '@redocly/ajv@8.11.2':
     dependencies:
@@ -6197,6 +6204,10 @@ snapshots:
   ee-first@1.1.1: {}
 
   electron-to-chromium@1.5.152: {}
+
+  elics@2.3.0:
+    dependencies:
+      '@preact/signals-core': 1.9.0
 
   emoji-regex@8.0.0: {}
 

@@ -1,18 +1,3 @@
-/**
- * Component Registry for ECS (Entity Component System)
- *
- * Provides efficient component management with direct array access for maximum performance.
- * Uses sparse arrays for component tracking and bitflags for fast component checks.
- *
- * Key features:
- * - O(1) component checks using bitflags
- * - Direct array access for component data
- * - Memory-efficient sparse array storage
- * - Cache-friendly iteration patterns
- * - Unlimited components via generation system
- * - Flexible component structure - supports multiple patterns
- */
-
 import { TEntityId } from '../entity';
 import { TComponentCallbacks, TComponentData, TComponentRef, TUpdateComponentValue } from './types';
 

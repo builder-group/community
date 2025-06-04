@@ -1,11 +1,11 @@
+import { createSeededRandom } from '@blgc/utils';
 import { bench, describe, expect } from 'vitest';
 import { And, createApp, With, Without } from '../../src';
-import { createSeededRandom } from '../utils';
 
 describe('Query Performance', () => {
 	const seed = Math.random() * 1000000;
 	const random = createSeededRandom(seed);
-	const app = createApp();
+	const app = createApp({ plugins: [], systemSets: [] });
 
 	// Component definitions
 	const Position = { x: [] as number[], y: [] as number[] };

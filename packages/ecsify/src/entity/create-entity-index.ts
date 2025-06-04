@@ -1,17 +1,3 @@
-/**
- * Entity Index for ECS (Entity Component System)
- *
- * Provides efficient entity ID management with optional versioning support.
- * Uses a sparse-dense array pattern for O(1) operations while maintaining
- * cache-friendly dense iteration.
- *
- * Key features:
- * - O(1) entity creation, removal, and alive checks
- * - Memory-efficient ID recycling
- * - Optional versioning to prevent stale entity references
- * - Dense array for cache-friendly iteration
- */
-
 import { TEntityId } from './types';
 
 /**

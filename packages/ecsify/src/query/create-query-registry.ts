@@ -1,12 +1,7 @@
-/**
- * Query Registry for ECS
- *
- * Simple and fast query registry with bitmask optimizations.
- */
-
 import { TComponentRef, TComponentRegistry } from '../component';
 import { TEntityId, TEntityIndex } from '../entity';
 import { categorizeEvaluationStrategy } from './categorize-evaluation-strategy';
+import { And, With } from './query-filters';
 import { Entity, TEntity, TQueryComponentValue, TQueryData, TQueryFilter } from './types';
 
 /**
@@ -57,10 +52,20 @@ export function createQueryRegistry(
 			components: GComponents,
 			filter?: TQueryFilter
 		): TComponentDataTuple<GComponents>[] {
-			// Get entities that match the filter (or all alive entities if no filter)
+			// Query entities matching the provided filter,
+			// or infer a filter from the given components if none is provided
 			const matchingEntities = filter
 				? this.queryEntities(filter)
-				: this._entityIndex.getAliveEntities();
+				: this.queryEntities(
+						And(
+							...components.reduce((acc, val) => {
+								if (val !== Entity) {
+									acc.push(With(val));
+								}
+								return acc;
+							}, [] as TQueryFilter[])
+						)
+					);
 
 			// For each entity, check if it has all components and get their data
 			const results: TComponentDataTuple<GComponents>[] = [];

@@ -1,4 +1,11 @@
-import { createApp, Entity, type TDefaultPlugin, type TPlugin, type TPluginSystemFn } from 'ecsify';
+import {
+	createApp,
+	createDefaultPlugin,
+	Entity,
+	type TDefaultPlugin,
+	type TPlugin,
+	type TPluginSystemFn
+} from 'ecsify';
 
 // Get canvas context
 const canvas =
@@ -37,7 +44,8 @@ export function runAppExample(): void {
 
 	// Create app with GamePlugin
 	const app = createApp({
-		plugins: [createGamePlugin()]
+		plugins: [createDefaultPlugin(), createGamePlugin()] as const,
+		systemSets: ['First', 'Update', 'Last']
 	});
 
 	// Game loop
