@@ -34,23 +34,23 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	c: GAppContext['components'];
 	r: GAppContext['resources'];
 
-	/**
-	 * Add a plugin to the app
-	 * @param plugin - The plugin to add
-	 * @returns The new app with the plugin added
-	 */
-	addPlugin<GNewPlugin extends TAnyPlugin>(
-		plugin: GNewPlugin
-	): TApp<TAppContext<[GNewPlugin, ...TPluginsFromAppContext<GAppContext>]>>;
+	// /**
+	//  * Add a plugin to the app
+	//  * @param plugin - The plugin to add
+	//  * @returns The new app with the plugin added
+	//  */
+	// addPlugin<GNewPlugin extends TAnyPlugin>(
+	// 	plugin: GNewPlugin
+	// ): TApp<TAppContext<[GNewPlugin, ...TPluginsFromAppContext<GAppContext>]>>;
 
-	/**
-	 * Add multiple plugins to the app
-	 * @param plugins - The plugins to add
-	 * @returns The new app with the plugins added
-	 */
-	addPlugins<GNewPlugins extends TAnyPlugin[]>(
-		...plugins: GNewPlugins
-	): TApp<TAppContext<[...GNewPlugins, ...TPluginsFromAppContext<GAppContext>]>>;
+	// /**
+	//  * Add multiple plugins to the app
+	//  * @param plugins - The plugins to add
+	//  * @returns The new app with the plugins added
+	//  */
+	// addPlugins<GNewPlugins extends TAnyPlugin[]>(
+	// 	...plugins: GNewPlugins
+	// ): TApp<TAppContext<[...GNewPlugins, ...TPluginsFromAppContext<GAppContext>]>>;
 
 	/**
 	 * Creates a new entity and returns its ID.
@@ -133,10 +133,10 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	 * @example
 	 * ```typescript
 	 * // Simple component query
-	 * const entities = world.queryEntities(With(Position));
+	 * const entities = app.queryEntities(With(Position));
 	 *
 	 * // Complex query with multiple conditions
-	 * const movingEntities = world.queryEntities(
+	 * const movingEntities = app.queryEntities(
 	 *   And(With(Position), With(Velocity), Without(Dead))
 	 * );
 	 * ```
@@ -152,11 +152,11 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	 * @example
 	 * ```ts
 	 * // Query for entities with both Position and Velocity, include entity ID
-	 * const results = world.queryComponents([Entity, Position, Velocity]);
+	 * const results = app.queryComponents([Entity, Position, Velocity]);
 	 * // Returns: [[eid1, {x: 10, y: 5}, {x: 2, y: 1}], [eid2, {x: 20, y: 15}, {x: 1, y: -1}]]
 	 *
 	 * // Query with filter
-	 * const playerResults = world.queryComponents([Entity, Health], With(Player));
+	 * const playerResults = app.queryComponents([Entity, Health], With(Player));
 	 * // Returns: [[eid1, 100], [eid3, 75]]
 	 * ```
 	 */
@@ -196,17 +196,17 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	): TEvent<GAppContext['events'][GType]>[];
 
 	/**
-	 * Update the world.
+	 * Update the app.
 	 */
 	update(delta?: number): void;
 
 	/**
-	 * Clears the world.
+	 * Clears the app.
 	 */
 	flush(): void;
 
 	/**
-	 * Resets the world to its initial state.
+	 * Resets the app to its initial state.
 	 */
 	reset(): void;
 };

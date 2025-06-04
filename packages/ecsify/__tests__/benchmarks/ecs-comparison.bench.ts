@@ -5,18 +5,18 @@ import {
 	createWorld as createBitEcsWorld
 } from 'bitecs';
 import { bench, describe, expect } from 'vitest';
-import { And, createWorld, With } from '../src';
-import { createSeededRandom } from './utils';
+import { And, createApp, With } from '../../src';
+import { createSeededRandom } from '../utils';
 
 describe('ECS Performance Comparison', () => {
 	const seed = Math.random() * 1000000;
 
-	// FeatureEcs setup
-	const featureEcsRandom = createSeededRandom(seed);
-	const featureEcsWorld = createWorld();
-	const FeatureEcsPosition = { x: [] as number[], y: [] as number[] };
-	const FeatureEcsVelocity = { x: [] as number[], y: [] as number[] };
-	const FeatureEcsHealth: number[] = [];
+	// Ecsify setup
+	const ecsifyRandom = createSeededRandom(seed);
+	const ecsifyApp = createApp();
+	const EcsifyPosition = { x: [] as number[], y: [] as number[] };
+	const EcsifyVelocity = { x: [] as number[], y: [] as number[] };
+	const EcsifyHealth: number[] = [];
 
 	// BitEcs setup
 	const bitEcsRandom = createSeededRandom(seed);
@@ -26,8 +26,8 @@ describe('ECS Performance Comparison', () => {
 	const BitEcsHealth = [] as number[];
 
 	describe('Entity Creation', () => {
-		bench('FeatureEcs - Create entity', () => {
-			const eid = featureEcsWorld.createEntity();
+		bench('Ecsify - Create entity', () => {
+			const eid = ecsifyApp.createEntity();
 			expect(eid).toBeGreaterThanOrEqual(0);
 		});
 
@@ -38,11 +38,11 @@ describe('ECS Performance Comparison', () => {
 	});
 
 	describe('Component Addition', () => {
-		bench('FeatureEcs - Add Position component', () => {
-			const eid = featureEcsWorld.createEntity();
-			featureEcsWorld.addComponent(eid, FeatureEcsPosition);
-			FeatureEcsPosition.x[eid] = 100;
-			FeatureEcsPosition.y[eid] = 200;
+		bench('Ecsify - Add Position component', () => {
+			const eid = ecsifyApp.createEntity();
+			ecsifyApp.addComponent(eid, EcsifyPosition);
+			EcsifyPosition.x[eid] = 100;
+			EcsifyPosition.y[eid] = 200;
 		});
 
 		bench('BitEcs - Add Position component', () => {
@@ -55,21 +55,21 @@ describe('ECS Performance Comparison', () => {
 
 	describe('Component Queries', () => {
 		for (let i = 0; i < 1000; i++) {
-			// FeatureEcs entities
-			const featureEcsEid = featureEcsWorld.createEntity();
-			if (featureEcsRandom.nextBool(0.7)) {
-				featureEcsWorld.addComponent(featureEcsEid, FeatureEcsPosition);
-				FeatureEcsPosition.x[featureEcsEid] = i;
-				FeatureEcsPosition.y[featureEcsEid] = i * 2;
+			// Ecsify entities
+			const ecsifyEid = ecsifyApp.createEntity();
+			if (ecsifyRandom.nextBool(0.7)) {
+				ecsifyApp.addComponent(ecsifyEid, EcsifyPosition);
+				EcsifyPosition.x[ecsifyEid] = i;
+				EcsifyPosition.y[ecsifyEid] = i * 2;
 			}
-			if (featureEcsRandom.nextBool(0.5)) {
-				featureEcsWorld.addComponent(featureEcsEid, FeatureEcsVelocity);
-				FeatureEcsVelocity.x[featureEcsEid] = 1.5;
-				FeatureEcsVelocity.y[featureEcsEid] = 2.0;
+			if (ecsifyRandom.nextBool(0.5)) {
+				ecsifyApp.addComponent(ecsifyEid, EcsifyVelocity);
+				EcsifyVelocity.x[ecsifyEid] = 1.5;
+				EcsifyVelocity.y[ecsifyEid] = 2.0;
 			}
-			if (featureEcsRandom.nextBool(0.3)) {
-				featureEcsWorld.addComponent(featureEcsEid, FeatureEcsHealth);
-				FeatureEcsHealth[featureEcsEid] = 100;
+			if (ecsifyRandom.nextBool(0.3)) {
+				ecsifyApp.addComponent(ecsifyEid, EcsifyHealth);
+				EcsifyHealth[ecsifyEid] = 100;
 			}
 
 			// BitEcs entities
@@ -90,8 +90,8 @@ describe('ECS Performance Comparison', () => {
 			}
 		}
 
-		bench('FeatureEcs - Query Position components', () => {
-			const entities = featureEcsWorld.queryEntities(With(FeatureEcsPosition));
+		bench('Ecsify - Query Position components', () => {
+			const entities = ecsifyApp.queryEntities(With(EcsifyPosition));
 			expect(entities.length).toBeGreaterThan(0);
 		});
 
@@ -100,10 +100,8 @@ describe('ECS Performance Comparison', () => {
 			expect(entities.length).toBeGreaterThan(0);
 		});
 
-		bench('FeatureEcs - Query Position + Velocity', () => {
-			const entities = featureEcsWorld.queryEntities(
-				And(With(FeatureEcsPosition), With(FeatureEcsVelocity))
-			);
+		bench('Ecsify - Query Position + Velocity', () => {
+			const entities = ecsifyApp.queryEntities(And(With(EcsifyPosition), With(EcsifyVelocity)));
 			expect(entities.length).toBeGreaterThanOrEqual(0);
 		});
 
@@ -115,19 +113,19 @@ describe('ECS Performance Comparison', () => {
 
 	describe('System Iteration Performance', () => {
 		for (let i = 0; i < 5000; i++) {
-			const posX = featureEcsRandom.next() * 1000;
-			const posY = featureEcsRandom.next() * 1000;
-			const velX = (featureEcsRandom.next() - 0.5) * 10;
-			const velY = (featureEcsRandom.next() - 0.5) * 10;
+			const posX = ecsifyRandom.next() * 1000;
+			const posY = ecsifyRandom.next() * 1000;
+			const velX = (ecsifyRandom.next() - 0.5) * 10;
+			const velY = (ecsifyRandom.next() - 0.5) * 10;
 
-			// FeatureEcs
-			const featureEcsEid = featureEcsWorld.createEntity();
-			featureEcsWorld.addComponent(featureEcsEid, FeatureEcsPosition);
-			featureEcsWorld.addComponent(featureEcsEid, FeatureEcsVelocity);
-			FeatureEcsPosition.x[featureEcsEid] = posX;
-			FeatureEcsPosition.y[featureEcsEid] = posY;
-			FeatureEcsVelocity.x[featureEcsEid] = velX;
-			FeatureEcsVelocity.y[featureEcsEid] = velY;
+			// Ecsify
+			const ecsifyEid = ecsifyApp.createEntity();
+			ecsifyApp.addComponent(ecsifyEid, EcsifyPosition);
+			ecsifyApp.addComponent(ecsifyEid, EcsifyVelocity);
+			EcsifyPosition.x[ecsifyEid] = posX;
+			EcsifyPosition.y[ecsifyEid] = posY;
+			EcsifyVelocity.x[ecsifyEid] = velX;
+			EcsifyVelocity.y[ecsifyEid] = velY;
 
 			// BitEcs
 			const bitEcsEid = bitECSAddEntity(bitECSWorld);
@@ -139,16 +137,14 @@ describe('ECS Performance Comparison', () => {
 			BitEcsVelocity.y[bitEcsEid] = velY;
 		}
 
-		bench('FeatureEcs - Movement system iteration', () => {
+		bench('Ecsify - Movement system iteration', () => {
 			let updateCount = 0;
 
-			for (const eid of featureEcsWorld.queryEntities(
-				And(With(FeatureEcsPosition), With(FeatureEcsVelocity))
-			)) {
-				const velX = FeatureEcsVelocity.x[eid] ?? 0;
-				const velY = FeatureEcsVelocity.y[eid] ?? 0;
-				FeatureEcsPosition.x[eid] = (FeatureEcsPosition.x[eid] ?? 0) + velX * 0.016; // 60fps delta
-				FeatureEcsPosition.y[eid] = (FeatureEcsPosition.y[eid] ?? 0) + velY * 0.016;
+			for (const eid of ecsifyApp.queryEntities(And(With(EcsifyPosition), With(EcsifyVelocity)))) {
+				const velX = EcsifyVelocity.x[eid] ?? 0;
+				const velY = EcsifyVelocity.y[eid] ?? 0;
+				EcsifyPosition.x[eid] = (EcsifyPosition.x[eid] ?? 0) + velX * 0.016; // 60fps delta
+				EcsifyPosition.y[eid] = (EcsifyPosition.y[eid] ?? 0) + velY * 0.016;
 				updateCount++;
 			}
 

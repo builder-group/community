@@ -934,7 +934,7 @@ type THealth = number[];
 type TMana = number[];
 type TLevel = number[];
 
-// 4. Tag Components (Markers)
+// 4. Marker Components
 type TPlayer = {};
 type TEnemy = {};
 type TFrozen = {};

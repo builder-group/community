@@ -57,7 +57,7 @@ For optimal performance:
 ### Basic Setup
 
 ```ts
-import { And, createWorld, With } from 'ecsify';
+import { And, createApp, With } from 'ecsify';
 
 // Define components - no registration needed!
 const Position = { x: [], y: [] }; // AoS pattern
@@ -65,45 +65,45 @@ const Velocity = { dx: [], dy: [] }; // AoS pattern
 const Health = []; // Single value array
 const Player = {}; // Marker component
 
-// Create world
-const world = createWorld();
+// Create app
+const app = createApp();
 ```
 
 ### Entity Management
 
 ```ts
 // Create entity
-const entity = world.createEntity();
+const entity = app.createEntity();
 
 // Destroy entity (removes all components)
-world.destroyEntity(entity);
+app.destroyEntity(entity);
 ```
 
 ### Component Operations
 
 ```ts
 // Add components
-world.addComponent(entity, Position, { x: 100, y: 50 });
-world.addComponent(entity, Velocity, { dx: 2, dy: 1 });
-world.addComponent(entity, Health, 100);
-world.addComponent(entity, Player, true);
+app.addComponent(entity, Position, { x: 100, y: 50 });
+app.addComponent(entity, Velocity, { dx: 2, dy: 1 });
+app.addComponent(entity, Health, 100);
+app.addComponent(entity, Player, true);
 
 // Update components (AoS)
-world.updateComponent(entity, Position, { x: 110 });
-world.updateComponent(entity, Health, 95);
-world.updateComponent(entity, Player, false); // Also removes marker
+app.updateComponent(entity, Position, { x: 110 });
+app.updateComponent(entity, Health, 95);
+app.updateComponent(entity, Player, false); // Also removes marker
 
 // Direct updates - mark as changed for reactive queries
 Position.x[entity] = 110;
-world.markComponentChanged(entity, Position);
+app.markComponentChanged(entity, Position);
 Health[entity] = 95;
-world.markComponentChanged(entity, Health);
+app.markComponentChanged(entity, Health);
 
 // Remove component
-world.removeComponent(entity, Velocity);
+app.removeComponent(entity, Velocity);
 
 // Check component
-if (world.hasComponent(entity, Player)) {
+if (app.hasComponent(entity, Player)) {
 	// Entity is a player
 }
 ```
@@ -114,12 +114,12 @@ if (world.hasComponent(entity, Player)) {
 import { Added, And, Changed, Or, Removed, With, Without } from 'ecsify';
 
 // Query entity IDs
-const players = world.queryEntities(With(Player));
-const moving = world.queryEntities(And(With(Position), With(Velocity)));
-const damaged = world.queryEntities(Changed(Health));
+const players = app.queryEntities(With(Player));
+const moving = app.queryEntities(And(With(Position), With(Velocity)));
+const damaged = app.queryEntities(Changed(Health));
 
 // Query with component data
-for (const [eid, pos, health] of world.queryComponents([Entity, Position, Health] as const)) {
+for (const [eid, pos, health] of app.queryComponents([Entity, Position, Health] as const)) {
 	console.log(`Entity ${eid} at (${pos.x}, ${pos.y}) with ${health} health`);
 }
 ```
@@ -129,15 +129,15 @@ for (const [eid, pos, health] of world.queryComponents([Entity, Position, Health
 ```ts
 function update(deltaTime: number) {
 	// Movement system
-	for (const [eid, pos, vel] of world.queryComponents([Entity, Position, Velocity] as const)) {
-		world.updateComponent(eid, Position, {
+	for (const [eid, pos, vel] of app.queryComponents([Entity, Position, Velocity] as const)) {
+		app.updateComponent(eid, Position, {
 			x: pos.x + vel.dx * deltaTime,
 			y: pos.y + vel.dy * deltaTime
 		});
 	}
 
 	// Clear change tracking
-	world.flush();
+	app.flush();
 }
 ```
 
@@ -253,7 +253,7 @@ entity2: (0b101 & 0b011) === 0b011  ✗ false
 
 ```typescript
 // Complex queries like Or(With(Position), Changed(Health))
-// Fall back to: filters.some(filter => filter.evaluate(world, eid))
+// Fall back to: filters.some(filter => filter.evaluate(app, eid))
 ```
 
 #### Performance (10,000 entities)

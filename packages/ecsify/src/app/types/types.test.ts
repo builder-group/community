@@ -64,9 +64,9 @@ describe('types', () => {
 			}
 		});
 
-		const createRenderPlugin = (transformPlugin: TTransformPlugin): TRenderPlugin => ({
+		const createRenderPlugin = (): TRenderPlugin => ({
 			name: 'Render',
-			deps: [transformPlugin],
+			deps: ['Transform'],
 			components: {
 				Sprite: null as any
 			},
@@ -80,12 +80,9 @@ describe('types', () => {
 			}
 		});
 
-		const createGamePlugin = (
-			transformPlugin: TTransformPlugin,
-			renderPlugin: TRenderPlugin
-		): TGamePlugin => ({
+		const createGamePlugin = (): TGamePlugin => ({
 			name: 'Game',
-			deps: [transformPlugin, renderPlugin],
+			deps: ['Transform', 'Render'],
 			components: {
 				Player: null as any,
 				Health: null as any

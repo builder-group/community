@@ -1,6 +1,6 @@
 import { bench, describe, expect } from 'vitest';
-import { createWorld, With } from '../src';
-import { createSeededRandom } from './utils';
+import { createApp, With } from '../../src';
+import { createSeededRandom } from '../utils';
 
 describe('Component Variants Performance', () => {
 	const seed = Math.random() * 1000000;
@@ -14,99 +14,99 @@ describe('Component Variants Performance', () => {
 
 	describe('Add Component', () => {
 		bench('AoS - Position', () => {
-			const world = createWorld();
-			const eid = world.createEntity();
+			const app = createApp();
+			const eid = app.createEntity();
 
-			world.addComponent(eid, Position);
+			app.addComponent(eid, Position);
 			Position.x[eid] = random.next() * 1000;
 			Position.y[eid] = random.next() * 1000;
 
-			expect(world.hasComponent(eid, Position)).toBe(true);
+			expect(app.hasComponent(eid, Position)).toBe(true);
 		});
 
 		bench('SoA - Transform', () => {
-			const world = createWorld();
-			const eid = world.createEntity();
+			const app = createApp();
+			const eid = app.createEntity();
 
-			world.addComponent(eid, Transform);
+			app.addComponent(eid, Transform);
 			Transform[eid] = { x: random.next() * 1000, y: random.next() * 1000 };
 
-			expect(world.hasComponent(eid, Transform)).toBe(true);
+			expect(app.hasComponent(eid, Transform)).toBe(true);
 		});
 
 		bench('Single Array - Health', () => {
-			const world = createWorld();
-			const eid = world.createEntity();
+			const app = createApp();
+			const eid = app.createEntity();
 
-			world.addComponent(eid, Health);
+			app.addComponent(eid, Health);
 			Health[eid] = Math.floor(random.next() * 100) + 1;
 
-			expect(world.hasComponent(eid, Health)).toBe(true);
+			expect(app.hasComponent(eid, Health)).toBe(true);
 		});
 
-		bench('Tag - Player', () => {
-			const world = createWorld();
-			const eid = world.createEntity();
+		bench('Marker - Player', () => {
+			const app = createApp();
+			const eid = app.createEntity();
 
-			world.addComponent(eid, Player);
+			app.addComponent(eid, Player);
 
-			expect(world.hasComponent(eid, Player)).toBe(true);
+			expect(app.hasComponent(eid, Player)).toBe(true);
 		});
 	});
 
 	describe('Remove Component', () => {
 		bench('AoS - Position', () => {
-			const world = createWorld();
-			const eid = world.createEntity();
-			world.addComponent(eid, Position);
+			const app = createApp();
+			const eid = app.createEntity();
+			app.addComponent(eid, Position);
 			Position.x[eid] = 100;
 			Position.y[eid] = 200;
 
-			const removed = world.removeComponent(eid, Position);
+			const removed = app.removeComponent(eid, Position);
 			expect(removed).toBe(true);
 		});
 
 		bench('SoA - Transform', () => {
-			const world = createWorld();
-			const eid = world.createEntity();
-			world.addComponent(eid, Transform);
+			const app = createApp();
+			const eid = app.createEntity();
+			app.addComponent(eid, Transform);
 			Transform[eid] = { x: 100, y: 200 };
 
-			const removed = world.removeComponent(eid, Transform);
+			const removed = app.removeComponent(eid, Transform);
 			expect(removed).toBe(true);
 		});
 
 		bench('Single Array - Health', () => {
-			const world = createWorld();
-			const eid = world.createEntity();
-			world.addComponent(eid, Health);
+			const app = createApp();
+			const eid = app.createEntity();
+			app.addComponent(eid, Health);
 			Health[eid] = 100;
 
-			const removed = world.removeComponent(eid, Health);
+			const removed = app.removeComponent(eid, Health);
 			expect(removed).toBe(true);
 		});
 
-		bench('Tag - Player', () => {
-			const world = createWorld();
-			const eid = world.createEntity();
-			world.addComponent(eid, Player);
+		bench('Marker - Player', () => {
+			const app = createApp();
+			const eid = app.createEntity();
+			app.addComponent(eid, Player);
 
-			const removed = world.removeComponent(eid, Player);
+			const removed = app.removeComponent(eid, Player);
 			expect(removed).toBe(true);
 		});
 	});
 
 	describe('Query Component', () => {
-		const worldAoS = createWorld();
-		const worldSoA = createWorld();
-		const worldSingle = createWorld();
-		const worldTag = createWorld();
+		const appAoS = createApp();
+		const appSoA = createApp();
+		const appSingle = createApp();
+		const appMarker = createApp();
 
 		// AoS setup
 		for (let i = 0; i < 500; i++) {
-			const eid = worldAoS.createEntity();
+			const eid = appAoS.createEntity();
 			if (random.nextBool(0.7)) {
-				worldAoS.addComponent(eid, Position);
+				appAoS.addComponent(eid, Position);
 				Position.x[eid] = random.next() * 1000;
 				Position.y[eid] = random.next() * 1000;
 			}
@@ -114,47 +114,47 @@ describe('Component Variants Performance', () => {
 
 		// SoA setup
 		for (let i = 0; i < 500; i++) {
-			const eid = worldSoA.createEntity();
+			const eid = appSoA.createEntity();
 			if (random.nextBool(0.7)) {
-				worldSoA.addComponent(eid, Transform);
+				appSoA.addComponent(eid, Transform);
 				Transform[eid] = { x: random.next() * 1000, y: random.next() * 1000 };
 			}
 		}
 
 		// Single array setup
 		for (let i = 0; i < 500; i++) {
-			const eid = worldSingle.createEntity();
+			const eid = appSingle.createEntity();
 			if (random.nextBool(0.7)) {
-				worldSingle.addComponent(eid, Health);
+				appSingle.addComponent(eid, Health);
 				Health[eid] = Math.floor(random.next() * 100) + 1;
 			}
 		}
 
-		// Tag setup
+		// Marker setup
 		for (let i = 0; i < 500; i++) {
-			const eid = worldTag.createEntity();
+			const eid = appMarker.createEntity();
 			if (random.nextBool(0.7)) {
-				worldTag.addComponent(eid, Player);
+				appMarker.addComponent(eid, Player);
 			}
 		}
 
 		bench('AoS - Position', () => {
-			const entities = worldAoS.queryEntities(With(Position));
+			const entities = appAoS.queryEntities(With(Position));
 			expect(entities.length).toBeGreaterThan(0);
 		});
 
 		bench('SoA - Transform', () => {
-			const entities = worldSoA.queryEntities(With(Transform));
+			const entities = appSoA.queryEntities(With(Transform));
 			expect(entities.length).toBeGreaterThan(0);
 		});
 
 		bench('Single Array - Health', () => {
-			const entities = worldSingle.queryEntities(With(Health));
+			const entities = appSingle.queryEntities(With(Health));
 			expect(entities.length).toBeGreaterThan(0);
 		});
 
-		bench('Tag - Player', () => {
-			const entities = worldTag.queryEntities(With(Player));
+		bench('Marker - Player', () => {
+			const entities = appMarker.queryEntities(With(Player));
 			expect(entities.length).toBeGreaterThan(0);
 		});
 	});

@@ -9,20 +9,27 @@ import { createEntityIndex, TEntityId } from '../entity';
 import { createEventRegistry, TEvent } from '../event';
 import { createQueryRegistry } from '../query';
 import { createSystemRegistry, TAddSystemOptions, TSystemFn } from '../system';
+import { createDefaultPlugin } from './plugins';
 import { TAnyPlugin, TApp, TAppContext } from './types';
 
 export function createApp<
 	GPlugins extends TAnyPlugin[],
 	GAppContext extends TAppContext<GPlugins> = TAppContext<GPlugins>
->(config: TCreateAppConfig<GPlugins, GAppContext>): TApp<GAppContext> {
-	const { plugins, systemSets, debug } = config;
+>(options: TCreateAppOptions<GPlugins, GAppContext> = {}): TApp<GAppContext> {
+	const {
+		plugins = [createDefaultPlugin()],
+		systemSets = ['First', 'Update', 'Last'],
+		debug
+	} = options;
 
 	return withNew<TApp<GAppContext>>({
 		_pluginNames: plugins.map((p) => p.name),
 		_componentRegistry: createComponentRegistry(),
 		_entityIndex: createEntityIndex(),
 		_queryRegistry: null as any, // Will be set in _new
-		_systemRegistry: createSystemRegistry<GAppContext['systemSets'], TApp<GAppContext>>(systemSets),
+		_systemRegistry: createSystemRegistry<GAppContext['systemSets'], TApp<GAppContext>>(
+			systemSets as GAppContext['systemSets'][]
+		),
 		_eventRegistry: createEventRegistry<GAppContext['events']>(),
 
 		c: plugins.reduce(
@@ -51,16 +58,6 @@ export function createApp<
 			}),
 			{}
 		) as GAppContext['appExtensions']),
-
-		addPlugin() {
-			// TODO: Implement
-			return this as any;
-		},
-
-		addPlugins() {
-			// TODO: Implement
-			return this as any;
-		},
 
 		createEntity() {
 			return this._entityIndex.createEntity();
@@ -150,11 +147,11 @@ export function createApp<
 	});
 }
 
-interface TCreateAppConfig<
+interface TCreateAppOptions<
 	GPlugins extends TAnyPlugin[],
 	GAppContext extends TAppContext<GPlugins> = TAppContext<GPlugins>
 > {
-	plugins: GPlugins;
-	systemSets: GAppContext['systemSets'][];
+	plugins?: GPlugins;
+	systemSets?: GAppContext['systemSets'][];
 	debug?: boolean;
 }

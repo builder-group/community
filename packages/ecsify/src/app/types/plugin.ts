@@ -17,7 +17,9 @@ export type TPlugin<
 	>
 > = {
 	name: GShape['name'];
-	deps: GDeps;
+	deps: {
+		[K in keyof GDeps]: GDeps[K]['name'];
+	};
 	components?: GShape['components'];
 	resources?: GShape['resources'];
 	appExtensions?: GShape['appExtensions'];
