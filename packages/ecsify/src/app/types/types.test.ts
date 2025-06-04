@@ -1,105 +1,89 @@
 import { describe, it } from 'vitest';
-import { TApp, TAppContext } from './app';
+import { createApp } from '../create-app';
+import { createDefaultPlugin, TDefaultPlugin } from '../plugins';
 import { TPlugin } from './plugin';
 
 describe('types', () => {
 	it('should work', () => {
-		type TTransformPlugin = TPlugin<{
-			name: 'Transform';
-			components: {
-				Transform: { x: number; y: number; rotation: number };
-				Velocity: { dx: number; dy: number };
-			};
-			appExtensions: {
-				move: () => void;
-			};
-			systemSets: 'Movement' | 'Physics';
-		}>;
-
-		type TRenderPlugin = TPlugin<
-			{
-				name: 'Render';
-				components: {
-					Sprite: { texture: string; visible: boolean };
-				};
-				resources: {
-					renderer: { canvas: any };
-				};
-				systemSets: 'Render';
-			},
-			[TTransformPlugin]
-		>;
-
+		// Define plugin
 		type TGamePlugin = TPlugin<
 			{
 				name: 'Game';
 				components: {
-					Player: { id: string };
-					Health: { value: number; max: number };
+					Position: TCPosition;
+					Velocity: TCVelocity;
+					Rectangle: TCRectangle;
+					Color: TCColor;
 				};
-				events: {
-					PlayerDied: { playerId: string };
-					LevelCompleted: { level: number };
-				};
-				systemSets: 'Game';
 			},
-			[TTransformPlugin, TRenderPlugin]
+			[TDefaultPlugin]
 		>;
 
-		const createTransformPlugin = (): TTransformPlugin => ({
-			name: 'Transform',
-			deps: [],
-			components: {
-				Transform: null as any,
-				Velocity: null as any
-			},
-			appExtensions: {
-				move: () => {
-					console.log('move');
-				}
-			},
-			setup: (app) => {
-				app.c.Transform;
-				app.c.Velocity;
-			}
+		// Define components
+		type TCPosition = { x: number[]; y: number[] };
+		type TCVelocity = { dx: number[]; dy: number[] };
+		type TCRectangle = { width: number[]; height: number[] };
+		type TCColor = { value: string[] };
+
+		function createGamePlugin(): TGamePlugin {
+			return {
+				name: 'Game',
+				deps: ['Default'],
+				components: {
+					Position: { x: [], y: [] },
+					Velocity: { dx: [], dy: [] },
+					Rectangle: { width: [], height: [] },
+					Color: { value: [] }
+				},
+				setup: (app) => {}
+			};
+		}
+
+		const app = createApp({
+			plugins: [createDefaultPlugin(), createGamePlugin()] as const,
+			systemSets: ['First', 'Update', 'Last']
 		});
 
-		const createRenderPlugin = (): TRenderPlugin => ({
-			name: 'Render',
-			deps: ['Transform'],
-			components: {
-				Sprite: null as any
-			},
-			resources: {
-				renderer: { canvas: null as any }
-			},
-			setup: (app) => {
-				app.c.Transform; // From Transform dependency
-				app.c.Sprite; // From Render plugin
-				app.r.renderer; // From Render plugin
-			}
-		});
-
-		const createGamePlugin = (): TGamePlugin => ({
-			name: 'Game',
-			deps: ['Transform', 'Render'],
-			components: {
-				Player: null as any,
-				Health: null as any
-			},
-			setup: (app) => {
-				app.c.Transform; // From Transform dependency
-				app.c.Sprite; // From Render dependency
-				app.c.Player; // From Game plugin
-				app.r.renderer; // From Render dependency
-			}
-		});
-
-		type TTestAppContext = TAppContext<[TTransformPlugin, TRenderPlugin, TGamePlugin]>;
-		type TSystemSets = TTestAppContext['systemSets'];
-		type TEvents = TTestAppContext['events'];
-
-		const testApp: TApp<TTestAppContext> = null as any;
-		testApp._eventRegistry.push('PlayerDied', { playerId: '1' });
+		app.update();
 	});
 });
+
+type TGamePlugin = TPlugin<
+	{
+		name: 'Game';
+		components: {
+			Position: TCPosition;
+			Velocity: TCVelocity;
+			Rectangle: TCRectangle;
+			Color: TCColor;
+		};
+	},
+	[TDefaultPlugin]
+>;
+
+// Define components
+type TCPosition = { x: number[]; y: number[] };
+type TCVelocity = { dx: number[]; dy: number[] };
+type TCRectangle = { width: number[]; height: number[] };
+type TCColor = { value: string[] };
+
+function createGamePlugin(): TGamePlugin {
+	return {
+		name: 'Game',
+		deps: ['Default'],
+		components: {
+			Position: { x: [], y: [] },
+			Velocity: { dx: [], dy: [] },
+			Rectangle: { width: [], height: [] },
+			Color: { value: [] }
+		},
+		setup: (app) => {}
+	};
+}
+
+const app = createApp({
+	plugins: [createDefaultPlugin(), createGamePlugin()] as const,
+	systemSets: ['First', 'Update', 'Last']
+});
+
+app.update();

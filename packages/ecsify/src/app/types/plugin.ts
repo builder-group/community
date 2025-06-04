@@ -78,8 +78,24 @@ export interface TPluginShape {
  */
 export type TAnyPlugin = TPlugin<any, any, any>;
 
-export type TShapeFromPlugin<GPlugin extends TAnyPlugin> =
-	GPlugin extends TPlugin<infer GShape, any> ? GShape : never;
+/**
+ * Extracts the `GShape` type from any variation of a TPlugin.
+ *
+ * Note: TypeScript's `infer` in conditional types only works when the matched type
+ *     has the *same number of generic parameters* as the one you're checking against.
+ *     That means:
+ *       - `TPlugin<A>` ≠ `TPlugin<A, any, any>`
+ *       - `TPlugin<A, B>` ≠ `TPlugin<A, B, any>`
+ *     If you don't account for all generic arities, inference will silently fail.
+ */
+export type TShapeFromPlugin<GPlugin> =
+	GPlugin extends TPlugin<infer GShape, any, any>
+		? GShape
+		: GPlugin extends TPlugin<infer GShape, any>
+			? GShape
+			: GPlugin extends TPlugin<infer GShape>
+				? GShape
+				: never;
 
 export type TMergeTwoPluginShapes<A, B> = {
 	components: (A extends { components: infer AC } ? AC : {}) &
@@ -100,11 +116,13 @@ export type TMergeTwoPluginShapes<A, B> = {
  * This avoids TypeScript recursion limits and circular type constraints
  * caused by merging plugin objects directly (e.g., with `setup` functions).
  */
-export type TMergePlugins<GPlugins extends TAnyPlugin[]> = GPlugins extends [
+export type TMergePlugins<GPlugins extends TAnyPlugin[]> = GPlugins extends readonly [
 	infer GFirst,
 	...infer GRest
 ]
 	? GFirst extends TAnyPlugin
-		? TMergeTwoPluginShapes<TShapeFromPlugin<GFirst>, TMergePlugins<Extract<GRest, TAnyPlugin[]>>>
-		: TMergePlugins<Extract<GRest, TAnyPlugin[]>>
+		? GRest extends TAnyPlugin[]
+			? TMergeTwoPluginShapes<TShapeFromPlugin<GFirst>, TMergePlugins<GRest>>
+			: TShapeFromPlugin<GFirst>
+		: {}
 	: {};
