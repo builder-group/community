@@ -1,5 +1,5 @@
 import { TComponentRef } from '../component';
-import { TWorld } from '../create-world';
+import { TQueryRegistry } from './create-query-registry';
 import { TQueryData, TQueryFilter, TQueryParentType } from './types';
 
 /**
@@ -10,8 +10,8 @@ export function With<T extends TComponentRef>(component: T): TQueryFilter {
 		type: 'With',
 		component,
 
-		evaluate(world, eid): boolean {
-			const registry = world._componentRegistry;
+		evaluate(queryRegistry, eid): boolean {
+			const registry = queryRegistry._componentRegistry;
 			const componentData = registry._componentMap.get(component);
 
 			if (componentData == null) {
@@ -23,21 +23,21 @@ export function With<T extends TComponentRef>(component: T): TQueryFilter {
 			return (entityMask & bitflag) !== 0;
 		},
 
-		register(world, queryData, parentType): void {
+		register(queryRegistry, queryData, parentType): void {
 			// Register callbacks to invalidate this query when components are added/removed
-			world._componentRegistry.onComponentAdd(component, () => {
+			queryRegistry._componentRegistry.onComponentAdd(component, () => {
 				queryData.isDirty = true;
 			});
-			world._componentRegistry.onComponentRemove(component, () => {
+			queryRegistry._componentRegistry.onComponentRemove(component, () => {
 				queryData.isDirty = true;
 			});
 
 			// Register the component mask in the appropriate structure
-			registerComponentMask(world, queryData, component, 'with', parentType);
+			registerComponentMask(queryRegistry, queryData, component, 'with', parentType);
 		},
 
-		getHash(world): string {
-			const componentId = getComponentId(world, component);
+		getHash(queryRegistry): string {
+			const componentId = getComponentId(queryRegistry, component);
 			return `with(${componentId})`;
 		}
 	};
@@ -51,8 +51,8 @@ export function Without<T extends TComponentRef>(component: T): TQueryFilter {
 		type: 'Without',
 		component,
 
-		evaluate(world, eid): boolean {
-			const registry = world._componentRegistry;
+		evaluate(queryRegistry, eid): boolean {
+			const registry = queryRegistry._componentRegistry;
 			const componentData = registry._componentMap.get(component);
 
 			if (componentData == null) {
@@ -64,21 +64,21 @@ export function Without<T extends TComponentRef>(component: T): TQueryFilter {
 			return (entityMask & bitflag) === 0;
 		},
 
-		register(world, queryData, parentType): void {
+		register(queryRegistry, queryData, parentType): void {
 			// Register callbacks to invalidate this query when components are added/removed
-			world._componentRegistry.onComponentAdd(component, () => {
+			queryRegistry._componentRegistry.onComponentAdd(component, () => {
 				queryData.isDirty = true;
 			});
-			world._componentRegistry.onComponentRemove(component, () => {
+			queryRegistry._componentRegistry.onComponentRemove(component, () => {
 				queryData.isDirty = true;
 			});
 
 			// Register the component mask in the appropriate structure
-			registerComponentMask(world, queryData, component, 'without', parentType);
+			registerComponentMask(queryRegistry, queryData, component, 'without', parentType);
 		},
 
-		getHash(world): string {
-			const componentId = getComponentId(world, component);
+		getHash(queryRegistry): string {
+			const componentId = getComponentId(queryRegistry, component);
 			return `without(${componentId})`;
 		}
 	};
@@ -92,27 +92,27 @@ export function Added<T extends TComponentRef>(component: T): TQueryFilter {
 		type: 'Added',
 		component,
 
-		evaluate(world, eid): boolean {
-			return world._componentRegistry.wasAdded(eid, component);
+		evaluate(queryRegistry, eid): boolean {
+			return queryRegistry._componentRegistry.wasAdded(eid, component);
 		},
 
-		register(world, queryData, parentType): void {
+		register(queryRegistry, queryData, parentType): void {
 			// Register callback to invalidate this query when components are added
-			world._componentRegistry.onComponentAdd(component, () => {
+			queryRegistry._componentRegistry.onComponentAdd(component, () => {
 				queryData.isDirty = true;
 			});
 
 			// Register callback to invalidate when change tracking is flushed
-			world._componentRegistry.onComponentFlush(component, () => {
+			queryRegistry._componentRegistry.onComponentFlush(component, () => {
 				queryData.isDirty = true;
 			});
 
 			// Register the component mask in the appropriate structure
-			registerComponentMask(world, queryData, component, 'added', parentType);
+			registerComponentMask(queryRegistry, queryData, component, 'added', parentType);
 		},
 
-		getHash(world): string {
-			const componentId = getComponentId(world, component);
+		getHash(queryRegistry): string {
+			const componentId = getComponentId(queryRegistry, component);
 			return `added(${componentId})`;
 		}
 	};
@@ -126,27 +126,27 @@ export function Changed<T extends TComponentRef>(component: T): TQueryFilter {
 		type: 'Changed',
 		component,
 
-		evaluate(world, eid): boolean {
-			return world._componentRegistry.wasChanged(eid, component);
+		evaluate(queryRegistry, eid): boolean {
+			return queryRegistry._componentRegistry.wasChanged(eid, component);
 		},
 
-		register(world, queryData, parentType): void {
+		register(queryRegistry, queryData, parentType): void {
 			// Register callback to invalidate this query when components are changed
-			world._componentRegistry.onComponentChange(component, () => {
+			queryRegistry._componentRegistry.onComponentChange(component, () => {
 				queryData.isDirty = true;
 			});
 
 			// Register callback to invalidate when change tracking is flushed
-			world._componentRegistry.onComponentFlush(component, () => {
+			queryRegistry._componentRegistry.onComponentFlush(component, () => {
 				queryData.isDirty = true;
 			});
 
 			// Register the component mask in the appropriate structure
-			registerComponentMask(world, queryData, component, 'changed', parentType);
+			registerComponentMask(queryRegistry, queryData, component, 'changed', parentType);
 		},
 
-		getHash(world): string {
-			const componentId = getComponentId(world, component);
+		getHash(queryRegistry): string {
+			const componentId = getComponentId(queryRegistry, component);
 			return `changed(${componentId})`;
 		}
 	};
@@ -160,27 +160,27 @@ export function Removed<T extends TComponentRef>(component: T): TQueryFilter {
 		type: 'Removed',
 		component,
 
-		evaluate(world, eid): boolean {
-			return world._componentRegistry.wasRemoved(eid, component);
+		evaluate(queryRegistry, eid): boolean {
+			return queryRegistry._componentRegistry.wasRemoved(eid, component);
 		},
 
-		register(world, queryData, parentType): void {
+		register(queryRegistry, queryData, parentType): void {
 			// Register callback to invalidate this query when components are removed
-			world._componentRegistry.onComponentRemove(component, () => {
+			queryRegistry._componentRegistry.onComponentRemove(component, () => {
 				queryData.isDirty = true;
 			});
 
 			// Register callback to invalidate when change tracking is flushed
-			world._componentRegistry.onComponentFlush(component, () => {
+			queryRegistry._componentRegistry.onComponentFlush(component, () => {
 				queryData.isDirty = true;
 			});
 
 			// Register the component mask in the appropriate structure
-			registerComponentMask(world, queryData, component, 'removed', parentType);
+			registerComponentMask(queryRegistry, queryData, component, 'removed', parentType);
 		},
 
-		getHash(world): string {
-			const componentId = getComponentId(world, component);
+		getHash(queryRegistry): string {
+			const componentId = getComponentId(queryRegistry, component);
 			return `removed(${componentId})`;
 		}
 	};
@@ -194,14 +194,14 @@ export function And(...filters: TQueryFilter[]): TQueryFilter {
 		type: 'And',
 		filters,
 
-		evaluate(world, eid, queryData): boolean {
+		evaluate(queryRegistry, eid, queryData): boolean {
 			switch (queryData.evaluationStrategy) {
 				case 'bitmask': {
 					const { andMasks, orMasks, generations } = queryData;
-					const entityMasks = world._componentRegistry._entityMasks;
-					const addedMasks = world._componentRegistry._addedMasks;
-					const changedMasks = world._componentRegistry._changedMasks;
-					const removedMasks = world._componentRegistry._removedMasks;
+					const entityMasks = queryRegistry._componentRegistry._entityMasks;
+					const addedMasks = queryRegistry._componentRegistry._addedMasks;
+					const changedMasks = queryRegistry._componentRegistry._changedMasks;
+					const removedMasks = queryRegistry._componentRegistry._removedMasks;
 
 					for (let i = 0; i < generations.length; i++) {
 						const gen = generations[i] as number;
@@ -276,21 +276,21 @@ export function And(...filters: TQueryFilter[]): TQueryFilter {
 				}
 
 				case 'individual':
-					return filters.every((filter) => filter.evaluate(world, eid, queryData));
+					return filters.every((filter) => filter.evaluate(queryRegistry, eid, queryData));
 			}
 		},
 
-		register(world, queryData): void {
+		register(queryRegistry, queryData): void {
 			for (const filter of filters) {
 				if (filter.register != null) {
-					filter.register(world, queryData, 'And');
+					filter.register(queryRegistry, queryData, 'And');
 				}
 			}
 		},
 
-		getHash(world): string {
+		getHash(queryRegistry): string {
 			const childHashes = filters
-				.map((f) => f.getHash(world))
+				.map((f) => f.getHash(queryRegistry))
 				.sort()
 				.join(',');
 			return `and(${childHashes})`;
@@ -306,14 +306,14 @@ export function Or(...filters: TQueryFilter[]): TQueryFilter {
 		type: 'Or',
 		filters,
 
-		evaluate(world, eid, queryData): boolean {
+		evaluate(queryRegistry, eid, queryData): boolean {
 			switch (queryData.evaluationStrategy) {
 				case 'bitmask': {
 					const { orMasks, generations } = queryData;
-					const entityMasks = world._componentRegistry._entityMasks;
-					const addedMasks = world._componentRegistry._addedMasks;
-					const changedMasks = world._componentRegistry._changedMasks;
-					const removedMasks = world._componentRegistry._removedMasks;
+					const entityMasks = queryRegistry._componentRegistry._entityMasks;
+					const addedMasks = queryRegistry._componentRegistry._addedMasks;
+					const changedMasks = queryRegistry._componentRegistry._changedMasks;
+					const removedMasks = queryRegistry._componentRegistry._removedMasks;
 
 					for (let i = 0; i < generations.length; i++) {
 						const gen = generations[i] as number;
@@ -352,21 +352,21 @@ export function Or(...filters: TQueryFilter[]): TQueryFilter {
 				}
 
 				case 'individual':
-					return filters.some((filter) => filter.evaluate(world, eid, queryData));
+					return filters.some((filter) => filter.evaluate(queryRegistry, eid, queryData));
 			}
 		},
 
-		register(world, queryData): void {
+		register(queryRegistry, queryData): void {
 			for (const filter of filters) {
 				if (filter.register != null) {
-					filter.register(world, queryData, 'Or');
+					filter.register(queryRegistry, queryData, 'Or');
 				}
 			}
 		},
 
-		getHash(world): string {
+		getHash(queryRegistry): string {
 			const childHashes = filters
-				.map((f) => f.getHash(world))
+				.map((f) => f.getHash(queryRegistry))
 				.sort()
 				.join(',');
 			return `or(${childHashes})`;
@@ -381,8 +381,8 @@ export const Any = Or;
 /**
  * Helper to get component ID, registering if needed
  */
-function getComponentId(world: TWorld, component: TComponentRef): number {
-	const registry = world._componentRegistry;
+function getComponentId(queryRegistry: TQueryRegistry, component: TComponentRef): number {
+	const registry = queryRegistry._componentRegistry;
 	if (!registry._componentMap.has(component)) {
 		registry.registerComponent(component);
 	}
@@ -393,13 +393,13 @@ function getComponentId(world: TWorld, component: TComponentRef): number {
  * Helper function to register component masks with proper parent type
  */
 function registerComponentMask(
-	world: TWorld,
+	queryRegistry: TQueryRegistry,
 	queryData: TQueryData,
 	component: TComponentRef,
 	maskType: 'with' | 'without' | 'added' | 'changed' | 'removed',
 	parentType: TQueryParentType = 'And'
 ): void {
-	const registry = world._componentRegistry;
+	const registry = queryRegistry._componentRegistry;
 	const componentData = registry._componentMap.get(component);
 	if (componentData == null) {
 		return;

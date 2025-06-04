@@ -1,6 +1,6 @@
 import { TComponentRef, TComponentValue } from '../component';
-import { TWorld } from '../create-world';
 import { TEntityId } from '../entity';
+import { TQueryRegistry } from './create-query-registry';
 
 /**
  * Special entity symbol for component queries
@@ -58,9 +58,13 @@ export interface TQueryData {
 
 export interface TBaseQueryFilter {
 	type: string;
-	evaluate(world: TWorld, eid: TEntityId, queryData: TQueryData): boolean;
-	register?(world: TWorld, queryData: TQueryData, parentType?: TQueryParentType): void;
-	getHash(world: TWorld): string;
+	evaluate(queryRegistry: TQueryRegistry, eid: TEntityId, queryData: TQueryData): boolean;
+	register?(
+		queryRegistry: TQueryRegistry,
+		queryData: TQueryData,
+		parentType?: TQueryParentType
+	): void;
+	getHash(queryRegistry: TQueryRegistry): string;
 }
 
 export type TQueryParentType = Extract<TQueryFilter['type'], 'And' | 'Or'>;

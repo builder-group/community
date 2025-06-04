@@ -41,7 +41,7 @@ export function createApp<
 		) as GAppContext['resources'],
 
 		_new() {
-			this._queryRegistry = createQueryRegistry(this);
+			this._queryRegistry = createQueryRegistry(this._entityIndex, this._componentRegistry);
 		},
 
 		...(plugins.reduce(

@@ -4,18 +4,21 @@
  * Simple and fast query registry with bitmask optimizations.
  */
 
-import { TComponentRef } from '../component';
-import { TWorld } from '../create-world';
-import { TEntityId } from '../entity';
+import { TComponentRef, TComponentRegistry } from '../component';
+import { TEntityId, TEntityIndex } from '../entity';
 import { categorizeEvaluationStrategy } from './categorize-evaluation-strategy';
 import { Entity, TEntity, TQueryComponentValue, TQueryData, TQueryFilter } from './types';
 
 /**
  * Creates a new query registry
  */
-export function createQueryRegistry(world: TWorld): TQueryRegistry {
+export function createQueryRegistry(
+	entityIndex: TEntityIndex,
+	componentRegistry: TComponentRegistry
+): TQueryRegistry {
 	return {
-		_world: world,
+		_entityIndex: entityIndex,
+		_componentRegistry: componentRegistry,
 		_queryCache: new Map(),
 
 		queryEntities(filter, options = {}) {
@@ -28,7 +31,7 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 			}
 
 			// Exit if no entities exist
-			const aliveEntities = this._world._entityIndex.getAliveEntities();
+			const aliveEntities = this._entityIndex.getAliveEntities();
 			if (aliveEntities.length === 0) {
 				queryData.cachedResult = [];
 				queryData.isDirty = false;
@@ -38,7 +41,7 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 			// Find matching entities
 			const matchingEntities: TEntityId[] = [];
 			for (const eid of aliveEntities) {
-				if (filter.evaluate(this._world, eid, queryData)) {
+				if (filter.evaluate(this, eid, queryData)) {
 					matchingEntities.push(eid);
 				}
 			}
@@ -57,7 +60,7 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 			// Get entities that match the filter (or all alive entities if no filter)
 			const matchingEntities = filter
 				? this.queryEntities(filter)
-				: this._world._entityIndex.getAliveEntities();
+				: this._entityIndex.getAliveEntities();
 
 			// For each entity, check if it has all components and get their data
 			const results: TComponentDataTuple<GComponents>[] = [];
@@ -70,7 +73,7 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 						row.push(eid);
 					} else {
 						// Check if entity has this component
-						if (!this._world._componentRegistry.hasComponent(eid, comp)) {
+						if (!this._componentRegistry.hasComponent(eid, comp)) {
 							hasAllComponents = false;
 							break;
 						}
@@ -116,7 +119,7 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 
 		getQuery(filter, options = {}) {
 			const { evaluationStrategy = categorizeEvaluationStrategy(filter) } = options;
-			const hash = filter.getHash(this._world);
+			const hash = filter.getHash(this);
 
 			// Return cached query if exists
 			if (this._queryCache.has(hash)) {
@@ -135,7 +138,7 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 
 			// Let filter register
 			if (filter.register != null) {
-				filter.register(this._world, queryData);
+				filter.register(this, queryData);
 			}
 
 			// Cache the query
@@ -149,12 +152,12 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 		},
 
 		generateQueryHash(filter) {
-			return filter.getHash(this._world);
+			return filter.getHash(this);
 		},
 
 		checkEntity(queryData, eid) {
 			// Use the stored filter's evaluate method with the query data
-			return queryData.filter.evaluate(this._world, eid, queryData);
+			return queryData.filter.evaluate(this, eid, queryData);
 		},
 
 		reset() {
@@ -164,8 +167,10 @@ export function createQueryRegistry(world: TWorld): TQueryRegistry {
 }
 
 export interface TQueryRegistry {
-	/** Reference to the world */
-	_world: TWorld;
+	/** Reference to the entity index */
+	_entityIndex: TEntityIndex;
+	/** Reference to the component registry */
+	_componentRegistry: TComponentRegistry;
 	/** Cache of compiled queries by hash */
 	_queryCache: Map<string, TQueryData>;
 
