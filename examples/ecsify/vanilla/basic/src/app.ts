@@ -2,9 +2,10 @@ import {
 	createApp,
 	createDefaultPlugin,
 	Entity,
+	type TApp,
+	type TAppContext,
 	type TDefaultPlugin,
-	type TPlugin,
-	type TPluginSystemFn
+	type TPlugin
 } from 'ecsify';
 
 // Get canvas context
@@ -105,7 +106,7 @@ export function createGamePlugin(): TGamePlugin {
 }
 
 // Physics system
-const physicsSystem: TPluginSystemFn<TGamePlugin> = (app, dt = 0.016) => {
+const physicsSystem = (app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>, dt = 0.016) => {
 	for (const [eid, pos, vel, rect] of app.queryComponents([
 		Entity,
 		app.c.Position,
@@ -140,7 +141,7 @@ const physicsSystem: TPluginSystemFn<TGamePlugin> = (app, dt = 0.016) => {
 };
 
 // Rendering system
-const renderingSystem: TPluginSystemFn<TGamePlugin> = (app) => {
+const renderingSystem = (app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>) => {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	for (const [pos, color, rect] of app.queryComponents([

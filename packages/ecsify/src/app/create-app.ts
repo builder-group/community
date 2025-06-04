@@ -75,7 +75,7 @@ export function createApp<
 
 				// Call setup if it exists
 				if (plugin.setup != null) {
-					plugin.setup(this);
+					plugin.setup(this as unknown as TApp);
 				}
 
 				return this as unknown as TApp<
