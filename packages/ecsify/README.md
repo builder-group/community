@@ -29,11 +29,11 @@
 
 ### 📚 Examples
 
-- [Basic](https://github.com/builder-group/community/tree/develop/examples/ecsify/vanilla/basic)
+- [Basic](https://github.com/builder-group/community/tree/develop/examples/ecsify/vanilla/basic) ([CodeSandbox](https://codesandbox.io/p/sandbox/822vss))
 
 ### 🌟 Motivation
 
-Build a modern, type-safe ECS library that fully leverages TypeScript's type system without compromising performance. While libraries like [bitECS](https://github.com/NateTheGreatt/bitECS) offer good speed, they often lack robust TypeScript support and more advanced queries like `Added()`, `Removed()`, or `Changed()`. `ecsify` bridges this gap—combining high performance, full TypeScript integration, and powerful query capabilities—all while adhering to the KISS principle for a clean, intuitive API.
+Build a modern, type-safe ECS library that fully leverages TypeScript's type system without compromising performance. While libraries like [bitECS](https://github.com/NateTheGreatt/bitECS) offer good speed, they often lack robust TypeScript support and more advanced queries like `Added()`, `Removed()`, or `Changed()`. `ecsify` bridges this gap - combining high performance, full TypeScript integration, and powerful query capabilities - all while adhering to the KISS principle for a clean, intuitive API.
 
 ### ⚖️ Alternatives
 

@@ -75,7 +75,7 @@ export function tsDeclarationsPlugin(config: TTsDeclarationsPluginConfig): Plugi
 					if (fileName.endsWith('.d.ts') || fileName.endsWith('.d.ts.map')) {
 						const relativePath = path.relative(outDir, fileName);
 
-						// Rollup requires chunk names to be neither absolute nor relative paths—normalize to a valid format.
+						// Rollup requires chunk names to be neither absolute nor relative paths - normalize to a valid format.
 						const normalizedPath = relativePath
 							.split(path.sep)
 							.filter((segment) => segment !== '..' && segment !== '.')
