@@ -1,9 +1,17 @@
-import { addComponent, addEntity, createWorld, query, removeComponent, removeEntity } from 'bitecs';
+import {
+	And,
+	createComponentRegistry,
+	createEntityIndex,
+	createQueryRegistry,
+	With
+} from '../../../src';
 
-export function createBitEcsBenchmarks() {
+export function createEcsifyRawBenchmarks() {
 	return {
 		packedIteration() {
-			const world = createWorld();
+			const entityIndex = createEntityIndex();
+			const componentRegistry = createComponentRegistry();
+			const queryRegistry = createQueryRegistry(entityIndex, componentRegistry);
 
 			// Create 5 simple components
 			const A = { value: [] as number[] };
@@ -14,35 +22,35 @@ export function createBitEcsBenchmarks() {
 
 			// Create 1,000 entities with all 5 components (packed archetype)
 			for (let i = 0; i < 1000; i++) {
-				const eid = addEntity(world);
-				addComponent(world, eid, A);
+				const eid = entityIndex.createEntity();
+				componentRegistry.addComponent(eid, A);
 				A.value[eid] = 1;
-				addComponent(world, eid, B);
+				componentRegistry.addComponent(eid, B);
 				B.value[eid] = 1;
-				addComponent(world, eid, C);
+				componentRegistry.addComponent(eid, C);
 				C.value[eid] = 1;
-				addComponent(world, eid, D);
+				componentRegistry.addComponent(eid, D);
 				D.value[eid] = 1;
-				addComponent(world, eid, E);
+				componentRegistry.addComponent(eid, E);
 				E.value[eid] = 1;
 			}
 
 			return {
 				runPackedIteration() {
 					// Process each component type - doubles all values
-					for (const eid of query(world, [A])) {
+					for (const eid of queryRegistry.queryEntities(With(A))) {
 						A.value[eid] = (A.value[eid] ?? 0) * 2;
 					}
-					for (const eid of query(world, [B])) {
+					for (const eid of queryRegistry.queryEntities(With(B))) {
 						B.value[eid] = (B.value[eid] ?? 0) * 2;
 					}
-					for (const eid of query(world, [C])) {
+					for (const eid of queryRegistry.queryEntities(With(C))) {
 						C.value[eid] = (C.value[eid] ?? 0) * 2;
 					}
-					for (const eid of query(world, [D])) {
+					for (const eid of queryRegistry.queryEntities(With(D))) {
 						D.value[eid] = (D.value[eid] ?? 0) * 2;
 					}
-					for (const eid of query(world, [E])) {
+					for (const eid of queryRegistry.queryEntities(With(E))) {
 						E.value[eid] = (E.value[eid] ?? 0) * 2;
 					}
 				}
@@ -50,7 +58,9 @@ export function createBitEcsBenchmarks() {
 		},
 
 		simpleIteration() {
-			const world = createWorld();
+			const entityIndex = createEntityIndex();
+			const componentRegistry = createComponentRegistry();
+			const queryRegistry = createQueryRegistry(entityIndex, componentRegistry);
 
 			// Create 5 components for different combinations
 			const A = { value: [] as number[] };
@@ -61,48 +71,48 @@ export function createBitEcsBenchmarks() {
 
 			// Create entities with different component combinations
 			for (let i = 0; i < 1000; i++) {
-				const eid = addEntity(world);
-				addComponent(world, eid, A);
+				const eid = entityIndex.createEntity();
+				componentRegistry.addComponent(eid, A);
 				A.value[eid] = 0;
-				addComponent(world, eid, B);
+				componentRegistry.addComponent(eid, B);
 				B.value[eid] = 0;
 			}
 			for (let i = 0; i < 1000; i++) {
-				const eid = addEntity(world);
-				addComponent(world, eid, A);
+				const eid = entityIndex.createEntity();
+				componentRegistry.addComponent(eid, A);
 				A.value[eid] = 0;
-				addComponent(world, eid, B);
+				componentRegistry.addComponent(eid, B);
 				B.value[eid] = 0;
-				addComponent(world, eid, C);
+				componentRegistry.addComponent(eid, C);
 				C.value[eid] = 0;
 			}
 			for (let i = 0; i < 1000; i++) {
-				const eid = addEntity(world);
-				addComponent(world, eid, A);
+				const eid = entityIndex.createEntity();
+				componentRegistry.addComponent(eid, A);
 				A.value[eid] = 0;
-				addComponent(world, eid, B);
+				componentRegistry.addComponent(eid, B);
 				B.value[eid] = 0;
-				addComponent(world, eid, C);
+				componentRegistry.addComponent(eid, C);
 				C.value[eid] = 0;
-				addComponent(world, eid, D);
+				componentRegistry.addComponent(eid, D);
 				D.value[eid] = 0;
 			}
 			for (let i = 0; i < 1000; i++) {
-				const eid = addEntity(world);
-				addComponent(world, eid, A);
+				const eid = entityIndex.createEntity();
+				componentRegistry.addComponent(eid, A);
 				A.value[eid] = 0;
-				addComponent(world, eid, B);
+				componentRegistry.addComponent(eid, B);
 				B.value[eid] = 0;
-				addComponent(world, eid, C);
+				componentRegistry.addComponent(eid, C);
 				C.value[eid] = 0;
-				addComponent(world, eid, E);
+				componentRegistry.addComponent(eid, E);
 				E.value[eid] = 0;
 			}
 
 			return {
 				runSimpleIteration() {
 					// System 1: Swaps values between A and B components
-					for (const eid of query(world, [A, B])) {
+					for (const eid of queryRegistry.queryEntities(And(With(A), With(B)))) {
 						const valueA = A.value[eid] ?? 0;
 						const valueB = B.value[eid] ?? 0;
 						A.value[eid] = valueB;
@@ -110,7 +120,7 @@ export function createBitEcsBenchmarks() {
 					}
 
 					// System 2: Swaps values between C and D components
-					for (const eid of query(world, [C, D])) {
+					for (const eid of queryRegistry.queryEntities(And(With(C), With(D)))) {
 						const valueC = C.value[eid] ?? 0;
 						const valueD = D.value[eid] ?? 0;
 						C.value[eid] = valueD;
@@ -118,7 +128,7 @@ export function createBitEcsBenchmarks() {
 					}
 
 					// System 3: Swaps values between C and E components
-					for (const eid of query(world, [C, E])) {
+					for (const eid of queryRegistry.queryEntities(And(With(C), With(E)))) {
 						const valueC = C.value[eid] ?? 0;
 						const valueE = E.value[eid] ?? 0;
 						C.value[eid] = valueE;
@@ -129,7 +139,9 @@ export function createBitEcsBenchmarks() {
 		},
 
 		fragmentedIteration() {
-			const world = createWorld();
+			const entityIndex = createEntityIndex();
+			const componentRegistry = createComponentRegistry();
+			const queryRegistry = createQueryRegistry(entityIndex, componentRegistry);
 
 			// Shared component across all entities
 			const Data = { value: [] as number[] };
@@ -145,10 +157,10 @@ export function createBitEcsBenchmarks() {
 				const component = components[componentIndex];
 				if (component != null) {
 					for (let entityCount = 0; entityCount < 100; entityCount++) {
-						const eid = addEntity(world);
-						addComponent(world, eid, component);
+						const eid = entityIndex.createEntity();
+						componentRegistry.addComponent(eid, component);
 						component.value[eid] = 0;
-						addComponent(world, eid, Data);
+						componentRegistry.addComponent(eid, Data);
 						Data.value[eid] = 0;
 					}
 				}
@@ -157,14 +169,14 @@ export function createBitEcsBenchmarks() {
 			return {
 				runFragmentedIteration() {
 					// Process all entities with shared data
-					for (const eid of query(world, [Data])) {
+					for (const eid of queryRegistry.queryEntities(With(Data))) {
 						Data.value[eid] = (Data.value[eid] ?? 0) * 2;
 					}
 
 					// Process entities with the last specialized component
 					const component = components[25];
 					if (component != null) {
-						for (const eid of query(world, [components[25]])) {
+						for (const eid of queryRegistry.queryEntities(With(components[25]))) {
 							component.value[eid] = (component.value[eid] ?? 0) * 2;
 						}
 					}
@@ -173,59 +185,64 @@ export function createBitEcsBenchmarks() {
 		},
 
 		entityCycle() {
-			const world = createWorld();
+			const entityIndex = createEntityIndex();
+			const componentRegistry = createComponentRegistry();
+			const queryRegistry = createQueryRegistry(entityIndex, componentRegistry);
 
 			const A = { value: [] as number[] };
 			const B = { value: [] as number[] };
 
 			// Create initial persistent entities
 			for (let i = 0; i < 1000; i++) {
-				const eid = addEntity(world);
-				addComponent(world, eid, A);
+				const eid = entityIndex.createEntity();
+				componentRegistry.addComponent(eid, A);
 				A.value[eid] = 0;
 			}
 
 			return {
 				runEntityCycle() {
 					// Create new temporary entity for each persistent entity
-					for (const _eid of query(world, [A])) {
-						const newEid = addEntity(world);
-						addComponent(world, newEid, B);
+					for (const _eid of queryRegistry.queryEntities(With(A))) {
+						const newEid = entityIndex.createEntity();
+						componentRegistry.addComponent(newEid, B);
 						B.value[newEid] = 0;
 					}
 
 					// Destroy all temporary entities
-					for (const eid of query(world, [B])) {
-						removeEntity(world, eid);
+					for (const eid of queryRegistry.queryEntities(With(B))) {
+						componentRegistry.removeAllComponents(eid);
+						entityIndex.removeEntity(eid);
 					}
 				}
 			};
 		},
 
 		addRemove() {
-			const world = createWorld();
+			const entityIndex = createEntityIndex();
+			const componentRegistry = createComponentRegistry();
+			const queryRegistry = createQueryRegistry(entityIndex, componentRegistry);
 
 			const A = { value: [] as number[] };
 			const B = { value: [] as number[] };
 
 			// Create initial entities with only base component
 			for (let i = 0; i < 1000; i++) {
-				const eid = addEntity(world);
-				addComponent(world, eid, A);
+				const eid = entityIndex.createEntity();
+				componentRegistry.addComponent(eid, A);
 				A.value[eid] = 0;
 			}
 
 			return {
 				runAddRemove() {
 					// Add dynamic component to entities that only have base component
-					for (const eid of query(world, [A])) {
-						addComponent(world, eid, B);
+					for (const eid of queryRegistry.queryEntities(With(A))) {
+						componentRegistry.addComponent(eid, B);
 						B.value[eid] = 0;
 					}
 
 					// Remove dynamic component from entities that have both components
-					for (const eid of query(world, [B])) {
-						removeComponent(world, eid, B);
+					for (const eid of queryRegistry.queryEntities(With(B))) {
+						componentRegistry.removeComponent(eid, B);
 					}
 				}
 			};

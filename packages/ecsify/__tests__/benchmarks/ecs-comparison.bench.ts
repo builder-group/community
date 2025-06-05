@@ -1,121 +1,183 @@
-import { createSeededRandom } from '@blgc/utils';
 import { bench, describe } from 'vitest';
-import { createBitEcsBenchmarks, createEcsifyBenchmarks, createElicsBenchmarks } from './ecs';
+import {
+	createBitEcsBenchmarks,
+	createEcsifyAppBenchmarks,
+	createEcsifyRawBenchmarks,
+	createElicsBenchmarks
+} from './ecs';
+
+// Based on: https://github.com/elixr-games/elics/tree/main/benchmarks
 
 describe('ECS Performance Comparison', () => {
-	const seed = 42; // Fixed seed for consistent results
-
 	// Create benchmark instances for each ECS
-	const ecsifyBenchmarks = createEcsifyBenchmarks(createSeededRandom(seed));
-	const bitecsBenchmarks = createBitEcsBenchmarks(createSeededRandom(seed));
-	const elicsBenchmarks = createElicsBenchmarks(createSeededRandom(seed));
-	// const becsyBenchmarks = createBecsyBenchmarks(createSeededRandom(seed));
+	const ecsifyAppBenchmarks = createEcsifyAppBenchmarks();
+	const ecsifyRawBenchmarks = createEcsifyRawBenchmarks();
+	const bitecsBenchmarks = createBitEcsBenchmarks();
+	const elicsBenchmarks = createElicsBenchmarks();
+	// const becsyBenchmarks = createBecsyBenchmarks();
 
-	describe('Entity Creation', async () => {
-		const ecsifyEntityCreation = ecsifyBenchmarks.entityCreation();
-		const bitecsEntityCreation = bitecsBenchmarks.entityCreation();
-		const elicsEntityCreation = elicsBenchmarks.entityCreation();
-		// const becsyEntityCreation = await becsyBenchmarks.entityCreation();
+	/**
+	 * Tests optimal-case iteration performance with dense, homogeneous data.
+	 * 1,000 entities each with components A-E, 5 systems iterating through them.
+	 * Simulates high-performance scenarios like physics where all entities share identical layouts.
+	 */
+	describe('Packed Iteration', async () => {
+		const ecsifyApp = ecsifyAppBenchmarks.packedIteration();
+		const ecsifyRaw = ecsifyRawBenchmarks.packedIteration();
+		const bitecs = bitecsBenchmarks.packedIteration();
+		const elics = elicsBenchmarks.packedIteration();
+		// const becsy = await becsyBenchmarks.packedIteration();
 
-		bench('Ecsify - Create entity', () => {
-			ecsifyEntityCreation.createEntity();
+		bench('Ecsify (App) - Packed iteration (5 systems, 1000 entities)', () => {
+			ecsifyApp.runPackedIteration();
 		});
 
-		bench('BitECS - Create entity', () => {
-			bitecsEntityCreation.createEntity();
+		bench('Ecsify (Raw) - Packed iteration (5 systems, 1000 entities)', () => {
+			ecsifyRaw.runPackedIteration();
 		});
 
-		bench('EliCS - Create entity', () => {
-			elicsEntityCreation.createEntity();
+		bench('BitECS - Packed iteration (5 systems, 1000 entities)', () => {
+			bitecs.runPackedIteration();
 		});
 
-		// bench('Becsy - Create entity', () => {
-		// 	becsyEntityCreation.createEntity();
+		bench('EliCS - Packed iteration (5 systems, 1000 entities)', () => {
+			elics.runPackedIteration();
+		});
+
+		// bench('Becsy - Packed iteration (5 systems, 1000 entities)', async () => {
+		// 	await becsy.runPackedIteration();
 		// });
 	});
 
-	describe('Component Addition', async () => {
-		const ecsifyComponentAddition = ecsifyBenchmarks.componentAddition();
-		const bitecsComponentAddition = bitecsBenchmarks.componentAddition();
-		const elicsComponentAddition = elicsBenchmarks.componentAddition();
-		// const becsyComponentAddition = await becsyBenchmarks.componentAddition();
+	/**
+	 * Tests heterogeneous entity processing with multiple archetype combinations.
+	 * 4,000 entities across different component combinations, 3 systems with overlapping queries.
+	 * Simulates typical game scenarios with diverse entity types.
+	 */
+	describe('Simple Iteration', async () => {
+		const ecsifyApp = ecsifyAppBenchmarks.simpleIteration();
+		const ecsifyRaw = ecsifyRawBenchmarks.simpleIteration();
+		const bitecs = bitecsBenchmarks.simpleIteration();
+		const elics = elicsBenchmarks.simpleIteration();
+		// const becsy = await becsyBenchmarks.simpleIteration();
 
-		bench('Ecsify - Add Position component', () => {
-			ecsifyComponentAddition.addPositionComponent();
+		bench('Ecsify (App) - Simple iteration (3 systems, 4000 entities)', () => {
+			ecsifyApp.runSimpleIteration();
 		});
 
-		bench('BitECS - Add Position component', () => {
-			bitecsComponentAddition.addPositionComponent();
+		bench('Ecsify (Raw) - Simple iteration (3 systems, 4000 entities)', () => {
+			ecsifyRaw.runSimpleIteration();
 		});
 
-		bench('EliCS - Add Position component', () => {
-			elicsComponentAddition.addPositionComponent();
+		bench('BitECS - Simple iteration (3 systems, 4000 entities)', () => {
+			bitecs.runSimpleIteration();
 		});
 
-		// bench('Becsy - Add Position component', () => {
-		// 	becsyComponentAddition.addPositionComponent();
+		bench('EliCS - Simple iteration (3 systems, 4000 entities)', () => {
+			elics.runSimpleIteration();
+		});
+
+		// bench('Becsy - Simple iteration (3 systems, 4000 entities)', async () => {
+		// 	await becsy.runSimpleIteration();
 		// });
 	});
 
-	describe('Component Queries', async () => {
-		const ecsifyComponentQueries = ecsifyBenchmarks.componentQueries();
-		const bitecsComponentQueries = bitecsBenchmarks.componentQueries();
-		const elicsComponentQueries = elicsBenchmarks.componentQueries();
-		// const becsyComponentQueries = await becsyBenchmarks.componentQueries();
+	/**
+	 * Tests sparse data handling with many archetype variations.
+	 * 26 component types with only 100 entities per archetype + shared Data component.
+	 * Simulates complex games with many specialized entity types spread thin.
+	 */
+	describe('Fragmented Iteration', async () => {
+		const ecsifyApp = ecsifyAppBenchmarks.fragmentedIteration();
+		const ecsifyRaw = ecsifyRawBenchmarks.fragmentedIteration();
+		const bitecs = bitecsBenchmarks.fragmentedIteration();
+		const elics = elicsBenchmarks.fragmentedIteration();
+		// const becsy = await becsyBenchmarks.fragmentedIteration();
 
-		bench('Ecsify - Query Position components', () => {
-			ecsifyComponentQueries.queryPositionComponents();
+		bench('Ecsify (App) - Fragmented iteration (26 archetypes, 100 entities each)', () => {
+			ecsifyApp.runFragmentedIteration();
 		});
 
-		bench('BitECS - Query Position components', () => {
-			bitecsComponentQueries.queryPositionComponents();
+		bench('Ecsify (Raw) - Fragmented iteration (26 archetypes, 100 entities each)', () => {
+			ecsifyRaw.runFragmentedIteration();
 		});
 
-		bench('EliCS - Query Position components', () => {
-			elicsComponentQueries.queryPositionComponents();
+		bench('BitECS - Fragmented iteration (26 archetypes, 100 entities each)', () => {
+			bitecs.runFragmentedIteration();
 		});
 
-		// bench('Becsy - Query Position components', async () => {
-		// 	await becsyComponentQueries.queryPositionComponents();
-		// });
-
-		bench('Ecsify - Query Position + Velocity', () => {
-			ecsifyComponentQueries.queryPositionAndVelocity();
+		bench('EliCS - Fragmented iteration (26 archetypes, 100 entities each)', () => {
+			elics.runFragmentedIteration();
 		});
 
-		bench('BitECS - Query Position + Velocity', () => {
-			bitecsComponentQueries.queryPositionAndVelocity();
-		});
-
-		bench('EliCS - Query Position + Velocity', () => {
-			elicsComponentQueries.queryPositionAndVelocity();
-		});
-
-		// bench('Becsy - Query Position + Velocity', async () => {
-		// 	await becsyComponentQueries.queryPositionAndVelocity();
+		// bench('Becsy - Fragmented iteration (26 archetypes, 100 entities each)', async () => {
+		// 	await becsy.runFragmentedIteration();
 		// });
 	});
 
-	describe('System Iteration Performance', async () => {
-		const ecsifySystemIteration = ecsifyBenchmarks.systemIteration();
-		const bitecsSystemIteration = bitecsBenchmarks.systemIteration();
-		const elicsSystemIteration = elicsBenchmarks.systemIteration();
-		// const becsySystemIteration = await becsyBenchmarks.systemIteration();
+	/**
+	 * Tests dynamic entity lifecycle management with rapid creation/destruction.
+	 * Creates new entities for every existing entity, then destroys the new ones.
+	 * Simulates high-frequency spawning like bullets, particles, or temporary objects.
+	 */
+	describe('Entity Lifecycle', async () => {
+		const ecsifyApp = ecsifyAppBenchmarks.entityCycle();
+		const ecsifyRaw = ecsifyRawBenchmarks.entityCycle();
+		const bitecs = bitecsBenchmarks.entityCycle();
+		const elics = elicsBenchmarks.entityCycle();
+		// const becsy = await becsyBenchmarks.entityCycle();
 
-		bench('Ecsify - Movement system iteration', () => {
-			ecsifySystemIteration.movementSystemIteration();
+		bench('Ecsify (App) - Entity creation/destruction cycle', () => {
+			ecsifyApp.runEntityCycle();
 		});
 
-		bench('BitECS - Movement system iteration', () => {
-			bitecsSystemIteration.movementSystemIteration();
+		bench('Ecsify (Raw) - Entity creation/destruction cycle', () => {
+			ecsifyRaw.runEntityCycle();
 		});
 
-		bench('EliCS - Movement system iteration', () => {
-			elicsSystemIteration.movementSystemIteration();
+		bench('BitECS - Entity creation/destruction cycle', () => {
+			bitecs.runEntityCycle();
 		});
 
-		// bench('Becsy - Movement system iteration', async () => {
-		// 	await becsySystemIteration.movementSystemIteration();
+		bench('EliCS - Entity creation/destruction cycle', () => {
+			elics.runEntityCycle();
+		});
+
+		// bench('Becsy - Entity creation/destruction cycle', async () => {
+		// 	await becsy.runEntityCycle();
+		// });
+	});
+
+	/**
+	 * Tests component mutation performance through rapid archetype transitions.
+	 * Continuously adds/removes components, causing entities to migrate between archetypes.
+	 * Simulates dynamic state changes like status effects or equipment modifications.
+	 */
+	describe('Component Mutation', async () => {
+		const ecsifyApp = ecsifyAppBenchmarks.addRemove();
+		const ecsifyRaw = ecsifyRawBenchmarks.addRemove();
+		const bitecs = bitecsBenchmarks.addRemove();
+		const elics = elicsBenchmarks.addRemove();
+		// const becsy = await becsyBenchmarks.addRemove();
+
+		bench('Ecsify (App) - Component add/remove transitions', () => {
+			ecsifyApp.runAddRemove();
+		});
+
+		bench('Ecsify (Raw) - Component add/remove transitions', () => {
+			ecsifyRaw.runAddRemove();
+		});
+
+		bench('BitECS - Component add/remove transitions', () => {
+			bitecs.runAddRemove();
+		});
+
+		bench('EliCS - Component add/remove transitions', () => {
+			elics.runAddRemove();
+		});
+
+		// bench('Becsy - Component add/remove transitions', async () => {
+		// 	await becsy.runAddRemove();
 		// });
 	});
 });
