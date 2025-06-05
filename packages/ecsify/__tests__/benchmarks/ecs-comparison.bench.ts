@@ -7,6 +7,7 @@ import {
 } from './ecs';
 
 // Based on: https://github.com/elixr-games/elics/tree/main/benchmarks
+//           https://github.com/noctjs/ecs-benchmark
 
 describe('ECS Performance Comparison', () => {
 	// Create benchmark instances for each ECS

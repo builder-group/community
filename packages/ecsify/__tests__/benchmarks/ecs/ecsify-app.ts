@@ -9,6 +9,16 @@ import {
 	With
 } from '../../../src';
 
+/**
+ * Ecsify App Benchmarks - Better DX but ~50x slower than Raw
+ *
+ * Performance bottlenecks vs Raw implementation:
+ * 1. queryComponents() creates [eid, componentData] arrays for each entity vs queryEntities() returning just entity IDs
+ * 2. updateComponent() has type checking overhead and markChanged() calls vs direct array access (A.value[eid] = x)
+ * 3. Component access through app.c.A adds minimal indirection vs direct references
+ *
+ * Tradeoff: Use Raw for performance-critical code, App for better developer experience
+ */
 export function createEcsifyAppBenchmarks() {
 	return {
 		packedIteration() {
@@ -25,6 +35,12 @@ export function createEcsifyAppBenchmarks() {
 				},
 				[]
 			>;
+
+			// const A = { value: [] as number[] };
+			// const B = { value: [] as number[] };
+			// const C = { value: [] as number[] };
+			// const D = { value: [] as number[] };
+			// const E = { value: [] as number[] };
 
 			function createCorePlugin(): TCorePlugin {
 				// System that processes all 5 component types separately
@@ -45,6 +61,78 @@ export function createEcsifyAppBenchmarks() {
 					for (const [eid, e] of app.queryComponents([Entity, app.c.E] as const, With(app.c.E))) {
 						app.updateComponent(eid, app.c.E, { value: e.value * 2 });
 					}
+
+					// around 4,000.00 hz - queryComponents overhead
+					//
+					// for (const [eid, a] of app.queryComponents([Entity, app.c.A] as const, With(app.c.A))) {
+					// 	app.c.A.value[eid] = a.value * 2;
+					// }
+					// for (const [eid, b] of app.queryComponents([Entity, app.c.B] as const, With(app.c.B))) {
+					// 	app.c.B.value[eid] = b.value * 2;
+					// }
+					// for (const [eid, c] of app.queryComponents([Entity, app.c.C] as const, With(app.c.C))) {
+					// 	app.c.C.value[eid] = c.value * 2;
+					// }
+					// for (const [eid, d] of app.queryComponents([Entity, app.c.D] as const, With(app.c.D))) {
+					// 	app.c.D.value[eid] = d.value * 2;
+					// }
+					// for (const [eid, e] of app.queryComponents([Entity, app.c.E] as const, With(app.c.E))) {
+					// 	app.c.E.value[eid] = e.value * 2;
+					// }
+
+					// around 4,000.00 hz - updateComponent overhead
+					//
+					// for (const eid of app.queryEntities(With(app.c.A))) {
+					// 	app.updateComponent(eid, app.c.A, { value: (app.c.A.value[eid] ?? 0) * 2 });
+					// }
+					// for (const eid of app.queryEntities(With(app.c.B))) {
+					// 	app.updateComponent(eid, app.c.B, { value: (app.c.B.value[eid] ?? 0) * 2 });
+					// }
+					// for (const eid of app.queryEntities(With(app.c.C))) {
+					// 	app.updateComponent(eid, app.c.C, { value: (app.c.C.value[eid] ?? 0) * 2 });
+					// }
+					// for (const eid of app.queryEntities(With(app.c.D))) {
+					// 	app.updateComponent(eid, app.c.D, { value: (app.c.D.value[eid] ?? 0) * 2 });
+					// }
+					// for (const eid of app.queryEntities(With(app.c.E))) {
+					// 	app.updateComponent(eid, app.c.E, { value: (app.c.E.value[eid] ?? 0) * 2 });
+					// }
+
+					// around 21,000.00 hz - Direct array access via app.c and no updateComponent & queryComponents overhead
+					//
+					// for (const eid of app.queryEntities(With(app.c.A))) {
+					// 	app.c.A.value[eid] = (app.c.A.value[eid] ?? 0) * 2;
+					// }
+					// for (const eid of app.queryEntities(With(app.c.B))) {
+					// 	app.c.B.value[eid] = (app.c.B.value[eid] ?? 0) * 2;
+					// }
+					// for (const eid of app.queryEntities(With(app.c.C))) {
+					// 	app.c.C.value[eid] = (app.c.C.value[eid] ?? 0) * 2;
+					// }
+					// for (const eid of app.queryEntities(With(app.c.D))) {
+					// 	app.c.D.value[eid] = (app.c.D.value[eid] ?? 0) * 2;
+					// }
+					// for (const eid of app.queryEntities(With(app.c.E))) {
+					// 	app.c.E.value[eid] = (app.c.E.value[eid] ?? 0) * 2;
+					// }
+
+					// around 103,000.00 hz - Direct component references avoid app.c property access overhead and no updateComponent & queryComponents overhead
+					//
+					// for (const eid of app.queryEntities(With(A))) {
+					// 	A.value[eid] = (A.value[eid] ?? 0) * 2;
+					// }
+					// for (const eid of app.queryEntities(With(B))) {
+					// 	B.value[eid] = (B.value[eid] ?? 0) * 2;
+					// }
+					// for (const eid of app.queryEntities(With(C))) {
+					// 	C.value[eid] = (C.value[eid] ?? 0) * 2;
+					// }
+					// for (const eid of app.queryEntities(With(D))) {
+					// 	D.value[eid] = (D.value[eid] ?? 0) * 2;
+					// }
+					// for (const eid of app.queryEntities(With(E))) {
+					// 	E.value[eid] = (E.value[eid] ?? 0) * 2;
+					// }
 				}
 
 				return {
@@ -75,7 +163,7 @@ export function createEcsifyAppBenchmarks() {
 			}
 
 			const app = createApp({
-				plugins: [createDefaultPlugin(), createCorePlugin()],
+				plugins: [createDefaultPlugin(), createCorePlugin()] as const,
 				systemSets: ['First', 'Update', 'Last']
 			});
 
@@ -182,7 +270,7 @@ export function createEcsifyAppBenchmarks() {
 			}
 
 			const app = createApp({
-				plugins: [createDefaultPlugin(), createCorePlugin()],
+				plugins: [createDefaultPlugin(), createCorePlugin()] as const,
 				systemSets: ['First', 'Update', 'Last']
 			});
 
@@ -259,7 +347,7 @@ export function createEcsifyAppBenchmarks() {
 			}
 
 			const app = createApp({
-				plugins: [createDefaultPlugin(), createCorePlugin()],
+				plugins: [createDefaultPlugin(), createCorePlugin()] as const,
 				systemSets: ['First', 'Update', 'Last']
 			});
 
@@ -318,7 +406,7 @@ export function createEcsifyAppBenchmarks() {
 			}
 
 			const app = createApp({
-				plugins: [createDefaultPlugin(), createCorePlugin()],
+				plugins: [createDefaultPlugin(), createCorePlugin()] as const,
 				systemSets: ['First', 'Update', 'Last']
 			});
 
@@ -376,7 +464,7 @@ export function createEcsifyAppBenchmarks() {
 			}
 
 			const app = createApp({
-				plugins: [createDefaultPlugin(), createCorePlugin()],
+				plugins: [createDefaultPlugin(), createCorePlugin()] as const,
 				systemSets: ['First', 'Update', 'Last']
 			});
 
