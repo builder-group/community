@@ -1,7 +1,7 @@
 import { describe, it } from 'vitest';
 import { createApp } from '../create-app';
 import { createDefaultPlugin, TDefaultPlugin } from '../plugins';
-import { TAppContext } from './app';
+import { TInnerAppContext } from './app';
 import { TMergePlugins, TPlugin } from './plugin';
 
 describe('types', () => {
@@ -58,11 +58,10 @@ describe('types', () => {
 		app.r.game;
 		app.c.Position;
 
-		type TGameAppContext = TAppContext<[TDefaultPlugin, TGamePlugin]>;
-		type TGameSystemSets = TGameAppContext['systemSets'];
-
-		type TGameMergedPlugins = TMergePlugins<[TDefaultPlugin, TGamePlugin]>;
-		type TGameMergedSystemSets = TGameMergedPlugins['systemSets'];
+		type TGameMergedPlugins = TMergePlugins<[TGamePlugin, TDefaultPlugin]>;
+		type TGameInnerAppContext = TInnerAppContext<TGameMergedPlugins>;
+		type TGameMergedPluginsSystemSets = TGameMergedPlugins['systemSets'];
+		type TGameInnerAppContextSystemSets = TGameInnerAppContext['systemSets'];
 
 		app.update();
 	});

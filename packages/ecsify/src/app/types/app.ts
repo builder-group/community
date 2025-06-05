@@ -239,11 +239,11 @@ export interface TInnerAppContext<GMergedPlugins extends Record<string, any> = {
 			? GAppExtensions
 			: {}
 		: {};
-	systemSets: GMergedPlugins extends { systemSets: infer GSystemSets }
-		? GSystemSets extends string
+	systemSets: GMergedPlugins extends { systemSets: never }
+		? string
+		: GMergedPlugins extends { systemSets: infer GSystemSets }
 			? GSystemSets
-			: string
-		: string;
+			: string;
 }
 
 export type TPluginsFromAppContext<GAppContext extends TAppContext> =

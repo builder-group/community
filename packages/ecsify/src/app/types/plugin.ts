@@ -92,6 +92,8 @@ export type TMergeTwoPluginShapes<A, B> = {
 		(B extends { events: infer GEvents } ? GEvents : {});
 	appExtensions: (A extends { appExtensions: infer GAppExtensions } ? GAppExtensions : {}) &
 		(B extends { appExtensions: infer GAppExtensions } ? GAppExtensions : {});
+	// Note: Uses never instead of string to preserve literal types
+	// (using string would turn "First" | "Update" | "Last" | string into just string)
 	systemSets:
 		| (A extends { systemSets: infer GSystemSets } ? GSystemSets : never)
 		| (B extends { systemSets: infer GSystemSets } ? GSystemSets : never);
