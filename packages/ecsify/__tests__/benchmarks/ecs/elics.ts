@@ -10,8 +10,7 @@ export function createElicsBenchmarks(random: {
 		entityCreation() {
 			return {
 				createEntity() {
-					const entity = world.createEntity();
-					return entity.index >= 0;
+					world.createEntity();
 				}
 			};
 		},
@@ -61,36 +60,35 @@ export function createElicsBenchmarks(random: {
 			}
 
 			// Create query systems
-			class PositionQuerySystem extends createSystem({
+			class PosQuerySystem extends createSystem({
 				positionEntities: { required: [Position] }
 			}) {
 				getPositionEntities() {
-					return Array.from(this.queries.positionEntities.entities);
+					return this.queries.positionEntities.entities;
 				}
 			}
 
-			class MovableQuerySystem extends createSystem({
+			class PosVelQuerySystem extends createSystem({
 				movableEntities: { required: [Position, Velocity] }
 			}) {
 				getMovableEntities() {
-					return Array.from(this.queries.movableEntities.entities);
+					return this.queries.movableEntities.entities;
 				}
 			}
 
-			world.registerSystem(PositionQuerySystem);
-			world.registerSystem(MovableQuerySystem);
+			world.registerSystem(PosQuerySystem);
+			const posQuerySystem = world.getSystem(PosQuerySystem);
+
+			world.registerSystem(PosVelQuerySystem);
+			const posVelQuerySystem = world.getSystem(PosVelQuerySystem);
 
 			return {
 				queryPositionComponents() {
-					const positionQuerySystem = world.getSystem(PositionQuerySystem);
-					const entities = positionQuerySystem?.getPositionEntities();
-					return entities?.length || 0;
+					posQuerySystem?.getPositionEntities();
 				},
 
 				queryPositionAndVelocity() {
-					const movableQuerySystem = world.getSystem(MovableQuerySystem);
-					const entities = movableQuerySystem?.getMovableEntities();
-					return entities?.length || 0;
+					posVelQuerySystem?.getMovableEntities();
 				}
 			};
 		},
@@ -138,11 +136,11 @@ export function createElicsBenchmarks(random: {
 			}
 
 			world.registerSystem(MovementSystem);
+			const movementSystem = world.getSystem(MovementSystem);
 
 			return {
 				movementSystemIteration() {
-					const movementSystem = world.getSystem(MovementSystem);
-					return movementSystem?.updateMovement() || 0;
+					movementSystem?.updateMovement();
 				}
 			};
 		}

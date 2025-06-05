@@ -1,0 +1,12 @@
+{
+  "extends": "@blgc/config/typescript/library",
+	"compilerOptions": {
+		"rootDir": ".",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+	},
+  "include": [
+    "./**/*.ts"
+  ],
+  "exclude": []
+} 

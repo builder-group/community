@@ -76,7 +76,7 @@ export function createGamePlugin(): TGamePlugin {
 			Rectangle: { width: [], height: [] },
 			Color: { value: [] }
 		},
-		setup: (app) => {
+		setup: (app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>) => {
 			// Create entities
 			for (let i = 0; i < 100; i++) {
 				const entity = app.createEntity();

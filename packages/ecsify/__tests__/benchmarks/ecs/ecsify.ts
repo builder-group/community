@@ -10,8 +10,7 @@ export function createEcsifyBenchmarks(random: {
 		entityCreation() {
 			return {
 				createEntity() {
-					const eid = app.createEntity();
-					return eid >= 0;
+					app.createEntity();
 				}
 			};
 		},
@@ -55,13 +54,11 @@ export function createEcsifyBenchmarks(random: {
 
 			return {
 				queryPositionComponents() {
-					const entities = app.queryEntities(With(Position));
-					return entities.length;
+					app.queryEntities(With(Position));
 				},
 
 				queryPositionAndVelocity() {
-					const entities = app.queryEntities(And(With(Position), With(Velocity)));
-					return entities.length;
+					app.queryEntities(And(With(Position), With(Velocity)));
 				}
 			};
 		},
@@ -88,17 +85,12 @@ export function createEcsifyBenchmarks(random: {
 
 			return {
 				movementSystemIteration() {
-					let updateCount = 0;
-
 					for (const eid of app.queryEntities(And(With(Position), With(Velocity)))) {
 						const velX = Velocity.x[eid] ?? 0;
 						const velY = Velocity.y[eid] ?? 0;
 						Position.x[eid] = (Position.x[eid] ?? 0) + velX * 0.016;
 						Position.y[eid] = (Position.y[eid] ?? 0) + velY * 0.016;
-						updateCount++;
 					}
-
-					return updateCount;
 				}
 			};
 		}

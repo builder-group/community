@@ -15,8 +15,7 @@ export function createBitEcsBenchmarks(random: {
 		entityCreation() {
 			return {
 				createEntity() {
-					const eid = bitECSAddEntity(world);
-					return eid >= 0;
+					bitECSAddEntity(world);
 				}
 			};
 		},
@@ -60,13 +59,11 @@ export function createBitEcsBenchmarks(random: {
 
 			return {
 				queryPositionComponents() {
-					const entities = Array.from(bitECSQuery(world, [Position]));
-					return entities.length;
+					bitECSQuery(world, [Position]);
 				},
 
 				queryPositionAndVelocity() {
-					const entities = bitECSQuery(world, [Position, Velocity]);
-					return entities.length;
+					bitECSQuery(world, [Position, Velocity]);
 				}
 			};
 		},
@@ -93,17 +90,12 @@ export function createBitEcsBenchmarks(random: {
 
 			return {
 				movementSystemIteration() {
-					let updateCount = 0;
-
 					for (const eid of bitECSQuery(world, [Position, Velocity])) {
 						const velX = Velocity.x[eid] ?? 0;
 						const velY = Velocity.y[eid] ?? 0;
 						Position.x[eid] = (Position.x[eid] ?? 0) + velX * 0.016;
 						Position.y[eid] = (Position.y[eid] ?? 0) + velY * 0.016;
-						updateCount++;
 					}
-
-					return updateCount;
 				}
 			};
 		}

@@ -356,6 +356,9 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
+      '@lastolivegames/becsy':
+        specifier: ^0.15.5
+        version: 0.15.5
       '@types/node':
         specifier: ^22.15.29
         version: 22.15.29
@@ -1698,6 +1701,10 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
+
+  '@lastolivegames/becsy@0.15.5':
+    resolution: {integrity: sha512-RZEL52er3eH+zpczz2xPyVIxVId+tx0pfTRxYjvE4Vi14plgHzqX7q+4TTJvJDmaxR9pdVjGwFnrY0Oe23fN7Q==}
+    engines: {node: '>=12'}
 
   '@manypkg/find-root@1.1.0':
     resolution: {integrity: sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA==}
@@ -5353,6 +5360,8 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
+
+  '@lastolivegames/becsy@0.15.5': {}
 
   '@manypkg/find-root@1.1.0':
     dependencies:
