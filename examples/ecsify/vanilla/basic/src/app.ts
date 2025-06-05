@@ -51,7 +51,6 @@ export function runAppExample(): void {
 
 	// Game loop
 	let lastTime = 0;
-
 	function gameLoop(currentTime: number): void {
 		const dt = (currentTime - lastTime) / 1000;
 		lastTime = currentTime;
@@ -78,67 +77,69 @@ export function createGamePlugin(): TGamePlugin {
 		},
 		setup: (app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>) => {
 			// Create entities
-			for (let i = 0; i < 100; i++) {
-				const entity = app.createEntity();
+			for (let i = 0; i < 1000; i++) {
+				const eid = app.createEntity();
 
-				app.addComponent(entity, app.c.Position, {
+				app.addComponent(eid, app.c.Position, {
 					x: getRandom(canvas.width),
 					y: getRandom(canvas.height)
 				});
-				app.addComponent(entity, app.c.Velocity, {
+				app.addComponent(eid, app.c.Velocity, {
 					dx: getRandom(100, 20),
 					dy: getRandom(100, 20)
 				});
-				app.addComponent(entity, app.c.Rectangle, {
+				app.addComponent(eid, app.c.Rectangle, {
 					width: getRandom(20, 10),
 					height: getRandom(20, 10)
 				});
-				app.addComponent(entity, app.c.Color, {
+				app.addComponent(eid, app.c.Color, {
 					value: `rgba(${getRandom(255)}, ${getRandom(255)}, ${getRandom(255)}, 1)`
 				});
 			}
 
 			// Add systems
 			app.addSystem(physicsSystem, { set: 'Update' });
-			app.addSystem(renderingSystem, { set: 'Update' });
+			app.addSystem(renderingSystem, { set: 'Update', after: physicsSystem });
 		}
 	};
 }
 
 // Physics system
-const physicsSystem = (app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>, dt = 0.016) => {
+function physicsSystem(app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>, dt = 0.016) {
 	for (const [eid, pos, vel, rect] of app.queryComponents([
 		Entity,
 		app.c.Position,
 		app.c.Velocity,
 		app.c.Rectangle
 	] as const)) {
-		// Move position
-		pos.x += vel.dx * dt;
-		pos.y += vel.dy * dt;
+		// Calculate new position
+		let newX = pos.x + vel.dx * dt;
+		let newY = pos.y + vel.dy * dt;
+		let newDx = vel.dx;
+		let newDy = vel.dy;
 
 		// Boundary collision
-		if (pos.x + rect.width > canvas.width) {
-			pos.x = canvas.width - rect.width;
-			vel.dx = -vel.dx;
-		} else if (pos.x < 0) {
-			pos.x = 0;
-			vel.dx = -vel.dx;
+		if (newX + rect.width > canvas.width) {
+			newX = canvas.width - rect.width;
+			newDx = -newDx;
+		} else if (newX < 0) {
+			newX = 0;
+			newDx = -newDx;
 		}
 
-		if (pos.y + rect.height > canvas.height) {
-			pos.y = canvas.height - rect.height;
-			vel.dy = -vel.dy;
-		} else if (pos.y < 0) {
-			pos.y = 0;
-			vel.dy = -vel.dy;
+		if (newY + rect.height > canvas.height) {
+			newY = canvas.height - rect.height;
+			newDy = -newDy;
+		} else if (newY < 0) {
+			newY = 0;
+			newDy = -newDy;
 		}
 
 		// Update components
-		app.updateComponent(eid, app.c.Position, pos);
-		app.updateComponent(eid, app.c.Velocity, vel);
+		app.updateComponent(eid, app.c.Position, { x: newX, y: newY });
+		app.updateComponent(eid, app.c.Velocity, { dx: newDx, dy: newDy });
 	}
-};
+}
 
 // Rendering system
 const renderingSystem = (app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>) => {
