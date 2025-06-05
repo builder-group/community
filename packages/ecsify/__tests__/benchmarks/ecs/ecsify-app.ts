@@ -263,8 +263,6 @@ export function createEcsifyAppBenchmarks() {
 				systemSets: ['First', 'Update', 'Last']
 			});
 
-			console.log(app);
-
 			return {
 				runFragmentedIteration() {
 					app.update();
