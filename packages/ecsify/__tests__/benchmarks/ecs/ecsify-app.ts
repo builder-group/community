@@ -237,7 +237,7 @@ export function createEcsifyAppBenchmarks() {
 						// Create 26 specialized components (A-Z)
 						...Array.from({ length: 26 }, (_, i) => ({
 							[`C${i}`]: { value: [] }
-						}))
+						})).reduce((acc, cur) => ({ ...acc, ...cur }), {})
 					},
 					setup(app: TApp<TAppContext<[TCorePlugin]>>) {
 						// Create sparse entity distribution - 100 entities per specialized component type
@@ -262,6 +262,8 @@ export function createEcsifyAppBenchmarks() {
 				plugins: [createDefaultPlugin(), createCorePlugin()],
 				systemSets: ['First', 'Update', 'Last']
 			});
+
+			console.log(app);
 
 			return {
 				runFragmentedIteration() {
