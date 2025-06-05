@@ -1,6 +1,6 @@
 {
 	"name": "ecsify",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"private": false,
 	"description": "A flexible, typesafe, and performance-focused Entity Component System (ECS) library for TypeScript.",
 	"keywords": [],

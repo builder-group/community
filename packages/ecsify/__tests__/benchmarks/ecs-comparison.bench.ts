@@ -1,5 +1,6 @@
 import { bench, describe } from 'vitest';
 import {
+	createBecsyBenchmarks,
 	createBitEcsBenchmarks,
 	createEcsifyAppBenchmarks,
 	createEcsifyRawBenchmarks,
@@ -15,7 +16,7 @@ describe('ECS Performance Comparison', () => {
 	const ecsifyRawBenchmarks = createEcsifyRawBenchmarks();
 	const bitecsBenchmarks = createBitEcsBenchmarks();
 	const elicsBenchmarks = createElicsBenchmarks();
-	// const becsyBenchmarks = createBecsyBenchmarks();
+	const becsyBenchmarks = createBecsyBenchmarks();
 
 	/**
 	 * Tests optimal-case iteration performance with dense, homogeneous data.
@@ -27,7 +28,7 @@ describe('ECS Performance Comparison', () => {
 		const ecsifyRaw = ecsifyRawBenchmarks.packedIteration();
 		const bitecs = bitecsBenchmarks.packedIteration();
 		const elics = elicsBenchmarks.packedIteration();
-		// const becsy = await becsyBenchmarks.packedIteration();
+		const becsy = await becsyBenchmarks.packedIteration();
 
 		bench('Ecsify (App) - Packed iteration (5 systems, 1000 entities)', () => {
 			ecsifyApp.runPackedIteration();
@@ -45,9 +46,9 @@ describe('ECS Performance Comparison', () => {
 			elics.runPackedIteration();
 		});
 
-		// bench('Becsy - Packed iteration (5 systems, 1000 entities)', async () => {
-		// 	await becsy.runPackedIteration();
-		// });
+		bench('Becsy - Packed iteration (5 systems, 1000 entities)', async () => {
+			await becsy.runPackedIteration();
+		});
 	});
 
 	/**

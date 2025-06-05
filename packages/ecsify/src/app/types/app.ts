@@ -242,7 +242,9 @@ export interface TInnerAppContext<GMergedPlugins extends Record<string, any> = {
 	systemSets: GMergedPlugins extends { systemSets: never }
 		? string
 		: GMergedPlugins extends { systemSets: infer GSystemSets }
-			? GSystemSets
+			? GSystemSets extends string
+				? GSystemSets
+				: string
 			: string;
 }
 

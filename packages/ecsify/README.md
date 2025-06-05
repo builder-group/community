@@ -38,45 +38,188 @@ Build a modern, type-safe ECS library that fully leverages TypeScript's type sys
 ### ⚖️ Alternatives
 
 - [bitECS](https://github.com/NateTheGreatt/bitECS)
+- [becsy](https://github.com/lastolivegames/becsy)
+- [elics](https://github.com/elixr-games/elics)
 - [ecsy](https://github.com/ecsyjs/ecsy)
 
 ## 📖 Usage
 
-`ecsify` offers core ECS concepts without imposing strict rules onto your architecture:
+`ecsify` offers two approaches: **App** for better developer experience, and **Raw** for maximum performance.
 
-- **Entities** are numerical IDs representing game objects
-- **Components** are data containers that can follow different storage patterns
-- **Systems** are just functions that query and process entities
-- **Queries** provide powerful filtering with change detection
+- **App**: Better DX, type safety, unified API
+- **Raw**: Maximum performance, direct memory access
+- Both approaches can be mixed in the same codebase
 
-For optimal performance:
+### App Approach (Recommended)
 
-- Use [Array of Structures (AoS) format](https://en.wikipedia.org/wiki/AoS_and_SoA) for related component properties
-- Implement systems as pure functions operating on query results
-
-### Basic Setup
+Better DX with plugins, systems, and unified API (slower than **Raw** because of added abstractions):
 
 ```ts
-import { And, createApp, With } from 'ecsify';
+import { createApp, createDefaultPlugin, TPlugin, With } from 'ecsify';
 
-// Define components - no registration needed!
-const Position = { x: [], y: [] }; // AoS pattern
-const Velocity = { dx: [], dy: [] }; // AoS pattern
-const Health = []; // Single value array
-const Player = {}; // Marker component
+// Create plugin with components and systems
+type TCorePlugin = TPlugin<{
+  name: 'Core';
+  components: {
+    Position: { x: number[]; y: number[] };
+    Velocity: { dx: number[]; dy: number[] };
+    Health: number[];
+  };
+}, []>;
 
-// Create app
-const app = createApp();
+function createCorePlugin(): TCorePlugin {
+  return {
+    name: 'Core',
+    deps: [],
+    components: {
+      Position: { x: [], y: [] },
+      Velocity: { dx: [], dy: [] },
+      Health: []
+    },
+    setup(app: TApp<TAppContext<[TCorePlugin]>>) {
+      // Initialize entities
+      const entity = app.createEntity();
+      app.addComponent(entity, app.c.Position, { x: 0, y: 0 });
+      app.addComponent(entity, app.c.Velocity, { dx: 1, dy: 1 });
+      
+      // Register systems
+      app.addSystem(movementSystem, { set: 'Update' });
+    }
+  };
+}
+
+function movementSystem(app: TApp<TAppContext<[TCorePlugin]>>) {
+    for (const [eid, pos, vel] of app.queryComponents([Entity, app.c.Position, app.c.Velocity] as const)) {
+      app.updateComponent(eid, app.c.Position, {
+        x: pos.x + vel.dx,
+        y: pos.y + vel.dy
+      });
+    }
+}
+
+// Create app with plugins
+const app = createApp({
+  plugins: [createDefaultPlugin(), createCorePlugin()] as const,
+  systemSets: ['First', 'Update', 'Last'] // Execution order of systems
+});
+
+// Game loop
+function gameLoop() {
+  app.update(); // Runs all systems in order: First → Update → Last
+  requestAnimationFrame(gameLoop);
+}
 ```
 
-### Entity Management
+### Raw Approach (Performance Critical)
+
+Direct ECS access for maximum performance:
 
 ```ts
-// Create entity
-const entity = app.createEntity();
+import { 
+  createEntityIndex, 
+  createComponentRegistry, 
+  createQueryRegistry,
+  With, And
+} from 'ecsify';
 
-// Destroy entity (removes all components)
-app.destroyEntity(entity);
+// Create core registries
+const entityIndex = createEntityIndex();
+const componentRegistry = createComponentRegistry();
+const queryRegistry = createQueryRegistry(entityIndex, componentRegistry);
+
+// Define components directly
+const Position: { x: number[]; y: number[] } = { x: [], y: [] };
+const Velocity: { dx: number[], dy: number[] } = { dx: [], dy: [] };
+const Health: number[] = [];
+
+// Create entities and add components
+const entity = entityIndex.createEntity();
+componentRegistry.addComponent(entity, Position);
+Position.x[entity] = 0;
+Position.y[entity] = 0;
+componentRegistry.addComponent(entity, Velocity);
+Velocity.dx[entity] = 1;
+Velocity.dy[entity] = 1;
+
+// Systems are just functions
+function movementSystem() {
+  for (const eid of queryRegistry.queryEntities(And(With(Position), With(Velocity)))) {
+    Position.x[eid] += Velocity.dx[eid];
+    Position.y[eid] += Velocity.dy[eid];
+  }
+}
+
+// Manual game loop
+function gameLoop() {
+  movementSystem();
+  componentRegistry.flush(); // Clear change tracking
+  requestAnimationFrame(gameLoop);
+}
+```
+
+### Key Concepts
+
+**Entities** are numerical IDs representing game objects:
+
+```ts
+const entity = app.createEntity(); // App approach
+const entity = entityIndex.createEntity(); // Raw approach
+```
+
+**Components** are data containers following different patterns:
+
+```ts
+// Structure of Arrays (SoA)
+const Position: { x: number[]; y: number[] } = { x: [], y: [] };
+
+// Array of Structures (AoS) 
+const Transform: { x: number; y: number }[] = [];
+
+// Single arrays
+const Health: number[] = [];
+
+// Markers
+const Player = {};
+```
+
+**Systems** are functions that query and process entities:
+
+```ts
+// App approach - registered systems
+app.addSystem(movementSystem);
+
+// Raw approach - manual execution
+movementSystem();
+```
+
+**Queries** filter entities with powerful operators:
+
+```ts
+import { Added, Changed, Removed, With, Without, And, Or } from 'ecsify';
+
+app.queryEntities(With(Player)); // Has component
+app.queryEntities(Without(Dead)); // Lacks component
+app.queryEntities(And(With(Position), With(Velocity))); // Has all components
+app.queryEntities(Or(With(Player), With(Enemy))); // Has either component
+
+// Reactive queries - track component lifecycle
+app.queryEntities(Added(Player)); // Component added this frame
+app.queryEntities(Removed(Velocity)); // Component removed this frame
+app.queryEntities(Changed(Health)); // Component changed this frame
+
+// Query entities with components
+for (const [eid, pos, vel] of app.queryComponents([Entity, app.c.Position, app.c.Velocity] as const, With(Player))) {
+  console.log(`Player ${eid} at (${pos.x}, ${pos.y})`);
+}
+
+// Query entities
+for (const eid of app.queryEntities(With(Enemy))) {
+    console.log(`Enemy ${eid} at (${Position.x[eid]}, ${Position.y[eid]})`);
+}
+
+// For reactive queries with direct updates, mark changes manually
+Position.x[entity] = 110;
+app.markComponentChanged(entity, Position); // Required for Changed() queries
 ```
 
 ### Component Operations
@@ -84,43 +227,24 @@ app.destroyEntity(entity);
 ```ts
 // Add components
 app.addComponent(entity, Position, { x: 100, y: 50 });
-app.addComponent(entity, Velocity, { dx: 2, dy: 1 });
 app.addComponent(entity, Health, 100);
-app.addComponent(entity, Player, true);
+app.addComponent(entity, Player); // Marker
 
-// Update components (AoS)
-app.updateComponent(entity, Position, { x: 110 });
+// Update components  
+app.updateComponent(entity, Position, { x: 110 }); // Partial updates (only possible for SoA)
 app.updateComponent(entity, Health, 95);
-app.updateComponent(entity, Player, false); // Also removes marker
 
-// Direct updates - mark as changed for reactive queries
+// Direct updates
 Position.x[entity] = 110;
-app.markComponentChanged(entity, Position);
+app.markComponentChanged(entity, Position); // Required for Changed() queries
 Health[entity] = 95;
-app.markComponentChanged(entity, Health);
 
-// Remove component
+// Remove components
 app.removeComponent(entity, Velocity);
 
-// Check component
+// Check components
 if (app.hasComponent(entity, Player)) {
-	// Entity is a player
-}
-```
-
-### Querying
-
-```ts
-import { Added, And, Changed, Or, Removed, With, Without } from 'ecsify';
-
-// Query entity IDs
-const players = app.queryEntities(With(Player));
-const moving = app.queryEntities(And(With(Position), With(Velocity)));
-const damaged = app.queryEntities(Changed(Health));
-
-// Query with component data
-for (const [eid, pos, health] of app.queryComponents([Entity, Position, Health] as const)) {
-	console.log(`Entity ${eid} at (${pos.x}, ${pos.y}) with ${health} health`);
+  // Entity is a player
 }
 ```
 
@@ -128,22 +252,19 @@ for (const [eid, pos, health] of app.queryComponents([Entity, Position, Health] 
 
 ```ts
 function update(deltaTime: number) {
-	// Movement system
-	for (const [eid, pos, vel] of app.queryComponents([Entity, Position, Velocity] as const)) {
-		app.updateComponent(eid, Position, {
-			x: pos.x + vel.dx * deltaTime,
-			y: pos.y + vel.dy * deltaTime
-		});
-	}
-
-	// Clear change tracking
-	app.flush();
+  // App approach
+  app.update(); // Runs all registered systems
+  
+  // Raw approach  
+  movementSystem();
+  renderSystem();
+  componentRegistry.flush(); // Clear change tracking
 }
 ```
 
 ## 📐 Architecture
 
-### Entity Index
+### Entity Index (`create-entity-index.ts`)
 
 Efficient entity ID management using sparse-dense array pattern with optional versioning. Provides O(1) operations while maintaining cache-friendly iteration.
 
@@ -210,7 +331,7 @@ dense = [1, 2, 3, 4, 5];
 
 **Performance:** O(1) all operations, ~8 bytes per entity, cache-friendly iteration.
 
-### Query System
+### Query Registry (`create-query-registry.ts`)
 
 Entity filtering with two strategies: bitmask optimization for simple queries, individual evaluation for complex queries.
 
@@ -243,7 +364,7 @@ Position: bitflag=0b001, Velocity: bitflag=0b010, Health: bitflag=0b100
 entity1: 0b011  // Has Position + Velocity
 entity2: 0b101  // Has Position + Health
 
-// Query: And(With(Position), With(Velocity)) → withMask = 0b011
+// Query: And(With(Position), With(Velocity)) → andMasks.with = 0b011
 // Check: (entityMask & 0b011) === 0b011
 entity1: (0b011 & 0b011) === 0b011  ✓ true
 entity2: (0b101 & 0b011) === 0b011  ✗ false
@@ -272,7 +393,7 @@ entity2: (0b101 & 0b011) === 0b011  ✗ false
 
 **Key Insight:** Caching matters most (7-14x faster than no cache). Bitmask vs individual evaluation shows minimal difference.
 
-### Component Registry
+### Component Registry (`create-component-registry.ts`)
 
 Component management with direct array access, unlimited components via generations, and flexible storage patterns.
 
@@ -343,18 +464,6 @@ _removedMasks[0][eid] |= bitflag;  // Component removed
 flush() { /* clear all change masks */ }
 ```
 
-#### Why These Decisions?
-
-**Sparse Arrays:** Memory-efficient with large entity IDs - only allocated indices use memory.
-
-**Direct Array Access:** No function call overhead - `Health[eid] = 100` is fastest possible.
-
-**Flexible Patterns:** Physics systems benefit from SoA cache locality, UI systems need complete AoS objects.
-
-**Generations:** JavaScript 32-bit integers limit us to 31 components - generations provide unlimited components.
-
-**Performance:** O(1) operations, 4 bytes per entity per generation, direct memory access.
-
 ## 📚 Good to Know
 
 ### Sparse vs Dense Arrays
@@ -383,3 +492,4 @@ Use sparse arrays for large, mostly empty datasets. Use dense arrays when you ne
 ## 💡 Resources / References
 
 - [BitECS](https://github.com/NateTheGreatt/bitECS) - High-performance ECS library that inspired our implementation
+- [Bevy](https://github.com/bevyengine/bevy) - Data-driven game engine built in Rust that inspired our API
