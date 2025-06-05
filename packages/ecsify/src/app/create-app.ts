@@ -173,6 +173,7 @@ export function createApp<
 
 			flush() {
 				this._componentRegistry.flush();
+				this._eventRegistry.flush();
 			},
 
 			reset() {
