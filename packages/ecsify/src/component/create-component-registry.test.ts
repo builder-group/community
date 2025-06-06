@@ -99,7 +99,39 @@ describe('createComponentRegistry', () => {
 	});
 
 	describe('addComponent', () => {
-		it('should support object with array properties pattern (AoS)', () => {
+		it('should support array of objects pattern (AoS)', () => {
+			const Transform: TTransform = [];
+			const RenderInfo: TRenderInfo = [];
+
+			registry.registerComponent(Transform);
+			registry.registerComponent(RenderInfo);
+
+			const eid1 = entityIndex.createEntity();
+			const eid2 = entityIndex.createEntity();
+
+			// Add components
+			registry.addComponent(eid1, Transform);
+			registry.addComponent(eid1, RenderInfo);
+			registry.addComponent(eid2, Transform);
+
+			// Set data as complete objects
+			Transform[eid1] = { x: 5, y: 15, rotation: 45 };
+			RenderInfo[eid1] = { sprite: 'player.png', layer: 1, visible: true };
+			Transform[eid2] = { x: 100, y: 200, rotation: 0 };
+
+			// Check components
+			expect(registry.hasComponent(eid1, Transform)).toBe(true);
+			expect(registry.hasComponent(eid1, RenderInfo)).toBe(true);
+			expect(registry.hasComponent(eid2, Transform)).toBe(true);
+			expect(registry.hasComponent(eid2, RenderInfo)).toBe(false);
+
+			// Verify data
+			expect(Transform[eid1]).toEqual({ x: 5, y: 15, rotation: 45 });
+			expect(RenderInfo[eid1]).toEqual({ sprite: 'player.png', layer: 1, visible: true });
+			expect(Transform[eid2]).toEqual({ x: 100, y: 200, rotation: 0 });
+		});
+
+		it('should support object with array properties pattern (SoA)', () => {
 			const Position: TPosition = { x: [], y: [] };
 			const Velocity: TVelocity = { dx: [], dy: [] };
 
@@ -135,38 +167,6 @@ describe('createComponentRegistry', () => {
 			expect(Velocity.dy[eid1]).toBe(2);
 			expect(Position.x[eid2]).toBe(30);
 			expect(Position.y[eid2]).toBe(40);
-		});
-
-		it('should support array of objects pattern (SoA)', () => {
-			const Transform: TTransform = [];
-			const RenderInfo: TRenderInfo = [];
-
-			registry.registerComponent(Transform);
-			registry.registerComponent(RenderInfo);
-
-			const eid1 = entityIndex.createEntity();
-			const eid2 = entityIndex.createEntity();
-
-			// Add components
-			registry.addComponent(eid1, Transform);
-			registry.addComponent(eid1, RenderInfo);
-			registry.addComponent(eid2, Transform);
-
-			// Set data as complete objects
-			Transform[eid1] = { x: 5, y: 15, rotation: 45 };
-			RenderInfo[eid1] = { sprite: 'player.png', layer: 1, visible: true };
-			Transform[eid2] = { x: 100, y: 200, rotation: 0 };
-
-			// Check components
-			expect(registry.hasComponent(eid1, Transform)).toBe(true);
-			expect(registry.hasComponent(eid1, RenderInfo)).toBe(true);
-			expect(registry.hasComponent(eid2, Transform)).toBe(true);
-			expect(registry.hasComponent(eid2, RenderInfo)).toBe(false);
-
-			// Verify data
-			expect(Transform[eid1]).toEqual({ x: 5, y: 15, rotation: 45 });
-			expect(RenderInfo[eid1]).toEqual({ sprite: 'player.png', layer: 1, visible: true });
-			expect(Transform[eid2]).toEqual({ x: 100, y: 200, rotation: 0 });
 		});
 
 		it('should support single value array pattern', () => {
@@ -325,7 +325,7 @@ describe('createComponentRegistry', () => {
 			expect(registry.wasChanged(eid, Health)).toBe(false);
 		});
 
-		it('should update object with arrays (AoS) and mark as changed by default', () => {
+		it('should update object with array properties (SoA) and mark as changed by default', () => {
 			const Position: TPosition = { x: [], y: [] };
 			const eid = entityIndex.createEntity();
 
@@ -921,20 +921,20 @@ describe('createComponentRegistry', () => {
 	});
 });
 
-// 1. Object with Array Properties (Performance Optimized)
-type TPosition = { x: number[]; y: number[] };
-type TVelocity = { dx: number[]; dy: number[] };
-
-// 2. Array of Objects (Simple but Less Performant)
+// Array of objects components (AoS)
 type TTransform = { x: number; y: number; rotation: number }[];
 type TRenderInfo = { sprite: string; layer: number; visible: boolean }[];
 
-// 3. Single Value Array
+// Object with array properties components (SoA)
+type TPosition = { x: number[]; y: number[] };
+type TVelocity = { dx: number[]; dy: number[] };
+
+// Single value array components
 type THealth = number[];
 type TMana = number[];
 type TLevel = number[];
 
-// 4. Marker Components
+// Marker components
 type TPlayer = {};
 type TEnemy = {};
 type TFrozen = {};

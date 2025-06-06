@@ -7,13 +7,23 @@ describe('Component Variants Performance', () => {
 	const random = createSeededRandom(seed);
 
 	// Different component patterns
-	const Position: { x: number[]; y: number[] } = { x: [], y: [] }; // Object with arrays (AoS)
-	const Transform: { x: number; y: number }[] = []; // Array of objects (SoA)
+	const Transform: { x: number; y: number }[] = []; // Array of objects (AoS)
+	const Position: { x: number[]; y: number[] } = { x: [], y: [] }; // Object with array properties (SoA)
 	const Health: number[] = []; // Single value array
 	const Player: {} = {}; // Marker component
 
 	describe('Add Component', () => {
-		bench('AoS - Position', () => {
+		bench('AoS - Transform', () => {
+			const app = createApp({ plugins: [], systemSets: [] });
+			const eid = app.createEntity();
+
+			app.addComponent(eid, Transform);
+			Transform[eid] = { x: random.next() * 1000, y: random.next() * 1000 };
+
+			expect(app.hasComponent(eid, Transform)).toBe(true);
+		});
+
+		bench('SoA - Position', () => {
 			const app = createApp({ plugins: [], systemSets: [] });
 			const eid = app.createEntity();
 
@@ -22,16 +32,6 @@ describe('Component Variants Performance', () => {
 			Position.y[eid] = random.next() * 1000;
 
 			expect(app.hasComponent(eid, Position)).toBe(true);
-		});
-
-		bench('SoA - Transform', () => {
-			const app = createApp({ plugins: [], systemSets: [] });
-			const eid = app.createEntity();
-
-			app.addComponent(eid, Transform);
-			Transform[eid] = { x: random.next() * 1000, y: random.next() * 1000 };
-
-			expect(app.hasComponent(eid, Transform)).toBe(true);
 		});
 
 		bench('Single Array - Health', () => {
@@ -55,7 +55,17 @@ describe('Component Variants Performance', () => {
 	});
 
 	describe('Remove Component', () => {
-		bench('AoS - Position', () => {
+		bench('AoS - Transform', () => {
+			const app = createApp({ plugins: [], systemSets: [] });
+			const eid = app.createEntity();
+			app.addComponent(eid, Transform);
+			Transform[eid] = { x: 100, y: 200 };
+
+			const removed = app.removeComponent(eid, Transform);
+			expect(removed).toBe(true);
+		});
+
+		bench('SoA - Position', () => {
 			const app = createApp({ plugins: [], systemSets: [] });
 			const eid = app.createEntity();
 			app.addComponent(eid, Position);
@@ -63,16 +73,6 @@ describe('Component Variants Performance', () => {
 			Position.y[eid] = 200;
 
 			const removed = app.removeComponent(eid, Position);
-			expect(removed).toBe(true);
-		});
-
-		bench('SoA - Transform', () => {
-			const app = createApp({ plugins: [], systemSets: [] });
-			const eid = app.createEntity();
-			app.addComponent(eid, Transform);
-			Transform[eid] = { x: 100, y: 200 };
-
-			const removed = app.removeComponent(eid, Transform);
 			expect(removed).toBe(true);
 		});
 
@@ -106,9 +106,8 @@ describe('Component Variants Performance', () => {
 		for (let i = 0; i < 500; i++) {
 			const eid = appAoS.createEntity();
 			if (random.nextBool(0.7)) {
-				appAoS.addComponent(eid, Position);
-				Position.x[eid] = random.next() * 1000;
-				Position.y[eid] = random.next() * 1000;
+				appAoS.addComponent(eid, Transform);
+				Transform[eid] = { x: random.next() * 1000, y: random.next() * 1000 };
 			}
 		}
 
@@ -116,8 +115,9 @@ describe('Component Variants Performance', () => {
 		for (let i = 0; i < 500; i++) {
 			const eid = appSoA.createEntity();
 			if (random.nextBool(0.7)) {
-				appSoA.addComponent(eid, Transform);
-				Transform[eid] = { x: random.next() * 1000, y: random.next() * 1000 };
+				appSoA.addComponent(eid, Position);
+				Position.x[eid] = random.next() * 1000;
+				Position.y[eid] = random.next() * 1000;
 			}
 		}
 
@@ -138,13 +138,13 @@ describe('Component Variants Performance', () => {
 			}
 		}
 
-		bench('AoS - Position', () => {
-			const entities = appAoS.queryEntities(With(Position));
+		bench('AoS - Transform', () => {
+			const entities = appAoS.queryEntities(With(Transform));
 			expect(entities.length).toBeGreaterThan(0);
 		});
 
-		bench('SoA - Transform', () => {
-			const entities = appSoA.queryEntities(With(Transform));
+		bench('SoA - Position', () => {
+			const entities = appSoA.queryEntities(With(Position));
 			expect(entities.length).toBeGreaterThan(0);
 		});
 

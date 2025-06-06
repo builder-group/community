@@ -17,7 +17,7 @@
     </a>
 </p>
 
-`ecsify` is a flexible, typesafe, and performance-focused Entity Component System (ECS) library for TypeScript.
+`ecsify` is a flexible, typesafe, and performance-focused [Entity Component System (ECS)](https://en.wikipedia.org/wiki/Entity_component_system) library for TypeScript.
 
 - **🔮 Simple, declarative API**: Intuitive component patterns with full type safety
 - **🍃 Lightweight & Tree Shakable**: Function-based and modular design
@@ -37,7 +37,8 @@ Build a modern, type-safe ECS library that fully leverages TypeScript's type sys
 
 ### ⚖️ Alternatives
 
-- [bitECS](https://github.com/NateTheGreatt/bitECS)
+- [bitecs](https://github.com/NateTheGreatt/bitECS)
+- [koota](https://github.com/pmndrs/koota)
 - [becsy](https://github.com/lastolivegames/becsy)
 - [elics](https://github.com/elixr-games/elics)
 - [ecsy](https://github.com/ecsyjs/ecsy)
@@ -169,11 +170,11 @@ const entity = entityIndex.createEntity(); // Raw approach
 **Components** are data containers following different patterns:
 
 ```ts
-// Structure of Arrays (SoA)
-const Position: { x: number[]; y: number[] } = { x: [], y: [] };
-
 // Array of Structures (AoS) 
 const Transform: { x: number; y: number }[] = [];
+
+// Structure of Arrays (SoA)
+const Position: { x: number[]; y: number[] } = { x: [], y: [] };
 
 // Single arrays
 const Health: number[] = [];
@@ -400,14 +401,14 @@ Component management with direct array access, unlimited components via generati
 #### Component Patterns
 
 ```typescript
+// Array of Structures (AoS) - good for complete entity data
+const Transform = [];
+Transform[eid] = { x: 10, y: 20 };
+
 // Structure of Arrays (SoA) - cache-friendly for bulk operations
 const Position = { x: [], y: [] };
 Position.x[eid] = 10;
 Position.y[eid] = 20;
-
-// Array of Structures (AoS) - good for complete entity data
-const Transform = [];
-Transform[eid] = { x: 10, y: 20 };
 
 // Single arrays and marker components
 const Health = []; // Health[eid] = 100
@@ -493,3 +494,4 @@ Use sparse arrays for large, mostly empty datasets. Use dense arrays when you ne
 
 - [BitECS](https://github.com/NateTheGreatt/bitECS) - High-performance ECS library that inspired our implementation
 - [Bevy](https://github.com/bevyengine/bevy) - Data-driven game engine built in Rust that inspired our API
+- [Data Oriented Design and Entity Component System Explained](https://www.youtube.com/watch?v=xm4AQj5PHT4)

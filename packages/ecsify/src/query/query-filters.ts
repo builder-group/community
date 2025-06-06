@@ -320,6 +320,7 @@ export function Or(...filters: TQueryFilter[]): TQueryFilter {
 						const entityMask = entityMasks[gen]?.[eid] ?? 0;
 						const orMask = orMasks?.[gen];
 
+						// Check OR requirements (must have ANY within each type)
 						if (orMask != null) {
 							if (orMask.with != null && (entityMask & orMask.with) !== 0) {
 								return true;
@@ -422,7 +423,7 @@ function registerComponentMask(
 	if (queryData[targetMasks] == null) {
 		queryData[targetMasks] = {};
 	}
-	if (queryData[targetMasks]![generationId] == null) {
+	if (queryData[targetMasks]?.[generationId] == null) {
 		queryData[targetMasks]![generationId] = {};
 	}
 	if (queryData.affectedMasks == null) {
@@ -431,7 +432,7 @@ function registerComponentMask(
 
 	// Add to appropriate mask
 	queryData[targetMasks]![generationId]![maskType] =
-		(queryData[targetMasks]![generationId]![maskType] ?? 0) | bitflag;
+		(queryData[targetMasks]?.[generationId]?.[maskType] ?? 0) | bitflag;
 	queryData.affectedMasks[generationId] = (queryData.affectedMasks[generationId] ?? 0) | bitflag;
 
 	// Add to generations array if not already present

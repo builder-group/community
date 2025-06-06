@@ -11,8 +11,8 @@ import { TComponentCallbacks, TComponentData, TComponentRef, TUpdateComponentVal
  * const registry = createComponentRegistry();
  *
  * // Define components using any supported pattern
- * const Position: { x: number[]; y: number[] } = { x: [], y: [] };     // Object with arrays (AoS)
- * const Transform: { x: number; y: number }[] = [];                    // Array of objects (SoA)
+ * const Transform: { x: number; y: number }[] = [];                    // Array of objects (AoS)
+ * const Position: { x: number[]; y: number[] } = { x: [], y: [] };     // Object with array properties (SoA)
  * const Health: number[] = [];                                         // Single value array
  * const Player: {} = {};                                               // Marker component
  *
@@ -152,7 +152,7 @@ export function createComponentRegistry(): TComponentRegistry {
 			value: TUpdateComponentValue<GComponent>,
 			markAsChanged = true
 		): void {
-			// Array component (SoA): Health[eid] = 100
+			// Array of objects (AoS) or single value array component: Health[eid] = value
 			if (Array.isArray(component)) {
 				component[eid] = value;
 				if (markAsChanged) {
@@ -175,7 +175,7 @@ export function createComponentRegistry(): TComponentRegistry {
 				return;
 			}
 
-			// Object component (AoS): Position.x[eid] = value.x
+			// Object with array properties component (SoA): Position.x[eid] = value.x
 			if (typeof component === 'object' && component !== null) {
 				const valueObj = value as Record<string, any>;
 				for (const [key, val] of Object.entries(valueObj)) {

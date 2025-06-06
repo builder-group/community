@@ -33,6 +33,9 @@ export function createQueryRegistry(
 			}
 
 			// Find matching entities
+			// Dense iteration with O(1) bitmask checks - simple and cache-friendly
+			// If this becomes slow: consider archetype system (group entities by component signature)?
+			// https://www.youtube.com/watch?v=71RSWVyOMEY
 			const matchingEntities: TEntityId[] = [];
 			for (let i = 0; i < this._entityIndex._aliveCount; i++) {
 				const eid = this._entityIndex._dense[i];
@@ -86,15 +89,15 @@ export function createQueryRegistry(
 						// Get component data directly from the component array/object
 						let componentData;
 						if (Array.isArray(comp)) {
-							// Single array component: Health[eid]
+							// Array of objects (AoS) or single value array component: Health[eid]
 							componentData = comp[eid];
 						} else if (typeof comp === 'object' && comp !== null) {
-							// Object with arrays (SoA): Position.x[eid], Position.y[eid]
+							// Object with array properties component (SoA): Position.x[eid]
 							componentData = {} as Record<string, any>;
 							let hasArrayProperties = false;
 							for (const key in comp) {
-								if (Array.isArray((comp as Record<string, any>)[key])) {
-									componentData[key] = (comp as Record<string, any>)[key][eid];
+								if (Array.isArray(comp[key])) {
+									componentData[key] = comp[key][eid];
 									hasArrayProperties = true;
 								}
 							}

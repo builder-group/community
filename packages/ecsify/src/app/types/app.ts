@@ -93,7 +93,7 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	 * - For objects with arrays: sets each property value (supports partial updates)
 	 * @param eid - The entity ID
 	 * @param component - The component to update
-	 * @param value - New component data (partial for AoS, boolean for marker components)
+	 * @param value - New component data (partial for SoA, boolean for marker components)
 	 * @param markAsChanged - Whether to mark the component as changed (default: true)
 	 */
 	updateComponent<T>(
