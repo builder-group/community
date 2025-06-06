@@ -26,8 +26,7 @@ export function createQueryRegistry(
 			}
 
 			// Exit if no entities exist
-			const aliveEntities = this._entityIndex.getAliveEntities();
-			if (aliveEntities.length === 0) {
+			if (this._entityIndex._aliveCount <= 0) {
 				queryData.cachedResult = [];
 				queryData.isDirty = false;
 				return [];
@@ -35,8 +34,9 @@ export function createQueryRegistry(
 
 			// Find matching entities
 			const matchingEntities: TEntityId[] = [];
-			for (const eid of aliveEntities) {
-				if (filter.evaluate(this, eid, queryData)) {
+			for (let i = 0; i < this._entityIndex._aliveCount; i++) {
+				const eid = this._entityIndex._dense[i];
+				if (eid != null && filter.evaluate(this, eid, queryData)) {
 					matchingEntities.push(eid);
 				}
 			}

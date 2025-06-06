@@ -1,10 +1,4 @@
 /**
- * Event Registry for ECS
- *
- * Simple and fast event registry for managing typed events.
- */
-
-/**
  * Creates a new event registry
  */
 export function createEventRegistry<

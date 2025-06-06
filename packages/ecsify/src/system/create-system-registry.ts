@@ -1,10 +1,4 @@
 /**
- * System Registry for ECS
- *
- * Simple and fast system registry for managing ordered systems.
- */
-
-/**
  * Creates a new system registry
  */
 export function createSystemRegistry<GSystemSets extends string = string, GContext = any>(

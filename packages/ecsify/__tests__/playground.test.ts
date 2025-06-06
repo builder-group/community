@@ -1,6 +1,6 @@
+import { createSeededRandom } from '@blgc/utils';
 import { describe, expect, it } from 'vitest';
 import { createApp, With } from '../src';
-import { createSeededRandom } from './utils';
 
 describe('playground', () => {
 	it('should pass', () => {
@@ -10,7 +10,10 @@ describe('playground', () => {
 	it.skip('should work', () => {
 		const seed = Math.random() * 1000000;
 		const random = createSeededRandom(seed);
-		const app = createApp();
+		const app = createApp({
+			plugins: [],
+			systemSets: []
+		});
 
 		// Component definitions
 		const Position = { x: [] as number[], y: [] as number[] };
