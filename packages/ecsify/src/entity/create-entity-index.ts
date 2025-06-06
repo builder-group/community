@@ -38,7 +38,7 @@ export function createEntityIndex(options: TCreateEntityIndexOptions = {}): TEnt
 		_sparse: [] as number[],
 		_nextBaseEid: 1,
 		_dense: [] as number[],
-		_aliveCount: 0, // Cursor
+		_aliveCount: 0,
 
 		_versionBits: versionBits,
 		_entityBits: entityBits,
