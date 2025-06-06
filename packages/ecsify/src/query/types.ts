@@ -1,6 +1,6 @@
 import { TComponentRef, TComponentValue } from '../component';
 import { TEntityId } from '../entity';
-import { TQueryRegistry } from './create-query-registry';
+import { TQueryFilter } from './query-filters';
 
 /**
  * Special entity symbol for component queries
@@ -55,28 +55,6 @@ export interface TQueryData {
 	/** Components that can affect this query - enables O(1) invalidation checks */
 	affectedMasks?: Record<number, number>;
 }
-
-export interface TBaseQueryFilter {
-	type: string;
-	evaluate(queryRegistry: TQueryRegistry, eid: TEntityId, queryData: TQueryData): boolean;
-	register?(
-		queryRegistry: TQueryRegistry,
-		queryData: TQueryData,
-		parentType?: TQueryParentType
-	): void;
-	getHash(queryRegistry: TQueryRegistry): string;
-}
-
-export type TQueryParentType = Extract<TQueryFilter['type'], 'And' | 'Or'>;
-
-export type TQueryFilter =
-	| (TBaseQueryFilter & { type: 'With'; component: TComponentRef })
-	| (TBaseQueryFilter & { type: 'Without'; component: TComponentRef })
-	| (TBaseQueryFilter & { type: 'Added'; component: TComponentRef })
-	| (TBaseQueryFilter & { type: 'Changed'; component: TComponentRef })
-	| (TBaseQueryFilter & { type: 'Removed'; component: TComponentRef })
-	| (TBaseQueryFilter & { type: 'And'; filters: TQueryFilter[] })
-	| (TBaseQueryFilter & { type: 'Or'; filters: TQueryFilter[] });
 
 export type TQueryComponentValue<GComponent extends TComponentRef | TEntity> =
 	GComponent extends TEntity ? TEntityId : TComponentValue<GComponent>;

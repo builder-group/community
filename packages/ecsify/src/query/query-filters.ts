@@ -1,6 +1,12 @@
 import { TComponentRef } from '../component';
+import { TEntityId } from '../entity';
+import { TQuery } from './create-query';
 import { TQueryRegistry } from './create-query-registry';
-import { TQueryData, TQueryFilter, TQueryParentType } from './types';
+import { isReactiveQuery } from './create-reactive-query';
+
+// =============================================================================
+// Query Filters
+// =============================================================================
 
 /**
  * Requires entity to have component
@@ -23,17 +29,23 @@ export function With<T extends TComponentRef>(component: T): TQueryFilter {
 			return (entityMask & bitflag) !== 0;
 		},
 
-		register(queryRegistry, queryData, parentType): void {
+		register(queryRegistry, query, parentType): void {
 			// Register callbacks to invalidate this query when components are added/removed
 			queryRegistry._componentRegistry.onComponentAdd(component, () => {
-				queryData.isDirty = true;
+				query.isDirty = true;
+				if (isReactiveQuery(query)) {
+					query._callbacks.forEach((callback) => callback());
+				}
 			});
 			queryRegistry._componentRegistry.onComponentRemove(component, () => {
-				queryData.isDirty = true;
+				query.isDirty = true;
+				if (isReactiveQuery(query)) {
+					query._callbacks.forEach((callback) => callback());
+				}
 			});
 
 			// Register the component mask in the appropriate structure
-			registerComponentMask(queryRegistry, queryData, component, 'with', parentType);
+			registerComponentMask(queryRegistry, query, component, 'with', parentType);
 		},
 
 		getHash(queryRegistry): string {
@@ -64,17 +76,23 @@ export function Without<T extends TComponentRef>(component: T): TQueryFilter {
 			return (entityMask & bitflag) === 0;
 		},
 
-		register(queryRegistry, queryData, parentType): void {
+		register(queryRegistry, query, parentType): void {
 			// Register callbacks to invalidate this query when components are added/removed
 			queryRegistry._componentRegistry.onComponentAdd(component, () => {
-				queryData.isDirty = true;
+				query.isDirty = true;
+				if (isReactiveQuery(query)) {
+					query._callbacks.forEach((callback) => callback());
+				}
 			});
 			queryRegistry._componentRegistry.onComponentRemove(component, () => {
-				queryData.isDirty = true;
+				query.isDirty = true;
+				if (isReactiveQuery(query)) {
+					query._callbacks.forEach((callback) => callback());
+				}
 			});
 
 			// Register the component mask in the appropriate structure
-			registerComponentMask(queryRegistry, queryData, component, 'without', parentType);
+			registerComponentMask(queryRegistry, query, component, 'without', parentType);
 		},
 
 		getHash(queryRegistry): string {
@@ -96,19 +114,25 @@ export function Added<T extends TComponentRef>(component: T): TQueryFilter {
 			return queryRegistry._componentRegistry.wasAdded(eid, component);
 		},
 
-		register(queryRegistry, queryData, parentType): void {
+		register(queryRegistry, query, parentType): void {
 			// Register callback to invalidate this query when components are added
 			queryRegistry._componentRegistry.onComponentAdd(component, () => {
-				queryData.isDirty = true;
+				query.isDirty = true;
+				if (isReactiveQuery(query)) {
+					query._callbacks.forEach((callback) => callback());
+				}
 			});
 
 			// Register callback to invalidate when change tracking is flushed
 			queryRegistry._componentRegistry.onComponentFlush(component, () => {
-				queryData.isDirty = true;
+				query.isDirty = true;
+				if (isReactiveQuery(query)) {
+					query._callbacks.forEach((callback) => callback());
+				}
 			});
 
 			// Register the component mask in the appropriate structure
-			registerComponentMask(queryRegistry, queryData, component, 'added', parentType);
+			registerComponentMask(queryRegistry, query, component, 'added', parentType);
 		},
 
 		getHash(queryRegistry): string {
@@ -130,19 +154,25 @@ export function Changed<T extends TComponentRef>(component: T): TQueryFilter {
 			return queryRegistry._componentRegistry.wasChanged(eid, component);
 		},
 
-		register(queryRegistry, queryData, parentType): void {
+		register(queryRegistry, query, parentType): void {
 			// Register callback to invalidate this query when components are changed
 			queryRegistry._componentRegistry.onComponentChange(component, () => {
-				queryData.isDirty = true;
+				query.isDirty = true;
+				if (isReactiveQuery(query)) {
+					query._callbacks.forEach((callback) => callback());
+				}
 			});
 
 			// Register callback to invalidate when change tracking is flushed
 			queryRegistry._componentRegistry.onComponentFlush(component, () => {
-				queryData.isDirty = true;
+				query.isDirty = true;
+				if (isReactiveQuery(query)) {
+					query._callbacks.forEach((callback) => callback());
+				}
 			});
 
 			// Register the component mask in the appropriate structure
-			registerComponentMask(queryRegistry, queryData, component, 'changed', parentType);
+			registerComponentMask(queryRegistry, query, component, 'changed', parentType);
 		},
 
 		getHash(queryRegistry): string {
@@ -164,19 +194,25 @@ export function Removed<T extends TComponentRef>(component: T): TQueryFilter {
 			return queryRegistry._componentRegistry.wasRemoved(eid, component);
 		},
 
-		register(queryRegistry, queryData, parentType): void {
+		register(queryRegistry, query, parentType): void {
 			// Register callback to invalidate this query when components are removed
 			queryRegistry._componentRegistry.onComponentRemove(component, () => {
-				queryData.isDirty = true;
+				query.isDirty = true;
+				if (isReactiveQuery(query)) {
+					query._callbacks.forEach((callback) => callback());
+				}
 			});
 
 			// Register callback to invalidate when change tracking is flushed
 			queryRegistry._componentRegistry.onComponentFlush(component, () => {
-				queryData.isDirty = true;
+				query.isDirty = true;
+				if (isReactiveQuery(query)) {
+					query._callbacks.forEach((callback) => callback());
+				}
 			});
 
 			// Register the component mask in the appropriate structure
-			registerComponentMask(queryRegistry, queryData, component, 'removed', parentType);
+			registerComponentMask(queryRegistry, query, component, 'removed', parentType);
 		},
 
 		getHash(queryRegistry): string {
@@ -194,10 +230,10 @@ export function And(...filters: TQueryFilter[]): TQueryFilter {
 		type: 'And',
 		filters,
 
-		evaluate(queryRegistry, eid, queryData): boolean {
-			switch (queryData.evaluationStrategy) {
+		evaluate(queryRegistry, eid, query): boolean {
+			switch (query.evaluationStrategy) {
 				case 'bitmask': {
-					const { andMasks, orMasks, generations } = queryData;
+					const { andMasks, orMasks, generations } = query;
 					const entityMasks = queryRegistry._componentRegistry._entityMasks;
 					const addedMasks = queryRegistry._componentRegistry._addedMasks;
 					const changedMasks = queryRegistry._componentRegistry._changedMasks;
@@ -276,14 +312,14 @@ export function And(...filters: TQueryFilter[]): TQueryFilter {
 				}
 
 				case 'individual':
-					return filters.every((filter) => filter.evaluate(queryRegistry, eid, queryData));
+					return filters.every((filter) => filter.evaluate(queryRegistry, eid, query));
 			}
 		},
 
-		register(queryRegistry, queryData): void {
+		register(queryRegistry, query): void {
 			for (const filter of filters) {
 				if (filter.register != null) {
-					filter.register(queryRegistry, queryData, 'And');
+					filter.register(queryRegistry, query, 'And');
 				}
 			}
 		},
@@ -306,10 +342,10 @@ export function Or(...filters: TQueryFilter[]): TQueryFilter {
 		type: 'Or',
 		filters,
 
-		evaluate(queryRegistry, eid, queryData): boolean {
-			switch (queryData.evaluationStrategy) {
+		evaluate(queryRegistry, eid, query): boolean {
+			switch (query.evaluationStrategy) {
 				case 'bitmask': {
-					const { orMasks, generations } = queryData;
+					const { orMasks, generations } = query;
 					const entityMasks = queryRegistry._componentRegistry._entityMasks;
 					const addedMasks = queryRegistry._componentRegistry._addedMasks;
 					const changedMasks = queryRegistry._componentRegistry._changedMasks;
@@ -353,14 +389,14 @@ export function Or(...filters: TQueryFilter[]): TQueryFilter {
 				}
 
 				case 'individual':
-					return filters.some((filter) => filter.evaluate(queryRegistry, eid, queryData));
+					return filters.some((filter) => filter.evaluate(queryRegistry, eid, query));
 			}
 		},
 
-		register(queryRegistry, queryData): void {
+		register(queryRegistry, query): void {
 			for (const filter of filters) {
 				if (filter.register != null) {
-					filter.register(queryRegistry, queryData, 'Or');
+					filter.register(queryRegistry, query, 'Or');
 				}
 			}
 		},
@@ -379,6 +415,10 @@ export function Or(...filters: TQueryFilter[]): TQueryFilter {
 export const All = And;
 export const Any = Or;
 
+// =============================================================================
+// Helpers
+// =============================================================================
+
 /**
  * Helper to get component ID, registering if needed
  */
@@ -395,7 +435,7 @@ function getComponentId(queryRegistry: TQueryRegistry, component: TComponentRef)
  */
 function registerComponentMask(
 	queryRegistry: TQueryRegistry,
-	queryData: TQueryData,
+	query: TQuery,
 	component: TComponentRef,
 	maskType: 'with' | 'without' | 'added' | 'changed' | 'removed',
 	parentType: TQueryParentType = 'And'
@@ -420,23 +460,45 @@ function registerComponentMask(
 	}
 
 	// Lazy allocation: only create objects when needed
-	if (queryData[targetMasks] == null) {
-		queryData[targetMasks] = {};
+	if (query[targetMasks] == null) {
+		query[targetMasks] = {};
 	}
-	if (queryData[targetMasks]?.[generationId] == null) {
-		queryData[targetMasks]![generationId] = {};
+	if (query[targetMasks]?.[generationId] == null) {
+		query[targetMasks]![generationId] = {};
 	}
-	if (queryData.affectedMasks == null) {
-		queryData.affectedMasks = {};
+	if (query.affectedMasks == null) {
+		query.affectedMasks = {};
 	}
 
 	// Add to appropriate mask
-	queryData[targetMasks]![generationId]![maskType] =
-		(queryData[targetMasks]?.[generationId]?.[maskType] ?? 0) | bitflag;
-	queryData.affectedMasks[generationId] = (queryData.affectedMasks[generationId] ?? 0) | bitflag;
+	query[targetMasks]![generationId]![maskType] =
+		(query[targetMasks]?.[generationId]?.[maskType] ?? 0) | bitflag;
+	query.affectedMasks[generationId] = (query.affectedMasks[generationId] ?? 0) | bitflag;
 
 	// Add to generations array if not already present
-	if (!queryData.generations.includes(generationId)) {
-		queryData.generations.push(generationId);
+	if (!query.generations.includes(generationId)) {
+		query.generations.push(generationId);
 	}
 }
+
+// =============================================================================
+// Types
+// =============================================================================
+
+export interface TBaseQueryFilter {
+	type: string;
+	evaluate(queryRegistry: TQueryRegistry, eid: TEntityId, query: TQuery): boolean;
+	register?(queryRegistry: TQueryRegistry, query: TQuery, parentType?: TQueryParentType): void;
+	getHash(queryRegistry: TQueryRegistry): string;
+}
+
+export type TQueryFilter =
+	| (TBaseQueryFilter & { type: 'With'; component: TComponentRef })
+	| (TBaseQueryFilter & { type: 'Without'; component: TComponentRef })
+	| (TBaseQueryFilter & { type: 'Added'; component: TComponentRef })
+	| (TBaseQueryFilter & { type: 'Changed'; component: TComponentRef })
+	| (TBaseQueryFilter & { type: 'Removed'; component: TComponentRef })
+	| (TBaseQueryFilter & { type: 'And'; filters: TQueryFilter[] })
+	| (TBaseQueryFilter & { type: 'Or'; filters: TQueryFilter[] });
+
+export type TQueryParentType = Extract<TQueryFilter['type'], 'And' | 'Or'>;

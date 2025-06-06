@@ -1,4 +1,4 @@
-import { TQueryFilter } from './types';
+import { TQueryFilter } from './query-filters';
 
 /**
  * Pre-categorizes a query's evaluation strategy.

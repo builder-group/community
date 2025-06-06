@@ -1,8 +1,8 @@
 import { TComponentRef, TComponentRegistry } from '../component';
 import { TEntityId, TEntityIndex } from '../entity';
-import { categorizeEvaluationStrategy } from './categorize-evaluation-strategy';
-import { And, With } from './query-filters';
-import { Entity, TEntity, TQueryComponentValue, TQueryData, TQueryFilter } from './types';
+import { createQuery, isQuery, TQuery } from './create-query';
+import { And, TQueryFilter, With } from './query-filters';
+import { Entity, TEntity, TQueryComponentValue } from './types';
 
 /**
  * Creates a new query registry
@@ -16,19 +16,21 @@ export function createQueryRegistry(
 		_componentRegistry: componentRegistry,
 		_queryCache: new Map(),
 
-		queryEntities(filter, options = {}) {
+		queryEntities(filterOrQuery, options = {}) {
 			const { cache = true, ...getQueryOptions } = options;
-			const queryData = this.getQuery(filter, getQueryOptions);
+			const query = isQuery(filterOrQuery)
+				? filterOrQuery
+				: this.getQuery(filterOrQuery, getQueryOptions);
 
 			// Return cached result if available and not dirty
-			if (!queryData.isDirty && cache) {
-				return queryData.cachedResult;
+			if (!query.isDirty && cache) {
+				return query.cachedResult;
 			}
 
 			// Exit if no entities exist
 			if (this._entityIndex._aliveCount <= 0) {
-				queryData.cachedResult = [];
-				queryData.isDirty = false;
+				query.cachedResult = [];
+				query.isDirty = false;
 				return [];
 			}
 
@@ -39,14 +41,14 @@ export function createQueryRegistry(
 			const matchingEntities: TEntityId[] = [];
 			for (let i = 0; i < this._entityIndex._aliveCount; i++) {
 				const eid = this._entityIndex._dense[i];
-				if (eid != null && filter.evaluate(this, eid, queryData)) {
+				if (eid != null && query.filter.evaluate(this, eid, query)) {
 					matchingEntities.push(eid);
 				}
 			}
 
 			// Cache results
-			queryData.cachedResult = matchingEntities;
-			queryData.isDirty = false;
+			query.cachedResult = matchingEntities;
+			query.isDirty = false;
 
 			return matchingEntities;
 		},
@@ -126,46 +128,43 @@ export function createQueryRegistry(
 		},
 
 		getQuery(filter, options = {}) {
-			const { evaluationStrategy = categorizeEvaluationStrategy(filter) } = options;
 			const hash = filter.getHash(this);
 
 			// Return cached query if exists
 			if (this._queryCache.has(hash)) {
-				return this._queryCache.get(hash) as TQueryData;
+				return this._queryCache.get(hash) as TQuery;
 			}
 
+			return this.registerQuery(filter, options);
+		},
+
+		registerQuery(queryOrFilter, options = {}) {
+			const { evaluationStrategy } = options;
+
 			// Create new query data
-			const queryData: TQueryData = {
-				hash,
-				filter,
-				evaluationStrategy,
-				cachedResult: [],
-				isDirty: true,
-				generations: []
-			};
+			const query = isQuery(queryOrFilter)
+				? queryOrFilter
+				: createQuery(this, queryOrFilter, {
+						hash: queryOrFilter.getHash(this),
+						evaluationStrategy
+					});
 
 			// Let filter register
-			if (filter.register != null) {
-				filter.register(this, queryData);
+			if (query.filter.register != null) {
+				query.filter.register(this, query);
 			}
 
 			// Cache the query
-			this._queryCache.set(hash, queryData);
-
-			return queryData;
-		},
-
-		registerQuery(filter) {
-			return this.getQuery(filter);
+			this._queryCache.set(query.hash, query);
+			return query;
 		},
 
 		generateQueryHash(filter) {
 			return filter.getHash(this);
 		},
 
-		checkEntity(queryData, eid) {
-			// Use the stored filter's evaluate method with the query data
-			return queryData.filter.evaluate(this, eid, queryData);
+		checkEntity(query, eid) {
+			return query.filter.evaluate(this, eid, query);
 		},
 
 		reset() {
@@ -180,12 +179,12 @@ export interface TQueryRegistry {
 	/** Reference to the component registry */
 	_componentRegistry: TComponentRegistry;
 	/** Cache of compiled queries by hash */
-	_queryCache: Map<string, TQueryData>;
+	_queryCache: Map<string, TQuery>;
 
 	/**
 	 * Queries entities that match the specified filter and returns only entity IDs.
 	 */
-	queryEntities(filter: TQueryFilter, options?: TExecuteQueryOptions): TEntityId[];
+	queryEntities(queryOrFilter: TQueryFilter | TQuery, options?: TExecuteQueryOptions): TEntityId[];
 
 	/**
 	 * Queries components and returns matching entities with component data.
@@ -198,12 +197,12 @@ export interface TQueryRegistry {
 	/**
 	 * Gets or creates a compiled query
 	 */
-	getQuery(filter: TQueryFilter, options?: TGetQueryOptions): TQueryData;
+	getQuery(filter: TQueryFilter, options?: TRegisterQueryOptions): TQuery;
 
 	/**
-	 * Registers a query (alias for getOrCreateQuery)
+	 * Registers a query.
 	 */
-	registerQuery(filter: TQueryFilter): TQueryData;
+	registerQuery(queryOrFilter: TQueryFilter | TQuery, options?: TRegisterQueryOptions): TQuery;
 
 	/**
 	 * Generates a hash for a query filter
@@ -213,7 +212,7 @@ export interface TQueryRegistry {
 	/**
 	 * Checks if an entity matches a query
 	 */
-	checkEntity(queryData: TQueryData, eid: TEntityId): boolean;
+	checkEntity(query: TQuery, eid: TEntityId): boolean;
 
 	/**
 	 * Resets the query registry to its initial state
@@ -221,12 +220,12 @@ export interface TQueryRegistry {
 	reset(): void;
 }
 
-export interface TGetQueryOptions {
+export interface TRegisterQueryOptions {
 	/** Evaluation strategy to use for the query */
 	evaluationStrategy?: 'bitmask' | 'individual';
 }
 
-export interface TExecuteQueryOptions extends TGetQueryOptions {
+export interface TExecuteQueryOptions extends TRegisterQueryOptions {
 	/** Whether to cache the query result */
 	cache?: boolean;
 }

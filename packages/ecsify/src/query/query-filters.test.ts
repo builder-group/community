@@ -663,41 +663,41 @@ describe('Query Filters', () => {
 			componentRegistry.addComponent(eid1, Health);
 
 			// Execute different queries to populate cache
-			const positionQuery = queryRegistry.queryEntities(With(Position));
-			const healthQuery = queryRegistry.queryEntities(With(Health));
-			const velocityQuery = queryRegistry.queryEntities(With(Velocity));
+			const positionQueryResult = queryRegistry.queryEntities(With(Position));
+			const healthQueryResult = queryRegistry.queryEntities(With(Health));
+			const velocityQueryResult = queryRegistry.queryEntities(With(Velocity));
 
 			// Verify initial state
-			expect(positionQuery).toEqual([eid1]);
-			expect(healthQuery).toEqual([eid1]);
-			expect(velocityQuery).toEqual([]);
+			expect(positionQueryResult).toEqual([eid1]);
+			expect(healthQueryResult).toEqual([eid1]);
+			expect(velocityQueryResult).toEqual([]);
 
 			// Get query data to check dirty flags
-			const positionQueryData = queryRegistry.registerQuery(With(Position));
-			const healthQueryData = queryRegistry.registerQuery(With(Health));
-			const velocityQueryData = queryRegistry.registerQuery(With(Velocity));
+			const positionQuery = queryRegistry.registerQuery(With(Position));
+			const healthQuery = queryRegistry.registerQuery(With(Health));
+			const velocityQuery = queryRegistry.registerQuery(With(Velocity));
 
 			// Queries should not be dirty after execution
-			expect(positionQueryData.isDirty).toBe(false);
-			expect(healthQueryData.isDirty).toBe(false);
-			expect(velocityQueryData.isDirty).toBe(false);
+			expect(positionQuery.isDirty).toBe(false);
+			expect(healthQuery.isDirty).toBe(false);
+			expect(velocityQuery.isDirty).toBe(false);
 
 			// Add Velocity to eid2 - should ONLY affect Velocity query
 			componentRegistry.addComponent(eid2, Velocity);
 
 			// Only Velocity query should be marked as dirty
-			expect(positionQueryData.isDirty).toBe(false); // Should NOT be dirty
-			expect(healthQueryData.isDirty).toBe(false); // Should NOT be dirty
-			expect(velocityQueryData.isDirty).toBe(true); // Should be dirty
+			expect(positionQuery.isDirty).toBe(false); // Should NOT be dirty
+			expect(healthQuery.isDirty).toBe(false); // Should NOT be dirty
+			expect(velocityQuery.isDirty).toBe(true); // Should be dirty
 
 			// Execute queries to verify results
-			const newPositionQuery = queryRegistry.queryEntities(With(Position));
-			const newHealthQuery = queryRegistry.queryEntities(With(Health));
-			const newVelocityQuery = queryRegistry.queryEntities(With(Velocity));
+			const newPositionQueryResult = queryRegistry.queryEntities(With(Position));
+			const newHealthQueryResult = queryRegistry.queryEntities(With(Health));
+			const newVelocityQueryResult = queryRegistry.queryEntities(With(Velocity));
 
-			expect(newPositionQuery).toEqual([eid1]); // No change
-			expect(newHealthQuery).toEqual([eid1]); // No change
-			expect(newVelocityQuery).toEqual([eid2]); // Changed
+			expect(newPositionQueryResult).toEqual([eid1]); // No change
+			expect(newHealthQueryResult).toEqual([eid1]); // No change
+			expect(newVelocityQueryResult).toEqual([eid2]); // Changed
 		});
 
 		it('should invalidate multiple queries when shared component changes', () => {
@@ -737,16 +737,16 @@ describe('Query Filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const queryData = queryRegistry.registerQuery(And(With(Position), With(Health)));
-			expect(queryData.evaluationStrategy).toBe('bitmask');
+			const query = queryRegistry.registerQuery(And(With(Position), With(Health)));
+			expect(query.evaluationStrategy).toBe('bitmask');
 		});
 
 		it('should use bitmask evaluation for simple Or filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const queryData = queryRegistry.registerQuery(Or(With(Position), With(Health)));
-			expect(queryData.evaluationStrategy).toBe('bitmask');
+			const query = queryRegistry.registerQuery(Or(With(Position), With(Health)));
+			expect(query.evaluationStrategy).toBe('bitmask');
 		});
 
 		it('should use individual evaluation for complex nested filters', () => {
@@ -755,10 +755,10 @@ describe('Query Filters', () => {
 			const Shield = [] as number[];
 
 			// Or(And(...), ...) should fall back to individual evaluation
-			const queryData = queryRegistry.registerQuery(
+			const query = queryRegistry.registerQuery(
 				Or(And(With(Position), With(Health)), With(Shield))
 			);
-			expect(queryData.evaluationStrategy).toBe('individual');
+			expect(query.evaluationStrategy).toBe('individual');
 		});
 
 		it('should produce same results regardless of evaluation strategy', () => {

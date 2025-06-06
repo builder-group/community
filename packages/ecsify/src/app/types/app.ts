@@ -218,6 +218,8 @@ export type TAppContext<GPlugins extends TAnyPlugin[] = []> = TInnerAppContext<
 	TMergePlugins<GPlugins>
 >;
 
+export type TAppWithPlugins<GPlugins extends TAnyPlugin[]> = TApp<TAppContext<GPlugins>>;
+
 export interface TInnerAppContext<GMergedPlugins extends Record<string, any> = {}> {
 	components: GMergedPlugins extends { components: infer GComponents }
 		? GComponents extends Record<string, any>
