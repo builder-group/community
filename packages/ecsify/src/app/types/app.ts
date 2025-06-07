@@ -166,7 +166,7 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	 */
 	queryComponents<T extends readonly (TComponentRef | TEntity)[]>(
 		components: T,
-		queryOrFilter: TQueryFilter | TQuery
+		queryOrFilter?: TQueryFilter | TQuery
 	): TComponentDataTuple<T>[];
 
 	/**

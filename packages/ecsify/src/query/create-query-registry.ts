@@ -178,7 +178,7 @@ export interface TQueryRegistry {
 	 */
 	queryComponents<GComponents extends readonly (TComponentRef | TEntity)[]>(
 		components: GComponents,
-		queryOrFilter: TQueryFilter | TQuery
+		queryOrFilter?: TQueryFilter | TQuery
 	): TComponentDataTuple<GComponents>[];
 
 	/**
