@@ -1,3 +1,4 @@
+import { categorizeEvaluationStrategy } from '../categorize-evaluation-strategy';
 import { TQueryRegistry } from '../create-query-registry';
 import { TQueryData } from '../types';
 import { createQuery, isQuery, TCreateQueryOptions, TQuery } from './create-query';
@@ -7,9 +8,16 @@ export function createReactiveQuery(
 	filter: TQueryData['filter'],
 	options: TCreateReactiveQueryOptions = {}
 ): TReactiveQuery {
-	return {
-		...createQuery(queryRegistry, filter, options),
+	const {
+		evaluationStrategy = categorizeEvaluationStrategy(filter),
+		hash = filter.getHash(queryRegistry),
+		register = true
+	} = options;
+
+	const query: TReactiveQuery = {
+		...createQuery(queryRegistry, filter, { evaluationStrategy, hash, register: false }),
 		_callbacks: [],
+
 		markDirty() {
 			this.isDirty = true;
 			for (const callback of this._callbacks) {
@@ -29,6 +37,13 @@ export function createReactiveQuery(
 			this._callbacks = [];
 		}
 	};
+
+	// Register query if requested
+	if (register) {
+		queryRegistry.registerQuery(query);
+	}
+
+	return query;
 }
 
 export interface TCreateReactiveQueryOptions extends TCreateQueryOptions {}
