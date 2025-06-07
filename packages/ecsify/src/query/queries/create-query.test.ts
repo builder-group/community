@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createComponentRegistry, TComponentRegistry } from '../../component';
 import { createEntityIndex, TEntityIndex } from '../../entity';
 import { createQueryRegistry, TQueryRegistry } from '../create-query-registry';
@@ -48,19 +48,12 @@ describe('createQuery function', () => {
 		it('should call filter register method', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const query = createQuery(queryRegistry, With(Position));
+			const filter = With(Position);
+			const filterRegisterSpy = vi.spyOn(filter, 'register');
 
-			// Should not throw when calling register
-			expect(() => query.register(queryRegistry)).not.toThrow();
-		});
+			const query = createQuery(queryRegistry, filter);
 
-		it('should pass parentType to filter register', () => {
-			const Position = { x: [] as number[], y: [] as number[] };
-
-			const query = createQuery(queryRegistry, With(Position));
-
-			// Should not throw when calling register with parentType
-			expect(() => query.register(queryRegistry, 'And')).not.toThrow();
+			expect(filterRegisterSpy).toHaveBeenCalledWith(queryRegistry, query, undefined);
 		});
 	});
 
@@ -95,7 +88,7 @@ describe('createQuery function', () => {
 			expect(result).toEqual([]);
 		});
 
-		it('should handle complex filters', () => {
+		it('should handle more complex filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 

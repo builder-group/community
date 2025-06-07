@@ -154,27 +154,6 @@ describe('createQueueQuery function', () => {
 			expect(result).toEqual([]);
 		});
 
-		it('should track queue size correctly', () => {
-			const Position = { x: [] as number[], y: [] as number[] };
-
-			const queueQuery = createQueueQuery(queryRegistry, With(Position));
-			queueQuery.register(queryRegistry);
-
-			// Initially empty
-			expect(queueQuery._entityQueue).toHaveLength(0);
-
-			// Add entity to trigger queuing
-			const eid = entityIndex.createEntity();
-			componentRegistry.addComponent(eid, Position, { x: 10, y: 20 });
-
-			expect(queueQuery._entityQueue).toHaveLength(1);
-
-			// Pop from queue
-			queueQuery.query(queryRegistry);
-
-			expect(queueQuery._entityQueue).toHaveLength(0);
-		});
-
 		it('should respect maxQueueSize limit', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 

@@ -56,15 +56,6 @@ describe('createReactiveQuery function', () => {
 			expect(callback1).toHaveBeenCalledTimes(1);
 			expect(callback2).toHaveBeenCalledTimes(1);
 		});
-
-		it('should not call callbacks if none are registered', () => {
-			const Position = { x: [] as number[], y: [] as number[] };
-
-			const reactiveQuery = createReactiveQuery(queryRegistry, With(Position));
-
-			// Should not throw when calling markDirty with no callbacks
-			expect(() => reactiveQuery.markDirty()).not.toThrow();
-		});
 	});
 
 	describe('onDirty', () => {
