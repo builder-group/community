@@ -1,6 +1,5 @@
-import { TComponentRef } from '../component';
+import { TComponentRef, TComponentRegistry } from '../component';
 import { TEntityId } from '../entity';
-import { TQueryRegistry } from './create-query-registry';
 import { TQuery } from './queries';
 
 // =============================================================================
@@ -15,34 +14,33 @@ export function With<T extends TComponentRef>(component: T): TQueryFilter {
 		type: 'With',
 		component,
 
-		evaluate(queryRegistry, eid): boolean {
-			const registry = queryRegistry._componentRegistry;
-			const componentData = registry._componentMap.get(component);
+		evaluate(query, eid): boolean {
+			const componentData = query._componentRegistry._componentMap.get(component);
 
 			if (componentData == null) {
 				return false;
 			}
 
 			const { generationId, bitflag } = componentData;
-			const entityMask = registry._entityMasks[generationId]?.[eid] ?? 0;
+			const entityMask = query._componentRegistry._entityMasks[generationId]?.[eid] ?? 0;
 			return (entityMask & bitflag) !== 0;
 		},
 
-		register(queryRegistry, query, parentType): void {
+		register(query, parentType): void {
 			// Register callbacks to invalidate this query when components are added/removed
-			queryRegistry._componentRegistry.onComponentAdd(component, () => {
+			query._componentRegistry.onComponentAdd(component, () => {
 				query.markDirty();
 			});
-			queryRegistry._componentRegistry.onComponentRemove(component, () => {
+			query._componentRegistry.onComponentRemove(component, () => {
 				query.markDirty();
 			});
 
 			// Register the component mask in the appropriate structure
-			registerComponentMask(queryRegistry, query, component, 'with', parentType);
+			registerComponentMask(query, component, 'with', parentType);
 		},
 
-		getHash(queryRegistry): string {
-			const componentId = getComponentId(queryRegistry, component);
+		toString(componentRegistry): string {
+			const componentId = getComponentId(componentRegistry, component);
 			return `with(${componentId})`;
 		}
 	};
@@ -56,34 +54,33 @@ export function Without<T extends TComponentRef>(component: T): TQueryFilter {
 		type: 'Without',
 		component,
 
-		evaluate(queryRegistry, eid): boolean {
-			const registry = queryRegistry._componentRegistry;
-			const componentData = registry._componentMap.get(component);
+		evaluate(query, eid): boolean {
+			const componentData = query._componentRegistry._componentMap.get(component);
 
 			if (componentData == null) {
 				return true;
 			}
 
 			const { generationId, bitflag } = componentData;
-			const entityMask = registry._entityMasks[generationId]?.[eid] ?? 0;
+			const entityMask = query._componentRegistry._entityMasks[generationId]?.[eid] ?? 0;
 			return (entityMask & bitflag) === 0;
 		},
 
-		register(queryRegistry, query, parentType): void {
+		register(query, parentType): void {
 			// Register callbacks to invalidate this query when components are added/removed
-			queryRegistry._componentRegistry.onComponentAdd(component, () => {
+			query._componentRegistry.onComponentAdd(component, () => {
 				query.markDirty();
 			});
-			queryRegistry._componentRegistry.onComponentRemove(component, () => {
+			query._componentRegistry.onComponentRemove(component, () => {
 				query.markDirty();
 			});
 
 			// Register the component mask in the appropriate structure
-			registerComponentMask(queryRegistry, query, component, 'without', parentType);
+			registerComponentMask(query, component, 'without', parentType);
 		},
 
-		getHash(queryRegistry): string {
-			const componentId = getComponentId(queryRegistry, component);
+		toString(componentRegistry): string {
+			const componentId = getComponentId(componentRegistry, component);
 			return `without(${componentId})`;
 		}
 	};
@@ -97,27 +94,27 @@ export function Added<T extends TComponentRef>(component: T): TQueryFilter {
 		type: 'Added',
 		component,
 
-		evaluate(queryRegistry, eid): boolean {
-			return queryRegistry._componentRegistry.wasAdded(eid, component);
+		evaluate(query, eid): boolean {
+			return query._componentRegistry.wasAdded(eid, component);
 		},
 
-		register(queryRegistry, query, parentType): void {
+		register(query, parentType): void {
 			// Register callback to invalidate this query when components are added
-			queryRegistry._componentRegistry.onComponentAdd(component, () => {
+			query._componentRegistry.onComponentAdd(component, () => {
 				query.markDirty();
 			});
 
 			// Register callback to invalidate when change tracking is flushed
-			queryRegistry._componentRegistry.onComponentFlush(component, () => {
+			query._componentRegistry.onComponentFlush(component, () => {
 				query.markDirty();
 			});
 
 			// Register the component mask in the appropriate structure
-			registerComponentMask(queryRegistry, query, component, 'added', parentType);
+			registerComponentMask(query, component, 'added', parentType);
 		},
 
-		getHash(queryRegistry): string {
-			const componentId = getComponentId(queryRegistry, component);
+		toString(componentRegistry): string {
+			const componentId = getComponentId(componentRegistry, component);
 			return `added(${componentId})`;
 		}
 	};
@@ -131,27 +128,27 @@ export function Changed<T extends TComponentRef>(component: T): TQueryFilter {
 		type: 'Changed',
 		component,
 
-		evaluate(queryRegistry, eid): boolean {
-			return queryRegistry._componentRegistry.wasChanged(eid, component);
+		evaluate(query, eid): boolean {
+			return query._componentRegistry.wasChanged(eid, component);
 		},
 
-		register(queryRegistry, query, parentType): void {
+		register(query, parentType): void {
 			// Register callback to invalidate this query when components are changed
-			queryRegistry._componentRegistry.onComponentChange(component, () => {
+			query._componentRegistry.onComponentChange(component, () => {
 				query.markDirty();
 			});
 
 			// Register callback to invalidate when change tracking is flushed
-			queryRegistry._componentRegistry.onComponentFlush(component, () => {
+			query._componentRegistry.onComponentFlush(component, () => {
 				query.markDirty();
 			});
 
 			// Register the component mask in the appropriate structure
-			registerComponentMask(queryRegistry, query, component, 'changed', parentType);
+			registerComponentMask(query, component, 'changed', parentType);
 		},
 
-		getHash(queryRegistry): string {
-			const componentId = getComponentId(queryRegistry, component);
+		toString(componentRegistry): string {
+			const componentId = getComponentId(componentRegistry, component);
 			return `changed(${componentId})`;
 		}
 	};
@@ -165,27 +162,27 @@ export function Removed<T extends TComponentRef>(component: T): TQueryFilter {
 		type: 'Removed',
 		component,
 
-		evaluate(queryRegistry, eid): boolean {
-			return queryRegistry._componentRegistry.wasRemoved(eid, component);
+		evaluate(query, eid): boolean {
+			return query._componentRegistry.wasRemoved(eid, component);
 		},
 
-		register(queryRegistry, query, parentType): void {
+		register(query, parentType): void {
 			// Register callback to invalidate this query when components are removed
-			queryRegistry._componentRegistry.onComponentRemove(component, () => {
+			query._componentRegistry.onComponentRemove(component, () => {
 				query.markDirty();
 			});
 
 			// Register callback to invalidate when change tracking is flushed
-			queryRegistry._componentRegistry.onComponentFlush(component, () => {
+			query._componentRegistry.onComponentFlush(component, () => {
 				query.markDirty();
 			});
 
 			// Register the component mask in the appropriate structure
-			registerComponentMask(queryRegistry, query, component, 'removed', parentType);
+			registerComponentMask(query, component, 'removed', parentType);
 		},
 
-		getHash(queryRegistry): string {
-			const componentId = getComponentId(queryRegistry, component);
+		toString(componentRegistry): string {
+			const componentId = getComponentId(componentRegistry, component);
 			return `removed(${componentId})`;
 		}
 	};
@@ -199,14 +196,14 @@ export function And(...filters: TQueryFilter[]): TQueryFilter {
 		type: 'And',
 		filters,
 
-		evaluate(queryRegistry, eid, query): boolean {
+		evaluate(query, eid): boolean {
 			switch (query.evaluationStrategy) {
 				case 'bitmask': {
 					const { andMasks, orMasks, generations } = query;
-					const entityMasks = queryRegistry._componentRegistry._entityMasks;
-					const addedMasks = queryRegistry._componentRegistry._addedMasks;
-					const changedMasks = queryRegistry._componentRegistry._changedMasks;
-					const removedMasks = queryRegistry._componentRegistry._removedMasks;
+					const entityMasks = query._componentRegistry._entityMasks;
+					const addedMasks = query._componentRegistry._addedMasks;
+					const changedMasks = query._componentRegistry._changedMasks;
+					const removedMasks = query._componentRegistry._removedMasks;
 
 					for (let i = 0; i < generations.length; i++) {
 						const gen = generations[i] as number;
@@ -281,21 +278,21 @@ export function And(...filters: TQueryFilter[]): TQueryFilter {
 				}
 
 				case 'individual':
-					return filters.every((filter) => filter.evaluate(queryRegistry, eid, query));
+					return filters.every((filter) => filter.evaluate(query, eid));
 			}
 		},
 
-		register(queryRegistry, query): void {
+		register(query): void {
 			for (const filter of filters) {
 				if (filter.register != null) {
-					filter.register(queryRegistry, query, 'And');
+					filter.register(query, 'And');
 				}
 			}
 		},
 
-		getHash(queryRegistry): string {
+		toString(componentRegistry): string {
 			const childHashes = filters
-				.map((f) => f.getHash(queryRegistry))
+				.map((f) => f.toString(componentRegistry))
 				.sort()
 				.join(',');
 			return `and(${childHashes})`;
@@ -311,14 +308,14 @@ export function Or(...filters: TQueryFilter[]): TQueryFilter {
 		type: 'Or',
 		filters,
 
-		evaluate(queryRegistry, eid, query): boolean {
+		evaluate(query, eid): boolean {
 			switch (query.evaluationStrategy) {
 				case 'bitmask': {
 					const { orMasks, generations } = query;
-					const entityMasks = queryRegistry._componentRegistry._entityMasks;
-					const addedMasks = queryRegistry._componentRegistry._addedMasks;
-					const changedMasks = queryRegistry._componentRegistry._changedMasks;
-					const removedMasks = queryRegistry._componentRegistry._removedMasks;
+					const entityMasks = query._componentRegistry._entityMasks;
+					const addedMasks = query._componentRegistry._addedMasks;
+					const changedMasks = query._componentRegistry._changedMasks;
+					const removedMasks = query._componentRegistry._removedMasks;
 
 					for (let i = 0; i < generations.length; i++) {
 						const gen = generations[i] as number;
@@ -358,21 +355,21 @@ export function Or(...filters: TQueryFilter[]): TQueryFilter {
 				}
 
 				case 'individual':
-					return filters.some((filter) => filter.evaluate(queryRegistry, eid, query));
+					return filters.some((filter) => filter.evaluate(query, eid));
 			}
 		},
 
-		register(queryRegistry, query): void {
+		register(query): void {
 			for (const filter of filters) {
 				if (filter.register != null) {
-					filter.register(queryRegistry, query, 'Or');
+					filter.register(query, 'Or');
 				}
 			}
 		},
 
-		getHash(queryRegistry): string {
+		toString(componentRegistry): string {
 			const childHashes = filters
-				.map((f) => f.getHash(queryRegistry))
+				.map((f) => f.toString(componentRegistry))
 				.sort()
 				.join(',');
 			return `or(${childHashes})`;
@@ -391,26 +388,23 @@ export const Any = Or;
 /**
  * Helper to get component ID, registering if needed
  */
-function getComponentId(queryRegistry: TQueryRegistry, component: TComponentRef): number {
-	const registry = queryRegistry._componentRegistry;
-	if (!registry._componentMap.has(component)) {
-		registry.registerComponent(component);
+function getComponentId(componentRegistry: TComponentRegistry, component: TComponentRef): number {
+	if (!componentRegistry._componentMap.has(component)) {
+		componentRegistry.registerComponent(component);
 	}
-	return registry._componentMap.get(component)?.id as number;
+	return componentRegistry._componentMap.get(component)?.id as number;
 }
 
 /**
  * Helper function to register component masks with proper parent type
  */
 function registerComponentMask(
-	queryRegistry: TQueryRegistry,
 	query: TQuery,
 	component: TComponentRef,
 	maskType: 'with' | 'without' | 'added' | 'changed' | 'removed',
 	parentType: TQueryFilterParentType = 'And'
 ): void {
-	const registry = queryRegistry._componentRegistry;
-	const componentData = registry._componentMap.get(component);
+	const componentData = query._componentRegistry._componentMap.get(component);
 	if (componentData == null) {
 		return;
 	}
@@ -456,13 +450,9 @@ function registerComponentMask(
 
 export interface TBaseQueryFilter {
 	type: string;
-	evaluate(queryRegistry: TQueryRegistry, eid: TEntityId, query: TQuery): boolean;
-	register?(
-		queryRegistry: TQueryRegistry,
-		query: TQuery,
-		parentType?: TQueryFilterParentType
-	): void;
-	getHash(queryRegistry: TQueryRegistry): string;
+	evaluate(query: TQuery, eid: TEntityId): boolean;
+	register?(query: TQuery, parentType?: TQueryFilterParentType): void;
+	toString(componentRegistry: TComponentRegistry): string;
 }
 
 export type TQueryFilter =

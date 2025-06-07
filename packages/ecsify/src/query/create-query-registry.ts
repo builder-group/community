@@ -35,7 +35,7 @@ export function createQueryRegistry(
 			}
 
 			// Find matching entities
-			const matchingEntities = query.query(this);
+			const matchingEntities = query.execute();
 
 			// Cache results
 			query.cachedResult = matchingEntities;
@@ -120,11 +120,11 @@ export function createQueryRegistry(
 		},
 
 		getQuery(filter, options = {}) {
-			const hash = filter.getHash(this);
+			const key = filter.toString(this._componentRegistry);
 
 			// Return cached query if exists
-			if (this._queryCache.has(hash)) {
-				return this._queryCache.get(hash) as TQuery;
+			if (this._queryCache.has(key)) {
+				return this._queryCache.get(key) as TQuery;
 			}
 
 			return this.registerQuery(filter, options);
@@ -142,16 +142,16 @@ export function createQueryRegistry(
 					});
 
 			// Let query register itself
-			query.register(this);
+			query.register();
 
 			// Cache the query
-			this._queryCache.set(query.hash, query);
+			this._queryCache.set(query.key, query);
 
 			return query;
 		},
 
 		checkEntity(query, eid) {
-			return query.evaluate(this, eid);
+			return query.evaluate(eid);
 		},
 
 		reset() {

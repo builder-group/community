@@ -10,12 +10,12 @@ export function createReactiveQuery(
 ): TReactiveQuery {
 	const {
 		evaluationStrategy = categorizeEvaluationStrategy(filter),
-		hash = filter.getHash(queryRegistry),
+		key = filter.toString(queryRegistry._componentRegistry),
 		register = true
 	} = options;
 
 	const query: TReactiveQuery = {
-		...createQuery(queryRegistry, filter, { evaluationStrategy, hash, register: false }),
+		...createQuery(queryRegistry, filter, { evaluationStrategy, key, register: false }),
 		_callbacks: [],
 
 		markDirty() {

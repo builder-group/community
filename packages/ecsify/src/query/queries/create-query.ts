@@ -1,3 +1,4 @@
+import { TComponentRegistry } from '../../component';
 import { TEntityId } from '../../entity';
 import { categorizeEvaluationStrategy } from '../categorize-evaluation-strategy';
 import { TQueryRegistry } from '../create-query-registry';
@@ -11,22 +12,23 @@ export function createQuery(
 ): TQuery {
 	const {
 		evaluationStrategy = categorizeEvaluationStrategy(filter),
-		hash = filter.getHash(queryRegistry),
+		key = filter.toString(queryRegistry._componentRegistry),
 		register = true
 	} = options;
 
 	const query: TQuery = {
+		_componentRegistry: queryRegistry._componentRegistry,
 		filter,
 		evaluationStrategy,
-		hash,
+		key,
 		cachedResult: [],
 		isDirty: true,
 		generations: [],
 
-		register(queryRegistry, parentType) {
-			this.filter.register?.(queryRegistry, this, parentType);
+		register(parentType) {
+			this.filter.register?.(this, parentType);
 		},
-		query(queryRegistry) {
+		execute() {
 			// Find matching entities
 			// Dense iteration with O(1) bitmask checks - simple and cache-friendly
 			// If this becomes slow: consider archetype system (group entities by component signature)?
@@ -34,18 +36,15 @@ export function createQuery(
 			const matchingEntities: TEntityId[] = [];
 			for (let i = 0; i < queryRegistry._entityIndex._aliveCount; i++) {
 				const eid = queryRegistry._entityIndex._dense[i];
-				if (eid != null && this.filter.evaluate(queryRegistry, eid, this)) {
+				if (eid != null && this.filter.evaluate(this, eid)) {
 					matchingEntities.push(eid);
 				}
 			}
 
 			return matchingEntities;
 		},
-		evaluate(queryRegistry, eid) {
-			return this.filter.evaluate(queryRegistry, eid, this);
-		},
-		getHash(queryRegistry) {
-			return this.filter.getHash(queryRegistry);
+		evaluate(eid) {
+			return this.filter.evaluate(this, eid);
 		},
 		markDirty() {
 			this.isDirty = true;
@@ -62,15 +61,15 @@ export function createQuery(
 
 export interface TCreateQueryOptions {
 	evaluationStrategy?: TQueryData['evaluationStrategy'];
-	hash?: TQueryData['hash'];
+	key?: TQueryData['key'];
 	register?: boolean;
 }
 
 export interface TQuery extends TQueryData {
-	register(queryRegistry: TQueryRegistry, parentType?: TQueryFilterParentType): void;
-	query(queryRegistry: TQueryRegistry): TEntityId[];
-	evaluate(queryRegistry: TQueryRegistry, eid: TEntityId): boolean;
-	getHash(queryRegistry: TQueryRegistry): string;
+	_componentRegistry: TComponentRegistry;
+	register(parentType?: TQueryFilterParentType): void;
+	execute(): TEntityId[];
+	evaluate(eid: TEntityId): boolean;
 	markDirty(): void;
 }
 
@@ -80,7 +79,7 @@ export function isQuery(value: unknown): value is TQuery {
 		value != null &&
 		'filter' in value &&
 		typeof value.filter === 'object' &&
-		'hash' in value &&
-		typeof value.hash === 'string'
+		'key' in value &&
+		typeof value.key === 'string'
 	);
 }

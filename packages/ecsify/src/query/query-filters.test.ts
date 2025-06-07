@@ -588,35 +588,35 @@ describe('Query Filters', () => {
 		});
 	});
 
-	describe('getHash', () => {
-		it('should generate string hashes', () => {
+	describe('toString', () => {
+		it('should generate string', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const hash = With(Position).getHash(queryRegistry);
+			const hash = With(Position).toString(componentRegistry);
 
 			expect(typeof hash).toBe('string');
 			expect(hash.length).toBeGreaterThan(0);
 		});
 
-		it('should generate same hash for identical filters', () => {
+		it('should generate same string for identical filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const hash1 = With(Position).getHash(queryRegistry);
-			const hash2 = With(Position).getHash(queryRegistry);
+			const hash1 = With(Position).toString(componentRegistry);
+			const hash2 = With(Position).toString(componentRegistry);
 
 			expect(hash1).toBe(hash2);
 		});
 
-		it('should generate different hashes for different filters', () => {
+		it('should generate different strings for different filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 			const Health = [] as number[];
 
-			const withHash = With(Position).getHash(queryRegistry);
-			const withoutHash = Without(Position).getHash(queryRegistry);
-			const addedHash = Added(Position).getHash(queryRegistry);
-			const changedHash = Changed(Position).getHash(queryRegistry);
-			const removedHash = Removed(Position).getHash(queryRegistry);
-			const healthHash = With(Health).getHash(queryRegistry);
+			const withHash = With(Position).toString(componentRegistry);
+			const withoutHash = Without(Position).toString(componentRegistry);
+			const addedHash = Added(Position).toString(componentRegistry);
+			const changedHash = Changed(Position).toString(componentRegistry);
+			const removedHash = Removed(Position).toString(componentRegistry);
+			const healthHash = With(Health).toString(componentRegistry);
 
 			const hashes = [withHash, withoutHash, addedHash, changedHash, removedHash, healthHash];
 			const uniqueHashes = new Set(hashes);
@@ -628,8 +628,8 @@ describe('Query Filters', () => {
 			const Velocity = { x: [] as number[], y: [] as number[] };
 
 			// Order shouldn't matter due to sorting in And
-			const hash1 = And(With(Position), With(Velocity)).getHash(queryRegistry);
-			const hash2 = And(With(Velocity), With(Position)).getHash(queryRegistry);
+			const hash1 = And(With(Position), With(Velocity)).toString(componentRegistry);
+			const hash2 = And(With(Velocity), With(Position)).toString(componentRegistry);
 
 			expect(hash1).toBe(hash2);
 		});

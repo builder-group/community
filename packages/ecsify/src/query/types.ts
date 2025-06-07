@@ -9,8 +9,8 @@ export const Entity = Symbol('Entity');
 export type TEntity = typeof Entity;
 
 export interface TQueryData {
-	/** Unique hash identifying this query filter combination */
-	hash: string;
+	/** Unique key identifying this query filter combination */
+	key: string;
 	/** The original query filter that was compiled into this data */
 	filter: TQueryFilter;
 	/**

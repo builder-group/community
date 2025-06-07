@@ -26,8 +26,8 @@ describe('createQuery function', () => {
 		expect(query.cachedResult).toEqual([]);
 		expect(query.isDirty).toBe(true);
 		expect(query.generations).toEqual([0]);
-		expect(typeof query.hash).toBe('string');
-		expect(query.hash.length).toBeGreaterThan(0);
+		expect(typeof query.key).toBe('string');
+		expect(query.key.length).toBeGreaterThan(0);
 		expect(query.evaluationStrategy).toBe('bitmask'); // Default for simple With
 	});
 
@@ -37,11 +37,11 @@ describe('createQuery function', () => {
 
 		const query = createQuery(queryRegistry, With(Position), {
 			evaluationStrategy: 'individual',
-			hash: customHash
+			key: customHash
 		});
 
 		expect(query.evaluationStrategy).toBe('individual');
-		expect(query.hash).toBe(customHash);
+		expect(query.key).toBe(customHash);
 	});
 
 	describe('register', () => {
@@ -53,11 +53,11 @@ describe('createQuery function', () => {
 
 			const query = createQuery(queryRegistry, filter);
 
-			expect(filterRegisterSpy).toHaveBeenCalledWith(queryRegistry, query, undefined);
+			expect(filterRegisterSpy).toHaveBeenCalledWith(query, undefined);
 		});
 	});
 
-	describe('query', () => {
+	describe('execute', () => {
 		it('should return matching entities', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
@@ -70,7 +70,7 @@ describe('createQuery function', () => {
 			// Only eid1 has Position
 			componentRegistry.addComponent(eid1, Position, { x: 10, y: 20 });
 
-			const result = query.query(queryRegistry);
+			const result = query.execute();
 
 			expect(result).toEqual([eid1]);
 		});
@@ -83,7 +83,7 @@ describe('createQuery function', () => {
 			// Create entity without Position component
 			entityIndex.createEntity();
 
-			const result = query.query(queryRegistry);
+			const result = query.execute();
 
 			expect(result).toEqual([]);
 		});
@@ -108,7 +108,7 @@ describe('createQuery function', () => {
 
 			// eid3: Nothing (should not match)
 
-			const result = query.query(queryRegistry);
+			const result = query.execute();
 
 			expect(result).toEqual([eid1]);
 		});
@@ -123,7 +123,7 @@ describe('createQuery function', () => {
 			const eid = entityIndex.createEntity();
 			componentRegistry.addComponent(eid, Position, { x: 10, y: 20 });
 
-			const result = query.evaluate(queryRegistry, eid);
+			const result = query.evaluate(eid);
 
 			expect(result).toBe(true);
 		});
@@ -136,24 +136,9 @@ describe('createQuery function', () => {
 			const eid = entityIndex.createEntity();
 			// No Position component added
 
-			const result = query.evaluate(queryRegistry, eid);
+			const result = query.evaluate(eid);
 
 			expect(result).toBe(false);
-		});
-	});
-
-	describe('getHash', () => {
-		it('should return filter hash', () => {
-			const Position = { x: [] as number[], y: [] as number[] };
-			const filter = With(Position);
-
-			const query = createQuery(queryRegistry, filter);
-
-			const hash = query.getHash(queryRegistry);
-
-			expect(typeof hash).toBe('string');
-			expect(hash.length).toBeGreaterThan(0);
-			expect(hash).toBe(filter.getHash(queryRegistry));
 		});
 	});
 

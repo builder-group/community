@@ -251,22 +251,22 @@ describe('createQueryRegistry', () => {
 		it('should create and cache query data', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const queryData = queryRegistry.getQuery(With(Position));
+			const query = queryRegistry.getQuery(With(Position));
 
-			expect(queryData.filter.type).toBe('With');
-			expect(typeof queryData.hash).toBe('string');
-			expect(queryData.hash.length).toBeGreaterThan(0);
-			expect(Array.isArray(queryData.cachedResult)).toBe(true);
-			expect(typeof queryData.isDirty).toBe('boolean');
+			expect(query.filter.type).toBe('With');
+			expect(typeof query.key).toBe('string');
+			expect(query.key.length).toBeGreaterThan(0);
+			expect(Array.isArray(query.cachedResult)).toBe(true);
+			expect(typeof query.isDirty).toBe('boolean');
 		});
 
 		it('should return same cached query for identical filters', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const queryData1 = queryRegistry.getQuery(With(Position));
-			const queryData2 = queryRegistry.getQuery(With(Position));
+			const query1 = queryRegistry.getQuery(With(Position));
+			const query2 = queryRegistry.getQuery(With(Position));
 
-			expect(queryData1).toBe(queryData2);
+			expect(query1).toBe(query2);
 			expect(queryRegistry._queryCache.size).toBe(1);
 		});
 
@@ -301,11 +301,11 @@ describe('createQueryRegistry', () => {
 			const Health = [] as number[];
 
 			// Force individual strategy
-			const queryData = queryRegistry.getQuery(And(With(Position), With(Health)), {
+			const query = queryRegistry.getQuery(And(With(Position), With(Health)), {
 				evaluationStrategy: 'individual'
 			});
 
-			expect(queryData.evaluationStrategy).toBe('individual');
+			expect(query.evaluationStrategy).toBe('individual');
 		});
 
 		it('should auto-register components', () => {
@@ -324,10 +324,10 @@ describe('createQueryRegistry', () => {
 		it('should be an alias for getQuery', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const queryData1 = queryRegistry.registerQuery(With(Position));
-			const queryData2 = queryRegistry.getQuery(With(Position));
+			const query1 = queryRegistry.registerQuery(With(Position));
+			const query2 = queryRegistry.getQuery(With(Position));
 
-			expect(queryData1).toBe(queryData2);
+			expect(query1).toBe(query2);
 		});
 	});
 
@@ -340,8 +340,8 @@ describe('createQueryRegistry', () => {
 			componentRegistry.addComponent(eid, Position);
 			componentRegistry.addComponent(eid, Health);
 
-			const queryData = queryRegistry.getQuery(And(With(Position), With(Health)));
-			const result = queryRegistry.checkEntity(queryData, eid);
+			const query = queryRegistry.getQuery(And(With(Position), With(Health)));
+			const result = queryRegistry.checkEntity(query, eid);
 
 			expect(result).toBe(true);
 		});
@@ -354,8 +354,8 @@ describe('createQueryRegistry', () => {
 			componentRegistry.addComponent(eid, Position);
 			// Missing Health component
 
-			const queryData = queryRegistry.getQuery(And(With(Position), With(Health)));
-			const result = queryRegistry.checkEntity(queryData, eid);
+			const query = queryRegistry.getQuery(And(With(Position), With(Health)));
+			const result = queryRegistry.checkEntity(query, eid);
 
 			expect(result).toBe(false);
 		});
@@ -363,8 +363,8 @@ describe('createQueryRegistry', () => {
 		it('should handle non-existent entities', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
-			const queryData = queryRegistry.getQuery(With(Position));
-			const result = queryRegistry.checkEntity(queryData, 999);
+			const query = queryRegistry.getQuery(With(Position));
+			const result = queryRegistry.checkEntity(query, 999);
 
 			expect(result).toBe(false);
 		});
@@ -395,8 +395,8 @@ describe('createQueryRegistry', () => {
 			queryRegistry.reset();
 
 			// Should work normally after reset
-			const queryData = queryRegistry.getQuery(With(Position));
-			expect(queryData.filter.type).toBe('With');
+			const query = queryRegistry.getQuery(With(Position));
+			expect(query.filter.type).toBe('With');
 			expect(queryRegistry._queryCache.size).toBe(1);
 		});
 	});
