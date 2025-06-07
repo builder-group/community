@@ -133,12 +133,12 @@ export function createApp<
 				return this._componentRegistry.markChanged(eid, component);
 			},
 
-			queryEntities(filter, options) {
-				return this._queryRegistry.queryEntities(filter, options);
+			queryEntities(queryOrFilter, options) {
+				return this._queryRegistry.queryEntities(queryOrFilter, options);
 			},
 
-			queryComponents(components, filter) {
-				return this._queryRegistry.queryComponents(components, filter);
+			queryComponents(components, queryOrFilter) {
+				return this._queryRegistry.queryComponents(components, queryOrFilter);
 			},
 
 			addSystem(
