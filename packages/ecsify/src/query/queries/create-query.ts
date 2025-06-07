@@ -11,16 +11,18 @@ export function createQuery(
 ): TQuery {
 	const {
 		evaluationStrategy = categorizeEvaluationStrategy(filter),
-		hash = filter.getHash(queryRegistry)
+		hash = filter.getHash(queryRegistry),
+		register = true
 	} = options;
 
-	return {
+	const query: TQuery = {
 		filter,
 		evaluationStrategy,
 		hash,
 		cachedResult: [],
 		isDirty: true,
 		generations: [],
+
 		register(queryRegistry, parentType) {
 			this.filter.register?.(queryRegistry, this, parentType);
 		},
@@ -49,11 +51,19 @@ export function createQuery(
 			this.isDirty = true;
 		}
 	};
+
+	// Register query if requested
+	if (register) {
+		queryRegistry.registerQuery(query);
+	}
+
+	return query;
 }
 
 export interface TCreateQueryOptions {
 	evaluationStrategy?: TQueryData['evaluationStrategy'];
 	hash?: TQueryData['hash'];
+	register?: boolean;
 }
 
 export interface TQuery extends TQueryData {

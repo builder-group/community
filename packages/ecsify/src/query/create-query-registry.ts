@@ -46,22 +46,23 @@ export function createQueryRegistry(
 
 		queryComponents<GComponents extends readonly (TComponentRef | TEntity)[]>(
 			components: GComponents,
-			filter?: TQueryFilter
+			queryOrFilter?: TQueryFilter | TQuery
 		): TComponentDataTuple<GComponents>[] {
 			// Query entities matching the provided filter,
 			// or infer a filter from the given components if none is provided
-			const matchingEntities = filter
-				? this.queryEntities(filter)
-				: this.queryEntities(
-						And(
-							...components.reduce((acc, val) => {
-								if (val !== Entity) {
-									acc.push(With(val));
-								}
-								return acc;
-							}, [] as TQueryFilter[])
-						)
-					);
+			const matchingEntities =
+				queryOrFilter != null
+					? this.queryEntities(queryOrFilter)
+					: this.queryEntities(
+							And(
+								...components.reduce((acc, val) => {
+									if (val !== Entity) {
+										acc.push(With(val));
+									}
+									return acc;
+								}, [] as TQueryFilter[])
+							)
+						);
 
 			// For each entity, check if it has all components and get their data
 			const results: TComponentDataTuple<GComponents>[] = [];
@@ -136,7 +137,8 @@ export function createQueryRegistry(
 			const query = isQuery(queryOrFilter)
 				? queryOrFilter
 				: createQuery(this, queryOrFilter, {
-						evaluationStrategy
+						evaluationStrategy,
+						register: false // Will be registered below
 					});
 
 			// Let query register itself
@@ -176,11 +178,11 @@ export interface TQueryRegistry {
 	 */
 	queryComponents<GComponents extends readonly (TComponentRef | TEntity)[]>(
 		components: GComponents,
-		filter?: TQueryFilter
+		queryOrFilter: TQueryFilter | TQuery
 	): TComponentDataTuple<GComponents>[];
 
 	/**
-	 * Gets or creates a compiled query
+	 * Gets or creates a compiled query.
 	 */
 	getQuery(filter: TQueryFilter, options?: TRegisterQueryOptions): TQuery;
 
@@ -190,12 +192,12 @@ export interface TQueryRegistry {
 	registerQuery(queryOrFilter: TQueryFilter | TQuery, options?: TRegisterQueryOptions): TQuery;
 
 	/**
-	 * Checks if an entity matches a query
+	 * Checks if an entity matches a query.
 	 */
 	checkEntity(query: TQuery, eid: TEntityId): boolean;
 
 	/**
-	 * Resets the query registry to its initial state
+	 * Resets the query registry to its initial state.
 	 */
 	reset(): void;
 }

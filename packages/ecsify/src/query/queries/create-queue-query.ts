@@ -13,7 +13,7 @@ export function createQueueQuery(
 	filter: TQueryData['filter'],
 	options: TCreateQueueQueryOptions = {}
 ): TQueueQuery {
-	const { maxQueueSize = 10, ...reactiveQueryOptions } = options;
+	const { maxQueueSize = 5, ...reactiveQueryOptions } = options;
 
 	const queueQuery: TQueueQuery = {
 		...createReactiveQuery(queryRegistry, filter, reactiveQueryOptions),
@@ -75,7 +75,7 @@ export function createQueueQuery(
 }
 
 export interface TCreateQueueQueryOptions extends TCreateReactiveQueryOptions {
-	/** Maximum number of entity sets to keep in queue (default: 10) */
+	/** Maximum number of entity sets to keep in queue (default: 5) */
 	maxQueueSize?: number;
 }
 

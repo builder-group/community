@@ -10,6 +10,7 @@ import {
 	TComponentDataTuple,
 	TEntity,
 	TExecuteQueryOptions,
+	TQuery,
 	TQueryFilter,
 	TQueryRegistry
 } from '../../query';
@@ -38,7 +39,7 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	r: GAppContext['resources'];
 
 	/**
-	 * Add a plugin to the app
+	 * Add a plugin to the app.
 	 * @param plugin - The plugin to add
 	 * @returns The new app with the plugin added
 	 */
@@ -47,7 +48,7 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	): TApp<TAppContext<[GNewPlugin, ...TPluginsFromAppContext<GAppContext>]>>;
 
 	/**
-	 * Add multiple plugins to the app
+	 * Add multiple plugins to the app.
 	 * @param plugins - The plugins to add
 	 * @returns The new app with the plugins added
 	 */
@@ -144,7 +145,7 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	 * );
 	 * ```
 	 */
-	queryEntities(filter: TQueryFilter, options?: TExecuteQueryOptions): TEntityId[];
+	queryEntities(queryOrFilter: TQueryFilter | TQuery, options?: TExecuteQueryOptions): TEntityId[];
 
 	/**
 	 * Queries components and returns matching entities with component data.
@@ -165,7 +166,7 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	 */
 	queryComponents<T extends readonly (TComponentRef | TEntity)[]>(
 		components: T,
-		filter?: TQueryFilter
+		queryOrFilter: TQueryFilter | TQuery
 	): TComponentDataTuple<T>[];
 
 	/**
@@ -185,14 +186,14 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	): void;
 
 	/**
-	 * Read all events of a specific type without consuming them
+	 * Read all events of a specific type without consuming them.
 	 */
 	readEvent<GType extends keyof GAppContext['events']>(
 		type: GType
 	): TEvent<GAppContext['events'][GType]>[];
 
 	/**
-	 * Read and consume all events of a specific type
+	 * Read and consume all events of a specific type.
 	 */
 	consumeEvent<GType extends keyof GAppContext['events']>(
 		type: GType
