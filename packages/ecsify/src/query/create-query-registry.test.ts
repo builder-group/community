@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { createComponentRegistry, TComponentRegistry } from '../component';
 import { createEntityIndex, TEntityIndex } from '../entity';
 import { createQueryRegistry, TQueryRegistry } from './create-query-registry';
-import { Added, And, Changed, Or, Removed, With, Without } from './query-filters';
+import { And, Or, With, Without } from './query-filters';
 import { Entity } from './types';
 
 describe('createQueryRegistry', () => {
@@ -328,53 +328,6 @@ describe('createQueryRegistry', () => {
 			const queryData2 = queryRegistry.getQuery(With(Position));
 
 			expect(queryData1).toBe(queryData2);
-		});
-	});
-
-	describe('generateQueryHash', () => {
-		it('should generate string hashes', () => {
-			const Position = { x: [] as number[], y: [] as number[] };
-
-			const hash = queryRegistry.generateQueryHash(With(Position));
-
-			expect(typeof hash).toBe('string');
-			expect(hash.length).toBeGreaterThan(0);
-		});
-
-		it('should generate same hash for identical filters', () => {
-			const Position = { x: [] as number[], y: [] as number[] };
-
-			const hash1 = queryRegistry.generateQueryHash(With(Position));
-			const hash2 = queryRegistry.generateQueryHash(With(Position));
-
-			expect(hash1).toBe(hash2);
-		});
-
-		it('should generate different hashes for different filters', () => {
-			const Position = { x: [] as number[], y: [] as number[] };
-			const Health = [] as number[];
-
-			const withHash = queryRegistry.generateQueryHash(With(Position));
-			const withoutHash = queryRegistry.generateQueryHash(Without(Position));
-			const addedHash = queryRegistry.generateQueryHash(Added(Position));
-			const changedHash = queryRegistry.generateQueryHash(Changed(Position));
-			const removedHash = queryRegistry.generateQueryHash(Removed(Position));
-			const healthHash = queryRegistry.generateQueryHash(With(Health));
-
-			const hashes = [withHash, withoutHash, addedHash, changedHash, removedHash, healthHash];
-			const uniqueHashes = new Set(hashes);
-			expect(uniqueHashes.size).toBe(hashes.length);
-		});
-
-		it('should handle component order consistently', () => {
-			const Position = { x: [] as number[], y: [] as number[] };
-			const Velocity = { x: [] as number[], y: [] as number[] };
-
-			// Order shouldn't matter due to sorting in And
-			const hash1 = queryRegistry.generateQueryHash(And(With(Position), With(Velocity)));
-			const hash2 = queryRegistry.generateQueryHash(And(With(Velocity), With(Position)));
-
-			expect(hash1).toBe(hash2);
 		});
 	});
 

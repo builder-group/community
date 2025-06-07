@@ -1,6 +1,6 @@
 import { TComponentRef, TComponentRegistry } from '../component';
 import { TEntityId, TEntityIndex } from '../entity';
-import { createQuery, isQuery, TQuery } from './create-query';
+import { createQuery, isQuery, TQuery } from './queries';
 import { And, TQueryFilter, With } from './query-filters';
 import { Entity, TEntity, TQueryComponentValue } from './types';
 
@@ -41,7 +41,7 @@ export function createQueryRegistry(
 			const matchingEntities: TEntityId[] = [];
 			for (let i = 0; i < this._entityIndex._aliveCount; i++) {
 				const eid = this._entityIndex._dense[i];
-				if (eid != null && query.filter.evaluate(this, eid, query)) {
+				if (eid != null && query.evaluate(this, eid)) {
 					matchingEntities.push(eid);
 				}
 			}
@@ -145,26 +145,20 @@ export function createQueryRegistry(
 			const query = isQuery(queryOrFilter)
 				? queryOrFilter
 				: createQuery(this, queryOrFilter, {
-						hash: queryOrFilter.getHash(this),
 						evaluationStrategy
 					});
 
-			// Let filter register
-			if (query.filter.register != null) {
-				query.filter.register(this, query);
-			}
+			// Let query register itself
+			query.register(this);
 
 			// Cache the query
 			this._queryCache.set(query.hash, query);
+
 			return query;
 		},
 
-		generateQueryHash(filter) {
-			return filter.getHash(this);
-		},
-
 		checkEntity(query, eid) {
-			return query.filter.evaluate(this, eid, query);
+			return query.evaluate(this, eid);
 		},
 
 		reset() {
@@ -203,11 +197,6 @@ export interface TQueryRegistry {
 	 * Registers a query.
 	 */
 	registerQuery(queryOrFilter: TQueryFilter | TQuery, options?: TRegisterQueryOptions): TQuery;
-
-	/**
-	 * Generates a hash for a query filter
-	 */
-	generateQueryHash(filter: TQueryFilter): string;
 
 	/**
 	 * Checks if an entity matches a query

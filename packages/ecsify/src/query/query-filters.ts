@@ -1,8 +1,7 @@
 import { TComponentRef } from '../component';
 import { TEntityId } from '../entity';
-import { TQuery } from './create-query';
 import { TQueryRegistry } from './create-query-registry';
-import { isReactiveQuery } from './create-reactive-query';
+import { TQuery } from './queries';
 
 // =============================================================================
 // Query Filters
@@ -32,16 +31,10 @@ export function With<T extends TComponentRef>(component: T): TQueryFilter {
 		register(queryRegistry, query, parentType): void {
 			// Register callbacks to invalidate this query when components are added/removed
 			queryRegistry._componentRegistry.onComponentAdd(component, () => {
-				query.isDirty = true;
-				if (isReactiveQuery(query)) {
-					query._callbacks.forEach((callback) => callback());
-				}
+				query.markDirty();
 			});
 			queryRegistry._componentRegistry.onComponentRemove(component, () => {
-				query.isDirty = true;
-				if (isReactiveQuery(query)) {
-					query._callbacks.forEach((callback) => callback());
-				}
+				query.markDirty();
 			});
 
 			// Register the component mask in the appropriate structure
@@ -79,16 +72,10 @@ export function Without<T extends TComponentRef>(component: T): TQueryFilter {
 		register(queryRegistry, query, parentType): void {
 			// Register callbacks to invalidate this query when components are added/removed
 			queryRegistry._componentRegistry.onComponentAdd(component, () => {
-				query.isDirty = true;
-				if (isReactiveQuery(query)) {
-					query._callbacks.forEach((callback) => callback());
-				}
+				query.markDirty();
 			});
 			queryRegistry._componentRegistry.onComponentRemove(component, () => {
-				query.isDirty = true;
-				if (isReactiveQuery(query)) {
-					query._callbacks.forEach((callback) => callback());
-				}
+				query.markDirty();
 			});
 
 			// Register the component mask in the appropriate structure
@@ -117,18 +104,12 @@ export function Added<T extends TComponentRef>(component: T): TQueryFilter {
 		register(queryRegistry, query, parentType): void {
 			// Register callback to invalidate this query when components are added
 			queryRegistry._componentRegistry.onComponentAdd(component, () => {
-				query.isDirty = true;
-				if (isReactiveQuery(query)) {
-					query._callbacks.forEach((callback) => callback());
-				}
+				query.markDirty();
 			});
 
 			// Register callback to invalidate when change tracking is flushed
 			queryRegistry._componentRegistry.onComponentFlush(component, () => {
-				query.isDirty = true;
-				if (isReactiveQuery(query)) {
-					query._callbacks.forEach((callback) => callback());
-				}
+				query.markDirty();
 			});
 
 			// Register the component mask in the appropriate structure
@@ -157,18 +138,12 @@ export function Changed<T extends TComponentRef>(component: T): TQueryFilter {
 		register(queryRegistry, query, parentType): void {
 			// Register callback to invalidate this query when components are changed
 			queryRegistry._componentRegistry.onComponentChange(component, () => {
-				query.isDirty = true;
-				if (isReactiveQuery(query)) {
-					query._callbacks.forEach((callback) => callback());
-				}
+				query.markDirty();
 			});
 
 			// Register callback to invalidate when change tracking is flushed
 			queryRegistry._componentRegistry.onComponentFlush(component, () => {
-				query.isDirty = true;
-				if (isReactiveQuery(query)) {
-					query._callbacks.forEach((callback) => callback());
-				}
+				query.markDirty();
 			});
 
 			// Register the component mask in the appropriate structure
@@ -197,18 +172,12 @@ export function Removed<T extends TComponentRef>(component: T): TQueryFilter {
 		register(queryRegistry, query, parentType): void {
 			// Register callback to invalidate this query when components are removed
 			queryRegistry._componentRegistry.onComponentRemove(component, () => {
-				query.isDirty = true;
-				if (isReactiveQuery(query)) {
-					query._callbacks.forEach((callback) => callback());
-				}
+				query.markDirty();
 			});
 
 			// Register callback to invalidate when change tracking is flushed
 			queryRegistry._componentRegistry.onComponentFlush(component, () => {
-				query.isDirty = true;
-				if (isReactiveQuery(query)) {
-					query._callbacks.forEach((callback) => callback());
-				}
+				query.markDirty();
 			});
 
 			// Register the component mask in the appropriate structure
@@ -438,7 +407,7 @@ function registerComponentMask(
 	query: TQuery,
 	component: TComponentRef,
 	maskType: 'with' | 'without' | 'added' | 'changed' | 'removed',
-	parentType: TQueryParentType = 'And'
+	parentType: TQueryFilterParentType = 'And'
 ): void {
 	const registry = queryRegistry._componentRegistry;
 	const componentData = registry._componentMap.get(component);
@@ -488,7 +457,11 @@ function registerComponentMask(
 export interface TBaseQueryFilter {
 	type: string;
 	evaluate(queryRegistry: TQueryRegistry, eid: TEntityId, query: TQuery): boolean;
-	register?(queryRegistry: TQueryRegistry, query: TQuery, parentType?: TQueryParentType): void;
+	register?(
+		queryRegistry: TQueryRegistry,
+		query: TQuery,
+		parentType?: TQueryFilterParentType
+	): void;
 	getHash(queryRegistry: TQueryRegistry): string;
 }
 
@@ -501,4 +474,4 @@ export type TQueryFilter =
 	| (TBaseQueryFilter & { type: 'And'; filters: TQueryFilter[] })
 	| (TBaseQueryFilter & { type: 'Or'; filters: TQueryFilter[] });
 
-export type TQueryParentType = Extract<TQueryFilter['type'], 'And' | 'Or'>;
+export type TQueryFilterParentType = Extract<TQueryFilter['type'], 'And' | 'Or'>;
