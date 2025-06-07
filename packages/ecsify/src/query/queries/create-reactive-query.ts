@@ -1,35 +1,15 @@
-import { categorizeEvaluationStrategy } from '../categorize-evaluation-strategy';
 import { TQueryRegistry } from '../create-query-registry';
 import { TQueryData } from '../types';
-import { isQuery, TCreateQueryOptions, TQuery } from './create-query';
+import { createQuery, isQuery, TCreateQueryOptions, TQuery } from './create-query';
 
 export function createReactiveQuery(
 	queryRegistry: TQueryRegistry,
 	filter: TQueryData['filter'],
 	options: TCreateReactiveQueryOptions = {}
 ): TReactiveQuery {
-	const {
-		evaluationStrategy = categorizeEvaluationStrategy(filter),
-		hash = filter.getHash(queryRegistry)
-	} = options;
-
 	return {
-		filter,
-		evaluationStrategy,
-		hash,
-		cachedResult: [],
-		isDirty: true,
-		generations: [],
+		...createQuery(queryRegistry, filter, options),
 		_callbacks: [],
-		evaluate(queryRegistry, eid) {
-			return this.filter.evaluate(queryRegistry, eid, this);
-		},
-		register(queryRegistry, parentType) {
-			this.filter.register?.(queryRegistry, this, parentType);
-		},
-		getHash(queryRegistry) {
-			return this.filter.getHash(queryRegistry);
-		},
 		markDirty() {
 			this.isDirty = true;
 			for (const callback of this._callbacks) {

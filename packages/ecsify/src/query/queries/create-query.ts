@@ -21,11 +21,26 @@ export function createQuery(
 		cachedResult: [],
 		isDirty: true,
 		generations: [],
-		evaluate(queryRegistry, eid) {
-			return this.filter.evaluate(queryRegistry, eid, this);
-		},
 		register(queryRegistry, parentType) {
 			this.filter.register?.(queryRegistry, this, parentType);
+		},
+		query(queryRegistry) {
+			// Find matching entities
+			// Dense iteration with O(1) bitmask checks - simple and cache-friendly
+			// If this becomes slow: consider archetype system (group entities by component signature)?
+			// https://www.youtube.com/watch?v=71RSWVyOMEY
+			const matchingEntities: TEntityId[] = [];
+			for (let i = 0; i < queryRegistry._entityIndex._aliveCount; i++) {
+				const eid = queryRegistry._entityIndex._dense[i];
+				if (eid != null && this.filter.evaluate(queryRegistry, eid, this)) {
+					matchingEntities.push(eid);
+				}
+			}
+
+			return matchingEntities;
+		},
+		evaluate(queryRegistry, eid) {
+			return this.filter.evaluate(queryRegistry, eid, this);
 		},
 		getHash(queryRegistry) {
 			return this.filter.getHash(queryRegistry);
@@ -42,8 +57,9 @@ export interface TCreateQueryOptions {
 }
 
 export interface TQuery extends TQueryData {
-	evaluate(queryRegistry: TQueryRegistry, eid: TEntityId): boolean;
 	register(queryRegistry: TQueryRegistry, parentType?: TQueryFilterParentType): void;
+	query(queryRegistry: TQueryRegistry): TEntityId[];
+	evaluate(queryRegistry: TQueryRegistry, eid: TEntityId): boolean;
 	getHash(queryRegistry: TQueryRegistry): string;
 	markDirty(): void;
 }

@@ -35,16 +35,7 @@ export function createQueryRegistry(
 			}
 
 			// Find matching entities
-			// Dense iteration with O(1) bitmask checks - simple and cache-friendly
-			// If this becomes slow: consider archetype system (group entities by component signature)?
-			// https://www.youtube.com/watch?v=71RSWVyOMEY
-			const matchingEntities: TEntityId[] = [];
-			for (let i = 0; i < this._entityIndex._aliveCount; i++) {
-				const eid = this._entityIndex._dense[i];
-				if (eid != null && query.evaluate(this, eid)) {
-					matchingEntities.push(eid);
-				}
-			}
+			const matchingEntities = query.query(this);
 
 			// Cache results
 			query.cachedResult = matchingEntities;
