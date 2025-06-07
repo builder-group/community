@@ -103,7 +103,6 @@ describe('createReactiveQuery function', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
 			const reactiveQuery = createReactiveQuery(queryRegistry, With(Position));
-			reactiveQuery.register(queryRegistry); // Register with component callbacks
 
 			const dirtyCallback = vi.fn();
 			reactiveQuery.onDirty(dirtyCallback);
