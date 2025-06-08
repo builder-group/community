@@ -1,5 +1,5 @@
 import { TComponentRegistry } from '../../component';
-import { TEntityId } from '../../entity';
+import { TEntityId, TEntityIndex } from '../../entity';
 import { categorizeEvaluationStrategy } from '../categorize-evaluation-strategy';
 import { TQueryRegistry } from '../create-query-registry';
 import { TQueryFilterParentType } from '../query-filters';
@@ -18,6 +18,7 @@ export function createQuery(
 
 	const query: TQuery = {
 		_componentRegistry: queryRegistry._componentRegistry,
+		_entityIndex: queryRegistry._entityIndex,
 		filter,
 		evaluationStrategy,
 		key,
@@ -34,8 +35,8 @@ export function createQuery(
 			// If this becomes slow: consider archetype system (group entities by component signature)?
 			// https://www.youtube.com/watch?v=71RSWVyOMEY
 			const matchingEntities: TEntityId[] = [];
-			for (let i = 0; i < queryRegistry._entityIndex._aliveCount; i++) {
-				const eid = queryRegistry._entityIndex._dense[i];
+			for (let i = 0; i < this._entityIndex._aliveCount; i++) {
+				const eid = this._entityIndex._dense[i];
 				if (eid != null && this.filter.evaluate(this, eid)) {
 					matchingEntities.push(eid);
 				}
@@ -67,6 +68,7 @@ export interface TCreateQueryOptions {
 
 export interface TQuery extends TQueryData {
 	_componentRegistry: TComponentRegistry;
+	_entityIndex: TEntityIndex;
 	register(parentType?: TQueryFilterParentType): void;
 	execute(): TEntityId[];
 	evaluate(eid: TEntityId): boolean;

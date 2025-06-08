@@ -3,6 +3,14 @@ import { TQueryRegistry } from '../create-query-registry';
 import { TQueryData } from '../types';
 import { createQuery, isQuery, TCreateQueryOptions, TQuery } from './create-query';
 
+/**
+ * Creates a reactive query that notifies callbacks when it becomes dirty.
+ *
+ * @param queryRegistry - The query registry to use
+ * @param filter - The query filter
+ * @param options - Configuration options
+ * @returns A reactive query instance
+ */
 export function createReactiveQuery(
 	queryRegistry: TQueryRegistry,
 	filter: TQueryData['filter'],
