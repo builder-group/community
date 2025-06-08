@@ -60,6 +60,44 @@ export function createRetainedQuery(
 				this._syncFromRegistry();
 			},
 
+			// TODO: Improve swapping component registry masks feels dirty
+			execute() {
+				// Temporarily swap component registry masks with our retained masks
+				const originalAdded = this._componentRegistry._addedMasks;
+				const originalChanged = this._componentRegistry._changedMasks;
+				const originalRemoved = this._componentRegistry._removedMasks;
+
+				this._componentRegistry._addedMasks = this._addedMasks;
+				this._componentRegistry._changedMasks = this._changedMasks;
+				this._componentRegistry._removedMasks = this._removedMasks;
+
+				// Find matching entities
+				const matchingEntities: TEntityId[] = [];
+				for (let i = 0; i < this._entityIndex._aliveCount; i++) {
+					const eid = this._entityIndex._dense[i];
+					if (eid != null && this.filter.evaluate(this, eid)) {
+						matchingEntities.push(eid);
+					}
+				}
+
+				// Restore original masks
+				this._componentRegistry._addedMasks = originalAdded;
+				this._componentRegistry._changedMasks = originalChanged;
+				this._componentRegistry._removedMasks = originalRemoved;
+
+				// Reset state
+				switch (this._resetBehavior) {
+					case 'reset':
+						this.reset();
+						break;
+					case 'sync':
+						this.resetAndSync();
+						break;
+				}
+
+				return matchingEntities;
+			},
+
 			_registerComponentFilters(filter) {
 				switch (filter.type) {
 					case 'Added': {
@@ -125,44 +163,6 @@ export function createRetainedQuery(
 				if (targetGenMask != null) {
 					targetGenMask[eid] = currentMask | bitflag;
 				}
-			},
-
-			// TODO: Improve swapping component registry masks feels dirty
-			execute() {
-				// Temporarily swap component registry masks with our retained masks
-				const originalAdded = this._componentRegistry._addedMasks;
-				const originalChanged = this._componentRegistry._changedMasks;
-				const originalRemoved = this._componentRegistry._removedMasks;
-
-				this._componentRegistry._addedMasks = this._addedMasks;
-				this._componentRegistry._changedMasks = this._changedMasks;
-				this._componentRegistry._removedMasks = this._removedMasks;
-
-				// Find matching entities
-				const matchingEntities: TEntityId[] = [];
-				for (let i = 0; i < this._entityIndex._aliveCount; i++) {
-					const eid = this._entityIndex._dense[i];
-					if (eid != null && this.filter.evaluate(this, eid)) {
-						matchingEntities.push(eid);
-					}
-				}
-
-				// Restore original masks
-				this._componentRegistry._addedMasks = originalAdded;
-				this._componentRegistry._changedMasks = originalChanged;
-				this._componentRegistry._removedMasks = originalRemoved;
-
-				// Reset state
-				switch (this._resetBehavior) {
-					case 'reset':
-						this.reset();
-						break;
-					case 'sync':
-						this.resetAndSync();
-						break;
-				}
-
-				return matchingEntities;
 			},
 
 			_syncFromRegistry() {
