@@ -1,8 +1,8 @@
 {
-	"name": "@blgc/utils",
-	"version": "0.0.55",
+	"name": "webito",
+	"version": "0.0.2",
 	"private": false,
-	"description": "Straightforward, typesafe, and tree-shakable collection of utility functions",
+	"description": "A flexible, typesafe, and performance-focused Web Editor powered by an Entity Component System (ECS)",
 	"keywords": [],
 	"homepage": "https://builder.group/?source=package-json",
 	"bugs": {
@@ -33,6 +33,9 @@
 		"start:dev": "tsc -w",
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest"
+	},
+	"dependencies": {
+		"ecsify": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",

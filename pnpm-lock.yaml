@@ -762,6 +762,22 @@ importers:
         specifier: ^3.25.46
         version: 3.25.46
 
+  packages/webito:
+    dependencies:
+      ecsify:
+        specifier: workspace:*
+        version: link:../ecsify
+    devDependencies:
+      '@blgc/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/node':
+        specifier: ^22.15.29
+        version: 22.15.29
+      rollup-presets:
+        specifier: workspace:*
+        version: link:../rollup-presets
+
   packages/xml-tokenizer:
     devDependencies:
       '@blgc/config':
