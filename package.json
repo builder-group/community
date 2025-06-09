@@ -3,7 +3,7 @@
 	"private": true,
 	"description": "Community libraries maintained by builder.group",
 	"keywords": [],
-	"homepage": "https://builder.group/?source=github",
+	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
 	},

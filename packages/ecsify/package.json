@@ -4,7 +4,7 @@
 	"private": false,
 	"description": "A flexible, typesafe, and performance-focused Entity Component System (ECS) library for TypeScript.",
 	"keywords": [],
-	"homepage": "https://builder.group/?source=github",
+	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
 	},

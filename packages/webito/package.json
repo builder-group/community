@@ -4,7 +4,7 @@
 	"private": false,
 	"description": "A flexible, typesafe, and performance-focused Web Editor powered by an Entity Component System (ECS)",
 	"keywords": [],
-	"homepage": "https://builder.group/?source=package-json",
+	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
 	},

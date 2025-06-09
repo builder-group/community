@@ -4,7 +4,7 @@
 	"private": false,
 	"description": "Straightforward, typesafe, and tree-shakable collection of utility functions",
 	"keywords": [],
-	"homepage": "https://builder.group/?source=package-json",
+	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
 	},

@@ -47,7 +47,7 @@ The structure of the `package.json` file in this project should adhere to a spec
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
 	},
-	"homepage": "https://builder.group/?source=github",
+	"homepage": "https://builder.group/?utm_source=package-json",
 	"dependencies": {
 		// Project dependencies here
 	},

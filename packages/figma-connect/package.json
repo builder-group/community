@@ -4,7 +4,7 @@
 	"private": false,
 	"description": "Straightforward and typesafe wrapper around the communication between the app/ui (iframe) and plugin (sandbox) part of a Figma Plugin",
 	"keywords": [],
-	"homepage": "https://builder.group/?source=package-json",
+	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
 	},
