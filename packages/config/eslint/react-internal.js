@@ -15,8 +15,8 @@ module.exports = [
 		languageOptions: {
 			...pluginReact.configs.flat.recommended.languageOptions,
 			globals: {
-				...globals.serviceworker,
-				...globals.browser
+				...cleanGlobals(globals.serviceworker),
+				...cleanGlobals(globals.browser)
 			}
 		}
 	},
@@ -31,3 +31,12 @@ module.exports = [
 		}
 	}
 ];
+
+/**
+ * Clean globals object by trimming whitespace from keys.
+ *
+ * Fixes: Global "AudioWorkletGlobalScope " has leading or trailing whitespace.
+ */
+function cleanGlobals(globalsObj) {
+	return Object.fromEntries(Object.entries(globalsObj).map(([key, value]) => [key.trim(), value]));
+}
