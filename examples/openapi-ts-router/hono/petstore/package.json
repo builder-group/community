@@ -6,15 +6,15 @@
 		"openapi:generate": "npx openapi-typescript ./resources/openapi-v1.yaml -o ./src/gen/v1.ts"
 	},
 	"dependencies": {
-		"@hono/node-server": "^1.13.7",
-		"@hono/zod-validator": "^0.4.2",
-		"hono": "^4.6.15",
+		"@hono/node-server": "^1.14.4",
+		"@hono/zod-validator": "^0.7.0",
+		"hono": "^4.7.11",
 		"openapi-ts-router": "workspace:*",
 		"validation-adapters": "workspace:*",
-		"zod": "^3.24.1"
+		"zod": "^3.25.56"
 	},
 	"devDependencies": {
-		"@types/node": "^22.10.3",
-		"tsx": "^4.19.2"
+		"@types/node": "^22.15.30",
+		"tsx": "^4.19.4"
 	}
 }

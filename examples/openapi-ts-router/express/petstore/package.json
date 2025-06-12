@@ -13,17 +13,17 @@
 		"openapi:generate": "npx openapi-typescript ./resources/openapi-v1.yaml -o ./src/gen/v1.ts"
 	},
 	"dependencies": {
-		"express": "^4.21.2",
+		"express": "^5.1.0",
 		"openapi-ts-router": "workspace:*",
-		"valibot": "1.0.0-beta.12",
+		"valibot": "1.1.0",
 		"validation-adapters": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/express": "^5.0.0",
-		"@types/node": "^22.10.7",
-		"nodemon": "^3.1.9",
-		"openapi-typescript": "^7.5.2",
+		"@types/express": "^5.0.3",
+		"@types/node": "^22.15.30",
+		"nodemon": "^3.1.10",
+		"openapi-typescript": "^7.8.0",
 		"ts-node": "^10.9.2",
 		"tsconfig-paths": "^4.2.0"
 	}
