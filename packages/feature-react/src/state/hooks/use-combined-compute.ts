@@ -134,7 +134,7 @@ export function useCombinedCompute<
 				TState<V5, F5>
 			]
 		).map((state, index) =>
-			state.listen(({ background, value }) => updateValue(index, value, background), {
+			state.subscribe(({ background, value }) => updateValue(index, value, background), {
 				key: `use-combined-compute-${index}`,
 				...listenerOptions
 			})

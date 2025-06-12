@@ -1,5 +1,5 @@
 import { TFeatureDefinition } from '@blgc/types/features';
-import type { TListenerOptions, TState } from 'feature-state';
+import { type TListenerOptions, type TState } from 'feature-state';
 import React from 'react';
 
 export function useCompute<GValue, GFeatures extends TFeatureDefinition[], GComputed>(
@@ -14,7 +14,10 @@ export function useCompute<GValue, GFeatures extends TFeatureDefinition[], GComp
 	const lastComputedRef = React.useRef<GComputed>(compute(state._v));
 
 	React.useEffect(() => {
-		const unbind = state.listen(
+		// Use subscribe to ensure lastComputedRef is updated when useEffect re-runs on component re-renders,
+		// even if the state value hasn't changed since the last subscription
+		// but the state instance might have changed.
+		const unbind = state.subscribe(
 			({ background, value }) => {
 				const newComputed = compute(value);
 
