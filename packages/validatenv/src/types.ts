@@ -4,7 +4,7 @@ export type TEnvData = Record<string, any>;
 
 export type TEnvMiddleware<GValue> = (value: string | undefined) => GValue | undefined;
 
-export type TDefaultValueFn<GValue> = (env: NodeJS.ProcessEnv) => GValue | undefined;
+export type TDefaultValueFn<GValue> = (env?: NodeJS.ProcessEnv) => GValue | undefined;
 
 export type TEnvSpec<GValue> = {
 	/**

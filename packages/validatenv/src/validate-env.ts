@@ -32,10 +32,7 @@ export function validateEnv<GEnvData extends TEnvData>(
 	return result as GEnvData;
 }
 
-export function validateEnvVar<GValue>(
-	spec: TEnvSpec<GValue>,
-	env: NodeJS.ProcessEnv = process.env
-): GValue {
+export function validateEnvVar<GValue>(spec: TEnvSpec<GValue>, env?: NodeJS.ProcessEnv): GValue {
 	const result = processEnvVar(spec, env);
 	if (!result.success) {
 		throw new Error(`Environment validation failed: ${result.error}`);
@@ -45,10 +42,18 @@ export function validateEnvVar<GValue>(
 
 function processEnvVar<GValue>(
 	spec: TEnvSpec<GValue>,
-	env: NodeJS.ProcessEnv
+	env?: NodeJS.ProcessEnv
 ): { success: true; value: GValue } | { success: false; error: string } {
 	const { validator, defaultValue, middlewares = [], description, example, envKey } = spec;
-	let value: unknown = spec.value ?? env[String(envKey)];
+
+	let value: unknown;
+	if (spec.value != null) {
+		value = spec.value;
+	} else if (env != null && envKey != null) {
+		value = env[envKey];
+	} else {
+		value = undefined;
+	}
 
 	// Apply middlewares if any
 	if (middlewares.length > 0) {
