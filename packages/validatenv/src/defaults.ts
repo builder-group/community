@@ -2,7 +2,7 @@ import { TDefaultValueFn } from './types';
 
 export function envDefault<GValue>(value: GValue, allowedEnvs: string[]): TDefaultValueFn<GValue> {
 	return (env) => {
-		if (!allowedEnvs.includes(env?.['NODE_ENV'] as string)) {
+		if (!allowedEnvs.includes(env['NODE_ENV'] as string)) {
 			return undefined;
 		}
 		return value;
@@ -37,7 +37,7 @@ export function testDefault<GValue>(value: GValue): TDefaultValueFn<GValue> {
 
 export function ciDefault<GValue>(value: GValue): TDefaultValueFn<GValue> {
 	return (env) => {
-		if (!env?.['CI']) {
+		if (!env['CI']) {
 			return undefined;
 		}
 		return value;

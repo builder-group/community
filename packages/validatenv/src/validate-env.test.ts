@@ -62,7 +62,7 @@ describe('validateEnv function', () => {
 		const result = validateEnv(env, {
 			PORT: {
 				validator: createValidator<number>([]),
-				defaultValue: (env) => (env?.['NODE_ENV'] === 'development' ? 3000 : 8080),
+				defaultValue: (env) => (env['NODE_ENV'] === 'development' ? 3000 : 8080),
 				middlewares: [numberMiddleware]
 			}
 		});

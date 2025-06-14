@@ -1,8 +1,8 @@
 import { createValidationContext, TValidationError } from 'validation-adapter';
-import { TDefaultValueFn, TEnvData, TEnvSpec, TEnvSpecs, TEnvSpecValue } from './types';
+import { TDefaultValueFn, TEnv, TEnvData, TEnvSpec, TEnvSpecs, TEnvSpecValue } from './types';
 
 export function validateEnv<GEnvData extends TEnvData>(
-	env: NodeJS.ProcessEnv,
+	env: TEnv,
 	specs: TEnvSpecs<GEnvData>
 ): GEnvData {
 	const result: Partial<GEnvData> = {};
@@ -32,7 +32,7 @@ export function validateEnv<GEnvData extends TEnvData>(
 	return result as GEnvData;
 }
 
-export function validateEnvVar<GValue>(spec: TEnvSpec<GValue>, env?: NodeJS.ProcessEnv): GValue {
+export function validateEnvVar<GValue>(spec: TEnvSpec<GValue>, env: TEnv = process.env): GValue {
 	const result = processEnvVar(spec, env);
 	if (!result.success) {
 		throw new Error(`Environment validation failed: ${result.error}`);
@@ -42,14 +42,14 @@ export function validateEnvVar<GValue>(spec: TEnvSpec<GValue>, env?: NodeJS.Proc
 
 function processEnvVar<GValue>(
 	spec: TEnvSpec<GValue>,
-	env?: NodeJS.ProcessEnv
+	env: TEnv
 ): { success: true; value: GValue } | { success: false; error: string } {
 	const { validator, defaultValue, middlewares = [], description, example, envKey } = spec;
 
 	let value: unknown;
 	if (spec.value != null) {
 		value = spec.value;
-	} else if (env != null && envKey != null) {
+	} else if (envKey != null) {
 		value = env[envKey];
 	} else {
 		value = undefined;
