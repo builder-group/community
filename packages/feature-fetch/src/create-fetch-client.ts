@@ -78,6 +78,12 @@ export function createFetchClient(options: TFetchClientOptions = {}): TFetchClie
 				}
 			}
 
+			// Remove `Content-Type` if body is FormData.
+			// Browser will correctly set Content-Type & boundary expression.
+			if (typeof FormData !== 'undefined' && serializedBody instanceof FormData) {
+				mergedHeaders.delete('Content-Type');
+			}
+
 			// Build request init object
 			const requestInit: TRequestInitWithHeadersObject = {
 				redirect: 'follow',
@@ -87,12 +93,6 @@ export function createFetchClient(options: TFetchClientOptions = {}): TFetchClie
 				headers: mergedHeaders.toHeadersInit(),
 				body: serializedBody
 			};
-
-			// Remove `Content-Type` if body is FormData.
-			// Browser will correctly set Content-Type & boundary expression.
-			if (typeof FormData !== 'undefined' && requestInit.body instanceof FormData) {
-				delete requestInit.headers['Content-Type'];
-			}
 
 			// Process before request middlewares
 			try {
