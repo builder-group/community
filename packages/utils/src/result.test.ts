@@ -4,7 +4,6 @@ import { Err, mapErr, mapOk, Ok, unwrapErr, unwrapOk, type TResult } from './res
 describe('Result implementation', () => {
 	it('should create an Ok result correctly', () => {
 		const result = Ok(42);
-		expect(result._type).toBe('Ok');
 		expect(result.value).toBe(42);
 		expect(result.unwrap()).toBe(42);
 		expect(result.isOk()).toBe(true);
@@ -13,7 +12,6 @@ describe('Result implementation', () => {
 
 	it('should create an Err result correctly', () => {
 		const result = Err('Some error');
-		expect(result._type).toBe('Err');
 		expect(result.error).toBe('Some error');
 		expect(() => result.unwrap()).toThrowError();
 		expect(result.isOk()).toBe(false);

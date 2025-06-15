@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { serializeBody } from './index';
+import { serializeBody } from './serialize-body';
 
 describe('serializeBody function', () => {
 	it('should return FormData instance as is', () => {

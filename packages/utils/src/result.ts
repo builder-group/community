@@ -1,5 +1,4 @@
 export interface TOkResult<T, E> {
-	_type: 'Ok';
 	value: T;
 	unwrap: () => T;
 	isOk: () => this is TOkResult<T, E>;
@@ -7,7 +6,6 @@ export interface TOkResult<T, E> {
 }
 
 export interface TErrResult<T, E> {
-	_type: 'Err';
 	error: E;
 	unwrap: () => T;
 	isOk: () => this is TOkResult<T, E>;
@@ -19,7 +17,6 @@ export type TResult<T, E> = TOkResult<T, E> | TErrResult<T, E>;
 // Factory function for creating an Ok result
 export function Ok<T, E>(value: T): TOkResult<T, E> {
 	return {
-		_type: 'Ok',
 		value,
 		unwrap() {
 			return value;
@@ -38,7 +35,6 @@ export function Ok<T, E>(value: T): TOkResult<T, E> {
 // Factory function for creating an Err result
 export function Err<T, E>(error: E): TErrResult<T, E> {
 	return {
-		_type: 'Err',
 		error,
 		unwrap() {
 			if (error instanceof Error) {
@@ -109,28 +105,24 @@ export function unwrapOr<T, E>(result: TResult<T, E>, defaultValue: T): T {
 
 // Convert a server result to a Result type
 export function fromServerResult<T, E>(result: TServerResult<T, E>): TResult<T, E> {
-	return result._type === 'Ok' ? Ok(result.value) : Err(result.error);
+	return 'value' in result ? Ok(result.value) : Err(result.error);
 }
 
 // Convert a Result type to a server result format
 export function toServerResult<T, E>(result: TResult<T, E>): TServerResult<T, E> {
 	return result.isOk()
 		? {
-				_type: 'Ok',
 				value: result.value
 			}
 		: {
-				_type: 'Err',
 				error: result.error
 			};
 }
 
 export type TServerResult<T, E> =
 	| {
-			_type: 'Ok';
 			value: T;
 	  }
 	| {
-			_type: 'Err';
 			error: E;
 	  };

@@ -1,23 +1,48 @@
 import { type DocumentNode } from '@0no-co/graphql.web';
-import { type TParseAs } from '../fetch';
-import type { TFetchOptions, TFetchResponse } from '../fetch-client';
+import { TResult } from '@blgc/utils';
+import type { TFetchOptions, TFetchResponse, TFetchResponseError } from '../fetch-client';
 
 export interface TGraphQLFeature {
 	key: 'graphql';
 	api: {
 		query: TGraphQLQuery;
+		queryRaw: TGraphQLQueryRaw;
 	};
 }
 
 export type TGraphQLQuery = <
+	GSuccessResponseBody extends Record<string, any>,
+	GVariables extends Record<string, any>,
+	GErrorResponseBody = unknown
+>(
+	query: TDocumentInput<GSuccessResponseBody, GVariables>,
+	options: TGraphQLQueryOptions<GVariables>
+) => Promise<TGraphQLFetchResponse<GSuccessResponseBody, GErrorResponseBody>>;
+
+export type TGraphQLQueryRaw = <
 	GSucessResponseBody extends Record<string, any>,
 	GVariables extends Record<string, any>,
-	GErrorResponseBody = unknown,
-	GParseAs extends TParseAs = 'json'
+	GErrorResponseBody = unknown
 >(
 	query: TDocumentInput<GSucessResponseBody, GVariables>,
-	options: TFetchOptions<GParseAs> & { variables?: GVariables }
-) => Promise<TFetchResponse<TGraphQLResponse<GSucessResponseBody>, GErrorResponseBody, GParseAs>>;
+	options: TGraphQLQueryOptions<GVariables>
+) => Promise<TFetchResponse<TGraphQLResponse<GSucessResponseBody>, GErrorResponseBody, 'json'>>;
+
+export interface TGraphQLQueryOptions<GVariables extends Record<string, any>>
+	extends Omit<TFetchOptions<'json'>, 'parseAs'> {
+	variables?: GVariables;
+}
+
+export type TGraphQLFetchResponse<GSuccessResponseBody, GErrorResponseBody> = TResult<
+	TGraphQLFetchResponseSuccess<GSuccessResponseBody>,
+	TFetchResponseError<GErrorResponseBody>
+>;
+
+export interface TGraphQLFetchResponseSuccess<GSuccessResponseBody> {
+	data: GSuccessResponseBody;
+	extensions?: Record<string, any>;
+	response: Response;
+}
 
 /**
  * Standard GraphQL response structure
