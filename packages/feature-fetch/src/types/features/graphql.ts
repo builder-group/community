@@ -17,7 +17,31 @@ export type TGraphQLQuery = <
 >(
 	query: TDocumentInput<GSucessResponseBody, GVariables>,
 	options: TFetchOptions<GParseAs> & { variables?: GVariables }
-) => Promise<TFetchResponse<GSucessResponseBody, GErrorResponseBody, GParseAs>>;
+) => Promise<TFetchResponse<TGraphQLResponse<GSucessResponseBody>, GErrorResponseBody, GParseAs>>;
+
+/**
+ * Standard GraphQL response structure
+ * @see https://spec.graphql.org/October2021/#sec-Response
+ */
+export interface TGraphQLResponse<GData = unknown> {
+	data?: GData | null;
+	errors?: TGraphQLError[];
+	extensions?: Record<string, any>;
+}
+
+/**
+ * Standard GraphQL error structure
+ * @see https://spec.graphql.org/October2021/#sec-Errors
+ */
+export interface TGraphQLError {
+	message: string;
+	locations?: Array<{
+		line: number;
+		column: number;
+	}>;
+	path?: Array<string | number>;
+	extensions?: Record<string, any>;
+}
 
 /**
  * Any GraphQL `DocumentNode` or query string input.

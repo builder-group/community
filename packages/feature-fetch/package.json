@@ -1,6 +1,6 @@
 {
 	"name": "feature-fetch",
-	"version": "0.0.46",
+	"version": "0.0.47",
 	"private": false,
 	"description": "Straightforward, typesafe, and feature-based fetch wrapper supporting OpenAPI types",
 	"keywords": [],
