@@ -110,8 +110,7 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 							? [
 									createCrossModuleImportPlugin({
 										pkgJson,
-										format,
-										debug
+										format
 									})
 								]
 							: []),

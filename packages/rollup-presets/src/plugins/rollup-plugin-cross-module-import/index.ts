@@ -1,5 +1,4 @@
 import path from 'node:path';
-import pc from 'picocolors';
 import type { Plugin } from 'rollup';
 import type { PackageJson } from 'type-fest';
 
@@ -29,191 +28,201 @@ import type { PackageJson } from 'type-fest';
  * ```
  */
 export function createCrossModuleImportPlugin(options: TCrossModuleImportOptions): Plugin {
-	const { pkgJson, format, debug = false } = options;
-	const moduleExports = filterSubpathExports(pkgJson.exports);
+	const { pkgJson, format } = options;
+
+	// Pre-process exports
+	const moduleExports = Object.entries(pkgJson.exports ?? {}).reduce<TModuleExports>(
+		(acc, [key, config]) => {
+			if (
+				// Skip root export
+				key === '.' ||
+				// Skip package.json
+				key === './package.json' ||
+				// Skip non-relative imports
+				!key.startsWith('./')
+			) {
+				return acc;
+			}
+
+			// Validate export config
+			if (!isValidExportConfig(config)) {
+				return acc;
+			}
+
+			// Store normalized paths for faster lookup
+			const moduleName = key.replace(/^\.\//, '');
+			acc[moduleName] = {
+				source: normalizePath(config.source),
+				output: normalizePath(format === 'esm' ? config.import : config.require)
+			};
+
+			return acc;
+		},
+		{}
+	);
 
 	return {
 		name: 'cross-module-imports',
-
-		resolveId(source: string, importer: string | undefined) {
-			if (importer == null || source == null) {
+		resolveId(importPath: string, importerPath?: string): { id: string; external: true } | null {
+			if (
+				typeof importerPath !== 'string' ||
+				typeof importPath !== 'string' ||
+				// Skip virtual modules
+				importPath.startsWith('\0') ||
+				// Only handle relative imports
+				!importPath.startsWith('../')
+			) {
 				return null;
 			}
 
-			// Only handle imports that go up at least one directory (cross-module imports)
-			if (!source.startsWith('../')) {
+			// Find the modules involved in the import
+			const modules = findModules(importPath, importerPath, moduleExports);
+			if (modules == null) {
 				return null;
 			}
 
-			// Convert paths to a common format
-			const importerDir = path.dirname(importer);
-			const absoluteSource = path.resolve(importerDir, source);
-			const relativeImporter = path.relative(process.cwd(), importer);
-			const relativeSource = path.relative(process.cwd(), absoluteSource);
-
-			// Identify which modules are involved
-			const importerModule = getModuleFromPath(relativeImporter, moduleExports);
-			const targetModule = getModuleFromPath(relativeSource, moduleExports);
-
-			if (debug) {
-				console.log('\n');
-				console.log(pc.dim('=== Resolving Import ==='));
-				console.log(pc.dim(`Source: ${source}`));
-				console.log(pc.dim(`Importer: ${importer}`));
-				console.log(pc.dim(`Importer Module: ${importerModule}`));
-				console.log(pc.dim(`Target Module: ${targetModule}`));
-			}
-
-			// Only process cross-module imports
-			if (targetModule == null || importerModule === targetModule) {
+			// Calculate the final import path
+			const resolvedPath = resolveImportPath(modules);
+			if (resolvedPath == null) {
 				return null;
-			}
-
-			// Get the export config for the target module
-			const exportConfig = moduleExports[`./${targetModule}`];
-			if (exportConfig == null) {
-				return null;
-			}
-
-			// Get the appropriate output path based on format (esm/cjs)
-			const outputPath = format === 'esm' ? exportConfig.import : exportConfig.require;
-			if (outputPath == null) {
-				return null;
-			}
-
-			// Calculate how many levels deep the importing file is
-			const importerNesting = path.relative(process.cwd(), importerDir).split('/').length - 1;
-
-			// Extract the build structure (e.g., "adapter/esm" from "./dist/adapter/esm/index.js")
-			const outputParts = normalizePath(outputPath).split('/');
-			const buildPath = outputParts.slice(1, -1).join('/');
-
-			// Extract any specific path after the module name
-			const normalizedSource = normalizePath(relativeSource);
-			const normalizedExportSource = normalizePath(exportConfig.source);
-			const moduleDir = path.dirname(normalizedExportSource);
-
-			// If source is longer than the module path, it's importing a specific file
-			const specificPath = normalizedSource.startsWith(moduleDir)
-				? normalizedSource.slice(moduleDir.length)
-				: '';
-
-			const relativePath = `${'../'.repeat(importerNesting + 1)}${buildPath}${specificPath}`;
-
-			if (debug) {
-				console.log(pc.dim(`Found export config for: ${targetModule}`));
-				console.log(pc.dim(`Format: ${format}`));
-				console.log(pc.dim(`Source Path: ${exportConfig.source}`));
-				console.log(pc.dim(`Output Path: ${outputPath}`));
-				console.log(pc.dim(`Build Path: ${buildPath}`));
-				console.log(pc.dim(`Module Dir: ${moduleDir}`));
-				console.log(pc.dim(`Specific Path: ${specificPath}`));
-				console.log(pc.dim(`Importer Nesting: ${importerNesting}`));
-				console.log(pc.dim(`Final Path: ${relativePath}`));
 			}
 
 			return {
-				id: relativePath,
-				external: true // Mark as external to prevent bundling
+				id: resolvedPath,
+				external: true
 			};
 		}
 	};
 }
 
 /**
- * Validates and filters package.json exports to ensure they match our supported format:
- * ```json
- * {
- *   "./module1": {
- *     "source": "./src/module1/index.ts",
- *     "import": "./dist/module1/esm/index.js",
- *     "require": "./dist/module1/cjs/index.js"
- *   }
- * }
- * ```
- *
- * - Only accepts subpath exports (e.g., "./module1")
- * - Requires source, import, and require fields
- * - Skips special exports like "." and "./package.json"
- *
- * @throws {Error} If exports format is invalid or unsupported
+ * Type guard to validate export config structure and paths.
+ * Ensures all required fields are present and paths start with './'.
  */
-function filterSubpathExports(exports: PackageJson['exports']): TSubpathExports {
-	if (exports == null || typeof exports !== 'object') {
-		return {};
-	}
-
-	const validExports: Record<string, TSubpathExportConfig> = {};
-	for (const [key, config] of Object.entries(exports)) {
-		// Skip special exports
-		if (key === '.' || key === './package.json') {
-			continue;
-		}
-
-		// Validate export key format (must be "./something")
-		if (!key.startsWith('./')) {
-			continue;
-		}
-
-		// Validate export config
-		if (!isValidSubpathConfig(config)) {
-			continue;
-		}
-
-		validExports[key] = config;
-	}
-
-	return validExports;
-}
-
-/**
- * Type guard to validate export config matches our required format.
- * @returns true if config has all required fields with correct format
- */
-function isValidSubpathConfig(config: unknown): config is TSubpathExportConfig {
-	if (config == null || typeof config !== 'object') {
-		return false;
-	}
-
-	const { source, import: esm, require: cjs } = config as Record<string, unknown>;
+function isValidExportConfig(config: unknown): config is TExportConfig {
 	return (
-		typeof source === 'string' &&
-		typeof esm === 'string' &&
-		typeof cjs === 'string' &&
-		source.startsWith('./') &&
-		esm.startsWith('./') &&
-		cjs.startsWith('./')
+		config != null &&
+		typeof config === 'object' &&
+		'source' in config &&
+		'import' in config &&
+		'require' in config &&
+		typeof config.source === 'string' &&
+		typeof config.import === 'string' &&
+		typeof config.require === 'string' &&
+		config.source.startsWith('./') &&
+		config.import.startsWith('./') &&
+		config.require.startsWith('./')
 	);
 }
 
 /**
- * Extracts module name from a file path by matching against exports config.
- * @example
- * // With exports: { './module1': { source: './src/module1/index.ts' } }
- * getModuleFromPath('src/module1/nested/file.ts') => 'module1'
- */
-function getModuleFromPath(filePath: string, exports: TSubpathExports): string | null {
-	const normalizedPath = normalizePath(filePath);
-
-	for (const [exportKey, config] of Object.entries(exports)) {
-		const sourcePath = normalizePath(config.source);
-		const sourceDir = path.dirname(sourcePath);
-
-		if (normalizedPath.startsWith(sourceDir)) {
-			return exportKey.replace(/^\.\//, '');
-		}
-	}
-	return null;
-}
-
-/**
- * Normalizes file paths for consistent comparison.
- * - Removes leading './' if present
- * - Converts Windows backslashes to forward slashes
- * - Preserves relative paths (e.g., '../')
+ * Normalizes a path by removing leading './' and converting backslashes to forward slashes.
  */
 function normalizePath(p: string): string {
 	return p.replace(/^\.\//, '').replace(/\\/g, '/');
+}
+
+/**
+ * Finds the target and importer modules involved in an import.
+ * Returns null if either module cannot be found.
+ */
+function findModules(
+	importPath: string,
+	importerPath: string,
+	exports: TModuleExports
+): TModuleMatch | null {
+	// Convert paths to absolute for comparison
+	const importerDir = path.dirname(importerPath);
+	const absoluteSource = path.resolve(importerDir, importPath);
+	const relativeSource = path.relative(process.cwd(), absoluteSource);
+	const normalizedSource = normalizePath(relativeSource);
+
+	// Find target module (the one being imported)
+	const targetModule = Object.entries(exports).find(([_, paths]) => {
+		const sourceDir = path.dirname(paths.source);
+		return normalizedSource.startsWith(sourceDir);
+	});
+
+	// Find importer module
+	const importerModule = Object.entries(exports).find(([_, paths]) => {
+		const sourceDir = path.dirname(paths.source);
+		return normalizePath(importerPath).includes(sourceDir);
+	});
+
+	if (!targetModule || !importerModule) {
+		return null;
+	}
+
+	const [targetName, targetPaths] = targetModule;
+	const [importerName, importerPaths] = importerModule;
+
+	// Calculate specific path and nesting level
+	const baseDir = path.dirname(targetPaths.source);
+	const specificPath = normalizedSource.startsWith(baseDir)
+		? normalizedSource.slice(baseDir.length)
+		: '';
+	const nesting = path.relative(process.cwd(), path.dirname(importerPath)).split('/').length - 1;
+
+	return {
+		target: {
+			name: targetName,
+			paths: targetPaths,
+			specificPath
+		},
+		importer: {
+			name: importerName,
+			paths: importerPaths,
+			nesting
+		}
+	};
+}
+
+/**
+ * Extracts the output format structure (everything after the module name).
+ * Example: For 'dist/adapter/esm/v2/index.js', returns '/esm/v2/index.js'
+ */
+function extractOutputFormat(outputPath: string, moduleName: string): string {
+	const parts = outputPath.split('/');
+	const moduleIndex = parts.indexOf(moduleName);
+	if (moduleIndex === -1) {
+		return '';
+	}
+	return `/${parts.slice(moduleIndex + 1).join('/')}`;
+}
+
+/**
+ * Constructs the final output path based on whether this is a module import or file import:
+ *
+ * For module imports (e.g., '../adapter'):
+ * - Uses the outputFormat as is (e.g., 'dist/adapter/esm/index.js')
+ *
+ * For file imports (e.g., '../adapter/utils'):
+ * - Replaces the last segment of outputFormat with the specific file path
+ * - Example:
+ *   outputFormat = 'dist/adapter/esm/index.js'
+ *   specificPath = '/utils'
+ *   Result = 'dist/adapter/esm/utils.js'
+ */
+function resolveImportPath(modules: TModuleMatch): string | null {
+	const { target, importer } = modules;
+	const isModuleImport = !target.specificPath || target.specificPath === '/index';
+
+	// Get output format (everything after module name)
+	const outputFormat = extractOutputFormat(target.paths.output, target.name);
+	if (outputFormat === '') {
+		return null;
+	}
+
+	// For specific files, replace the last segment
+	const outputPath = isModuleImport
+		? outputFormat
+		: outputFormat.replace(
+				/\/[^/]+$/,
+				`${target.specificPath}${path.extname(target.paths.output)}`
+			);
+
+	// Construct the final path
+	return `${'../'.repeat(importer.nesting + 1)}${target.name}${outputPath}`;
 }
 
 interface TCrossModuleImportOptions {
@@ -226,14 +235,9 @@ interface TCrossModuleImportOptions {
 	 * Current bundle format being built
 	 */
 	format: 'esm' | 'cjs';
-
-	/**
-	 * Whether to log detailed debug information
-	 */
-	debug?: boolean;
 }
 
-interface TSubpathExportConfig {
+interface TExportConfig {
 	/** Source file path (e.g., "./src/module1/index.ts") */
 	source: string;
 	/** ESM build output path (e.g., "./dist/module1/esm/index.js") */
@@ -244,4 +248,24 @@ interface TSubpathExportConfig {
 	types?: string;
 }
 
-type TSubpathExports = Record<string, TSubpathExportConfig>;
+interface TModulePaths {
+	/** Source file path (e.g., "./src/module1/index.ts") */
+	source: string;
+	/** ESM/CJS build output path (e.g., "./dist/module1/esm/index.js") */
+	output: string;
+}
+
+interface TModuleMatch {
+	target: {
+		name: string;
+		paths: TModulePaths;
+		specificPath: string;
+	};
+	importer: {
+		name: string;
+		paths: TModulePaths;
+		nesting: number;
+	};
+}
+
+type TModuleExports = Record<string, TModulePaths>;
