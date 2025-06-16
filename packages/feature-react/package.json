@@ -1,6 +1,6 @@
 {
 	"name": "feature-react",
-	"version": "0.0.53",
+	"version": "0.0.54",
 	"private": false,
 	"description": "ReactJs extension features for feature-state",
 	"keywords": [],
@@ -37,6 +37,19 @@
 			"default": "./dist/form/cjs/index.js"
 		},
 		"./package.json": "./package.json"
+	},
+	"typesVersions": {
+		"*": {
+			".": [
+				"./dist/types/state/index.d.ts"
+			],
+			"state": [
+				"./dist/types/state/index.d.ts"
+			],
+			"form": [
+				"./dist/types/form/index.d.ts"
+			]
+		}
 	},
 	"files": [
 		"dist",
