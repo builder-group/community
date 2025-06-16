@@ -1,6 +1,6 @@
 {
 	"name": "validation-adapters",
-	"version": "0.0.25",
+	"version": "0.0.27",
 	"private": false,
 	"description": "Pre-made validation adapters for the validation-adapter library, including adapters for Zod and Valibot",
 	"keywords": [],
@@ -15,47 +15,42 @@
 	"license": "MIT",
 	"author": "@bennobuilder",
 	"exports": {
+		".": {
+			"source": "./src/adapter/index.ts",
+			"types": "./dist/types/adapter/index.d.ts",
+			"import": "./dist/adapter/esm/index.js",
+			"require": "./dist/adapter/cjs/index.js",
+			"default": "./dist/adapter/cjs/index.js"
+		},
 		"./adapter": {
 			"source": "./src/adapter/index.ts",
-			"require": "./dist/adapter/cjs/index.js",
+			"types": "./dist/types/adapter/index.d.ts",
 			"import": "./dist/adapter/esm/index.js",
-			"types": "./dist/types/adapter/index.d.ts"
+			"require": "./dist/adapter/cjs/index.js",
+			"default": "./dist/adapter/cjs/index.js"
 		},
 		"./valibot": {
 			"source": "./src/valibot/index.ts",
-			"require": "./dist/valibot/cjs/index.js",
+			"types": "./dist/types/valibot/index.d.ts",
 			"import": "./dist/valibot/esm/index.js",
-			"types": "./dist/types/valibot/index.d.ts"
+			"require": "./dist/valibot/cjs/index.js",
+			"default": "./dist/valibot/cjs/index.js"
 		},
 		"./yup": {
 			"source": "./src/yup/index.ts",
-			"require": "./dist/yup/cjs/index.js",
+			"types": "./dist/types/yup/index.d.ts",
 			"import": "./dist/yup/esm/index.js",
-			"types": "./dist/types/yup/index.d.ts"
+			"require": "./dist/yup/cjs/index.js",
+			"default": "./dist/yup/cjs/index.js"
 		},
 		"./zod": {
 			"source": "./src/zod/index.ts",
-			"require": "./dist/zod/cjs/index.js",
+			"types": "./dist/types/zod/index.d.ts",
 			"import": "./dist/zod/esm/index.js",
-			"types": "./dist/types/zod/index.d.ts"
+			"require": "./dist/zod/cjs/index.js",
+			"default": "./dist/zod/cjs/index.js"
 		},
 		"./package.json": "./package.json"
-	},
-	"typesVersions": {
-		"*": {
-			"adapter": [
-				"./dist/types/adapter/index.d.ts"
-			],
-			"valibot": [
-				"./dist/types/valibot/index.d.ts"
-			],
-			"yup": [
-				"./dist/types/yup/index.d.ts"
-			],
-			"zod": [
-				"./dist/types/zod/index.d.ts"
-			]
-		}
 	},
 	"files": [
 		"dist",
@@ -85,6 +80,9 @@
 		"zod": "^3.25.56"
 	},
 	"size-limit": [
+		{
+			"path": "dist/adapter/esm/index.js"
+		},
 		{
 			"path": "dist/valibot/esm/index.js"
 		},

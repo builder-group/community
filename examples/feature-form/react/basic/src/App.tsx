@@ -10,7 +10,7 @@ import { useForm } from 'feature-react/form';
 import { useFeatureState, withGlobalBind } from 'feature-react/state';
 import React from 'react';
 import * as v from 'valibot';
-import { createValidator } from 'validation-adapters/adapter';
+import { createValidator } from 'validation-adapters';
 import { vValidator } from 'validation-adapters/valibot';
 import { zValidator } from 'validation-adapters/zod';
 import * as z from 'zod';
