@@ -1,6 +1,6 @@
 {
 	"name": "feature-react",
-	"version": "0.0.52",
+	"version": "0.0.53",
 	"private": false,
 	"description": "ReactJs extension features for feature-state",
 	"keywords": [],
@@ -15,28 +15,28 @@
 	"license": "MIT",
 	"author": "@bennobuilder",
 	"exports": {
+		".": {
+			"source": "./src/state/index.ts",
+			"types": "./dist/types/state/index.d.ts",
+			"import": "./dist/state/esm/index.js",
+			"require": "./dist/state/cjs/index.js",
+			"default": "./dist/state/cjs/index.js"
+		},
 		"./state": {
 			"source": "./src/state/index.ts",
-			"require": "./dist/state/cjs/index.js",
+			"types": "./dist/types/state/index.d.ts",
 			"import": "./dist/state/esm/index.js",
-			"types": "./dist/types/state/index.d.ts"
+			"require": "./dist/state/cjs/index.js",
+			"default": "./dist/state/cjs/index.js"
 		},
 		"./form": {
 			"source": "./src/form/index.ts",
-			"require": "./dist/form/cjs/index.js",
+			"types": "./dist/types/form/index.d.ts",
 			"import": "./dist/form/esm/index.js",
-			"types": "./dist/types/form/index.d.ts"
-		}
-	},
-	"typesVersions": {
-		"*": {
-			"state": [
-				"./dist/types/state/index.d.ts"
-			],
-			"form": [
-				"./dist/types/form/index.d.ts"
-			]
-		}
+			"require": "./dist/form/cjs/index.js",
+			"default": "./dist/form/cjs/index.js"
+		},
+		"./package.json": "./package.json"
 	},
 	"files": [
 		"dist",
