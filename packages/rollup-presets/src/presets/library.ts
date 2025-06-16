@@ -16,7 +16,7 @@ import {
 	getTsConfigPath,
 	resolvePkgJsonBundlePaths
 } from '../lib';
-import { tsPathsPlugin } from '../plugins';
+import { createCrossModuleImportPlugin, tsPathsPlugin } from '../plugins';
 
 export async function libraryPreset(options: TLibraryPresetOptions = {}): Promise<RollupOptions[]> {
 	const {
@@ -28,6 +28,7 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 		plugins: additionalPlugins = {},
 		esbuildOptions = {},
 		compilerOptions = {},
+		crossModuleImports = false,
 		onCreateConfig,
 		debug = false
 	} = options;
@@ -104,6 +105,17 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 						// Stage 1: Pre-processing
 						...(additionalPlugins.pre ?? []),
 
+						// Our path rewriting plugin (only if module mapping is enabled and needed)
+						...(pkgJson.exports != null && crossModuleImports
+							? [
+									createCrossModuleImportPlugin({
+										pkgJson,
+										format,
+										debug
+									})
+								]
+							: []),
+
 						// Marks Node.js built-in modules (node:*) as external to prevent bundling
 						// and avoid unresolved dependency warnings
 						nodeExternals(),
@@ -152,7 +164,10 @@ export async function libraryPreset(options: TLibraryPresetOptions = {}): Promis
 					if (debug) {
 						console.log(
 							pc.dim(
-								`Skipping TypeScript declaration generation for ${path.relative(process.cwd(), bundlePath.input)} in favor of tsc`
+								`Skipping TypeScript declaration generation for ${path.relative(
+									process.cwd(),
+									bundlePath.input
+								)} in favor of tsc`
 							)
 						);
 					}
@@ -279,6 +294,34 @@ export interface TLibraryPresetOptions {
 	 * Additional compiler options to pass to the TypeScript compiler
 	 */
 	compilerOptions?: ts.CompilerOptions;
+
+	/**
+	 * Whether to enable cross-module import handling.
+	 *
+	 * Resolves imports between modules in a package using package.json exports.
+	 * For example, transforms:
+	 * ```ts
+	 * // Input: src/module2/nested/index.ts
+	 * import { something } from '../../module1';
+	 * // Output: dist/module2/nested/index.js
+	 * import { something } from '../../../module1/esm';
+	 * ```
+	 *
+	 * Only needed for packages with multiple entry points that import from each other.
+	 * Uses the exports configuration to determine correct build paths:
+	 * ```json
+	 * {
+	 *   "exports": {
+	 *     "./module1": {
+	 *       "import": "./dist/module1/esm/index.js",
+	 *       "require": "./dist/module1/cjs/index.js"
+	 *     }
+	 *   }
+	 * }
+	 * ```
+	 * @default false
+	 */
+	crossModuleImports?: boolean;
 
 	/**
 	 * Callback to modify the rollup config for each bundle
