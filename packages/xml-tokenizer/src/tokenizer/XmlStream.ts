@@ -217,6 +217,32 @@ export class XmlStream {
 	}
 
 	/**
+	 * Checks if the stream starts with the given text, case-insensitive.
+	 *
+	 * @param text - The text to check for (should be uppercase).
+	 * @returns True if the stream starts with the text (case-insensitive), false otherwise.
+	 */
+	public startsWithIgnoreCase(text: string): boolean {
+		if (this._pos + text.length > this._end) {
+			return false;
+		}
+
+		for (let i = 0; i < text.length; i++) {
+			const streamChar = this._text.charCodeAt(this._pos + i);
+			const textChar = text.charCodeAt(i);
+
+			// Convert to uppercase for comparison if it's a lowercase letter
+			const streamCharUpper = streamChar >= 97 && streamChar <= 122 ? streamChar - 32 : streamChar;
+
+			if (streamCharUpper !== textChar) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Skips a specific string in the stream.
 	 *
 	 * @param text - The string to skip.

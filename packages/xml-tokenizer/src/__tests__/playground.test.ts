@@ -16,7 +16,7 @@ describe('playground', () => {
 		let html = '';
 
 		beforeAll(async () => {
-			html = await readFile(`${__dirname}/resources/kleinanzeigen.html`, 'utf-8');
+			html = await readFile(`${__dirname}/resources/linkpop.html`, 'utf-8');
 		});
 
 		it('[xml-tokenizer] shoud work', async () => {

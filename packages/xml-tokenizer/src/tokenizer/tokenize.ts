@@ -68,19 +68,15 @@ export function tokenizeXmlStream(s: XmlStream, tokenCallback: TTokenCallback): 
 
 	parseMisc(s, tokenCallback);
 
-	s.skipSpaces();
-	if (s.startsWith(DOCTYPE_START) || s.startsWith(DOCTYPE_START.toLowerCase())) {
-		if (!s.config.allowDtd) {
-			throw new XmlError({ type: 'DtdDetected' });
+	if (s.config.strictDocument) {
+		s.skipSpaces();
+		if (s.startsWithIgnoreCase(DOCTYPE_START)) {
+			parseDoctype(s, tokenCallback);
+			parseMisc(s, tokenCallback);
 		}
 
-		parseDoctype(s, tokenCallback);
-		parseMisc(s, tokenCallback);
-	}
+		s.skipSpaces();
 
-	s.skipSpaces();
-
-	if (s.config.strictDocument) {
 		if (!s.atEnd() && s.currCodeUnit() === LESS_THAN) {
 			parseElement(s, tokenCallback);
 		}
@@ -114,6 +110,8 @@ function parseMisc(s: XmlStream, tokenCallback: TTokenCallback): void {
 		s.skipSpaces();
 		if (s.startsWith(COMMENT_START)) {
 			parseComment(s, tokenCallback);
+		} else if (!s.config.strictDocument && s.startsWithIgnoreCase(DOCTYPE_START)) {
+			parseDoctype(s, tokenCallback);
 		} else if (s.startsWith(PI_START)) {
 			parsePi(s, tokenCallback);
 		} else {
@@ -222,6 +220,10 @@ function parsePi(s: XmlStream, tokenCallback: TTokenCallback): void {
  * Parses the DOCTYPE declaration.
  */
 function parseDoctype(s: XmlStream, tokenCallback: TTokenCallback): void {
+	if (!s.config.allowDtd) {
+		throw new XmlError({ type: 'DtdDetected' });
+	}
+
 	const start = s.getPos();
 	parseDoctypeStart(s);
 	s.skipSpaces();
@@ -565,6 +567,8 @@ function parseContent(
 					parseComment(s, tokenCallback);
 				} else if (s.startsWith(CDATA_START)) {
 					parseCdata(s, tokenCallback);
+				} else if (!s.config.strictDocument && s.startsWithIgnoreCase(DOCTYPE_START)) {
+					parseDoctype(s, tokenCallback);
 				} else {
 					throw new XmlError(
 						{ type: 'UnknownToken', message: 'Failed to parse content' },
