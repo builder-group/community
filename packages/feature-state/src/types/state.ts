@@ -19,7 +19,7 @@ export type TState<GValue, GFeatures extends TFeatureDefinition[]> = TWithFeatur
 		 *
 		 * @returns The current state value of type `GValue`.
 		 */
-		get: () => Readonly<GValue>;
+		get: () => GValue;
 		/**
 		 * Updates the state value.
 		 *
@@ -102,3 +102,8 @@ export interface TStateNotifyOptions<GValue> {
 }
 
 export type TStateSetOptions<GValue> = Omit<TStateNotifyOptions<GValue>, 'prevValue'>;
+
+export type TNullableStateValue<GState> =
+	NonNullable<GState> extends TState<infer GValue, any>
+		? Readonly<GValue> | (Extract<GState, null | undefined> extends never ? never : null)
+		: never;

@@ -1,19 +1,32 @@
-import { TFeatureDefinition } from '@blgc/types/features';
-import { type TListenerOptions, type TState } from 'feature-state';
+import { TNullableStateValue, type TListenerOptions, type TState } from 'feature-state';
 import React from 'react';
 
-export function useCompute<GValue, GFeatures extends TFeatureDefinition[], GComputed>(
-	state: TState<GValue, GFeatures>,
-	compute: (value: Readonly<GValue>) => GComputed,
+export function useCompute<
+	GState extends TState<any, any> | undefined | null,
+	GValue extends TNullableStateValue<GState>,
+	GComputed
+>(
+	state: GState,
+	compute: (value: GValue) => GComputed,
 	deps: React.DependencyList = [],
-	options: TUseComputeOptions<GValue, GComputed> = {}
+	options: TUseComputeOptions<any, GComputed> = {}
 ): GComputed {
 	const { isEqual = Object.is, ...listenerOptions } = options;
 	const [, forceRender] = React.useReducer((s: number) => s + 1, 0);
 
-	const lastComputedRef = React.useRef<GComputed>(compute(state._v));
+	const lastComputedRef = React.useRef<GComputed>(compute(state == null ? null : state._v));
 
 	React.useEffect(() => {
+		// If state is null/undefined, compute with null and update if needed
+		if (state == null) {
+			const newComputed = compute(null as GValue);
+			if (!isEqual(newComputed, lastComputedRef.current)) {
+				forceRender();
+			}
+			lastComputedRef.current = newComputed;
+			return;
+		}
+
 		// Use subscribe to ensure lastComputedRef is updated when useEffect re-runs on component re-renders,
 		// even if the state value hasn't changed since the last subscription
 		// but the state instance might have changed.
