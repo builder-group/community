@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { describe } from 'node:test';
 import * as camaro from 'camaro';
 import { beforeAll, expect, it } from 'vitest';
@@ -35,10 +35,10 @@ describe('playground', () => {
 			console.log(result);
 		});
 
-		it('[xml-tokenizer] should transform html to markdown', () => {
+		it('[xml-tokenizer] should transform html to markdown', async () => {
 			const markdown = htmlToMarkdown(html);
 
-			console.log({ markdown });
+			await writeFile(`${__dirname}/resources/sample.md`, markdown.string);
 		});
 	});
 
