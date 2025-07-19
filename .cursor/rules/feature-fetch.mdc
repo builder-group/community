@@ -1,0 +1,218 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Feature Fetch Patterns
+
+Core patterns and best practices for using feature-fetch, our typesafe API client library.
+
+## Core Principles
+- **Type Safety First** - Always use proper typing for requests and responses
+- **Error Handling** - Always handle errors using the Result pattern
+- **Modular Features** - Always compose clients with relevant features only
+- **Clean Architecture** - Always organize API clients in a consistent way
+
+## Implementation Guidelines
+
+### Client Creation
+- Always create clients in dedicated environment files
+- Always specify proper type parameters
+- Always configure base URL and headers appropriately
+- Always use feature composition for extended functionality
+
+✅ Good:
+```typescript
+// environment/clients/api-client.ts
+import { createApiFetchClient, withRetry, withOpenApi } from 'feature-fetch';
+import type { paths } from '../types/api';
+
+export const apiClient = withRetry(
+  createOpenApiFetchClient<paths>({
+    prefixUrl: config.apiUrl,
+    headers: {
+      'Authorization': `Bearer ${config.apiToken}`
+    }
+  }),
+  { maxRetries: 3 }
+);
+```
+
+❌ Bad:
+```typescript
+// Scattered across components
+const client = createApiFetchClient(); // Wrong: No configuration
+const client = new ApiClient(); // Wrong: Class-based approach
+const client = fetch(url); // Wrong: Raw fetch usage
+```
+
+### Error Handling
+- Always use the Result pattern with `.isOk()` and `.isErr()`
+- Always handle specific error types appropriately
+- Always provide meaningful error messages
+- Always propagate errors with proper context
+
+#### Error Types and Classes
+- **NetworkError**: For connection-level failures (timeout, DNS, offline)
+- **RequestError**: For HTTP-level failures (status codes, validation)
+- **FetchError**: Base class for all fetch-related errors
+
+✅ Good:
+```typescript
+if (response.isErr()) {
+  if (response.error instanceof NetworkError) {
+    logger.error('Network connectivity issue', { error: response.error });
+    throw new AppError('Failed to connect', { cause: response.error });
+  }
+  if (response.error instanceof RequestError) {
+    if (response.error.response?.status === 404) {
+      return Result.err(new NotFoundError(`User ${id} not found`));
+    }
+  }
+  throw response.error;
+}
+```
+
+### OpenAPI Integration
+- Always generate types from OpenAPI schemas
+- Always use strongly typed paths and responses
+- Always validate schema changes
+- Always keep generated types in sync
+
+✅ Good:
+```typescript
+// Generated type usage
+const response = await apiClient.get('/users/{userId}', {
+  pathParams: { userId: '123' }
+});
+
+if (response.isOk()) {
+  const user: TUser = response.value.data;
+  return user;
+}
+```
+
+❌ Bad:
+```typescript
+// Manual type definitions
+type User = any; // Wrong: Loose typing
+const response = await fetch('/users/123'); // Wrong: No type safety
+const data = await response.json(); // Wrong: Untyped response
+```
+
+### Feature Composition
+- Always compose features in a logical order
+- Always document feature dependencies
+- Always configure features appropriately
+- Always use only necessary features
+
+✅ Good:
+```typescript
+const apiClient = withOpenApi(
+  withRetry(
+    withAuth(
+      createApiFetchClient({
+        prefixUrl: config.apiUrl
+      })
+    ),
+    { maxRetries: 3 }
+  )
+);
+```
+
+❌ Bad:
+```typescript
+// Wrong: Inconsistent composition
+const client = withAuth(createApiFetchClient());
+const retryClient = withRetry(fetch);
+const finalClient = withOpenApi(retryClient);
+```
+
+### GraphQL Usage
+- Always use the `gql` template literal
+- Always define operation types
+- Always handle GraphQL errors properly
+- Always organize queries in dedicated files
+
+✅ Good:
+```typescript
+// queries/user.ts
+const GET_USER = gql`
+  query GetUser($id: ID!) {
+    user(id: $id) {
+      id
+      name
+      email
+    }
+  }
+`;
+
+// Usage
+const response = await graphqlClient.query<TVariables, TData>(GET_USER, {
+  variables: { id: '123' }
+});
+```
+
+❌ Bad:
+```typescript
+// Wrong: String literals
+const query = `query { user { id } }`;
+
+// Wrong: No typing
+const data = await client.query(query);
+```
+
+## Best Practices
+
+### Request Configuration
+- Always set appropriate timeouts
+- Always include necessary headers
+- Always validate request parameters
+- Always use proper HTTP methods
+
+✅ Good:
+```typescript
+const response = await apiClient.post('/orders', {
+  headers: {
+    'Idempotency-Key': generateKey()
+  },
+  body: orderData,
+  timeout: 5000
+});
+```
+
+❌ Bad:
+```typescript
+// Wrong: Missing headers and validation
+const response = await fetch('/orders', {
+  method: 'POST',
+  body: JSON.stringify(data)
+});
+```
+
+### Response Handling
+- Always check response status
+- Always parse response data safely
+- Always handle pagination properly
+- Always respect content types
+
+✅ Good:
+```typescript
+const response = await apiClient.get('/users', {
+  queryParams: { page: 1, limit: 10 }
+});
+
+if (response.isOk()) {
+  const { data, pagination } = response.value.data;
+  return { users: data, hasMore: pagination.hasNextPage };
+}
+```
+
+❌ Bad:
+```typescript
+// Wrong: Unsafe response handling
+const res = await fetch('/users');
+const data = await res.json();
+return data.users;
+```
+

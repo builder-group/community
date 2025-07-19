@@ -1,0 +1,600 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# XML Tokenizer
+
+Stream-based XML/HTML parsing patterns and best practices using the xml-tokenizer library. This library provides a callback-based tokenization approach for efficient XML/HTML processing.
+
+## Core Principles
+- **Stream Processing** - Always use callback-based streaming for memory efficiency
+- **Type Safety** - Always use TypeScript types for tokens and configurations
+- **Early Termination** - Always terminate parsing early when target data is found
+- **Error Handling** - Always handle parsing errors gracefully with meaningful messages
+
+## Import Patterns
+
+### Essential Imports
+- Always import specific functions and types you need
+- Always use the `htmlConfig` for HTML parsing
+- Always import `TXmlToken` type for token handling
+
+✅ Good:
+```typescript
+import { tokenize, htmlConfig, type TXmlToken } from 'xml-tokenizer';
+```
+
+❌ Bad:
+```typescript
+import * as xmlTokenizer from 'xml-tokenizer';  // Wrong: Avoid namespace imports
+import { tokenize } from 'xml-tokenizer';       // Wrong: Missing config and types
+```
+
+## Basic Usage Patterns
+
+### HTML Parsing
+- Always use `htmlConfig` when parsing HTML content
+- Always handle different token types in the callback
+- Always provide type-safe token handling
+
+**HTML Configuration Features:**
+- `strictDocument: false` - Allows non-strict HTML structure
+- `rawTextElements: ['script', 'style', 'title', 'textarea']` - Handles raw text content
+- `implicitSelfClosingElements: [...]` - Recognizes HTML void elements (br, img, etc.)
+- `allowDtd: true` - Allows DTD declarations
+
+✅ Good:
+```typescript
+import { htmlConfig, type TXmlToken } from 'xml-tokenizer';
+
+function parseHtml(html: string): void {
+  tokenize(
+    html,
+    (token: TXmlToken, stream) => {
+      switch (token.type) {
+        case 'ElementStart':
+          // HTML config recognizes void elements automatically
+          console.log(`Element: ${token.local}`);
+          break;
+        case 'Attribute':
+          // HTML config handles attributes without values as "true"
+          console.log(`${token.local}="${token.value}"`);
+          break;
+        case 'ElementEnd':
+          if (token.end.type === 'Empty') {
+            console.log('Self-closing element');
+          }
+          break;
+        case 'Text':
+          console.log(`Text: ${token.text}`);
+          break;
+        default:
+          break;
+      }
+    },
+    htmlConfig  // Essential for HTML parsing
+  );
+}
+```
+
+❌ Bad:
+```typescript
+function parseHtml(html: string): void {
+  tokenize(html, (token) => {  // Wrong: Missing types and config
+    if (token.type === 'ElementStart') {
+      // Handle element
+    }
+    // Wrong: No comprehensive token handling
+  });
+}
+```
+
+### XML Parsing
+- Always use `xmlConfig` for strict XML content
+- Always validate XML structure when needed
+- Always handle namespaces properly
+
+**XML Configuration Features:**
+- `strictDocument: true` - Enforces strict XML structure and validation
+- `allowDtd: true` - Allows DTD declarations
+- `rawTextElements: null` - No raw text elements (all content is parsed)
+- `implicitSelfClosingElements: null` - No implicit self-closing elements
+
+✅ Good:
+```typescript
+import { xmlConfig, type TXmlToken } from 'xml-tokenizer';
+
+function parseXml(xml: string): void {
+  tokenize(
+    xml,
+    (token: TXmlToken, stream) => {
+      switch (token.type) {
+        case 'ElementStart':
+          // XML config enforces proper namespace handling
+          const qName = token.prefix ? `${token.prefix}:${token.local}` : token.local;
+          console.log(`XML Element: ${qName}`);
+          break;
+        case 'Text':
+          if (token.text.trim()) {
+            console.log(`Text: ${token.text}`);
+          }
+          break;
+        case 'Attribute':
+          // XML config requires explicit attribute values
+          console.log(`Attribute: ${token.local}="${token.value}"`);
+          break;
+        default:
+          break;
+      }
+    },
+    xmlConfig  // Strict XML parsing
+  );
+}
+```
+
+❌ Bad:
+```typescript
+function parseXml(xml: string): void {
+  tokenize(xml, (token) => {  // Wrong: Missing types
+    console.log(token);       // Wrong: Not handling specific token types
+  }, htmlConfig);             // Wrong: Using HTML config for XML
+}
+```
+
+### SVG Parsing
+- Always use `svgConfig` for SVG content
+- Always understand SVG-specific parsing behavior
+- Always handle SVG elements and structure properly
+
+**SVG Configuration Features:**
+- `strictDocument: false` - Allows non-strict SVG structure
+- `rawTextElements: ['style']` - Handles style elements as raw text
+- `implicitSelfClosingElements: []` - No implicit self-closing elements
+- `allowDtd: true` - Allows DTD declarations
+
+✅ Good:
+```typescript
+import { svgConfig, type TXmlToken } from 'xml-tokenizer';
+
+function parseSvg(svg: string): void {
+  tokenize(
+    svg,
+    (token: TXmlToken, stream) => {
+      switch (token.type) {
+        case 'ElementStart':
+          // SVG config handles SVG-specific elements
+          console.log(`SVG Element: ${token.local}`);
+          break;
+        case 'Attribute':
+          // Handle SVG attributes (viewBox, d, etc.)
+          console.log(`SVG Attribute: ${token.local}="${token.value}"`);
+          break;
+        case 'Text':
+          if (token.text.trim()) {
+            console.log(`SVG Text: ${token.text}`);
+          }
+          break;
+        default:
+          break;
+      }
+    },
+    svgConfig  // SVG-specific parsing
+  );
+}
+```
+
+❌ Bad:
+```typescript
+function parseSvg(svg: string): void {
+  tokenize(svg, (token) => {
+    // Parse logic
+  });  // Wrong: No config specified, may not handle SVG properly
+}
+```
+
+## Advanced Patterns
+
+### Stream Control
+- Always use `stream.goToEnd()` to terminate parsing early
+- Always use stream control for performance optimization
+- Always check stream state before continuing
+
+✅ Good:
+```typescript
+function findSpecificData(html: string): string | null {
+  let foundData: string | null = null;
+  
+  tokenize(
+    html,
+    (token: TXmlToken, stream) => {
+      if (token.type === 'Attribute' && token.local === 'data-target') {
+        foundData = token.value;
+        stream.goToEnd(); // Stop processing immediately
+      }
+    },
+    htmlConfig
+  );
+  
+  return foundData;
+}
+```
+
+❌ Bad:
+```typescript
+function findSpecificData(html: string): string | null {
+  let foundData: string | null = null;
+  
+  tokenize(html, (token) => {
+    if (token.type === 'Attribute' && token.local === 'data-target') {
+      foundData = token.value;
+      // Wrong: Continue processing unnecessarily
+    }
+  }, htmlConfig);
+  
+  return foundData;
+}
+```
+
+### State Management
+- Always maintain parsing state outside the callback
+- Always use clear state tracking for complex parsing
+- Always reset state appropriately
+
+✅ Good:
+```typescript
+function parseMetaTags(html: string): Record<string, string> {
+  const metaTags: Record<string, string> = {};
+  let isInMetaTag = false;
+  let currentAttributes: Record<string, string> = {};
+
+  tokenize(
+    html,
+    (token: TXmlToken, stream) => {
+      switch (token.type) {
+        case 'ElementStart':
+          if (token.local.toLowerCase() === 'meta') {
+            isInMetaTag = true;
+            currentAttributes = {};
+          }
+          break;
+
+        case 'Attribute':
+          if (isInMetaTag) {
+            currentAttributes[token.local] = token.value;
+          }
+          break;
+
+        case 'ElementEnd':
+          if (isInMetaTag) {
+            const name = currentAttributes.name;
+            const content = currentAttributes.content;
+            if (name && content) {
+              metaTags[name] = content;
+            }
+            isInMetaTag = false;
+            currentAttributes = {};
+          }
+          break;
+
+        default:
+          break;
+      }
+    },
+    htmlConfig
+  );
+
+  return metaTags;
+}
+```
+
+❌ Bad:
+```typescript
+function parseMetaTags(html: string): Record<string, string> {
+  const metaTags: Record<string, string> = {};
+  
+  tokenize(html, (token) => {  // Wrong: Missing types and complex state logic
+    if (token.type === 'ElementStart' && token.local === 'meta') {
+      // Wrong: No state management for attributes
+    }
+  }, htmlConfig);
+  
+  return metaTags;
+}
+```
+
+## Error Handling
+
+### Parsing Errors
+- Always wrap tokenization in try-catch blocks
+- Always provide meaningful error messages
+- Always log parsing errors for debugging
+
+✅ Good:
+```typescript
+function safeParseHtml(html: string): TParseResult {
+  try {
+    const result = extractDataFromHtml(html);
+    return { success: true, data: result };
+  } catch (error) {
+    logger.error('Failed to parse HTML', { error });
+    return { 
+      success: false, 
+      error: 'Could not parse HTML content' 
+    };
+  }
+}
+
+function extractDataFromHtml(html: string): TExtractedData {
+  let data: TExtractedData | null = null;
+  
+  tokenize(
+    html,
+    (token: TXmlToken, stream) => {
+      // Parse logic here
+    },
+    htmlConfig
+  );
+  
+  if (data == null) {
+    throw new Error('Required data not found in HTML');
+  }
+  
+  return data;
+}
+```
+
+❌ Bad:
+```typescript
+function parseHtml(html: string): TParseResult {
+  let data: TExtractedData | null = null;
+  
+  tokenize(html, (token) => {  // Wrong: No error handling
+    // Parse logic
+  }, htmlConfig);
+  
+  return data;  // Wrong: Could return null without handling
+}
+```
+
+## Performance Optimization
+
+### Memory Efficiency
+- Always use streaming approach for large documents
+- Always avoid storing unnecessary token data
+- Always terminate parsing when target data is found
+
+✅ Good:
+```typescript
+function findFirstMatch(html: string, targetAttribute: string): string | null {
+  let result: string | null = null;
+  
+  tokenize(
+    html,
+    (token: TXmlToken, stream) => {
+      if (token.type === 'Attribute' && token.local === targetAttribute) {
+        result = token.value;
+        stream.goToEnd(); // Immediately stop processing
+      }
+    },
+    htmlConfig
+  );
+  
+  return result;
+}
+```
+
+❌ Bad:
+```typescript
+function findAllMatches(html: string, targetAttribute: string): string[] {
+  const results: string[] = [];
+  
+  tokenize(html, (token) => {
+    if (token.type === 'Attribute' && token.local === targetAttribute) {
+      results.push(token.value);
+      // Wrong: Continue processing even if only first match needed
+    }
+  }, htmlConfig);
+  
+  return results.slice(0, 1); // Wrong: Process everything then filter
+}
+```
+
+## Common Token Types
+
+### Element Tokens
+- Always handle `ElementStart` for opening tags
+- Always handle `ElementEnd` for closing tags and self-closing tags
+- Always check `ElementEnd.end.type` for different closing patterns
+
+✅ Good:
+```typescript
+function handleElementTokens(token: TXmlToken): void {
+  switch (token.type) {
+    case 'ElementStart':
+      console.log(`Opening tag: <${token.local}>`);
+      break;
+      
+    case 'ElementEnd':
+      if (token.end.type === 'Empty') {
+        console.log('Self-closing tag');
+      } else if (token.end.type === 'Close') {
+        console.log(`Closing tag: </${token.end.local}>`);
+      } else if (token.end.type === 'Open') {
+        console.log('Tag opened for content');
+      }
+      break;
+      
+    default:
+      break;
+  }
+}
+```
+
+❌ Bad:
+```typescript
+function handleElementTokens(token: TXmlToken): void {
+  if (token.type === 'ElementStart') {
+    console.log(token.local);  // Wrong: Not comprehensive handling
+  }
+  // Wrong: Missing ElementEnd handling
+}
+```
+
+### Attribute Tokens
+- Always access attribute name via `token.local`
+- Always access attribute value via `token.value`
+- Always handle attribute prefixes when needed
+
+✅ Good:
+```typescript
+function handleAttribute(token: TXmlToken): void {
+  if (token.type === 'Attribute') {
+    const fullName = token.prefix 
+      ? `${token.prefix}:${token.local}` 
+      : token.local;
+    console.log(`Attribute: ${fullName}="${token.value}"`);
+  }
+}
+```
+
+❌ Bad:
+```typescript
+function handleAttribute(token: TXmlToken): void {
+  if (token.type === 'Attribute') {
+    console.log(`${token.local}=${token.value}`);  // Wrong: Missing quotes and prefix handling
+  }
+}
+```
+
+## Custom Configuration
+
+### Creating Custom Configurations
+- Always create custom configurations for specific parsing needs
+- Always use proper TypeScript typing with `TXmlStreamOptions`
+- Always document custom configuration choices
+
+✅ Good:
+```typescript
+import { type TXmlStreamOptions, tokenize, type TXmlToken } from 'xml-tokenizer';
+
+// Custom configuration for specific parsing needs
+const customConfig: TXmlStreamOptions = {
+  strictDocument: false,
+  allowDtd: false,  // Disable DTD for security
+  rawTextElements: ['script', 'style', 'pre'],
+  implicitSelfClosingElements: ['br', 'hr', 'img'],
+  contextSliceSize: 50  // Larger context for debugging
+};
+
+function parseWithCustomConfig(content: string): void {
+  tokenize(
+    content,
+    (token: TXmlToken, stream) => {
+      // Handle parsing with custom configuration
+    },
+    customConfig
+  );
+}
+```
+
+❌ Bad:
+```typescript
+// Wrong: Hardcoded configuration without explanation
+function parseContent(content: string): void {
+  tokenize(content, (token) => {
+    // Parse logic
+  }, {
+    strictDocument: false,  // Wrong: No explanation of why
+    allowDtd: true,
+    rawTextElements: null,
+    implicitSelfClosingElements: null,
+    contextSliceSize: 30
+  });
+}
+```
+
+### Configuration Selection by Content Type
+- Always choose the appropriate configuration for your content type
+- Always provide fallback configurations for unknown content types
+- Always document configuration selection logic
+
+✅ Good:
+```typescript
+import { htmlConfig, xmlConfig, svgConfig, type TXmlStreamOptions } from 'xml-tokenizer';
+
+function parseByContentType(content: string, contentType: string): void {
+  let config: TXmlStreamOptions;
+  
+  switch (contentType) {
+    case 'text/html':
+      config = htmlConfig;
+      break;
+    case 'application/xml':
+    case 'text/xml':
+      config = xmlConfig;
+      break;
+    case 'image/svg+xml':
+      config = svgConfig;
+      break;
+    default:
+      config = htmlConfig;  // Default to HTML config
+      break;
+  }
+  
+  tokenize(content, (token: TXmlToken, stream) => {
+    // Handle parsing
+  }, config);
+}
+```
+
+❌ Bad:
+```typescript
+function parseContent(content: string, contentType: string): void {
+  // Wrong: Always using same config regardless of content type
+  tokenize(content, (token) => {
+    // Parse logic
+  }, htmlConfig);
+}
+```
+
+## Debugging
+
+### Debug Logging
+- Always log parsing errors with context
+- Always save problematic HTML/XML for debugging
+- Always include relevant metadata in error logs
+
+✅ Good:
+```typescript
+function parseWithDebug(html: string): TParseResult {
+  try {
+    return parseHtml(html);
+  } catch (error) {
+    logger.error('XML parsing failed', { 
+      error: error.message,
+      htmlLength: html.length,
+      htmlPreview: html.substring(0, 200)
+    });
+    
+    // Save debug file if needed
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const debugFile = `/tmp/parse-debug-${timestamp}.html`;
+    fs.writeFileSync(debugFile, html);
+    
+    throw new Error('Failed to parse HTML content');
+  }
+}
+```
+
+❌ Bad:
+```typescript
+function parseWithDebug(html: string): TParseResult {
+  try {
+    return parseHtml(html);
+  } catch (error) {
+    console.log('Error:', error);  // Wrong: Minimal error info
+    throw error;                   // Wrong: Re-throw without context
+  }
+}
+```

@@ -1,5 +1,6 @@
 export * from './config';
 export * from './get-q-name';
+export * from './html-to-md';
 export * from './processor';
 export * from './selector';
 export * from './token-to-xml';
@@ -7,3 +8,4 @@ export * from './tokenizer';
 export * from './tokens-to-xml';
 export * from './xml-to-object';
 export * from './xml-to-simplified-object';
+export * from './xml-to-string';

@@ -19,7 +19,7 @@ export function xmlToObject(xmlString: string, options: TXmlStreamOptions = {}):
 	return root.content[0] as TXmlNode;
 }
 
-export function processTokenForObject(token: TXmlToken, stack: TXmlNode[]): void {
+function processTokenForObject(token: TXmlToken, stack: TXmlNode[]): void {
 	switch (token.type) {
 		case 'ElementStart': {
 			const newNode: TXmlNode = {

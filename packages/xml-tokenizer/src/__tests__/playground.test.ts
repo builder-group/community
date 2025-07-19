@@ -3,6 +3,7 @@ import { describe } from 'node:test';
 import * as camaro from 'camaro';
 import { beforeAll, expect, it } from 'vitest';
 import { htmlConfig } from '../config';
+import { htmlToMarkdown } from '../html-to-md';
 import { select } from '../selector';
 import { tokenToXml } from '../token-to-xml';
 import { xmlToSimplifiedObject } from '../xml-to-simplified-object';
@@ -16,13 +17,28 @@ describe('playground', () => {
 		let html = '';
 
 		beforeAll(async () => {
-			html = await readFile(`${__dirname}/resources/linkpop.html`, 'utf-8');
+			html = await readFile(`${__dirname}/resources/sample.html`, 'utf-8');
 		});
 
 		it('[xml-tokenizer] shoud work', async () => {
 			const result = await xmlToSimplifiedObject(html, htmlConfig);
 
 			console.log(result);
+		});
+
+		it('[xml-tokenizer] should work with fetched html', async () => {
+			const response = await fetch('https://www.reddit.com');
+			const html = await response.text();
+
+			const result = await xmlToSimplifiedObject(html, htmlConfig);
+
+			console.log(result);
+		});
+
+		it('[xml-tokenizer] should transform html to markdown', () => {
+			const markdown = htmlToMarkdown(html);
+
+			console.log({ markdown });
 		});
 	});
 
