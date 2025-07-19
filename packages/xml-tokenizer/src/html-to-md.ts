@@ -22,10 +22,16 @@ export function htmlToMarkdown(
 	html: string,
 	options: THtmlToMarkdownOptions = {}
 ): TXmlStringNode & { string: string } {
-	const { xmlOptions = htmlConfig, transformers, ...rest } = options;
+	const {
+		xmlOptions = htmlConfig,
+		transformers,
+		skipNodes = DEFAULT_SKIP_NODES,
+		...rest
+	} = options;
 
 	return xmlToString(html, {
 		xmlOptions,
+		skipNodes,
 		transformers: {
 			h1: (node, stack) => {
 				const content = normalizeWhitespace(getXmlStringNodeContent(node));
@@ -258,3 +264,18 @@ const BLOCK_ELEMENTS = new Set([
 ]);
 
 const INLINE_ELEMENTS = new Set(['strong', 'b', 'em', 'i', 'a', 'code', 'br']);
+
+const DEFAULT_SKIP_NODES = [
+	'script',
+	'style',
+	'meta',
+	'link',
+	'noscript',
+	'iframe',
+	'object',
+	'embed',
+	'param',
+	'base',
+	'title',
+	'head'
+];

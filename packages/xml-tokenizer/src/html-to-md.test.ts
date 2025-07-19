@@ -55,4 +55,17 @@ describe('htmlToMarkdown', () => {
 		const result = htmlToMarkdown(html);
 		expect(result.string).toBe('');
 	});
+
+	it('should skip default nodes like script and style', () => {
+		const html =
+			'<h1>Title</h1><script>alert("test")</script><p>Content</p><style>.test { color: red; }</style>';
+		const result = htmlToMarkdown(html);
+		expect(result.string).toBe('# Title\n\nContent');
+	});
+
+	it('should allow custom skip nodes', () => {
+		const html = '<h1>Title</h1><div>Content</div><p>More</p>';
+		const result = htmlToMarkdown(html, { skipNodes: ['div'] });
+		expect(result.string).toBe('# Title\n\nMore');
+	});
 });
