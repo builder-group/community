@@ -1,4 +1,4 @@
-import { getQueue } from './queue';
+import { createQueue, getQueue } from './queue';
 import type { TListener, TListenerContext, TState } from './types';
 
 export const SET_SOURCE_KEY = 'state_set';
@@ -8,9 +8,11 @@ export function createState<GValue>(
 	options: TCreateStateOptions = {}
 ): TState<GValue, []> {
 	const { queue: queueName = 'async' } = options;
-	const queue = getQueue(queueName);
+
+	let queue = getQueue(queueName);
 	if (queue == null) {
-		throw new Error(`Queue "${queueName}" not found`);
+		// Auto-create any queue - sync if named 'sync', otherwise async
+		queue = createQueue(queueName, { sync: queueName === 'sync' });
 	}
 
 	return {
@@ -90,7 +92,7 @@ export function createState<GValue>(
 }
 
 interface TCreateStateOptions {
-	queue?: string;
+	queue?: 'sync' | 'async' | string;
 }
 
 export enum EStateListenerQueuePriority {

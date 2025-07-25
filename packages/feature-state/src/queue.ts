@@ -1,13 +1,11 @@
 import { ListenerQueue } from './ListenerQueue';
 
-const GLOBAL_STATE_QUEUES = new Map<string, ListenerQueue>();
+export const GLOBAL_STATE_QUEUES = new Map<string, ListenerQueue>();
 
-// Initialize default queues
-GLOBAL_STATE_QUEUES.set('async', new ListenerQueue(false));
-GLOBAL_STATE_QUEUES.set('sync', new ListenerQueue(true));
-
-export function createQueue(name: string, options: { sync: boolean }): void {
-	GLOBAL_STATE_QUEUES.set(name, new ListenerQueue(options.sync));
+export function createQueue(name: string, options: { sync: boolean }): ListenerQueue {
+	const queue = new ListenerQueue(options.sync);
+	GLOBAL_STATE_QUEUES.set(name, queue);
+	return queue;
 }
 
 export function getQueue(name: string): ListenerQueue | undefined {
