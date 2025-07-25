@@ -1,10 +1,12 @@
 import { TWithFeatures, type TFeatureDefinition } from '@blgc/types/features';
 import { type TNestedPath } from '@blgc/utils';
+import type { ListenerQueue } from '../ListenerQueue';
 
 export type TState<GValue, GFeatures extends TFeatureDefinition[]> = TWithFeatures<
 	{
 		_v: GValue;
 		_listeners: TListener<GValue>[];
+		_queue: ListenerQueue;
 		/**
 		 * Triggers all registered listeners to run with the current state value.
 		 */

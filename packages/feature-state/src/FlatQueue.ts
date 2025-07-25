@@ -1,13 +1,13 @@
 // Based on: https://github.com/mourner/flatqueue/blob/main/index.js
 // Could not use the original package because it doesn't support CommonJs.
 export class FlatQueue<GItem> {
-	private ids: Array<GItem | undefined>;
-	private values: Array<number>;
+	private _ids: Array<GItem | undefined>;
+	private _values: Array<number>;
 	private _length: number;
 
 	constructor() {
-		this.ids = [];
-		this.values = [];
+		this._ids = [];
+		this._values = [];
 		this._length = 0;
 	}
 
@@ -30,17 +30,17 @@ export class FlatQueue<GItem> {
 
 		while (pos > 0) {
 			const parent = (pos - 1) >> 1;
-			const parentValue = this.values[parent] as number;
+			const parentValue = this._values[parent] as number;
 			if (priority >= parentValue) {
 				break;
 			}
-			this.ids[pos] = this.ids[parent];
-			this.values[pos] = parentValue;
+			this._ids[pos] = this._ids[parent];
+			this._values[pos] = parentValue;
 			pos = parent;
 		}
 
-		this.ids[pos] = id;
-		this.values[pos] = priority;
+		this._ids[pos] = id;
+		this._values[pos] = priority;
 	}
 
 	/**
@@ -53,14 +53,14 @@ export class FlatQueue<GItem> {
 			return null;
 		}
 
-		const top = this.ids[0];
+		const top = this._ids[0];
 		this._length--;
 
 		if (this._length > 0) {
-			const id = this.ids[this._length] as GItem;
-			const value = this.values[this._length] as number;
-			this.ids[0] = id;
-			this.values[0] = value;
+			const id = this._ids[this._length] as GItem;
+			const value = this._values[this._length] as number;
+			this._ids[0] = id;
+			this._values[0] = value;
 
 			const halfLength = this._length >> 1;
 			let pos = 0;
@@ -70,15 +70,15 @@ export class FlatQueue<GItem> {
 				const right = left + 1;
 
 				// Initialize with left child values
-				let bestIndex = this.ids[left] as GItem;
-				let bestValue = this.values[left] as number;
+				let bestIndex = this._ids[left] as GItem;
+				let bestValue = this._values[left] as number;
 
 				// Check if right child exists and has lower priority
-				const rightValue = this.values[right] as number;
+				const rightValue = this._values[right] as number;
 
 				if (right < this._length && rightValue < bestValue) {
 					left = right;
-					bestIndex = this.ids[right] as GItem;
+					bestIndex = this._ids[right] as GItem;
 					bestValue = rightValue;
 				}
 
@@ -88,14 +88,14 @@ export class FlatQueue<GItem> {
 				}
 
 				// Move best child up
-				this.ids[pos] = bestIndex;
-				this.values[pos] = bestValue;
+				this._ids[pos] = bestIndex;
+				this._values[pos] = bestValue;
 				pos = left;
 			}
 
 			// Place the current item at its new position
-			this.ids[pos] = id;
-			this.values[pos] = value;
+			this._ids[pos] = id;
+			this._values[pos] = value;
 		}
 
 		return top ?? null;

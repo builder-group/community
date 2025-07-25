@@ -1,25 +1,34 @@
-import { FlatQueue } from './FlatQueue';
-import type { TListener, TListenerContext, TListenerQueueItem, TState } from './types';
+import { getQueue } from './queue';
+import type { TListener, TListenerContext, TState } from './types';
 
-const GLOBAL_LISTENER_QUEUE = new FlatQueue<TListenerQueueItem>();
 export const SET_SOURCE_KEY = 'state_set';
 
-export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
+export function createState<GValue>(
+	initialValue: GValue,
+	options: TCreateStateOptions = {}
+): TState<GValue, []> {
+	const { queue: queueName = 'async' } = options;
+	const queue = getQueue(queueName);
+	if (queue == null) {
+		throw new Error(`Queue "${queueName}" not found`);
+	}
+
 	return {
 		_features: [],
 		_listeners: [],
 		_v: initialValue,
+		_queue: queue,
 		_notify(notifyOptions = {}) {
 			const { processListenerQueue = true, listenerContext = {}, prevValue } = notifyOptions;
 
-			// Push current state's listeners to the queue
+			// Push all listeners to the state's queue
 			for (const listener of this._listeners) {
 				const context: TListenerContext<GValue> = Object.assign(listenerContext, {
 					value: this._v,
 					prevValue
 				});
 				if (listener.queueIf == null || listener.queueIf(context)) {
-					GLOBAL_LISTENER_QUEUE.push(
+					this._queue.push(
 						{
 							context,
 							callback: listener.callback
@@ -29,9 +38,9 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 				}
 			}
 
-			// Process queue
+			// Process the state's queue
 			if (processListenerQueue) {
-				void processStateQueue();
+				void this._queue.process();
 			}
 		},
 		get() {
@@ -64,7 +73,7 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 			};
 			this._listeners.push(listener);
 
-			// Undbind
+			// Unbind
 			return () => {
 				const index = this._listeners.indexOf(listener);
 				if (index !== -1) {
@@ -80,15 +89,12 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 	};
 }
 
+interface TCreateStateOptions {
+	queue?: string;
+}
+
 export enum EStateListenerQueuePriority {
 	EARLY = 50,
 	DEFAULT = 100,
 	LATE = 200
-}
-
-export async function processStateQueue(): Promise<void> {
-	let item: TListenerQueueItem | null;
-	while ((item = GLOBAL_LISTENER_QUEUE.pop()) != null) {
-		await item.callback(item.context);
-	}
 }
