@@ -6,8 +6,6 @@ import { formatPath, parseParams, ValidationError } from '../../lib';
 import {
 	TOpenApiExpressFeature,
 	TOpenApiExpressParsedData,
-	TOpenApiExpressPathParams,
-	TOpenApiExpressQueryParams,
 	TParams,
 	type TOpenApiExpressParamsParserOptions,
 	type TOpenApiExpressRequest,
@@ -96,11 +94,11 @@ function parseParamsMiddleware<GPathOperation>(
 				query: parseQueryParams(
 					req.query as TParams,
 					parseQueryParamsBlacklist
-				) as TOpenApiExpressQueryParams<GPathOperation>,
+				) as TOperationQueryParams<GPathOperation>,
 				params: parsePathParams(
 					req.params as TParams,
 					parsePathParamsBlacklist
-				) as TOpenApiExpressPathParams<GPathOperation>
+				) as TOperationPathParams<GPathOperation>
 			} as TOpenApiExpressParsedData<GPathOperation>;
 		}
 		next();

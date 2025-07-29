@@ -84,16 +84,6 @@ export type TOpenApiExpressRequest<GPathOperation> = express.Request<
 	valid: TOpenApiExpressParsedData<GPathOperation>;
 };
 
-export type TOpenApiExpressQueryParams<GPathOperation> =
-	TOperationQueryParams<GPathOperation> extends never
-		? core.Query
-		: TOperationQueryParams<GPathOperation>;
-
-export type TOpenApiExpressPathParams<GPathOperation> =
-	TOperationPathParams<GPathOperation> extends never
-		? core.ParamsDictionary
-		: TOperationPathParams<GPathOperation>;
-
 export type TOpenApiExpressRequestBody<GPathOperation> = TRequestBody<GPathOperation>;
 
 export type TOpenApiExpressResponse<GPathOperation> = express.Response<
@@ -107,12 +97,12 @@ export type TOpenApiExpressParsedData<GPathOperation> = TOpenApiExpressParsedQue
 export type TOpenApiExpressParsedQuery<GPathOperation> =
 	TOperationQueryParams<GPathOperation> extends never
 		? { query?: never }
-		: { query: TOpenApiExpressQueryParams<GPathOperation> };
+		: { query: TOperationQueryParams<GPathOperation> };
 
 export type TOpenApiExpressParsedParams<GPathOperation> =
 	TOperationPathParams<GPathOperation> extends never
 		? { params?: never }
-		: { params: TOpenApiExpressPathParams<GPathOperation> };
+		: { params: TOperationPathParams<GPathOperation> };
 
 // =============================================================================
 // Router Options
