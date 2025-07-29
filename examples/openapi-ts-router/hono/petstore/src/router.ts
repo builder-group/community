@@ -22,7 +22,7 @@ openApiRouter.get('/pet/{petId}', {
 	],
 	handler: (c) => {
 		const { petId } = c.req.valid('param');
-		console.log('handler');
+		console.log('handler', petId, typeof petId);
 
 		return c.json({
 			name: 'Falko',

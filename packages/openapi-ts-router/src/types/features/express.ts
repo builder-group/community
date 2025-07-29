@@ -74,10 +74,10 @@ export type TOpenApiExpressRequestHandler<GPathOperation> = (
 ) => Promise<void> | void;
 
 export type TOpenApiExpressRequest<GPathOperation> = express.Request<
-	TOpenApiExpressPathParams<GPathOperation>, // Params
+	core.ParamsDictionary, // Params
 	TOperationSuccessResponseContent<GPathOperation>, // ResBody
 	TOpenApiExpressRequestBody<GPathOperation>, // ReqBody
-	TOpenApiExpressQueryParams<GPathOperation> // ReqQuery
+	core.Query // ReqQuery
 > & {
 	// Express 5: req.query/req.params are read-only -> parsed & validated params stored here
 	// https://expressjs.com/en/api.html#req.params
