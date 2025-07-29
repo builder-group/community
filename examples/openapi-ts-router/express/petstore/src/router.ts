@@ -21,7 +21,7 @@ openApiRouter.get('/pet/{petId}', {
 		}
 	],
 	handler: (req, res) => {
-		const { petId } = req.parsed.params;
+		const { petId } = req.valid.params;
 		console.log('handler', petId, typeof petId);
 
 		res.send({

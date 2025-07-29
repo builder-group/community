@@ -2,8 +2,7 @@ import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/featu
 import { type TOperationPathParams, type TOperationQueryParams } from '@blgc/types/openapi';
 import type * as express from 'express';
 import { createValidationContext, type TValidationError } from 'validation-adapter';
-import { ValidationError } from '../../exceptions';
-import { formatPath, parseParams } from '../../helper';
+import { formatPath, parseParams, ValidationError } from '../../lib';
 import {
 	TOpenApiExpressFeature,
 	TOpenApiExpressParsedData,
@@ -93,7 +92,7 @@ function parseParamsMiddleware<GPathOperation>(
 
 	return (req, _res, next) => {
 		if (shouldParseParams) {
-			(req as TOpenApiExpressRequest<GPathOperation>).parsed = {
+			(req as TOpenApiExpressRequest<GPathOperation>).valid = {
 				query: parseQueryParams(
 					req.query as TParams,
 					parseQueryParamsBlacklist
@@ -128,7 +127,7 @@ function validationMiddleware<GPathOperation>(
 
 			if (pathValidator != null) {
 				const pathParams =
-					(req as TOpenApiExpressRequest<GPathOperation>).parsed?.params ?? req.params;
+					(req as TOpenApiExpressRequest<GPathOperation>).valid?.params ?? req.params;
 				const pathValidationContext = createValidationContext<TOperationPathParams<GPathOperation>>(
 					pathParams as TOperationPathParams<GPathOperation>
 				);
@@ -141,7 +140,7 @@ function validationMiddleware<GPathOperation>(
 
 			if (queryValidator != null) {
 				const queryParams =
-					(req as TOpenApiExpressRequest<GPathOperation>).parsed?.query ?? req.query;
+					(req as TOpenApiExpressRequest<GPathOperation>).valid?.query ?? req.query;
 				const queryValidationContext = createValidationContext<
 					TOperationQueryParams<GPathOperation>
 				>(queryParams as TOperationQueryParams<GPathOperation>);
