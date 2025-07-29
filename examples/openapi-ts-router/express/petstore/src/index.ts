@@ -7,7 +7,7 @@ const port = 3000;
 
 app.use(express.json());
 
-app.get('/*', router);
+app.use(router);
 
 app.use(invalidPathMiddleware);
 app.use(errorMiddleware);

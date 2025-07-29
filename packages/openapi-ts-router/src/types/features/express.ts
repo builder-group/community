@@ -78,7 +78,10 @@ export type TOpenApiExpressRequest<GPathOperation> = express.Request<
 	TOperationSuccessResponseContent<GPathOperation>, // ResBody
 	TOpenApiExpressRequestBody<GPathOperation>, // ReqBody
 	TOpenApiExpressQueryParams<GPathOperation> // ReqQuery
->;
+> & {
+	// Express 5: req.query/req.params are read-only -> parsed params stored here
+	parsed: TOpenApiExpressParsedData<GPathOperation>;
+};
 
 export type TOpenApiExpressQueryParams<GPathOperation> =
 	TOperationQueryParams<GPathOperation> extends never
@@ -96,6 +99,19 @@ export type TOpenApiExpressResponse<GPathOperation> = express.Response<
 	TOperationSuccessResponseContent<GPathOperation>,
 	express.Locals
 >;
+
+export type TOpenApiExpressParsedData<GPathOperation> = TOpenApiExpressParsedQuery<GPathOperation> &
+	TOpenApiExpressParsedParams<GPathOperation>;
+
+export type TOpenApiExpressParsedQuery<GPathOperation> =
+	TOperationQueryParams<GPathOperation> extends never
+		? { query?: never }
+		: { query: TOpenApiExpressQueryParams<GPathOperation> };
+
+export type TOpenApiExpressParsedParams<GPathOperation> =
+	TOperationPathParams<GPathOperation> extends never
+		? { params?: never }
+		: { params: TOpenApiExpressPathParams<GPathOperation> };
 
 // =============================================================================
 // Router Options
