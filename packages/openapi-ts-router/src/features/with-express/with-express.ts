@@ -1,16 +1,16 @@
 import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
 import { type TOperationPathParams, type TOperationQueryParams } from '@blgc/types/openapi';
 import type * as express from 'express';
-import { type ParamsDictionary } from 'express-serve-static-core';
 import { createValidationContext, type TValidationError } from 'validation-adapter';
-import { ValidationError } from '../../exceptions';
-import { formatPath, parseParams } from '../../helper';
+import { formatPath, parseParams, ValidationError } from '../../lib';
 import {
 	TOpenApiExpressFeature,
+	TOpenApiExpressParsedData,
+	TParams,
 	type TOpenApiExpressParamsParserOptions,
+	type TOpenApiExpressRequest,
 	type TOpenApiExpressValidators,
-	type TOpenApiRouter,
-	type TParams
+	type TOpenApiRouter
 } from '../../types';
 
 export function withExpress<GPaths extends object, GFeatures extends TFeatureDefinition[]>(
@@ -77,7 +77,7 @@ export function withExpress<GPaths extends object, GFeatures extends TFeatureDef
 	>;
 }
 
-function parseParamsMiddleware(
+function parseParamsMiddleware<GPathOperation>(
 	paramsParser: TOpenApiExpressParamsParserOptions = {}
 ): express.RequestHandler {
 	const {
@@ -88,23 +88,19 @@ function parseParamsMiddleware(
 		parseQueryParamsBlacklist
 	} = paramsParser;
 
-	if (shouldParseParams) {
-		return (req, _res, next) => {
-			// Extend Express query params & path params parsing to handle numbers and booleans
-			// as primitive type instead of string.
-			// See: https://expressjs.com/en/5x/api.html#req.query
-			//      https://github.com/ljharb/qs/issues/91
-			req.query = parseQueryParams(req.query as TParams, parseQueryParamsBlacklist) as TParams;
-			req.params = parsePathParams(
-				req.params as TParams,
-				parsePathParamsBlacklist
-			) as ParamsDictionary;
-
-			next();
-		};
-	}
-
-	return (_req, _res, next) => {
+	return (req, _res, next) => {
+		if (shouldParseParams) {
+			(req as TOpenApiExpressRequest<GPathOperation>).valid = {
+				query: parseQueryParams(
+					req.query as TParams,
+					parseQueryParamsBlacklist
+				) as TOperationQueryParams<GPathOperation>,
+				params: parsePathParams(
+					req.params as TParams,
+					parsePathParamsBlacklist
+				) as TOperationPathParams<GPathOperation>
+			} as TOpenApiExpressParsedData<GPathOperation>;
+		}
 		next();
 	};
 }
@@ -128,8 +124,10 @@ function validationMiddleware<GPathOperation>(
 			}
 
 			if (pathValidator != null) {
+				const pathParams =
+					(req as TOpenApiExpressRequest<GPathOperation>).valid?.params ?? req.params;
 				const pathValidationContext = createValidationContext<TOperationPathParams<GPathOperation>>(
-					req.params as TOperationPathParams<GPathOperation>
+					pathParams as TOperationPathParams<GPathOperation>
 				);
 				await pathValidator.validate(pathValidationContext);
 				for (const error of pathValidationContext.errors) {
@@ -139,9 +137,11 @@ function validationMiddleware<GPathOperation>(
 			}
 
 			if (queryValidator != null) {
+				const queryParams =
+					(req as TOpenApiExpressRequest<GPathOperation>).valid?.query ?? req.query;
 				const queryValidationContext = createValidationContext<
 					TOperationQueryParams<GPathOperation>
-				>(req.query as TOperationQueryParams<GPathOperation>);
+				>(queryParams as TOperationQueryParams<GPathOperation>);
 				await queryValidator.validate(queryValidationContext);
 				for (const error of queryValidationContext.errors) {
 					error['source'] = 'query';

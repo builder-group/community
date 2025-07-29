@@ -74,21 +74,15 @@ export type TOpenApiExpressRequestHandler<GPathOperation> = (
 ) => Promise<void> | void;
 
 export type TOpenApiExpressRequest<GPathOperation> = express.Request<
-	TOpenApiExpressPathParams<GPathOperation>, // Params
+	core.ParamsDictionary, // Params
 	TOperationSuccessResponseContent<GPathOperation>, // ResBody
 	TOpenApiExpressRequestBody<GPathOperation>, // ReqBody
-	TOpenApiExpressQueryParams<GPathOperation> // ReqQuery
->;
-
-export type TOpenApiExpressQueryParams<GPathOperation> =
-	TOperationQueryParams<GPathOperation> extends never
-		? core.Query
-		: TOperationQueryParams<GPathOperation>;
-
-export type TOpenApiExpressPathParams<GPathOperation> =
-	TOperationPathParams<GPathOperation> extends never
-		? core.ParamsDictionary
-		: TOperationPathParams<GPathOperation>;
+	core.Query // ReqQuery
+> & {
+	// Express 5: req.query/req.params are read-only -> parsed & validated params stored here
+	// https://expressjs.com/en/api.html#req.params
+	valid: TOpenApiExpressParsedData<GPathOperation>;
+};
 
 export type TOpenApiExpressRequestBody<GPathOperation> = TRequestBody<GPathOperation>;
 
@@ -96,6 +90,19 @@ export type TOpenApiExpressResponse<GPathOperation> = express.Response<
 	TOperationSuccessResponseContent<GPathOperation>,
 	express.Locals
 >;
+
+export type TOpenApiExpressParsedData<GPathOperation> = TOpenApiExpressParsedQuery<GPathOperation> &
+	TOpenApiExpressParsedParams<GPathOperation>;
+
+export type TOpenApiExpressParsedQuery<GPathOperation> =
+	TOperationQueryParams<GPathOperation> extends never
+		? { query?: never }
+		: { query: TOperationQueryParams<GPathOperation> };
+
+export type TOpenApiExpressParsedParams<GPathOperation> =
+	TOperationPathParams<GPathOperation> extends never
+		? { params?: never }
+		: { params: TOperationPathParams<GPathOperation> };
 
 // =============================================================================
 // Router Options

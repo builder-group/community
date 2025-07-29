@@ -63,7 +63,7 @@ openApiRouter.get('/pet/{petId}', {
 		})
 	),
 	handler: (req, res) => {
-		const { petId } = req.params; // Access validated params
+		const { petId } = req.valid.params; // Access parsed & validated params
 		res.send({ name: 'Falko', photoUrls: [] });
 	}
 });
