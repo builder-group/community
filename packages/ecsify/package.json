@@ -40,9 +40,9 @@
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@lastolivegames/becsy": "^0.15.5",
-		"@types/node": "^22.15.29",
+		"@types/node": "^24.1.0",
 		"bitecs": "github:NateTheGreatt/bitECS#rc-0-4-0",
-		"elics": "^2.3.0",
+		"elics": "^3.0.1",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [

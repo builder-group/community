@@ -37,11 +37,11 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.15.29",
+		"@types/node": "^24.1.0",
 		"@types/sax": "^1.2.7",
 		"@types/xml2js": "^0.4.14",
 		"camaro": "^6.2.3",
-		"fast-xml-parser": "^5.2.3",
+		"fast-xml-parser": "^5.2.5",
 		"rollup-presets": "workspace:*",
 		"sax": "^1.4.1",
 		"saxen": "^10.0.0",

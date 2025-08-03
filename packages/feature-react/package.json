@@ -73,11 +73,11 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^22.15.29",
-		"@types/react": "^19.1.6",
+		"@types/node": "^24.1.0",
+		"@types/react": "^19.1.9",
 		"feature-form": "workspace:*",
 		"feature-state": "workspace:*",
-		"react": "^19.1.0",
+		"react": "^19.1.1",
 		"rollup-presets": "workspace:*"
 	},
 	"peerDependencies": {
