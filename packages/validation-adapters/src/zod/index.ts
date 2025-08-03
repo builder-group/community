@@ -1,9 +1,9 @@
 import { createValidator, type TValidator } from 'validation-adapter';
-import { ZodError, type Schema } from 'zod';
+import { ZodError, type ZodType } from 'zod';
 
 export { zodValidator as zValidator };
 
-export function zodValidator<GValue>(schema: Schema<GValue>): TValidator<GValue> {
+export function zodValidator<GValue>(schema: ZodType<GValue>): TValidator<GValue> {
 	return createValidator([
 		{
 			key: 'zod',
@@ -12,14 +12,14 @@ export function zodValidator<GValue>(schema: Schema<GValue>): TValidator<GValue>
 					schema.parse(cx.value);
 				} catch (err) {
 					if (isZodError(err)) {
-						if (err.errors.length > 0) {
+						if (err.issues.length > 0) {
 							const errorCount =
-								cx.config.collectErrorMode === 'firstError' ? 1 : err.errors.length;
+								cx.config.collectErrorMode === 'firstError' ? 1 : err.issues.length;
 							for (let i = 0; i < errorCount; i++) {
 								// eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- Can't be null
-								const { code, message, path } = err.errors[i]!;
+								const { code, message, path } = err.issues[i]!;
 								cx.registerError({
-									code,
+									code: code,
 									message,
 									path: path.join('.')
 								});
@@ -40,6 +40,6 @@ export function zodValidator<GValue>(schema: Schema<GValue>): TValidator<GValue>
 export function isZodError(err: unknown): err is ZodError {
 	return (
 		err instanceof ZodError ||
-		(err instanceof Error && 'errors' in err && Array.isArray(err.errors))
+		(err instanceof Error && 'issues' in err && Array.isArray((err as any).issues))
 	);
 }
