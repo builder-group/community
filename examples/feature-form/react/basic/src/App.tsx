@@ -79,7 +79,7 @@ const $form = withGlobalBind(
 				defaultValue: 'female'
 			},
 			email: {
-				validator: zValidator(z.string().email().max(30).min(1)),
+				validator: zValidator(z.email().max(30).min(1)),
 				defaultValue: ''
 			},
 			image: {
