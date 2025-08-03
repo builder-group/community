@@ -1,5 +1,14 @@
 # validation-adapters
 
+## 0.0.29
+
+### Patch Changes
+
+- updated deps
+
+- Updated dependencies []:
+  - validation-adapter@0.0.24
+
 ## 0.0.25
 
 ### Patch Changes

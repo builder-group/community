@@ -1,5 +1,11 @@
 # @blgc/types
 
+## 0.0.18
+
+### Patch Changes
+
+- updated deps
+
 ## 0.0.17
 
 ### Patch Changes

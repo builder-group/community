@@ -1,5 +1,17 @@
 # feature-form
 
+## 0.0.51
+
+### Patch Changes
+
+- updated deps
+
+- Updated dependencies []:
+  - validation-adapter@0.0.24
+  - feature-state@0.0.58
+  - @blgc/types@0.0.18
+  - @blgc/utils@0.0.58
+
 ## 0.0.48
 
 ### Patch Changes
