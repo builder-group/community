@@ -126,7 +126,7 @@ export function createFetchClient(options: TFetchClientOptions = {}): TFetchClie
 			// Send request
 			let response: Response;
 			try {
-				response = await baseFetch(finalUrl, requestInit);
+				response = await baseFetch(finalUrl, requestInit as unknown as RequestInit);
 			} catch (error) {
 				return Err(mapErrorToNetworkError(error));
 			}

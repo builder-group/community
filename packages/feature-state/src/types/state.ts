@@ -109,3 +109,6 @@ export type TNullableStateValue<GState> =
 	NonNullable<GState> extends TState<infer GValue, any>
 		? Readonly<GValue> | (Extract<GState, null | undefined> extends never ? never : null)
 		: never;
+
+export type TStateValue<S> = S extends TState<infer V, any> ? V : never;
+export type TStateFeatures<S> = S extends TState<any, infer F> ? F : never;

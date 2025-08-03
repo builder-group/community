@@ -1,4 +1,9 @@
-import { TNullableStateValue, type TListenerOptions, type TState } from 'feature-state';
+import {
+	TListenerContext,
+	TNullableStateValue,
+	type TListenerOptions,
+	type TState
+} from 'feature-state';
 import React from 'react';
 
 export function useCompute<
@@ -7,19 +12,21 @@ export function useCompute<
 	GComputed
 >(
 	state: GState,
-	compute: (value: GValue) => GComputed,
+	compute: (cx: TListenerContext<GValue>) => GComputed,
 	deps: React.DependencyList = [],
 	options: TUseComputeOptions<any, GComputed> = {}
 ): GComputed {
 	const { isEqual = Object.is, ...listenerOptions } = options;
 	const [, forceRender] = React.useReducer((s: number) => s + 1, 0);
 
-	const lastComputedRef = React.useRef<GComputed>(compute(state == null ? null : state._v));
+	const lastComputedRef = React.useRef<GComputed>(
+		compute({ value: state == null ? null : state._v })
+	);
 
 	React.useEffect(() => {
 		// If state is null/undefined, compute with null and update if needed
 		if (state == null) {
-			const newComputed = compute(null as GValue);
+			const newComputed = compute({ value: null as GValue });
 			if (!isEqual(newComputed, lastComputedRef.current)) {
 				forceRender();
 			}
@@ -31,11 +38,11 @@ export function useCompute<
 		// even if the state value hasn't changed since the last subscription
 		// but the state instance might have changed.
 		const unbind = state.subscribe(
-			({ background, value }) => {
-				const newComputed = compute(value);
+			(cx) => {
+				const newComputed = compute(cx);
 
 				// Only trigger re-render if computed value changed and not in background
-				if (!background && !isEqual(newComputed, lastComputedRef.current)) {
+				if (!cx.background && !isEqual(newComputed, lastComputedRef.current)) {
 					forceRender();
 				}
 				lastComputedRef.current = newComputed;

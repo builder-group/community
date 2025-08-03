@@ -1,122 +1,143 @@
-import { TFeatureDefinition } from '@blgc/types/features';
-import { TListenerOptions, TState } from 'feature-state';
+import { TListenerContext, TListenerOptions, TState, TStateValue } from 'feature-state';
 import React from 'react';
 
 // 1 state
-export function useCombinedCompute<V1, F1 extends TFeatureDefinition[], GComputed>(
-	states: readonly [TState<V1, F1>],
-	compute: (values: readonly [V1]) => GComputed,
+export function useCombinedCompute<S1 extends TState<any, any>, GComputed>(
+	states: readonly [S1],
+	compute: (cxs: readonly [TListenerContext<TStateValue<S1>>]) => GComputed,
 	deps?: React.DependencyList,
-	options?: TUseCombinedComputeOptions<V1, GComputed>
+	options?: TUseCombinedComputeOptions<TStateValue<S1>, GComputed>
 ): GComputed;
 
 // 2 states
 export function useCombinedCompute<
-	V1,
-	F1 extends TFeatureDefinition[],
-	V2,
-	F2 extends TFeatureDefinition[],
+	S1 extends TState<any, any>,
+	S2 extends TState<any, any>,
 	GComputed
 >(
-	states: readonly [TState<V1, F1>, TState<V2, F2>],
-	compute: (values: readonly [V1, V2]) => GComputed,
+	states: readonly [S1, S2],
+	compute: (
+		cxs: readonly [TListenerContext<TStateValue<S1>>, TListenerContext<TStateValue<S2>>]
+	) => GComputed,
 	deps?: React.DependencyList,
-	options?: TUseCombinedComputeOptions<V1 | V2, GComputed>
+	options?: TUseCombinedComputeOptions<TStateValue<S1> | TStateValue<S2>, GComputed>
 ): GComputed;
 
 // 3 states
 export function useCombinedCompute<
-	V1,
-	F1 extends TFeatureDefinition[],
-	V2,
-	F2 extends TFeatureDefinition[],
-	V3,
-	F3 extends TFeatureDefinition[],
+	S1 extends TState<any, any>,
+	S2 extends TState<any, any>,
+	S3 extends TState<any, any>,
 	GComputed
 >(
-	states: readonly [TState<V1, F1>, TState<V2, F2>, TState<V3, F3>],
-	compute: (values: readonly [V1, V2, V3]) => GComputed,
+	states: readonly [S1, S2, S3],
+	compute: (
+		cxs: readonly [
+			TListenerContext<TStateValue<S1>>,
+			TListenerContext<TStateValue<S2>>,
+			TListenerContext<TStateValue<S3>>
+		]
+	) => GComputed,
 	deps?: React.DependencyList,
-	options?: TUseCombinedComputeOptions<V1 | V2 | V3, GComputed>
+	options?: TUseCombinedComputeOptions<
+		TStateValue<S1> | TStateValue<S2> | TStateValue<S3>,
+		GComputed
+	>
 ): GComputed;
 
 // 4 states
 export function useCombinedCompute<
-	V1,
-	F1 extends TFeatureDefinition[],
-	V2,
-	F2 extends TFeatureDefinition[],
-	V3,
-	F3 extends TFeatureDefinition[],
-	V4,
-	F4 extends TFeatureDefinition[],
+	S1 extends TState<any, any>,
+	S2 extends TState<any, any>,
+	S3 extends TState<any, any>,
+	S4 extends TState<any, any>,
 	GComputed
 >(
-	states: readonly [TState<V1, F1>, TState<V2, F2>, TState<V3, F3>, TState<V4, F4>],
-	compute: (values: readonly [V1, V2, V3, V4]) => GComputed,
+	states: readonly [S1, S2, S3, S4],
+	compute: (
+		cxs: readonly [
+			TListenerContext<TStateValue<S1>>,
+			TListenerContext<TStateValue<S2>>,
+			TListenerContext<TStateValue<S3>>,
+			TListenerContext<TStateValue<S4>>
+		]
+	) => GComputed,
 	deps?: React.DependencyList,
-	options?: TUseCombinedComputeOptions<V1 | V2 | V3 | V4, GComputed>
+	options?: TUseCombinedComputeOptions<
+		TStateValue<S1> | TStateValue<S2> | TStateValue<S3> | TStateValue<S4>,
+		GComputed
+	>
 ): GComputed;
 
 // 5 states
 export function useCombinedCompute<
-	V1,
-	F1 extends TFeatureDefinition[],
-	V2,
-	F2 extends TFeatureDefinition[],
-	V3,
-	F3 extends TFeatureDefinition[],
-	V4,
-	F4 extends TFeatureDefinition[],
-	V5,
-	F5 extends TFeatureDefinition[],
+	S1 extends TState<any, any>,
+	S2 extends TState<any, any>,
+	S3 extends TState<any, any>,
+	S4 extends TState<any, any>,
+	S5 extends TState<any, any>,
 	GComputed
 >(
-	states: readonly [TState<V1, F1>, TState<V2, F2>, TState<V3, F3>, TState<V4, F4>, TState<V5, F5>],
-	compute: (values: readonly [V1, V2, V3, V4, V5]) => GComputed,
+	states: readonly [S1, S2, S3, S4, S5],
+	compute: (
+		cxs: readonly [
+			TListenerContext<TStateValue<S1>>,
+			TListenerContext<TStateValue<S2>>,
+			TListenerContext<TStateValue<S3>>,
+			TListenerContext<TStateValue<S4>>,
+			TListenerContext<TStateValue<S5>>
+		]
+	) => GComputed,
 	deps?: React.DependencyList,
-	options?: TUseCombinedComputeOptions<V1 | V2 | V3 | V4 | V5, GComputed>
+	options?: TUseCombinedComputeOptions<
+		TStateValue<S1> | TStateValue<S2> | TStateValue<S3> | TStateValue<S4> | TStateValue<S5>,
+		GComputed
+	>
 ): GComputed;
 
 // Implementation
 export function useCombinedCompute<
-	V1,
-	F1 extends TFeatureDefinition[],
-	V2,
-	F2 extends TFeatureDefinition[],
-	V3,
-	F3 extends TFeatureDefinition[],
-	V4,
-	F4 extends TFeatureDefinition[],
-	V5,
-	F5 extends TFeatureDefinition[],
+	S1 extends TState<any, any>,
+	S2 extends TState<any, any>,
+	S3 extends TState<any, any>,
+	S4 extends TState<any, any>,
+	S5 extends TState<any, any>,
 	GComputed
 >(
-	states: any,
-	compute: (values: any) => GComputed,
+	states: readonly TState<any, any>[],
+	compute: (cxs: any) => GComputed,
 	deps: React.DependencyList = [],
-	options: TUseCombinedComputeOptions<V1 | V2 | V3 | V4 | V5, GComputed> = {}
+	options: TUseCombinedComputeOptions<
+		TStateValue<S1> | TStateValue<S2> | TStateValue<S3> | TStateValue<S4> | TStateValue<S5>,
+		GComputed
+	> = {}
 ): GComputed {
 	const { isEqual = Object.is, ...listenerOptions } = options;
 	const [, forceRender] = React.useReducer((s) => s + 1, 0);
 
-	const currentValuesRef = React.useRef<[V1, V2, V3, V4, V5]>(
-		(
-			states as readonly [
-				TState<V1, F1>,
-				TState<V2, F2>,
-				TState<V3, F3>,
-				TState<V4, F4>,
-				TState<V5, F5>
-			]
-		).map((state) => state._v) as unknown as [V1, V2, V3, V4, V5]
+	const currentContextsRef = React.useRef<
+		[
+			TListenerContext<TStateValue<S1>>,
+			TListenerContext<TStateValue<S2>>,
+			TListenerContext<TStateValue<S3>>,
+			TListenerContext<TStateValue<S4>>,
+			TListenerContext<TStateValue<S5>>
+		]
+	>(
+		states.map((state) => ({ value: state._v })) as unknown as [
+			TListenerContext<TStateValue<S1>>,
+			TListenerContext<TStateValue<S2>>,
+			TListenerContext<TStateValue<S3>>,
+			TListenerContext<TStateValue<S4>>,
+			TListenerContext<TStateValue<S5>>
+		]
 	);
-	const lastComputedRef = React.useRef<GComputed>(compute(currentValuesRef.current));
+	const lastComputedRef = React.useRef<GComputed>(compute(currentContextsRef.current));
 
 	React.useEffect(() => {
-		const updateValue = (index: number, value: any, background?: boolean) => {
-			currentValuesRef.current[index] = value;
-			const newComputed = compute(currentValuesRef.current);
+		const updateContext = (index: number, context: any, background?: boolean) => {
+			currentContextsRef.current[index] = context;
+			const newComputed = compute(currentContextsRef.current);
 
 			// Only trigger re-render if computed value changed and not in background
 			if (!background && !isEqual(newComputed, lastComputedRef.current)) {
@@ -125,16 +146,8 @@ export function useCombinedCompute<
 			lastComputedRef.current = newComputed;
 		};
 
-		const unbinds = (
-			states as readonly [
-				TState<V1, F1>,
-				TState<V2, F2>,
-				TState<V3, F3>,
-				TState<V4, F4>,
-				TState<V5, F5>
-			]
-		).map((state, index) =>
-			state.subscribe(({ background, value }) => updateValue(index, value, background), {
+		const unbinds = states.map((state, index) =>
+			state.subscribe((context) => updateContext(index, context, context.background), {
 				key: `use-combined-compute-${index}`,
 				...listenerOptions
 			})

@@ -128,7 +128,7 @@ function ComputedStateExample() {
 	const renderCount = useRenderCount();
 
 	// Compute doubled count value
-	const doubledCount = useCompute($counter, (count) => {
+	const doubledCount = useCompute($counter, ({ value: count }) => {
 		if (count > 5) {
 			return count * 2;
 		}
@@ -150,9 +150,16 @@ function CombinedComputeExample() {
 	const renderCount = useRenderCount();
 
 	// Combine counter and user theme for a dynamic message
-	const combinedState = useCombinedCompute(
-		[$counter, $userState] as const,
-		([count, userState]) => {
+	const combinedState = useCombinedCompute<
+		typeof $counter,
+		typeof $userState,
+		{
+			message: string;
+			isDarkWithHighCount: boolean;
+		}
+	>(
+		[$counter, $userState],
+		([{ value: count }, { value: userState }]) => {
 			if (count > 5) {
 				return {
 					message: `Count is ${count} and theme is ${userState.settings.theme}`,
