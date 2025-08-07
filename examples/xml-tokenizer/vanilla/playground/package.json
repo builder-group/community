@@ -9,6 +9,7 @@
 	"dependencies": {
 		"camaro": "^6.2.3",
 		"fast-xml-parser": "^5.2.5",
+		"stream-xml": "^0.6.0",
 		"tinybench": "^4.0.1",
 		"txml": "^5.1.1",
 		"xml-tokenizer": "workspace:*",
