@@ -30,7 +30,7 @@ export function yupValidator<GValue>(schema: Schema<GValue>): TValidator<GValue>
 								message:
 									cx.config.name != null
 										? innerErr.message.replace('this', cx.config.name)
-										: innerErr.message,
+										: err.message,
 								path: innerErr.path
 							});
 						}

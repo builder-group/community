@@ -1,6 +1,6 @@
 {
 	"name": "validation-adapters",
-	"version": "0.0.29",
+	"version": "0.0.30",
 	"private": false,
 	"description": "Pre-made validation adapters for the validation-adapter library, including adapters for Zod and Valibot",
 	"keywords": [],
@@ -94,7 +94,7 @@
 		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
 		"size": "size-limit --why",
 		"start:dev": "tsc -w",
-		"test": "echo \"Error: no test specified\"",
+		"test": "vitest run",
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
