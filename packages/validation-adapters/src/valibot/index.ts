@@ -1,4 +1,4 @@
-import { getDotPath, safeParseAsync, type BaseIssue, type BaseSchema } from 'valibot';
+import { getDotPath, safeParse, type BaseIssue, type BaseSchema } from 'valibot';
 import { createValidator, type TValidator } from 'validation-adapter';
 
 export { valibotValidator as vValidator };
@@ -10,7 +10,7 @@ export function valibotValidator<GValue>(
 		{
 			key: 'valibot',
 			validate: async (cx) => {
-				const result = await safeParseAsync(schema, cx.value, {
+				const result = safeParse(schema, cx.value, {
 					abortPipeEarly: cx.config.collectErrorMode === 'firstError'
 				});
 

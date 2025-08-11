@@ -79,7 +79,8 @@ function processEnvVar<GValue>(
 	}
 
 	const validationContext = createValidationContext<GValue>(value as GValue);
-	validator.validate(validationContext);
+	// TODO: Support async validators?
+	void validator.validate(validationContext);
 
 	if (validationContext.hasError()) {
 		const finalDescription = description != null ? `\nDescription: ${description}` : '';
