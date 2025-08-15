@@ -17,7 +17,7 @@ import {
 	type TResult
 } from './index';
 
-describe('try-results implementation', () => {
+describe('trydent implementation', () => {
 	// it('should work', () => {
 	// 	const result: TResult<number, string> = null as any;
 	// 	const [ok, err, val] = result;

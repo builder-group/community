@@ -1,6 +1,6 @@
 {
-	"name": "try-results",
-	"version": "0.0.5",
+	"name": "trydent",
+	"version": "0.0.2",
 	"private": false,
 	"description": "A minimal, functional, and tree-shakable Result library for TypeScript that prioritizes simplicity and serialization",
 	"keywords": [],

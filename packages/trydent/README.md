@@ -1,23 +1,23 @@
 <h1 align="center">
-    <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/try-results/.github/banner.svg" alt="try-results banner">
+    <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/trydent/.github/banner.svg" alt="trydent banner">
 </h1>
 
 <p align="left">
     <a href="https://github.com/builder-group/community/blob/develop/LICENSE">
         <img src="https://img.shields.io/github/license/builder-group/community.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
     </a>
-    <a href="https://www.npmjs.com/package/try-results">
-        <img src="https://img.shields.io/bundlephobia/minzip/try-results.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
+    <a href="https://www.npmjs.com/package/trydent">
+        <img src="https://img.shields.io/bundlephobia/minzip/trydent.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
     </a>
-    <a href="https://www.npmjs.com/package/try-results">
-        <img src="https://img.shields.io/npm/dt/try-results.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>
+    <a href="https://www.npmjs.com/package/trydent">
+        <img src="https://img.shields.io/npm/dt/trydent.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>
     </a>
     <a href="https://discord.gg/w4xE3bSjhQ">
         <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=FDE200" alt="Join Discord"/>
     </a>
 </p>
 
-`try-results` is a minimal, functional, and tree-shakable Result library for TypeScript that prioritizes simplicity and serialization.
+`trydent` is a minimal, functional, and tree-shakable Result library for TypeScript that prioritizes simplicity and serialization.
 
 - **🔮 Simple, declarative API**: Intuitive array destructuring with full type safety
 - **🍃 Lightweight & Tree Shakable**: Function-based design with zero dependencies
@@ -29,7 +29,7 @@
 
 ### 🌟 Motivation
 
-Build a minimal, functional Result library that prioritizes simplicity and serialization. While libraries like [ts-results](https://github.com/vultix/ts-results) and [neverthrow](https://github.com/supermacro/neverthrow) offer robust features, they often come with bloated class hierarchies that can't be easily serialized. `try-results` provides a simpler alternative - combining minimal overhead, easy serialization for APIs and frameworks like React Router, and functional helpers while adhering to the KISS principle.
+Build a minimal, functional Result library that prioritizes simplicity and serialization. While libraries like [ts-results](https://github.com/vultix/ts-results) and [neverthrow](https://github.com/supermacro/neverthrow) offer robust features, they often come with bloated class hierarchies that can't be easily serialized. `trydent` provides a simpler alternative - combining minimal overhead, easy serialization for APIs and frameworks like React Router, and functional helpers while adhering to the KISS principle.
 
 **Key Features:**
 - **Minimal Core**: Just a 3-element array `[boolean, E, T]` with methods
@@ -44,12 +44,12 @@ Build a minimal, functional Result library that prioritizes simplicity and seria
 
 ## 📖 Usage
 
-`try-results` provides a simple approach to error handling. Here's how to use it:
+`trydent` provides a simple approach to error handling. Here's how to use it:
 
 ### 1. Creating Results
 
 ```ts
-import { Ok, Err } from 'try-results';
+import { Ok, Err } from 'trydent';
 
 const success = Ok(42);
 const failure = Err('Something went wrong');
@@ -76,7 +76,7 @@ const value = success.unwrap(); // 42
 ### 3. Safe Value Extraction
 
 ```ts
-import { unwrapOr, unwrapErr } from 'try-results';
+import { unwrapOr, unwrapErr } from 'trydent';
 
 // Provide defaults
 const value = unwrapOr(failure, 0); // 0
@@ -88,7 +88,7 @@ const error = unwrapErr(failure); // 'Something went wrong'
 ### 4. Transforming Results
 
 ```ts
-import { mapOk, mapErr } from 'try-results';
+import { mapOk, mapErr } from 'trydent';
 
 // Transform success values
 const doubled = mapOk(success, x => x * 2); // Ok(84)
@@ -100,7 +100,7 @@ const wrapped = mapErr(failure, e => `Error: ${e}`); // Err('Error: Something we
 ### 5. Wrapping Functions
 
 ```ts
-import { t, tAsync } from 'try-results';
+import { t, tAsync } from 'trydent';
 
 // Wrap synchronous functions
 const result = t(() => JSON.parse('invalid')); // Err(SyntaxError)
@@ -112,7 +112,7 @@ const asyncResult = await tAsync(fetch('/api/data')); // Ok(Response) or Err(Err
 ### 6. Serialization
 
 ```ts
-import { serialize, deserialize } from 'try-results';
+import { serialize, deserialize } from 'trydent';
 
 // Convert to wire format
 const wireFormat = serialize(success); // [true, 42]
