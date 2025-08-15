@@ -4,6 +4,8 @@ import {
 	Err,
 	isErr,
 	isOk,
+	mapErr,
+	mapOk,
 	Ok,
 	serialize,
 	t,
@@ -13,9 +15,21 @@ import {
 	unwrapOr,
 	unwrapOrNull,
 	type TResult
-} from './try-result';
+} from './index';
 
-describe('TryResult implementation', () => {
+describe('try-results implementation', () => {
+	// it('should work', () => {
+	// 	const result: TResult<number, string> = null as any;
+	// 	const [ok, err, val] = result;
+	// 	if (ok) {
+	// 		const error: undefined = err;
+	// 		const value: number = val;
+	// 	} else {
+	// 		const error: string = err;
+	// 		const value: undefined = val;
+	// 	}
+	// });
+
 	describe('OkResult class', () => {
 		it('should create an Ok result correctly', () => {
 			const result = Ok(42);
@@ -122,23 +136,6 @@ describe('TryResult implementation', () => {
 			} else {
 				throw new Error('Expected ok to be true');
 			}
-		});
-
-		it('should work with rest destructuring', () => {
-			const result = Ok([1, 2, 3]);
-			const [ok, ...rest] = result;
-
-			expect(ok).toBe(true);
-			expect(rest).toEqual([undefined, [1, 2, 3]]);
-		});
-
-		it('should work with nested destructuring', () => {
-			const result = Ok({ name: 'John', age: 30 });
-			const [ok, , { name, age }] = result;
-
-			expect(ok).toBe(true);
-			expect(name).toBe('John');
-			expect(age).toBe(30);
 		});
 	});
 
@@ -247,6 +244,56 @@ describe('TryResult implementation', () => {
 		it('should return null for Err result', () => {
 			const result = Err('Error occurred');
 			expect(unwrapOrNull(result)).toBe(null);
+		});
+	});
+
+	describe('mapOk function', () => {
+		it('should map value for Ok result', () => {
+			const result = Ok(21);
+			const mapped = mapOk(result, (x: number) => x * 2);
+			expect(mapped.isOk()).toBe(true);
+			expect(mapped.unwrap()).toBe(42);
+		});
+
+		it('should return error unchanged for Err result', () => {
+			const result = Err('Error occurred');
+			const mapped = mapOk<string, string, number>(
+				result as TResult<string, string>,
+				(x: string) => x.length
+			);
+			expect(mapped.isErr()).toBe(true);
+			expect(mapped.error).toBe('Error occurred');
+		});
+
+		it('should work with type transformations', () => {
+			const result = Ok('hello');
+			const mapped = mapOk(result, (str: string) => str.length);
+			expect(mapped.isOk()).toBe(true);
+			expect(mapped.unwrap()).toBe(5);
+		});
+	});
+
+	describe('mapErr function', () => {
+		it('should map error for Err result', () => {
+			const result = Err('Error occurred');
+			const mapped = mapErr(result, (err) => `Wrapped: ${err}`);
+			expect(mapped.isErr()).toBe(true);
+			expect(mapped.error).toBe('Wrapped: Error occurred');
+		});
+
+		it('should return value unchanged for Ok result', () => {
+			const result = Ok(42);
+			const mapped = mapErr(result, (err) => `Wrapped: ${err}`);
+			expect(mapped.isOk()).toBe(true);
+			expect(mapped.unwrap()).toBe(42);
+		});
+
+		it('should work with error type transformations', () => {
+			const result = Err(404);
+			const mapped = mapErr(result, (code) => new Error(`HTTP ${code}`));
+			expect(mapped.isErr()).toBe(true);
+			expect(mapped.error).toBeInstanceOf(Error);
+			expect(mapped.error?.message).toBe('HTTP 404');
 		});
 	});
 

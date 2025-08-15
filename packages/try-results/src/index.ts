@@ -1,7 +1,3 @@
-// Based on:
-// https://github.com/arthurfiorette/try
-// https://github.com/vultix/ts-results
-
 /**
  * Represents a successful result as an array with literal types.
  * Structure: [true, undefined, T] where T is the success value.
@@ -182,6 +178,34 @@ export function unwrapOr<T, E>(result: TResult<T, E>, defaultValue: T): T {
  */
 export function unwrapOrNull<T, E>(result: TResult<T, E>): T | null {
 	return unwrapOr(result, null as T | null);
+}
+
+/**
+ * Maps the value inside an Ok result using the provided function.
+ * If the input is an Err result, it returns the Err result unchanged.
+ * @param result - The result to map
+ * @param mapFn - Function to transform the success value
+ * @returns A new Result with the mapped value or the original error
+ */
+export function mapOk<T, E, U>(result: TResult<T, E>, mapFn: (value: T) => U): TResult<U, E> {
+	if (result[0]) {
+		return Ok(mapFn(result[2]));
+	}
+	return Err(result[1]);
+}
+
+/**
+ * Maps the error inside an Err result using the provided function.
+ * If the input is an Ok result, it returns the Ok result unchanged.
+ * @param result - The result to map
+ * @param mapFn - Function to transform the error value
+ * @returns A new Result with the mapped error or the original success value
+ */
+export function mapErr<T, E, F>(result: TResult<T, E>, mapFn: (error: E) => F): TResult<T, F> {
+	if (!result[0]) {
+		return Err(mapFn(result[1]));
+	}
+	return Ok(result[2]);
 }
 
 /**
