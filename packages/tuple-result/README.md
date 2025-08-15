@@ -257,6 +257,6 @@ const result = deserialize([true, 42]); // Ok(42)
 
 ## 💡 Resources / References
 
-- [try operator proposal](https://github.com/tc39/proposal-try) - ECMAScript proposal that inspired our array destructuring
+- [try operator proposal](https://github.com/arthurfiorette/proposal-try-operator) - ECMAScript proposal that inspired our array destructuring
 - [ts-results](https://github.com/vultix/ts-results)
 - [neverthrow](https://github.com/supermacro/neverthrow)
