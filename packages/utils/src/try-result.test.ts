@@ -84,7 +84,65 @@ describe('TryResult implementation', () => {
 		});
 	});
 
-	describe('Ok() factory function', () => {
+	describe('array destructuring', () => {
+		it('should destructure Ok results with correct types', () => {
+			const result = Ok(42);
+			const [ok, error, value] = result;
+
+			// TypeScript should know these exact types
+			const isTrue: true = ok;
+			const isUndefined: undefined = error;
+			const isNumber: number = value;
+
+			expect(isTrue).toBe(true);
+			expect(isUndefined).toBe(undefined);
+			expect(isNumber).toBe(42);
+		});
+
+		it('should destructure Err results with correct types', () => {
+			const result = Err('oops');
+			const [ok, error, value] = result;
+
+			// TypeScript should know these exact types
+			const isFalse: false = ok;
+			const isString: string = error;
+			const isUndefined: undefined = value;
+
+			expect(isFalse).toBe(false);
+			expect(isString).toBe('oops');
+			expect(isUndefined).toBe(undefined);
+		});
+
+		it('should work with conditional destructuring', () => {
+			const result = Ok('success');
+			const [ok, , value] = result; // Skip error position
+
+			if (ok) {
+				expect(value).toBe('success');
+			} else {
+				throw new Error('Expected ok to be true');
+			}
+		});
+
+		it('should work with rest destructuring', () => {
+			const result = Ok([1, 2, 3]);
+			const [ok, ...rest] = result;
+
+			expect(ok).toBe(true);
+			expect(rest).toEqual([undefined, [1, 2, 3]]);
+		});
+
+		it('should work with nested destructuring', () => {
+			const result = Ok({ name: 'John', age: 30 });
+			const [ok, , { name, age }] = result;
+
+			expect(ok).toBe(true);
+			expect(name).toBe('John');
+			expect(age).toBe(30);
+		});
+	});
+
+	describe('Ok function', () => {
 		it('should create OkResult instances', () => {
 			const result = Ok(42);
 			expect(result.value).toBe(42);
@@ -98,7 +156,7 @@ describe('TryResult implementation', () => {
 		});
 	});
 
-	describe('Err() factory function', () => {
+	describe('Err function', () => {
 		it('should create ErrResult instances', () => {
 			const result = Err('error');
 			expect(result.error).toBe('error');
@@ -112,7 +170,7 @@ describe('TryResult implementation', () => {
 		});
 	});
 
-	describe('isOk() type guard', () => {
+	describe('isOk function', () => {
 		it('should narrow types correctly for Ok results', () => {
 			const okResult: TResult<number, string> = Ok(99);
 			if (isOk(okResult)) {
@@ -128,7 +186,7 @@ describe('TryResult implementation', () => {
 		});
 	});
 
-	describe('isErr() type guard', () => {
+	describe('isErr function', () => {
 		it('should narrow types correctly for Err results', () => {
 			const errResult: TResult<number, string> = Err('Failure');
 			if (isErr(errResult)) {
@@ -144,7 +202,7 @@ describe('TryResult implementation', () => {
 		});
 	});
 
-	describe('unwrapOk() function', () => {
+	describe('unwrapOk function', () => {
 		it('should extract value from Ok result', () => {
 			const result = Ok('Success');
 			expect(unwrapOk(result)).toBe('Success');
@@ -156,7 +214,7 @@ describe('TryResult implementation', () => {
 		});
 	});
 
-	describe('unwrapErr() function', () => {
+	describe('unwrapErr function', () => {
 		it('should extract error from Err result', () => {
 			const result = Err('Error occurred');
 			expect(unwrapErr(result)).toBe('Error occurred');
@@ -168,7 +226,7 @@ describe('TryResult implementation', () => {
 		});
 	});
 
-	describe('unwrapOr() function', () => {
+	describe('unwrapOr function', () => {
 		it('should return value for Ok result', () => {
 			const result = Ok(42);
 			expect(unwrapOr(result, 0)).toBe(42);
@@ -180,7 +238,7 @@ describe('TryResult implementation', () => {
 		});
 	});
 
-	describe('unwrapOrNull() function', () => {
+	describe('unwrapOrNull function', () => {
 		it('should return value for Ok result', () => {
 			const result = Ok(42);
 			expect(unwrapOrNull(result)).toBe(42);
@@ -192,7 +250,7 @@ describe('TryResult implementation', () => {
 		});
 	});
 
-	describe('serialize() function', () => {
+	describe('serialize function', () => {
 		it('should serialize Ok result correctly', () => {
 			const result = Ok('success');
 			const serialized = serialize(result);
@@ -206,7 +264,7 @@ describe('TryResult implementation', () => {
 		});
 	});
 
-	describe('deserialize() function', () => {
+	describe('deserialize function', () => {
 		it('should deserialize Ok result correctly', () => {
 			const serialized: [boolean, string] = [true, 'success'];
 			const result = deserialize(serialized);
@@ -222,7 +280,7 @@ describe('TryResult implementation', () => {
 		});
 	});
 
-	describe('t() function wrapper', () => {
+	describe('t function', () => {
 		it('should wrap successful sync functions', () => {
 			const fn = (x: number) => x * 2;
 			const result = t(fn, 21);
@@ -240,7 +298,7 @@ describe('TryResult implementation', () => {
 		});
 	});
 
-	describe('tAsync() function wrapper', () => {
+	describe('tAsync function', () => {
 		it('should wrap resolved promises', async () => {
 			const promise = Promise.resolve(42);
 			const result = await tAsync(promise);
@@ -253,20 +311,6 @@ describe('TryResult implementation', () => {
 			const result = await tAsync(promise);
 			expect(result.isErr()).toBe(true);
 			expect(result.error).toBe('oops');
-		});
-	});
-
-	describe('type safety', () => {
-		it('should maintain type safety with getters', () => {
-			const okResult = Ok(42);
-			const errResult = Err('error');
-
-			// TypeScript should know these types
-			const okValue: number = okResult.value;
-			const errError: string = errResult.error;
-
-			expect(okValue).toBe(42);
-			expect(errError).toBe('error');
 		});
 	});
 });
