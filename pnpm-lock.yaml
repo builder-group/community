@@ -684,7 +684,7 @@ importers:
         specifier: ^4.41.0
         version: 4.41.0
 
-  packages/trydent:
+  packages/try-results:
     devDependencies:
       '@blgc/config':
         specifier: workspace:*
