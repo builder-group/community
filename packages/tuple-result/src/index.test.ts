@@ -6,6 +6,7 @@ import {
 	isOk,
 	mapErr,
 	mapOk,
+	match,
 	Ok,
 	t,
 	tAsync,
@@ -153,6 +154,56 @@ describe('tuple-result', () => {
 			const mapped = mapErr(result, (err) => `Wrapped: ${err}`);
 			expect(mapped.isOk()).toBe(true);
 			expect(mapped.unwrap()).toBe(42);
+		});
+	});
+
+	describe('match function', () => {
+		it('should call ok handler for Ok results', () => {
+			const result = Ok(42);
+			const message = match(result, {
+				ok: (value) => `Success: ${value}`,
+				err: (error) => `Error: ${error}`
+			});
+			expect(message).toBe('Success: 42');
+		});
+
+		it('should call err handler for Err results', () => {
+			const result = Err('Something went wrong');
+			const message = match(result, {
+				ok: (value) => `Success: ${value}`,
+				err: (error) => `Error: ${error}`
+			});
+			expect(message).toBe('Error: Something went wrong');
+		});
+
+		it('should work with complex transformations', () => {
+			const result = Ok({ name: 'John', age: 30 });
+			const processed = match(result, {
+				ok: (user) => ({ ...user, displayName: user.name.toUpperCase() }),
+				err: (error) => ({ name: 'Unknown', age: 0, displayName: 'UNKNOWN' })
+			});
+			expect(processed).toEqual({
+				name: 'John',
+				age: 30,
+				displayName: 'JOHN'
+			});
+		});
+
+		it('should work with plain arrays', () => {
+			const okArray: [true, undefined, string] = [true, undefined, 'hello'];
+			const errArray: [false, string, undefined] = [false, 'oops', undefined];
+
+			const okMessage = match(okArray, {
+				ok: (value) => `Got: ${value}`,
+				err: (error) => `Failed: ${error}`
+			});
+			expect(okMessage).toBe('Got: hello');
+
+			const errMessage = match(errArray, {
+				ok: (value) => `Got: ${value}`,
+				err: (error) => `Failed: ${error}`
+			});
+			expect(errMessage).toBe('Failed: oops');
 		});
 	});
 

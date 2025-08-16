@@ -332,7 +332,7 @@ export function t<T, Args extends any[]>(
 }
 
 /**
- * Wraps a Promise in a result.
+ * Wraps a Promise in a Result.
  * @param promise - The promise to wrap
  * @returns A Promise that resolves to a result
  */
@@ -343,4 +343,24 @@ export async function tAsync<T>(promise: Promise<T>): Promise<TResult<T, unknown
 	} catch (error) {
 		return Err<T, unknown>(error);
 	}
+}
+
+/**
+ * Pattern matches on a result, calling the appropriate handler.
+ * Similar to Rust's match! macro but following KISS principles.
+ * @param result - The result to match on
+ * @param handlers - Object with ok and err handlers
+ * @returns The result of calling the appropriate handler
+ */
+export function match<T, E, R>(
+	result: TResult<T, E> | TResultArray<T, E>,
+	handlers: {
+		ok: (value: T) => R;
+		err: (error: E) => R;
+	}
+): R {
+	if (result[0]) {
+		return handlers.ok(result[2]);
+	}
+	return handlers.err(result[1]);
 }

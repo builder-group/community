@@ -104,7 +104,25 @@ const doubled = mapOk(success, (x) => x * 2); // Ok(84)
 const wrapped = mapErr(failure, (e) => `Error: ${e}`); // Err('Error: Something went wrong')
 ```
 
-### 6. Serialization
+### 6. Pattern Matching
+
+```ts
+import { match } from 'tuple-result';
+
+// Clean conditional logic
+const message = match(result, {
+  ok: (value) => `Success: ${value}`,
+  err: (error) => `Error: ${error}`
+});
+
+// Complex transformations
+const processed = match(result, {
+  ok: (user) => ({ ...user, displayName: user.name.toUpperCase() }),
+  err: (error) => ({ id: 0, name: 'Unknown', error: error.message })
+});
+```
+
+### 7. Serialization
 
 ```ts
 // Convert to serializable format
@@ -224,6 +242,19 @@ Maps the error inside an Err result using the provided function.
 
 ```ts
 const wrapped = mapErr(Err(404), (code) => `HTTP ${code}`); // Err('HTTP 404')
+```
+
+### Pattern Matching Functions
+
+#### `match<T, E, R>(result: TResult<T, E> | TResultArray<T, E>, handlers: { ok: (value: T) => R; err: (error: E) => R }): R`
+
+Pattern matches on a result, calling the appropriate handler. Similar to Rust's `match!` macro.
+
+```ts
+const message = match(result, {
+  ok: (value) => `Success: ${value}`,
+  err: (error) => `Error: ${error}`
+});
 ```
 
 ### Function Wrappers
