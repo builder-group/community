@@ -1,6 +1,6 @@
 {
 	"name": "tuple-result",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"private": false,
 	"description": "A minimal, functional, and tree-shakable Result library for TypeScript that prioritizes simplicity and serialization",
 	"keywords": [],
@@ -34,10 +34,9 @@
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest"
 	},
-	"dependencies": {},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^24.1.0",
+		"@types/node": "^24.3.0",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [

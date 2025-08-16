@@ -1,5 +1,16 @@
 # feature-fetch
 
+## 0.0.51
+
+### Patch Changes
+
+- updated deps
+
+- Updated dependencies []:
+  - tuple-result@0.0.7
+  - @blgc/types@0.0.19
+  - @blgc/utils@0.0.59
+
 ## 0.0.50
 
 ### Patch Changes

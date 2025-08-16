@@ -1,6 +1,6 @@
 {
 	"name": "openapi-ts-router",
-	"version": "0.3.3",
+	"version": "0.3.4",
 	"private": false,
 	"description": "Thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod",
 	"keywords": [],
@@ -42,9 +42,9 @@
 		"@blgc/config": "workspace:*",
 		"@types/express": "^5.0.3",
 		"@types/express-serve-static-core": "^5.0.7",
-		"@types/node": "^24.1.0",
+		"@types/node": "^24.3.0",
 		"express": "^5.1.0",
-		"hono": "^4.8.12",
+		"hono": "^4.9.2",
 		"rollup-presets": "workspace:*",
 		"valibot": "1.1.0",
 		"validation-adapters": "workspace:*"

@@ -1,4 +1,4 @@
-import { Err, Ok } from '@blgc/utils';
+import { Err, Ok } from 'tuple-result';
 import { FetchError } from './exceptions';
 import {
 	buildUrl,

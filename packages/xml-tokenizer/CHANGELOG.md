@@ -1,5 +1,11 @@
 # xml-tokenizer
 
+## 0.0.42
+
+### Patch Changes
+
+- updated deps
+
 ## 0.0.41
 
 ### Patch Changes

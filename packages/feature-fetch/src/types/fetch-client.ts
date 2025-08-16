@@ -1,5 +1,5 @@
 import { TWithFeatures, type TFeatureDefinition } from '@blgc/types/features';
-import { type TResult } from '@blgc/utils';
+import { type TResult } from 'tuple-result';
 import type { FetchError, NetworkError, RequestError } from '../exceptions';
 import type { FetchHeaders } from '../helper';
 import {

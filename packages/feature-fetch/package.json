@@ -1,6 +1,6 @@
 {
 	"name": "feature-fetch",
-	"version": "0.0.50",
+	"version": "0.0.51",
 	"private": false,
 	"description": "Straightforward, typesafe, and feature-based fetch wrapper supporting OpenAPI types",
 	"keywords": [],
@@ -37,13 +37,14 @@
 	"dependencies": {
 		"@0no-co/graphql.web": "^1.2.0",
 		"@blgc/types": "workspace:*",
-		"@blgc/utils": "workspace:*"
+		"@blgc/utils": "workspace:*",
+		"tuple-result": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^24.1.0",
+		"@types/node": "^24.3.0",
 		"@types/url-parse": "^1.4.11",
-		"msw": "^2.10.4",
+		"msw": "^2.10.5",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [

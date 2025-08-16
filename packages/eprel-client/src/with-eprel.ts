@@ -1,10 +1,10 @@
 import type { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
-import { mapOk } from '@blgc/utils';
 import {
 	Err,
 	FetchError,
 	isFetchClientWithFeatures,
 	isStatusCode,
+	mapOk,
 	Ok,
 	TOpenApiFeature,
 	type TFetchClient

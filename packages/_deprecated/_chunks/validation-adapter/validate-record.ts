@@ -1,6 +1,6 @@
 import { Err, Ok, TResult } from '@blgc/utils';
-import { createValidationContext } from '../create-validation-context';
-import { TValidationError, TValidator } from '../types';
+import { createValidationContext } from '../../../validation-adapter/src/create-validation-context';
+import { TValidationError, TValidator } from '../../../validation-adapter/src/types';
 
 /**
  * Validates a record of values against their corresponding validators

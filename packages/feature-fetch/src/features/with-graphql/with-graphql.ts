@@ -1,5 +1,5 @@
 import { TEnforceFeatureConstraint, TFeatureDefinition } from '@blgc/types/features';
-import { Err, Ok } from '@blgc/utils';
+import { Err, Ok } from 'tuple-result';
 import type {
 	TDocumentInput,
 	TFetchClient,

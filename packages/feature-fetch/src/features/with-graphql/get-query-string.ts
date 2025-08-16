@@ -1,4 +1,4 @@
-import { Ok, type TResult } from '@blgc/utils';
+import { Ok, type TResult } from 'tuple-result';
 import { type FetchError } from '../../exceptions';
 import { type TDocumentInput } from '../../types';
 

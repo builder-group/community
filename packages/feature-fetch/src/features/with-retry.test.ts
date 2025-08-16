@@ -1,6 +1,6 @@
-import { unwrapErr } from '@blgc/utils';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
+import { unwrapErr } from 'tuple-result';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { createFetchClient } from '../create-fetch-client';
 import { RequestError } from '../exceptions';

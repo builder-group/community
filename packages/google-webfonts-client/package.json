@@ -1,6 +1,6 @@
 {
 	"name": "google-webfonts-client",
-	"version": "0.0.34",
+	"version": "0.0.35",
 	"private": false,
 	"description": "Typesafe and straightforward fetch client for interacting with the Google Web Fonts API using feature-fetch",
 	"keywords": [],
@@ -37,14 +37,13 @@
 	},
 	"dependencies": {
 		"@blgc/types": "workspace:*",
-		"@blgc/utils": "workspace:*",
 		"feature-fetch": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^24.1.0",
+		"@types/node": "^24.3.0",
 		"dotenv": "^17.2.1",
-		"openapi-typescript": "^7.8.0",
+		"openapi-typescript": "^7.9.1",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [

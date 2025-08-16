@@ -8,11 +8,13 @@
 	"baseBranch": "origin/main",
 	"updateInternalDependencies": "patch",
 	"ignore": [
+		"ecsify-vanilla-basic",
 		"feature-fetch-vanilla-open-meteo",
 		"feature-form-react-basic",
 		"feature-state-react-counter",
 		"openapi-ts-router-express-petstore",
 		"openapi-ts-router-hono-petstore",
+		"tuple-result-react-router-basic",
 		"xml-tokenizer-vanilla-playground"
 	]
 }

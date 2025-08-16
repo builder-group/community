@@ -1,6 +1,6 @@
 {
 	"name": "head-metadata",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"private": false,
 	"description": "Typesafe and straightforward utility for extracting structured metadata (like `<meta>`, `<title>`, and `<link>`) from the `<head>` of an HTML document",
 	"keywords": [],
@@ -38,7 +38,7 @@
 		"xml-tokenizer": "workspace:*"
 	},
 	"devDependencies": {
-		"@types/node": "^24.1.0",
+		"@types/node": "^24.3.0",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [

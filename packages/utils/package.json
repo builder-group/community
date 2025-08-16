@@ -1,6 +1,6 @@
 {
 	"name": "@blgc/utils",
-	"version": "0.0.58",
+	"version": "0.0.59",
 	"private": false,
 	"description": "Straightforward, typesafe, and tree-shakable collection of utility functions",
 	"keywords": [],
@@ -36,7 +36,7 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^24.1.0",
+		"@types/node": "^24.3.0",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [

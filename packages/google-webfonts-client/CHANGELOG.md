@@ -1,5 +1,15 @@
 # google-webfonts-client
 
+## 0.0.35
+
+### Patch Changes
+
+- updated deps
+
+- Updated dependencies []:
+  - feature-fetch@0.0.51
+  - @blgc/types@0.0.19
+
 ## 0.0.34
 
 ### Patch Changes

@@ -1,5 +1,5 @@
 import { type DocumentNode } from '@0no-co/graphql.web';
-import { TResult } from '@blgc/utils';
+import { type TResult } from 'tuple-result';
 import type { TFetchOptions, TFetchResponse, TFetchResponseError } from '../fetch-client';
 
 export interface TGraphQLFeature {
