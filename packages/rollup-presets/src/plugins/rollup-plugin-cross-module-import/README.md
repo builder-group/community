@@ -50,12 +50,12 @@ The plugin transforms cross-module imports based on package.json exports configu
    // In src/module2/nested/deep.ts
 
    // Main module import - transforms to build path
-   import { something } from '../../module1';
+
    // ↓
    import { something } from '../../../module1/esm';
-
-   // Specific file import - preserves file path
-   import { internal } from '../../module1/internal';
    // ↓
    import { internal } from '../../../module1/esm/internal';
+   import { something } from '../../module1';
+   // Specific file import - preserves file path
+   import { internal } from '../../module1/internal';
    ```

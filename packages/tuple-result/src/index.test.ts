@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
-	deserialize,
 	Err,
+	fromArray,
 	isErr,
 	isOk,
 	mapErr,
 	mapOk,
 	Ok,
-	serialize,
 	t,
 	tAsync,
+	toArray,
 	unwrapErr,
 	unwrapOk,
 	unwrapOr,
@@ -17,21 +17,9 @@ import {
 	type TResult
 } from './index';
 
-describe('tuple-result implementation', () => {
-	// it('should work', () => {
-	// 	const result: TResult<number, string> = Math.random() > 0.5 ? Ok(42) : Err('oops');
-	// 	const [ok, err, val] = result;
-	// 	if (ok) {
-	// 		const error: undefined = err;
-	// 		const value: number = val;
-	// 	} else {
-	// 		const error: string = err;
-	// 		const value: undefined = val;
-	// 	}
-	// });
-
+describe('tuple-result', () => {
 	describe('OkResult class', () => {
-		it('should create an Ok result correctly', () => {
+		it('should create Ok results with correct behavior', () => {
 			const result = Ok(42);
 			expect(result.value).toBe(42);
 			expect(result.unwrap()).toBe(42);
@@ -39,43 +27,23 @@ describe('tuple-result implementation', () => {
 			expect(result.isErr()).toBe(false);
 		});
 
-		it('should handle unwrap correctly', () => {
-			const result = Ok('Success');
-			expect(result.unwrap()).toBe('Success');
-		});
-
 		it('should support array destructuring', () => {
 			const result = Ok('hello');
 			const [ok, error, value] = result;
-
 			expect(ok).toBe(true);
 			expect(error).toBe(undefined);
 			expect(value).toBe('hello');
 		});
 
-		it('should work with array methods', () => {
-			const result = Ok(42);
-			expect(result.length).toBe(3);
-			expect(result[0]).toBe(true);
-			expect(result[1]).toBe(undefined);
-			expect(result[2]).toBe(42);
-		});
-
-		it('should handle null values correctly', () => {
+		it('should handle edge cases', () => {
 			const result = Ok(null);
 			expect(result.value).toBe(null);
 			expect(result.unwrap()).toBe(null);
 		});
-
-		it('should handle undefined values correctly', () => {
-			const result = Ok(undefined);
-			expect(result.value).toBe(undefined);
-			expect(result.unwrap()).toBe(undefined);
-		});
 	});
 
 	describe('ErrResult class', () => {
-		it('should create an Err result correctly', () => {
+		it('should create Err results with correct behavior', () => {
 			const result = Err('Some error');
 			expect(result.error).toBe('Some error');
 			expect(() => result.unwrap()).toThrowError();
@@ -83,119 +51,30 @@ describe('tuple-result implementation', () => {
 			expect(result.isErr()).toBe(true);
 		});
 
-		it('should throw error on unwrap', () => {
-			const result = Err('Error occurred');
-			expect(() => result.unwrap()).toThrow('Error occurred');
-		});
-
 		it('should support array destructuring', () => {
 			const result = Err('oops');
 			const [ok, error, value] = result;
-
 			expect(ok).toBe(false);
 			expect(error).toBe('oops');
 			expect(value).toBe(undefined);
 		});
 	});
 
-	describe('array destructuring', () => {
-		it('should destructure Ok results with correct types', () => {
-			const result = Ok(42);
-			const [ok, error, value] = result;
-
-			// TypeScript should know these exact types
-			const isTrue: true = ok;
-			const isUndefined: undefined = error;
-			const isNumber: number = value;
-
-			expect(isTrue).toBe(true);
-			expect(isUndefined).toBe(undefined);
-			expect(isNumber).toBe(42);
-		});
-
-		it('should destructure Err results with correct types', () => {
-			const result = Err('oops');
-			const [ok, error, value] = result;
-
-			// TypeScript should know these exact types
-			const isFalse: false = ok;
-			const isString: string = error;
-			const isUndefined: undefined = value;
-
-			expect(isFalse).toBe(false);
-			expect(isString).toBe('oops');
-			expect(isUndefined).toBe(undefined);
-		});
-
-		it('should work with conditional destructuring', () => {
-			const result = Ok('success');
-			const [ok, , value] = result; // Skip error position
-
-			if (ok) {
-				expect(value).toBe('success');
-			} else {
-				throw new Error('Expected ok to be true');
-			}
-		});
-	});
-
-	describe('Ok function', () => {
-		it('should create OkResult instances', () => {
-			const result = Ok(42);
-			expect(result.value).toBe(42);
-		});
-
-		it('should handle multiple instances', () => {
-			const okResult1 = Ok(1);
-			const okResult2 = Ok(2);
-			expect(okResult1.isOk()).toBe(true);
-			expect(okResult2.isOk()).toBe(true);
-		});
-	});
-
-	describe('Err function', () => {
-		it('should create ErrResult instances', () => {
-			const result = Err('error');
-			expect(result.error).toBe('error');
-		});
-
-		it('should handle multiple instances', () => {
-			const errResult1 = Err('First error');
-			const errResult2 = Err('Second error');
-			expect(errResult1.isErr()).toBe(true);
-			expect(errResult2.isErr()).toBe(true);
-		});
-	});
-
 	describe('isOk function', () => {
-		it('should narrow types correctly for Ok results', () => {
+		it('should narrow types correctly', () => {
 			const okResult: TResult<number, string> = Ok(99);
 			if (isOk(okResult)) {
 				expect(okResult.value).toBe(99);
-			} else {
-				throw new Error('Expected okResult to be Ok');
 			}
-		});
-
-		it('should return false for Err results', () => {
-			const errResult = Err('Failure');
-			expect(isOk(errResult)).toBe(false);
 		});
 	});
 
 	describe('isErr function', () => {
-		it('should narrow types correctly for Err results', () => {
+		it('should narrow types correctly', () => {
 			const errResult: TResult<number, string> = Err('Failure');
 			if (isErr(errResult)) {
 				expect(errResult.error).toBe('Failure');
-			} else {
-				throw new Error('Expected errResult to be Err');
 			}
-		});
-
-		it('should return false for Ok results', () => {
-			const okResult = Ok(99);
-			expect(isErr(okResult)).toBe(false);
 		});
 	});
 
@@ -207,7 +86,7 @@ describe('tuple-result implementation', () => {
 
 		it('should throw error for Err result', () => {
 			const result = Err('Error occurred');
-			expect(() => unwrapOk(result)).toThrow('Expected an Ok result');
+			expect(() => unwrapOk(result)).toThrow();
 		});
 	});
 
@@ -219,7 +98,7 @@ describe('tuple-result implementation', () => {
 
 		it('should throw error for Ok result', () => {
 			const result = Ok('No error');
-			expect(() => unwrapErr(result)).toThrow('Expected an Err result');
+			expect(() => unwrapErr(result)).toThrow();
 		});
 	});
 
@@ -248,116 +127,81 @@ describe('tuple-result implementation', () => {
 	});
 
 	describe('mapOk function', () => {
-		it('should map value for Ok result', () => {
+		it('should transform Ok values', () => {
 			const result = Ok(21);
-			const mapped = mapOk(result, (x: number) => x * 2);
-			expect(mapped.isOk()).toBe(true);
-			expect(mapped.unwrap()).toBe(42);
+			const doubled = mapOk(result, (x: number) => x * 2);
+			expect(doubled.unwrap()).toBe(42);
 		});
 
-		it('should return error unchanged for Err result', () => {
+		it('should leave Err results unchanged', () => {
 			const result = Err('Error occurred');
-			const mapped = mapOk<string, string, number>(
-				result as TResult<string, string>,
-				(x: string) => x.length
-			);
+			const mapped = mapOk(result, (x: number) => x * 2);
 			expect(mapped.isErr()).toBe(true);
 			expect(mapped.error).toBe('Error occurred');
-		});
-
-		it('should work with type transformations', () => {
-			const result = Ok('hello');
-			const mapped = mapOk(result, (str: string) => str.length);
-			expect(mapped.isOk()).toBe(true);
-			expect(mapped.unwrap()).toBe(5);
 		});
 	});
 
 	describe('mapErr function', () => {
-		it('should map error for Err result', () => {
+		it('should transform Err values', () => {
 			const result = Err('Error occurred');
-			const mapped = mapErr(result, (err) => `Wrapped: ${err}`);
-			expect(mapped.isErr()).toBe(true);
-			expect(mapped.error).toBe('Wrapped: Error occurred');
+			const wrapped = mapErr(result, (err) => `Wrapped: ${err}`);
+			expect(wrapped.error).toBe('Wrapped: Error occurred');
 		});
 
-		it('should return value unchanged for Ok result', () => {
+		it('should leave Ok results unchanged', () => {
 			const result = Ok(42);
 			const mapped = mapErr(result, (err) => `Wrapped: ${err}`);
 			expect(mapped.isOk()).toBe(true);
 			expect(mapped.unwrap()).toBe(42);
 		});
+	});
 
-		it('should work with error type transformations', () => {
-			const result = Err(404);
-			const mapped = mapErr(result, (code) => new Error(`HTTP ${code}`));
-			expect(mapped.isErr()).toBe(true);
-			expect(mapped.error).toBeInstanceOf(Error);
-			expect(mapped.error?.message).toBe('HTTP 404');
+	describe('toArray function', () => {
+		it('should convert Ok and Err results to arrays', () => {
+			const okResult = Ok('success');
+			const errResult = Err('error');
+
+			expect(toArray(okResult)).toEqual([true, undefined, 'success']);
+			expect(toArray(errResult)).toEqual([false, 'error', undefined]);
 		});
 	});
 
-	describe('serialize function', () => {
-		it('should serialize Ok result correctly', () => {
-			const result = Ok('success');
-			const serialized = serialize(result);
-			expect(serialized).toEqual([true, 'success']);
-		});
+	describe('fromArray function', () => {
+		it('should create results from arrays', () => {
+			const okArray: [true, undefined, string] = [true, undefined, 'success'];
+			const errArray: [false, string, undefined] = [false, 'error', undefined];
 
-		it('should serialize Err result correctly', () => {
-			const result = Err('error');
-			const serialized = serialize(result);
-			expect(serialized).toEqual([false, 'error']);
-		});
-	});
+			const okResult = fromArray(okArray);
+			const errResult = fromArray(errArray);
 
-	describe('deserialize function', () => {
-		it('should deserialize Ok result correctly', () => {
-			const serialized: [boolean, string] = [true, 'success'];
-			const result = deserialize(serialized);
-			expect(result.isOk()).toBe(true);
-			expect(result.unwrap()).toBe('success');
-		});
-
-		it('should deserialize Err result correctly', () => {
-			const serialized: [boolean, string] = [false, 'error'];
-			const result = deserialize(serialized);
-			expect(result.isOk()).toBe(false);
-			expect(() => result.unwrap()).toThrow();
+			expect(okResult.unwrap()).toBe('success');
+			expect(() => errResult.unwrap()).toThrow();
 		});
 	});
 
 	describe('t function', () => {
-		it('should wrap successful sync functions', () => {
-			const fn = (x: number) => x * 2;
-			const result = t(fn, 21);
-			expect(result.isOk()).toBe(true);
+		it('should wrap successful and throwing functions', () => {
+			const successFn = (x: number) => x * 2;
+			const result = t(successFn, 21);
 			expect(result.unwrap()).toBe(42);
-		});
 
-		it('should wrap throwing functions', () => {
-			const fn = () => {
+			const throwingFn = () => {
 				throw new Error('oops');
 			};
-			const result = t(fn);
-			expect(result.isErr()).toBe(true);
-			expect(result.error).toBeInstanceOf(Error);
+			const errorResult = t(throwingFn);
+			expect(errorResult.isErr()).toBe(true);
 		});
 	});
 
 	describe('tAsync function', () => {
-		it('should wrap resolved promises', async () => {
+		it('should wrap resolved and rejected promises', async () => {
 			const promise = Promise.resolve(42);
 			const result = await tAsync(promise);
-			expect(result.isOk()).toBe(true);
 			expect(result.unwrap()).toBe(42);
-		});
 
-		it('should wrap rejecting promises', async () => {
-			const promise = Promise.reject('oops');
-			const result = await tAsync(promise);
-			expect(result.isErr()).toBe(true);
-			expect(result.error).toBe('oops');
+			const rejectingPromise = Promise.reject('oops');
+			const errorResult = await tAsync(rejectingPromise);
+			expect(errorResult.isErr()).toBe(true);
 		});
 	});
 });

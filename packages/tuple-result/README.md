@@ -27,6 +27,10 @@
 - **🔧 Functional Helpers**: Powerful map, unwrap, and utility functions
 - **🧵 Type Safe**: Full TypeScript support with literal types and type guards
 
+### 📚 Examples
+
+- [React Router v7](https://github.com/builder-group/community/tree/develop/examples/tuple-result/react-router/basic) ([CodeSandbox](https://codesandbox.io/p/devbox/zkdsr2))
+
 ### 🌟 Motivation
 
 Build a minimal, functional Result library that prioritizes simplicity and serialization. While libraries like [ts-results](https://github.com/vultix/ts-results) and [neverthrow](https://github.com/supermacro/neverthrow) offer robust features, their class-based implementations can create challenges with serialization and bundle size. `tuple-result` provides a functional alternative using simple arrays - combining minimal overhead (~150B core), easy serialization for APIs and frameworks like React Router, and helper functions while adhering to the KISS principle.
@@ -43,7 +47,7 @@ Build a minimal, functional Result library that prioritizes simplicity and seria
 ### 1. Creating Results
 
 ```ts
-import { Ok, Err } from 'tuple-result';
+import { Err, Ok } from 'tuple-result';
 
 const success = Ok(42);
 const failure = Err('Something went wrong');
@@ -82,37 +86,32 @@ const asyncResult = await tAsync(fetch('/api/data')); // Ok(Response) or Err(Err
 ### 4. Safe Value Extraction
 
 ```ts
-import { unwrapOr, unwrapErr } from 'tuple-result';
+import { unwrapErr, unwrapOr } from 'tuple-result';
 
 // Provide defaults
 const value = unwrapOr(failure, 0); // 0
-
-// Extract errors safely
-const error = unwrapErr(failure); // 'Something went wrong'
 ```
 
 ### 5. Transforming Results
 
 ```ts
-import { mapOk, mapErr } from 'tuple-result';
+import { mapErr, mapOk } from 'tuple-result';
 
 // Transform success values
-const doubled = mapOk(success, x => x * 2); // Ok(84)
+const doubled = mapOk(success, (x) => x * 2); // Ok(84)
 
 // Transform errors
-const wrapped = mapErr(failure, e => `Error: ${e}`); // Err('Error: Something went wrong')
+const wrapped = mapErr(failure, (e) => `Error: ${e}`); // Err('Error: Something went wrong')
 ```
 
 ### 6. Serialization
 
 ```ts
-import { serialize, deserialize } from 'tuple-result';
+// Convert to serializable format
+const serialized = success.toArray(); // [true, undefined, 42]
 
-// Convert to wire format
-const wireFormat = serialize(success); // [true, 42]
-
-// Reconstruct from wire format
-const reconstructed = deserialize(wireFormat); // Back to TResult
+// Reconstruct from serialized format
+const reconstructed = fromArray(serialized); // Back to TResult with methods
 ```
 
 ## 📚 API Reference
@@ -120,26 +119,29 @@ const reconstructed = deserialize(wireFormat); // Back to TResult
 ### Core Functions
 
 #### `Ok<T, E>(value: T): OkResult<T, E>`
+
 Creates a successful result containing the given value.
 
 ```ts
 const result = Ok(42);
 console.log(result.unwrap()); // 42
-console.log(result.isOk());   // true
+console.log(result.isOk()); // true
 ```
 
 #### `Err<T, E>(error: E): ErrResult<T, E>`
+
 Creates an error result containing the given error.
 
 ```ts
 const result = Err('Something went wrong');
-console.log(result.isErr());  // true
-console.log(result.error);    // 'Something went wrong'
+console.log(result.isErr()); // true
+console.log(result.error); // 'Something went wrong'
 ```
 
 ### Type Guards
 
 #### `isOk<T, E>(result: TResult<T, E>): result is OkResult<T, E>`
+
 Type guard to check if a result is successful.
 
 ```ts
@@ -150,6 +152,7 @@ if (isOk(result)) {
 ```
 
 #### `isErr<T, E>(result: TResult<T, E>): result is ErrResult<T, E>`
+
 Type guard to check if a result is an error.
 
 ```ts
@@ -162,6 +165,7 @@ if (isErr(result)) {
 ### Unwrapping Functions
 
 #### `unwrap<T, E>(result: TResult<T, E>): T`
+
 Extracts the value from a result, throwing if it's an error.
 
 ```ts
@@ -173,6 +177,7 @@ try {
 ```
 
 #### `unwrapOk<T, E>(result: TResult<T, E>): T`
+
 Extracts the value from an Ok result, throwing if it's an error.
 
 ```ts
@@ -180,6 +185,7 @@ const value = unwrapOk(success); // 42
 ```
 
 #### `unwrapErr<T, E>(result: TResult<T, E>): E`
+
 Extracts the error from an Err result, throwing if it's successful.
 
 ```ts
@@ -187,6 +193,7 @@ const error = unwrapErr(failure); // 'Something went wrong'
 ```
 
 #### `unwrapOr<T, E>(result: TResult<T, E>, defaultValue: T): T`
+
 Extracts the value from a result, returning a default if it's an error.
 
 ```ts
@@ -194,6 +201,7 @@ const value = unwrapOr(failure, 0); // 0
 ```
 
 #### `unwrapOrNull<T, E>(result: TResult<T, E>): T | null`
+
 Extracts the value from a result, returning null if it's an error.
 
 ```ts
@@ -203,22 +211,25 @@ const value = unwrapOrNull(failure); // null
 ### Transformation Functions
 
 #### `mapOk<T, E, U>(result: TResult<T, E>, mapFn: (value: T) => U): TResult<U, E>`
+
 Maps the value inside an Ok result using the provided function.
 
 ```ts
-const doubled = mapOk(Ok(21), x => x * 2); // Ok(42)
+const doubled = mapOk(Ok(21), (x) => x * 2); // Ok(42)
 ```
 
 #### `mapErr<T, E, F>(result: TResult<T, E>, mapFn: (error: E) => F): TResult<T, F>`
+
 Maps the error inside an Err result using the provided function.
 
 ```ts
-const wrapped = mapErr(Err(404), code => `HTTP ${code}`); // Err('HTTP 404')
+const wrapped = mapErr(Err(404), (code) => `HTTP ${code}`); // Err('HTTP 404')
 ```
 
 ### Function Wrappers
 
 #### `t<T, Args extends any[]>(fn: (...args: Args) => T, ...args: Args): TResult<T, unknown>`
+
 Wraps a synchronous function call in a Result.
 
 ```ts
@@ -227,6 +238,7 @@ const safeDivide = (a: number, b: number) => t(() => a / b, a, b);
 ```
 
 #### `tAsync<T>(promise: Promise<T>): Promise<TResult<T, unknown>>`
+
 Wraps a Promise in a Result.
 
 ```ts
@@ -235,19 +247,53 @@ const result = await tAsync(fetch('/api/data')); // Ok(Response) or Err(Error)
 
 ### Serialization Functions
 
-#### `serialize<T, E>(result: TResult<T, E>): [boolean, T | E]`
-Converts a result to a wire-friendly format.
+#### `toArray()` (Instance Method)
+
+Converts a result to a plain array for serialization.
 
 ```ts
-const wireFormat = serialize(Ok(42)); // [true, 42]
+const result = Ok(42);
+const serialized = result.toArray(); // [true, undefined, 42]
 ```
 
-#### `deserialize<T, E>(serialized: [boolean, T | E]): TResult<T, E>`
-Converts a serialized result back to a TResult.
+#### `fromArray<T, E>(array: TResultArray<T, E>): TResult<T, E>`
+
+Creates a result instance from a plain array.
 
 ```ts
-const result = deserialize([true, 42]); // Ok(42)
+const result = fromArray([true, undefined, 42]); // Ok(42) with methods
 ```
+
+## ❓ FAQ
+
+### Why both `TResult` and `TResultArray`?
+
+**`TResultArray` is a subset of `TResult`** - same array structure, but `TResult` adds convenience methods.
+
+- **`TResult`**: Full-featured classes with `.isOk()`, `.unwrap()`, `.value` methods
+- **`TResultArray`**: Plain arrays perfect for serialization (React Router, APIs, JSON)
+
+**Key benefit:** All helper functions work with both types seamlessly.
+
+```typescript
+const classResult = Ok('hello');
+const arrayResult = [true, undefined, 'hello'] as const;
+
+isOk(classResult); // ✅ works
+isOk(arrayResult); // ✅ also works
+```
+
+### When do I use each?
+
+**Use `TResult` by default.** You get `TResultArray` from:
+
+- React Router loaders: `useLoaderData()`
+- JSON parsing: `JSON.parse(response)`
+- API responses
+
+**For serialization:** `result.toArray()` → send over network → use helpers directly on received arrays or deserialize using `fromArray(result)`.
+
+No conversion needed - helpers work with both!
 
 ## 💡 Resources / References
 
