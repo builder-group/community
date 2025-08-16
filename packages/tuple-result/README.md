@@ -20,7 +20,7 @@
 `tuple-result` is a minimal, functional, and tree-shakable Result library for TypeScript that prioritizes simplicity and serialization.
 
 - **🔮 Simple, declarative API**: Intuitive array destructuring with full type safety
-- **🍃 Lightweight & Tree Shakable**: Function-based design with zero dependencies
+- **🍃 Lightweight & Tree Shakable**: Function-based design with ~150B core
 - **⚡ High Performance**: Minimal overhead with just a 3-element array
 - **🔍 Easy Serialization**: Simple array format perfect for wire transmission
 - **📦 Zero Dependencies**: Standalone library ensuring ease of use in various environments
@@ -29,13 +29,7 @@
 
 ### 🌟 Motivation
 
-Build a minimal, functional Result library that prioritizes simplicity and serialization. While libraries like [ts-results](https://github.com/vultix/ts-results) and [neverthrow](https://github.com/supermacro/neverthrow) offer robust features, they often come with bloated class hierarchies that can't be easily serialized. `tuple-result` provides a simpler alternative - combining minimal overhead, easy serialization for APIs and frameworks like React Router, and functional helpers while adhering to the KISS principle.
-
-**Key Features:**
-- **Minimal Core**: Just a 3-element array `[boolean, E, T]` with methods
-- **Easy Serialization**: Perfect for APIs, Remix loaders, and network requests
-- **Array Destructuring**: Intuitive `[ok, error, value]` pattern
-- **Tree Shakable**: Import only what you need
+Build a minimal, functional Result library that prioritizes simplicity and serialization. While libraries like [ts-results](https://github.com/vultix/ts-results) and [neverthrow](https://github.com/supermacro/neverthrow) offer robust features, their class-based implementations can create challenges with serialization and bundle size. `tuple-result` provides a functional alternative using simple arrays - combining minimal overhead (~150B core), easy serialization for APIs and frameworks like React Router, and helper functions while adhering to the KISS principle.
 
 ### ⚖️ Alternatives
 
@@ -73,7 +67,19 @@ if (ok) {
 const value = success.unwrap(); // 42
 ```
 
-### 3. Safe Value Extraction
+### 3. Wrapping Functions
+
+```ts
+import { t, tAsync } from 'tuple-result';
+
+// Wrap synchronous functions
+const result = t(() => JSON.parse('invalid')); // Err(SyntaxError)
+
+// Wrap promises
+const asyncResult = await tAsync(fetch('/api/data')); // Ok(Response) or Err(Error)
+```
+
+### 4. Safe Value Extraction
 
 ```ts
 import { unwrapOr, unwrapErr } from 'tuple-result';
@@ -85,7 +91,7 @@ const value = unwrapOr(failure, 0); // 0
 const error = unwrapErr(failure); // 'Something went wrong'
 ```
 
-### 4. Transforming Results
+### 5. Transforming Results
 
 ```ts
 import { mapOk, mapErr } from 'tuple-result';
@@ -95,18 +101,6 @@ const doubled = mapOk(success, x => x * 2); // Ok(84)
 
 // Transform errors
 const wrapped = mapErr(failure, e => `Error: ${e}`); // Err('Error: Something went wrong')
-```
-
-### 5. Wrapping Functions
-
-```ts
-import { t, tAsync } from 'tuple-result';
-
-// Wrap synchronous functions
-const result = t(() => JSON.parse('invalid')); // Err(SyntaxError)
-
-// Wrap promises
-const asyncResult = await tAsync(fetch('/api/data')); // Ok(Response) or Err(Error)
 ```
 
 ### 6. Serialization

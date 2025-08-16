@@ -98,6 +98,8 @@ export function Ok<T, E>(value: T): OkResult<T, E> {
 	return new OkResult(value);
 }
 
+export const ok = Ok;
+
 /**
  * Creates an error result containing the given error.
  * @param error - The error value to wrap
@@ -106,6 +108,8 @@ export function Ok<T, E>(value: T): OkResult<T, E> {
 export function Err<T, E>(error: E): ErrResult<T, E> {
 	return new ErrResult(error);
 }
+
+export const err = Err;
 
 /**
  * Type guard to check if a result is successful.

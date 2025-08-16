@@ -19,7 +19,7 @@ import {
 
 describe('tuple-result implementation', () => {
 	// it('should work', () => {
-	// 	const result: TResult<number, string> = null as any;
+	// 	const result: TResult<number, string> = Math.random() > 0.5 ? Ok(42) : Err('oops');
 	// 	const [ok, err, val] = result;
 	// 	if (ok) {
 	// 		const error: undefined = err;
