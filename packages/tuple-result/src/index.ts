@@ -178,7 +178,9 @@ export const err = Err;
  * @param result - The result to check
  * @returns True if the result is Ok, false otherwise
  */
-export function isOk<T, E>(result: TResult<T, E> | TResultArray<T, E>): result is OkResult<T, E> {
+export function isOk<T, E>(result: TResult<T, E>): result is OkResult<T, E>;
+export function isOk<T, E>(result: TResultArray<T, E>): result is [true, undefined, T];
+export function isOk<T, E>(result: TResult<T, E> | TResultArray<T, E>): result is OkResult<T, E> | [true, undefined, T] {
 	return result[0];
 }
 
@@ -187,7 +189,9 @@ export function isOk<T, E>(result: TResult<T, E> | TResultArray<T, E>): result i
  * @param result - The result to check
  * @returns True if the result is Err, false otherwise
  */
-export function isErr<T, E>(result: TResult<T, E> | TResultArray<T, E>): result is ErrResult<T, E> {
+export function isErr<T, E>(result: TResult<T, E>): result is ErrResult<T, E>;
+export function isErr<T, E>(result: TResultArray<T, E>): result is [false, E, undefined];
+export function isErr<T, E>(result: TResult<T, E> | TResultArray<T, E>): result is ErrResult<T, E> | [false, E, undefined] {
 	return !result[0];
 }
 
@@ -197,6 +201,8 @@ export function isErr<T, E>(result: TResult<T, E> | TResultArray<T, E>): result 
  * @returns The success value
  * @throws The error if the result is Err
  */
+export function unwrap<T, E>(result: TResult<T, E>): T;
+export function unwrap<T, E>(result: TResultArray<T, E>): T;
 export function unwrap<T, E>(result: TResult<T, E> | TResultArray<T, E>): T {
 	if (result[0]) {
 		return result[2];
@@ -218,6 +224,8 @@ export function unwrap<T, E>(result: TResult<T, E> | TResultArray<T, E>): T {
  * @returns The success value
  * @throws Error if the result is not Ok
  */
+export function unwrapOk<T, E>(result: TResult<T, E>): T;
+export function unwrapOk<T, E>(result: TResultArray<T, E>): T;
 export function unwrapOk<T, E>(result: TResult<T, E> | TResultArray<T, E>): T {
 	if (result[0]) {
 		return result[2];
@@ -231,6 +239,8 @@ export function unwrapOk<T, E>(result: TResult<T, E> | TResultArray<T, E>): T {
  * @returns The error value
  * @throws Error if the result is not Err
  */
+export function unwrapErr<T, E>(result: TResult<T, E>): E;
+export function unwrapErr<T, E>(result: TResultArray<T, E>): E;
 export function unwrapErr<T, E>(result: TResult<T, E> | TResultArray<T, E>): E {
 	if (!result[0]) {
 		return result[1];
@@ -244,6 +254,8 @@ export function unwrapErr<T, E>(result: TResult<T, E> | TResultArray<T, E>): E {
  * @param defaultValue - The value to return if the result is Err
  * @returns The success value or the default value
  */
+export function unwrapOr<T, E>(result: TResult<T, E>, defaultValue: T): T;
+export function unwrapOr<T, E>(result: TResultArray<T, E>, defaultValue: T): T;
 export function unwrapOr<T, E>(result: TResult<T, E> | TResultArray<T, E>, defaultValue: T): T {
 	return result[0] ? result[2] : defaultValue;
 }
@@ -253,6 +265,8 @@ export function unwrapOr<T, E>(result: TResult<T, E> | TResultArray<T, E>, defau
  * @param result - The result to unwrap
  * @returns The success value or null
  */
+export function unwrapOrNull<T, E>(result: TResultArray<T, E>): T | null;
+export function unwrapOrNull<T, E>(result: TResult<T, E>): T | null;
 export function unwrapOrNull<T, E>(result: TResult<T, E> | TResultArray<T, E>): T | null {
 	return result[0] ? result[2] : null;
 }
@@ -264,6 +278,14 @@ export function unwrapOrNull<T, E>(result: TResult<T, E> | TResultArray<T, E>): 
  * @param mapFn - Function to transform the success value
  * @returns A new result with the mapped value or the original error
  */
+export function mapOk<T, E, U>(
+	result: TResult<T, E>,
+	mapFn: (value: T) => U
+): TResult<U, E>;
+export function mapOk<T, E, U>(
+	result: TResultArray<T, E>,
+	mapFn: (value: T) => U
+): TResult<U, E>;
 export function mapOk<T, E, U>(
 	result: TResult<T, E> | TResultArray<T, E>,
 	mapFn: (value: T) => U
@@ -282,6 +304,14 @@ export function mapOk<T, E, U>(
  * @returns A new result with the mapped error or the original success value
  */
 export function mapErr<T, E, F>(
+	result: TResult<T, E>,
+	mapFn: (error: E) => F
+): TResult<T, F>;
+export function mapErr<T, E, F>(
+	result: TResultArray<T, E>,
+	mapFn: (error: E) => F
+): TResult<T, F>;
+export function mapErr<T, E, F>(
 	result: TResult<T, E> | TResultArray<T, E>,
 	mapFn: (error: E) => F
 ): TResult<T, F> {
@@ -296,6 +326,8 @@ export function mapErr<T, E, F>(
  * @param result - The result to convert
  * @returns A plain array representation
  */
+export function toArray<T, E>(result: TResult<T, E>): TResultArray<T, E>;
+export function toArray<T, E>(result: TResultArray<T, E>): TResultArray<T, E>;
 export function toArray<T, E>(result: TResult<T, E> | TResultArray<T, E>): TResultArray<T, E> {
 	return result[0] ? [true, undefined, result[2]] : [false, result[1], undefined];
 }
@@ -305,6 +337,8 @@ export function toArray<T, E>(result: TResult<T, E> | TResultArray<T, E>): TResu
  * @param array - The array to convert
  * @returns A result instance with methods
  */
+export function fromArray<T, E>(array: TResultArray<T, E>): TResult<T, E>;
+export function fromArray<T, E>(array: TResult<T, E>): TResult<T, E>;
 export function fromArray<T, E>(array: TResult<T, E> | TResultArray<T, E>): TResult<T, E> {
 	if (array[0]) {
 		return new OkResult(array[2] as T);
@@ -352,6 +386,20 @@ export async function tAsync<T>(promise: Promise<T>): Promise<TResult<T, unknown
  * @param handlers - Object with ok and err handlers
  * @returns The result of calling the appropriate handler
  */
+export function match<T, E, R>(
+	result: TResult<T, E>,
+	handlers: {
+		ok: (value: T) => R;
+		err: (error: E) => R;
+	}
+): R;
+export function match<T, E, R>(
+	result: TResultArray<T, E>,
+	handlers: {
+		ok: (value: T) => R;
+		err: (error: E) => R;
+	}
+): R;
 export function match<T, E, R>(
 	result: TResult<T, E> | TResultArray<T, E>,
 	handlers: {

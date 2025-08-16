@@ -326,6 +326,27 @@ isOk(arrayResult); // ✅ also works
 
 No conversion needed - helpers work with both!
 
+### Why do helper functions have overloads?
+
+**TypeScript compatibility.** Since `TResult` (classes) and `TResultArray` (plain arrays) have the same structure but different types, overloads ensure all helper functions work seamlessly with both:
+
+```typescript
+// These all work the same way
+unwrapOr(Ok(42), 0);           // ✅ TResult
+unwrapOr([true, undefined, 42], 0); // ✅ TResultArray
+unwrapOr(someResult, 0);        // ✅ Either type
+```
+
+Without overloads, complex types can cause TypeScript errors:
+
+```typescript
+// ❌ Sometimes fails with complex types
+const result: TResultArray<User, Error> = [false, new Error('Not found'), undefined];
+unwrapOr(result, defaultUser); // Type 'TResultArray<User, Error>' is not assignable to parameter type 'TResult<User, Error>'
+```
+
+Overloads ensure compatibility in all scenarios.
+
 ## 💡 Resources / References
 
 - [try operator proposal](https://github.com/arthurfiorette/proposal-try-operator) - ECMAScript proposal that inspired our array destructuring
