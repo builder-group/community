@@ -255,4 +255,14 @@ describe('tuple-result', () => {
 			expect(errorResult.isErr()).toBe(true);
 		});
 	});
+
+	describe('JSON serialization', () => {
+		it('should be directly stringifiable', () => {
+			const okResult = Ok(42);
+			const errResult = Err('error');
+
+			expect(JSON.stringify(okResult)).toBe('[true,null,42]');
+			expect(JSON.stringify(errResult)).toBe('[false,"error",null]');
+		});
+	});
 });
