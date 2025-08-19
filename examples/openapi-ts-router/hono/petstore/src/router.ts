@@ -1,5 +1,7 @@
 import { Hono } from 'hono';
 import { createHonoOpenApiRouter } from 'openapi-ts-router';
+import * as v from 'valibot';
+import { vValidator } from 'validation-adapters/valibot';
 import { zValidator } from 'validation-adapters/zod';
 import * as z from 'zod';
 import { paths } from './gen/v1';
@@ -27,6 +29,30 @@ openApiRouter.get('/pet/{petId}', {
 		return c.json({
 			name: 'Falko',
 			photoUrls: []
+		});
+	}
+});
+
+openApiRouter.post('/pet/{petId}/uploadImage', {
+	pathValidator: vValidator(
+		v.object({
+			petId: v.number()
+		})
+	),
+	queryValidator: zValidator(
+		z.object({
+			additionalMetadata: z.string().optional()
+		})
+	),
+	handler: (c) => {
+		const { petId } = c.req.valid('param');
+		const { additionalMetadata } = c.req.valid('query');
+		console.log('uploadFile', { petId, additionalMetadata });
+
+		return c.json({
+			code: 200,
+			type: 'success',
+			message: 'File uploaded successfully'
 		});
 	}
 });

@@ -16,7 +16,8 @@
 		"express": "^5.1.0",
 		"openapi-ts-router": "workspace:*",
 		"valibot": "1.1.0",
-		"validation-adapters": "workspace:*"
+		"validation-adapters": "workspace:*",
+		"zod": "^4.0.17"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",

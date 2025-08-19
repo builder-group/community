@@ -10,6 +10,7 @@
 		"@hono/zod-validator": "^0.7.2",
 		"hono": "^4.8.12",
 		"openapi-ts-router": "workspace:*",
+		"valibot": "1.1.0",
 		"validation-adapters": "workspace:*",
 		"zod": "^4.0.14"
 	},
