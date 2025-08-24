@@ -91,7 +91,7 @@ export function createState<GValue>(
 	};
 }
 
-interface TCreateStateOptions {
+export interface TCreateStateOptions {
 	queue?: 'sync' | 'async' | string;
 }
 
