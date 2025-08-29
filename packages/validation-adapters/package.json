@@ -1,6 +1,6 @@
 {
 	"name": "validation-adapters",
-	"version": "0.0.34",
+	"version": "0.0.35",
 	"private": false,
 	"description": "Pre-made validation adapters for the validation-adapter library, including adapters for Zod and Valibot",
 	"keywords": [],
@@ -107,7 +107,7 @@
 		"rollup-presets": "workspace:*",
 		"valibot": "1.1.0",
 		"yup": "^1.7.0",
-		"zod": "^4.0.17"
+		"zod": "^4.1.5"
 	},
 	"size-limit": [
 		{

@@ -40,6 +40,6 @@ export function zodValidator<GValue>(schema: ZodType<GValue>): TValidator<GValue
 export function isZodError(err: unknown): err is ZodError {
 	return (
 		err instanceof ZodError ||
-		(err instanceof Error && 'issues' in err && Array.isArray((err as any).issues))
+		(err instanceof Error && 'issues' in err && Array.isArray(err.issues))
 	);
 }
