@@ -140,7 +140,7 @@ export function useCombinedCompute<
 			const newComputed = compute(currentContextsRef.current);
 
 			// Only trigger re-render if computed value changed and not in background
-			if (!background && !isEqual(newComputed, lastComputedRef.current)) {
+			if (!background && (isEqual === false || !isEqual(newComputed, lastComputedRef.current))) {
 				forceRender();
 			}
 			lastComputedRef.current = newComputed;
@@ -160,5 +160,5 @@ export function useCombinedCompute<
 }
 
 interface TUseCombinedComputeOptions<GValue, GComputed> extends TListenerOptions<GValue> {
-	isEqual?: (a: GComputed, b: GComputed) => boolean;
+	isEqual?: ((a: GComputed, b: GComputed) => boolean) | false;
 }

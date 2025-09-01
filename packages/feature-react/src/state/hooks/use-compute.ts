@@ -27,7 +27,7 @@ export function useCompute<
 		// If state is null/undefined, compute with null and update if needed
 		if (state == null) {
 			const newComputed = compute({ value: null as GValue });
-			if (!isEqual(newComputed, lastComputedRef.current)) {
+			if (isEqual === false || !isEqual(newComputed, lastComputedRef.current)) {
 				forceRender();
 			}
 			lastComputedRef.current = newComputed;
@@ -42,7 +42,10 @@ export function useCompute<
 				const newComputed = compute(cx);
 
 				// Only trigger re-render if computed value changed and not in background
-				if (!cx.background && !isEqual(newComputed, lastComputedRef.current)) {
+				if (
+					!cx.background &&
+					(isEqual === false || !isEqual(newComputed, lastComputedRef.current))
+				) {
 					forceRender();
 				}
 				lastComputedRef.current = newComputed;
@@ -59,5 +62,5 @@ export function useCompute<
 }
 
 interface TUseComputeOptions<GValue, GComputed> extends TListenerOptions<GValue> {
-	isEqual?: (a: GComputed, b: GComputed) => boolean;
+	isEqual?: ((a: GComputed, b: GComputed) => boolean) | false;
 }
