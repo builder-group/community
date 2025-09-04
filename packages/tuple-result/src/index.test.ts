@@ -242,6 +242,20 @@ describe('tuple-result', () => {
 			const errorResult = t(throwingFn);
 			expect(errorResult.isErr()).toBe(true);
 		});
+
+		it('should work with URL constructor when wrapped in function', () => {
+			const createUrl = (url: string) => new URL(url);
+
+			// Valid URL
+			const validResult = t(createUrl, 'https://example.com');
+			expect(validResult.isOk()).toBe(true);
+			expect(validResult.unwrap().href).toBe('https://example.com/');
+
+			// Invalid URL
+			const invalidResult = t(createUrl, 'not-a-valid-url');
+			expect(invalidResult.isErr()).toBe(true);
+			expect(invalidResult.error).toBeInstanceOf(TypeError);
+		});
 	});
 
 	describe('tAsync function', () => {
