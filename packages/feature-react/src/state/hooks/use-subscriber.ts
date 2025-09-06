@@ -33,4 +33,4 @@ export interface TUseSubscriberOptions<GValue> extends TListenerOptions<GValue> 
 
 export type TUseSubscriberCallback<GValue> = (
 	context: TListenerContext<GValue>
-) => (() => void) | Promise<() => void>;
+) => (() => void) | Promise<() => void> | void | Promise<void>;
