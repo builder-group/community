@@ -107,7 +107,7 @@ export type TStateSetOptions<GValue> = Omit<TStateNotifyOptions<GValue>, 'prevVa
 
 export type TNullableStateValue<GState> =
 	NonNullable<GState> extends TState<infer GValue, any>
-		? Readonly<GValue> | (Extract<GState, null | undefined> extends never ? never : null)
+		? GValue | (Extract<GState, null | undefined> extends never ? never : null)
 		: never;
 
 export type TStateValue<S> = S extends TState<infer V, any> ? V : never;
