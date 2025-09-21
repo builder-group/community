@@ -180,7 +180,9 @@ export const err = Err;
  */
 export function isOk<T, E>(result: TResult<T, E>): result is OkResult<T, E>;
 export function isOk<T, E>(result: TResultArray<T, E>): result is [true, undefined, T];
-export function isOk<T, E>(result: TResult<T, E> | TResultArray<T, E>): result is OkResult<T, E> | [true, undefined, T] {
+export function isOk<T, E>(
+	result: TResult<T, E> | TResultArray<T, E>
+): result is OkResult<T, E> | [true, undefined, T] {
 	return result[0];
 }
 
@@ -191,7 +193,9 @@ export function isOk<T, E>(result: TResult<T, E> | TResultArray<T, E>): result i
  */
 export function isErr<T, E>(result: TResult<T, E>): result is ErrResult<T, E>;
 export function isErr<T, E>(result: TResultArray<T, E>): result is [false, E, undefined];
-export function isErr<T, E>(result: TResult<T, E> | TResultArray<T, E>): result is ErrResult<T, E> | [false, E, undefined] {
+export function isErr<T, E>(
+	result: TResult<T, E> | TResultArray<T, E>
+): result is ErrResult<T, E> | [false, E, undefined] {
 	return !result[0];
 }
 
@@ -272,20 +276,25 @@ export function unwrapOrNull<T, E>(result: TResult<T, E> | TResultArray<T, E>): 
 }
 
 /**
+ * Extracts the value from a result, returning undefined if it's an error.
+ * @param result - The result to unwrap
+ * @returns The success value or undefined
+ */
+export function unwrapOrUndefined<T, E>(result: TResultArray<T, E>): T | undefined;
+export function unwrapOrUndefined<T, E>(result: TResult<T, E>): T | undefined;
+export function unwrapOrUndefined<T, E>(result: TResult<T, E> | TResultArray<T, E>): T | undefined {
+	return result[0] ? result[2] : undefined;
+}
+
+/**
  * Maps the value inside an Ok result using the provided function.
  * Returns a new result with the mapped value or the original error.
  * @param result - The result to map
  * @param mapFn - Function to transform the success value
  * @returns A new result with the mapped value or the original error
  */
-export function mapOk<T, E, U>(
-	result: TResult<T, E>,
-	mapFn: (value: T) => U
-): TResult<U, E>;
-export function mapOk<T, E, U>(
-	result: TResultArray<T, E>,
-	mapFn: (value: T) => U
-): TResult<U, E>;
+export function mapOk<T, E, U>(result: TResult<T, E>, mapFn: (value: T) => U): TResult<U, E>;
+export function mapOk<T, E, U>(result: TResultArray<T, E>, mapFn: (value: T) => U): TResult<U, E>;
 export function mapOk<T, E, U>(
 	result: TResult<T, E> | TResultArray<T, E>,
 	mapFn: (value: T) => U
@@ -303,14 +312,8 @@ export function mapOk<T, E, U>(
  * @param mapFn - Function to transform the error value
  * @returns A new result with the mapped error or the original success value
  */
-export function mapErr<T, E, F>(
-	result: TResult<T, E>,
-	mapFn: (error: E) => F
-): TResult<T, F>;
-export function mapErr<T, E, F>(
-	result: TResultArray<T, E>,
-	mapFn: (error: E) => F
-): TResult<T, F>;
+export function mapErr<T, E, F>(result: TResult<T, E>, mapFn: (error: E) => F): TResult<T, F>;
+export function mapErr<T, E, F>(result: TResultArray<T, E>, mapFn: (error: E) => F): TResult<T, F>;
 export function mapErr<T, E, F>(
 	result: TResult<T, E> | TResultArray<T, E>,
 	mapFn: (error: E) => F

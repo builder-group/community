@@ -15,6 +15,7 @@ import {
 	unwrapOk,
 	unwrapOr,
 	unwrapOrNull,
+	unwrapOrUndefined,
 	type TResult
 } from './index';
 
@@ -124,6 +125,18 @@ describe('tuple-result', () => {
 		it('should return null for Err result', () => {
 			const result = Err('Error occurred');
 			expect(unwrapOrNull(result)).toBe(null);
+		});
+	});
+
+	describe('unwrapOrUndefined function', () => {
+		it('should return value for Ok result', () => {
+			const result = Ok(42);
+			expect(unwrapOrUndefined(result)).toBe(42);
+		});
+
+		it('should return undefined for Err result', () => {
+			const result = Err('Error occurred');
+			expect(unwrapOrUndefined(result)).toBe(undefined);
 		});
 	});
 

@@ -1,6 +1,6 @@
 {
 	"name": "tuple-result",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"private": false,
 	"description": "A minimal, functional, and tree-shakable Result library for TypeScript that prioritizes simplicity and serialization",
 	"keywords": [],
