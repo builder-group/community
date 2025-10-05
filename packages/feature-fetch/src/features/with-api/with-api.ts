@@ -14,6 +14,9 @@ export function withApi<GFeatures extends TFeatureDefinition[]>(
 		put(this: TFetchClient<[]>, path, body, options = {}) {
 			return this._baseFetch(path, 'PUT', { ...options, body });
 		},
+		patch(this: TFetchClient<[]>, path, body, options = {}) {
+			return this._baseFetch(path, 'PATCH', { ...options, body });
+		},
 		del(this: TFetchClient<[]>, path, options = {}) {
 			return this._baseFetch(path, 'DELETE', options);
 		}

@@ -66,6 +66,24 @@ describe('withApi function', () => {
 		});
 	});
 
+	it('should make a PATCH request successfully', async () => {
+		server.use(
+			http.patch(new URL('/test', BASE_URL).toString(), async ({ request }) => {
+				const body = await request.json();
+				return HttpResponse.json({ message: 'Patched', received: body }, { status: 200 });
+			})
+		);
+
+		const client = withApi(createFetchClient({ prefixUrl: BASE_URL }));
+		const result = await client.patch('/test', { name: 'John Patched' });
+
+		expect(result.isOk()).toBe(true);
+		expect(result.unwrap().data).toEqual({
+			message: 'Patched',
+			received: { name: 'John Patched' }
+		});
+	});
+
 	it('should make a DELETE request successfully', async () => {
 		server.use(
 			http.delete(new URL('/test', BASE_URL).toString(), () => {

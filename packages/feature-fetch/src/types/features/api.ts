@@ -7,6 +7,7 @@ export interface TApiFeature {
 		get: TApiGet;
 		put: TApiPut;
 		post: TApiPost;
+		patch: TApiPatch;
 		del: TApiDelete;
 	};
 }
@@ -32,6 +33,17 @@ export type TApiPost = <
 ) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 
 export type TApiPut = <
+	GSuccessResponseBody = unknown,
+	GErrorResponseBody = unknown,
+	GRequestBody extends TUnserializedBody = Record<string, unknown>,
+	GParseAs extends TParseAs = 'json'
+>(
+	path: string,
+	body: GRequestBody,
+	options?: TFetchOptions<GParseAs>
+) => Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
+
+export type TApiPatch = <
 	GSuccessResponseBody = unknown,
 	GErrorResponseBody = unknown,
 	GRequestBody extends TUnserializedBody = Record<string, unknown>,

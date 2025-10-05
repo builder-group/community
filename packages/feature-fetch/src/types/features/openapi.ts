@@ -23,6 +23,7 @@ export interface TOpenApiFeature<GPaths extends object> {
 		get: TOpenApiGet<GPaths>;
 		put: TOpenApiPut<GPaths>;
 		post: TOpenApiPost<GPaths>;
+		patch: TOpenApiPatch<GPaths>;
 		del: TOpenApiDelete<GPaths>;
 	};
 }
@@ -61,6 +62,22 @@ export type TOpenApiPut<GPaths extends object> = <
 	> extends never
 		? null
 		: TRequestBody<'put' extends keyof GPaths[GPutPaths] ? GPaths[GPutPaths]['put'] : unknown>,
+	options?: TOpenApiFetchOptions<GPathOperation, GParseAs>
+) => Promise<TOpenApiFetchResponse<GPathOperation, GParseAs>>;
+
+export type TOpenApiPatch<GPaths extends object> = <
+	GPatchPaths extends TPathsWithMethod<GPaths, 'patch'>,
+	GPathOperation extends TFilterKeys<GPaths[GPatchPaths], 'patch'>,
+	GParseAs extends TParseAs = 'json'
+>(
+	path: GPatchPaths | (string & Record<never, never>), // https://github.com/microsoft/TypeScript/issues/29729
+	body: TRequestBody<
+		'patch' extends keyof GPaths[GPatchPaths] ? GPaths[GPatchPaths]['patch'] : unknown
+	> extends never
+		? null
+		: TRequestBody<
+				'patch' extends keyof GPaths[GPatchPaths] ? GPaths[GPatchPaths]['patch'] : unknown
+			>,
 	options?: TOpenApiFetchOptions<GPathOperation, GParseAs>
 ) => Promise<TOpenApiFetchResponse<GPathOperation, GParseAs>>;
 

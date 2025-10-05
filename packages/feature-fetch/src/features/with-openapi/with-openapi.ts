@@ -20,6 +20,12 @@ export function withOpenApi<GPaths extends object, GFeatures extends TFeatureDef
 				body
 			});
 		},
+		patch(this: TFetchClient<[]>, path, body, options) {
+			return this._baseFetch(path as string, 'PATCH', {
+				...(options as any),
+				body
+			});
+		},
 		del(this: TFetchClient<[]>, path, options) {
 			return this._baseFetch(path as string, 'DELETE', options as any);
 		}
