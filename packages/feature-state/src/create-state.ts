@@ -1,5 +1,8 @@
-import { TListenerQueueOptions } from './ListenerQueue';
-import { createQueue, getQueue } from './queue';
+import {
+	createListenerQueue,
+	getListenerQueue,
+	TCreateListenerQueueOptions
+} from './listener-queue';
 import type { TListener, TListenerContext, TState } from './types';
 
 export const SET_SOURCE_KEY = 'state_set';
@@ -15,15 +18,15 @@ export function createState<GValue>(
 			queueConfigOrKey = 'sync'
 	} = options;
 
-	let queue = getQueue(
+	let queue = getListenerQueue(
 		typeof queueConfigOrKey === 'string' ? queueConfigOrKey : queueConfigOrKey.key
 	);
 	if (queue == null) {
 		const { key, ...queueOptions } =
 			typeof queueConfigOrKey === 'string'
-				? { key: queueConfigOrKey, sync: queueConfigOrKey !== 'async' }
+				? { key: queueConfigOrKey, async: queueConfigOrKey === 'async' }
 				: queueConfigOrKey;
-		queue = createQueue(key, queueOptions);
+		queue = createListenerQueue(key, queueOptions);
 	}
 
 	return {
@@ -103,7 +106,7 @@ export function createState<GValue>(
 }
 
 export interface TCreateStateOptions {
-	queue?: ({ key: string } & TListenerQueueOptions) | string;
+	queue?: ({ key: string } & TCreateListenerQueueOptions) | string;
 }
 
 export enum EStateListenerQueuePriority {

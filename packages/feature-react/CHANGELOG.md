@@ -1,5 +1,11 @@
 # feature-react
 
+## 0.0.65
+
+### Patch Changes
+
+- updated queue system
+
 ## 0.0.64
 
 ### Patch Changes

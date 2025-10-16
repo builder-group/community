@@ -1,5 +1,14 @@
 # feature-form
 
+## 0.0.54
+
+### Patch Changes
+
+- updated queue system
+
+- Updated dependencies []:
+  - feature-state@0.0.63
+
 ## 0.0.53
 
 ### Patch Changes

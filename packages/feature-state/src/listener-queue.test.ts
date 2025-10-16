@@ -1,69 +1,71 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createState, EStateListenerQueuePriority } from './create-state';
 import {
-	createQueue,
-	getQueue,
-	GLOBAL_STATE_QUEUES,
-	processAllQueues,
-	processQueue
-} from './queue';
+	AsyncListenerQueue,
+	createListenerQueue,
+	getListenerQueue,
+	GLOBAL_LISTENER_QUEUES,
+	processAllListenerQueues,
+	processListenerQueue,
+	SyncListenerQueue
+} from './listener-queue';
 
-describe('Queue system', () => {
+describe('Listener queue', () => {
 	beforeEach(() => {
-		GLOBAL_STATE_QUEUES.clear();
+		GLOBAL_LISTENER_QUEUES.clear();
 	});
 
 	it('should create, retrieve and handle queues correctly', () => {
 		// Create queues
-		createQueue('test-sync', { sync: true });
-		createQueue('test-async', { sync: false });
+		createListenerQueue('test-sync', { async: false });
+		createListenerQueue('test-async', { async: true });
 
 		// Direct access to global state
-		expect(GLOBAL_STATE_QUEUES.size).toBe(2);
-		expect(GLOBAL_STATE_QUEUES.has('test-sync')).toBe(true);
-		expect(GLOBAL_STATE_QUEUES.has('test-async')).toBe(true);
+		expect(GLOBAL_LISTENER_QUEUES.size).toBe(2);
+		expect(GLOBAL_LISTENER_QUEUES.has('test-sync')).toBe(true);
+		expect(GLOBAL_LISTENER_QUEUES.has('test-async')).toBe(true);
 
 		// Retrieve queues
-		const syncQueue = getQueue('test-sync');
-		const asyncQueue = getQueue('test-async');
-		const nonExistent = getQueue('non-existent');
+		const syncQueue = getListenerQueue('test-sync');
+		const asyncQueue = getListenerQueue('test-async');
+		const nonExistent = getListenerQueue('non-existent');
 
 		// Assert
-		expect(syncQueue?.sync).toBe(true);
-		expect(asyncQueue?.sync).toBe(false);
+		expect(syncQueue instanceof SyncListenerQueue).toBe(true);
+		expect(asyncQueue instanceof AsyncListenerQueue).toBe(true);
 		expect(nonExistent).toBeUndefined();
 
 		// Override queue
-		createQueue('test-sync', { sync: false });
-		expect(getQueue('test-sync')?.sync).toBe(false);
-		expect(GLOBAL_STATE_QUEUES.size).toBe(2); // Size should remain same
+		createListenerQueue('test-sync', { async: true });
+		expect(getListenerQueue('test-sync') instanceof AsyncListenerQueue).toBe(true);
+		expect(GLOBAL_LISTENER_QUEUES.size).toBe(2); // Size should remain same
 	});
 
 	it('should create states with auto-created queues', () => {
 		// States should auto-create default queues
 		const defaultState = createState('default');
 		const customState = createState('custom', { queue: 'my-custom-queue' });
-		const syncState = createState('sync', { queue: { key: 'sync', sync: true } });
-		const asyncState = createState('async', { queue: { key: 'async', sync: false } });
+		const syncState = createState('sync', { queue: { key: 'sync', async: false } });
+		const asyncState = createState('async', { queue: { key: 'async', async: true } });
 
 		// Check auto-created queues
-		expect(GLOBAL_STATE_QUEUES.has('sync')).toBe(true);
-		expect(GLOBAL_STATE_QUEUES.has('async')).toBe(true);
-		expect(GLOBAL_STATE_QUEUES.has('my-custom-queue')).toBe(true);
+		expect(GLOBAL_LISTENER_QUEUES.has('sync')).toBe(true);
+		expect(GLOBAL_LISTENER_QUEUES.has('async')).toBe(true);
+		expect(GLOBAL_LISTENER_QUEUES.has('my-custom-queue')).toBe(true);
 
-		expect(GLOBAL_STATE_QUEUES.get('sync')?.sync).toBe(true);
-		expect(GLOBAL_STATE_QUEUES.get('async')?.sync).toBe(false);
-		expect(GLOBAL_STATE_QUEUES.get('my-custom-queue')?.sync).toBe(true);
+		expect(GLOBAL_LISTENER_QUEUES.get('sync') instanceof SyncListenerQueue).toBe(true);
+		expect(GLOBAL_LISTENER_QUEUES.get('async') instanceof AsyncListenerQueue).toBe(true);
+		expect(GLOBAL_LISTENER_QUEUES.get('my-custom-queue') instanceof SyncListenerQueue).toBe(true);
 
 		// Verify states reference the correct queues
-		expect(defaultState._queue).toBe(GLOBAL_STATE_QUEUES.get('sync'));
-		expect(syncState._queue).toBe(GLOBAL_STATE_QUEUES.get('sync'));
-		expect(asyncState._queue).toBe(GLOBAL_STATE_QUEUES.get('async'));
-		expect(customState._queue).toBe(GLOBAL_STATE_QUEUES.get('my-custom-queue'));
+		expect(defaultState._queue).toBe(GLOBAL_LISTENER_QUEUES.get('sync'));
+		expect(syncState._queue).toBe(GLOBAL_LISTENER_QUEUES.get('sync'));
+		expect(asyncState._queue).toBe(GLOBAL_LISTENER_QUEUES.get('async'));
+		expect(customState._queue).toBe(GLOBAL_LISTENER_QUEUES.get('my-custom-queue'));
 	});
 
 	it('should handle shared queues and isolation correctly', () => {
-		createQueue('shared', { sync: true });
+		createListenerQueue('shared', { async: false });
 
 		const state1 = createState(0, { queue: { key: 'shared' } });
 		const state2 = createState(0, { queue: { key: 'shared' } });
@@ -89,8 +91,8 @@ describe('Queue system', () => {
 	});
 
 	it('should process sync immediately and async in next tick', async () => {
-		const syncState = createState(0, { queue: { key: 'sync', sync: true } });
-		const asyncState = createState(0, { queue: { key: 'async', sync: false } });
+		const syncState = createState(0, { queue: { key: 'sync', async: false } });
+		const asyncState = createState(0, { queue: { key: 'async', async: true } });
 		const syncListener = vi.fn();
 		const asyncListener = vi.fn();
 
@@ -151,16 +153,16 @@ describe('Queue system', () => {
 		state.set(1, { processListenerQueue: false });
 
 		// Queue should have items
-		expect(GLOBAL_STATE_QUEUES.get('sync')?.length).toBe(1);
+		expect(GLOBAL_LISTENER_QUEUES.get('sync')?.length).toBe(1);
 		expect(listener).not.toHaveBeenCalled();
 
 		// Manual processing
-		processQueue('sync');
-		expect(GLOBAL_STATE_QUEUES.get('sync')?.length).toBe(0);
+		processListenerQueue('sync');
+		expect(GLOBAL_LISTENER_QUEUES.get('sync')?.length).toBe(0);
 		expect(listener).toHaveBeenCalled();
 
 		// Test processAllQueues
-		createQueue('test-queue', { sync: true });
+		createListenerQueue('test-queue', { async: false });
 		const testState = createState(0, { queue: { key: 'test-queue' } });
 		const testListener = vi.fn();
 		testState.listen(testListener);
@@ -168,12 +170,12 @@ describe('Queue system', () => {
 		state.set(2, { processListenerQueue: false });
 		testState.set(3, { processListenerQueue: false });
 
-		processAllQueues();
+		processAllListenerQueues();
 
 		expect(listener).toHaveBeenCalledTimes(2);
 		expect(testListener).toHaveBeenCalled();
 
 		// Test non-existent queue handling
-		expect(() => processQueue('non-existent')).not.toThrow();
+		expect(() => processListenerQueue('non-existent')).not.toThrow();
 	});
 });
