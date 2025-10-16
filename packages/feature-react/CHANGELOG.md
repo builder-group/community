@@ -1,5 +1,11 @@
 # feature-react
 
+## 0.0.64
+
+### Patch Changes
+
+- default to sync queue
+
 ## 0.0.58
 
 ### Patch Changes

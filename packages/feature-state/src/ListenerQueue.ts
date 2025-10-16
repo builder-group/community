@@ -4,7 +4,8 @@ import type { TListenerQueueItem } from './types';
 export class ListenerQueue extends FlatQueue<TListenerQueueItem> {
 	public readonly sync: boolean;
 
-	constructor(sync = false) {
+	constructor(options: TListenerQueueOptions) {
+		const { sync = true } = options;
 		super();
 		this.sync = sync;
 	}
@@ -30,4 +31,8 @@ export class ListenerQueue extends FlatQueue<TListenerQueueItem> {
 			await item.callback(item.context);
 		}
 	}
+}
+
+export interface TListenerQueueOptions {
+	sync?: boolean;
 }

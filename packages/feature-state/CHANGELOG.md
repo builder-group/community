@@ -1,5 +1,11 @@
 # feature-state
 
+## 0.0.62
+
+### Patch Changes
+
+- default to sync queue
+
 ## 0.0.59
 
 ### Patch Changes

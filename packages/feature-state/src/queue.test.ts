@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createState } from './create-state';
+import { createState, EStateListenerQueuePriority } from './create-state';
 import {
 	createQueue,
 	getQueue,
@@ -10,7 +10,6 @@ import {
 
 describe('Queue system', () => {
 	beforeEach(() => {
-		// Clear global state for clean reset
 		GLOBAL_STATE_QUEUES.clear();
 	});
 
@@ -43,30 +42,32 @@ describe('Queue system', () => {
 	it('should create states with auto-created queues', () => {
 		// States should auto-create default queues
 		const defaultState = createState('default');
-		const syncState = createState('sync', { queue: 'sync' });
 		const customState = createState('custom', { queue: 'my-custom-queue' });
+		const syncState = createState('sync', { queue: { key: 'sync', sync: true } });
+		const asyncState = createState('async', { queue: { key: 'async', sync: false } });
 
 		// Check auto-created queues
-		expect(GLOBAL_STATE_QUEUES.has('async')).toBe(true);
 		expect(GLOBAL_STATE_QUEUES.has('sync')).toBe(true);
+		expect(GLOBAL_STATE_QUEUES.has('async')).toBe(true);
 		expect(GLOBAL_STATE_QUEUES.has('my-custom-queue')).toBe(true);
 
-		expect(GLOBAL_STATE_QUEUES.get('async')?.sync).toBe(false);
 		expect(GLOBAL_STATE_QUEUES.get('sync')?.sync).toBe(true);
-		expect(GLOBAL_STATE_QUEUES.get('my-custom-queue')?.sync).toBe(false); // Custom queues default to async
+		expect(GLOBAL_STATE_QUEUES.get('async')?.sync).toBe(false);
+		expect(GLOBAL_STATE_QUEUES.get('my-custom-queue')?.sync).toBe(true);
 
 		// Verify states reference the correct queues
-		expect(defaultState._queue).toBe(GLOBAL_STATE_QUEUES.get('async'));
+		expect(defaultState._queue).toBe(GLOBAL_STATE_QUEUES.get('sync'));
 		expect(syncState._queue).toBe(GLOBAL_STATE_QUEUES.get('sync'));
+		expect(asyncState._queue).toBe(GLOBAL_STATE_QUEUES.get('async'));
 		expect(customState._queue).toBe(GLOBAL_STATE_QUEUES.get('my-custom-queue'));
 	});
 
 	it('should handle shared queues and isolation correctly', () => {
 		createQueue('shared', { sync: true });
 
-		const state1 = createState(0, { queue: 'shared' });
-		const state2 = createState(0, { queue: 'shared' });
-		const isolatedState = createState(0, { queue: 'sync' });
+		const state1 = createState(0, { queue: { key: 'shared' } });
+		const state2 = createState(0, { queue: { key: 'shared' } });
+		const isolatedState = createState(0, { queue: { key: 'sync' } });
 
 		// Verify queue sharing
 		expect(state1._queue).toBe(state2._queue);
@@ -88,35 +89,52 @@ describe('Queue system', () => {
 	});
 
 	it('should process sync immediately and async in next tick', async () => {
-		const syncState = createState(0, { queue: 'sync' });
-		const asyncState = createState(0, { queue: 'async' });
+		const syncState = createState(0, { queue: { key: 'sync', sync: true } });
+		const asyncState = createState(0, { queue: { key: 'async', sync: false } });
 		const syncListener = vi.fn();
 		const asyncListener = vi.fn();
 
-		syncState.listen((context) => {
-			syncListener(context);
-		});
-		asyncState.listen(async (context) => {
-			await new Promise((resolve) => setTimeout(resolve, 10));
-			asyncListener(context);
-		});
+		syncState.listen(
+			async () => {
+				await new Promise((resolve) => setTimeout(resolve, 10));
+			},
+			{ priority: EStateListenerQueuePriority.EARLY }
+		);
+		syncState.listen(
+			(context) => {
+				syncListener(context);
+			},
+			{ priority: EStateListenerQueuePriority.DEFAULT }
+		);
+		asyncState.listen(
+			async () => {
+				await new Promise((resolve) => setTimeout(resolve, 10));
+			},
+			{ priority: EStateListenerQueuePriority.EARLY }
+		);
+		asyncState.listen(
+			(context) => {
+				asyncListener(context);
+			},
+			{ priority: EStateListenerQueuePriority.LATE }
+		);
 
 		// Act
 		syncState.set(1);
 		asyncState.set(2);
 
-		// Sync should be immediate
+		// Sync should be immediate and not await promise in earlier listeners
 		expect(syncListener).toHaveBeenCalledWith({
 			source: 'state_set',
 			value: 1,
 			prevValue: 0
 		});
 
-		// Async should be deferred to next microtask
+		// Async should be deferred and await promise in earlier listeners
 		expect(asyncListener).not.toHaveBeenCalled();
 
 		// Wait for async processing to complete
-		await new Promise((resolve) => setTimeout(resolve, 10));
+		await new Promise((resolve) => setTimeout(resolve, 15));
 		expect(asyncListener).toHaveBeenCalledWith({
 			source: 'state_set',
 			value: 2,
@@ -125,7 +143,7 @@ describe('Queue system', () => {
 	});
 
 	it('should handle manual processing and queue inspection', () => {
-		const state = createState(0, { queue: 'sync' });
+		const state = createState(0, { queue: { key: 'sync' } });
 		const listener = vi.fn();
 		state.listen(listener);
 
@@ -143,7 +161,7 @@ describe('Queue system', () => {
 
 		// Test processAllQueues
 		createQueue('test-queue', { sync: true });
-		const testState = createState(0, { queue: 'test-queue' });
+		const testState = createState(0, { queue: { key: 'test-queue' } });
 		const testListener = vi.fn();
 		testState.listen(testListener);
 

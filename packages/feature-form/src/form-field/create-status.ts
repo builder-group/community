@@ -6,7 +6,7 @@ import {
 } from '../types';
 
 export function createStatus(initialValue: TFormFieldStatusValue): TFormFieldStatus {
-	const baseState = createState(initialValue);
+	const baseState = createState(initialValue, { queue: 'async' });
 
 	const formFieldStatusFeature: TFormFielStatusStateFeature['api'] = {
 		_nextValue: undefined,

@@ -1,3 +1,4 @@
+import { TListenerQueueOptions } from './ListenerQueue';
 import { createQueue, getQueue } from './queue';
 import type { TListener, TListenerContext, TState } from './types';
 
@@ -7,12 +8,22 @@ export function createState<GValue>(
 	initialValue: GValue,
 	options: TCreateStateOptions = {}
 ): TState<GValue, []> {
-	const { queue: queueName = 'async' } = options;
+	const {
+		queue:
+			// Default to sync queue to avoid side-effects
+			// https://evilmartians.com/chronicles/how-to-avoid-tricky-async-state-manager-pitfalls-react
+			queueConfigOrKey = 'sync'
+	} = options;
 
-	let queue = getQueue(queueName);
+	let queue = getQueue(
+		typeof queueConfigOrKey === 'string' ? queueConfigOrKey : queueConfigOrKey.key
+	);
 	if (queue == null) {
-		// Auto-create any queue - sync if named 'sync', otherwise async
-		queue = createQueue(queueName, { sync: queueName === 'sync' });
+		const { key, ...queueOptions } =
+			typeof queueConfigOrKey === 'string'
+				? { key: queueConfigOrKey, sync: queueConfigOrKey !== 'async' }
+				: queueConfigOrKey;
+		queue = createQueue(key, queueOptions);
 	}
 
 	return {
@@ -92,11 +103,13 @@ export function createState<GValue>(
 }
 
 export interface TCreateStateOptions {
-	queue?: 'sync' | 'async' | string;
+	queue?: ({ key: string } & TListenerQueueOptions) | string;
 }
 
 export enum EStateListenerQueuePriority {
-	EARLY = 50,
-	DEFAULT = 100,
-	LATE = 200
+	FIRST = 0,
+	EARLY = 125,
+	DEFAULT = 250,
+	LATE = 375,
+	LAST = 500
 }

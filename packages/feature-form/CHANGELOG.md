@@ -1,5 +1,14 @@
 # feature-form
 
+## 0.0.53
+
+### Patch Changes
+
+- default to sync queue
+
+- Updated dependencies []:
+  - feature-state@0.0.62
+
 ## 0.0.52
 
 ### Patch Changes
