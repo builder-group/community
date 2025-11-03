@@ -37,15 +37,15 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^24.3.0",
+		"@types/node": "^24.10.0",
 		"@types/sax": "^1.2.7",
 		"@types/xml2js": "^0.4.14",
 		"camaro": "^6.2.3",
-		"fast-xml-parser": "^5.2.5",
+		"fast-xml-parser": "^5.3.1",
 		"rollup-presets": "workspace:*",
 		"sax": "^1.4.1",
 		"saxen": "^10.0.0",
-		"txml": "^5.1.1",
+		"txml": "^5.2.1",
 		"xml2js": "^0.6.2"
 	},
 	"size-limit": [

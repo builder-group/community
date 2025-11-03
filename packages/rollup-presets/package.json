@@ -32,17 +32,17 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@rollup/plugin-commonjs": "^28.0.6",
+		"@rollup/plugin-commonjs": "^29.0.0",
 		"execa": "9.6.0",
 		"picocolors": "^1.1.1",
 		"rollup-plugin-dts": "^6.2.3",
 		"rollup-plugin-esbuild": "^6.2.1",
-		"rollup-plugin-node-externals": "8.1.0"
+		"rollup-plugin-node-externals": "8.1.1"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^24.3.0",
-		"rollup": "^4.49.0",
-		"type-fest": "^4.41.0"
+		"@types/node": "^24.10.0",
+		"rollup": "^4.52.5",
+		"type-fest": "^5.2.0"
 	}
 }
