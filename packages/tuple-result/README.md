@@ -111,14 +111,14 @@ import { match } from 'tuple-result';
 
 // Clean conditional logic
 const message = match(result, {
-  ok: (value) => `Success: ${value}`,
-  err: (error) => `Error: ${error}`
+	ok: (value) => `Success: ${value}`,
+	err: (error) => `Error: ${error}`
 });
 
 // Complex transformations
 const processed = match(result, {
-  ok: (user) => ({ ...user, displayName: user.name.toUpperCase() }),
-  err: (error) => ({ id: 0, name: 'Unknown', error: error.message })
+	ok: (user) => ({ ...user, displayName: user.name.toUpperCase() }),
+	err: (error) => ({ id: 0, name: 'Unknown', error: error.message })
 });
 ```
 
@@ -252,8 +252,8 @@ Pattern matches on a result, calling the appropriate handler. Similar to Rust's 
 
 ```ts
 const message = match(result, {
-  ok: (value) => `Success: ${value}`,
-  err: (error) => `Error: ${error}`
+	ok: (value) => `Success: ${value}`,
+	err: (error) => `Error: ${error}`
 });
 ```
 
@@ -332,9 +332,9 @@ No conversion needed - helpers work with both!
 
 ```typescript
 // These all work the same way
-unwrapOr(Ok(42), 0);           // ✅ TResult
+unwrapOr(Ok(42), 0); // ✅ TResult
 unwrapOr([true, undefined, 42], 0); // ✅ TResultArray
-unwrapOr(someResult, 0);        // ✅ Either type
+unwrapOr(someResult, 0); // ✅ Either type
 ```
 
 Without overloads, complex types can cause TypeScript errors:

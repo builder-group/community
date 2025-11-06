@@ -4,7 +4,7 @@ import logoLight from './logo-light.svg';
 
 export function Welcome() {
 	return (
-		<main className="flex items-center justify-center pb-4 pt-16">
+		<main className="flex items-center justify-center pt-16 pb-4">
 			<div className="flex min-h-0 flex-1 flex-col items-center gap-16">
 				<header className="flex flex-col items-center gap-9">
 					<div className="w-[500px] max-w-[100vw] p-4">
@@ -21,7 +21,7 @@ export function Welcome() {
 
 				<div className="w-full max-w-[600px] space-y-6 px-4">
 					<nav className="space-y-4 rounded-3xl border border-gray-200 p-6 dark:border-gray-700">
-						<p className="text-center font-medium leading-6 text-gray-700 dark:text-gray-200">
+						<p className="text-center leading-6 font-medium text-gray-700 dark:text-gray-200">
 							Demo Examples
 						</p>
 						<ul className="space-y-3">
@@ -49,7 +49,7 @@ export function Welcome() {
 					</nav>
 
 					<nav className="space-y-4 rounded-3xl border border-gray-200 p-6 dark:border-gray-700">
-						<p className="text-center font-medium leading-6 text-gray-700 dark:text-gray-200">
+						<p className="text-center leading-6 font-medium text-gray-700 dark:text-gray-200">
 							Resources
 						</p>
 						<ul className="space-y-3">
