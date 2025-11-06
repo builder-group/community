@@ -27,7 +27,9 @@ module.exports = [
 		settings: { react: { version: 'detect' } },
 		rules: {
 			...pluginReactHooks.configs.recommended.rules,
-			'react/react-in-jsx-scope': 'off'
+			'react/react-in-jsx-scope': 'off',
+			'react/prop-types': 'off',
+			'react/no-unknown-property': ['error', { ignore: ['variant'] }]
 		}
 	}
 ];

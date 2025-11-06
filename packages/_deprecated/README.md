@@ -1,1 +1,1 @@
-# Deprecated/Archived packages and code chunks
+# Deprecated/Archived packages

@@ -19,11 +19,14 @@ module.exports = {
 	bracketSameLine: false,
 
 	// Plugins
+	// Note: Use require.resolve() to ensure plugins are found from this package's node_modules.
+	// Without this, Prettier tries to resolve plugins from where Prettier runs (usually the root),
+	// which fails when plugins are only installed as dependencies of this config package.
 	plugins: [
-		'@ianvs/prettier-plugin-sort-imports',
-		'prettier-plugin-tailwindcss',
-		'prettier-plugin-css-order',
-		'prettier-plugin-packagejson'
+		require.resolve('@ianvs/prettier-plugin-sort-imports'),
+		require.resolve('prettier-plugin-tailwindcss'),
+		require.resolve('prettier-plugin-css-order'),
+		require.resolve('prettier-plugin-packagejson')
 	],
 
 	// Import Sorting Configuration

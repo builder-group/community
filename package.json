@@ -36,7 +36,6 @@
 		"@size-limit/preset-small-lib": "^11.2.0",
 		"eslint": "^9.27.0",
 		"prettier": "^3.5.3",
-		"prettier-plugin-tailwindcss": "^0.6.11",
 		"rollup": "^4.41.1",
 		"shx": "^0.4.0",
 		"size-limit": "^11.2.0",
@@ -44,8 +43,8 @@
 		"typescript": "^5.8.3",
 		"vitest": "^3.1.4"
 	},
-	"packageManager": "pnpm@10.12.1",
+	"packageManager": "pnpm@10.20.0",
 	"engines": {
-		"node": ">=20"
+		"node": ">=24"
 	}
 }
