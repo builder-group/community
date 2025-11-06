@@ -1,6 +1,6 @@
 {
 	"name": "webito",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"private": false,
 	"description": "A flexible, typesafe, and performance-focused Web Editor powered by an Entity Component System (ECS)",
 	"keywords": [],
