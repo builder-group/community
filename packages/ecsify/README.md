@@ -45,59 +45,58 @@ Build a modern, type-safe ECS library that fully leverages TypeScript's type sys
 
 ## 📖 Usage
 
-`ecsify` offers two approaches: **App** for better developer experience, and **Raw** for maximum performance.
+`ecsify` offers two approaches:
 
-- **App**: Better DX, type safety, unified API
-- **Raw**: Maximum performance, direct memory access
-- Both approaches can be mixed in the same codebase
+- [**App**](#app-approach-recommended): Better DX, type safety, unified API
+- [**Raw**](#raw-approach-advanced): Maximum performance, direct memory access
+
+Both approaches can be mixed in the same codebase. Most users start with [App](#app-approach-recommended). Use [Raw](#raw-approach-advanced) only for performance-critical code.
 
 ### App Approach (Recommended)
 
-Better DX with plugins, systems, and unified API (slower than **Raw** because of added abstractions):
+Better DX with plugins, systems, and unified API (slower than [Raw](#raw-approach-advanced) because of added abstractions):
 
 ```ts
-import { createApp, createDefaultPlugin, TPlugin, With } from 'ecsify';
+import { createApp, createDefaultPlugin, Entity, TPlugin } from 'ecsify';
 
-// Create plugin with components and systems
-type TCorePlugin = TPlugin<
+// Define plugin
+type TGamePlugin = TPlugin<
 	{
-		name: 'Core';
+		name: 'Game';
 		components: {
 			Position: { x: number[]; y: number[] };
 			Velocity: { dx: number[]; dy: number[] };
-			Health: number[];
 		};
 	},
-	[]
+	[TDefaultPlugin]
 >;
 
-function createCorePlugin(): TCorePlugin {
+function createGamePlugin(): TGamePlugin {
 	return {
-		name: 'Core',
-		deps: [],
+		name: 'Game',
+		deps: ['Default'],
 		components: {
 			Position: { x: [], y: [] },
-			Velocity: { dx: [], dy: [] },
-			Health: []
+			Velocity: { dx: [], dy: [] }
 		},
-		setup(app: TApp<TAppContext<[TCorePlugin]>>) {
-			// Initialize entities
-			const entity = app.createEntity();
-			app.addComponent(entity, app.c.Position, { x: 0, y: 0 });
-			app.addComponent(entity, app.c.Velocity, { dx: 1, dy: 1 });
+		setup(app) {
+			// Create entity
+			const player = app.createEntity();
+			app.addComponent(player, app.c.Position, { x: 0, y: 0 });
+			app.addComponent(player, app.c.Velocity, { dx: 1, dy: 1 });
 
-			// Register systems
+			// Register system
 			app.addSystem(movementSystem, { set: 'Update' });
 		}
 	};
 }
 
-function movementSystem(app: TApp<TAppContext<[TCorePlugin]>>) {
+function movementSystem(app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>) {
 	for (const [eid, pos, vel] of app.queryComponents([
 		Entity,
 		app.c.Position,
 		app.c.Velocity
-	] as const)) {
+	] as const)) { // 'as const' for type inference
 		app.updateComponent(eid, app.c.Position, {
 			x: pos.x + vel.dx,
 			y: pos.y + vel.dy
@@ -105,77 +104,39 @@ function movementSystem(app: TApp<TAppContext<[TCorePlugin]>>) {
 	}
 }
 
-// Create app with plugins
+// Create app
 const app = createApp({
-	plugins: [createDefaultPlugin(), createCorePlugin()] as const,
-	systemSets: ['First', 'Update', 'Last'] // Execution order of systems
+	plugins: [createDefaultPlugin(), createGamePlugin()] as const, // 'as const' for type inference
+	systemSets: ['First', 'Update', 'Last'] // Execution order
 });
 
 // Game loop
 function gameLoop() {
-	app.update(); // Runs all systems in order: First → Update → Last
-	requestAnimationFrame(gameLoop);
-}
-```
-
-### Raw Approach (Performance Critical)
-
-Direct ECS access for maximum performance:
-
-```ts
-import { And, createComponentRegistry, createEntityIndex, createQueryRegistry, With } from 'ecsify';
-
-// Create core registries
-const entityIndex = createEntityIndex();
-const componentRegistry = createComponentRegistry();
-const queryRegistry = createQueryRegistry(entityIndex, componentRegistry);
-
-// Define components directly
-const Position: { x: number[]; y: number[] } = { x: [], y: [] };
-const Velocity: { dx: number[]; dy: number[] } = { dx: [], dy: [] };
-const Health: number[] = [];
-
-// Create entities and add components
-const entity = entityIndex.createEntity();
-componentRegistry.addComponent(entity, Position);
-Position.x[entity] = 0;
-Position.y[entity] = 0;
-componentRegistry.addComponent(entity, Velocity);
-Velocity.dx[entity] = 1;
-Velocity.dy[entity] = 1;
-
-// Systems are just functions
-function movementSystem() {
-	for (const eid of queryRegistry.queryEntities(And(With(Position), With(Velocity)))) {
-		Position.x[eid] += Velocity.dx[eid];
-		Position.y[eid] += Velocity.dy[eid];
-	}
-}
-
-// Manual game loop
-function gameLoop() {
-	movementSystem();
-	componentRegistry.flush(); // Clear change tracking
+	app.update();
 	requestAnimationFrame(gameLoop);
 }
 ```
 
 ### Key Concepts
 
-**Entities** are numerical IDs representing game objects:
+#### Entities
+
+Numerical IDs representing game objects:
 
 ```ts
-const entity = app.createEntity(); // App approach
-const entity = entityIndex.createEntity(); // Raw approach
+const player = app.createEntity();
+const enemy = app.createEntity();
 ```
 
-**Components** are data containers following different patterns:
+#### Components
+
+Data containers:
 
 ```ts
-// Array of Structures (AoS)
-const Transform: { x: number; y: number }[] = [];
+// Array of Structures (AoS) - simpler
+const Position: { x: number; y: number }[] = [];
 
-// Structure of Arrays (SoA)
+// Structure of Arrays (SoA) - cache-friendly
 const Position: { x: number[]; y: number[] } = { x: [], y: [] };
 
 // Single arrays
@@ -185,41 +146,53 @@ const Health: number[] = [];
 const Player = {};
 ```
 
-**Systems** are functions that query and process entities:
+#### Systems
+
+Functions that process entities:
 
 ```ts
-// App approach - registered systems
-app.addSystem(movementSystem);
+function movementSystem(app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>) {
+	for (const [eid, pos, vel] of app.queryComponents([
+		Entity,
+		app.c.Position,
+		app.c.Velocity
+	] as const)) {
+		pos.x += vel.dx;
+		pos.y += vel.dy;
+	}
+}
 
-// Raw approach - manual execution
-movementSystem();
+app.addSystem(movementSystem, { set: 'Update' });
 ```
 
-**Queries** filter entities with powerful operators:
+#### Queries
+
+Filter entities:
 
 ```ts
 import { Added, And, Changed, Or, Removed, With, Without } from 'ecsify';
 
-app.queryEntities(With(Player)); // Has component
-app.queryEntities(Without(Dead)); // Lacks component
-app.queryEntities(And(With(Position), With(Velocity))); // Has all components
-app.queryEntities(Or(With(Player), With(Enemy))); // Has either component
+// Filters
+app.queryEntities(With(app.c.Player)); // Has component
+app.queryEntities(Without(app.c.Dead)); // Lacks component
+app.queryEntities(And(With(app.c.Position), With(app.c.Velocity))); // Has all components
+app.queryEntities(Or(With(app.c.Player), With(app.c.Enemy))); // Has either component
 
-// Reactive queries - track component lifecycle
-app.queryEntities(Added(Player)); // Component added this frame
-app.queryEntities(Removed(Velocity)); // Component removed this frame
-app.queryEntities(Changed(Health)); // Component changed this frame
+// Change tracking
+app.queryEntities(Added(app.c.Player)); // Component added this frame
+app.queryEntities(Removed(app.c.Velocity)); // Component removed this frame
+app.queryEntities(Changed(app.c.Health)); // Component changed this frame
 
 // Query entities with components
 for (const [eid, pos, vel] of app.queryComponents(
-	[Entity, app.c.Position, app.c.Velocity] as const,
-	With(Player)
+	[Entity, app.c.Position, app.c.Velocity] as const, // 'as const' for type inference
+	With(app.c.Player)
 )) {
 	console.log(`Player ${eid} at (${pos.x}, ${pos.y})`);
 }
 
-// Query entities
-for (const eid of app.queryEntities(With(Enemy))) {
+// Query just entities
+for (const eid of app.queryEntities(With(app.c.Enemy))) {
 	console.log(`Enemy ${eid} at (${Position.x[eid]}, ${Position.y[eid]})`);
 }
 
@@ -228,43 +201,186 @@ Position.x[entity] = 110;
 app.markComponentChanged(entity, Position); // Required for Changed() queries
 ```
 
+#### Resources
+
+Global state (config, input, score):
+
+```ts
+type TGamePlugin = TPlugin<
+	{
+		name: 'Game';
+		components: { Position: { x: number; y: number }[] };
+		resources: {
+			inputState: { jump: boolean };
+			gameConfig: { gravity: number };
+		};
+	},
+	[TDefaultPlugin]
+>;
+
+function createGamePlugin(): TGamePlugin {
+	return {
+		name: 'Game',
+		deps: ['Default'],
+		components: { Position: [] },
+		resources: {
+			inputState: { jump: false },
+			gameConfig: { gravity: 9.8 }
+		},
+		setup(app) {
+			app.addSystem(physicsSystem, { set: 'Update' });
+		}
+	};
+}
+
+function physicsSystem(app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>) {
+	const { inputState, gameConfig } = app.r;
+	
+	for (const [eid, pos] of app.queryComponents([Entity, app.c.Position] as const)) {
+		if (inputState.jump) pos.y -= 100;
+		pos.y += gameConfig.gravity;
+	}
+}
+
+// Modify anywhere
+app.r.inputState.jump = true;
+```
+
+#### App Extensions
+
+Custom methods on app:
+
+```ts
+type TGamePlugin = TPlugin<
+	{
+		name: 'Game';
+		components: {
+			Position: { x: number; y: number }[];
+			Health: number[];
+			Dead: Record<string, never>;
+		};
+		resources: { inputState: { w: boolean; s: boolean } };
+		appExtensions: {
+			handleKeyDown: (key: string) => void;
+			damageEntity: (eid: TEntityId, amount: number) => void;
+			spawnEnemy: (x: number, y: number) => TEntityId;
+		};
+	},
+	[TDefaultPlugin]
+>;
+
+function createGamePlugin(): TGamePlugin {
+	return {
+		name: 'Game',
+		deps: ['Default'],
+		components: { Position: [], Health: [], Dead: {} },
+		resources: { inputState: { w: false, s: false } },
+		appExtensions: {
+			handleKeyDown(this: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>, key: string) {
+				if (key === 'w') this.r.inputState.w = true;
+				if (key === 's') this.r.inputState.s = true;
+			},
+
+			damageEntity(this: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>, eid: TEntityId, amount: number) {
+				const health = this.c.Health[eid];
+				if (health == null) return;
+				
+				this.updateComponent(eid, this.c.Health, health - amount);
+				if (health - amount <= 0) this.addComponent(eid, this.c.Dead);
+			},
+
+			spawnEnemy(this: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>, x: number, y: number): TEntityId {
+				const enemy = this.createEntity();
+				this.addComponent(enemy, this.c.Position, { x, y });
+				this.addComponent(enemy, this.c.Health, 100);
+				return enemy;
+			}
+		},
+		setup(app) {
+			const enemy = app.spawnEnemy(100, 200);
+		}
+	};
+}
+
+// Use anywhere
+app.handleKeyDown('w');
+app.damageEntity(enemy, 25);
+```
+
 ### Component Operations
 
 ```ts
-// Add components
-app.addComponent(entity, Position, { x: 100, y: 50 });
-app.addComponent(entity, Health, 100);
-app.addComponent(entity, Player); // Marker
+const player = app.createEntity();
 
-// Update components
-app.updateComponent(entity, Position, { x: 110 }); // Partial updates (only possible for SoA)
-app.updateComponent(entity, Health, 95);
+// Add
+app.addComponent(player, app.c.Position, { x: 100, y: 50 });
+app.addComponent(player, app.c.Health, 100);
+app.addComponent(player, app.c.Player); // Marker
 
-// Direct updates
-Position.x[entity] = 110;
-app.markComponentChanged(entity, Position); // Required for Changed() queries
-Health[entity] = 95;
+// Update
+app.updateComponent(player, app.c.Position, { x: 110 }); // Partial updates (only possible for SoA)
+app.updateComponent(player, app.c.Health, 95);
 
-// Remove components
-app.removeComponent(entity, Velocity);
+// Direct access (faster)
+app.c.Position.x[player] = 110;
+app.markComponentChanged(player, app.c.Position); // Required for Changed() queries
 
-// Check components
-if (app.hasComponent(entity, Player)) {
-	// Entity is a player
+// Remove
+app.removeComponent(player, app.c.Velocity);
+
+// Check
+if (app.hasComponent(player, app.c.Player)) {
+	// Is player
 }
 ```
 
 ### Game Loop
 
 ```ts
-function update(deltaTime: number) {
-	// App approach
+function gameLoop() {
 	app.update(); // Runs all registered systems
+	requestAnimationFrame(gameLoop);
+}
+```
 
-	// Raw approach
+### Raw Approach (Advanced)
+
+Direct memory access for maximum performance. You manage everything manually:
+
+```ts
+import { And, createComponentRegistry, createEntityIndex, createQueryRegistry, With } from 'ecsify';
+
+// Create registries
+const entityIndex = createEntityIndex();
+const componentRegistry = createComponentRegistry();
+const queryRegistry = createQueryRegistry(entityIndex, componentRegistry);
+
+// Define components
+const Position: { x: number[]; y: number[] } = { x: [], y: [] };
+const Velocity: { dx: number[]; dy: number[] } = { dx: [], dy: [] };
+
+// Create entity
+const player = entityIndex.createEntity();
+componentRegistry.addComponent(player, Position);
+Position.x[player] = 0;
+Position.y[player] = 0;
+componentRegistry.addComponent(player, Velocity);
+Velocity.dx[player] = 1;
+Velocity.dy[player] = 1;
+
+// Systems are just functions
+function movementSystem() {
+	for (const eid of queryRegistry.queryEntities(And(With(Position), With(Velocity)))) {
+		Position.x[eid] += Velocity.dx[eid];
+		Position.y[eid] += Velocity.dy[eid];
+	}
+}
+
+// Game loop
+function gameLoop() {
 	movementSystem();
-	renderSystem();
 	componentRegistry.flush(); // Clear change tracking
+	requestAnimationFrame(gameLoop);
 }
 ```
 
