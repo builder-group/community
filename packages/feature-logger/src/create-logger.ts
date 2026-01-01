@@ -58,7 +58,6 @@ export interface TCreateLoggerOptions {
 
 function defaultInvokeConsole(logMethod: TLogMethod, data: unknown[]): void {
 	if (logMethod in console && typeof console[logMethod] === 'function') {
-		// @ts-expect-error -- We verify that the method exists in the console object
 		console[logMethod](...data);
 	} else {
 		throw Error(`Failed to invoke console.${logMethod}!`);
