@@ -16,43 +16,43 @@
 	"author": "@bennobuilder",
 	"exports": {
 		".": {
-			"source": "./src/adapter/index.ts",
 			"types": "./dist/types/adapter/index.d.ts",
+			"source": "./src/adapter/index.ts",
 			"import": "./dist/adapter/esm/index.js",
 			"require": "./dist/adapter/cjs/index.js",
 			"default": "./dist/adapter/cjs/index.js"
 		},
 		"./adapter": {
-			"source": "./src/adapter/index.ts",
 			"types": "./dist/types/adapter/index.d.ts",
+			"source": "./src/adapter/index.ts",
 			"import": "./dist/adapter/esm/index.js",
 			"require": "./dist/adapter/cjs/index.js",
 			"default": "./dist/adapter/cjs/index.js"
 		},
 		"./valibot": {
-			"source": "./src/valibot/index.ts",
 			"types": "./dist/types/valibot/index.d.ts",
+			"source": "./src/valibot/index.ts",
 			"import": "./dist/valibot/esm/index.js",
 			"require": "./dist/valibot/cjs/index.js",
 			"default": "./dist/valibot/cjs/index.js"
 		},
 		"./yup": {
-			"source": "./src/yup/index.ts",
 			"types": "./dist/types/yup/index.d.ts",
+			"source": "./src/yup/index.ts",
 			"import": "./dist/yup/esm/index.js",
 			"require": "./dist/yup/cjs/index.js",
 			"default": "./dist/yup/cjs/index.js"
 		},
 		"./zod": {
-			"source": "./src/zod/index.ts",
 			"types": "./dist/types/zod/index.d.ts",
+			"source": "./src/zod/index.ts",
 			"import": "./dist/zod/esm/index.js",
 			"require": "./dist/zod/cjs/index.js",
 			"default": "./dist/zod/cjs/index.js"
 		},
 		"./standard-schema": {
-			"source": "./src/standard-schema/index.ts",
 			"types": "./dist/types/standard-schema/index.d.ts",
+			"source": "./src/standard-schema/index.ts",
 			"import": "./dist/standard-schema/esm/index.js",
 			"require": "./dist/standard-schema/cjs/index.js",
 			"default": "./dist/standard-schema/cjs/index.js"

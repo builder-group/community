@@ -96,7 +96,8 @@ function movementSystem(app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>) {
 		Entity,
 		app.c.Position,
 		app.c.Velocity
-	] as const)) { // 'as const' for type inference
+	] as const)) {
+		// 'as const' for type inference
 		app.updateComponent(eid, app.c.Position, {
 			x: pos.x + vel.dx,
 			y: pos.y + vel.dy
@@ -235,7 +236,7 @@ function createGamePlugin(): TGamePlugin {
 
 function physicsSystem(app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>) {
 	const { inputState, gameConfig } = app.r;
-	
+
 	for (const [eid, pos] of app.queryComponents([Entity, app.c.Position] as const)) {
 		if (inputState.jump) pos.y -= 100;
 		pos.y += gameConfig.gravity;
@@ -281,15 +282,23 @@ function createGamePlugin(): TGamePlugin {
 				if (key === 's') this.r.inputState.s = true;
 			},
 
-			damageEntity(this: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>, eid: TEntityId, amount: number) {
+			damageEntity(
+				this: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>,
+				eid: TEntityId,
+				amount: number
+			) {
 				const health = this.c.Health[eid];
 				if (health == null) return;
-				
+
 				this.updateComponent(eid, this.c.Health, health - amount);
 				if (health - amount <= 0) this.addComponent(eid, this.c.Dead);
 			},
 
-			spawnEnemy(this: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>, x: number, y: number): TEntityId {
+			spawnEnemy(
+				this: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>,
+				x: number,
+				y: number
+			): TEntityId {
 				const enemy = this.createEntity();
 				this.addComponent(enemy, this.c.Position, { x, y });
 				this.addComponent(enemy, this.c.Health, 100);

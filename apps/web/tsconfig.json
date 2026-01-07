@@ -1,0 +1,14 @@
+{
+	"extends": "@blgc/config/typescript/react-internal",
+	"compilerOptions": {
+		"target": "ES2022",
+		"lib": ["ES2022", "dom", "dom.iterable"],
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["./src/*"]
+		}
+	},
+	"include": ["env.d.ts", "**/*.ts", "**/*.tsx"],
+	"exclude": ["node_modules"],
+	"noEmit": true
+}

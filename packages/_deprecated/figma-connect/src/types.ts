@@ -19,14 +19,12 @@ export type TPluginCallbackRegistration<
 export interface TPluginCallbackRegistrationBase<
 	GFromAppMessageEvent extends TFromAppMessageEvent,
 	GEventType extends keyof TPluginEventTypes<GFromAppMessageEvent>,
-	GPluginCallbackArgs extends
-		TPluginEventTypes<GFromAppMessageEvent>[GEventType][0] = TPluginEventTypes<GFromAppMessageEvent>[GEventType][0],
-	GPluginCallbackReturnValue extends
-		TPluginEventTypes<GFromAppMessageEvent>[GEventType][1] = TPluginEventTypes<GFromAppMessageEvent>[GEventType][1],
-	GPluginCallbackKey extends TPluginCallbackKey<
-		GFromAppMessageEvent,
-		GEventType
-	> = TPluginCallbackKey<GFromAppMessageEvent, GEventType>
+	GPluginCallbackArgs extends TPluginEventTypes<GFromAppMessageEvent>[GEventType][0] =
+		TPluginEventTypes<GFromAppMessageEvent>[GEventType][0],
+	GPluginCallbackReturnValue extends TPluginEventTypes<GFromAppMessageEvent>[GEventType][1] =
+		TPluginEventTypes<GFromAppMessageEvent>[GEventType][1],
+	GPluginCallbackKey extends TPluginCallbackKey<GFromAppMessageEvent, GEventType> =
+		TPluginCallbackKey<GFromAppMessageEvent, GEventType>
 > {
 	key: GPluginCallbackKey;
 	type: GEventType;
@@ -45,8 +43,8 @@ export interface TPluginCallbackRegistrationBase<
 export type TPluginCallbackKey<
 	GFromAppMessageEvent extends TFromAppMessageEvent,
 	GEventType extends keyof TPluginEventTypes<GFromAppMessageEvent>,
-	GPluginCallbackArgs extends
-		TPluginEventTypes<GFromAppMessageEvent>[GEventType][0] = TPluginEventTypes<GFromAppMessageEvent>[GEventType][0]
+	GPluginCallbackArgs extends TPluginEventTypes<GFromAppMessageEvent>[GEventType][0] =
+		TPluginEventTypes<GFromAppMessageEvent>[GEventType][0]
 > = GPluginCallbackArgs[0] extends {
 	key: infer TKey;
 }
@@ -96,10 +94,10 @@ export type TAppCallbackRegistration<
 export interface TAppCallbackRegistrationBase<
 	GFromPluginMessageEvent extends TFromPluginMessageEvent,
 	GEventType extends keyof TAppEventTypes<GFromPluginMessageEvent>,
-	GAppCallbackArgs extends
-		TAppEventTypes<GFromPluginMessageEvent>[GEventType][0] = TAppEventTypes<GFromPluginMessageEvent>[GEventType][0],
-	GAppCallbackReturnValue extends
-		TAppEventTypes<GFromPluginMessageEvent>[GEventType][1] = TAppEventTypes<GFromPluginMessageEvent>[GEventType][1],
+	GAppCallbackArgs extends TAppEventTypes<GFromPluginMessageEvent>[GEventType][0] =
+		TAppEventTypes<GFromPluginMessageEvent>[GEventType][0],
+	GAppCallbackReturnValue extends TAppEventTypes<GFromPluginMessageEvent>[GEventType][1] =
+		TAppEventTypes<GFromPluginMessageEvent>[GEventType][1],
 	GAppCallbackKey extends TAppCallbackKey<GFromPluginMessageEvent, GEventType> = TAppCallbackKey<
 		GFromPluginMessageEvent,
 		GEventType
@@ -126,8 +124,8 @@ export interface TAppCallbackRegistrationBase<
 export type TAppCallbackKey<
 	GFromPluginMessageEvent extends TFromPluginMessageEvent,
 	GEventType extends keyof TAppEventTypes<GFromPluginMessageEvent>,
-	GAppCallbackArgs extends
-		TAppEventTypes<GFromPluginMessageEvent>[GEventType][0] = TAppEventTypes<GFromPluginMessageEvent>[GEventType][0]
+	GAppCallbackArgs extends TAppEventTypes<GFromPluginMessageEvent>[GEventType][0] =
+		TAppEventTypes<GFromPluginMessageEvent>[GEventType][0]
 > = GAppCallbackArgs[0] extends {
 	key: infer TKey;
 }

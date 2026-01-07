@@ -16,16 +16,16 @@
 	"author": "@bennobuilder",
 	"exports": {
 		"./app": {
+			"types": "./dist/types/app/index.d.ts",
 			"source": "./src/app/index.ts",
 			"require": "./dist/app/cjs/index.js",
-			"import": "./dist/app/esm/index.js",
-			"types": "./dist/types/app/index.d.ts"
+			"import": "./dist/app/esm/index.js"
 		},
 		"./plugin": {
+			"types": "./dist/types/plugin/index.d.ts",
 			"source": "./src/plugin/index.ts",
 			"require": "./dist/plugin/cjs/index.js",
-			"import": "./dist/plugin/esm/index.js",
-			"types": "./dist/types/plugin/index.d.ts"
+			"import": "./dist/plugin/esm/index.js"
 		}
 	},
 	"typesVersions": {

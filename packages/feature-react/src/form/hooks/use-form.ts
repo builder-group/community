@@ -85,7 +85,9 @@ export interface TUseFormResponse<
 	status: <GKey extends keyof GFormData>(formFieldKey: GKey) => TFormFieldStatus;
 }
 
-interface THandleSubmitOptions<GFormData extends TFormData, GFeatures extends TFeatureDefinition[]>
-	extends TSubmitOptions<GFormData, GFeatures> {
+interface THandleSubmitOptions<
+	GFormData extends TFormData,
+	GFeatures extends TFeatureDefinition[]
+> extends TSubmitOptions<GFormData, GFeatures> {
 	preventDefault?: boolean;
 }

@@ -3,8 +3,8 @@ import type { TFromAppMessageEvent, TPluginCallbackRegistration } from '../types
 
 export class PluginCallback<
 	GAppMessageEvent extends TFromAppMessageEvent,
-	GPluginEventRegistration extends
-		TPluginCallbackRegistration<GAppMessageEvent> = TPluginCallbackRegistration<GAppMessageEvent>
+	GPluginEventRegistration extends TPluginCallbackRegistration<GAppMessageEvent> =
+		TPluginCallbackRegistration<GAppMessageEvent>
 > {
 	public readonly key: string;
 	public readonly type: GPluginEventRegistration['type'];

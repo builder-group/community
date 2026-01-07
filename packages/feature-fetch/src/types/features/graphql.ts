@@ -28,8 +28,10 @@ export type TGraphQLQueryRaw = <
 	options: TGraphQLQueryOptions<GVariables>
 ) => Promise<TFetchResponse<TGraphQLResponse<GSucessResponseBody>, GErrorResponseBody, 'json'>>;
 
-export interface TGraphQLQueryOptions<GVariables extends Record<string, any>>
-	extends Omit<TFetchOptions<'json'>, 'parseAs'> {
+export interface TGraphQLQueryOptions<GVariables extends Record<string, any>> extends Omit<
+	TFetchOptions<'json'>,
+	'parseAs'
+> {
 	variables?: GVariables;
 }
 

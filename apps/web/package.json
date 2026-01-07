@@ -1,0 +1,51 @@
+{
+	"name": "@repo/web",
+	"version": "0.0.1",
+	"private": true,
+	"description": "",
+	"keywords": [],
+	"bugs": {
+		"url": "https://github.com/builder-group/community/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/builder-group/community.git"
+	},
+	"license": "AGPL-3.0-or-later",
+	"author": "@bennobuilder",
+	"type": "module",
+	"scripts": {
+		"build": "pnpm typecheck && vite build",
+		"clean": "shx rm -rf dist && shx rm -rf .tanstack && shx rm -rf .turbo && shx rm -rf node_modules",
+		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
+		"install:clean": "pnpm run clean && pnpm install",
+		"lint": "eslint . --fix",
+		"start:dev": "vite dev",
+		"test": "echo \"🧪 No tests defined yet.\"",
+		"typecheck": "tsc --noEmit",
+		"update:latest": "pnpm update --latest"
+	},
+	"dependencies": {
+		"@tanstack/react-router": "^1.145.7",
+		"@tanstack/react-router-devtools": "^1.145.7",
+		"@tanstack/react-start": "^1.145.9",
+		"clsx": "^2.1.1",
+		"react": "^19.2.3",
+		"react-dom": "^19.2.3",
+		"tailwind-merge": "^3.4.0",
+		"zod": "^4.3.5"
+	},
+	"devDependencies": {
+		"@mdx-js/rollup": "^3.1.1",
+		"@tailwindcss/typography": "^0.5.19",
+		"@tailwindcss/vite": "^4.1.18",
+		"@types/mdx": "^2.0.13",
+		"@types/node": "^25.0.3",
+		"@types/react": "^19.2.7",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^5.1.2",
+		"nitro": "3.0.1-alpha.1",
+		"tailwindcss": "^4.1.18",
+		"vite-tsconfig-paths": "^6.0.3"
+	}
+}

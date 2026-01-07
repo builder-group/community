@@ -16,20 +16,20 @@
 	"author": "@bennobuilder",
 	"exports": {
 		"./api": {
-			"source": "./src/api/index.ts",
-			"types": "./dist/api/index.d.ts"
+			"types": "./dist/api/index.d.ts",
+			"source": "./src/api/index.ts"
 		},
 		"./openapi": {
-			"source": "./src/openapi/index.ts",
-			"types": "./dist/openapi/index.d.ts"
+			"types": "./dist/openapi/index.d.ts",
+			"source": "./src/openapi/index.ts"
 		},
 		"./utils": {
-			"source": "./src/utils/index.ts",
-			"types": "./dist/utils/index.d.ts"
+			"types": "./dist/utils/index.d.ts",
+			"source": "./src/utils/index.ts"
 		},
 		"./features": {
-			"source": "./src/features/index.ts",
-			"types": "./dist/features/index.d.ts"
+			"types": "./dist/features/index.d.ts",
+			"source": "./src/features/index.ts"
 		}
 	},
 	"typesVersions": {

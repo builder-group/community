@@ -1,0 +1,9 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@theme {
+	/* https://fonts.google.com/specimen/Inter */
+	--font-sans: 'Inter', system-ui, sans-serif;
+	/* https://www.fontshare.com/fonts/erode */
+	--font-serif: 'Erode', serif;
+}
