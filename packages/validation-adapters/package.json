@@ -107,7 +107,7 @@
 		"rollup-presets": "workspace:*",
 		"valibot": "1.2.0",
 		"yup": "^1.7.1",
-		"zod": "^4.3.4"
+		"zod": "^4.3.5"
 	},
 	"size-limit": [
 		{
