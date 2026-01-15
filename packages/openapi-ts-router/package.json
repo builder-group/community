@@ -41,10 +41,10 @@
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@types/express": "^5.0.6",
-		"@types/express-serve-static-core": "^5.1.0",
-		"@types/node": "^25.0.3",
+		"@types/express-serve-static-core": "^5.1.1",
+		"@types/node": "^25.0.8",
 		"express": "^5.2.1",
-		"hono": "^4.11.3",
+		"hono": "^4.11.4",
 		"rollup-presets": "workspace:*",
 		"valibot": "1.2.0",
 		"validation-adapters": "workspace:*"

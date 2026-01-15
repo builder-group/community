@@ -36,7 +36,7 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^25.0.3",
+		"@types/node": "^25.0.8",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [

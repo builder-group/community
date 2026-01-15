@@ -171,6 +171,7 @@ function CombinedComputeExample() {
 				isDarkWithHighCount: false
 			};
 		},
+		[],
 		{ isEqual: deepEqual }
 	);
 

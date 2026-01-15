@@ -1,5 +1,5 @@
 {
-	"name": "ecsify-vanilla-basic",
+	"name": "tuple-result-vanilla-basic",
 	"version": "0.0.1",
 	"private": true,
 	"type": "module",
@@ -9,7 +9,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"ecsify": "workspace:*"
+		"tuple-result": "workspace:*"
 	},
 	"devDependencies": {
 		"typescript": "~5.9.3",
