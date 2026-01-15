@@ -1,5 +1,11 @@
 # rollup-presets
 
+## 0.0.26
+
+### Patch Changes
+
+- updated deps
+
 ## 0.0.25
 
 ### Patch Changes

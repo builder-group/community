@@ -1,5 +1,14 @@
 # ecsify
 
+## 0.0.15
+
+### Patch Changes
+
+- updated deps
+
+- Updated dependencies []:
+  - @blgc/utils@0.0.61
+
 ## 0.0.14
 
 ### Patch Changes

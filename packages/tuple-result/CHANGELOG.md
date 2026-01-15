@@ -1,5 +1,11 @@
 # tuple-result
 
+## 0.0.11
+
+### Patch Changes
+
+- updated deps
+
 ## 0.0.10
 
 ### Patch Changes

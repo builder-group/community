@@ -1,5 +1,11 @@
 # @blgc/config
 
+## 0.0.40
+
+### Patch Changes
+
+- updated deps
+
 ## 0.0.39
 
 ### Patch Changes

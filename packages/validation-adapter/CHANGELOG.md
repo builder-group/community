@@ -1,5 +1,14 @@
 # validation-adapter
 
+## 0.0.27
+
+### Patch Changes
+
+- updated deps
+
+- Updated dependencies []:
+  - @blgc/utils@0.0.61
+
 ## 0.0.26
 
 ### Patch Changes

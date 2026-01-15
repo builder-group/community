@@ -1,5 +1,11 @@
 # @blgc/utils
 
+## 0.0.61
+
+### Patch Changes
+
+- updated deps
+
 ## 0.0.60
 
 ### Patch Changes

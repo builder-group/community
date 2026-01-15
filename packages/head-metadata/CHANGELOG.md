@@ -1,5 +1,14 @@
 # head-metadata
 
+## 0.0.11
+
+### Patch Changes
+
+- updated deps
+
+- Updated dependencies []:
+  - xml-tokenizer@0.0.44
+
 ## 0.0.10
 
 ### Patch Changes
