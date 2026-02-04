@@ -38,7 +38,7 @@
 		"xml-tokenizer": "workspace:*"
 	},
 	"devDependencies": {
-		"@types/node": "^25.0.8",
+		"@types/node": "^25.2.0",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [
