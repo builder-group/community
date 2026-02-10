@@ -45,10 +45,10 @@ const AppsDeriveLegalPrivacyIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/apps/derive': typeof AppsDeriveIndexRoute
-  '/apps/derive/help': typeof AppsDeriveHelpIndexRoute
-  '/apps/derive/legal/privacy': typeof AppsDeriveLegalPrivacyIndexRoute
-  '/apps/derive/legal/terms': typeof AppsDeriveLegalTermsIndexRoute
+  '/apps/derive/': typeof AppsDeriveIndexRoute
+  '/apps/derive/help/': typeof AppsDeriveHelpIndexRoute
+  '/apps/derive/legal/privacy/': typeof AppsDeriveLegalPrivacyIndexRoute
+  '/apps/derive/legal/terms/': typeof AppsDeriveLegalTermsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -69,10 +69,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/apps/derive'
-    | '/apps/derive/help'
-    | '/apps/derive/legal/privacy'
-    | '/apps/derive/legal/terms'
+    | '/apps/derive/'
+    | '/apps/derive/help/'
+    | '/apps/derive/legal/privacy/'
+    | '/apps/derive/legal/terms/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -109,28 +109,28 @@ declare module '@tanstack/react-router' {
     '/apps/derive/': {
       id: '/apps/derive/'
       path: '/apps/derive'
-      fullPath: '/apps/derive'
+      fullPath: '/apps/derive/'
       preLoaderRoute: typeof AppsDeriveIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/apps/derive/help/': {
       id: '/apps/derive/help/'
       path: '/apps/derive/help'
-      fullPath: '/apps/derive/help'
+      fullPath: '/apps/derive/help/'
       preLoaderRoute: typeof AppsDeriveHelpIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/apps/derive/legal/terms/': {
       id: '/apps/derive/legal/terms/'
       path: '/apps/derive/legal/terms'
-      fullPath: '/apps/derive/legal/terms'
+      fullPath: '/apps/derive/legal/terms/'
       preLoaderRoute: typeof AppsDeriveLegalTermsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/apps/derive/legal/privacy/': {
       id: '/apps/derive/legal/privacy/'
       path: '/apps/derive/legal/privacy'
-      fullPath: '/apps/derive/legal/privacy'
+      fullPath: '/apps/derive/legal/privacy/'
       preLoaderRoute: typeof AppsDeriveLegalPrivacyIndexRouteImport
       parentRoute: typeof rootRouteImport
     }

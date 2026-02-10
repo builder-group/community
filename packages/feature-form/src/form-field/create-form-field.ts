@@ -25,7 +25,7 @@ export function createFormField<GValue>(
 		collectErrorMode = 'firstError',
 		notifyOnStatusChange = true
 	} = config;
-	const baseState = createState(initialValue, { queue: 'async' });
+	const baseState = createState(initialValue);
 
 	const formFieldFeature: TFormFieldStateFeature<GValue>['api'] = {
 		_config: {
