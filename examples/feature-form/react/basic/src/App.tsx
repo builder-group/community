@@ -198,7 +198,18 @@ function App() {
 			</div>
 			<StatusMessage $status={status('image')} />
 
-			<button type="submit">Submit</button>
+			<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+				<button type="submit">Submit</button>
+				<button
+					onClick={(e) => {
+						e.preventDefault();
+						$form.reset();
+					}}
+				>
+					Reset
+				</button>
+			</div>
+
 			<p>Is Valid: {isValid.toString()}</p>
 			<p>Render Count: {renderCount}</p>
 			<p>Data: {data}</p>
