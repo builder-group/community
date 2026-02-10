@@ -24,18 +24,18 @@
 		"packages:publish": "pnpm build:prod && changeset publish",
 		"packages:version": "changeset version",
 		"test": "turbo run test",
-		"update:latest": "turbo run update:latest --force && pnpm update --latest && pnpm build"
+		"update:latest": "turbo run update:latest --force && pnpm update --latest '!eslint' '!@eslint/js' && pnpm build"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@changesets/changelog-github": "^0.5.2",
 		"@changesets/cli": "^2.29.8",
-		"@eslint/js": "^10.0.1",
+		"@eslint/js": "^9.39.2",
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
 		"@size-limit/esbuild": "^12.0.0",
 		"@size-limit/esbuild-why": "^12.0.0",
 		"@size-limit/preset-small-lib": "^12.0.0",
-		"eslint": "^10.0.0",
+		"eslint": "^9.39.2",
 		"prettier": "^3.8.1",
 		"rollup": "^4.57.1",
 		"shx": "^0.4.0",
