@@ -15,6 +15,7 @@
 		"openapi-ts-router-express-petstore",
 		"openapi-ts-router-hono-petstore",
 		"tuple-result-vanilla-basic",
-		"xml-tokenizer-vanilla-playground"
+		"xml-tokenizer-vanilla-playground",
+		"@repo/web"
 	]
 }
