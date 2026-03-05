@@ -17,5 +17,5 @@ export const deriveConfig = {
 		privacy: `${appConfig.website}/apps/derive/legal/privacy`,
 		terms: `${appConfig.website}/apps/derive/legal/terms`
 	},
-	appstore: ''
+	appstore: 'https://apps.apple.com/us/app/d%C3%A9rive-color-hunt-photo-game/id6757438691'
 };

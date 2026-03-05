@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppsTaplingIndexRouteImport } from './routes/apps.tapling/index'
 import { Route as AppsDeriveIndexRouteImport } from './routes/apps.derive/index'
 import { Route as AppsDeriveHelpIndexRouteImport } from './routes/apps.derive.help/index'
 import { Route as AppsDeriveLegalTermsIndexRouteImport } from './routes/apps.derive.legal.terms/index'
@@ -18,6 +19,11 @@ import { Route as AppsDeriveLegalPrivacyIndexRouteImport } from './routes/apps.d
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppsTaplingIndexRoute = AppsTaplingIndexRouteImport.update({
+  id: '/apps/tapling/',
+  path: '/apps/tapling/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppsDeriveIndexRoute = AppsDeriveIndexRouteImport.update({
@@ -46,6 +52,7 @@ const AppsDeriveLegalPrivacyIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/apps/derive/': typeof AppsDeriveIndexRoute
+  '/apps/tapling/': typeof AppsTaplingIndexRoute
   '/apps/derive/help/': typeof AppsDeriveHelpIndexRoute
   '/apps/derive/legal/privacy/': typeof AppsDeriveLegalPrivacyIndexRoute
   '/apps/derive/legal/terms/': typeof AppsDeriveLegalTermsIndexRoute
@@ -53,6 +60,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/apps/derive': typeof AppsDeriveIndexRoute
+  '/apps/tapling': typeof AppsTaplingIndexRoute
   '/apps/derive/help': typeof AppsDeriveHelpIndexRoute
   '/apps/derive/legal/privacy': typeof AppsDeriveLegalPrivacyIndexRoute
   '/apps/derive/legal/terms': typeof AppsDeriveLegalTermsIndexRoute
@@ -61,6 +69,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/apps/derive/': typeof AppsDeriveIndexRoute
+  '/apps/tapling/': typeof AppsTaplingIndexRoute
   '/apps/derive/help/': typeof AppsDeriveHelpIndexRoute
   '/apps/derive/legal/privacy/': typeof AppsDeriveLegalPrivacyIndexRoute
   '/apps/derive/legal/terms/': typeof AppsDeriveLegalTermsIndexRoute
@@ -70,6 +79,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/apps/derive/'
+    | '/apps/tapling/'
     | '/apps/derive/help/'
     | '/apps/derive/legal/privacy/'
     | '/apps/derive/legal/terms/'
@@ -77,6 +87,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/apps/derive'
+    | '/apps/tapling'
     | '/apps/derive/help'
     | '/apps/derive/legal/privacy'
     | '/apps/derive/legal/terms'
@@ -84,6 +95,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/apps/derive/'
+    | '/apps/tapling/'
     | '/apps/derive/help/'
     | '/apps/derive/legal/privacy/'
     | '/apps/derive/legal/terms/'
@@ -92,6 +104,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppsDeriveIndexRoute: typeof AppsDeriveIndexRoute
+  AppsTaplingIndexRoute: typeof AppsTaplingIndexRoute
   AppsDeriveHelpIndexRoute: typeof AppsDeriveHelpIndexRoute
   AppsDeriveLegalPrivacyIndexRoute: typeof AppsDeriveLegalPrivacyIndexRoute
   AppsDeriveLegalTermsIndexRoute: typeof AppsDeriveLegalTermsIndexRoute
@@ -104,6 +117,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apps/tapling/': {
+      id: '/apps/tapling/'
+      path: '/apps/tapling'
+      fullPath: '/apps/tapling/'
+      preLoaderRoute: typeof AppsTaplingIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/apps/derive/': {
@@ -140,6 +160,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppsDeriveIndexRoute: AppsDeriveIndexRoute,
+  AppsTaplingIndexRoute: AppsTaplingIndexRoute,
   AppsDeriveHelpIndexRoute: AppsDeriveHelpIndexRoute,
   AppsDeriveLegalPrivacyIndexRoute: AppsDeriveLegalPrivacyIndexRoute,
   AppsDeriveLegalTermsIndexRoute: AppsDeriveLegalTermsIndexRoute,
