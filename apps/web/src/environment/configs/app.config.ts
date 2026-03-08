@@ -6,7 +6,9 @@ export const appConfig = {
 	help: {
 		email,
 		mailto: (subject?: string) => {
-			const fullSubject = subject ? `[Builder.Group] ${subject}` : '[Builder.Group] Support Request';
+			const fullSubject = subject
+				? `[Builder.Group] ${subject}`
+				: '[Builder.Group] Support Request';
 			return `mailto:${email}?subject=${encodeURIComponent(fullSubject)}`;
 		},
 		discord: 'https://discord.com/invite/w4xE3bSjhQ'

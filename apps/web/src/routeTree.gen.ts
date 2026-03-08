@@ -11,8 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppsTaplingIndexRouteImport } from './routes/apps.tapling/index'
+import { Route as AppsKairosIndexRouteImport } from './routes/apps.kairos/index'
 import { Route as AppsDeriveIndexRouteImport } from './routes/apps.derive/index'
+import { Route as AppsKairosHelpIndexRouteImport } from './routes/apps.kairos.help/index'
 import { Route as AppsDeriveHelpIndexRouteImport } from './routes/apps.derive.help/index'
+import { Route as AppsKairosLegalTermsIndexRouteImport } from './routes/apps.kairos.legal.terms/index'
+import { Route as AppsKairosLegalPrivacyIndexRouteImport } from './routes/apps.kairos.legal.privacy/index'
 import { Route as AppsDeriveLegalTermsIndexRouteImport } from './routes/apps.derive.legal.terms/index'
 import { Route as AppsDeriveLegalPrivacyIndexRouteImport } from './routes/apps.derive.legal.privacy/index'
 
@@ -26,9 +30,19 @@ const AppsTaplingIndexRoute = AppsTaplingIndexRouteImport.update({
   path: '/apps/tapling/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppsKairosIndexRoute = AppsKairosIndexRouteImport.update({
+  id: '/apps/kairos/',
+  path: '/apps/kairos/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppsDeriveIndexRoute = AppsDeriveIndexRouteImport.update({
   id: '/apps/derive/',
   path: '/apps/derive/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppsKairosHelpIndexRoute = AppsKairosHelpIndexRouteImport.update({
+  id: '/apps/kairos/help/',
+  path: '/apps/kairos/help/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppsDeriveHelpIndexRoute = AppsDeriveHelpIndexRouteImport.update({
@@ -36,6 +50,18 @@ const AppsDeriveHelpIndexRoute = AppsDeriveHelpIndexRouteImport.update({
   path: '/apps/derive/help/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppsKairosLegalTermsIndexRoute =
+  AppsKairosLegalTermsIndexRouteImport.update({
+    id: '/apps/kairos/legal/terms/',
+    path: '/apps/kairos/legal/terms/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AppsKairosLegalPrivacyIndexRoute =
+  AppsKairosLegalPrivacyIndexRouteImport.update({
+    id: '/apps/kairos/legal/privacy/',
+    path: '/apps/kairos/legal/privacy/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AppsDeriveLegalTermsIndexRoute =
   AppsDeriveLegalTermsIndexRouteImport.update({
     id: '/apps/derive/legal/terms/',
@@ -52,62 +78,90 @@ const AppsDeriveLegalPrivacyIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/apps/derive/': typeof AppsDeriveIndexRoute
+  '/apps/kairos/': typeof AppsKairosIndexRoute
   '/apps/tapling/': typeof AppsTaplingIndexRoute
   '/apps/derive/help/': typeof AppsDeriveHelpIndexRoute
+  '/apps/kairos/help/': typeof AppsKairosHelpIndexRoute
   '/apps/derive/legal/privacy/': typeof AppsDeriveLegalPrivacyIndexRoute
   '/apps/derive/legal/terms/': typeof AppsDeriveLegalTermsIndexRoute
+  '/apps/kairos/legal/privacy/': typeof AppsKairosLegalPrivacyIndexRoute
+  '/apps/kairos/legal/terms/': typeof AppsKairosLegalTermsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/apps/derive': typeof AppsDeriveIndexRoute
+  '/apps/kairos': typeof AppsKairosIndexRoute
   '/apps/tapling': typeof AppsTaplingIndexRoute
   '/apps/derive/help': typeof AppsDeriveHelpIndexRoute
+  '/apps/kairos/help': typeof AppsKairosHelpIndexRoute
   '/apps/derive/legal/privacy': typeof AppsDeriveLegalPrivacyIndexRoute
   '/apps/derive/legal/terms': typeof AppsDeriveLegalTermsIndexRoute
+  '/apps/kairos/legal/privacy': typeof AppsKairosLegalPrivacyIndexRoute
+  '/apps/kairos/legal/terms': typeof AppsKairosLegalTermsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/apps/derive/': typeof AppsDeriveIndexRoute
+  '/apps/kairos/': typeof AppsKairosIndexRoute
   '/apps/tapling/': typeof AppsTaplingIndexRoute
   '/apps/derive/help/': typeof AppsDeriveHelpIndexRoute
+  '/apps/kairos/help/': typeof AppsKairosHelpIndexRoute
   '/apps/derive/legal/privacy/': typeof AppsDeriveLegalPrivacyIndexRoute
   '/apps/derive/legal/terms/': typeof AppsDeriveLegalTermsIndexRoute
+  '/apps/kairos/legal/privacy/': typeof AppsKairosLegalPrivacyIndexRoute
+  '/apps/kairos/legal/terms/': typeof AppsKairosLegalTermsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/apps/derive/'
+    | '/apps/kairos/'
     | '/apps/tapling/'
     | '/apps/derive/help/'
+    | '/apps/kairos/help/'
     | '/apps/derive/legal/privacy/'
     | '/apps/derive/legal/terms/'
+    | '/apps/kairos/legal/privacy/'
+    | '/apps/kairos/legal/terms/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/apps/derive'
+    | '/apps/kairos'
     | '/apps/tapling'
     | '/apps/derive/help'
+    | '/apps/kairos/help'
     | '/apps/derive/legal/privacy'
     | '/apps/derive/legal/terms'
+    | '/apps/kairos/legal/privacy'
+    | '/apps/kairos/legal/terms'
   id:
     | '__root__'
     | '/'
     | '/apps/derive/'
+    | '/apps/kairos/'
     | '/apps/tapling/'
     | '/apps/derive/help/'
+    | '/apps/kairos/help/'
     | '/apps/derive/legal/privacy/'
     | '/apps/derive/legal/terms/'
+    | '/apps/kairos/legal/privacy/'
+    | '/apps/kairos/legal/terms/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppsDeriveIndexRoute: typeof AppsDeriveIndexRoute
+  AppsKairosIndexRoute: typeof AppsKairosIndexRoute
   AppsTaplingIndexRoute: typeof AppsTaplingIndexRoute
   AppsDeriveHelpIndexRoute: typeof AppsDeriveHelpIndexRoute
+  AppsKairosHelpIndexRoute: typeof AppsKairosHelpIndexRoute
   AppsDeriveLegalPrivacyIndexRoute: typeof AppsDeriveLegalPrivacyIndexRoute
   AppsDeriveLegalTermsIndexRoute: typeof AppsDeriveLegalTermsIndexRoute
+  AppsKairosLegalPrivacyIndexRoute: typeof AppsKairosLegalPrivacyIndexRoute
+  AppsKairosLegalTermsIndexRoute: typeof AppsKairosLegalTermsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -126,6 +180,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppsTaplingIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/apps/kairos/': {
+      id: '/apps/kairos/'
+      path: '/apps/kairos'
+      fullPath: '/apps/kairos/'
+      preLoaderRoute: typeof AppsKairosIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apps/derive/': {
       id: '/apps/derive/'
       path: '/apps/derive'
@@ -133,11 +194,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppsDeriveIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/apps/kairos/help/': {
+      id: '/apps/kairos/help/'
+      path: '/apps/kairos/help'
+      fullPath: '/apps/kairos/help/'
+      preLoaderRoute: typeof AppsKairosHelpIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apps/derive/help/': {
       id: '/apps/derive/help/'
       path: '/apps/derive/help'
       fullPath: '/apps/derive/help/'
       preLoaderRoute: typeof AppsDeriveHelpIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apps/kairos/legal/terms/': {
+      id: '/apps/kairos/legal/terms/'
+      path: '/apps/kairos/legal/terms'
+      fullPath: '/apps/kairos/legal/terms/'
+      preLoaderRoute: typeof AppsKairosLegalTermsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apps/kairos/legal/privacy/': {
+      id: '/apps/kairos/legal/privacy/'
+      path: '/apps/kairos/legal/privacy'
+      fullPath: '/apps/kairos/legal/privacy/'
+      preLoaderRoute: typeof AppsKairosLegalPrivacyIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/apps/derive/legal/terms/': {
@@ -160,10 +242,14 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppsDeriveIndexRoute: AppsDeriveIndexRoute,
+  AppsKairosIndexRoute: AppsKairosIndexRoute,
   AppsTaplingIndexRoute: AppsTaplingIndexRoute,
   AppsDeriveHelpIndexRoute: AppsDeriveHelpIndexRoute,
+  AppsKairosHelpIndexRoute: AppsKairosHelpIndexRoute,
   AppsDeriveLegalPrivacyIndexRoute: AppsDeriveLegalPrivacyIndexRoute,
   AppsDeriveLegalTermsIndexRoute: AppsDeriveLegalTermsIndexRoute,
+  AppsKairosLegalPrivacyIndexRoute: AppsKairosLegalPrivacyIndexRoute,
+  AppsKairosLegalTermsIndexRoute: AppsKairosLegalTermsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

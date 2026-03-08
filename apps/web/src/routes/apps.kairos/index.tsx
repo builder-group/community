@@ -1,16 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { deriveConfig } from '@/environment';
+import { kairosConfig } from '@/environment';
 
-export const Route = createFileRoute('/apps/derive/')({
+export const Route = createFileRoute('/apps/kairos/')({
 	component: RouteComponent
 });
 
 function RouteComponent() {
 	return (
 		<div className="relative flex min-h-screen items-center justify-center">
-			<h1 className="text-4xl font-bold">{deriveConfig.name}</h1>
+			<h1 className="text-4xl font-bold">{kairosConfig.name}</h1>
 			<a
-				href={deriveConfig.appstore}
+				href={kairosConfig.appstore}
 				target="_blank"
 				rel="noopener noreferrer"
 				className="absolute bottom-12 left-1/2 -translate-x-1/2"
