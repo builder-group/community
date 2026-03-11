@@ -584,8 +584,8 @@ Instead, `ecsify` tracks resources by key using three small `Set`s:
 
 ```typescript
 _registered = new Set(); // Known resource keys
-_added = new Set();      // Added since last flush
-_changed = new Set();    // Changed since last flush
+_added = new Set(); // Added since last flush
+_changed = new Set(); // Changed since last flush
 ```
 
 This keeps resource tracking:
@@ -618,10 +618,7 @@ storage model.
 Bundles are flattened when defined:
 
 ```typescript
-const ActorBundle = defineBundle(
-	bundleEntry(Position, { x: 0, y: 0 }),
-	bundleEntry(Health, 100)
-);
+const ActorBundle = defineBundle(bundleEntry(Position, { x: 0, y: 0 }), bundleEntry(Health, 100));
 
 const PlayerBundle = defineBundle(ActorBundle, bundleEntry(Player));
 ```
