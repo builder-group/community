@@ -1,0 +1,6 @@
+# Deprecated packages
+packages/_deprecated/
+
+# Generated files
+**/*.gen.ts
+generated/
