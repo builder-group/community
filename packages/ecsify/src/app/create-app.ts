@@ -8,6 +8,7 @@ import {
 import { createEntityIndex, TEntityId } from '../entity';
 import { createEventRegistry, TEvent } from '../event';
 import { createQueryRegistry, TQueryRegistry } from '../query';
+import { createResourceRegistry } from '../resource';
 import { createSystemRegistry, TAddSystemOptions, TSystemFn } from '../system';
 import { TAnyPlugin, TApp, TAppContext, TPluginsFromAppContext } from './types';
 
@@ -33,6 +34,7 @@ export function createApp<
 				systemSets as GAppContext['systemSets'][]
 			),
 			_eventRegistry: createEventRegistry<GAppContext['events']>(),
+			_resourceRegistry: createResourceRegistry<GAppContext['resources']>(),
 
 			c: {} as GAppContext['components'], // Will be set in _new
 			r: {} as GAppContext['resources'], // Will be set in _new
@@ -65,7 +67,7 @@ export function createApp<
 
 				// Add resources to r
 				if (plugin.resources) {
-					Object.assign(this.r, plugin.resources);
+					this._applyResources(plugin.resources);
 				}
 
 				// Add appExtensions directly to this
@@ -133,6 +135,55 @@ export function createApp<
 				return this._componentRegistry.markChanged(eid, component);
 			},
 
+			hasResource(key) {
+				return this._resourceRegistry.has(key);
+			},
+
+			updateResource(key, value, markAsChanged = true) {
+				this._applyResources(
+					{
+						[key]: value
+					} as unknown as Partial<GAppContext['resources']>,
+					{
+						trackAdded: true,
+						trackChanged: markAsChanged
+					}
+				);
+			},
+
+			markResourceChanged(key) {
+				this._resourceRegistry.markChanged(key);
+			},
+
+			wasResourceAdded(key) {
+				return this._resourceRegistry.wasAdded(key);
+			},
+
+			wasResourceChanged(key) {
+				return this._resourceRegistry.wasChanged(key);
+			},
+
+			_applyResources(resources, options = {}) {
+				const { trackAdded = true, trackChanged = true, overwriteExisting = true } = options;
+
+				for (const [key, value] of Object.entries(resources)) {
+					const resourceKey = key as keyof GAppContext['resources'];
+					const hasResource = this._resourceRegistry.has(resourceKey);
+
+					if (overwriteExisting || !hasResource) {
+						(this.r as Record<keyof GAppContext['resources'], unknown>)[resourceKey] = value;
+					}
+
+					if (hasResource) {
+						if (trackChanged) {
+							this._resourceRegistry.markChanged(resourceKey);
+						}
+					} else {
+						this._resourceRegistry.register(resourceKey, { trackAdded, trackChanged });
+					}
+				}
+			},
+
 			queryEntities(queryOrFilter, options) {
 				return this._queryRegistry.queryEntities(queryOrFilter, options);
 			},
@@ -174,12 +225,20 @@ export function createApp<
 			flush() {
 				this._componentRegistry.flush();
 				this._eventRegistry.flush();
+				this._resourceRegistry.flush();
 			},
 
 			reset() {
 				this._componentRegistry.reset();
 				this._entityIndex.reset();
 				this._queryRegistry.reset();
+				this._eventRegistry.flush();
+				this._resourceRegistry.reset();
+				this._applyResources(this.r, {
+					trackAdded: false,
+					trackChanged: false,
+					overwriteExisting: false
+				});
 			}
 		},
 		plugins

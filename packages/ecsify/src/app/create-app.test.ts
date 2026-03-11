@@ -41,6 +41,24 @@ describe('createApp function', () => {
 			expect(result).toBe(app);
 		});
 
+		it('should track newly added resources as changed', () => {
+			const app = createApp({
+				plugins: [createDefaultPlugin()],
+				systemSets: ['First', 'Update', 'Last']
+			});
+
+			const typedApp = app.addPlugin({
+				name: 'Test',
+				deps: [],
+				resources: {
+					inputState: { jump: false }
+				}
+			});
+
+			expect(typedApp.wasResourceAdded('inputState')).toBe(true);
+			expect(typedApp.wasResourceChanged('inputState')).toBe(true);
+		});
+
 		it('should add plugin with dependencies', () => {
 			const app = createApp({
 				plugins: [createDefaultPlugin()],
@@ -176,6 +194,150 @@ describe('createApp function', () => {
 			expect(() => app.addPlugins([consumerPlugin, depPlugin])).toThrow(
 				"Plugin 'Consumer' depends on 'Dependency' which is not loaded"
 			);
+		});
+	});
+
+	describe('resources', () => {
+		it('should report whether a resource is registered', () => {
+			const app = createApp({
+				plugins: [
+					createDefaultPlugin(),
+					{
+						name: 'Test',
+						deps: ['Default'],
+						resources: {
+							score: 0
+						}
+					}
+				] as const,
+				systemSets: ['First', 'Update', 'Last']
+			});
+
+			expect(app.hasResource('score')).toBe(true);
+		});
+
+		it('should mark nested resource mutations explicitly', () => {
+			const app = createApp({
+				plugins: [
+					createDefaultPlugin(),
+					{
+						name: 'Test',
+						deps: ['Default'],
+						resources: {
+							inputState: { jump: false }
+						}
+					}
+				] as const,
+				systemSets: ['First', 'Update', 'Last']
+			});
+
+			app.flush();
+			app.r.inputState.jump = true;
+
+			expect(app.wasResourceChanged('inputState')).toBe(false);
+
+			app.markResourceChanged('inputState');
+
+			expect(app.wasResourceChanged('inputState')).toBe(true);
+		});
+
+		it('should update top-level resources and mark them as changed', () => {
+			const app = createApp({
+				plugins: [
+					createDefaultPlugin(),
+					{
+						name: 'Test',
+						deps: ['Default'],
+						resources: {
+							score: 0
+						}
+					}
+				] as const,
+				systemSets: ['First', 'Update', 'Last']
+			});
+
+			app.flush();
+			app.updateResource('score', 10);
+
+			expect(app.r.score).toBe(10);
+			expect(app.wasResourceChanged('score')).toBe(true);
+		});
+
+		it('should respect markAsChanged when updating a resource', () => {
+			const app = createApp({
+				plugins: [
+					createDefaultPlugin(),
+					{
+						name: 'Test',
+						deps: ['Default'],
+						resources: {
+							score: 0
+						}
+					}
+				] as const,
+				systemSets: ['First', 'Update', 'Last']
+			});
+
+			app.flush();
+			app.updateResource('score', 10, false);
+
+			expect(app.r.score).toBe(10);
+			expect(app.wasResourceChanged('score')).toBe(false);
+		});
+
+		it('should clear resource change state on flush', () => {
+			const app = createApp({
+				plugins: [
+					createDefaultPlugin(),
+					{
+						name: 'Test',
+						deps: ['Default'],
+						resources: {
+							score: 0
+						}
+					}
+				] as const,
+				systemSets: ['First', 'Update', 'Last']
+			});
+
+			app.flush();
+			app.updateResource('score', 10);
+
+			expect(app.wasResourceChanged('score')).toBe(true);
+
+			app.flush();
+
+			expect(app.wasResourceAdded('score')).toBe(false);
+			expect(app.wasResourceChanged('score')).toBe(false);
+		});
+
+		it('should preserve resource registration on reset', () => {
+			const app = createApp({
+				plugins: [
+					createDefaultPlugin(),
+					{
+						name: 'Test',
+						deps: ['Default'],
+						resources: {
+							score: 0
+						}
+					}
+				] as const,
+				systemSets: ['First', 'Update', 'Last']
+			});
+
+			expect(app.wasResourceAdded('score')).toBe(true);
+
+			app.reset();
+
+			expect(app.hasResource('score')).toBe(true);
+			expect(app.r.score).toBe(0);
+			expect(app.wasResourceAdded('score')).toBe(false);
+			expect(app.wasResourceChanged('score')).toBe(false);
+
+			app.markResourceChanged('score');
+
+			expect(app.wasResourceChanged('score')).toBe(true);
 		});
 	});
 });

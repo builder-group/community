@@ -247,6 +247,32 @@ function physicsSystem(app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>) {
 app.r.inputState.jump = true;
 ```
 
+Resources declared by plugins are registered automatically and can be tracked explicitly for
+frame-based change detection:
+
+```ts
+app.hasResource('inputState'); // true
+
+// Top-level replacement marks the resource as changed
+app.updateResource('inputState', { jump: true });
+
+if (app.wasResourceChanged('inputState')) {
+	console.log('Input state changed this frame');
+}
+
+// Direct nested mutation requires manual marking
+app.r.inputState.jump = false;
+app.markResourceChanged('inputState');
+
+if (app.wasResourceAdded('inputState')) {
+	console.log('Resource was added this frame');
+}
+```
+
+Like component change tracking, resource tracking is cleared on `app.flush()`. Direct nested writes on
+`app.r` are not observed automatically, so call `app.markResourceChanged(...)` when mutating in place.
+`app.reset()` preserves loaded resources and their current values, while clearing resource tracking state.
+
 #### App Extensions
 
 Custom methods on app:
@@ -524,6 +550,53 @@ entity2: (0b101 & 0b011) === 0b011  ✗ false
 
 **Key Insight:** Caching matters most (7-14x faster than no cache). Bitmask vs individual evaluation shows minimal difference.
 
+### Resource Registry (`create-resource-registry.ts`)
+
+Tracks top-level app resources independently from the entity/component query system.
+
+#### Why Separate from Queries?
+
+Resources are singleton values on `app.r`, not collections of ECS data. They do not benefit from
+bitmask matching, cached entity scans, or query compilation.
+
+Instead, `ecsify` tracks resources by key using three small `Set`s:
+
+```typescript
+_registered = new Set(); // Known resource keys
+_added = new Set();      // Added since last flush
+_changed = new Set();    // Changed since last flush
+```
+
+This keeps resource tracking:
+
+- **O(1) for lookups and writes**
+- **Cheap to maintain** because apps typically have very few resources
+- **Explicit** without proxy magic or deep object observation
+
+#### Update Model
+
+```typescript
+// Top-level replacement
+app.updateResource('score', 10);
+
+// Direct nested mutation
+app.r.inputState.jump = true;
+app.markResourceChanged('inputState');
+```
+
+Top-level updates can be tracked automatically because the app owns the assignment. Direct nested
+mutations are not intercepted, so they must be marked explicitly.
+
+#### Reset Behavior
+
+```typescript
+app.reset();
+```
+
+`reset()` clears runtime tracking state, but preserves loaded resources and their current values. The
+resource registry is rebuilt silently so `hasResource(...)`, `markResourceChanged(...)`, and
+`wasResourceChanged(...)` continue to work after a reset.
+
 ### Component Registry (`create-component-registry.ts`)
 
 Component management with direct array access, unlimited components via generations, and flexible storage patterns.
@@ -594,6 +667,19 @@ _removedMasks[0][eid] |= bitflag;  // Component removed
 // Clear at frame end
 flush() { /* clear all change masks */ }
 ```
+
+#### Flush-Based Semantics
+
+`ecsify` uses flush-based change detection, not per-system tick tracking.
+
+That means:
+
+- `Changed(...)` means changed since the last `flush()`
+- `wasResourceChanged(...)` means changed since the last `flush()`
+- By default, the app flushes in the `Last` system set via the default plugin
+
+This model is simpler than Bevy-style per-system ticks and matches the current scheduler design.
+If you need a different tracking boundary, you can control when `flush()` is called.
 
 ## 📚 Good to Know
 

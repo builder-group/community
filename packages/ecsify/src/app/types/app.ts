@@ -14,6 +14,7 @@ import {
 	TQueryFilter,
 	TQueryRegistry
 } from '../../query';
+import { TResourceRegistry } from '../../resource';
 import { TAddSystemOptions, TSystemFn, TSystemRegistry } from '../../system';
 import { TAnyPlugin } from '../types';
 import { TMergePlugins } from './plugin';
@@ -34,6 +35,8 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	_systemRegistry: TSystemRegistry<GAppContext['systemSets'], TApp<GAppContext>>;
 	/** Event registry for managing event data */
 	_eventRegistry: TEventRegistry<GAppContext['events']>;
+	/** Resource registry for tracking resource changes */
+	_resourceRegistry: TResourceRegistry<GAppContext['resources']>;
 
 	c: GAppContext['components'];
 	r: GAppContext['resources'];
@@ -128,6 +131,51 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	markComponentChanged(eid: TEntityId, component: TComponentRef): void;
 
 	/**
+	 * Checks if a top-level resource is currently registered on the app.
+	 */
+	hasResource<GKey extends keyof GAppContext['resources']>(key: GKey): boolean;
+
+	/**
+	 * Updates a top-level resource value.
+	 * @param key - The resource key
+	 * @param value - The new resource value
+	 * @param markAsChanged - Whether to mark the resource as changed (default: true)
+	 */
+	updateResource<GKey extends keyof GAppContext['resources']>(
+		key: GKey,
+		value: GAppContext['resources'][GKey],
+		markAsChanged?: boolean
+	): void;
+
+	/**
+	 * Marks a resource as changed for the current frame.
+	 * Useful when mutating nested data directly via `app.r`.
+	 */
+	markResourceChanged<GKey extends keyof GAppContext['resources']>(key: GKey): void;
+
+	/**
+	 * Checks if a resource was added in the current frame.
+	 */
+	wasResourceAdded<GKey extends keyof GAppContext['resources']>(key: GKey): boolean;
+
+	/**
+	 * Checks if a resource was changed in the current frame.
+	 */
+	wasResourceChanged<GKey extends keyof GAppContext['resources']>(key: GKey): boolean;
+
+	/**
+	 * Internal helper for applying top-level resources and tracking their lifecycle.
+	 */
+	_applyResources(
+		resources: Partial<GAppContext['resources']>,
+		options?: {
+			trackAdded?: boolean;
+			trackChanged?: boolean;
+			overwriteExisting?: boolean;
+		}
+	): void;
+
+	/**
 	 * Queries entities that match the specified filter and returns only entity IDs.
 	 *
 	 * @param filter - The query filter to match entities against
@@ -210,7 +258,7 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	flush(): void;
 
 	/**
-	 * Resets the app to its initial state.
+	 * Clears runtime state while preserving loaded plugins, systems, and resources.
 	 */
 	reset(): void;
 };
