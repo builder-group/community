@@ -417,10 +417,10 @@ const Velocity: { dx: number[]; dy: number[] } = { dx: [], dy: [] };
 
 // Create entity
 const player = entityIndex.createEntity();
-componentRegistry.addComponent(player, Position);
+componentRegistry.add(player, Position);
 Position.x[player] = 0;
 Position.y[player] = 0;
-componentRegistry.addComponent(player, Velocity);
+componentRegistry.add(player, Velocity);
 Velocity.dx[player] = 1;
 Velocity.dy[player] = 1;
 

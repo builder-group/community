@@ -23,15 +23,15 @@ export function createEcsifyRawBenchmarks() {
 			// Create 1,000 entities with all 5 components (packed archetype)
 			for (let i = 0; i < 1000; i++) {
 				const eid = entityIndex.createEntity();
-				componentRegistry.addComponent(eid, A);
+				componentRegistry.add(eid, A);
 				A.value[eid] = 1;
-				componentRegistry.addComponent(eid, B);
+				componentRegistry.add(eid, B);
 				B.value[eid] = 1;
-				componentRegistry.addComponent(eid, C);
+				componentRegistry.add(eid, C);
 				C.value[eid] = 1;
-				componentRegistry.addComponent(eid, D);
+				componentRegistry.add(eid, D);
 				D.value[eid] = 1;
-				componentRegistry.addComponent(eid, E);
+				componentRegistry.add(eid, E);
 				E.value[eid] = 1;
 			}
 
@@ -72,40 +72,40 @@ export function createEcsifyRawBenchmarks() {
 			// Create entities with different component combinations
 			for (let i = 0; i < 1000; i++) {
 				const eid = entityIndex.createEntity();
-				componentRegistry.addComponent(eid, A);
+				componentRegistry.add(eid, A);
 				A.value[eid] = 0;
-				componentRegistry.addComponent(eid, B);
+				componentRegistry.add(eid, B);
 				B.value[eid] = 0;
 			}
 			for (let i = 0; i < 1000; i++) {
 				const eid = entityIndex.createEntity();
-				componentRegistry.addComponent(eid, A);
+				componentRegistry.add(eid, A);
 				A.value[eid] = 0;
-				componentRegistry.addComponent(eid, B);
+				componentRegistry.add(eid, B);
 				B.value[eid] = 0;
-				componentRegistry.addComponent(eid, C);
+				componentRegistry.add(eid, C);
 				C.value[eid] = 0;
 			}
 			for (let i = 0; i < 1000; i++) {
 				const eid = entityIndex.createEntity();
-				componentRegistry.addComponent(eid, A);
+				componentRegistry.add(eid, A);
 				A.value[eid] = 0;
-				componentRegistry.addComponent(eid, B);
+				componentRegistry.add(eid, B);
 				B.value[eid] = 0;
-				componentRegistry.addComponent(eid, C);
+				componentRegistry.add(eid, C);
 				C.value[eid] = 0;
-				componentRegistry.addComponent(eid, D);
+				componentRegistry.add(eid, D);
 				D.value[eid] = 0;
 			}
 			for (let i = 0; i < 1000; i++) {
 				const eid = entityIndex.createEntity();
-				componentRegistry.addComponent(eid, A);
+				componentRegistry.add(eid, A);
 				A.value[eid] = 0;
-				componentRegistry.addComponent(eid, B);
+				componentRegistry.add(eid, B);
 				B.value[eid] = 0;
-				componentRegistry.addComponent(eid, C);
+				componentRegistry.add(eid, C);
 				C.value[eid] = 0;
-				componentRegistry.addComponent(eid, E);
+				componentRegistry.add(eid, E);
 				E.value[eid] = 0;
 			}
 
@@ -158,9 +158,9 @@ export function createEcsifyRawBenchmarks() {
 				if (component != null) {
 					for (let entityCount = 0; entityCount < 100; entityCount++) {
 						const eid = entityIndex.createEntity();
-						componentRegistry.addComponent(eid, component);
+						componentRegistry.add(eid, component);
 						component.value[eid] = 0;
-						componentRegistry.addComponent(eid, Data);
+						componentRegistry.add(eid, Data);
 						Data.value[eid] = 0;
 					}
 				}
@@ -195,7 +195,7 @@ export function createEcsifyRawBenchmarks() {
 			// Create initial persistent entities
 			for (let i = 0; i < 1000; i++) {
 				const eid = entityIndex.createEntity();
-				componentRegistry.addComponent(eid, A);
+				componentRegistry.add(eid, A);
 				A.value[eid] = 0;
 			}
 
@@ -204,13 +204,13 @@ export function createEcsifyRawBenchmarks() {
 					// Create new temporary entity for each persistent entity
 					for (const _eid of queryRegistry.queryEntities(With(A))) {
 						const newEid = entityIndex.createEntity();
-						componentRegistry.addComponent(newEid, B);
+						componentRegistry.add(newEid, B);
 						B.value[newEid] = 0;
 					}
 
 					// Destroy all temporary entities
 					for (const eid of queryRegistry.queryEntities(With(B))) {
-						componentRegistry.removeAllComponents(eid);
+						componentRegistry.removeAll(eid);
 						entityIndex.removeEntity(eid);
 					}
 				}
@@ -228,7 +228,7 @@ export function createEcsifyRawBenchmarks() {
 			// Create initial entities with only base component
 			for (let i = 0; i < 1000; i++) {
 				const eid = entityIndex.createEntity();
-				componentRegistry.addComponent(eid, A);
+				componentRegistry.add(eid, A);
 				A.value[eid] = 0;
 			}
 
@@ -236,13 +236,13 @@ export function createEcsifyRawBenchmarks() {
 				runAddRemove() {
 					// Add dynamic component to entities that only have base component
 					for (const eid of queryRegistry.queryEntities(With(A))) {
-						componentRegistry.addComponent(eid, B);
+						componentRegistry.add(eid, B);
 						B.value[eid] = 0;
 					}
 
 					// Remove dynamic component from entities that have both components
 					for (const eid of queryRegistry.queryEntities(With(B))) {
-						componentRegistry.removeComponent(eid, B);
+						componentRegistry.remove(eid, B);
 					}
 				}
 			};

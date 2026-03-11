@@ -1,5 +1,5 @@
 import { TEntityId } from '../entity';
-import { TComponentCallbacks, TComponentData, TComponentRef, TUpdateComponentValue } from './types';
+import { TComponentData, TComponentRef, TUpdateComponentValue } from './types';
 
 /**
  * Creates a new component registry.
@@ -17,25 +17,25 @@ import { TComponentCallbacks, TComponentData, TComponentRef, TUpdateComponentVal
  * const Player: {} = {};                                               // Marker component
  *
  * // Register all components
- * registry.registerComponent(Position);
- * registry.registerComponent(Transform);
- * registry.registerComponent(Health);
- * registry.registerComponent(Player);
+ * registry.register(Position);
+ * registry.register(Transform);
+ * registry.register(Health);
+ * registry.register(Player);
  *
  * const eid = 1;
  *
  * // Add components and set data
- * registry.addComponent(eid, Position);
+ * registry.add(eid, Position);
  * Position.x[eid] = 10;
  * Position.y[eid] = 20;
  *
- * registry.addComponent(eid, Transform);
+ * registry.add(eid, Transform);
  * Transform[eid] = { x: 5, y: 15 };
  *
- * registry.addComponent(eid, Health);
+ * registry.add(eid, Health);
  * Health[eid] = 100;
  *
- * registry.addComponent(eid, Player); // Just a flag, no data
+ * registry.add(eid, Player); // Just a flag, no data
  * ```
  */
 export function createComponentRegistry(): TComponentRegistry {
@@ -52,7 +52,7 @@ export function createComponentRegistry(): TComponentRegistry {
 		_callbacks: new Map(),
 		_componentsToFlush: new Set(),
 
-		registerComponent(component) {
+		register(component) {
 			if (this._componentMap.has(component)) {
 				return this._componentMap.get(component) as TComponentData;
 			}
@@ -79,7 +79,7 @@ export function createComponentRegistry(): TComponentRegistry {
 			return componentData;
 		},
 
-		hasComponent(eid, component) {
+		has(eid, component) {
 			const componentData = this._componentMap.get(component);
 			if (componentData == null) {
 				return false;
@@ -95,21 +95,21 @@ export function createComponentRegistry(): TComponentRegistry {
 		// Generation 1: [Armor, Weapon, ...] (components 31+, bitflags 1-2^30)
 		//
 		// Before:     entityMasks: [[<1 empty>, 5, <3 empty>, 2], []]
-		//             addComponent(eid=5, Armor) where Armor.generationId=1, bitflag=1 ↓
+		//             add(eid=5, Armor) where Armor.generationId=1, bitflag=1 ↓
 		//
 		// Step 1:     Get current mask: entityMasks[1][5] || 0 = 0
 		// Step 2:     Set component bit: 0 | 1 = 1
 		// Step 3:     Store new mask: entityMasks[1][5] = 1
 		//
 		// After:      entityMasks: [[<1 empty>, 5, <3 empty>, 2], [<5 empty>, 1]]  (entity 5 has Armor)
-		addComponent<GComponent extends TComponentRef>(
+		add<GComponent extends TComponentRef>(
 			eid: TEntityId,
 			component: GComponent,
 			value?: TUpdateComponentValue<GComponent>
 		): void {
 			// Auto-register component if not already registered
 			if (!this._componentMap.has(component)) {
-				this.registerComponent(component);
+				this.register(component);
 			}
 
 			const componentData = this._componentMap.get(component) as TComponentData;
@@ -133,7 +133,7 @@ export function createComponentRegistry(): TComponentRegistry {
 
 			// Set component data if value is provided
 			if (value !== undefined) {
-				this.updateComponent(eid, component, value, false);
+				this.update(eid, component, value, false);
 			}
 
 			// Fire callbacks if registered
@@ -146,7 +146,7 @@ export function createComponentRegistry(): TComponentRegistry {
 			this._componentsToFlush.add(component);
 		},
 
-		updateComponent<GComponent extends TComponentRef>(
+		update<GComponent extends TComponentRef>(
 			eid: TEntityId,
 			component: GComponent,
 			value: TUpdateComponentValue<GComponent>,
@@ -167,10 +167,10 @@ export function createComponentRegistry(): TComponentRegistry {
 				component !== null &&
 				Object.keys(component).length === 0
 			) {
-				if (value === true && !this.hasComponent(eid, component)) {
-					this.addComponent(eid, component);
+				if (value === true && !this.has(eid, component)) {
+					this.add(eid, component);
 				} else if (value === false) {
-					this.removeComponent(eid, component);
+					this.remove(eid, component);
 				}
 				return;
 			}
@@ -193,7 +193,7 @@ export function createComponentRegistry(): TComponentRegistry {
 
 		// Component Removal Flow
 		// Before:     entityMasks: [[<1 empty>, 5, <3 empty>, 2], [<5 empty>, 1]]
-		//             removeComponent(eid=5, Armor) where Armor.generationId=1, bitflag=1 ↓
+		//             remove(eid=5, Armor) where Armor.generationId=1, bitflag=1 ↓
 		//
 		// Step 1:     Get current mask: entityMasks[1][5] = 1
 		// Step 2:     Check component exists: 1 & 1 = 1 ✓
@@ -201,7 +201,7 @@ export function createComponentRegistry(): TComponentRegistry {
 		// Step 4:     Clear component data
 		//
 		// After:      entityMasks: [[<1 empty>, 5, <3 empty>, 2], [<5 empty>, 0]]  (entity 5 no longer has Armor)
-		removeComponent(eid, component) {
+		remove(eid, component) {
 			const componentData = this._componentMap.get(component);
 			if (componentData == null) {
 				return false;
@@ -249,9 +249,9 @@ export function createComponentRegistry(): TComponentRegistry {
 			return true;
 		},
 
-		removeAllComponents(eid) {
+		removeAll(eid) {
 			for (const component of this._componentMap.keys()) {
-				this.removeComponent(eid, component);
+				this.remove(eid, component);
 			}
 		},
 
@@ -319,7 +319,7 @@ export function createComponentRegistry(): TComponentRegistry {
 			return (mask & bitflag) !== 0;
 		},
 
-		onComponentAdd(component, callback) {
+		onAdd(component, callback) {
 			if (!this._callbacks.has(component)) {
 				this._callbacks.set(component, {});
 			}
@@ -338,7 +338,7 @@ export function createComponentRegistry(): TComponentRegistry {
 			};
 		},
 
-		onComponentChange(component, callback) {
+		onChange(component, callback) {
 			if (!this._callbacks.has(component)) {
 				this._callbacks.set(component, {});
 			}
@@ -357,7 +357,7 @@ export function createComponentRegistry(): TComponentRegistry {
 			};
 		},
 
-		onComponentRemove(component, callback) {
+		onRemove(component, callback) {
 			if (!this._callbacks.has(component)) {
 				this._callbacks.set(component, {});
 			}
@@ -376,7 +376,7 @@ export function createComponentRegistry(): TComponentRegistry {
 			};
 		},
 
-		onComponentFlush(component, callback) {
+		onFlush(component, callback) {
 			if (!this._callbacks.has(component)) {
 				this._callbacks.set(component, {});
 			}
@@ -487,7 +487,7 @@ export interface TComponentRegistry {
 	 * @param component - The component to register (can be array or object with arrays)
 	 * @returns Component metadata including ID, generation, and bitflag
 	 */
-	registerComponent(component: TComponentRef): TComponentData;
+	register(component: TComponentRef): TComponentData;
 
 	/**
 	 * Checks if an entity has a specific component.
@@ -495,7 +495,7 @@ export interface TComponentRegistry {
 	 * @param component - The component to check
 	 * @returns True if entity has the component
 	 */
-	hasComponent(eid: TEntityId, component: TComponentRef): boolean;
+	has(eid: TEntityId, component: TComponentRef): boolean;
 
 	/**
 	 * Adds a component to an entity (sets the component bit).
@@ -503,7 +503,7 @@ export interface TComponentRegistry {
 	 * @param eid - The entity ID
 	 * @param component - The component to add
 	 */
-	addComponent<GComponent extends TComponentRef>(
+	add<GComponent extends TComponentRef>(
 		eid: TEntityId,
 		component: GComponent,
 		value?: TUpdateComponentValue<GComponent>
@@ -516,7 +516,7 @@ export interface TComponentRegistry {
 	 * - For objects with arrays: sets each property value
 	 * @param markAsChanged - Whether to mark the component as changed (default: true)
 	 */
-	updateComponent<GComponent extends TComponentRef>(
+	update<GComponent extends TComponentRef>(
 		eid: TEntityId,
 		component: GComponent,
 		value: TUpdateComponentValue<GComponent>,
@@ -529,13 +529,13 @@ export interface TComponentRegistry {
 	 * @param component - The component to remove
 	 * @returns True if component was removed, false if entity didn't have it
 	 */
-	removeComponent(eid: TEntityId, component: TComponentRef): boolean;
+	remove(eid: TEntityId, component: TComponentRef): boolean;
 
 	/**
 	 * Removes all components from an entity.
 	 * @param eid - The entity ID
 	 */
-	removeAllComponents(eid: TEntityId): void;
+	removeAll(eid: TEntityId): void;
 
 	/**
 	 * Marks a component as changed for the current frame.
@@ -574,28 +574,28 @@ export interface TComponentRegistry {
 	 * @param component - The component to register the callback for
 	 * @param callback - The callback function to register
 	 */
-	onComponentAdd(component: TComponentRef, callback: (eid: TEntityId) => void): () => void;
+	onAdd(component: TComponentRef, callback: (eid: TEntityId) => void): () => void;
 
 	/**
 	 * Registers a callback for when a component is changed for an entity.
 	 * @param component - The component to register the callback for
 	 * @param callback - The callback function to register
 	 */
-	onComponentChange(component: TComponentRef, callback: (eid: TEntityId) => void): () => void;
+	onChange(component: TComponentRef, callback: (eid: TEntityId) => void): () => void;
 
 	/**
 	 * Registers a callback for when a component is removed from an entity.
 	 * @param component - The component to register the callback for
 	 * @param callback - The callback function to register
 	 */
-	onComponentRemove(component: TComponentRef, callback: (eid: TEntityId) => void): () => void;
+	onRemove(component: TComponentRef, callback: (eid: TEntityId) => void): () => void;
 
 	/**
 	 * Registers a callback for when a component is flushed for an entity.
 	 * @param component - The component to register the callback for
 	 * @param callback - The callback function to register
 	 */
-	onComponentFlush(component: TComponentRef, callback: () => void): () => void;
+	onFlush(component: TComponentRef, callback: () => void): () => void;
 
 	/**
 	 * Clears all change tracking for the current frame.
@@ -606,4 +606,11 @@ export interface TComponentRegistry {
 	 * Resets the registry to its initial empty state.
 	 */
 	reset(): void;
+}
+
+export interface TComponentCallbacks {
+	onAdd?: ((eid: TEntityId) => void)[];
+	onChange?: ((eid: TEntityId) => void)[];
+	onRemove?: ((eid: TEntityId) => void)[];
+	onFlush?: (() => void)[];
 }

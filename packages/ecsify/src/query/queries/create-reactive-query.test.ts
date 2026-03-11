@@ -109,7 +109,7 @@ describe('createReactiveQuery function', () => {
 
 			// Add component should trigger dirty
 			const eid = entityIndex.createEntity();
-			componentRegistry.addComponent(eid, Position, { x: 10, y: 20 });
+			componentRegistry.add(eid, Position, { x: 10, y: 20 });
 
 			expect(dirtyCallback).toHaveBeenCalledTimes(1);
 		});

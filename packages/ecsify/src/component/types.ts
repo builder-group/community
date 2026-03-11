@@ -1,5 +1,3 @@
-import { TEntityId } from '../entity';
-
 export interface TComponentData {
 	/** Unique component ID */
 	id: number;
@@ -12,13 +10,6 @@ export interface TComponentData {
 }
 
 export type TComponentRef = any; // Can be array or object with arrays
-
-export interface TComponentCallbacks {
-	onAdd?: ((eid: TEntityId) => void)[];
-	onChange?: ((eid: TEntityId) => void)[];
-	onRemove?: ((eid: TEntityId) => void)[];
-	onFlush?: (() => void)[];
-}
 
 /**
  * Infers the appropriate value type for different component patterns:

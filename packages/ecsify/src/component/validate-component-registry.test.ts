@@ -20,8 +20,8 @@ describe('validateComponentRegistry', () => {
 		const Position: TPosition = { x: [], y: [] };
 		const Health: THealth = [];
 
-		registry.registerComponent(Position);
-		registry.registerComponent(Health);
+		registry.register(Position);
+		registry.register(Health);
 
 		expect(validateComponentRegistry(registry)).toBe(true);
 	});
@@ -30,22 +30,22 @@ describe('validateComponentRegistry', () => {
 		const Position: TPosition = { x: [], y: [] };
 		const Health: THealth = [];
 
-		registry.registerComponent(Position);
-		registry.registerComponent(Health);
+		registry.register(Position);
+		registry.register(Health);
 
 		const eid1 = entityIndex.createEntity();
 		const eid2 = entityIndex.createEntity();
 
-		registry.addComponent(eid1, Position);
-		registry.addComponent(eid1, Health);
-		registry.addComponent(eid2, Position);
+		registry.add(eid1, Position);
+		registry.add(eid1, Health);
+		registry.add(eid2, Position);
 
 		expect(validateComponentRegistry(registry)).toBe(true);
 
-		registry.removeComponent(eid1, Health);
+		registry.remove(eid1, Health);
 		expect(validateComponentRegistry(registry)).toBe(true);
 
-		registry.removeAllComponents(eid2);
+		registry.removeAll(eid2);
 		expect(validateComponentRegistry(registry)).toBe(true);
 	});
 
@@ -55,24 +55,24 @@ describe('validateComponentRegistry', () => {
 		for (let i = 0; i < 35; i++) {
 			const component = {};
 			components.push(component);
-			registry.registerComponent(component);
+			registry.register(component);
 		}
 
 		expect(validateComponentRegistry(registry)).toBe(true);
 
 		const eid = entityIndex.createEntity();
-		registry.addComponent(eid, components[0]!); // Gen 0
-		registry.addComponent(eid, components[31]!); // Gen 1
+		registry.add(eid, components[0]!); // Gen 0
+		registry.add(eid, components[31]!); // Gen 1
 
 		expect(validateComponentRegistry(registry)).toBe(true);
 	});
 
 	it('should return true after reset', () => {
 		const Position: TPosition = { x: [], y: [] };
-		registry.registerComponent(Position);
+		registry.register(Position);
 
 		const eid = entityIndex.createEntity();
-		registry.addComponent(eid, Position);
+		registry.add(eid, Position);
 
 		registry.reset();
 

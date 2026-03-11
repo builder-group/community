@@ -103,7 +103,7 @@ export function createApp<
 			},
 
 			destroyEntity(eid) {
-				this._componentRegistry.removeAllComponents(eid);
+				this._componentRegistry.removeAll(eid);
 				this._entityIndex.removeEntity(eid);
 			},
 
@@ -112,7 +112,7 @@ export function createApp<
 				component: GComponent,
 				value?: TComponentValue<GComponent>
 			): void {
-				this._componentRegistry.addComponent(eid, component, value);
+				this._componentRegistry.add(eid, component, value);
 			},
 
 			updateComponent<GComponent extends TComponentRef>(
@@ -121,15 +121,15 @@ export function createApp<
 				value: TUpdateComponentValue<GComponent>,
 				markAsChanged?: boolean
 			): void {
-				this._componentRegistry.updateComponent(eid, component, value, markAsChanged);
+				this._componentRegistry.update(eid, component, value, markAsChanged);
 			},
 
 			removeComponent(eid, component) {
-				return this._componentRegistry.removeComponent(eid, component);
+				return this._componentRegistry.remove(eid, component);
 			},
 
 			hasComponent(eid, component) {
-				return this._componentRegistry.hasComponent(eid, component);
+				return this._componentRegistry.has(eid, component);
 			},
 
 			markComponentChanged(eid, component) {
@@ -141,7 +141,7 @@ export function createApp<
 				bundle: TBundle<GComponent>
 			): void {
 				for (const entry of bundle) {
-					this._componentRegistry.addComponent(
+					this._componentRegistry.add(
 						eid,
 						entry.component,
 						entry.value as TComponentValue<GComponent> | undefined

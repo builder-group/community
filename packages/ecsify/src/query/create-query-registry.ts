@@ -75,7 +75,7 @@ export function createQueryRegistry(
 						row.push(eid);
 					} else {
 						// Check if entity has this component
-						if (!this._componentRegistry.hasComponent(eid, comp)) {
+						if (!this._componentRegistry.has(eid, comp)) {
 							hasAllComponents = false;
 							break;
 						}

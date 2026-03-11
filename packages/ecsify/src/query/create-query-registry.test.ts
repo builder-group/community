@@ -23,7 +23,7 @@ describe('createQueryRegistry', () => {
 			const eid1 = entityIndex.createEntity();
 			const eid2 = entityIndex.createEntity();
 
-			componentRegistry.addComponent(eid1, Position);
+			componentRegistry.add(eid1, Position);
 
 			const result = queryRegistry.queryEntities(With(Position));
 			expect(result).toEqual([eid1]);
@@ -43,9 +43,9 @@ describe('createQueryRegistry', () => {
 			const eid1 = entityIndex.createEntity();
 			const eid2 = entityIndex.createEntity();
 
-			componentRegistry.addComponent(eid1, Position);
-			componentRegistry.addComponent(eid1, Health);
-			componentRegistry.addComponent(eid2, Position);
+			componentRegistry.add(eid1, Position);
+			componentRegistry.add(eid1, Health);
+			componentRegistry.add(eid2, Position);
 
 			const result = queryRegistry.queryEntities(And(With(Position), With(Health)));
 			expect(result).toEqual([eid1]);
@@ -55,7 +55,7 @@ describe('createQueryRegistry', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
 			const eid = entityIndex.createEntity();
-			componentRegistry.addComponent(eid, Position);
+			componentRegistry.add(eid, Position);
 
 			// First execution should cache result
 			const result1 = queryRegistry.queryEntities(With(Position));
@@ -70,7 +70,7 @@ describe('createQueryRegistry', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
 			const eid1 = entityIndex.createEntity();
-			componentRegistry.addComponent(eid1, Position);
+			componentRegistry.add(eid1, Position);
 
 			// First execution
 			const result1 = queryRegistry.queryEntities(With(Position));
@@ -78,7 +78,7 @@ describe('createQueryRegistry', () => {
 
 			// Add another entity (makes cache dirty)
 			const eid2 = entityIndex.createEntity();
-			componentRegistry.addComponent(eid2, Position);
+			componentRegistry.add(eid2, Position);
 
 			// Should rebuild with new entity
 			const result2 = queryRegistry.queryEntities(With(Position));
@@ -89,7 +89,7 @@ describe('createQueryRegistry', () => {
 			const Position = { x: [] as number[], y: [] as number[] };
 
 			const eid = entityIndex.createEntity();
-			componentRegistry.addComponent(eid, Position);
+			componentRegistry.add(eid, Position);
 
 			// Query with cache enabled
 			const result1 = queryRegistry.queryEntities(With(Position));
@@ -97,7 +97,7 @@ describe('createQueryRegistry', () => {
 
 			// Add another entity
 			const eid2 = entityIndex.createEntity();
-			componentRegistry.addComponent(eid2, Position);
+			componentRegistry.add(eid2, Position);
 
 			// Query with cache disabled - should always rebuild
 			const result2 = queryRegistry.queryEntities(With(Position), { cache: false });
@@ -109,8 +109,8 @@ describe('createQueryRegistry', () => {
 			const Health = [] as number[];
 
 			const eid = entityIndex.createEntity();
-			componentRegistry.addComponent(eid, Position);
-			componentRegistry.addComponent(eid, Health);
+			componentRegistry.add(eid, Position);
+			componentRegistry.add(eid, Health);
 
 			const filter = And(With(Position), With(Health));
 
@@ -144,16 +144,16 @@ describe('createQueryRegistry', () => {
 			const eid3 = entityIndex.createEntity();
 
 			// Add components with data
-			componentRegistry.addComponent(eid1, Position, { x: 10, y: 5 });
-			componentRegistry.addComponent(eid1, Velocity, { x: 0, y: 0 });
-			componentRegistry.addComponent(eid1, Health, 100);
-			componentRegistry.addComponent(eid1, Player);
+			componentRegistry.add(eid1, Position, { x: 10, y: 5 });
+			componentRegistry.add(eid1, Velocity, { x: 0, y: 0 });
+			componentRegistry.add(eid1, Health, 100);
+			componentRegistry.add(eid1, Player);
 
-			componentRegistry.addComponent(eid2, Position, { x: 20, y: 15 });
-			componentRegistry.addComponent(eid2, Velocity, { x: 10, y: 0 });
-			componentRegistry.addComponent(eid2, Health, 75);
+			componentRegistry.add(eid2, Position, { x: 20, y: 15 });
+			componentRegistry.add(eid2, Velocity, { x: 10, y: 0 });
+			componentRegistry.add(eid2, Health, 75);
 
-			componentRegistry.addComponent(eid3, Health, 50);
+			componentRegistry.add(eid3, Health, 50);
 
 			// Query with Entity ID
 			const results = queryRegistry.queryComponents([Entity, Position, Velocity, Health] as const);
@@ -172,13 +172,13 @@ describe('createQueryRegistry', () => {
 			const eid2 = entityIndex.createEntity();
 			const eid3 = entityIndex.createEntity();
 
-			componentRegistry.addComponent(eid1, Health, 100);
-			componentRegistry.addComponent(eid1, Player);
+			componentRegistry.add(eid1, Health, 100);
+			componentRegistry.add(eid1, Player);
 
-			componentRegistry.addComponent(eid2, Health, 75);
-			componentRegistry.addComponent(eid2, Enemy);
+			componentRegistry.add(eid2, Health, 75);
+			componentRegistry.add(eid2, Enemy);
 
-			componentRegistry.addComponent(eid3, Health, 50);
+			componentRegistry.add(eid3, Health, 50);
 
 			// Query only players
 			const playerResults = queryRegistry.queryComponents([Entity, Health] as const, With(Player));
@@ -201,8 +201,8 @@ describe('createQueryRegistry', () => {
 			const eid1 = entityIndex.createEntity();
 			const eid2 = entityIndex.createEntity();
 
-			componentRegistry.addComponent(eid1, Health, 100);
-			componentRegistry.addComponent(eid2, Health, 75);
+			componentRegistry.add(eid1, Health, 100);
+			componentRegistry.add(eid2, Health, 75);
 
 			const results = queryRegistry.queryComponents([Entity, Health] as const);
 
@@ -217,7 +217,7 @@ describe('createQueryRegistry', () => {
 			const eid1 = entityIndex.createEntity();
 			const eid2 = entityIndex.createEntity();
 
-			componentRegistry.addComponent(eid1, Player);
+			componentRegistry.add(eid1, Player);
 
 			const results = queryRegistry.queryComponents([Entity, Player] as const);
 
@@ -233,11 +233,11 @@ describe('createQueryRegistry', () => {
 			const eid2 = entityIndex.createEntity();
 
 			// eid1 has both Position and Velocity
-			componentRegistry.addComponent(eid1, Position, { x: 10, y: 5 });
-			componentRegistry.addComponent(eid1, Velocity, { x: 2, y: 1 });
+			componentRegistry.add(eid1, Position, { x: 10, y: 5 });
+			componentRegistry.add(eid1, Velocity, { x: 2, y: 1 });
 
 			// eid2 has only Position
-			componentRegistry.addComponent(eid2, Position, { x: 20, y: 15 });
+			componentRegistry.add(eid2, Position, { x: 20, y: 15 });
 
 			const results = queryRegistry.queryComponents([Entity, Position, Velocity] as const);
 
@@ -337,8 +337,8 @@ describe('createQueryRegistry', () => {
 			const Health = [] as number[];
 
 			const eid = entityIndex.createEntity();
-			componentRegistry.addComponent(eid, Position);
-			componentRegistry.addComponent(eid, Health);
+			componentRegistry.add(eid, Position);
+			componentRegistry.add(eid, Health);
 
 			const query = queryRegistry.getQuery(And(With(Position), With(Health)));
 			const result = queryRegistry.checkEntity(query, eid);
@@ -351,7 +351,7 @@ describe('createQueryRegistry', () => {
 			const Health = [] as number[];
 
 			const eid = entityIndex.createEntity();
-			componentRegistry.addComponent(eid, Position);
+			componentRegistry.add(eid, Position);
 			// Missing Health component
 
 			const query = queryRegistry.getQuery(And(With(Position), With(Health)));

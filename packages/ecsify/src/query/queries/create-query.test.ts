@@ -68,7 +68,7 @@ describe('createQuery function', () => {
 			const eid2 = entityIndex.createEntity();
 
 			// Only eid1 has Position
-			componentRegistry.addComponent(eid1, Position, { x: 10, y: 20 });
+			componentRegistry.add(eid1, Position, { x: 10, y: 20 });
 
 			const result = query.execute();
 
@@ -100,11 +100,11 @@ describe('createQuery function', () => {
 			const eid3 = entityIndex.createEntity();
 
 			// eid1: Position only (should match)
-			componentRegistry.addComponent(eid1, Position, { x: 10, y: 20 });
+			componentRegistry.add(eid1, Position, { x: 10, y: 20 });
 
 			// eid2: Position + Health (should not match)
-			componentRegistry.addComponent(eid2, Position, { x: 30, y: 40 });
-			componentRegistry.addComponent(eid2, Health, 100);
+			componentRegistry.add(eid2, Position, { x: 30, y: 40 });
+			componentRegistry.add(eid2, Health, 100);
 
 			// eid3: Nothing (should not match)
 
@@ -121,7 +121,7 @@ describe('createQuery function', () => {
 			const query = createQuery(queryRegistry, With(Position));
 
 			const eid = entityIndex.createEntity();
-			componentRegistry.addComponent(eid, Position, { x: 10, y: 20 });
+			componentRegistry.add(eid, Position, { x: 10, y: 20 });
 
 			const result = query.evaluate(eid);
 

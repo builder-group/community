@@ -102,7 +102,7 @@ export function createRetainedQuery(
 				switch (filter.type) {
 					case 'Added': {
 						this._trackedComponents.push({ component: filter.component, changeType: 'added' });
-						this._componentRegistry.onComponentAdd(filter.component, (eid) => {
+						this._componentRegistry.onAdd(filter.component, (eid) => {
 							this._accumulateChange(eid, filter.component, 'added');
 						});
 						break;
@@ -110,7 +110,7 @@ export function createRetainedQuery(
 
 					case 'Changed': {
 						this._trackedComponents.push({ component: filter.component, changeType: 'changed' });
-						this._componentRegistry.onComponentChange(filter.component, (eid) => {
+						this._componentRegistry.onChange(filter.component, (eid) => {
 							this._accumulateChange(eid, filter.component, 'changed');
 						});
 						break;
@@ -118,7 +118,7 @@ export function createRetainedQuery(
 
 					case 'Removed': {
 						this._trackedComponents.push({ component: filter.component, changeType: 'removed' });
-						this._componentRegistry.onComponentRemove(filter.component, (eid) => {
+						this._componentRegistry.onRemove(filter.component, (eid) => {
 							this._accumulateChange(eid, filter.component, 'removed');
 						});
 						break;

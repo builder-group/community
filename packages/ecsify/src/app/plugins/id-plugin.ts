@@ -17,14 +17,14 @@ export function createIdPlugin(): TIdPlugin {
 			}
 		},
 		setup: (app: TApp<TAppContext<[TIdPlugin]>>) => {
-			app._componentRegistry.onComponentAdd(app.c.IdMixin, (eid: TEntityId) => {
+			app._componentRegistry.onAdd(app.c.IdMixin, (eid: TEntityId) => {
 				const idComponent = app.c.IdMixin[eid];
 				if (idComponent != null) {
 					app.r.idMap.set(idComponent.id, eid);
 				}
 			});
 
-			app._componentRegistry.onComponentRemove(app.c.IdMixin, (eid: TEntityId) => {
+			app._componentRegistry.onRemove(app.c.IdMixin, (eid: TEntityId) => {
 				const idComponent = app.c.IdMixin[eid];
 				if (idComponent != null) {
 					app.r.idMap.delete(idComponent.id);

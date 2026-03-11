@@ -23,8 +23,8 @@ describe('createRetainedQuery function', () => {
 		const retainedQuery = createRetainedQuery(queryRegistry, And(Changed(Foo), Changed(Bar)));
 
 		const eid1 = entityIndex.createEntity();
-		componentRegistry.addComponent(eid1, Foo);
-		componentRegistry.addComponent(eid1, Bar);
+		componentRegistry.add(eid1, Foo);
+		componentRegistry.add(eid1, Bar);
 
 		// Tick X-3, throttled system runs
 		const res1 = retainedQuery.execute();
@@ -52,10 +52,10 @@ describe('createRetainedQuery function', () => {
 		const retainedQuery = createRetainedQuery(queryRegistry, Changed(Foo));
 
 		const eid1 = entityIndex.createEntity();
-		componentRegistry.addComponent(eid1, Foo);
+		componentRegistry.add(eid1, Foo);
 
 		const eid2 = entityIndex.createEntity();
-		componentRegistry.addComponent(eid2, Foo);
+		componentRegistry.add(eid2, Foo);
 
 		// Tick X-3, throttled system runs
 		const res1 = retainedQuery.execute();

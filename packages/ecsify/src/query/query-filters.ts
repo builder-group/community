@@ -28,10 +28,10 @@ export function With<T extends TComponentRef>(component: T): TQueryFilter {
 
 		register(query, parentType): void {
 			// Register callbacks to invalidate this query when components are added/removed
-			query._componentRegistry.onComponentAdd(component, () => {
+			query._componentRegistry.onAdd(component, () => {
 				query.markDirty();
 			});
-			query._componentRegistry.onComponentRemove(component, () => {
+			query._componentRegistry.onRemove(component, () => {
 				query.markDirty();
 			});
 
@@ -68,10 +68,10 @@ export function Without<T extends TComponentRef>(component: T): TQueryFilter {
 
 		register(query, parentType): void {
 			// Register callbacks to invalidate this query when components are added/removed
-			query._componentRegistry.onComponentAdd(this.component, () => {
+			query._componentRegistry.onAdd(this.component, () => {
 				query.markDirty();
 			});
-			query._componentRegistry.onComponentRemove(this.component, () => {
+			query._componentRegistry.onRemove(this.component, () => {
 				query.markDirty();
 			});
 
@@ -100,12 +100,12 @@ export function Added<T extends TComponentRef>(component: T): TQueryFilter {
 
 		register(query, parentType): void {
 			// Register callback to invalidate this query when components are added
-			query._componentRegistry.onComponentAdd(this.component, () => {
+			query._componentRegistry.onAdd(this.component, () => {
 				query.markDirty();
 			});
 
 			// Register callback to invalidate when change tracking is flushed
-			query._componentRegistry.onComponentFlush(this.component, () => {
+			query._componentRegistry.onFlush(this.component, () => {
 				query.markDirty();
 			});
 
@@ -134,12 +134,12 @@ export function Changed<T extends TComponentRef>(component: T): TQueryFilter {
 
 		register(query, parentType): void {
 			// Register callback to invalidate this query when components are changed
-			query._componentRegistry.onComponentChange(this.component, () => {
+			query._componentRegistry.onChange(this.component, () => {
 				query.markDirty();
 			});
 
 			// Register callback to invalidate when change tracking is flushed
-			query._componentRegistry.onComponentFlush(this.component, () => {
+			query._componentRegistry.onFlush(this.component, () => {
 				query.markDirty();
 			});
 
@@ -168,12 +168,12 @@ export function Removed<T extends TComponentRef>(component: T): TQueryFilter {
 
 		register(query, parentType): void {
 			// Register callback to invalidate this query when components are removed
-			query._componentRegistry.onComponentRemove(this.component, () => {
+			query._componentRegistry.onRemove(this.component, () => {
 				query.markDirty();
 			});
 
 			// Register callback to invalidate when change tracking is flushed
-			query._componentRegistry.onComponentFlush(this.component, () => {
+			query._componentRegistry.onFlush(this.component, () => {
 				query.markDirty();
 			});
 
@@ -390,7 +390,7 @@ export const Any = Or;
  */
 function getComponentId(componentRegistry: TComponentRegistry, component: TComponentRef): number {
 	if (!componentRegistry._componentMap.has(component)) {
-		componentRegistry.registerComponent(component);
+		componentRegistry.register(component);
 	}
 	return componentRegistry._componentMap.get(component)?.id as number;
 }
