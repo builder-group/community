@@ -1,3 +1,4 @@
+import { TBundle } from '../../bundle';
 import {
 	TComponentRef,
 	TComponentRegistry,
@@ -131,9 +132,21 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	markComponentChanged(eid: TEntityId, component: TComponentRef): void;
 
 	/**
-	 * Checks if a top-level resource is currently registered on the app.
+	 * Adds all components from a bundle to an entity.
 	 */
-	hasResource<GKey extends keyof GAppContext['resources']>(key: GKey): boolean;
+	addBundle<GComponent extends TComponentRef>(eid: TEntityId, bundle: TBundle<GComponent>): void;
+
+	/**
+	 * Applies multiple top-level resources and tracks their lifecycle.
+	 */
+	applyResources(
+		resources: Partial<GAppContext['resources']>,
+		options?: {
+			trackAdded?: boolean;
+			trackChanged?: boolean;
+			overwriteExisting?: boolean;
+		}
+	): void;
 
 	/**
 	 * Updates a top-level resource value.
@@ -146,6 +159,11 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 		value: GAppContext['resources'][GKey],
 		markAsChanged?: boolean
 	): void;
+
+	/**
+	 * Checks if a top-level resource is currently registered on the app.
+	 */
+	hasResource<GKey extends keyof GAppContext['resources']>(key: GKey): boolean;
 
 	/**
 	 * Marks a resource as changed for the current frame.
@@ -162,18 +180,6 @@ export type TApp<GAppContext extends TAppContext = TAppContext> = GAppContext['a
 	 * Checks if a resource was changed in the current frame.
 	 */
 	wasResourceChanged<GKey extends keyof GAppContext['resources']>(key: GKey): boolean;
-
-	/**
-	 * Internal helper for applying top-level resources and tracking their lifecycle.
-	 */
-	_applyResources(
-		resources: Partial<GAppContext['resources']>,
-		options?: {
-			trackAdded?: boolean;
-			trackChanged?: boolean;
-			overwriteExisting?: boolean;
-		}
-	): void;
 
 	/**
 	 * Queries entities that match the specified filter and returns only entity IDs.

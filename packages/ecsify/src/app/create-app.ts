@@ -1,4 +1,5 @@
 import { withNew } from '@blgc/utils';
+import { TBundle } from '../bundle';
 import {
 	createComponentRegistry,
 	TComponentRef,
@@ -67,7 +68,7 @@ export function createApp<
 
 				// Add resources to r
 				if (plugin.resources) {
-					this._applyResources(plugin.resources);
+					this.applyResources(plugin.resources);
 				}
 
 				// Add appExtensions directly to this
@@ -135,35 +136,20 @@ export function createApp<
 				return this._componentRegistry.markChanged(eid, component);
 			},
 
-			hasResource(key) {
-				return this._resourceRegistry.has(key);
+			addBundle<GComponent extends TComponentRef>(
+				eid: TEntityId,
+				bundle: TBundle<GComponent>
+			): void {
+				for (const entry of bundle) {
+					this._componentRegistry.addComponent(
+						eid,
+						entry.component,
+						entry.value as TComponentValue<GComponent> | undefined
+					);
+				}
 			},
 
-			updateResource(key, value, markAsChanged = true) {
-				this._applyResources(
-					{
-						[key]: value
-					} as unknown as Partial<GAppContext['resources']>,
-					{
-						trackAdded: true,
-						trackChanged: markAsChanged
-					}
-				);
-			},
-
-			markResourceChanged(key) {
-				this._resourceRegistry.markChanged(key);
-			},
-
-			wasResourceAdded(key) {
-				return this._resourceRegistry.wasAdded(key);
-			},
-
-			wasResourceChanged(key) {
-				return this._resourceRegistry.wasChanged(key);
-			},
-
-			_applyResources(resources, options = {}) {
+			applyResources(resources, options = {}) {
 				const { trackAdded = true, trackChanged = true, overwriteExisting = true } = options;
 
 				for (const [key, value] of Object.entries(resources)) {
@@ -182,6 +168,34 @@ export function createApp<
 						this._resourceRegistry.register(resourceKey, { trackAdded, trackChanged });
 					}
 				}
+			},
+
+			updateResource(key, value, markAsChanged = true) {
+				this.applyResources(
+					{
+						[key]: value
+					} as unknown as Partial<GAppContext['resources']>,
+					{
+						trackAdded: true,
+						trackChanged: markAsChanged
+					}
+				);
+			},
+
+			hasResource(key) {
+				return this._resourceRegistry.has(key);
+			},
+
+			markResourceChanged(key) {
+				this._resourceRegistry.markChanged(key);
+			},
+
+			wasResourceAdded(key) {
+				return this._resourceRegistry.wasAdded(key);
+			},
+
+			wasResourceChanged(key) {
+				return this._resourceRegistry.wasChanged(key);
 			},
 
 			queryEntities(queryOrFilter, options) {
@@ -234,7 +248,7 @@ export function createApp<
 				this._queryRegistry.reset();
 				this._eventRegistry.flush();
 				this._resourceRegistry.reset();
-				this._applyResources(this.r, {
+				this.applyResources(this.r, {
 					trackAdded: false,
 					trackChanged: false,
 					overwriteExisting: false

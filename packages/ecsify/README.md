@@ -273,6 +273,27 @@ Like component change tracking, resource tracking is cleared on `app.flush()`. D
 `app.r` are not observed automatically, so call `app.markResourceChanged(...)` when mutating in place.
 `app.reset()` preserves loaded resources and their current values, while clearing resource tracking state.
 
+#### Bundles
+
+Reusable groups of components for entity setup:
+
+```ts
+import { bundleEntry, defineBundle } from 'ecsify';
+
+const ActorBundle = defineBundle(
+	bundleEntry(app.c.Position, { x: 0, y: 0 }),
+	bundleEntry(app.c.Health, 100)
+);
+
+const PlayerBundle = defineBundle(ActorBundle, bundleEntry(app.c.Player));
+
+const player = app.createEntity();
+app.addBundle(player, PlayerBundle);
+```
+
+Bundles are insertion helpers only. They are flattened when defined and can be composed from other
+bundles, but they are not queryable as a separate ECS concept.
+
 #### App Extensions
 
 Custom methods on app:
@@ -587,15 +608,32 @@ app.markResourceChanged('inputState');
 Top-level updates can be tracked automatically because the app owns the assignment. Direct nested
 mutations are not intercepted, so they must be marked explicitly.
 
-#### Reset Behavior
+### Bundles (`define-bundle.ts`)
+
+Bundles provide a lightweight way to group components for insertion without introducing a new runtime
+storage model.
+
+#### Design
+
+Bundles are flattened when defined:
 
 ```typescript
-app.reset();
+const ActorBundle = defineBundle(
+	bundleEntry(Position, { x: 0, y: 0 }),
+	bundleEntry(Health, 100)
+);
+
+const PlayerBundle = defineBundle(ActorBundle, bundleEntry(Player));
 ```
 
-`reset()` clears runtime tracking state, but preserves loaded resources and their current values. The
-resource registry is rebuilt silently so `hasResource(...)`, `markResourceChanged(...)`, and
-`wasResourceChanged(...)` continue to work after a reset.
+This keeps application fast and simple:
+
+- `app.addBundle(...)` only iterates flat bundle entries
+- Nested bundle composition is resolved once up front
+- Duplicate component references are rejected early
+
+Bundles are intentionally just insertion convenience. Like Bevy bundles, they are not used for
+queries or runtime grouping.
 
 ### Component Registry (`create-component-registry.ts`)
 

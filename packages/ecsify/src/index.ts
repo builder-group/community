@@ -1,4 +1,5 @@
 export * from './app';
+export * from './bundle';
 export * from './component';
 export * from './entity';
 export * from './event';

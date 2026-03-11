@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { bundleEntry, defineBundle } from '../bundle';
 import { createApp } from './create-app';
 import { createDefaultPlugin } from './plugins';
 
@@ -338,6 +339,63 @@ describe('createApp function', () => {
 			app.markResourceChanged('score');
 
 			expect(app.wasResourceChanged('score')).toBe(true);
+		});
+	});
+
+	describe('bundles', () => {
+		it('should add all bundle components to an entity', () => {
+			const app = createApp({
+				plugins: [
+					createDefaultPlugin(),
+					{
+						name: 'Test',
+						deps: ['Default'],
+						components: {
+							Position: { x: [] as number[], y: [] as number[] },
+							Health: [] as number[],
+							Player: {}
+						}
+					}
+				] as const,
+				systemSets: ['First', 'Update', 'Last']
+			});
+
+			const eid = app.createEntity();
+			const actorBundle = defineBundle(
+				bundleEntry(app.c.Position, { x: 10, y: 20 }),
+				bundleEntry(app.c.Health, 100)
+			);
+			const playerBundle = defineBundle(actorBundle, bundleEntry(app.c.Player));
+
+			app.addBundle(eid, playerBundle);
+
+			expect(app.c.Position.x[eid]).toBe(10);
+			expect(app.c.Position.y[eid]).toBe(20);
+			expect(app.c.Health[eid]).toBe(100);
+			expect(app.hasComponent(eid, app.c.Player)).toBe(true);
+		});
+
+		it('should not overwrite existing component data when adding a bundle', () => {
+			const app = createApp({
+				plugins: [
+					createDefaultPlugin(),
+					{
+						name: 'Test',
+						deps: ['Default'],
+						components: {
+							Health: [] as number[]
+						}
+					}
+				] as const,
+				systemSets: ['First', 'Update', 'Last']
+			});
+
+			const eid = app.createEntity();
+			app.addComponent(eid, app.c.Health, 100);
+
+			app.addBundle(eid, defineBundle(bundleEntry(app.c.Health, 25)));
+
+			expect(app.c.Health[eid]).toBe(100);
 		});
 	});
 });
