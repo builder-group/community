@@ -11,3 +11,10 @@ export type TBundle<GComponent extends TComponentRef = TComponentRef> =
 export type TBundlePart<GComponent extends TComponentRef = TComponentRef> =
 	| TBundleEntry<GComponent>
 	| TBundle<GComponent>;
+
+export type TBundleComponentFromPart<GPart> =
+	GPart extends TBundleEntry<infer GComponent>
+		? GComponent
+		: GPart extends TBundle<infer GComponent>
+			? GComponent
+			: never;

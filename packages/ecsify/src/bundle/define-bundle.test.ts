@@ -3,7 +3,7 @@ import { bundleEntry, defineBundle } from './define-bundle';
 
 describe('defineBundle', () => {
 	it('flattens nested bundles into a single bundle', () => {
-		const Position = { x: [], y: [] };
+		const Position = { x: [] as number[], y: [] as number[] };
 		const Health = [] as number[];
 		const Player = {};
 

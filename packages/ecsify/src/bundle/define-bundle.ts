@@ -1,9 +1,9 @@
 import { TComponentRef, TComponentValue } from '../component';
-import { TBundle, TBundleEntry, TBundlePart } from './types';
+import { TBundle, TBundleComponentFromPart, TBundleEntry, TBundlePart } from './types';
 
-export function defineBundle<GComponent extends TComponentRef = TComponentRef>(
-	...parts: readonly TBundlePart<GComponent>[]
-): TBundle<GComponent> {
+export function defineBundle<const GParts extends readonly TBundlePart[]>(
+	...parts: GParts
+): TBundle<TBundleComponentFromPart<GParts[number]>> {
 	const entries = flattenBundle(parts);
 	const components = new Set<TComponentRef>();
 
@@ -24,10 +24,10 @@ export function bundleEntry<GComponent extends TComponentRef>(
 	return { component, value };
 }
 
-function flattenBundle<GComponent extends TComponentRef>(
-	parts: readonly TBundlePart<GComponent>[]
-): TBundleEntry<GComponent>[] {
-	const entries: TBundleEntry<GComponent>[] = [];
+function flattenBundle<const GParts extends readonly TBundlePart[]>(
+	parts: GParts
+): TBundle<TBundleComponentFromPart<GParts[number]>> {
+	const entries: TBundleEntry<TBundleComponentFromPart<GParts[number]>>[] = [];
 
 	for (const part of parts) {
 		if (isBundleEntry(part)) {
@@ -41,8 +41,6 @@ function flattenBundle<GComponent extends TComponentRef>(
 	return entries;
 }
 
-function isBundleEntry<GComponent extends TComponentRef>(
-	part: TBundlePart<GComponent>
-): part is TBundleEntry<GComponent> {
+function isBundleEntry(part: TBundlePart): part is TBundleEntry {
 	return typeof part === 'object' && part !== null && 'component' in part;
 }
