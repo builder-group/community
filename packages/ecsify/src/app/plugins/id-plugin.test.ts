@@ -7,7 +7,7 @@ describe('createIdPlugin function', () => {
 	it('should create plugin that can be added to app', () => {
 		const app = createApp({
 			plugins: [createDefaultPlugin(), createIdPlugin()] as const,
-			systemSets: ['First', 'Update', 'Last']
+			systemSets: ['First', 'Update', 'Last', 'Flush']
 		});
 
 		expect(app.c.IdMixin).toBeDefined();
@@ -18,7 +18,7 @@ describe('createIdPlugin function', () => {
 	it('should map entity to ID when component is added', () => {
 		const app = createApp({
 			plugins: [createDefaultPlugin(), createIdPlugin()] as const,
-			systemSets: ['First', 'Update', 'Last']
+			systemSets: ['First', 'Update', 'Last', 'Flush']
 		});
 
 		const eid = app.createEntity();
@@ -30,7 +30,7 @@ describe('createIdPlugin function', () => {
 	it('should unmap entity when component is removed', () => {
 		const app = createApp({
 			plugins: [createDefaultPlugin(), createIdPlugin()] as const,
-			systemSets: ['First', 'Update', 'Last']
+			systemSets: ['First', 'Update', 'Last', 'Flush']
 		});
 
 		const eid = app.createEntity();
@@ -46,7 +46,7 @@ describe('createIdPlugin function', () => {
 	it('should handle multiple entities with different IDs', () => {
 		const app = createApp({
 			plugins: [createDefaultPlugin(), createIdPlugin()] as const,
-			systemSets: ['First', 'Update', 'Last']
+			systemSets: ['First', 'Update', 'Last', 'Flush']
 		});
 
 		const eid1 = app.createEntity();
@@ -66,7 +66,7 @@ describe('createIdPlugin function', () => {
 	it('should handle ID updates correctly', () => {
 		const app = createApp({
 			plugins: [createDefaultPlugin(), createIdPlugin()] as const,
-			systemSets: ['First', 'Update', 'Last']
+			systemSets: ['First', 'Update', 'Last', 'Flush']
 		});
 
 		const eid = app.createEntity();
@@ -86,7 +86,7 @@ describe('createIdPlugin function', () => {
 		it('should return entity ID for existing ID', () => {
 			const app = createApp({
 				plugins: [createDefaultPlugin(), createIdPlugin()] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			const eid = app.createEntity();
@@ -98,7 +98,7 @@ describe('createIdPlugin function', () => {
 		it('should return null for non-existent ID', () => {
 			const app = createApp({
 				plugins: [createDefaultPlugin(), createIdPlugin()] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			expect(app.getEntityById('nonExistent')).toBe(null);
@@ -107,7 +107,7 @@ describe('createIdPlugin function', () => {
 		it('should return null after entity ID is removed', () => {
 			const app = createApp({
 				plugins: [createDefaultPlugin(), createIdPlugin()] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			const eid = app.createEntity();

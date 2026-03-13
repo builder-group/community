@@ -164,7 +164,7 @@ export function createEcsifyAppBenchmarks() {
 
 			const app = createApp({
 				plugins: [createDefaultPlugin(), createCorePlugin()] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			return {
@@ -271,7 +271,7 @@ export function createEcsifyAppBenchmarks() {
 
 			const app = createApp({
 				plugins: [createDefaultPlugin(), createCorePlugin()] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			return {
@@ -348,7 +348,7 @@ export function createEcsifyAppBenchmarks() {
 
 			const app = createApp({
 				plugins: [createDefaultPlugin(), createCorePlugin()] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			return {
@@ -407,7 +407,7 @@ export function createEcsifyAppBenchmarks() {
 
 			const app = createApp({
 				plugins: [createDefaultPlugin(), createCorePlugin()] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			return {
@@ -465,7 +465,7 @@ export function createEcsifyAppBenchmarks() {
 
 			const app = createApp({
 				plugins: [createDefaultPlugin(), createCorePlugin()] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			return {

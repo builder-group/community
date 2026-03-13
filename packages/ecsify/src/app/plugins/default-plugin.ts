@@ -15,7 +15,9 @@ export function createDefaultPlugin(): TDefaultPlugin {
 			}
 		},
 		setup: (app: TApp<TAppContext<[TDefaultPlugin]>>) => {
-			app.addSystem(cleanupSystem, { set: 'Last' });
+			app.addSystem(cleanupSystem, {
+				set: 'Flush'
+			});
 		}
 	};
 }
@@ -44,7 +46,7 @@ export type TDefaultPlugin = TPlugin<
 			 */
 			markEntityForRemoval(eid: TEntityId): void;
 		};
-		systemSets: 'First' | 'Update' | 'Last';
+		systemSets: 'First' | 'Update' | 'Last' | 'Flush';
 	},
 	[]
 >;

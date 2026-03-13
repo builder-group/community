@@ -2,18 +2,23 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createSystemRegistry, TSystemFn, TSystemRegistry } from './create-system-registry';
 
 describe('createSystemRegistry', () => {
+	type TTestSystemSets = 'First' | 'Update' | 'Last' | 'Flush';
+
 	type TestContext = {
 		value: number;
 		executed: string[];
 	};
 
-	type TTestSystemSets = 'First' | 'Update' | 'Last';
-
 	let systemRegistry: TSystemRegistry<TTestSystemSets, TestContext>;
 	let context: TestContext;
 
 	beforeEach(() => {
-		systemRegistry = createSystemRegistry<TTestSystemSets>(['First', 'Update', 'Last'] as const);
+		systemRegistry = createSystemRegistry<TTestSystemSets>([
+			'First',
+			'Update',
+			'Last',
+			'Flush'
+		] as const);
 		context = { value: 0, executed: [] };
 	});
 
@@ -103,6 +108,14 @@ describe('createSystemRegistry', () => {
 
 			expect(system.set).toBe('First');
 		});
+
+		it('should throw when adding a system to an undeclared set', () => {
+			const system: TSystemFn<TTestSystemSets, TestContext> = () => {};
+
+			expect(() => systemRegistry.addSystem(system, { set: 'Render' as TTestSystemSets })).toThrow(
+				"System set 'Render' is not declared in createApp({ systemSets: [...] })"
+			);
+		});
 	});
 
 	describe('update', () => {
@@ -150,7 +163,7 @@ describe('createSystemRegistry', () => {
 			systemRegistry.addSystem(lastSystem, { set: 'Last' });
 
 			// Reverse the order
-			systemRegistry.setSystemSets(['Last', 'Update', 'First'] as const);
+			systemRegistry.setSystemSets(['Last', 'Update', 'First', 'Flush'] as const);
 			systemRegistry.update(context);
 
 			expect(context.executed).toEqual(['last', 'first']);
@@ -173,10 +186,20 @@ describe('createSystemRegistry', () => {
 
 			// Reset and change order
 			context.executed = [];
-			systemRegistry.setSystemSets(['Update', 'First', 'Last'] as const);
+			systemRegistry.setSystemSets(['Update', 'First', 'Last', 'Flush'] as const);
 			systemRegistry.update(context);
 
 			expect(context.executed).toEqual(['update', 'first']);
+		});
+
+		it('should throw when new system sets omit an existing system set', () => {
+			const flushSystem: TSystemFn<TTestSystemSets, TestContext> = () => {};
+
+			systemRegistry.addSystem(flushSystem, { set: 'Flush' });
+
+			expect(() => systemRegistry.setSystemSets(['First', 'Update', 'Last'] as const)).toThrow(
+				"System set 'Flush' is not declared in createApp({ systemSets: [...] })"
+			);
 		});
 	});
 

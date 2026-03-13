@@ -8,7 +8,7 @@ describe('createApp function', () => {
 		it('should create app with required plugins and systemSets', () => {
 			const app = createApp({
 				plugins: [createDefaultPlugin()] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			expect(app._pluginNames).toEqual(['Default']);
@@ -20,7 +20,7 @@ describe('createApp function', () => {
 		it('should add plugin with components and resources', () => {
 			const app = createApp({
 				plugins: [createDefaultPlugin()],
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			const testPlugin = {
@@ -45,7 +45,7 @@ describe('createApp function', () => {
 		it('should track newly added resources as changed', () => {
 			const app = createApp({
 				plugins: [createDefaultPlugin()],
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			const typedApp = app.addPlugin({
@@ -63,7 +63,7 @@ describe('createApp function', () => {
 		it('should add plugin with dependencies', () => {
 			const app = createApp({
 				plugins: [createDefaultPlugin()],
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			const depPlugin = {
@@ -96,7 +96,7 @@ describe('createApp function', () => {
 		it('should throw error for missing dependencies', () => {
 			const app = createApp({
 				plugins: [createDefaultPlugin()],
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			const pluginWithDeps = {
@@ -117,7 +117,7 @@ describe('createApp function', () => {
 		it('should call setup function if provided', () => {
 			const app = createApp({
 				plugins: [createDefaultPlugin()],
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 			const setupSpy = vi.fn();
 
@@ -140,7 +140,7 @@ describe('createApp function', () => {
 		it('should add multiple plugins in order', () => {
 			const app = createApp({
 				plugins: [createDefaultPlugin()],
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			const plugin1 = {
@@ -170,7 +170,7 @@ describe('createApp function', () => {
 		it('should throw error if dependencies not in correct order', () => {
 			const app = createApp({
 				plugins: [createDefaultPlugin()],
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			const depPlugin = {
@@ -211,7 +211,7 @@ describe('createApp function', () => {
 						}
 					}
 				] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			expect(app.hasResource('score')).toBe(true);
@@ -229,7 +229,7 @@ describe('createApp function', () => {
 						}
 					}
 				] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			app.flush();
@@ -254,7 +254,7 @@ describe('createApp function', () => {
 						}
 					}
 				] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			app.flush();
@@ -276,7 +276,7 @@ describe('createApp function', () => {
 						}
 					}
 				] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			app.flush();
@@ -298,7 +298,7 @@ describe('createApp function', () => {
 						}
 					}
 				] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			app.flush();
@@ -324,7 +324,7 @@ describe('createApp function', () => {
 						}
 					}
 				] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			expect(app.wasResourceAdded('score')).toBe(true);
@@ -357,7 +357,7 @@ describe('createApp function', () => {
 						}
 					}
 				] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			const eid = app.createEntity();
@@ -387,7 +387,7 @@ describe('createApp function', () => {
 						}
 					}
 				] as const,
-				systemSets: ['First', 'Update', 'Last']
+				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
 			const eid = app.createEntity();

@@ -10,6 +10,7 @@ export function createSystemRegistry<GSystemSets extends string = string, GConte
 
 		addSystem(fn, options = {}) {
 			const { set = this._systemSets[0] as GSystemSets, before, after } = options;
+			validateSystemSet(this._systemSets, set);
 			fn.set = set;
 
 			// Setup the system if it has a setup function
@@ -46,6 +47,12 @@ export function createSystemRegistry<GSystemSets extends string = string, GConte
 		},
 
 		setSystemSets(newSystemSets) {
+			for (const system of this._systems) {
+				if (system.set != null) {
+					validateSystemSet(newSystemSets, system.set);
+				}
+			}
+
 			this._systemSets = [...newSystemSets];
 			// Re-sort existing systems based on new order
 			this._systems.sort((a, b) => {
@@ -65,6 +72,15 @@ export function createSystemRegistry<GSystemSets extends string = string, GConte
 			return [...this._systems];
 		}
 	};
+}
+
+function validateSystemSet<GSystemSets extends string>(
+	systemSets: readonly GSystemSets[],
+	set: GSystemSets
+): void {
+	if (!systemSets.includes(set)) {
+		throw new Error(`System set '${set}' is not declared in createApp({ systemSets: [...] })`);
+	}
 }
 
 export interface TSystemRegistry<GSystemSets extends string = string, GContext = any> {

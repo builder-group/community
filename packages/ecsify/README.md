@@ -108,7 +108,7 @@ function movementSystem(app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>) {
 // Create app
 const app = createApp({
 	plugins: [createDefaultPlugin(), createGamePlugin()] as const, // 'as const' for type inference
-	systemSets: ['First', 'Update', 'Last'] // Execution order
+	systemSets: ['First', 'Update', 'Last', 'Flush'] // Execution order
 });
 
 // Game loop

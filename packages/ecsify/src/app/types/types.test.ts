@@ -52,7 +52,7 @@ describe('types', () => {
 
 		const app = createApp({
 			plugins: [createDefaultPlugin(), createGamePlugin()] as const,
-			systemSets: ['First', 'Update', 'Last']
+			systemSets: ['First', 'Update', 'Last', 'Flush']
 		});
 
 		app.r.game;
