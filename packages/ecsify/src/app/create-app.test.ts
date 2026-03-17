@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { bundleEntry, defineBundle } from '../bundle';
 import { createApp } from './create-app';
+import { definePlugin } from './define-plugin';
 import { createDefaultPlugin } from './plugins';
 
 describe('createApp function', () => {
@@ -19,11 +20,11 @@ describe('createApp function', () => {
 	describe('addPlugin', () => {
 		it('should add plugin with components and resources', () => {
 			const app = createApp({
-				plugins: [createDefaultPlugin()],
+				plugins: [createDefaultPlugin()] as const,
 				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
-			const testPlugin = {
+			const testPlugin = definePlugin({
 				name: 'Test',
 				deps: [],
 				components: {
@@ -32,29 +33,31 @@ describe('createApp function', () => {
 				resources: {
 					testResource: 'test-value'
 				}
-			};
+			});
 
 			const result = app.addPlugin(testPlugin);
 
 			expect(app._pluginNames).toContain('Test');
-			expect((app.c as any).TestComponent).toBe(testPlugin.components.TestComponent);
-			expect((app.r as any).testResource).toBe(testPlugin.resources.testResource);
+			expect(result.c.TestComponent).toBe(testPlugin.components.TestComponent);
+			expect(result.r.testResource).toBe(testPlugin.resources.testResource);
 			expect(result).toBe(app);
 		});
 
 		it('should track newly added resources as changed', () => {
 			const app = createApp({
-				plugins: [createDefaultPlugin()],
+				plugins: [createDefaultPlugin()] as const,
 				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
-			const typedApp = app.addPlugin({
-				name: 'Test',
-				deps: [],
-				resources: {
-					inputState: { jump: false }
-				}
-			});
+			const typedApp = app.addPlugin(
+				definePlugin({
+					name: 'Test',
+					deps: [],
+					resources: {
+						inputState: { jump: false }
+					}
+				})
+			);
 
 			expect(typedApp.wasResourceAdded('inputState')).toBe(true);
 			expect(typedApp.wasResourceChanged('inputState')).toBe(true);
@@ -62,19 +65,19 @@ describe('createApp function', () => {
 
 		it('should add plugin with dependencies', () => {
 			const app = createApp({
-				plugins: [createDefaultPlugin()],
+				plugins: [createDefaultPlugin()] as const,
 				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
-			const depPlugin = {
+			const depPlugin = definePlugin({
 				name: 'Dependency',
 				deps: [],
 				components: {
 					DepComponent: { data: [] as string[] }
 				}
-			};
+			});
 
-			const consumerPlugin = {
+			const consumerPlugin = definePlugin({
 				name: 'Consumer',
 				deps: ['Dependency'],
 				appExtensions: {
@@ -82,20 +85,20 @@ describe('createApp function', () => {
 						console.log('doing something');
 					}
 				}
-			};
+			});
 
-			app.addPlugin(depPlugin);
-			const result = app.addPlugin(consumerPlugin);
+			const afterDep = app.addPlugin(depPlugin);
+			const result = afterDep.addPlugin(consumerPlugin);
 
 			expect(app._pluginNames).toEqual(['Default', 'Dependency', 'Consumer']);
-			expect((app.c as any).DepComponent).toBe(depPlugin.components.DepComponent);
-			expect((app as any).doSomething).toBe(consumerPlugin.appExtensions.doSomething);
+			expect(result.c.DepComponent).toBe(depPlugin.components.DepComponent);
+			expect(result.doSomething).toBe(consumerPlugin.appExtensions.doSomething);
 			expect(result).toBe(app);
 		});
 
 		it('should throw error for missing dependencies', () => {
 			const app = createApp({
-				plugins: [createDefaultPlugin()],
+				plugins: [createDefaultPlugin()] as const,
 				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
@@ -116,7 +119,7 @@ describe('createApp function', () => {
 
 		it('should call setup function if provided', () => {
 			const app = createApp({
-				plugins: [createDefaultPlugin()],
+				plugins: [createDefaultPlugin()] as const,
 				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 			const setupSpy = vi.fn();
@@ -139,7 +142,7 @@ describe('createApp function', () => {
 	describe('addPlugins', () => {
 		it('should add multiple plugins in order', () => {
 			const app = createApp({
-				plugins: [createDefaultPlugin()],
+				plugins: [createDefaultPlugin()] as const,
 				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
@@ -169,7 +172,7 @@ describe('createApp function', () => {
 
 		it('should throw error if dependencies not in correct order', () => {
 			const app = createApp({
-				plugins: [createDefaultPlugin()],
+				plugins: [createDefaultPlugin()] as const,
 				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
 
@@ -203,13 +206,13 @@ describe('createApp function', () => {
 			const app = createApp({
 				plugins: [
 					createDefaultPlugin(),
-					{
+					definePlugin({
 						name: 'Test',
 						deps: ['Default'],
 						resources: {
 							score: 0
 						}
-					}
+					})
 				] as const,
 				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
@@ -221,13 +224,13 @@ describe('createApp function', () => {
 			const app = createApp({
 				plugins: [
 					createDefaultPlugin(),
-					{
+					definePlugin({
 						name: 'Test',
 						deps: ['Default'],
 						resources: {
 							inputState: { jump: false }
 						}
-					}
+					})
 				] as const,
 				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
@@ -246,13 +249,13 @@ describe('createApp function', () => {
 			const app = createApp({
 				plugins: [
 					createDefaultPlugin(),
-					{
+					definePlugin({
 						name: 'Test',
 						deps: ['Default'],
 						resources: {
 							score: 0
 						}
-					}
+					})
 				] as const,
 				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
@@ -268,13 +271,13 @@ describe('createApp function', () => {
 			const app = createApp({
 				plugins: [
 					createDefaultPlugin(),
-					{
+					definePlugin({
 						name: 'Test',
 						deps: ['Default'],
 						resources: {
 							score: 0
 						}
-					}
+					})
 				] as const,
 				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
@@ -290,13 +293,13 @@ describe('createApp function', () => {
 			const app = createApp({
 				plugins: [
 					createDefaultPlugin(),
-					{
+					definePlugin({
 						name: 'Test',
 						deps: ['Default'],
 						resources: {
 							score: 0
 						}
-					}
+					})
 				] as const,
 				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
@@ -316,13 +319,13 @@ describe('createApp function', () => {
 			const app = createApp({
 				plugins: [
 					createDefaultPlugin(),
-					{
+					definePlugin({
 						name: 'Test',
 						deps: ['Default'],
 						resources: {
 							score: 0
 						}
-					}
+					})
 				] as const,
 				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
@@ -347,7 +350,7 @@ describe('createApp function', () => {
 			const app = createApp({
 				plugins: [
 					createDefaultPlugin(),
-					{
+					definePlugin({
 						name: 'Test',
 						deps: ['Default'],
 						components: {
@@ -355,7 +358,7 @@ describe('createApp function', () => {
 							Health: [] as number[],
 							Player: {}
 						}
-					}
+					})
 				] as const,
 				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
@@ -379,13 +382,13 @@ describe('createApp function', () => {
 			const app = createApp({
 				plugins: [
 					createDefaultPlugin(),
-					{
+					definePlugin({
 						name: 'Test',
 						deps: ['Default'],
 						components: {
 							Health: [] as number[]
 						}
-					}
+					})
 				] as const,
 				systemSets: ['First', 'Update', 'Last', 'Flush']
 			});
