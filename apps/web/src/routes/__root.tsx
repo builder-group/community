@@ -27,14 +27,18 @@ export const Route = createRootRoute({
 					'An indie software studio shipping SaaS products and open-source TypeScript libraries in public.'
 			},
 			{ property: 'og:url', content: 'https://builder.group' },
-			{ name: 'twitter:card', content: 'summary' },
+			{ property: 'og:image', content: 'https://builder.group/og.png' },
+			{ property: 'og:image:width', content: '1200' },
+			{ property: 'og:image:height', content: '630' },
+			{ name: 'twitter:card', content: 'summary_large_image' },
 			{ name: 'twitter:site', content: '@bennobuilder' },
 			{ name: 'twitter:title', content: 'builder.group' },
 			{
 				name: 'twitter:description',
 				content:
 					'An indie software studio shipping SaaS products and open-source TypeScript libraries in public.'
-			}
+			},
+			{ name: 'twitter:image', content: 'https://builder.group/og.png' }
 		],
 		links: [
 			{ rel: 'canonical', href: 'https://builder.group' },
@@ -97,7 +101,7 @@ function NotFoundPage() {
 					<p className="text-base-400 text-sm">This page does not exist.</p>
 					<a
 						href="/"
-						className="text-base-500 hover:text-base-800 mt-6 inline-block text-sm underline underline-offset-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-base-500 focus-visible:ring-offset-2 rounded-sm"
+						className="text-base-500 hover:text-base-800 focus-visible:ring-base-500 mt-6 inline-block rounded-sm text-sm underline underline-offset-2 transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
 					>
 						Go home
 					</a>
