@@ -2,8 +2,51 @@
 @plugin '@tailwindcss/typography';
 
 @theme {
-	/* https://fonts.google.com/specimen/Inter */
+	/* Zinc-based neutral scale (light mode) */
+	--color-base-0: #ffffff;
+	--color-base-50: #fafafa;
+	--color-base-100: #f4f4f5;
+	--color-base-200: #e4e4e7;
+	--color-base-300: #d4d4d8;
+	--color-base-400: #a1a1aa;
+	--color-base-500: #71717a;
+	--color-base-600: #52525b;
+	--color-base-700: #3f3f46;
+	--color-base-800: #27272a;
+	--color-base-900: #18181b;
+	--color-base-950: #09090b;
+
+	/* Semantic colors */
+	--color-primary: #fde200;
+	--color-primary-content: #000000;
+	--color-accent: #0d99ff;
+	--color-accent-content: #ffffff;
+	--color-success: #22c55e;
+	--color-success-content: #ffffff;
+	--color-warning: #eab308;
+	--color-warning-content: #18181b;
+	--color-error: #ef4444;
+	--color-error-content: #ffffff;
+	--color-info: #0ea5e9;
+	--color-info-content: #ffffff;
+
+	/* Fonts */
 	--font-sans: 'Inter', system-ui, sans-serif;
-	/* https://www.fontshare.com/fonts/erode */
-	--font-serif: 'Erode', serif;
+	--font-serif: 'Old Standard TT', serif;
+}
+
+/* Dark mode */
+.dark {
+	--color-base-0: #0d0f14;
+	--color-base-50: #131720;
+	--color-base-100: #1c2235;
+	--color-base-200: #293140;
+	--color-base-300: #374355;
+	--color-base-400: #4f5b72;
+	--color-base-500: #8899b4;
+	--color-base-600: #a8b5c8;
+	--color-base-700: #c4cdd8;
+	--color-base-800: #dde3eb;
+	--color-base-900: #eef1f5;
+	--color-base-950: #f7f8fa;
 }

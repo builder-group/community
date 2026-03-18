@@ -39,4 +39,5 @@ yarn-error.log*
 *.pem
 *-why.html
 *-why-*.html
-.temp
+*.local
+.todo

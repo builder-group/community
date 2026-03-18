@@ -14,6 +14,7 @@ export const appConfig = {
 		discord: 'https://discord.com/invite/w4xE3bSjhQ'
 	},
 	social: {
-		github: 'https://github.com/builder-group'
+		github: 'https://github.com/builder-group',
+		githubPackages: 'https://github.com/builder-group/community/blob/develop/packages'
 	}
 };

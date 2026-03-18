@@ -1,39 +1,68 @@
 import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { Analytics } from '@vercel/analytics/react';
 import React from 'react';
+import { CanvasFrame } from '@/components';
 import styles from '../styles.css?url';
 
 export const Route = createRootRoute({
+	notFoundComponent: NotFoundPage,
 	head: () => ({
 		meta: [
+			{ charSet: 'utf-8' },
+			{ name: 'viewport', content: 'width=device-width, initial-scale=1' },
+			{ name: 'robots', content: 'index, follow' },
+			{ title: 'builder.group' },
 			{
-				charSet: 'utf-8'
+				name: 'description',
+				content:
+					'An indie software studio shipping SaaS products and open-source TypeScript libraries in public.'
 			},
+			{ property: 'og:type', content: 'website' },
+			{ property: 'og:site_name', content: 'builder.group' },
+			{ property: 'og:title', content: 'builder.group' },
 			{
-				name: 'viewport',
-				content: 'width=device-width, initial-scale=1'
+				property: 'og:description',
+				content:
+					'An indie software studio shipping SaaS products and open-source TypeScript libraries in public.'
+			},
+			{ property: 'og:url', content: 'https://builder.group' },
+			{ name: 'twitter:card', content: 'summary' },
+			{ name: 'twitter:site', content: '@bennobuilder' },
+			{ name: 'twitter:title', content: 'builder.group' },
+			{
+				name: 'twitter:description',
+				content:
+					'An indie software studio shipping SaaS products and open-source TypeScript libraries in public.'
 			}
 		],
 		links: [
+			{ rel: 'canonical', href: 'https://builder.group' },
 			{ rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-			{
-				rel: 'preconnect',
-				href: 'https://fonts.gstatic.com',
-				crossOrigin: 'anonymous'
-			},
-			{ rel: 'preconnect', href: 'https://api.fontshare.com' },
+			{ rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
 			// https://fonts.google.com/specimen/Inter
-			// https://fonts.google.com/specimen/Caveat
+			// https://fonts.google.com/specimen/Old+Standard+TT
 			{
 				rel: 'stylesheet',
-				href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Caveat:wght@400..700&display=swap'
-			},
-			// https://www.fontshare.com/fonts/erode
-			{
-				rel: 'stylesheet',
-				href: 'https://api.fontshare.com/v2/css?f[]=erode@1,2&display=swap'
+				href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap'
 			},
 			{ rel: 'stylesheet', href: styles }
+		],
+		scripts: [
+			// Apply theme before paint to prevent flash
+			{
+				children: `(function(){var t='auto';try{t=localStorage.getItem('blg-theme')||'auto';}catch(e){}var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.classList.toggle('dark',d);})();`
+			},
+			{
+				type: 'application/ld+json',
+				children: JSON.stringify({
+					'@context': 'https://schema.org',
+					'@type': 'Organization',
+					'name': 'builder.group',
+					'url': 'https://builder.group',
+					'sameAs': ['https://github.com/builder-group', 'https://x.com/bennobuilder']
+				})
+			}
 		]
 	}),
 	shellComponent: RootDocument
@@ -43,15 +72,46 @@ function RootDocument(props: { children: React.ReactNode }) {
 	const { children } = props;
 
 	return (
-		<html data-theme="light">
+		<html lang="en">
 			<head>
 				<HeadContent />
 			</head>
-			<body className="font-sans">
+			<body className="bg-base-0 text-base-950 font-sans">
 				{children}
 				<TanStackRouterDevtools position="bottom-right" />
 				<Scripts />
+				<Analytics />
 			</body>
 		</html>
+	);
+}
+
+function NotFoundPage() {
+	return (
+		<div
+			className="bg-base-200 flex min-h-screen items-center justify-center"
+			style={
+				{
+					'--canvas-bg': 'var(--color-base-200)',
+					'backgroundImage': 'radial-gradient(circle, rgba(0,0,0,0.07) 1px, transparent 1px)',
+					'backgroundSize': '24px 24px'
+				} as React.CSSProperties
+			}
+		>
+			<CanvasFrame label="404">
+				<div className="bg-base-100 px-16 py-12 text-center">
+					<p className="text-base-950 mb-1 font-serif text-4xl font-bold tracking-tight">
+						Not Found
+					</p>
+					<p className="text-base-400 text-sm">This page does not exist.</p>
+					<a
+						href="/"
+						className="text-base-500 hover:text-base-800 mt-6 inline-block text-sm underline underline-offset-2 transition-colors"
+					>
+						Go home
+					</a>
+				</div>
+			</CanvasFrame>
+		</div>
 	);
 }
