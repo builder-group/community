@@ -33,17 +33,17 @@ export const Route = createFileRoute('/')({
 function RouteComponent() {
 	const { npmDownloads } = Route.useLoaderData();
 
-	const statusOrder = React.useMemo(
-		() => ({
-			'in-progress': 0,
-			'maintenance': 1,
-			'paused': 2,
-			'completed': 3,
-			'pivoted': 4,
-			'discontinued': 5
-		}),
-		[]
-	);
+	// const statusOrder = React.useMemo(
+	// 	() => ({
+	// 		'in-progress': 0,
+	// 		'maintenance': 1,
+	// 		'paused': 2,
+	// 		'completed': 3,
+	// 		'pivoted': 4,
+	// 		'discontinued': 5
+	// 	}),
+	// 	[]
+	// );
 
 	const saasProjects = projectsConfig.projects
 		.filter((p) => p.category === 'saas')
@@ -154,23 +154,23 @@ function RouteComponent() {
 
 				{/* Footer */}
 				<div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 pb-4">
-					<span className="text-base-400 text-sm">Built in Europe 🇪🇺</span>
-					<span className="text-base-300 text-sm">|</span>
-					<span className="text-base-400 text-sm">
+					<span className="text-base-600 text-sm">Built in Europe 🇪🇺</span>
+					<span className="text-base-400 text-sm">|</span>
+					<span className="text-base-600 text-sm">
 						by{' '}
 						<a
 							href="https://x.com/bennobuilder"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="hover:text-base-600 transition-colors"
+							className="hover:text-base-900 transition-colors"
 						>
 							@bennobuilder
 						</a>
 					</span>
-					<span className="text-base-300 text-sm">|</span>
+					<span className="text-base-400 text-sm">|</span>
 					<a
 						href="mailto:hello@builder.group"
-						className="text-base-400 hover:text-base-600 text-sm transition-colors"
+						className="text-base-600 hover:text-base-900 text-sm transition-colors"
 					>
 						hello@builder.group
 					</a>

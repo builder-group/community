@@ -21,7 +21,7 @@ export async function getNpmTotalDownloads(
 		packageNames.map(async (name) => {
 			const [ok, , value] = await fetchClient.get<TNpmDownloadResponse>(
 				'https://api.npmjs.org/downloads/point/{range}/{name}',
-				{ queryParams: { range, name } }
+				{ pathParams: { range, name } }
 			);
 			if (ok) {
 				return { name, data: value.data };
