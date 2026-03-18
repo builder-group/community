@@ -175,10 +175,7 @@ export const projectsConfig: {
 			endedAt: { year: 2024, month: 12 },
 			status: 'pivoted',
 			category: 'saas',
-			tags: [
-				{ type: 'website', url: 'https://sub.me/' },
-				{ type: 'github', url: `${appConfig.social.github}/sub-me` }
-			]
+			tags: [{ type: 'github', url: `${appConfig.social.github}/sub-me` }]
 		},
 		// MARK: - SaaS: Discontinued
 		{
@@ -240,10 +237,7 @@ export const projectsConfig: {
 			endedAt: { year: 2024, month: 9 },
 			status: 'discontinued',
 			category: 'saas',
-			tags: [
-				{ type: 'shopify-store', url: 'https://apps.shopify.com/eu-blocks' },
-				{ type: 'github', url: `${appConfig.social.github}/shopify` }
-			]
+			tags: [{ type: 'github', url: `${appConfig.social.github}/shopify` }]
 		},
 		{
 			id: 'shortify',
