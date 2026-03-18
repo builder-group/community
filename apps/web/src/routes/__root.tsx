@@ -2,7 +2,7 @@ import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { Analytics } from '@vercel/analytics/react';
 import React from 'react';
-import { CanvasFrame } from '@/components';
+import { CanvasBackground, CanvasFrame } from '@/components';
 import styles from '../styles.css?url';
 
 export const Route = createRootRoute({
@@ -88,16 +88,7 @@ function RootDocument(props: { children: React.ReactNode }) {
 
 function NotFoundPage() {
 	return (
-		<div
-			className="bg-base-200 flex min-h-screen items-center justify-center"
-			style={
-				{
-					'--canvas-bg': 'var(--color-base-200)',
-					'backgroundImage': 'radial-gradient(circle, rgba(0,0,0,0.07) 1px, transparent 1px)',
-					'backgroundSize': '24px 24px'
-				} as React.CSSProperties
-			}
-		>
+		<CanvasBackground className="flex min-h-screen items-center justify-center">
 			<CanvasFrame label="404">
 				<div className="bg-base-100 px-16 py-12 text-center">
 					<p className="text-base-950 mb-1 font-serif text-4xl font-bold tracking-tight">
@@ -106,12 +97,12 @@ function NotFoundPage() {
 					<p className="text-base-400 text-sm">This page does not exist.</p>
 					<a
 						href="/"
-						className="text-base-500 hover:text-base-800 mt-6 inline-block text-sm underline underline-offset-2 transition-colors"
+						className="text-base-500 hover:text-base-800 mt-6 inline-block text-sm underline underline-offset-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-base-500 focus-visible:ring-offset-2 rounded-sm"
 					>
 						Go home
 					</a>
 				</div>
 			</CanvasFrame>
-		</div>
+		</CanvasBackground>
 	);
 }

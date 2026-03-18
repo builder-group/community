@@ -18,7 +18,7 @@ export interface TCanvasButtonProps
 		VariantProps<typeof canvasButtonVariants> {}
 
 export const canvasButtonVariants = cva(
-	'rounded-lg px-5 py-2.5 text-sm font-medium transition-colors',
+	'rounded-lg px-5 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-base-500 focus-visible:ring-offset-2',
 	{
 		variants: {
 			variant: {

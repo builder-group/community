@@ -64,7 +64,7 @@ export interface TTagLinkProps extends VariantProps<typeof tagLinkVariants> {
 }
 
 export const tagLinkVariants = cva(
-	'rounded px-2 py-0.5 text-xs transition-colors hover:text-base-800 ring-1',
+	'rounded px-2 py-0.5 text-xs transition-colors hover:text-base-800 ring-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-base-500 focus-visible:ring-offset-1',
 	{
 		variants: {
 			variant: {

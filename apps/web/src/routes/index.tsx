@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
 import React from 'react';
-import { CanvasButton, CanvasFrame, StatusBadge, TagList } from '@/components';
+import { CanvasBackground, CanvasButton, CanvasFrame, StatusBadge, TagList } from '@/components';
 import { appConfig, projectsConfig, type TProject, type TProjectLogo } from '@/environment';
 import { formatNpmDownloads, formatProjectDate, getNpmTotalDownloads } from '@/lib';
 
@@ -59,16 +59,7 @@ function RouteComponent() {
 		.sort((a, b) => (npmDownloads[b.name] ?? 0) - (npmDownloads[a.name] ?? 0));
 
 	return (
-		<div
-			className="bg-base-200 min-h-screen"
-			style={
-				{
-					'--canvas-bg': 'var(--color-base-200)',
-					'backgroundImage': 'radial-gradient(circle, rgba(0,0,0,0.07) 1px, transparent 1px)',
-					'backgroundSize': '24px 24px'
-				} as React.CSSProperties
-			}
-		>
+		<CanvasBackground className="min-h-screen">
 			<div className="mx-auto flex max-w-4xl flex-col gap-20 px-8 py-24">
 				{/* Header */}
 				<CanvasFrame label="builder.group">
@@ -162,7 +153,7 @@ function RouteComponent() {
 							href="https://x.com/bennobuilder"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="hover:text-base-900 transition-colors"
+							className="text-base-600 hover:text-base-900 underline-offset-2 transition-colors hover:underline"
 						>
 							@bennobuilder
 						</a>
@@ -170,13 +161,13 @@ function RouteComponent() {
 					<span className="text-base-400 text-sm">|</span>
 					<a
 						href="mailto:hello@builder.group"
-						className="text-base-600 hover:text-base-900 text-sm transition-colors"
+						className="text-base-600 hover:text-base-900 text-sm underline-offset-2 transition-colors hover:underline"
 					>
 						hello@builder.group
 					</a>
 				</div>
 			</div>
-		</div>
+		</CanvasBackground>
 	);
 }
 
@@ -286,7 +277,7 @@ const PackageRow: React.FC<TPackageRowProps> = (props) => {
 				</span>
 				<div className="flex shrink-0 items-center gap-2">
 					{downloads != null && (
-						<span className="text-base-400 font-mono text-[11px]">
+						<span className="text-base-500 font-mono text-[11px]">
 							↓ {formatNpmDownloads(downloads)}
 						</span>
 					)}

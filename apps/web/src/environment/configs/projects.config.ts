@@ -220,7 +220,7 @@ export const projectsConfig: {
 		{
 			id: 'midimarble',
 			name: 'MidiMarble',
-			description: 'Automated channel generating marble track synced to music videos',
+			description: 'Automated channel generating marble music videos',
 			logo: { type: 'image', src: '/illustrations/logos/midimarble.png' },
 			startedAt: { year: 2024, month: 9 },
 			endedAt: { year: 2024, month: 12 },

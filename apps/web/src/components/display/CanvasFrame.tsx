@@ -5,7 +5,7 @@ export const CanvasFrame: React.FC<TCanvasFrameProps> = (props) => {
 
 	return (
 		<div className="relative pt-7">
-			<span className="text-accent absolute top-0 left-0 z-10 bg-[--canvas-bg] px-1 font-mono text-[11px] leading-none select-none">
+			<span className="text-accent absolute top-0 left-0 z-10 px-1 font-mono text-[11px] leading-none select-none">
 				{label}
 			</span>
 			<div className="relative">
