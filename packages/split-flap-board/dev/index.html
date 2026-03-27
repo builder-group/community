@@ -30,6 +30,18 @@
 				width: 160px;
 				text-align: right;
 			}
+
+			.controls {
+				display: flex;
+				gap: 0.5rem;
+			}
+
+			button {
+				font-family: monospace;
+				font-size: 0.75rem;
+				padding: 0.25rem 0.5rem;
+				cursor: pointer;
+			}
 		</style>
 	</head>
 	<body>
@@ -40,6 +52,14 @@
 		<div class="row">
 			<span class="label">variant="realistic"</span>
 			<split-flap-spool id="realistic" variant="realistic"></split-flap-spool>
+		</div>
+		<div class="row">
+			<span class="label">numeric (11 flaps)</span>
+			<split-flap-spool id="numeric" variant="realistic"></split-flap-spool>
+		</div>
+		<div class="row controls">
+			<button id="btn-front">front view</button>
+			<button id="btn-side">side view</button>
 		</div>
 	</body>
 </html>
