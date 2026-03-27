@@ -1,0 +1,12 @@
+{
+	"extends": "@blgc/config/typescript/library",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"declarationDir": "./dist/types",
+		"experimentalDecorators": true,
+		"useDefineForClassFields": false
+	},
+	"include": ["src"],
+	"exclude": ["**/__tests__/*", "**/*.test.ts"]
+}

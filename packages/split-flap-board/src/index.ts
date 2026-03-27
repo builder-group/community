@@ -1,0 +1,1 @@
+export { SplitFlapBoard } from './SplitFlapBoard';
