@@ -6,6 +6,12 @@
 		<title>Split Flap Board — Dev Preview</title>
 		<script type="module" src="./main.ts"></script>
 		<style>
+			*,
+			*::before,
+			*::after {
+				box-sizing: border-box;
+			}
+
 			body {
 				margin: 0;
 				min-height: 100vh;
@@ -15,11 +21,12 @@
 				justify-content: center;
 				gap: 3rem;
 				background: #f0f0f0;
-				color: #888;
+				color: #555;
 				font-family: monospace;
 				font-size: 0.75rem;
 			}
 
+			/* ── spool rows ─────────────────────────────────────────── */
 			.row {
 				display: flex;
 				align-items: center;
@@ -29,37 +36,94 @@
 			.label {
 				width: 160px;
 				text-align: right;
+				color: #999;
 			}
 
-			.controls {
-				display: flex;
-				gap: 0.5rem;
+			/* ── control panel ──────────────────────────────────────── */
+			.panel {
+				background: #fff;
+				border: 1px solid #ddd;
+				border-radius: 8px;
+				padding: 1.25rem 1.5rem;
+				display: grid;
+				grid-template-columns: max-content 1fr max-content;
+				align-items: center;
+				gap: 0.5rem 1rem;
+				width: 480px;
 			}
 
-			button {
-				font-family: monospace;
-				font-size: 0.75rem;
-				padding: 0.25rem 0.5rem;
-				cursor: pointer;
+			.panel-title {
+				grid-column: 1 / -1;
+				font-weight: bold;
+				color: #333;
+				margin-bottom: 0.25rem;
 			}
+
+			.panel label {
+				color: #666;
+				white-space: nowrap;
+			}
+
+			.panel input[type='range'] {
+				width: 100%;
+			}
+
+			.panel .val {
+				color: #333;
+				text-align: right;
+				min-width: 3.5rem;
+			}
+
+			.panel-divider {
+				grid-column: 1 / -1;
+				border: none;
+				border-top: 1px solid #eee;
+				margin: 0.25rem 0;
+			}
+
 		</style>
 	</head>
 	<body>
 		<div class="row">
-			<span class="label">variant="minimal"</span>
+			<span class="label">minimal</span>
 			<split-flap-spool id="minimal"></split-flap-spool>
 		</div>
 		<div class="row">
-			<span class="label">variant="realistic"</span>
+			<span class="label">realistic (charSpool)</span>
 			<split-flap-spool id="realistic" variant="realistic"></split-flap-spool>
 		</div>
 		<div class="row">
-			<span class="label">numeric (11 flaps)</span>
+			<span class="label">realistic (numericSpool)</span>
 			<split-flap-spool id="numeric" variant="realistic"></split-flap-spool>
 		</div>
-		<div class="row controls">
-			<button id="btn-front">front view</button>
-			<button id="btn-side">side view</button>
+
+		<!-- ── control panel ──────────────────────────────────────────── -->
+		<div class="panel">
+			<span class="panel-title">controls</span>
+
+			<label for="ctrl-speed">speed (ms/step)</label>
+			<input type="range" id="ctrl-speed" min="50" max="3000" step="50" value="200" />
+			<span class="val" id="val-speed">200</span>
+
+			<label for="ctrl-radius">drum radius (px)</label>
+			<input type="range" id="ctrl-radius" min="0" max="80" step="1" value="30" />
+			<span class="val" id="val-radius">30px</span>
+
+			<label for="ctrl-side-count">visible side count</label>
+			<input type="range" id="ctrl-side-count" min="-1" max="20" step="1" value="-1" />
+			<span class="val" id="val-side-count">auto</span>
+
+			<label for="ctrl-font-size">font size (rem)</label>
+			<input type="range" id="ctrl-font-size" min="0.5" max="5" step="0.25" value="1.5" />
+			<span class="val" id="val-font-size">1.5rem</span>
+
+			<label for="ctrl-crease">crease gap (px)</label>
+			<input type="range" id="ctrl-crease" min="0" max="6" step="0.5" value="1" />
+			<span class="val" id="val-crease">1px</span>
+
+			<label for="ctrl-rotation">side rotation (°)</label>
+			<input type="range" id="ctrl-rotation" min="0" max="90" step="1" value="0" />
+			<span class="val" id="val-rotation">0°</span>
 		</div>
 	</body>
 </html>

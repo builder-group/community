@@ -26,6 +26,9 @@ export class SplitFlapSpool extends LitElement {
 	@property({ type: Number })
 	public speed = 60;
 
+	@property({ type: Number })
+	public visibleSideCount = -1;
+
 	override render(): TemplateResult {
 		if (this.variant === 'realistic') {
 			return html`
@@ -33,6 +36,7 @@ export class SplitFlapSpool extends LitElement {
 					.value=${this.value}
 					.flaps=${this.flaps}
 					.speed=${this.speed}
+					.visibleSideCount=${this.visibleSideCount}
 				></split-flap-spool-realistic>
 			`;
 		}

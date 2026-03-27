@@ -56,11 +56,15 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 	private _startStepping(): void {
 		const targetIndex = this.flaps.findIndex((f) => getFlapKey(f) === this.value);
 		if (targetIndex === -1) return;
-		if (targetIndex === this._currentIndex) return;
 
-		this._clearTimers();
-		this._stepping = false;
 		this._targetIndex = targetIndex;
+		if (this._currentIndex === this._targetIndex) return;
+
+		// If a flip is already in progress (animating or waiting between steps),
+		// just update the target — the running loop will reach it without
+		// interrupting the current animation.
+		if (this._stepping || this._stepTimer != null) return;
+
 		this._doStep();
 	}
 
@@ -76,17 +80,27 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 		}, this._animDur);
 
 		if (this._currentIndex !== this._targetIndex) {
-			this._stepTimer = setTimeout(() => this._doStep(), this.speed);
-		} else {
 			this._stepTimer = setTimeout(() => {
-				this._targetIndex = -1;
-				this.dispatchEvent(
-					new CustomEvent('settled', {
-						detail: { value: this.value },
-						bubbles: true,
-						composed: true
-					})
-				);
+				this._stepTimer = null;
+				this._doStep();
+			}, this.speed);
+		} else {
+			// Reached target — wait for the flip to finish, then settle.
+			// If _targetIndex changed while waiting (new value arrived), keep going.
+			this._stepTimer = setTimeout(() => {
+				this._stepTimer = null;
+				if (this._targetIndex !== -1 && this._currentIndex !== this._targetIndex) {
+					this._doStep();
+				} else {
+					this._targetIndex = -1;
+					this.dispatchEvent(
+						new CustomEvent('settled', {
+							detail: { value: this.value },
+							bubbles: true,
+							composed: true
+						})
+					);
+				}
 			}, this._animDur);
 		}
 	}
