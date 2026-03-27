@@ -144,6 +144,12 @@ const spool = document.querySelector('split-flap-spool');
 spool.value = 'Z'; // steps forward: A → B → ... → Z
 ```
 
+Switch to the realistic look:
+
+```html
+<split-flap-spool variant="realistic" value="A"></split-flap-spool>
+```
+
 Custom spool:
 
 ```js
@@ -241,7 +247,7 @@ import { fromLines } from 'split-flap-board';
 declare global {
 	namespace JSX {
 		interface IntrinsicElements {
-			'split-flap-spool': React.HTMLAttributes<HTMLElement> & { value?: string };
+			'split-flap-spool': React.HTMLAttributes<HTMLElement> & { value?: string; variant?: string };
 			'split-flap-board': React.HTMLAttributes<HTMLElement>;
 		}
 	}
@@ -265,11 +271,21 @@ export function DeparturesBoard() {
 
 ### `<split-flap-spool>`
 
-| Property | Type     | Default     | Description                                                                 |
-| -------- | -------- | ----------- | --------------------------------------------------------------------------- |
-| `value`  | `string` | `' '`       | Target flap key. Steps forward through the flaps until it reaches this key. |
-| `flaps`  | `TSpool` | `charSpool` | The ordered sequence of flaps this spool holds.                             |
-| `speed`  | `number` | `60`        | Milliseconds per flap step.                                                 |
+| Property  | Type                       | Default     | Description                                                                 |
+| --------- | -------------------------- | ----------- | --------------------------------------------------------------------------- |
+| `variant` | `'minimal' \| 'realistic'` | `'minimal'` | Which visual variant to render.                                             |
+| `value`   | `string`                   | `' '`       | Target flap key. Steps forward through the flaps until it reaches this key. |
+| `flaps`   | `TSpool`                   | `charSpool` | The ordered sequence of flaps this spool holds.                             |
+| `speed`   | `number`                   | `60`        | Milliseconds per flap step.                                                 |
+
+#### Variants
+
+| Variant       | Element                        | Description                                                              |
+| ------------- | ------------------------------ | ------------------------------------------------------------------------ |
+| `'minimal'`   | `<split-flap-spool-minimal>`   | Clean card, no decorations. Full control over the surrounding UI.        |
+| `'realistic'` | `<split-flap-spool-realistic>` | Side clips and stacked-flap shadow. Also responds to `--sfb-clip-color`. |
+
+The variant elements can also be used directly if you prefer not to use the wrapper.
 
 ### `<split-flap-board>`
 
@@ -294,6 +310,7 @@ export function DeparturesBoard() {
 | `board-settled` | `{ grid: string[][] }` | Fired when every spool on the board has settled. |
 
 ```js
+const spool = document.querySelector('split-flap-spool');
 spool.addEventListener('settled', (e) => console.log('landed on', e.detail.value));
 board.addEventListener('board-settled', (e) => console.log('board done', e.detail.grid));
 ```
@@ -349,6 +366,7 @@ split-flap-board {
 	--sfb-bg: #111;
 	--sfb-color: #f5f0e0;
 	--sfb-fold-color: #0a0a0a;
+	--sfb-clip-color: #3a3a3a;
 	--sfb-font-family: monospace;
 	--sfb-font-size: 1.5rem;
 }

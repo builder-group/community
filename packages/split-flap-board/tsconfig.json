@@ -1,11 +1,12 @@
 {
 	"extends": "@blgc/config/typescript/library",
 	"compilerOptions": {
+		"lib": ["ES2020", "DOM"],
+		"experimentalDecorators": true,
+		"useDefineForClassFields": false,
 		"outDir": "./dist",
 		"rootDir": "./src",
-		"declarationDir": "./dist/types",
-		"experimentalDecorators": true,
-		"useDefineForClassFields": false
+		"declarationDir": "./dist/types"
 	},
 	"include": ["src"],
 	"exclude": ["**/__tests__/*", "**/*.test.ts"]
