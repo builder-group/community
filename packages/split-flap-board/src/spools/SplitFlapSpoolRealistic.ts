@@ -16,12 +16,17 @@ import { SplitFlapSpoolBase } from './SplitFlapSpoolBase';
  */
 @customElement('split-flap-spool-realistic')
 export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
+	/**
+	 * Limits how many flaps are rendered on each side of the drum.
+	 * Negative values use the full visible half. This property is ignored by
+	 * the `minimal` variant because it only renders the active card.
+	 */
 	@property({ type: Number })
 	public visibleSideCount = -1;
 
-	private _mounted = false;
 	private readonly _slotRef = createRef<HTMLDivElement>();
 	private _wrapResetTimer: ReturnType<typeof setTimeout> | null = null;
+	private _skipNextIndexAnimation = false;
 
 	static readonly styles = css`
 		:host {
@@ -89,12 +94,11 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 			 * transition mirrors --_flip-dur so the snap phase (0ms) is instant
 			 * and the transition phase smoothly rotates the drum with the flip.
 			 */
-			transform:
-				translateZ(calc(var(--sfb-drum-radius, 0px) * cos(var(--drum-a))))
+			transform: translateZ(calc(var(--sfb-drum-radius, 0px) * cos(var(--drum-a))))
 				translateY(calc(var(--sfb-drum-radius, 0px) * sin(var(--drum-a)) * -1));
-			transition: transform var(--_flip-dur, 0ms) cubic-bezier(0.25, 0, 0.5, 1);
 			transform-style: preserve-3d;
 			z-index: calc(var(--is-current) * 2 + var(--is-previous) + var(--is-next));
+			transition: transform var(--_flip-dur, 0ms) cubic-bezier(0.25, 0, 0.5, 1);
 			pointer-events: none;
 		}
 
@@ -177,16 +181,25 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 		}
 	`;
 
+	override firstUpdated(): void {
+		this._syncSlotState();
+	}
+
 	override updated(changed: Map<string, unknown>): void {
 		super.updated(changed);
 
-		if (!this._mounted) {
-			this._mounted = true;
-			this._initSlot();
-			return;
+		if (changed.has('flaps')) {
+			this._skipNextIndexAnimation = true;
+			this._syncSlotState();
 		}
 
 		if (changed.has('_currentIndex')) {
+			if (this._skipNextIndexAnimation) {
+				this._skipNextIndexAnimation = false;
+				this._syncSlotState();
+				return;
+			}
+
 			const prevIdx = (changed.get('_currentIndex') as number) ?? 0;
 			void this._animateStep(prevIdx, this._currentIndex);
 		}
@@ -200,7 +213,7 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 		}
 	}
 
-	private _initSlot(): void {
+	private _syncSlotState(): void {
 		const el = this._slotRef.value;
 		if (!el) return;
 		el.style.setProperty('--current-character-index', String(this._currentIndex));
@@ -246,7 +259,9 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 
 	private _getRenderCenter(): number {
 		const isWrapForward =
-			this.flaps.length > 0 && this._prevIndex === this.flaps.length - 1 && this._currentIndex === 0;
+			this.flaps.length > 0 &&
+			this._prevIndex === this.flaps.length - 1 &&
+			this._currentIndex === 0;
 
 		if (isWrapForward && (this._stepping || this._wrapResetTimer != null)) {
 			return this.flaps.length;

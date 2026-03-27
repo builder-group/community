@@ -71,7 +71,7 @@ The library ships built-in spools:
 import { charSpool, numericSpool } from 'split-flap-board';
 
 // charSpool    → [' ', A-Z, 0-9, . - / :]
-// numericSpool → [' ', 0-9]
+// numericSpool → [0-9]
 ```
 
 Custom spools are just arrays:
@@ -271,43 +271,46 @@ export function DeparturesBoard() {
 
 ### `<split-flap-spool>`
 
-| Property  | Type                       | Default     | Description                                                                 |
-| --------- | -------------------------- | ----------- | --------------------------------------------------------------------------- |
-| `variant` | `'minimal' \| 'realistic'` | `'minimal'` | Which visual variant to render.                                             |
-| `value`   | `string`                   | `' '`       | Target flap key. Steps forward through the flaps until it reaches this key. |
-| `flaps`   | `TSpool`                   | `charSpool` | The ordered sequence of flaps this spool holds.                             |
-| `speed`   | `number`                   | `60`        | Milliseconds per flap step.                                                 |
+| Property           | Type                       | Default     | Description                                                                    |
+| ------------------ | -------------------------- | ----------- | ------------------------------------------------------------------------------ |
+| `variant`          | `'minimal' \| 'realistic'` | `'minimal'` | Which visual variant to render.                                                |
+| `value`            | `string`                   | `' '`       | Target flap key. Steps forward through the flaps until it reaches this key.    |
+| `flaps`            | `TSpool`                   | `charSpool` | The ordered sequence of flaps this spool holds.                                |
+| `speed`            | `number`                   | `60`        | Milliseconds per flap step.                                                    |
+| `visibleSideCount` | `number`                   | `-1`        | Realistic variant only. Limits how many flaps render on each side of the drum. |
 
 #### Variants
 
-| Variant       | Element                        | Description                                                              |
-| ------------- | ------------------------------ | ------------------------------------------------------------------------ |
-| `'minimal'`   | `<split-flap-spool-minimal>`   | Clean card, no decorations. Full control over the surrounding UI.        |
-| `'realistic'` | `<split-flap-spool-realistic>` | Side clips and stacked-flap shadow. Also responds to `--sfb-clip-color`. |
+| Variant       | Element                        | Description                                                      |
+| ------------- | ------------------------------ | ---------------------------------------------------------------- |
+| `'minimal'`   | `<split-flap-spool-minimal>`   | Clean card renderer that only draws the active flap.             |
+| `'realistic'` | `<split-flap-spool-realistic>` | 3D drum renderer that places multiple flaps around the cylinder. |
 
 The variant elements can also be used directly if you prefer not to use the wrapper.
 
 ### `<split-flap-board>`
 
-| Property | Type         | Default | Description                                                                                                                   |
-| -------- | ------------ | ------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `spools` | `TSpool[][]` | —       | 2D spool configuration, one per cell. Board dimensions are inferred from this. Always assign a new array reference to update. |
-| `grid`   | `string[][]` | `[]`    | 2D array of target keys. Always assign a new array reference to trigger a re-render.                                          |
-| `speed`  | `number`     | `60`    | Default speed for all spool units. Overridden per spool via `spool.speed`.                                                    |
+| Property           | Type                       | Default     | Description                                                                                                                   |
+| ------------------ | -------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `spools`           | `TSpool[][]`               | —           | 2D spool configuration, one per cell. Board dimensions are inferred from this. Always assign a new array reference to update. |
+| `grid`             | `string[][]`               | `[]`        | 2D array of target keys. Always assign a new array reference to trigger a re-render.                                          |
+| `speed`            | `number`                   | `60`        | Default speed for all spool units. Overridden per spool via `spool.speed`.                                                    |
+| `variant`          | `'minimal' \| 'realistic'` | `'minimal'` | Visual variant forwarded to every child spool.                                                                                |
+| `visibleSideCount` | `number`                   | `-1`        | Forwarded to child spools. Only affects the `realistic` variant.                                                              |
 
 ### Events
 
 #### `<split-flap-spool>`
 
-| Event     | Detail              | Description                                                     |
-| --------- | ------------------- | --------------------------------------------------------------- |
-| `settled` | `{ value: string }` | Fired when the spool finishes stepping and lands on its target. |
+| Event     | Detail              | Description                                                                       |
+| --------- | ------------------- | --------------------------------------------------------------------------------- |
+| `settled` | `{ value: string }` | Fired when the spool becomes idle. `value` is the flap key it actually landed on. |
 
 #### `<split-flap-board>`
 
-| Event           | Detail                 | Description                                      |
-| --------------- | ---------------------- | ------------------------------------------------ |
-| `board-settled` | `{ grid: string[][] }` | Fired when every spool on the board has settled. |
+| Event           | Detail                 | Description                                                           |
+| --------------- | ---------------------- | --------------------------------------------------------------------- |
+| `board-settled` | `{ grid: string[][] }` | Fired when every rendered spool is idle for the current board inputs. |
 
 ```js
 const spool = document.querySelector('split-flap-spool');
@@ -366,7 +369,6 @@ split-flap-board {
 	--sfb-bg: #111;
 	--sfb-color: #f5f0e0;
 	--sfb-fold-color: #0a0a0a;
-	--sfb-clip-color: #3a3a3a;
 	--sfb-font-family: monospace;
 	--sfb-font-size: 1.5rem;
 	--sfb-max-step-angle: 8deg;
@@ -391,7 +393,7 @@ Each flap step plays a fold animation where the top half falls away, revealing t
 
 ### Unknown key
 
-If `value` is set to a key that does not exist in `flaps`, the spool stays on its current flap. No error is thrown.
+If `value` is set to a key that does not exist in `flaps`, the spool does not start a new search and no error is thrown. If that happens during an in-flight animation, the current flip finishes and `settled` reports the flap the spool actually landed on.
 
 ### Grid size mismatch
 

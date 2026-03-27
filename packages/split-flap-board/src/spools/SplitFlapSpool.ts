@@ -1,7 +1,9 @@
 import { css, html, LitElement, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { getFlapKey } from '../lib';
 import type { TSpool } from '../types';
 import { charSpool } from './presets';
+import type { SplitFlapSpoolBase } from './SplitFlapSpoolBase';
 // Side-effect imports ensure both variants are registered when using <split-flap-spool>
 import './SplitFlapSpoolMinimal';
 import './SplitFlapSpoolRealistic';
@@ -28,6 +30,32 @@ export class SplitFlapSpool extends LitElement {
 
 	@property({ type: Number })
 	public visibleSideCount = -1;
+
+	/** The key currently shown by the active variant element, if any. */
+	public get currentValue(): string | undefined {
+		return (
+			this._getActiveSpool()?.currentValue ??
+			(this.flaps[0] != null ? getFlapKey(this.flaps[0]) : undefined)
+		);
+	}
+
+	/** Whether the active variant is idle and no longer animating. */
+	public get isSettled(): boolean {
+		return this._getActiveSpool()?.isSettled ?? true;
+	}
+
+	/** Returns whether a target key exists in the current spool. */
+	public hasKey(value: string): boolean {
+		return (
+			this._getActiveSpool()?.hasKey(value) ?? this.flaps.some((flap) => getFlapKey(flap) === value)
+		);
+	}
+
+	private _getActiveSpool(): SplitFlapSpoolBase | null {
+		return this.renderRoot.querySelector(
+			'split-flap-spool-minimal, split-flap-spool-realistic'
+		) as SplitFlapSpoolBase | null;
+	}
 
 	override render(): TemplateResult {
 		if (this.variant === 'realistic') {

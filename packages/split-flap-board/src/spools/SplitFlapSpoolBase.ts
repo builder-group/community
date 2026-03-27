@@ -37,12 +37,17 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 	private _targetIndex = -1;
 	private _stepTimer: ReturnType<typeof setTimeout> | null = null;
 	private _animTimer: ReturnType<typeof setTimeout> | null = null;
+	private _animEndsAt = 0;
 
 	protected get _animDur(): number {
 		return Math.max(Math.floor(this.speed * 0.85), 1);
 	}
 
 	override updated(changed: Map<string, unknown>): void {
+		if (changed.has('flaps')) {
+			this._syncIndicesToFlaps(changed.get('flaps') as TSpool | undefined);
+		}
+
 		if (changed.has('value') || changed.has('flaps')) {
 			this._startStepping();
 		}
@@ -53,12 +58,55 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 		this._clearTimers();
 	}
 
+	/** The flap currently shown by the spool, if any. */
+	public get currentFlap(): TFlap | undefined {
+		return this.flaps[this._currentIndex] ?? this.flaps[0];
+	}
+
+	/** The public key of the flap currently shown by the spool, if any. */
+	public get currentValue(): string | undefined {
+		return this.currentFlap != null ? getFlapKey(this.currentFlap) : undefined;
+	}
+
+	/** Whether the spool is idle and no longer animating toward a target. */
+	public get isSettled(): boolean {
+		return (
+			!this._stepping &&
+			this._targetIndex === -1 &&
+			this._stepTimer == null &&
+			this._animTimer == null
+		);
+	}
+
+	/** Returns whether a target key exists in the currently loaded spool. */
+	public hasKey(value: string): boolean {
+		return this.flaps.some((flap) => getFlapKey(flap) === value);
+	}
+
 	private _startStepping(): void {
+		if (this.flaps.length === 0) {
+			this._resetForEmptyFlaps();
+			return;
+		}
+
 		const targetIndex = this.flaps.findIndex((f) => getFlapKey(f) === this.value);
-		if (targetIndex === -1) return;
+		if (targetIndex === -1) {
+			this._targetIndex = -1;
+			if (this._stepping || this._stepTimer != null) {
+				this._scheduleAdvanceOrSettle(this._getRemainingAnimTime());
+			}
+			return;
+		}
 
 		this._targetIndex = targetIndex;
-		if (this._currentIndex === this._targetIndex) return;
+		if (this._currentIndex === this._targetIndex) {
+			if (this._stepping || this._stepTimer != null) {
+				this._scheduleAdvanceOrSettle(this._getRemainingAnimTime());
+			} else {
+				this._targetIndex = -1;
+			}
+			return;
+		}
 
 		// If a flip is already in progress (animating or waiting between steps),
 		// just update the target — the running loop will reach it without
@@ -69,40 +117,111 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 	}
 
 	private _doStep(): void {
+		if (this.flaps.length === 0) {
+			this._resetForEmptyFlaps();
+			return;
+		}
+
 		const nextIndex = (this._currentIndex + 1) % this.flaps.length;
 		this._prevIndex = this._currentIndex;
 		this._currentIndex = nextIndex;
 		this._stepping = true;
+		this._animEndsAt = Date.now() + this._animDur;
 
 		if (this._animTimer != null) clearTimeout(this._animTimer);
 		this._animTimer = setTimeout(() => {
 			this._stepping = false;
+			this._animTimer = null;
+			this._animEndsAt = 0;
 		}, this._animDur);
 
-		if (this._currentIndex !== this._targetIndex) {
-			this._stepTimer = setTimeout(() => {
-				this._stepTimer = null;
-				this._doStep();
-			}, this.speed);
-		} else {
-			// Reached target — wait for the flip to finish, then settle.
-			// If _targetIndex changed while waiting (new value arrived), keep going.
-			this._stepTimer = setTimeout(() => {
+		this._scheduleAdvanceOrSettle(
+			this._currentIndex !== this._targetIndex ? this.speed : this._getRemainingAnimTime()
+		);
+	}
+
+	private _scheduleAdvanceOrSettle(delay: number): void {
+		if (this._stepTimer != null) {
+			clearTimeout(this._stepTimer);
+		}
+
+		this._stepTimer = setTimeout(
+			() => {
 				this._stepTimer = null;
 				if (this._targetIndex !== -1 && this._currentIndex !== this._targetIndex) {
 					this._doStep();
-				} else {
-					this._targetIndex = -1;
-					this.dispatchEvent(
-						new CustomEvent('settled', {
-							detail: { value: this.value },
-							bubbles: true,
-							composed: true
-						})
-					);
+					return;
 				}
-			}, this._animDur);
+
+				this._finishSettling();
+			},
+			Math.max(delay, 0)
+		);
+	}
+
+	private _finishSettling(): void {
+		if (this._stepping) {
+			this._scheduleAdvanceOrSettle(this._getRemainingAnimTime());
+			return;
 		}
+
+		this._targetIndex = -1;
+		const settledValue = this.currentValue;
+		if (settledValue == null) return;
+
+		this.dispatchEvent(
+			new CustomEvent('settled', {
+				detail: { value: settledValue },
+				bubbles: true,
+				composed: true
+			})
+		);
+	}
+
+	private _getRemainingAnimTime(): number {
+		if (!this._stepping) return 0;
+		return Math.max(this._animEndsAt - Date.now(), 1);
+	}
+
+	private _resetForEmptyFlaps(): void {
+		this._clearTimers();
+		this._targetIndex = -1;
+		this._currentIndex = 0;
+		this._prevIndex = 0;
+		this._stepping = false;
+	}
+
+	private _syncIndicesToFlaps(previousFlaps?: TSpool): void {
+		if (this.flaps.length === 0) {
+			this._resetForEmptyFlaps();
+			return;
+		}
+
+		if (previousFlaps == null || previousFlaps.length === 0) {
+			this._currentIndex = 0;
+			this._prevIndex = 0;
+			this._targetIndex = -1;
+			this._clearTimers();
+			this._stepping = false;
+			return;
+		}
+
+		const previousCurrent = previousFlaps[this._currentIndex] ?? previousFlaps[0];
+		const previousPrev = previousFlaps[this._prevIndex] ?? previousCurrent;
+		const currentKey = previousCurrent != null ? getFlapKey(previousCurrent) : undefined;
+		const prevKey = previousPrev != null ? getFlapKey(previousPrev) : currentKey;
+
+		this._clearTimers();
+		this._stepping = false;
+		this._targetIndex = -1;
+
+		const nextCurrentIndex =
+			currentKey != null ? this.flaps.findIndex((flap) => getFlapKey(flap) === currentKey) : -1;
+		const nextPrevIndex =
+			prevKey != null ? this.flaps.findIndex((flap) => getFlapKey(flap) === prevKey) : -1;
+
+		this._currentIndex = nextCurrentIndex >= 0 ? nextCurrentIndex : 0;
+		this._prevIndex = nextPrevIndex >= 0 ? nextPrevIndex : this._currentIndex;
 	}
 
 	private _clearTimers(): void {
@@ -114,6 +233,7 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 			clearTimeout(this._animTimer);
 			this._animTimer = null;
 		}
+		this._animEndsAt = 0;
 	}
 
 	/** Renders the content of one flap half. Uses class names defined in sharedSpoolStyles. */
@@ -145,10 +265,13 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 	}
 
 	/** Returns current and previous flap for use in render. */
-	protected _getFlaps(): { current: TFlap; prev: TFlap } {
+	protected _getFlaps(): { current: TFlap; prev: TFlap } | null {
+		const current = this.currentFlap;
+		if (current == null) return null;
+
 		return {
-			current: (this.flaps[this._currentIndex] ?? this.flaps[0]) as TFlap,
-			prev: (this.flaps[this._prevIndex] ?? this.flaps[0]) as TFlap
+			current,
+			prev: (this.flaps[this._prevIndex] ?? current) as TFlap
 		};
 	}
 
@@ -156,8 +279,11 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 	 * Renders the two card halves with fold animation.
 	 * Wrap this in a `.spool` div with `--_anim-dur` set.
 	 */
-	protected _renderCard(): TemplateResult {
-		const { current, prev } = this._getFlaps();
+	protected _renderCard(): TemplateResult | typeof nothing {
+		const flaps = this._getFlaps();
+		if (flaps == null) return nothing;
+
+		const { current, prev } = flaps;
 		const bottomStatic = this._stepping ? prev : current;
 
 		return html`

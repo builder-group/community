@@ -71,37 +71,74 @@ function slider(
 	update(); // apply initial value on load
 }
 
-slider('ctrl-speed', 'val-speed', (v) => `${v}ms`, (v) => {
-	realisticSpools.forEach((el) => (el.speed = v));
-	minimal.speed = v;
-	restartIntervals(v);
-});
-
-slider('ctrl-radius', 'val-radius', (v) => `${v}px`, (v) => {
-	setCssVar('--sfb-drum-radius', `${v}px`);
-});
-
-slider('ctrl-max-angle', 'val-max-angle', (v) => (v <= 0 ? 'off' : formatDeg(v)), (v) => {
-	if (v <= 0) {
-		realisticSpools.forEach((el) => el.style.removeProperty('--sfb-max-step-angle'));
-		return;
+slider(
+	'ctrl-speed',
+	'val-speed',
+	(v) => `${v}ms`,
+	(v) => {
+		realisticSpools.forEach((el) => (el.speed = v));
+		minimal.speed = v;
+		restartIntervals(v);
 	}
+);
 
-	setCssVar('--sfb-max-step-angle', `${v}deg`);
-});
+slider(
+	'ctrl-radius',
+	'val-radius',
+	(v) => `${v}px`,
+	(v) => {
+		setCssVar('--sfb-drum-radius', `${v}px`);
+	}
+);
 
-slider('ctrl-side-count', 'val-side-count', (v) => (v < 0 ? 'auto' : String(v)), (v) => {
-	realisticSpools.forEach((el) => (el.visibleSideCount = v));
-});
+slider(
+	'ctrl-max-angle',
+	'val-max-angle',
+	(v) => (v <= 0 ? 'off' : formatDeg(v)),
+	(v) => {
+		if (v <= 0) {
+			realisticSpools.forEach((el) => el.style.removeProperty('--sfb-max-step-angle'));
+			return;
+		}
 
-slider('ctrl-font-size', 'val-font-size', (v) => `${v}rem`, (v) => {
-	[minimal, ...realisticSpools].forEach((el) => el.style.setProperty('--sfb-font-size', `${v}rem`));
-});
+		setCssVar('--sfb-max-step-angle', `${v}deg`);
+	}
+);
 
-slider('ctrl-crease', 'val-crease', (v) => `${v}px`, (v) => {
-	[minimal, ...realisticSpools].forEach((el) => el.style.setProperty('--sfb-crease', `${v}px`));
-});
+slider(
+	'ctrl-side-count',
+	'val-side-count',
+	(v) => (v < 0 ? 'auto' : String(v)),
+	(v) => {
+		realisticSpools.forEach((el) => (el.visibleSideCount = v));
+	}
+);
 
-slider('ctrl-rotation', 'val-rotation', (v) => `${v}°`, (v) => {
-	setCssVar('--sfb-view-transform', v === 0 ? 'none' : `rotateY(-${v}deg)`);
-});
+slider(
+	'ctrl-font-size',
+	'val-font-size',
+	(v) => `${v}rem`,
+	(v) => {
+		[minimal, ...realisticSpools].forEach((el) =>
+			el.style.setProperty('--sfb-font-size', `${v}rem`)
+		);
+	}
+);
+
+slider(
+	'ctrl-crease',
+	'val-crease',
+	(v) => `${v}px`,
+	(v) => {
+		[minimal, ...realisticSpools].forEach((el) => el.style.setProperty('--sfb-crease', `${v}px`));
+	}
+);
+
+slider(
+	'ctrl-rotation',
+	'val-rotation',
+	(v) => `${v}°`,
+	(v) => {
+		setCssVar('--sfb-view-transform', v === 0 ? 'none' : `rotateY(-${v}deg)`);
+	}
+);

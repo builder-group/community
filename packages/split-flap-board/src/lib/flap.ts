@@ -1,5 +1,6 @@
 import type { TFlap } from '../types';
 
+/** Returns the public key used to address a flap inside a spool. */
 export function getFlapKey(flap: TFlap): string {
 	if (flap.key != null) return flap.key;
 	switch (flap.type) {
