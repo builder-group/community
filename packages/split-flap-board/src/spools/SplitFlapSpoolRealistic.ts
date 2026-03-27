@@ -64,7 +64,9 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 			--is-current: clamp(0, calc(1 - var(--abs-offset) * 1000), 1);
 			--is-previous: clamp(0, calc(1 - max(var(--offset) + 1, (var(--offset) + 1) * -1) * 1000), 1);
 			--is-next: clamp(0, calc(1 - max(var(--offset) - 1, (var(--offset) - 1) * -1) * 1000), 1);
-			--angle: calc((0.5 / var(--total0)) * 1turn);
+			--natural-angle: calc((0.5 / var(--total0)) * 1turn);
+			/* Optional visual cap for small spools. Defaults to uncapped. */
+			--angle: min(var(--natural-angle), var(--sfb-max-step-angle, 1turn));
 			/* Unwrapped drum position — places fold hinge on the cylinder. */
 			--drum-a: calc(var(--abs-offset) * var(--direction) * var(--angle));
 			/* top-half angle on the drum (includes backside wrap) */

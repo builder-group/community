@@ -369,6 +369,7 @@ split-flap-board {
 	--sfb-clip-color: #3a3a3a;
 	--sfb-font-family: monospace;
 	--sfb-font-size: 1.5rem;
+	--sfb-max-step-angle: 8deg;
 }
 
 /* per-spool override */

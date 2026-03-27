@@ -47,6 +47,10 @@ function setCssVar(prop: string, value: string) {
 	realisticSpools.forEach((el) => el.style.setProperty(prop, value));
 }
 
+function formatDeg(value: number) {
+	return `${value.toFixed(1).replace(/\.0$/, '')}\u00b0`;
+}
+
 // ── sliders ───────────────────────────────────────────────────────────────
 function slider(
 	id: string,
@@ -75,6 +79,15 @@ slider('ctrl-speed', 'val-speed', (v) => `${v}ms`, (v) => {
 
 slider('ctrl-radius', 'val-radius', (v) => `${v}px`, (v) => {
 	setCssVar('--sfb-drum-radius', `${v}px`);
+});
+
+slider('ctrl-max-angle', 'val-max-angle', (v) => (v <= 0 ? 'off' : formatDeg(v)), (v) => {
+	if (v <= 0) {
+		realisticSpools.forEach((el) => el.style.removeProperty('--sfb-max-step-angle'));
+		return;
+	}
+
+	setCssVar('--sfb-max-step-angle', `${v}deg`);
 });
 
 slider('ctrl-side-count', 'val-side-count', (v) => (v < 0 ? 'auto' : String(v)), (v) => {
