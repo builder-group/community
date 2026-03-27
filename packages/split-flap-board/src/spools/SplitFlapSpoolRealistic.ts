@@ -186,10 +186,18 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 	}
 
 	override updated(changed: Map<string, unknown>): void {
+		const previousCurrentIndex = this._currentIndex;
+		const previousPrevIndex = this._prevIndex;
 		super.updated(changed);
 
 		if (changed.has('flaps')) {
-			this._skipNextIndexAnimation = true;
+			if (this._wrapResetTimer != null) {
+				clearTimeout(this._wrapResetTimer);
+				this._wrapResetTimer = null;
+			}
+
+			this._skipNextIndexAnimation =
+				this._currentIndex !== previousCurrentIndex || this._prevIndex !== previousPrevIndex;
 			this._syncSlotState();
 		}
 

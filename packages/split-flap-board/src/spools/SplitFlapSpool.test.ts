@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { SplitFlapSpoolMinimal } from './SplitFlapSpoolMinimal';
+import { SplitFlapSpoolRealistic } from './SplitFlapSpoolRealistic';
 
 describe('SplitFlapSpoolBase behavior', () => {
 	afterEach(() => {
@@ -67,5 +68,41 @@ describe('SplitFlapSpoolBase behavior', () => {
 
 		expect(spool.currentValue).toBe('A');
 		expect(spool.isSettled).toBe(true);
+	});
+
+	it('clears pending realistic wrap resets when the spool changes', () => {
+		const spool = new SplitFlapSpoolRealistic();
+		const internal = spool as unknown as {
+			_wrapResetTimer: ReturnType<typeof setTimeout> | null;
+		};
+		const previousFlaps = spool.flaps;
+
+		internal._wrapResetTimer = setTimeout(() => undefined, 1000);
+		spool.flaps = [...previousFlaps];
+		spool.updated(new Map([['flaps', previousFlaps]]));
+
+		expect(internal._wrapResetTimer).toBeNull();
+	});
+
+	it('does not suppress the next real animation after a no-op realistic spool replacement', () => {
+		const spool = new SplitFlapSpoolRealistic();
+		const internal = spool as unknown as {
+			_skipNextIndexAnimation: boolean;
+			_currentIndex: number;
+			_animateStep: (prevIdx: number, nextIdx: number) => Promise<void>;
+		};
+		const animateStep = vi.fn(async () => undefined);
+		const previousFlaps = spool.flaps;
+
+		internal._animateStep = animateStep;
+		spool.flaps = [...previousFlaps];
+		spool.updated(new Map([['flaps', previousFlaps]]));
+
+		expect(internal._skipNextIndexAnimation).toBe(false);
+
+		internal._currentIndex = 1;
+		spool.updated(new Map([['_currentIndex', 0]]));
+
+		expect(animateStep).toHaveBeenCalledWith(0, 1);
 	});
 });
