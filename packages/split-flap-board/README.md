@@ -71,7 +71,7 @@ The library ships built-in spools:
 import { charSpool, numericSpool } from 'split-flap-board';
 
 // charSpool    → [' ', A-Z, 0-9, . - / :]
-// numericSpool → [0-9]
+// numericSpool → [' ', 0-9]
 ```
 
 Custom spools are just arrays:
@@ -357,24 +357,37 @@ board.grid = grid;
 
 ### CSS Custom Properties
 
-Both `<split-flap-board>` and `<split-flap-spool>` respond to these properties. Set them on the board to theme all spools at once, or override on individual spools via CSS selectors.
+Set these on the board to theme all spools at once, or override on individual spools via CSS selectors.
 
 ```css
-/* board-wide theme */
+/* Shared */
 split-flap-board {
-	--sfb-spool-width: 1.2em;
-	--sfb-spool-height: 2em;
-	--sfb-spool-radius: 4px;
-	--sfb-gap: 2px;
-	--sfb-bg: #111;
-	--sfb-color: #f5f0e0;
-	--sfb-fold-color: #0a0a0a;
+	--sfb-bg: #111; /* flap background */
+	--sfb-color: #f5f0e0; /* flap text color */
+	--sfb-spool-radius: 4px; /* corner radius on each flap */
+	--sfb-gap: 2px; /* gap between spool cells */
 	--sfb-font-family: monospace;
 	--sfb-font-size: 1.5rem;
-	--sfb-max-step-angle: 8deg;
+	--sfb-font-weight: bold;
 }
 
-/* per-spool override */
+/* Minimal variant */
+split-flap-board {
+	--sfb-spool-width: 1.2em; /* explicit cell width */
+	--sfb-spool-height: 2em; /* explicit cell height */
+	--sfb-fold-color: #0a0a0a; /* center crease color */
+}
+
+/* Realistic variant */
+split-flap-board {
+	--sfb-drum-radius: 0px; /* cylinder radius; 0 keeps the flip flat */
+	--sfb-crease: 1px; /* gap between the two flap halves */
+	--sfb-perspective: 400px; /* CSS perspective depth */
+	--sfb-view-transform: none; /* e.g. rotateY(-30deg) */
+	--sfb-max-step-angle: 1turn; /* per-step angle cap; 8deg tightens small spools */
+}
+
+/* Per-spool override */
 split-flap-spool.highlight {
 	--sfb-bg: #16a34a;
 	--sfb-color: #fff;
@@ -394,6 +407,14 @@ Each flap step plays a fold animation where the top half falls away, revealing t
 ### Unknown key
 
 If `value` is set to a key that does not exist in `flaps`, the spool does not start a new search and no error is thrown. If that happens during an in-flight animation, the current flip finishes and `settled` reports the flap the spool actually landed on.
+
+### Retargeting during motion
+
+If `value` changes to another valid key while the spool is already moving, the spool keeps its current forward motion and retargets to the newest valid key. It does not snap backward or restart from the beginning.
+
+### Spool changes during motion
+
+If `flaps` changes while the spool is moving, the component remaps the currently visible flap by key into the new spool, clears stale animation bookkeeping, and continues from the new coherent state.
 
 ### Grid size mismatch
 

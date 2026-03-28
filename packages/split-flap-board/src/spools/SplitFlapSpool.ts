@@ -4,7 +4,7 @@ import { getFlapKey } from '../lib';
 import type { TSpool } from '../types';
 import { charSpool } from './presets';
 import type { SplitFlapSpoolBase } from './SplitFlapSpoolBase';
-// Side-effect imports ensure both variants are registered when using <split-flap-spool>
+// Register both variants so <split-flap-spool> can render either one.
 import './SplitFlapSpoolMinimal';
 import './SplitFlapSpoolRealistic';
 
@@ -31,7 +31,7 @@ export class SplitFlapSpool extends LitElement {
 	@property({ type: Number })
 	public visibleSideCount = -1;
 
-	/** The key currently shown by the active variant element, if any. */
+	/** Key currently shown by the active variant; falls back to the first flap key before the variant mounts. */
 	public get currentValue(): string | undefined {
 		return (
 			this._getActiveSpool()?.currentValue ??
@@ -39,12 +39,12 @@ export class SplitFlapSpool extends LitElement {
 		);
 	}
 
-	/** Whether the active variant is idle and no longer animating. */
+	/** True when the active variant is idle with no pending target. */
 	public get isSettled(): boolean {
 		return this._getActiveSpool()?.isSettled ?? true;
 	}
 
-	/** Returns whether a target key exists in the current spool. */
+	/** Returns true when the given key exists in the loaded flaps. */
 	public hasKey(value: string): boolean {
 		return (
 			this._getActiveSpool()?.hasKey(value) ?? this.flaps.some((flap) => getFlapKey(flap) === value)

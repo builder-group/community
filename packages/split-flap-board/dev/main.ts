@@ -1,7 +1,7 @@
 import '../src/spools/SplitFlapSpool';
 import { numericSpool } from '../src/spools/presets';
 
-// ── spools ────────────────────────────────────────────────────────────────
+// MARK: - Demo spools
 const minimal = document.querySelector<any>('#minimal')!;
 const realistic = document.querySelector<any>('#realistic')!;
 const numeric = document.querySelector<any>('#numeric')!;
@@ -10,7 +10,7 @@ numeric.flaps = numericSpool;
 
 const realisticSpools: any[] = [realistic, numeric];
 
-// ── auto-cycle ────────────────────────────────────────────────────────────
+// MARK: - Auto-cycle
 const chars = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
 let charIdx = 0;
 let charIntervalId: ReturnType<typeof setInterval>;
@@ -42,7 +42,7 @@ function restartIntervals(speed: number) {
 
 restartIntervals(200); // initial speed matches slider default
 
-// ── helpers ───────────────────────────────────────────────────────────────
+// MARK: - Slider helpers
 function setCssVar(prop: string, value: string) {
 	realisticSpools.forEach((el) => el.style.setProperty(prop, value));
 }
@@ -51,7 +51,6 @@ function formatDeg(value: number) {
 	return `${value.toFixed(1).replace(/\.0$/, '')}\u00b0`;
 }
 
-// ── sliders ───────────────────────────────────────────────────────────────
 function slider(
 	id: string,
 	valId: string,

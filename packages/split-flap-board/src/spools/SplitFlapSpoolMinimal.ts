@@ -83,7 +83,7 @@ export class SplitFlapSpoolMinimal extends SplitFlapSpoolBase {
 			justify-content: center;
 			align-items: center;
 			height: 200%;
-			font-weight: bold;
+			font-weight: var(--sfb-font-weight, bold);
 			letter-spacing: 0;
 		}
 

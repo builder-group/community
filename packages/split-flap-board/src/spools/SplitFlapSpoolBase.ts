@@ -6,12 +6,12 @@ import type { TFlap, TSpool } from '../types';
 import { charSpool } from './presets';
 
 /**
- * Base class for all spool variants. Contains only stepping logic and
- * HTML helpers — no styles, no element registration.
+ * Base class for all spool variants. Contains stepping logic and HTML helpers,
+ * but leaves styling and element registration to subclasses.
  *
  * Extend this to build a custom spool variant:
  *   export class MySpool extends SplitFlapSpoolBase {
- *     static readonly styles = css`...`; // fully yours
+ *     static readonly styles = css`...`;
  *     override render() { ... }
  *   }
  */
@@ -44,6 +44,8 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 	}
 
 	override updated(changed: Map<string, unknown>): void {
+		super.updated(changed);
+
 		if (changed.has('flaps')) {
 			this._syncIndicesToFlaps(changed.get('flaps') as TSpool | undefined);
 		}
@@ -58,17 +60,17 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 		this._clearTimers();
 	}
 
-	/** The flap currently shown by the spool, if any. */
+	/** The flap currently shown; falls back to index 0 when out of range. */
 	public get currentFlap(): TFlap | undefined {
 		return this.flaps[this._currentIndex] ?? this.flaps[0];
 	}
 
-	/** The public key of the flap currently shown by the spool, if any. */
+	/** Key of the currently shown flap, or undefined when flaps is empty. */
 	public get currentValue(): string | undefined {
 		return this.currentFlap != null ? getFlapKey(this.currentFlap) : undefined;
 	}
 
-	/** Whether the spool is idle and no longer animating toward a target. */
+	/** True when the spool is idle: no animation running and no pending target. */
 	public get isSettled(): boolean {
 		return (
 			!this._stepping &&
@@ -78,21 +80,23 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 		);
 	}
 
-	/** Returns whether a target key exists in the currently loaded spool. */
+	/** Returns true when the given key exists in the currently loaded flaps. */
 	public hasKey(value: string): boolean {
 		return this.flaps.some((flap) => getFlapKey(flap) === value);
 	}
 
 	private _startStepping(): void {
-		if (this.flaps.length === 0) {
+		if (!this.flaps.length) {
 			this._resetForEmptyFlaps();
 			return;
 		}
 
 		const targetIndex = this.flaps.findIndex((f) => getFlapKey(f) === this.value);
+		const isAnimating = this._stepping || this._stepTimer != null;
+
 		if (targetIndex === -1) {
 			this._targetIndex = -1;
-			if (this._stepping || this._stepTimer != null) {
+			if (isAnimating) {
 				this._scheduleAdvanceOrSettle(this._getRemainingAnimTime());
 			}
 			return;
@@ -100,7 +104,7 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 
 		this._targetIndex = targetIndex;
 		if (this._currentIndex === this._targetIndex) {
-			if (this._stepping || this._stepTimer != null) {
+			if (isAnimating) {
 				this._scheduleAdvanceOrSettle(this._getRemainingAnimTime());
 			} else {
 				this._targetIndex = -1;
@@ -108,16 +112,14 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 			return;
 		}
 
-		// If a flip is already in progress (animating or waiting between steps),
-		// just update the target — the running loop will reach it without
-		// interrupting the current animation.
-		if (this._stepping || this._stepTimer != null) return;
+		// Let the current loop finish and retarget instead of restarting mid-flip.
+		if (isAnimating) return;
 
 		this._doStep();
 	}
 
 	private _doStep(): void {
-		if (this.flaps.length === 0) {
+		if (!this.flaps.length) {
 			this._resetForEmptyFlaps();
 			return;
 		}
@@ -135,9 +137,9 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 			this._animEndsAt = 0;
 		}, this._animDur);
 
-		this._scheduleAdvanceOrSettle(
-			this._currentIndex !== this._targetIndex ? this.speed : this._getRemainingAnimTime()
-		);
+		const delay =
+			this._currentIndex !== this._targetIndex ? this.speed : this._getRemainingAnimTime();
+		this._scheduleAdvanceOrSettle(delay);
 	}
 
 	private _scheduleAdvanceOrSettle(delay: number): void {
@@ -192,12 +194,12 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 	}
 
 	private _syncIndicesToFlaps(previousFlaps?: TSpool): void {
-		if (this.flaps.length === 0) {
+		if (!this.flaps.length) {
 			this._resetForEmptyFlaps();
 			return;
 		}
 
-		if (previousFlaps == null || previousFlaps.length === 0) {
+		if (previousFlaps == null || !previousFlaps.length) {
 			this._currentIndex = 0;
 			this._prevIndex = 0;
 			this._targetIndex = -1;
@@ -236,7 +238,7 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 		this._animEndsAt = 0;
 	}
 
-	/** Renders the content of one flap half. Uses class names defined in sharedSpoolStyles. */
+	/** Renders the content of one flap half. Expects `.char-inner`, `.color-fill`, `.image-fill`, `.custom-fill` class names in the subclass stylesheet. */
 	protected _renderHalf(flap: TFlap, half: 'top' | 'bottom'): TemplateResult {
 		switch (flap.type) {
 			case 'char':
@@ -264,7 +266,7 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 		}
 	}
 
-	/** Returns current and previous flap for use in render. */
+	/** Returns current and previous flap for use in render. Returns null when flaps is empty. */
 	protected _getFlaps(): { current: TFlap; prev: TFlap } | null {
 		const current = this.currentFlap;
 		if (current == null) return null;
@@ -275,10 +277,7 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 		};
 	}
 
-	/**
-	 * Renders the two card halves with fold animation.
-	 * Wrap this in a `.spool` div with `--_anim-dur` set.
-	 */
+	/** Renders the two card halves. Wrap this in a `.spool` with `--_anim-dur` set. */
 	protected _renderCard(): TemplateResult | typeof nothing {
 		const flaps = this._getFlaps();
 		if (flaps == null) return nothing;

@@ -11,5 +11,6 @@ export const charSpool: TSpool = [
 ];
 
 export const numericSpool: TSpool = [
+	{ type: 'char', value: ' ' },
 	...'0123456789'.split('').map((c) => ({ type: 'char' as const, value: c }))
 ];

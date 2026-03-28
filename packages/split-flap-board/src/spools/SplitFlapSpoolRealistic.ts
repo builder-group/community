@@ -6,7 +6,7 @@ import { getRenderedFlaps } from '../lib/spool-layout';
 import { SplitFlapSpoolBase } from './SplitFlapSpoolBase';
 
 /**
- * Realistic split-flap spool — 3D drum approach.
+ * Realistic split-flap spool using a 3D drum.
  *
  * Every flap in the spool is a real DOM element positioned around a cylinder
  * with rotateX. Stepping advances the drum so you can see it rotate when the
@@ -39,44 +39,33 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 		.slot {
 			display: grid;
 			place-content: center;
-			/* Lets the outside rotate the slot while staying inside the host's own
-			   perspective context — an outer rotateY would flatten the 3D drum. */
+			/* Keep board tilt on the inner slot so the drum stays inside host perspective. */
 			transform: var(--sfb-view-transform, none);
 			transform-style: preserve-3d;
 			transition: transform 0.5s cubic-bezier(0.25, 0, 0.3, 1);
 		}
 
-		/*
-		 * All characters stack in the same grid cell (grid-area: 1/1).
-		 * Each is positioned around the drum via --a / --a2, computed purely
-		 * in CSS from --index relative to --current-character-index.
-		 *
-		 * --drum-a: unwrapped drum position angle (no backside-flip term).
-		 *   Used to place the character's fold hinge on the cylinder surface
-		 *   via translateZ/translateY when --sfb-drum-radius > 0.
-		 *
-		 * --a / --a2: full fold angles (include +past*0.5turn wrapping so
-		 *   flaps behind the drum are placed correctly for backface-visibility).
-		 */
+		/* Stack every flap in one grid cell and derive drum angles from the offset. */
 		.character {
 			--total0: calc(var(--total) - 1);
 			--offset: calc(var(--index) - var(--current-character-index));
 			--abs-offset: max(var(--offset), calc(var(--offset) * -1));
 			--safe-abs-offset: max(var(--abs-offset), 0.001);
 			--direction: calc(var(--offset) / var(--safe-abs-offset));
-			--past: min(0, var(--direction));
-			--future: max(0, var(--direction));
+			--past: min(0, var(--direction)); /* -1 when behind current, else 0 */
+			--future: max(0, var(--direction)); /* +1 when ahead of current, else 0 */
+			/* CSS booleans: 1 only at the exact offset, 0 everywhere else. */
 			--is-current: clamp(0, calc(1 - var(--abs-offset) * 1000), 1);
 			--is-previous: clamp(0, calc(1 - max(var(--offset) + 1, (var(--offset) + 1) * -1) * 1000), 1);
 			--is-next: clamp(0, calc(1 - max(var(--offset) - 1, (var(--offset) - 1) * -1) * 1000), 1);
 			--natural-angle: calc((0.5 / var(--total0)) * 1turn);
-			/* Optional visual cap for small spools. Defaults to uncapped. */
+			/* Cap the visual step angle for small spools so the gap between flaps stays tight. */
 			--angle: min(var(--natural-angle), var(--sfb-max-step-angle, 1turn));
-			/* Unwrapped drum position — places fold hinge on the cylinder. */
+			/* Unwrapped drum position; places the fold hinge on the cylinder surface. */
 			--drum-a: calc(var(--abs-offset) * var(--direction) * var(--angle));
-			/* top-half angle on the drum (includes backside wrap) */
+			/* Top-half angle; +0.5turn for past flaps puts them on the drum backface. */
 			--a: calc(var(--abs-offset) * var(--direction) * var(--angle) + var(--past) * 0.5turn);
-			/* bottom-half angle on the drum */
+			/* Bottom-half angle; +0.5turn for future flaps slides them in from below. */
 			--a2: calc(
 				max(var(--abs-offset) - 1, 0) * var(--direction) * var(--angle) + var(--future) * 0.5turn
 			);
@@ -86,14 +75,7 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 			grid-area: 1 / 1;
 			flex-direction: column;
 			gap: var(--sfb-crease, 1px);
-			/*
-			 * Place the fold hinge on the cylinder surface via --drum-a.
-			 * With --sfb-drum-radius: 0 (default) both transforms are no-ops.
-			 *   Z: current flap (drum-a=0) pushed toward viewer; back flaps recede.
-			 *   Y: next char rises above center; previous sinks below.
-			 * transition mirrors --_flip-dur so the snap phase (0ms) is instant
-			 * and the transition phase smoothly rotates the drum with the flip.
-			 */
+			/* Move each flap hinge onto the drum surface and animate in sync with the fold. */
 			transform: translateZ(calc(var(--sfb-drum-radius, 0px) * cos(var(--drum-a))))
 				translateY(calc(var(--sfb-drum-radius, 0px) * sin(var(--drum-a)) * -1));
 			transform-style: preserve-3d;
@@ -102,7 +84,6 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 			pointer-events: none;
 		}
 
-		/* ── half-flap cards ───────────────────────────────────────────── */
 		.flap {
 			display: flex;
 			position: relative;
@@ -121,8 +102,7 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 			line-height: 1;
 		}
 
-		/* Top flap — padding centres the character at the fold line.
-		   translateZ(0.1px) on current char keeps it in front of past flaps. */
+		/* Keep the current top flap slightly in front and center it on the fold line. */
 		.flap:first-child {
 			align-items: flex-start;
 			transform: translateZ(calc(var(--is-current) * 0.1px)) rotateX(var(--a));
@@ -130,12 +110,11 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 			padding-top: 0.25em;
 		}
 
-		/* Nudge content away from the crease gap */
+		/* Keep content clear of the crease gap. */
 		.flap:first-child > * {
 			translate: 0 calc(var(--sfb-crease, 1px) * 0.5);
 		}
 
-		/* Bottom flap */
 		.flap:last-child {
 			align-items: flex-end;
 			transform: translateZ(calc(var(--is-current) * 0.1px)) rotateX(var(--a2));
@@ -147,9 +126,8 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 			translate: 0 calc(var(--sfb-crease, 1px) * -0.5);
 		}
 
-		/* ── flap content ─────────────────────────────────────────────── */
 		.char-inner {
-			font-weight: bold;
+			font-weight: var(--sfb-font-weight, bold);
 		}
 
 		.color-fill {
@@ -186,23 +164,24 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 	}
 
 	override updated(changed: Map<string, unknown>): void {
+		// Read indices before super.updated(); it may remap them when flaps change.
 		const previousCurrentIndex = this._currentIndex;
 		const previousPrevIndex = this._prevIndex;
 		super.updated(changed);
 
 		if (changed.has('flaps')) {
-			if (this._wrapResetTimer != null) {
-				clearTimeout(this._wrapResetTimer);
-				this._wrapResetTimer = null;
-			}
+			this._clearWrapTimer();
 
-			this._skipNextIndexAnimation =
+			// Snap when the same flap keys move to new indices in the updated spool.
+			const indicesRemapped =
 				this._currentIndex !== previousCurrentIndex || this._prevIndex !== previousPrevIndex;
+			this._skipNextIndexAnimation = indicesRemapped;
 			this._syncSlotState();
 		}
 
 		if (changed.has('_currentIndex')) {
 			if (this._skipNextIndexAnimation) {
+				// Skip the flip when the index changed because the spool changed.
 				this._skipNextIndexAnimation = false;
 				this._syncSlotState();
 				return;
@@ -215,6 +194,10 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 
 	override disconnectedCallback(): void {
 		super.disconnectedCallback();
+		this._clearWrapTimer();
+	}
+
+	private _clearWrapTimer(): void {
 		if (this._wrapResetTimer != null) {
 			clearTimeout(this._wrapResetTimer);
 			this._wrapResetTimer = null;
@@ -223,7 +206,7 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 
 	private _syncSlotState(): void {
 		const el = this._slotRef.value;
-		if (!el) return;
+		if (el == null) return;
 		el.style.setProperty('--current-character-index', String(this._currentIndex));
 		el.style.setProperty('--_flip-dur', '0ms');
 	}
@@ -234,11 +217,8 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 	 */
 	private async _animateStep(prevIdx: number, nextIdx: number): Promise<void> {
 		const el = this._slotRef.value;
-		if (!el) return;
-		if (this._wrapResetTimer != null) {
-			clearTimeout(this._wrapResetTimer);
-			this._wrapResetTimer = null;
-		}
+		if (el == null) return;
+		this._clearWrapTimer();
 
 		el.style.setProperty('--_flip-dur', '0ms');
 		el.style.setProperty('--current-character-index', String(prevIdx));

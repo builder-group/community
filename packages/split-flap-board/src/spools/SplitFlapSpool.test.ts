@@ -42,6 +42,33 @@ describe('SplitFlapSpoolBase behavior', () => {
 		expect(spool.isSettled).toBe(true);
 	});
 
+	it('retargets to the latest valid value while a spin is in progress', async () => {
+		vi.useFakeTimers();
+
+		const spool = new SplitFlapSpoolMinimal();
+		const settled: string[] = [];
+		spool.dispatchEvent = ((event: Event) => {
+			if (event instanceof CustomEvent && event.type === 'settled') {
+				settled.push(String(event.detail.value));
+			}
+			return true;
+		}) as typeof spool.dispatchEvent;
+
+		spool.value = 'C';
+		spool.updated(new Map([['value', ' ']]));
+
+		await vi.advanceTimersByTimeAsync(10);
+
+		spool.value = 'A';
+		spool.updated(new Map([['value', 'C']]));
+
+		await vi.advanceTimersByTimeAsync(400);
+
+		expect(settled).toEqual(['A']);
+		expect(spool.currentValue).toBe('A');
+		expect(spool.isSettled).toBe(true);
+	});
+
 	it('remaps the current flap by key when the spool changes', () => {
 		const spool = new SplitFlapSpoolMinimal();
 		const internal = spool as unknown as {
@@ -67,6 +94,50 @@ describe('SplitFlapSpoolBase behavior', () => {
 		spool.updated(new Map([['flaps', previousFlaps]]));
 
 		expect(spool.currentValue).toBe('A');
+		expect(spool.isSettled).toBe(true);
+	});
+
+	it('continues coherently after the spool changes mid-animation', async () => {
+		vi.useFakeTimers();
+
+		const spool = new SplitFlapSpoolMinimal();
+		const settled: string[] = [];
+		spool.dispatchEvent = ((event: Event) => {
+			if (event instanceof CustomEvent && event.type === 'settled') {
+				settled.push(String(event.detail.value));
+			}
+			return true;
+		}) as typeof spool.dispatchEvent;
+
+		spool.flaps = [
+			{ type: 'char', value: '0' },
+			{ type: 'char', value: '1' },
+			{ type: 'char', value: '2' },
+			{ type: 'char', value: '3' }
+		];
+		spool.value = '3';
+		spool.updated(
+			new Map([
+				['flaps', []],
+				['value', ' ']
+			])
+		);
+
+		await vi.advanceTimersByTimeAsync(10);
+
+		const previousFlaps = spool.flaps;
+		spool.flaps = [
+			{ type: 'char', value: '1' },
+			{ type: 'char', value: '2' },
+			{ type: 'char', value: '3' },
+			{ type: 'char', value: '0' }
+		];
+		spool.updated(new Map([['flaps', previousFlaps]]));
+
+		await vi.advanceTimersByTimeAsync(400);
+
+		expect(settled).toEqual(['3']);
+		expect(spool.currentValue).toBe('3');
 		expect(spool.isSettled).toBe(true);
 	});
 
