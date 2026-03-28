@@ -2,7 +2,7 @@ import { css, html, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { createRef, ref } from 'lit/directives/ref.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import { getRenderedFlaps } from '../lib/spool-layout';
+import { getRenderedFlaps } from '../lib';
 import { SplitFlapSpoolBase } from './SplitFlapSpoolBase';
 
 /**
@@ -32,8 +32,8 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 		:host {
 			display: inline-block;
 			perspective: var(--sfb-perspective, 400px);
-			font-size: var(--sfb-font-size, 1.5rem);
-			font-family: var(--sfb-font-family, monospace);
+			font-size: 2rem;
+			font-family: monospace;
 		}
 
 		.slot {
@@ -71,7 +71,6 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 			);
 
 			display: flex;
-			position: relative;
 			grid-area: 1 / 1;
 			flex-direction: column;
 			gap: var(--sfb-crease, 1px);
@@ -85,18 +84,16 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 		}
 
 		.flap {
-			display: flex;
 			position: relative;
-			place-content: center;
 			transform-style: preserve-3d;
 			backface-visibility: hidden;
 			transition: transform var(--_flip-dur, 0ms) cubic-bezier(0.25, 0, 0.5, 1);
 			will-change: transform;
-			box-sizing: content-box;
+			box-sizing: border-box;
 			border-radius: var(--sfb-spool-radius, 3px);
 			background: var(--sfb-bg, #111);
-			width: 1em;
-			height: 0.5em;
+			width: var(--sfb-spool-width, 1em);
+			height: calc(var(--sfb-spool-height, 2em) / 2);
 			overflow: hidden;
 			color: var(--sfb-color, #f5f0e0);
 			line-height: 1;
@@ -104,58 +101,59 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 
 		/* Keep the current top flap slightly in front and center it on the fold line. */
 		.flap:first-child {
-			align-items: flex-start;
 			transform: translateZ(calc(var(--is-current) * 0.1px)) rotateX(var(--a));
 			transform-origin: center calc(100% + var(--sfb-crease, 1px) * 0.5);
-			padding-top: 0.25em;
-		}
-
-		/* Keep content clear of the crease gap. */
-		.flap:first-child > * {
-			translate: 0 calc(var(--sfb-crease, 1px) * 0.5);
 		}
 
 		.flap:last-child {
-			align-items: flex-end;
 			transform: translateZ(calc(var(--is-current) * 0.1px)) rotateX(var(--a2));
 			transform-origin: center calc(var(--sfb-crease, 1px) * -0.5);
-			padding-bottom: 0.25em;
 		}
 
-		.flap:last-child > * {
-			translate: 0 calc(var(--sfb-crease, 1px) * -0.5);
-		}
-
-		.char-inner {
-			font-weight: var(--sfb-font-weight, bold);
-		}
-
-		.color-fill {
-			width: 100%;
-			height: 100%;
-		}
-
-		.image-fill {
+		/* char-inner, image-fill, and custom-fill are 200%-tall absolute fills;
+		   top: 0 on the top half / bottom: 0 on the bottom half centers content at the fold. */
+		.char-inner,
+		.image-fill,
+		.custom-fill {
 			position: absolute;
 			left: 0;
 			width: 100%;
 			height: 200%;
+		}
+
+		.flap:first-child .char-inner,
+		.flap:first-child .image-fill,
+		.flap:first-child .custom-fill {
+			top: 0;
+		}
+
+		.flap:last-child .char-inner,
+		.flap:last-child .image-fill,
+		.flap:last-child .custom-fill {
+			bottom: 0;
+		}
+
+		.char-inner {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			font-weight: bold;
+		}
+
+		.color-fill {
+			position: absolute;
+			inset: 0;
+		}
+
+		.image-fill {
 			object-fit: cover;
 			object-position: center center;
 		}
 
-		.flap:first-child .image-fill {
-			top: 0;
-		}
-
-		.flap:last-child .image-fill {
-			bottom: 0;
-		}
-
 		.custom-fill {
-			width: 100%;
-			height: 100%;
-			overflow: hidden;
+			display: flex;
+			justify-content: center;
+			align-items: center;
 		}
 	`;
 

@@ -7,8 +7,8 @@ export class SplitFlapSpoolMinimal extends SplitFlapSpoolBase {
 	static readonly styles = css`
 		:host {
 			display: inline-block;
-			font-size: var(--sfb-font-size, 1.5rem);
-			font-family: var(--sfb-font-family, monospace);
+			font-size: 2rem;
+			font-family: monospace;
 		}
 
 		.spool {
@@ -83,7 +83,7 @@ export class SplitFlapSpoolMinimal extends SplitFlapSpoolBase {
 			justify-content: center;
 			align-items: center;
 			height: 200%;
-			font-weight: var(--sfb-font-weight, bold);
+			font-weight: bold;
 			letter-spacing: 0;
 		}
 

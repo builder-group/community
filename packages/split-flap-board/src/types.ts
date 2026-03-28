@@ -10,6 +10,9 @@ export interface TFlapChar {
 	value: string;
 	color?: string;
 	bg?: string;
+	fontSize?: string;
+	fontFamily?: string;
+	fontWeight?: string;
 }
 
 export interface TFlapColor {
@@ -28,6 +31,6 @@ export interface TFlapImage {
 export interface TFlapCustom {
 	type: 'custom';
 	key: string;
-	top: TemplateResult | (() => HTMLElement);
-	bottom: TemplateResult | (() => HTMLElement);
+	top: TemplateResult;
+	bottom: TemplateResult;
 }

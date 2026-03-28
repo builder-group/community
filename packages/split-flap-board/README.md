@@ -40,7 +40,7 @@ A flap is one card on the spool, the atomic unit of content. Four built-in types
 
 ```ts
 // Character (default)
-{ type: 'char'; value: string; color?: string; bg?: string }
+{ type: 'char'; value: string; color?: string; bg?: string; fontSize?: string; fontFamily?: string; fontWeight?: string }
 
 // Solid color
 { type: 'color'; value: string }  // any CSS color
@@ -48,14 +48,20 @@ A flap is one card on the spool, the atomic unit of content. Four built-in types
 // Image
 { type: 'image'; src: string; alt?: string }
 
-// Custom - top and bottom halves rendered independently
-// Accepts a Lit TemplateResult or a plain render function returning an HTMLElement
-{ type: 'custom'; key: string; top: TemplateResult | (() => HTMLElement); bottom: TemplateResult | (() => HTMLElement) }
+// Custom - top and bottom halves rendered independently (Lit TemplateResult)
+{ type: 'custom'; key: string; top: TemplateResult; bottom: TemplateResult }
 ```
 
 The `key` field is optional on all types except `custom`. When omitted it defaults to the natural identifier: `value` for char and color, `src` for image.
 
-`type: 'custom'` with `TemplateResult` is Lit-specific. For React, Vue, or plain JS consumers use the `() => HTMLElement` form instead.
+Char flaps default to `2rem` monospace bold. Override per-flap via the object, or rebuild the spool with a new `fontSize` to change all at once:
+
+```ts
+const bigSpool = charSpool.map((f) =>
+	f.type === 'char' ? { ...f, fontSize: '3rem', fontWeight: '400' } : f
+);
+spool.flaps = bigSpool;
+```
 
 ### Spool
 
@@ -366,9 +372,6 @@ split-flap-board {
 	--sfb-color: #f5f0e0; /* flap text color */
 	--sfb-spool-radius: 4px; /* corner radius on each flap */
 	--sfb-gap: 2px; /* gap between spool cells */
-	--sfb-font-family: monospace;
-	--sfb-font-size: 1.5rem;
-	--sfb-font-weight: bold;
 }
 
 /* Minimal variant */
@@ -380,6 +383,8 @@ split-flap-board {
 
 /* Realistic variant */
 split-flap-board {
+	--sfb-spool-width: 1em; /* flap width; defaults to 1× font-size */
+	--sfb-spool-height: 2em; /* flap height; defaults to 2× font-size */
 	--sfb-drum-radius: 0px; /* cylinder radius; 0 keeps the flip flat */
 	--sfb-crease: 1px; /* gap between the two flap halves */
 	--sfb-perspective: 400px; /* CSS perspective depth */

@@ -247,7 +247,10 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 						class="char-inner"
 						style=${styleMap({
 							...(flap.color != null ? { color: flap.color } : {}),
-							...(flap.bg != null ? { background: flap.bg } : {})
+							...(flap.bg != null ? { background: flap.bg } : {}),
+							...(flap.fontSize != null ? { fontSize: flap.fontSize } : {}),
+							...(flap.fontFamily != null ? { fontFamily: flap.fontFamily } : {}),
+							...(flap.fontWeight != null ? { fontWeight: flap.fontWeight } : {})
 						})}
 					>
 						${flap.value}
@@ -257,12 +260,8 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 				return html`<div class="color-fill" style="background: ${flap.value}"></div>`;
 			case 'image':
 				return html`<img class="image-fill" src=${flap.src} alt=${flap.alt ?? ''} />`;
-			case 'custom': {
-				const content = flap[half];
-				return html`<div class="custom-fill">
-					${typeof content === 'function' ? content() : content}
-				</div>`;
-			}
+			case 'custom':
+				return html`<div class="custom-fill">${flap[half]}</div>`;
 		}
 	}
 
