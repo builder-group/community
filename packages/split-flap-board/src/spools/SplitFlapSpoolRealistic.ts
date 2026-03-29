@@ -92,6 +92,7 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 			transition: transform var(--_flip-dur, 0ms) cubic-bezier(0.25, 0, 0.5, 1);
 			will-change: transform;
 			box-sizing: border-box;
+			border: 1px solid var(--sfb-flap-border, #2a2a2a);
 			border-radius: var(--sfb-spool-radius, 3px);
 			background: var(--sfb-bg, #111);
 			width: var(--sfb-spool-width, 1em);

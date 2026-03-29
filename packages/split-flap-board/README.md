@@ -1,5 +1,5 @@
 <h1 align="center">
-    split-flap-board
+    <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/split-flap-board/.github/banner.svg" alt="split-flap-board banner">
 </h1>
 
 <p align="left">
@@ -115,7 +115,7 @@ import { charSpool, spoolGrid } from 'split-flap-board';
 // spoolGrid(spool, cols, rows) fills a uniform TSpool[][]
 board.spools = spoolGrid(charSpool, 10, 3);
 
-// per-column: pass an array of spools, one per column
+// per-column: pass an array of spools, one per column (shorter arrays repeat)
 board.spools = spoolGrid([charSpool, charSpool, statusSpool], 3, 2);
 
 // fully custom: build the 2D array directly
@@ -300,7 +300,7 @@ The variant elements can also be used directly if you prefer not to use the wrap
 | ------------------ | -------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | `spools`           | `TSpool[][]`               | —           | 2D spool configuration, one per cell. Board dimensions are inferred from this. Always assign a new array reference to update. |
 | `grid`             | `string[][]`               | `[]`        | 2D array of target keys. Always assign a new array reference to trigger a re-render.                                          |
-| `speed`            | `number`                   | `60`        | Default speed for all spool units. Overridden per spool via `spool.speed`.                                                    |
+| `speed`            | `number`                   | `60`        | Flip speed in milliseconds forwarded to every child spool.                                                                     |
 | `variant`          | `'minimal' \| 'realistic'` | `'minimal'` | Visual variant forwarded to every child spool.                                                                                |
 | `visibleSideCount` | `number`                   | `-1`        | Forwarded to child spools. Only affects the `realistic` variant.                                                              |
 
@@ -336,7 +336,7 @@ Creates a `TSpool[][]` for use with `board.spools`.
 // Uniform - same spool for every cell
 spoolGrid(charSpool, 10, 3);
 
-// Per-column - pass an array where index = column, length must equal cols
+// Per-column - pass an array where index = column; shorter arrays repeat
 spoolGrid([charSpool, charSpool, statusSpool], 3, 2);
 ```
 
@@ -390,6 +390,7 @@ split-flap-board {
 	--sfb-perspective: 400px; /* CSS perspective depth */
 	--sfb-view-transform: none; /* e.g. rotateY(-30deg) */
 	--sfb-max-step-angle: 1turn; /* per-step angle cap; 8deg tightens small spools */
+	--sfb-flap-border: #2a2a2a; /* border on each flap card; separates adjacent cells */
 }
 
 /* Per-spool override */

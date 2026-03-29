@@ -477,6 +477,19 @@ export const projectsConfig: {
 				{ type: 'npm', url: 'https://www.npmjs.com/package/rollup-presets' },
 				{ type: 'github', url: `${appConfig.social.githubPackages}/rollup-presets` }
 			]
+		},
+		{
+			id: 'split-flap-board',
+			name: 'split-flap-board',
+			description:
+				'Web component that simulates a split-flap display inspired by airport and train station boards',
+			startedAt: { year: 2026 },
+			status: 'maintenance',
+			category: 'package',
+			tags: [
+				{ type: 'npm', url: 'https://www.npmjs.com/package/split-flap-board' },
+				{ type: 'github', url: `${appConfig.social.githubPackages}/split-flap-board` }
+			]
 		}
 	]
 };

@@ -13,13 +13,13 @@ describe('spool layout helpers', () => {
 	it('limits rendering to the requested number of flaps per side', () => {
 		expect(
 			getRenderedFlaps(numericSpool, 2, { visibleSideCount: 4 }).map((item) => item.actualIndex)
-		).toEqual([8, 9, 0, 1, 2, 3, 4, 5, 6]);
+		).toEqual([9, 10, 0, 1, 2, 3, 4, 5, 6]);
 	});
 
 	it('can shift the rendered center forward for wraparound animation', () => {
 		expect(getRenderedFlaps(numericSpool, 0, { visibleSideCount: 2, renderCenter: 10 })).toEqual([
-			{ flap: numericSpool[8]!, actualIndex: 8, renderedIndex: 8 },
-			{ flap: numericSpool[9]!, actualIndex: 9, renderedIndex: 9 },
+			{ flap: numericSpool[9]!, actualIndex: 9, renderedIndex: 8 },
+			{ flap: numericSpool[10]!, actualIndex: 10, renderedIndex: 9 },
 			{ flap: numericSpool[0]!, actualIndex: 0, renderedIndex: 10 },
 			{ flap: numericSpool[1]!, actualIndex: 1, renderedIndex: 11 },
 			{ flap: numericSpool[2]!, actualIndex: 2, renderedIndex: 12 }
