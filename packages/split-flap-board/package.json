@@ -1,0 +1,50 @@
+{
+	"name": "split-flap-board",
+	"version": "0.0.1",
+	"private": false,
+	"description": "Web component that simulates a split-flap display inspired by airport and train station boards",
+	"keywords": ["split-flap", "solari-board", "web-component", "lit", "display-board"],
+	"homepage": "https://builder.group/?utm_source=package-json",
+	"bugs": {
+		"url": "https://github.com/builder-group/community/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/builder-group/community.git"
+	},
+	"license": "MIT",
+	"author": "@bennobuilder",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"source": "./src/index.ts",
+	"types": "./dist/types/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"scripts": {
+		"build": "shx rm -rf dist && rollup -c rollup.config.js",
+		"build:prod": "export NODE_ENV=production && pnpm build",
+		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
+		"install:clean": "pnpm run clean && pnpm install",
+		"lint": "eslint . --fix",
+		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"size": "size-limit --why",
+		"start:dev": "vite --config ./dev/vite.config.mjs",
+		"test": "vitest run",
+		"update:latest": "pnpm update --latest"
+	},
+	"dependencies": {
+		"lit": "^3.3.0"
+	},
+	"devDependencies": {
+		"@blgc/config": "workspace:*",
+		"@types/node": "^25.2.3",
+		"rollup-presets": "workspace:*"
+	},
+	"size-limit": [
+		{
+			"path": "dist/esm/index.js"
+		}
+	]
+}

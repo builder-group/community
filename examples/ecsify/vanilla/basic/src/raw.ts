@@ -30,19 +30,19 @@ export function runRawExample(): void {
 		const eid = entityIndex.createEntity();
 
 		// Add components
-		componentRegistry.addComponent(eid, Position, {
+		componentRegistry.add(eid, Position, {
 			x: getRandom(canvas.width),
 			y: getRandom(canvas.height)
 		});
-		componentRegistry.addComponent(eid, Velocity, {
+		componentRegistry.add(eid, Velocity, {
 			dx: getRandom(100, 20),
 			dy: getRandom(100, 20)
 		});
-		componentRegistry.addComponent(eid, Rectangle, {
+		componentRegistry.add(eid, Rectangle, {
 			width: getRandom(20, 10),
 			height: getRandom(20, 10)
 		});
-		componentRegistry.addComponent(eid, Color, {
+		componentRegistry.add(eid, Color, {
 			value: `rgba(${getRandom(255)}, ${getRandom(255)}, ${getRandom(255)}, 1)`
 		});
 	}

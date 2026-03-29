@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const mdxComponents: Record<string, React.ComponentType<any>> = {
+export const mdxComponents: Record<string, React.ComponentType<TMdxElementProps>> = {
 	em: (props) => <i {...props} />,
 	a: (props) => {
 		// Open external links in new tab
@@ -10,4 +10,8 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
 		}
 		return <a {...props} />;
 	}
+};
+
+type TMdxElementProps = React.HTMLAttributes<HTMLElement> & {
+	href?: string;
 };
