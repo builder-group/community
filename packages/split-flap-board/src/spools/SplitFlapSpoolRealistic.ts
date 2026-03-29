@@ -46,7 +46,6 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 
 		/* Derive drum placement and fold angles from the flap offset. */
 		.character {
-			--total0: calc(var(--total) - 1);
 			--offset: calc(var(--index) - var(--current-character-index));
 			--abs-offset: max(var(--offset), calc(var(--offset) * -1));
 			--safe-abs-offset: max(var(--abs-offset), 0.001);
