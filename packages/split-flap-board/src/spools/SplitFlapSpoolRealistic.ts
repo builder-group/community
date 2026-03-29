@@ -8,9 +8,8 @@ import { SplitFlapSpoolBase } from './SplitFlapSpoolBase';
 /**
  * Realistic split-flap spool using a 3D drum.
  *
- * Each flap hinge is positioned around a cylinder. The top and bottom halves
- * share that slot position, then add fold deltas for the outgoing and incoming
- * flap during a step.
+ * Each flap keeps its own top and bottom half, while the hinge is positioned
+ * around a cylinder so the drum reads in perspective when the view is tilted.
  *
  * CSS approach adapted from Emil Kowalski's split-flap implementation.
  */
@@ -45,36 +44,42 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 			transition: transform 0.5s cubic-bezier(0.25, 0, 0.3, 1);
 		}
 
-		/* Use one slot angle so drum placement and fold state stay in sync. */
+		/* Derive drum placement and fold angles from the flap offset. */
 		.character {
+			--total0: calc(var(--total) - 1);
 			--offset: calc(var(--index) - var(--current-character-index));
 			--abs-offset: max(var(--offset), calc(var(--offset) * -1));
-			/* Treat exact offsets as booleans so CSS can select the active neighbors. */
+			--safe-abs-offset: max(var(--abs-offset), 0.001);
+			--direction: calc(var(--offset) / var(--safe-abs-offset));
+			--past: min(0, var(--direction)); /* -1 when behind current, else 0 */
+			--future: max(0, var(--direction)); /* +1 when ahead of current, else 0 */
+			/* Treat exact offsets as booleans so CSS can target the active neighbors. */
 			--is-current: clamp(0, calc(1 - var(--abs-offset) * 1000), 1);
 			--is-previous: clamp(0, calc(1 - max(var(--offset) + 1, (var(--offset) + 1) * -1) * 1000), 1);
 			--is-next: clamp(0, calc(1 - max(var(--offset) - 1, (var(--offset) - 1) * -1) * 1000), 1);
-			--is-future: clamp(0, calc(max(0, var(--offset)) * 1000), 1);
-			--is-past: clamp(0, calc(max(0, calc(var(--offset) * -1)) * 1000), 1);
-			--show-top: max(var(--is-current), max(var(--is-future), var(--is-previous)));
-			--show-bottom: max(var(--is-current), max(var(--is-past), var(--is-next)));
 			/*
 			 * Keep the outer visible odd-count flap inside the silhouette so it does not
-			 * disappear at the +/-90deg edge.
+			 * vanish at the drum edge.
 			 */
 			--natural-angle: calc((0.5 / var(--total)) * 1turn);
-			/* Cap the step angle so small spools still read as a tight drum. */
+			/* Cap the visual step angle for small spools so the gap between flaps stays tight. */
 			--angle: min(var(--natural-angle), var(--sfb-max-step-angle, 1turn));
-			--slot-angle: calc(var(--offset) * var(--angle));
-			--top-angle: calc(var(--slot-angle) - var(--is-previous) * 90deg);
-			--bottom-angle: calc(var(--slot-angle) + var(--is-next) * 90deg);
+			/* Unwrapped drum position; places the fold hinge on the cylinder surface. */
+			--drum-a: calc(var(--abs-offset) * var(--direction) * var(--angle));
+			/* Top-half angle; +0.5turn for past flaps puts them on the drum backface. */
+			--a: calc(var(--abs-offset) * var(--direction) * var(--angle) + var(--past) * 0.5turn);
+			/* Bottom-half angle; +0.5turn for future flaps slides them in from below. */
+			--a2: calc(
+				max(var(--abs-offset) - 1, 0) * var(--direction) * var(--angle) + var(--future) * 0.5turn
+			);
 
 			display: flex;
 			grid-area: 1 / 1;
 			flex-direction: column;
 			gap: var(--sfb-crease, 1px);
-			/* Move the shared hinge onto the drum surface. */
-			transform: translateZ(calc(var(--sfb-drum-radius, 0px) * cos(var(--slot-angle))))
-				translateY(calc(var(--sfb-drum-radius, 0px) * sin(var(--slot-angle)) * -1));
+			/* Move the fold line onto the drum surface so translation and fold stay aligned. */
+			transform: translateZ(calc(var(--sfb-drum-radius, 0px) * cos(var(--drum-a))))
+				translateY(calc(var(--sfb-drum-radius, 0px) * sin(var(--drum-a)) * -1));
 			transform-style: preserve-3d;
 			z-index: calc(var(--is-current) * 2 + var(--is-previous) + var(--is-next));
 			transition: transform var(--_flip-dur, 0ms) cubic-bezier(0.25, 0, 0.5, 1);
@@ -85,9 +90,7 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 			position: relative;
 			transform-style: preserve-3d;
 			backface-visibility: hidden;
-			transition:
-				transform var(--_flip-dur, 0ms) cubic-bezier(0.25, 0, 0.5, 1),
-				opacity var(--_flip-dur, 0ms) linear;
+			transition: transform var(--_flip-dur, 0ms) cubic-bezier(0.25, 0, 0.5, 1);
 			will-change: transform;
 			box-sizing: border-box;
 			border-radius: var(--sfb-spool-radius, 3px);
@@ -99,21 +102,18 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 			line-height: 1;
 		}
 
-		/* Keep top halves on the upper arc and the outgoing flap. */
+		/* Nudge the front flap forward so the center seam stays stable during the flip. */
 		.flap:first-child {
-			opacity: var(--show-top);
-			transform: translateZ(calc(var(--is-current) * 0.1px)) rotateX(var(--top-angle));
+			transform: translateZ(calc(var(--is-current) * 0.1px)) rotateX(var(--a));
 			transform-origin: center calc(100% + var(--sfb-crease, 1px) * 0.5);
 		}
 
-		/* Keep bottom halves on the lower arc and the incoming flap. */
 		.flap:last-child {
-			opacity: var(--show-bottom);
-			transform: translateZ(calc(var(--is-current) * 0.1px)) rotateX(var(--bottom-angle));
+			transform: translateZ(calc(var(--is-current) * 0.1px)) rotateX(var(--a2));
 			transform-origin: center calc(var(--sfb-crease, 1px) * -0.5);
 		}
 
-		/* Use 200% fills so each half can crop the same flap content at the fold. */
+		/* Use 200% fills so each half crops the same flap content at the fold. */
 		.char-inner,
 		.image-fill,
 		.custom-fill {
