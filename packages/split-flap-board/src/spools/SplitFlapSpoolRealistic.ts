@@ -172,31 +172,16 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 	}
 
 	override updated(changed: Map<string, unknown>): void {
-		// Read indices before super.updated(); it may remap them when flaps change.
 		const previousCurrentIndex = this._currentIndex;
 		const previousPrevIndex = this._prevIndex;
 		super.updated(changed);
 
 		if (changed.has('flaps')) {
-			this._clearWrapTimer();
-
-			// Snap when the same flap keys move to new indices in the updated spool.
-			const indicesRemapped =
-				this._currentIndex !== previousCurrentIndex || this._prevIndex !== previousPrevIndex;
-			this._skipNextIndexAnimation = indicesRemapped;
-			this._syncSlotState();
+			this._handleFlapChange(previousCurrentIndex, previousPrevIndex);
 		}
 
 		if (changed.has('_currentIndex')) {
-			if (this._skipNextIndexAnimation) {
-				// Skip the flip when the index changed because the spool changed.
-				this._skipNextIndexAnimation = false;
-				this._syncSlotState();
-				return;
-			}
-
-			const prevIdx = (changed.get('_currentIndex') as number) ?? 0;
-			void this._animateStep(prevIdx, this._currentIndex);
+			this._handleIndexChange((changed.get('_currentIndex') as number) ?? 0);
 		}
 	}
 
@@ -219,10 +204,38 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 		el.style.setProperty('--_flip-dur', '0ms');
 	}
 
-	/**
-	 * Snap back to prevIdx (instant), then transition to nextIdx.
-	 * For forward-only adjacent steps the drum advances by exactly one --angle.
-	 */
+	private _handleFlapChange(previousCurrentIndex: number, previousPrevIndex: number): void {
+		this._clearWrapTimer();
+
+		const indicesRemapped =
+			this._currentIndex !== previousCurrentIndex || this._prevIndex !== previousPrevIndex;
+
+		this._skipNextIndexAnimation = indicesRemapped;
+		this._syncSlotState();
+	}
+
+	private _handleIndexChange(previousIndex: number): void {
+		if (this._skipNextIndexAnimation) {
+			this._skipNextIndexAnimation = false;
+			this._syncSlotState();
+			return;
+		}
+
+		void this._animateStep(previousIndex, this._currentIndex);
+	}
+
+	private _waitForPositionReset(): Promise<void> {
+		return new Promise((resolve) => {
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => resolve());
+			});
+		});
+	}
+
+	private _isWrapForwardStep(prevIdx: number, nextIdx: number): boolean {
+		return prevIdx === this.flaps.length - 1 && nextIdx === 0;
+	}
+
 	private async _animateStep(prevIdx: number, nextIdx: number): Promise<void> {
 		const el = this._slotRef.value;
 		if (el == null) return;
@@ -231,14 +244,9 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 		el.style.setProperty('--_flip-dur', '0ms');
 		el.style.setProperty('--current-character-index', String(prevIdx));
 
-		// Two frames: first applies the instant position reset, second starts the transition.
-		await new Promise<void>((resolve) =>
-			requestAnimationFrame(() => {
-				requestAnimationFrame(() => resolve());
-			})
-		);
+		await this._waitForPositionReset();
 
-		const wrapForward = prevIdx === this.flaps.length - 1 && nextIdx === 0;
+		const wrapForward = this._isWrapForwardStep(prevIdx, nextIdx);
 		const nextDisplayIdx = wrapForward ? this.flaps.length : nextIdx;
 
 		el.style.setProperty('--_flip-dur', `${this._animDur}ms`);

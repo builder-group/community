@@ -1,6 +1,6 @@
 {
 	"name": "split-flap-board",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"private": false,
 	"description": "Web component that simulates a split-flap display inspired by airport and train station boards",
 	"keywords": [

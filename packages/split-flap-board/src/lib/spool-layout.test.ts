@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { numericSpool } from '../spools/presets';
 import { getMaxVisibleSideCount, getRenderedFlaps, getSignedCircularOffset } from './spool-layout';
 
+const [blank, digit0, digit1, , , , , , , digit8, digit9] = numericSpool;
+
 describe('spool layout helpers', () => {
 	it('distributes indices evenly around the current flap', () => {
 		expect(getSignedCircularOffset(3, 2, 11)).toBe(1);
@@ -17,12 +19,18 @@ describe('spool layout helpers', () => {
 	});
 
 	it('can shift the rendered center forward for wraparound animation', () => {
+		expect(blank).toBeDefined();
+		expect(digit0).toBeDefined();
+		expect(digit1).toBeDefined();
+		expect(digit8).toBeDefined();
+		expect(digit9).toBeDefined();
+
 		expect(getRenderedFlaps(numericSpool, 0, { visibleSideCount: 2, renderCenter: 10 })).toEqual([
-			{ flap: numericSpool[9]!, actualIndex: 9, renderedIndex: 8 },
-			{ flap: numericSpool[10]!, actualIndex: 10, renderedIndex: 9 },
-			{ flap: numericSpool[0]!, actualIndex: 0, renderedIndex: 10 },
-			{ flap: numericSpool[1]!, actualIndex: 1, renderedIndex: 11 },
-			{ flap: numericSpool[2]!, actualIndex: 2, renderedIndex: 12 }
+			{ flap: digit8, actualIndex: 9, renderedIndex: 8 },
+			{ flap: digit9, actualIndex: 10, renderedIndex: 9 },
+			{ flap: blank, actualIndex: 0, renderedIndex: 10 },
+			{ flap: digit0, actualIndex: 1, renderedIndex: 11 },
+			{ flap: digit1, actualIndex: 2, renderedIndex: 12 }
 		]);
 	});
 

@@ -1,7 +1,7 @@
 import { css, html, LitElement, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { getFlapKey } from '../lib';
-import type { TSpool } from '../types';
+import type { TSplitFlapVariant, TSpool } from '../types';
 import { charSpool } from './presets';
 import type { SplitFlapSpoolBase } from './SplitFlapSpoolBase';
 // Register both variants so <split-flap-spool> can render either one.
@@ -17,7 +17,7 @@ export class SplitFlapSpool extends LitElement {
 	`;
 
 	@property({ type: String })
-	public variant: 'minimal' | 'realistic' = 'minimal';
+	public variant: TSplitFlapVariant = 'minimal';
 
 	@property({ type: String })
 	public value = ' ';
@@ -57,7 +57,7 @@ export class SplitFlapSpool extends LitElement {
 		) as SplitFlapSpoolBase | null;
 	}
 
-	override render(): TemplateResult {
+	private _renderVariant(): TemplateResult {
 		if (this.variant === 'realistic') {
 			return html`
 				<split-flap-spool-realistic
@@ -68,6 +68,7 @@ export class SplitFlapSpool extends LitElement {
 				></split-flap-spool-realistic>
 			`;
 		}
+
 		return html`
 			<split-flap-spool-minimal
 				.value=${this.value}
@@ -75,6 +76,10 @@ export class SplitFlapSpool extends LitElement {
 				.speed=${this.speed}
 			></split-flap-spool-minimal>
 		`;
+	}
+
+	override render(): TemplateResult {
+		return this._renderVariant();
 	}
 }
 

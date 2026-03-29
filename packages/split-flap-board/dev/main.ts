@@ -1,9 +1,15 @@
 import { html } from 'lit';
-import '../src/SplitFlapBoard';
-import '../src/spools/SplitFlapSpool';
-import { fromLines, spoolGrid } from '../src/lib/board';
-import { charSpool, colorSpool, numericSpool } from '../src/spools/presets';
-import type { TSpool } from '../src/types';
+import {
+	charSpool,
+	colorSpool,
+	fromLines,
+	getFlapKey,
+	numericSpool,
+	spoolGrid,
+	type SplitFlapBoard,
+	type SplitFlapSpool,
+	type TSpool
+} from '../src';
 
 // MARK: - Custom spool showcasing all four flap types
 
@@ -22,20 +28,20 @@ const demoSpool: TSpool = [
 
 // MARK: - Element refs
 
-const elMinimal = document.querySelector<any>('#minimal')!;
-const elRealistic = document.querySelector<any>('#realistic')!;
-const elNumeric = document.querySelector<any>('#numeric')!;
-const elColor = document.querySelector<any>('#color')!;
-const elDemo = document.querySelector<any>('#demo')!;
-const elBoard = document.querySelector<any>('#quotes-board')!;
+const elMinimal = queryRequired<TSpoolElement>('#minimal');
+const elRealistic = queryRequired<TSpoolElement>('#realistic');
+const elNumeric = queryRequired<TSpoolElement>('#numeric');
+const elColor = queryRequired<TSpoolElement>('#color');
+const elDemo = queryRequired<TSpoolElement>('#demo');
+const elBoard = queryRequired<TBoardElement>('#quotes-board');
 
 elNumeric.flaps = numericSpool;
 elColor.flaps = colorSpool;
 elDemo.flaps = demoSpool;
 
-// Shared array used by slider controls to sync CSS vars, speed, visibleSideCount.
-// The board is included so all realistic controls apply to it automatically.
-const realisticEls: any[] = [elRealistic, elNumeric, elColor, elDemo, elBoard];
+const realisticEls: TControlTarget[] = [elRealistic, elNumeric, elColor, elDemo, elBoard];
+const sizedEls: TSpoolElement[] = [elMinimal, elRealistic, elNumeric, elColor, elDemo];
+const themedEls: HTMLElement[] = [elMinimal, ...realisticEls];
 
 // MARK: - Board: quote rotator
 //
@@ -56,10 +62,9 @@ const QUOTES: string[][] = [
 elBoard.spools = spoolGrid(charSpool, BOARD_COLS, BOARD_ROWS);
 
 let quoteIdx = 0;
-let boardCharSpool = charSpool; // updated when font size changes
 
-function showQuote(idx: number) {
-	const { grid } = fromLines(QUOTES[idx], BOARD_COLS);
+function showQuote(idx: number): void {
+	const { grid } = fromLines(QUOTES[idx] as string[], BOARD_COLS);
 	elBoard.grid = grid;
 }
 
@@ -75,8 +80,8 @@ showQuote(0);
 // MARK: - Individual spools: auto-cycle
 
 const chars = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
-const colorKeys = colorSpool.map((f) => (f as any).key as string);
-const demoKeys = demoSpool.map((f) => ((f as any).key ?? (f as any).value) as string);
+const colorKeys = colorSpool.map(getFlapKey);
+const demoKeys = demoSpool.map(getFlapKey);
 
 let charIdx = 0;
 let colorIdx = 0;
@@ -86,7 +91,7 @@ let digitIntervalId: ReturnType<typeof setInterval>;
 let colorIntervalId: ReturnType<typeof setInterval>;
 let demoIntervalId: ReturnType<typeof setInterval>;
 
-function restartIntervals(speed: number) {
+function restartIntervals(speed: number): void {
 	clearInterval(charIntervalId);
 	clearInterval(digitIntervalId);
 	clearInterval(colorIntervalId);
@@ -97,8 +102,8 @@ function restartIntervals(speed: number) {
 
 	charIntervalId = setInterval(() => {
 		charIdx = (charIdx + 1) % chars.length;
-		elMinimal.value = chars[charIdx];
-		elRealistic.value = chars[charIdx];
+		elMinimal.value = chars[charIdx] as string;
+		elRealistic.value = chars[charIdx] as string;
 	}, interval);
 
 	let digit = 0;
@@ -109,30 +114,18 @@ function restartIntervals(speed: number) {
 
 	colorIntervalId = setInterval(() => {
 		colorIdx = (colorIdx + 1) % colorKeys.length;
-		elColor.value = colorKeys[colorIdx];
+		elColor.value = colorKeys[colorIdx] as string;
 	}, interval);
 
 	demoIntervalId = setInterval(() => {
 		demoIdx = (demoIdx + 1) % demoKeys.length;
-		elDemo.value = demoKeys[demoIdx];
+		elDemo.value = demoKeys[demoIdx] as string;
 	}, interval);
 }
 
 restartIntervals(200); // matches slider default
 
 // MARK: - Controls
-
-function setCssVar(prop: string, value: string) {
-	realisticEls.forEach((el) => el.style.setProperty(prop, value));
-}
-
-function removeCssVar(prop: string) {
-	realisticEls.forEach((el) => el.style.removeProperty(prop));
-}
-
-function formatDeg(v: number) {
-	return `${v.toFixed(1).replace(/\.0$/, '')}\u00b0`;
-}
 
 /** Wire up a range slider: calls `apply` immediately on load and on every change. */
 function slider(
@@ -141,8 +134,8 @@ function slider(
 	format: (v: number) => string,
 	apply: (v: number) => void
 ) {
-	const input = document.getElementById(id) as HTMLInputElement;
-	const display = document.getElementById(valId)!;
+	const input = queryRequired<HTMLInputElement>(`#${id}`);
+	const display = queryRequired<HTMLElement>(`#${valId}`);
 	const update = () => {
 		const v = Number(input.value);
 		display.textContent = format(v);
@@ -168,7 +161,7 @@ slider(
 	'val-radius',
 	(v) => `${v}px`,
 	(v) => {
-		setCssVar('--sfb-drum-radius', `${v}px`);
+		setCssVar(realisticEls, '--sfb-drum-radius', `${v}px`);
 	}
 );
 
@@ -177,8 +170,12 @@ slider(
 	'val-max-angle',
 	(v) => (v <= 0 ? 'off' : formatDeg(v)),
 	(v) => {
-		if (v <= 0) removeCssVar('--sfb-max-step-angle');
-		else setCssVar('--sfb-max-step-angle', `${v}deg`);
+		if (v <= 0) {
+			removeCssVar(realisticEls, '--sfb-max-step-angle');
+			return;
+		}
+
+		setCssVar(realisticEls, '--sfb-max-step-angle', `${v}deg`);
 	}
 );
 
@@ -197,19 +194,19 @@ slider(
 	(v) => `${v}rem`,
 	(v) => {
 		const fontSize = `${v}rem`;
-		const sized = (spool: TSpool): TSpool =>
-			spool.map((f) => (f.type === 'char' ? { ...f, fontSize } : f));
+		const sizedSpools = [
+			withFontSize(charSpool, fontSize),
+			withFontSize(charSpool, fontSize),
+			withFontSize(numericSpool, fontSize),
+			withFontSize(colorSpool, fontSize),
+			withFontSize(demoSpool, fontSize)
+		] as const;
 
-		elMinimal.flaps = sized(charSpool);
-		elRealistic.flaps = sized(charSpool);
-		elNumeric.flaps = sized(numericSpool);
-		elColor.flaps = sized(colorSpool);
-		elDemo.flaps = sized(demoSpool);
+		sizedEls.forEach((element, index) => {
+			element.flaps = sizedSpools[index] ?? charSpool;
+		});
 
-		// Rebuild board spools with new font size, then re-apply the current grid
-		// so each cell retargets without losing its current position.
-		boardCharSpool = sized(charSpool);
-		elBoard.spools = spoolGrid(boardCharSpool, BOARD_COLS, BOARD_ROWS);
+		elBoard.spools = spoolGrid(withFontSize(charSpool, fontSize), BOARD_COLS, BOARD_ROWS);
 		showQuote(quoteIdx);
 	}
 );
@@ -219,7 +216,7 @@ slider(
 	'val-crease',
 	(v) => `${v}px`,
 	(v) => {
-		[elMinimal, ...realisticEls].forEach((el) => el.style.setProperty('--sfb-crease', `${v}px`));
+		setCssVar(themedEls, '--sfb-crease', `${v}px`);
 	}
 );
 
@@ -228,7 +225,7 @@ slider(
 	'val-rotation',
 	(v) => `${v}°`,
 	(v) => {
-		setCssVar('--sfb-view-transform', v === 0 ? 'none' : `rotateY(-${v}deg)`);
+		setCssVar(realisticEls, '--sfb-view-transform', v === 0 ? 'none' : `rotateY(-${v}deg)`);
 	}
 );
 
@@ -238,8 +235,12 @@ slider(
 	(v) => (v === 24 ? 'auto' : `${v}px`),
 	(v) => {
 		const prop = '--sfb-spool-width';
-		if (v === 24) [elMinimal, ...realisticEls].forEach((el) => el.style.removeProperty(prop));
-		else [elMinimal, ...realisticEls].forEach((el) => el.style.setProperty(prop, `${v}px`));
+		if (v === 24) {
+			removeCssVar(themedEls, prop);
+			return;
+		}
+
+		setCssVar(themedEls, prop, `${v}px`);
 	}
 );
 
@@ -249,7 +250,42 @@ slider(
 	(v) => (v === 24 ? 'auto' : `${v}px`),
 	(v) => {
 		const prop = '--sfb-spool-height';
-		if (v === 24) realisticEls.forEach((el) => el.style.removeProperty(prop));
-		else realisticEls.forEach((el) => el.style.setProperty(prop, `${v}px`));
+		if (v === 24) {
+			removeCssVar(realisticEls, prop);
+			return;
+		}
+
+		setCssVar(realisticEls, prop, `${v}px`);
 	}
 );
+
+// MARK: - Helpers
+
+type TBoardElement = SplitFlapBoard;
+type TSpoolElement = SplitFlapSpool;
+type TControlTarget = HTMLElement & { speed: number; visibleSideCount: number };
+
+function queryRequired<T extends Element>(selector: string): T {
+	const element = document.querySelector<T>(selector);
+	if (element == null) {
+		throw new Error(`Missing element: ${selector}`);
+	}
+
+	return element;
+}
+
+function setCssVar(elements: HTMLElement[], prop: string, value: string): void {
+	elements.forEach((element) => element.style.setProperty(prop, value));
+}
+
+function removeCssVar(elements: HTMLElement[], prop: string): void {
+	elements.forEach((element) => element.style.removeProperty(prop));
+}
+
+function formatDeg(value: number): string {
+	return `${value.toFixed(1).replace(/\.0$/, '')}\u00b0`;
+}
+
+function withFontSize(spool: TSpool, fontSize: string): TSpool {
+	return spool.map((flap) => (flap.type === 'char' ? { ...flap, fontSize } : flap));
+}

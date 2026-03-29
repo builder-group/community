@@ -1,5 +1,5 @@
 import { charSpool } from '../spools/presets';
-import type { TFlapChar, TSpool } from '../types';
+import type { TBoardData, TFlap, TLineConfig, TLineInput, TSpool } from '../types';
 
 /**
  * Fill a uniform 2-D spool grid.
@@ -12,13 +12,12 @@ import type { TFlapChar, TSpool } from '../types';
  * @param rows  - Number of rows.
  */
 export function spoolGrid(spool: TSpool | TSpool[], cols: number, rows: number): TSpool[][] {
-	const isPerColumn = spool.length > 0 && Array.isArray(spool[0]);
-	const colSpools: TSpool[] = isPerColumn
-		? (spool as TSpool[])
-		: Array.from({ length: cols }, () => spool as TSpool);
+	const columnSpools = isColumnSpoolList(spool) ? spool : [spool];
 
 	return Array.from({ length: rows }, () =>
-		Array.from({ length: cols }, (_, c) => colSpools[c % colSpools.length] ?? charSpool)
+		Array.from({ length: cols }, (_, columnIndex) => {
+			return columnSpools[columnIndex % columnSpools.length] ?? charSpool;
+		})
 	);
 }
 
@@ -31,41 +30,55 @@ export function spoolGrid(spool: TSpool | TSpool[], cols: number, rows: number):
  * @param lines - Text lines to display.
  * @param cols  - Board width in columns.
  */
-export function fromLines(
-	lines: TLineInput[],
-	cols: number
-): { spools: TSpool[][]; grid: string[][] } {
+export function fromLines(lines: TLineInput[], cols: number): TBoardData {
 	const spools: TSpool[][] = [];
 	const grid: string[][] = [];
 
 	for (const line of lines) {
-		const normalized = typeof line === 'string' ? { text: line } : line;
-		const { text, bg, color } = normalized;
+		const normalizedLine = normalizeLine(line);
+		const row = normalizeText(normalizedLine.text, cols).split('');
+		const hasCustomStyle = normalizedLine.bg != null || normalizedLine.color != null;
 
-		const padded = text.toUpperCase().padEnd(cols, ' ').slice(0, cols);
-		const chars = padded.split('');
-
-		if (bg != null || color != null) {
-			// Bake per-line colors into each cell's spool so all flaps share the same bg/color.
-			const rowSpools: TSpool[] = chars.map(() =>
-				charSpool.map((flap): TFlapChar => {
-					if (flap.type !== 'char') return flap as unknown as TFlapChar;
-					return {
-						...flap,
-						...(bg != null ? { bg } : {}),
-						...(color != null ? { color } : {})
-					};
-				})
-			);
-			spools.push(rowSpools);
-		} else {
-			spools.push(Array.from({ length: cols }, () => charSpool));
-		}
-
-		grid.push(chars);
+		spools.push(
+			hasCustomStyle
+				? createStyledRowSpools(cols, normalizedLine)
+				: createRowSpools(charSpool, cols)
+		);
+		grid.push(row);
 	}
 
 	return { spools, grid };
 }
 
-export type TLineInput = string | { text: string; bg?: string; color?: string };
+function isColumnSpoolList(spool: TSpool | TSpool[]): spool is TSpool[] {
+	return Array.isArray(spool[0]);
+}
+
+function createRowSpools(spool: TSpool, cols: number): TSpool[] {
+	return Array.from({ length: cols }, () => spool);
+}
+
+function withLineStyle(flap: TFlap, line: TLineConfig): TFlap {
+	if (flap.type !== 'char') {
+		return flap;
+	}
+
+	return {
+		...flap,
+		...(line.bg != null ? { bg: line.bg } : {}),
+		...(line.color != null ? { color: line.color } : {})
+	};
+}
+
+function normalizeLine(line: TLineInput): TLineConfig {
+	return typeof line === 'string' ? { text: line } : line;
+}
+
+function normalizeText(text: string, cols: number): string {
+	return text.toUpperCase().padEnd(cols, ' ').slice(0, cols);
+}
+
+function createStyledRowSpools(cols: number, line: TLineConfig): TSpool[] {
+	const styledSpool = charSpool.map((flap) => withLineStyle(flap, line));
+	return createRowSpools(styledSpool, cols);
+}

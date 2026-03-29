@@ -1,6 +1,9 @@
 import type { TemplateResult } from 'lit';
 
+export type TSplitFlapVariant = 'minimal' | 'realistic';
+
 export type TSpool = TFlap[];
+export type TGrid = string[][];
 
 export type TFlap = TFlapChar | TFlapColor | TFlapImage | TFlapCustom;
 
@@ -33,4 +36,25 @@ export interface TFlapCustom {
 	key: string;
 	top: TemplateResult;
 	bottom: TemplateResult;
+}
+
+export interface TBoardData {
+	spools: TSpool[][];
+	grid: TGrid;
+}
+
+export interface TLineConfig {
+	text: string;
+	bg?: string;
+	color?: string;
+}
+
+export type TLineInput = string | TLineConfig;
+
+export interface TSpoolSettledDetail {
+	value: string;
+}
+
+export interface TBoardSettledDetail {
+	grid: TGrid;
 }

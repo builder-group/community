@@ -1,7 +1,7 @@
 import { css, html, LitElement, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { SplitFlapSpool } from './spools/SplitFlapSpool';
-import type { TSpool } from './types';
+import type { TBoardSettledDetail, TGrid, TSplitFlapVariant, TSpool } from './types';
 
 @customElement('split-flap-board')
 export class SplitFlapBoard extends LitElement {
@@ -11,8 +11,6 @@ export class SplitFlapBoard extends LitElement {
 			position: relative;
 			flex-direction: column;
 			box-sizing: border-box;
-			/* Inset shadows for side rails; render below all children so frame bars
-			 * appear at the same visual level. */
 			box-shadow:
 				inset 14px 0 18px rgba(0, 0, 0, 0.55),
 				inset -14px 0 18px rgba(0, 0, 0, 0.55);
@@ -21,7 +19,6 @@ export class SplitFlapBoard extends LitElement {
 			padding: var(--sfb-board-padding, 10px);
 		}
 
-		/* Absolute overlay so the outer frame ring adds no layout space. */
 		:host::after {
 			position: absolute;
 			z-index: 10000;
@@ -32,8 +29,6 @@ export class SplitFlapBoard extends LitElement {
 			content: '';
 		}
 
-		/* Frame bar caps the top padding of each row. z-index increases per row in
-		 * render() so each bar sits above the drum content of the row above it. */
 		.board-row {
 			display: flex;
 			position: relative;
@@ -66,7 +61,7 @@ export class SplitFlapBoard extends LitElement {
 
 	/** Visual variant forwarded to every child spool. */
 	@property({ type: String })
-	public variant: 'minimal' | 'realistic' = 'minimal';
+	public variant: TSplitFlapVariant = 'minimal';
 
 	/** Number of visible drum sides forwarded to every child spool (-1 = default). */
 	@property({ type: Number })
@@ -80,33 +75,39 @@ export class SplitFlapBoard extends LitElement {
 
 		if (changed.has('spools') || changed.has('grid')) {
 			this._pendingSettle = true;
-			// Defer one microtask so child spools have run their own `updated()` and
-			// set their animation state before we check whether they are already settled.
-			void Promise.resolve().then(() => this._checkAllSettled());
+			queueMicrotask(() => this._checkAllSettled());
 		}
 	}
 
 	private _getSpoolEls(): SplitFlapSpool[] {
-		return Array.from(
-			this.renderRoot.querySelectorAll<SplitFlapSpool>('split-flap-spool')
-		);
+		return Array.from(this.renderRoot.querySelectorAll<SplitFlapSpool>('split-flap-spool'));
 	}
 
 	private _checkAllSettled(): void {
-		if (!this._pendingSettle) return;
-		const els = this._getSpoolEls();
-		if (els.length === 0) return;
-		if (els.every((el) => el.isSettled)) {
-			this._pendingSettle = false;
-			this._dispatchBoardSettled(els);
+		if (!this._pendingSettle) {
+			return;
 		}
+
+		const spoolElements = this._getSpoolEls();
+		if (spoolElements.length === 0) {
+			this._pendingSettle = false;
+			this._dispatchBoardSettled([]);
+			return;
+		}
+
+		if (!spoolElements.every((spool) => spool.isSettled)) {
+			return;
+		}
+
+		this._pendingSettle = false;
+		this._dispatchBoardSettled(spoolElements);
 	}
 
-	private _dispatchBoardSettled(els: SplitFlapSpool[]): void {
-		let idx = 0;
-		const grid = this.spools.map((row) => row.map(() => els[idx++]?.currentValue ?? ''));
+	private _dispatchBoardSettled(spoolElements: SplitFlapSpool[]): void {
+		const grid = this._getCurrentGrid(spoolElements);
+
 		this.dispatchEvent(
-			new CustomEvent('board-settled', {
+			new CustomEvent<TBoardSettledDetail>('board-settled', {
 				detail: { grid },
 				bubbles: true,
 				composed: true
@@ -114,16 +115,28 @@ export class SplitFlapBoard extends LitElement {
 		);
 	}
 
+	private _getCurrentGrid(spoolElements: SplitFlapSpool[]): TGrid {
+		let spoolIndex = 0;
+
+		return this.spools.map((row) =>
+			row.map(() => {
+				const currentValue = spoolElements[spoolIndex]?.currentValue ?? '';
+				spoolIndex += 1;
+				return currentValue;
+			})
+		);
+	}
+
 	override render(): TemplateResult {
 		return html`
 			${this.spools.map(
-				(row, r) => html`
-					<div class="board-row" style="z-index: ${r + 1}">
+				(row, rowIndex) => html`
+					<div class="board-row" style="z-index: ${rowIndex + 1}">
 						${row.map(
-							(spool, c) => html`
+							(spool, columnIndex) => html`
 								<split-flap-spool
 									.flaps=${spool}
-									.value=${this.grid[r]?.[c] ?? ''}
+									.value=${this.grid[rowIndex]?.[columnIndex] ?? ''}
 									.speed=${this.speed}
 									.variant=${this.variant}
 									.visibleSideCount=${this.visibleSideCount}

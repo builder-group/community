@@ -2,7 +2,7 @@ import { html, LitElement, nothing, type TemplateResult } from 'lit';
 import { property, state } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { getFlapKey } from '../lib';
-import type { TFlap, TSpool } from '../types';
+import type { TFlap, TSpool, TSpoolSettledDetail } from '../types';
 import { charSpool } from './presets';
 
 /**
@@ -82,7 +82,7 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 
 	/** Returns true when the given key exists in the currently loaded flaps. */
 	public hasKey(value: string): boolean {
-		return this.flaps.some((flap) => getFlapKey(flap) === value);
+		return this._findFlapIndex(value) >= 0;
 	}
 
 	private _startStepping(): void {
@@ -91,13 +91,13 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 			return;
 		}
 
-		const targetIndex = this.flaps.findIndex((f) => getFlapKey(f) === this.value);
-		const isAnimating = this._stepping || this._stepTimer != null;
+		const targetIndex = this._findFlapIndex(this.value);
+		const isAnimating = this._isAnimating();
 
 		if (targetIndex === -1) {
 			this._targetIndex = -1;
 			if (isAnimating) {
-				this._scheduleAdvanceOrSettle(this._getRemainingAnimTime());
+				this._scheduleAdvanceOrSettle(this._getRemainingAnimationTime());
 			}
 			return;
 		}
@@ -105,7 +105,7 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 		this._targetIndex = targetIndex;
 		if (this._currentIndex === this._targetIndex) {
 			if (isAnimating) {
-				this._scheduleAdvanceOrSettle(this._getRemainingAnimTime());
+				this._scheduleAdvanceOrSettle(this._getRemainingAnimationTime());
 			} else {
 				this._targetIndex = -1;
 			}
@@ -124,7 +124,7 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 			return;
 		}
 
-		const nextIndex = (this._currentIndex + 1) % this.flaps.length;
+		const nextIndex = this._getNextIndex();
 		this._prevIndex = this._currentIndex;
 		this._currentIndex = nextIndex;
 		this._stepping = true;
@@ -138,7 +138,7 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 		}, this._animDur);
 
 		const delay =
-			this._currentIndex !== this._targetIndex ? this.speed : this._getRemainingAnimTime();
+			this._currentIndex !== this._targetIndex ? this.speed : this._getRemainingAnimationTime();
 		this._scheduleAdvanceOrSettle(delay);
 	}
 
@@ -163,7 +163,7 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 
 	private _finishSettling(): void {
 		if (this._stepping) {
-			this._scheduleAdvanceOrSettle(this._getRemainingAnimTime());
+			this._scheduleAdvanceOrSettle(this._getRemainingAnimationTime());
 			return;
 		}
 
@@ -172,7 +172,7 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 		if (settledValue == null) return;
 
 		this.dispatchEvent(
-			new CustomEvent('settled', {
+			new CustomEvent<TSpoolSettledDetail>('settled', {
 				detail: { value: settledValue },
 				bubbles: true,
 				composed: true
@@ -180,7 +180,19 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 		);
 	}
 
-	private _getRemainingAnimTime(): number {
+	private _findFlapIndex(value: string): number {
+		return this.flaps.findIndex((flap) => getFlapKey(flap) === value);
+	}
+
+	private _getNextIndex(): number {
+		return (this._currentIndex + 1) % this.flaps.length;
+	}
+
+	private _isAnimating(): boolean {
+		return this._stepping || this._stepTimer != null;
+	}
+
+	private _getRemainingAnimationTime(): number {
 		if (!this._stepping) return 0;
 		return Math.max(this._animEndsAt - Date.now(), 1);
 	}
@@ -219,10 +231,8 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 		this._stepping = false;
 		this._targetIndex = -1;
 
-		const nextCurrentIndex =
-			currentKey != null ? this.flaps.findIndex((flap) => getFlapKey(flap) === currentKey) : -1;
-		const nextPrevIndex =
-			prevKey != null ? this.flaps.findIndex((flap) => getFlapKey(flap) === prevKey) : -1;
+		const nextCurrentIndex = currentKey != null ? this._findFlapIndex(currentKey) : -1;
+		const nextPrevIndex = prevKey != null ? this._findFlapIndex(prevKey) : -1;
 
 		this._currentIndex = nextCurrentIndex >= 0 ? nextCurrentIndex : 0;
 		this._prevIndex = nextPrevIndex >= 0 ? nextPrevIndex : this._currentIndex;
