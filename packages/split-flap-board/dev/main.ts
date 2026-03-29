@@ -1,9 +1,12 @@
 import { html } from 'lit';
+import '../src/SplitFlapBoard';
 import '../src/spools/SplitFlapSpool';
+import { fromLines, spoolGrid } from '../src/lib/board';
 import { charSpool, colorSpool, numericSpool } from '../src/spools/presets';
 import type { TSpool } from '../src/types';
 
-// Exercises all four flap types in one spool for visual testing.
+// MARK: - Custom spool showcasing all four flap types
+
 const demoSpool: TSpool = [
 	{ type: 'char', value: ' ' },
 	{ type: 'char', value: 'A', color: '#fff', bg: '#3b82f6' },
@@ -17,23 +20,64 @@ const demoSpool: TSpool = [
 	{ type: 'custom', key: 'star', top: html`<span>★</span>`, bottom: html`<span>★</span>` }
 ];
 
-// MARK: - Demo spools
-const minimal = document.querySelector<any>('#minimal')!;
-const realistic = document.querySelector<any>('#realistic')!;
-const numeric = document.querySelector<any>('#numeric')!;
-const color = document.querySelector<any>('#color')!;
-const demo = document.querySelector<any>('#demo')!;
+// MARK: - Element refs
 
-numeric.flaps = numericSpool;
-color.flaps = colorSpool;
-demo.flaps = demoSpool;
+const elMinimal = document.querySelector<any>('#minimal')!;
+const elRealistic = document.querySelector<any>('#realistic')!;
+const elNumeric = document.querySelector<any>('#numeric')!;
+const elColor = document.querySelector<any>('#color')!;
+const elDemo = document.querySelector<any>('#demo')!;
+const elBoard = document.querySelector<any>('#quotes-board')!;
 
-const realisticSpools: any[] = [realistic, numeric, color, demo];
+elNumeric.flaps = numericSpool;
+elColor.flaps = colorSpool;
+elDemo.flaps = demoSpool;
 
-// MARK: - Auto-cycle
+// Shared array used by slider controls to sync CSS vars, speed, visibleSideCount.
+// The board is included so all realistic controls apply to it automatically.
+const realisticEls: any[] = [elRealistic, elNumeric, elColor, elDemo, elBoard];
+
+// MARK: - Board: quote rotator
+//
+// Spools are initialised once. Only `grid` changes on each transition so each
+// cell steps forward through its chars rather than snapping to a new position.
+
+const BOARD_COLS = 15;
+const BOARD_ROWS = 5;
+const BOARD_PAUSE_MS = 3000;
+
+const QUOTES: string[][] = [
+	['', '  GOD IS IN   ', ' THE DETAILS. ', ' - LUDWIG MIES', ''],
+	['', ' STAY HUNGRY  ', ' STAY FOOLISH ', ' - STEVE JOBS ', ''],
+	['', 'GOOD DESIGN IS', 'GOOD BUSINESS ', '- THOMAS WATSON', '']
+];
+
+// Set once — persists across quote changes so animations stay smooth.
+elBoard.spools = spoolGrid(charSpool, BOARD_COLS, BOARD_ROWS);
+
+let quoteIdx = 0;
+let boardCharSpool = charSpool; // updated when font size changes
+
+function showQuote(idx: number) {
+	const { grid } = fromLines(QUOTES[idx], BOARD_COLS);
+	elBoard.grid = grid;
+}
+
+elBoard.addEventListener('board-settled', () => {
+	setTimeout(() => {
+		quoteIdx = (quoteIdx + 1) % QUOTES.length;
+		showQuote(quoteIdx);
+	}, BOARD_PAUSE_MS);
+});
+
+showQuote(0);
+
+// MARK: - Individual spools: auto-cycle
+
 const chars = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
 const colorKeys = colorSpool.map((f) => (f as any).key as string);
 const demoKeys = demoSpool.map((f) => ((f as any).key ?? (f as any).value) as string);
+
 let charIdx = 0;
 let colorIdx = 0;
 let demoIdx = 0;
@@ -42,53 +86,55 @@ let digitIntervalId: ReturnType<typeof setInterval>;
 let colorIntervalId: ReturnType<typeof setInterval>;
 let demoIntervalId: ReturnType<typeof setInterval>;
 
-function getCycleInterval(speed: number) {
-	// Always give the flip animation time to complete before advancing.
-	return Math.max(speed + 200, 600);
-}
-
 function restartIntervals(speed: number) {
 	clearInterval(charIntervalId);
 	clearInterval(digitIntervalId);
 	clearInterval(colorIntervalId);
 	clearInterval(demoIntervalId);
 
-	const interval = getCycleInterval(speed);
+	// Give the flip animation time to finish before the next step.
+	const interval = Math.max(speed + 200, 600);
 
 	charIntervalId = setInterval(() => {
 		charIdx = (charIdx + 1) % chars.length;
-		minimal.value = chars[charIdx];
-		realistic.value = chars[charIdx];
+		elMinimal.value = chars[charIdx];
+		elRealistic.value = chars[charIdx];
 	}, interval);
 
 	let digit = 0;
 	digitIntervalId = setInterval(() => {
 		digit = (digit + 1) % 10;
-		numeric.value = String(digit);
+		elNumeric.value = String(digit);
 	}, interval);
 
 	colorIntervalId = setInterval(() => {
 		colorIdx = (colorIdx + 1) % colorKeys.length;
-		color.value = colorKeys[colorIdx];
+		elColor.value = colorKeys[colorIdx];
 	}, interval);
 
 	demoIntervalId = setInterval(() => {
 		demoIdx = (demoIdx + 1) % demoKeys.length;
-		demo.value = demoKeys[demoIdx];
+		elDemo.value = demoKeys[demoIdx];
 	}, interval);
 }
 
-restartIntervals(200); // initial speed matches slider default
+restartIntervals(200); // matches slider default
 
-// MARK: - Slider helpers
+// MARK: - Controls
+
 function setCssVar(prop: string, value: string) {
-	realisticSpools.forEach((el) => el.style.setProperty(prop, value));
+	realisticEls.forEach((el) => el.style.setProperty(prop, value));
 }
 
-function formatDeg(value: number) {
-	return `${value.toFixed(1).replace(/\.0$/, '')}\u00b0`;
+function removeCssVar(prop: string) {
+	realisticEls.forEach((el) => el.style.removeProperty(prop));
 }
 
+function formatDeg(v: number) {
+	return `${v.toFixed(1).replace(/\.0$/, '')}\u00b0`;
+}
+
+/** Wire up a range slider: calls `apply` immediately on load and on every change. */
 function slider(
 	id: string,
 	valId: string,
@@ -97,15 +143,13 @@ function slider(
 ) {
 	const input = document.getElementById(id) as HTMLInputElement;
 	const display = document.getElementById(valId)!;
-
-	function update() {
+	const update = () => {
 		const v = Number(input.value);
 		display.textContent = format(v);
 		apply(v);
-	}
-
+	};
 	input.addEventListener('input', update);
-	update(); // apply initial value on load
+	update();
 }
 
 slider(
@@ -113,8 +157,8 @@ slider(
 	'val-speed',
 	(v) => `${v}ms`,
 	(v) => {
-		realisticSpools.forEach((el) => (el.speed = v));
-		minimal.speed = v;
+		realisticEls.forEach((el) => (el.speed = v));
+		elMinimal.speed = v;
 		restartIntervals(v);
 	}
 );
@@ -133,12 +177,8 @@ slider(
 	'val-max-angle',
 	(v) => (v <= 0 ? 'off' : formatDeg(v)),
 	(v) => {
-		if (v <= 0) {
-			realisticSpools.forEach((el) => el.style.removeProperty('--sfb-max-step-angle'));
-			return;
-		}
-
-		setCssVar('--sfb-max-step-angle', `${v}deg`);
+		if (v <= 0) removeCssVar('--sfb-max-step-angle');
+		else setCssVar('--sfb-max-step-angle', `${v}deg`);
 	}
 );
 
@@ -147,7 +187,7 @@ slider(
 	'val-side-count',
 	(v) => (v < 0 ? 'auto' : String(v)),
 	(v) => {
-		realisticSpools.forEach((el) => (el.visibleSideCount = v));
+		realisticEls.forEach((el) => (el.visibleSideCount = v));
 	}
 );
 
@@ -157,14 +197,20 @@ slider(
 	(v) => `${v}rem`,
 	(v) => {
 		const fontSize = `${v}rem`;
-		const applyFontSize = (spool: TSpool): TSpool =>
+		const sized = (spool: TSpool): TSpool =>
 			spool.map((f) => (f.type === 'char' ? { ...f, fontSize } : f));
 
-		minimal.flaps = applyFontSize(charSpool);
-		realistic.flaps = applyFontSize(charSpool);
-		numeric.flaps = applyFontSize(numericSpool);
-		color.flaps = applyFontSize(colorSpool);
-		demo.flaps = applyFontSize(demoSpool);
+		elMinimal.flaps = sized(charSpool);
+		elRealistic.flaps = sized(charSpool);
+		elNumeric.flaps = sized(numericSpool);
+		elColor.flaps = sized(colorSpool);
+		elDemo.flaps = sized(demoSpool);
+
+		// Rebuild board spools with new font size, then re-apply the current grid
+		// so each cell retargets without losing its current position.
+		boardCharSpool = sized(charSpool);
+		elBoard.spools = spoolGrid(boardCharSpool, BOARD_COLS, BOARD_ROWS);
+		showQuote(quoteIdx);
 	}
 );
 
@@ -173,7 +219,7 @@ slider(
 	'val-crease',
 	(v) => `${v}px`,
 	(v) => {
-		[minimal, ...realisticSpools].forEach((el) => el.style.setProperty('--sfb-crease', `${v}px`));
+		[elMinimal, ...realisticEls].forEach((el) => el.style.setProperty('--sfb-crease', `${v}px`));
 	}
 );
 
@@ -192,11 +238,8 @@ slider(
 	(v) => (v === 24 ? 'auto' : `${v}px`),
 	(v) => {
 		const prop = '--sfb-spool-width';
-		if (v === 24) {
-			[minimal, ...realisticSpools].forEach((el) => el.style.removeProperty(prop));
-		} else {
-			[minimal, ...realisticSpools].forEach((el) => el.style.setProperty(prop, `${v}px`));
-		}
+		if (v === 24) [elMinimal, ...realisticEls].forEach((el) => el.style.removeProperty(prop));
+		else [elMinimal, ...realisticEls].forEach((el) => el.style.setProperty(prop, `${v}px`));
 	}
 );
 
@@ -206,11 +249,7 @@ slider(
 	(v) => (v === 24 ? 'auto' : `${v}px`),
 	(v) => {
 		const prop = '--sfb-spool-height';
-		if (v === 24) {
-			realisticSpools.forEach((el) => el.style.removeProperty(prop));
-		} else {
-			realisticSpools.forEach((el) => el.style.setProperty(prop, `${v}px`));
-		}
+		if (v === 24) realisticEls.forEach((el) => el.style.removeProperty(prop));
+		else realisticEls.forEach((el) => el.style.setProperty(prop, `${v}px`));
 	}
 );
-
