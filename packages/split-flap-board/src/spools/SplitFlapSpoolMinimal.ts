@@ -23,23 +23,23 @@ export class SplitFlapSpoolMinimal extends SplitFlapSpoolBase {
 			position: absolute;
 			right: 0;
 			left: 0;
-			background: var(--sfb-bg, #111);
+			background: var(--sfb-flap-bg, #111);
 			height: 50%;
 			overflow: hidden;
-			color: var(--sfb-color, #f5f0e0);
+			color: var(--sfb-flap-color, #f5f0e0);
 		}
 
 		.half.top {
 			top: 0;
 			border-bottom: 1px solid var(--sfb-fold-color, #0a0a0a);
-			border-top-right-radius: var(--sfb-spool-radius, 4px);
-			border-top-left-radius: var(--sfb-spool-radius, 4px);
+			border-top-right-radius: var(--sfb-flap-radius, 4px);
+			border-top-left-radius: var(--sfb-flap-radius, 4px);
 		}
 
 		.half.bottom {
 			bottom: 0;
-			border-bottom-right-radius: var(--sfb-spool-radius, 4px);
-			border-bottom-left-radius: var(--sfb-spool-radius, 4px);
+			border-bottom-right-radius: var(--sfb-flap-radius, 4px);
+			border-bottom-left-radius: var(--sfb-flap-radius, 4px);
 		}
 
 		.half.flipping {

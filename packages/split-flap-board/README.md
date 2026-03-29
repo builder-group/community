@@ -300,7 +300,7 @@ The variant elements can also be used directly if you prefer not to use the wrap
 | ------------------ | -------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | `spools`           | `TSpool[][]`               | —           | 2D spool configuration, one per cell. Board dimensions are inferred from this. Always assign a new array reference to update. |
 | `grid`             | `string[][]`               | `[]`        | 2D array of target keys. Always assign a new array reference to trigger a re-render.                                          |
-| `speed`            | `number`                   | `60`        | Flip speed in milliseconds forwarded to every child spool.                                                                     |
+| `speed`            | `number`                   | `60`        | Flip speed in milliseconds forwarded to every child spool.                                                                    |
 | `variant`          | `'minimal' \| 'realistic'` | `'minimal'` | Visual variant forwarded to every child spool.                                                                                |
 | `visibleSideCount` | `number`                   | `-1`        | Forwarded to child spools. Only affects the `realistic` variant.                                                              |
 
@@ -366,12 +366,19 @@ board.grid = grid;
 Set these on the board to theme all spools at once, or override on individual spools via CSS selectors.
 
 ```css
-/* Shared */
+/* Board panel */
 split-flap-board {
-	--sfb-bg: #111; /* flap background */
-	--sfb-color: #f5f0e0; /* flap text color */
-	--sfb-spool-radius: 4px; /* corner radius on each flap */
-	--sfb-gap: 2px; /* gap between spool cells */
+	--sfb-board-bg: #1c1c1c; /* panel and frame background */
+	--sfb-board-padding: 10px; /* inset spacing around the cell grid */
+	--sfb-board-radius: 8px; /* corner radius of the panel itself */
+	--sfb-gap: 3px; /* gap between spool cells */
+}
+
+/* Shared (flap) */
+split-flap-board {
+	--sfb-flap-bg: #111; /* flap background */
+	--sfb-flap-color: #f5f0e0; /* flap text color */
+	--sfb-flap-radius: 4px; /* corner radius on each flap */
 }
 
 /* Minimal variant */
@@ -395,8 +402,8 @@ split-flap-board {
 
 /* Per-spool override */
 split-flap-spool.highlight {
-	--sfb-bg: #16a34a;
-	--sfb-color: #fff;
+	--sfb-flap-bg: #16a34a;
+	--sfb-flap-color: #fff;
 }
 ```
 

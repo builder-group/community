@@ -1,24 +1,63 @@
 import { css, html, LitElement, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import type { SplitFlapSpoolBase } from './spools/SplitFlapSpoolBase';
 import './spools/SplitFlapSpool';
+import type { SplitFlapSpoolBase } from './spools/SplitFlapSpoolBase';
 import type { TSpool } from './types';
 
 @customElement('split-flap-board')
 export class SplitFlapBoard extends LitElement {
 	static readonly styles = css`
 		:host {
-			display: inline-grid;
-			gap: var(--sfb-gap, 2px);
+			display: inline-flex;
+			position: relative;
+			flex-direction: column;
 			box-sizing: border-box;
+			/* Inset shadows for side rails; render below all children so frame bars
+			 * appear at the same visual level. */
+			box-shadow:
+				inset 14px 0 18px rgba(0, 0, 0, 0.55),
+				inset -14px 0 18px rgba(0, 0, 0, 0.55);
+			border-radius: var(--sfb-board-radius, 8px);
+			background: var(--sfb-board-bg, #1c1c1c);
+			padding: var(--sfb-board-padding, 10px);
+		}
+
+		/* Absolute overlay so the outer frame ring adds no layout space. */
+		:host::after {
+			position: absolute;
+			z-index: 10000;
+			inset: 0;
+			border: 10px solid var(--sfb-board-bg, #1c1c1c);
+			border-radius: var(--sfb-board-radius, 8px);
+			pointer-events: none;
+			content: '';
+		}
+
+		/* Frame bar caps the top padding of each row. z-index increases per row in
+		 * render() so each bar sits above the drum content of the row above it. */
+		.board-row {
+			display: flex;
+			position: relative;
+			gap: var(--sfb-gap, 3px);
+			padding-block: 12px;
+		}
+
+		.board-row::before {
+			position: absolute;
+			z-index: 1;
+			inset: 0 0 auto 0;
+			box-shadow: 0 3px 10px rgba(0, 0, 0, 0.65);
+			background: var(--sfb-board-bg, #1c1c1c);
+			height: 10px;
+			content: '';
 		}
 	`;
 
-	/** 2-D grid of spool configs — defines what each position can show. Row-major order. */
+	/** 2-D grid of spool configs; defines what each position can show. Row-major order. */
 	@property({ type: Array })
 	public spools: TSpool[][] = [];
 
-	/** 2-D grid of target keys — defines what each position currently shows. Row-major order. */
+	/** 2-D grid of target keys; defines what each position currently shows. Row-major order. */
 	@property({ type: Array })
 	public grid: string[][] = [];
 
@@ -39,9 +78,6 @@ export class SplitFlapBoard extends LitElement {
 
 	override updated(changed: Map<string, unknown>): void {
 		super.updated(changed);
-
-		const cols = this.spools[0]?.length ?? 0;
-		this.style.gridTemplateColumns = cols > 0 ? `repeat(${cols}, auto)` : '';
 
 		if (changed.has('spools') || changed.has('grid')) {
 			this._pendingSettle = true;
@@ -81,19 +117,23 @@ export class SplitFlapBoard extends LitElement {
 
 	override render(): TemplateResult {
 		return html`
-			${this.spools.flatMap((row, r) =>
-				row.map(
-					(spool, c) => html`
-						<split-flap-spool
-							.flaps=${spool}
-							.value=${this.grid[r]?.[c] ?? ''}
-							.speed=${this.speed}
-							.variant=${this.variant}
-							.visibleSideCount=${this.visibleSideCount}
-							@settled=${() => this._checkAllSettled()}
-						></split-flap-spool>
-					`
-				)
+			${this.spools.map(
+				(row, r) => html`
+					<div class="board-row" style="z-index: ${r + 1}">
+						${row.map(
+							(spool, c) => html`
+								<split-flap-spool
+									.flaps=${spool}
+									.value=${this.grid[r]?.[c] ?? ''}
+									.speed=${this.speed}
+									.variant=${this.variant}
+									.visibleSideCount=${this.visibleSideCount}
+									@settled=${() => this._checkAllSettled()}
+								></split-flap-spool>
+							`
+						)}
+					</div>
+				`
 			)}
 		`;
 	}

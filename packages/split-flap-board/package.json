@@ -1,9 +1,15 @@
 {
 	"name": "split-flap-board",
-	"version": "0.0.1",
+	"version": "0.0.4",
 	"private": false,
 	"description": "Web component that simulates a split-flap display inspired by airport and train station boards",
-	"keywords": ["split-flap", "solari-board", "web-component", "lit", "display-board"],
+	"keywords": [
+		"split-flap",
+		"solari-board",
+		"web-component",
+		"lit",
+		"display-board"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"

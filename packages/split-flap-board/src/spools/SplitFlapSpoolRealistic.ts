@@ -85,6 +85,11 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 			pointer-events: none;
 		}
 
+		.character.is-background {
+			opacity: 0;
+			z-index: 0;
+		}
+
 		.flap {
 			position: relative;
 			transform-style: preserve-3d;
@@ -92,13 +97,16 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 			transition: transform var(--_flip-dur, 0ms) cubic-bezier(0.25, 0, 0.5, 1);
 			will-change: transform;
 			box-sizing: border-box;
+			box-shadow:
+				0 2px 6px rgba(0, 0, 0, 0.7),
+				inset 0 1px 0 rgba(255, 255, 255, 0.04);
 			border: 1px solid var(--sfb-flap-border, #2a2a2a);
-			border-radius: var(--sfb-spool-radius, 3px);
-			background: var(--sfb-bg, #111);
+			border-radius: var(--sfb-flap-radius, 5px);
+			background: var(--sfb-flap-bg, #111);
 			width: var(--sfb-spool-width, 1em);
 			height: calc(var(--sfb-spool-height, 2em) / 2);
 			overflow: hidden;
-			color: var(--sfb-color, #f5f0e0);
+			color: var(--sfb-flap-color, #f5f0e0);
 			line-height: 1;
 		}
 
@@ -271,14 +279,23 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 				class="slot"
 				style=${styleMap({ '--total': String(this.flaps.length) })}
 			>
-				${renderedFlaps.map(
-					({ flap, actualIndex, renderedIndex }) => html`
-						<div class="character" style="--index: ${renderedIndex}" data-index=${actualIndex}>
+				${renderedFlaps.map(({ flap, actualIndex, renderedIndex }) => {
+					const isBackgroundFlap =
+						this.flaps.length > 2 &&
+						this.flaps.length % 2 === 0 &&
+						Math.abs(renderedIndex - renderCenter) === this.flaps.length / 2;
+
+					return html`
+						<div
+							class="character ${isBackgroundFlap ? 'is-background' : ''}"
+							style="--index: ${renderedIndex}"
+							data-index=${actualIndex}
+						>
 							<div class="flap">${this._renderHalf(flap, 'top')}</div>
 							<div class="flap" aria-hidden="true">${this._renderHalf(flap, 'bottom')}</div>
 						</div>
-					`
-				)}
+					`;
+				})}
 			</div>
 		`;
 	}
