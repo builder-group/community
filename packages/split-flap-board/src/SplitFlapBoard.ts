@@ -1,7 +1,6 @@
 import { css, html, LitElement, type TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import './spools/SplitFlapSpool';
-import type { SplitFlapSpoolBase } from './spools/SplitFlapSpoolBase';
+import { SplitFlapSpool } from './spools/SplitFlapSpool';
 import type { TSpool } from './types';
 
 @customElement('split-flap-board')
@@ -87,10 +86,10 @@ export class SplitFlapBoard extends LitElement {
 		}
 	}
 
-	private _getSpoolEls(): SplitFlapSpoolBase[] {
+	private _getSpoolEls(): SplitFlapSpool[] {
 		return Array.from(
-			this.renderRoot.querySelectorAll('split-flap-spool')
-		) as unknown as SplitFlapSpoolBase[];
+			this.renderRoot.querySelectorAll<SplitFlapSpool>('split-flap-spool')
+		);
 	}
 
 	private _checkAllSettled(): void {
@@ -103,7 +102,7 @@ export class SplitFlapBoard extends LitElement {
 		}
 	}
 
-	private _dispatchBoardSettled(els: SplitFlapSpoolBase[]): void {
+	private _dispatchBoardSettled(els: SplitFlapSpool[]): void {
 		let idx = 0;
 		const grid = this.spools.map((row) => row.map(() => els[idx++]?.currentValue ?? ''));
 		this.dispatchEvent(

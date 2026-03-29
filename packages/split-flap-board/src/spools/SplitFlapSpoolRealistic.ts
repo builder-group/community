@@ -231,6 +231,7 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 		el.style.setProperty('--_flip-dur', '0ms');
 		el.style.setProperty('--current-character-index', String(prevIdx));
 
+		// Two frames: first applies the instant position reset, second starts the transition.
 		await new Promise<void>((resolve) =>
 			requestAnimationFrame(() => {
 				requestAnimationFrame(() => resolve());
@@ -280,6 +281,8 @@ export class SplitFlapSpoolRealistic extends SplitFlapSpoolBase {
 				style=${styleMap({ '--total': String(this.flaps.length) })}
 			>
 				${renderedFlaps.map(({ flap, actualIndex, renderedIndex }) => {
+					// Hide the flap at the exact back of an even-count drum; it would
+					// visually bleed through the front face at 180 degrees.
 					const isBackgroundFlap =
 						this.flaps.length > 2 &&
 						this.flaps.length % 2 === 0 &&

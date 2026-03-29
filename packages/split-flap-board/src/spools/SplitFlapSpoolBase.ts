@@ -193,6 +193,8 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 		this._stepping = false;
 	}
 
+	// Preserve the visible flap when the spool array is replaced: look up the
+	// same key in the new spool so the display doesn't jump to index 0.
 	private _syncIndicesToFlaps(previousFlaps?: TSpool): void {
 		if (!this.flaps.length) {
 			this._resetForEmptyFlaps();
@@ -238,7 +240,7 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 		this._animEndsAt = 0;
 	}
 
-	/** Renders the content of one flap half. Expects `.char-inner`, `.color-fill`, `.image-fill`, `.custom-fill` class names in the subclass stylesheet. */
+	/** Renders one flap half. Subclass stylesheets must define `.char-inner`, `.color-fill`, `.image-fill`, `.custom-fill`. */
 	protected _renderHalf(flap: TFlap, half: 'top' | 'bottom'): TemplateResult {
 		switch (flap.type) {
 			case 'char':
@@ -265,7 +267,7 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 		}
 	}
 
-	/** Returns current and previous flap for use in render. Returns null when flaps is empty. */
+	/** Returns current and previous flap for render. Null when flaps is empty. */
 	protected _getFlaps(): { current: TFlap; prev: TFlap } | null {
 		const current = this.currentFlap;
 		if (current == null) return null;

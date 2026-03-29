@@ -39,16 +39,14 @@ export function fromLines(
 	const grid: string[][] = [];
 
 	for (const line of lines) {
-		const isObj = typeof line === 'object';
-		const text = isObj ? line.text : line;
-		const bg = isObj ? line.bg : undefined;
-		const color = isObj ? line.color : undefined;
+		const normalized = typeof line === 'string' ? { text: line } : line;
+		const { text, bg, color } = normalized;
 
 		const padded = text.toUpperCase().padEnd(cols, ' ').slice(0, cols);
 		const chars = padded.split('');
 
 		if (bg != null || color != null) {
-			// Bake the per-line colours into each cell's spool so all flaps share the same bg/color.
+			// Bake per-line colors into each cell's spool so all flaps share the same bg/color.
 			const rowSpools: TSpool[] = chars.map(() =>
 				charSpool.map((flap): TFlapChar => {
 					if (flap.type !== 'char') return flap as unknown as TFlapChar;
