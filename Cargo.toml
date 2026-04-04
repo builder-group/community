@@ -1,0 +1,10 @@
+[workspace]
+resolver = "2"
+members = ["crates/*"]
+exclude = ["crates/_deprecated"]
+
+[workspace.package]
+authors = ["@bennobuilder"]
+license = "MIT"
+edition = "2021"
+repository = "https://github.com/builder-group/community"
