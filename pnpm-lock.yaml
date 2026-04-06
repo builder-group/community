@@ -126,9 +126,6 @@ importers:
       tailwindcss:
         specifier: ^4.2.1
         version: 4.2.2
-      vite-tsconfig-paths:
-        specifier: ^6.1.1
-        version: 6.1.1(typescript@5.9.3)(vite@8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0))
 
   examples/ecsify/vanilla/basic:
     dependencies:
@@ -394,10 +391,10 @@ importers:
         version: 16.2.2
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.55.0
-        version: 8.58.0(@typescript-eslint/parser@8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
+        version: 8.58.0(@typescript-eslint/parser@8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2))(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2)
       '@typescript-eslint/parser':
         specifier: ^8.55.0
-        version: 8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
+        version: 8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2)
       eslint-config-prettier:
         specifier: ^10.1.8
         version: 10.1.8(eslint@9.39.4(jiti@2.6.1))
@@ -424,10 +421,10 @@ importers:
         version: 0.7.2(@ianvs/prettier-plugin-sort-imports@4.7.1(prettier@3.8.1))(prettier-plugin-css-order@2.2.0(prettier@3.8.1))(prettier@3.8.1)
       typescript-eslint:
         specifier: ^8.55.0
-        version: 8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
+        version: 8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2)
       vite-tsconfig-paths:
         specifier: ^6.1.0
-        version: 6.1.1(typescript@5.9.3)(vite@8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0))
+        version: 6.1.1(typescript@6.0.2)(vite@8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0))
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.2
@@ -439,11 +436,11 @@ importers:
         specifier: ^3.8.1
         version: 3.8.1
       typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
+        specifier: ^6.0.2
+        version: 6.0.2
       vitest:
         specifier: ^4.0.18
-        version: 4.1.2(@types/node@25.5.2)(msw@2.12.14(@types/node@25.5.2)(typescript@5.9.3))(vite@8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0))
+        version: 4.1.2(@types/node@25.5.2)(msw@2.12.14(@types/node@25.5.2)(typescript@6.0.2))(vite@8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0))
 
   packages/ecsify:
     dependencies:
@@ -457,9 +454,6 @@ importers:
       '@lastolivegames/becsy':
         specifier: ^0.15.5
         version: 0.15.5
-      '@types/node':
-        specifier: ^25.2.3
-        version: 25.5.2
       bitecs:
         specifier: github:NateTheGreatt/bitECS#rc-0-4-0
         version: https://codeload.github.com/NateTheGreatt/bitECS/tar.gz/07a68404718028e920ecacf822835b29be126220
@@ -482,9 +476,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@types/node':
-        specifier: ^25.2.3
-        version: 25.5.2
       dotenv:
         specifier: ^17.2.4
         version: 17.4.1
@@ -513,9 +504,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@types/node':
-        specifier: ^25.2.3
-        version: 25.5.2
       '@types/url-parse':
         specifier: ^1.4.11
         version: 1.4.11
@@ -544,9 +532,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@types/node':
-        specifier: ^25.2.3
-        version: 25.5.2
       rollup-presets:
         specifier: workspace:*
         version: link:../rollup-presets
@@ -563,9 +548,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@types/node':
-        specifier: ^25.2.3
-        version: 25.5.2
       rollup-presets:
         specifier: workspace:*
         version: link:../rollup-presets
@@ -582,9 +564,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@types/node':
-        specifier: ^25.2.3
-        version: 25.5.2
       '@types/react':
         specifier: ^19.2.13
         version: 19.2.14
@@ -613,9 +592,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@types/node':
-        specifier: ^25.2.3
-        version: 25.5.2
       rollup-presets:
         specifier: workspace:*
         version: link:../rollup-presets
@@ -713,9 +689,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@types/node':
-        specifier: ^25.2.3
-        version: 25.5.2
       rollup-presets:
         specifier: workspace:*
         version: link:../rollup-presets
@@ -725,9 +698,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@types/node':
-        specifier: ^25.2.3
-        version: 25.5.2
       rollup-presets:
         specifier: workspace:*
         version: link:../rollup-presets
@@ -746,9 +716,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@types/node':
-        specifier: ^25.2.3
-        version: 25.5.2
       rollup-presets:
         specifier: workspace:*
         version: link:../rollup-presets
@@ -781,9 +748,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@types/node':
-        specifier: ^25.2.3
-        version: 25.5.2
       rollup-presets:
         specifier: workspace:*
         version: link:../rollup-presets
@@ -800,9 +764,6 @@ importers:
       '@standard-schema/spec':
         specifier: ^1.1.0
         version: 1.1.0
-      '@types/node':
-        specifier: ^25.2.3
-        version: 25.5.2
       rollup-presets:
         specifier: workspace:*
         version: link:../rollup-presets
@@ -825,9 +786,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@types/node':
-        specifier: ^25.2.3
-        version: 25.5.2
       rollup-presets:
         specifier: workspace:*
         version: link:../rollup-presets
@@ -837,9 +795,6 @@ importers:
       '@blgc/config':
         specifier: workspace:*
         version: link:../config
-      '@types/node':
-        specifier: ^25.2.3
-        version: 25.5.2
       '@types/sax':
         specifier: ^1.2.7
         version: 1.2.7
@@ -7494,15 +7449,6 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.2(msw@2.12.14(@types/node@25.5.2)(typescript@5.9.3))(vite@8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0))':
-    dependencies:
-      '@vitest/spy': 4.1.2
-      estree-walker: 3.0.3
-      magic-string: 0.30.21
-    optionalDependencies:
-      msw: 2.12.14(@types/node@25.5.2)(typescript@5.9.3)
-      vite: 8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)
-
   '@vitest/mocker@4.1.2(msw@2.12.14(@types/node@25.5.2)(typescript@6.0.2))(vite@8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0))':
     dependencies:
       '@vitest/spy': 4.1.2
@@ -9469,32 +9415,6 @@ snapshots:
 
   ms@2.1.3: {}
 
-  msw@2.12.14(@types/node@25.5.2)(typescript@5.9.3):
-    dependencies:
-      '@inquirer/confirm': 5.1.21(@types/node@25.5.2)
-      '@mswjs/interceptors': 0.41.3
-      '@open-draft/deferred-promise': 2.2.0
-      '@types/statuses': 2.0.6
-      cookie: 1.1.1
-      graphql: 16.13.2
-      headers-polyfill: 4.0.3
-      is-node-process: 1.2.0
-      outvariant: 1.4.3
-      path-to-regexp: 6.3.0
-      picocolors: 1.1.1
-      rettime: 0.10.1
-      statuses: 2.0.2
-      strict-event-emitter: 0.5.1
-      tough-cookie: 6.0.1
-      type-fest: 5.5.0
-      until-async: 3.0.2
-      yargs: 17.7.2
-    optionalDependencies:
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - '@types/node'
-    optional: true
-
   msw@2.12.14(@types/node@25.5.2)(typescript@6.0.2):
     dependencies:
       '@inquirer/confirm': 5.1.21(@types/node@25.5.2)
@@ -10656,10 +10576,6 @@ snapshots:
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
 
-  tsconfck@3.1.6(typescript@5.9.3):
-    optionalDependencies:
-      typescript: 5.9.3
-
   tsconfck@3.1.6(typescript@6.0.2):
     optionalDependencies:
       typescript: 6.0.2
@@ -10742,17 +10658,6 @@ snapshots:
       is-typed-array: 1.1.15
       possible-typed-array-names: 1.1.0
       reflect.getprototypeof: 1.0.10
-
-  typescript-eslint@8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3):
-    dependencies:
-      '@typescript-eslint/eslint-plugin': 8.58.0(@typescript-eslint/parser@8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
-      '@typescript-eslint/parser': 8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
-      '@typescript-eslint/typescript-estree': 8.58.0(typescript@5.9.3)
-      '@typescript-eslint/utils': 8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
-      eslint: 9.39.4(jiti@2.6.1)
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - supports-color
 
   typescript-eslint@8.58.0(eslint@9.39.4(jiti@2.6.1))(typescript@6.0.2):
     dependencies:
@@ -10890,16 +10795,6 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
-  vite-tsconfig-paths@6.1.1(typescript@5.9.3)(vite@8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)):
-    dependencies:
-      debug: 4.4.3(supports-color@5.5.0)
-      globrex: 0.1.2
-      tsconfck: 3.1.6(typescript@5.9.3)
-      vite: 8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)
-    transitivePeerDependencies:
-      - supports-color
-      - typescript
-
   vite-tsconfig-paths@6.1.1(typescript@6.0.2)(vite@8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)):
     dependencies:
       debug: 4.4.3(supports-color@5.5.0)
@@ -10945,33 +10840,6 @@ snapshots:
   vitefu@1.1.3(vite@8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)):
     optionalDependencies:
       vite: 8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)
-
-  vitest@4.1.2(@types/node@25.5.2)(msw@2.12.14(@types/node@25.5.2)(typescript@5.9.3))(vite@8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)):
-    dependencies:
-      '@vitest/expect': 4.1.2
-      '@vitest/mocker': 4.1.2(msw@2.12.14(@types/node@25.5.2)(typescript@5.9.3))(vite@8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0))
-      '@vitest/pretty-format': 4.1.2
-      '@vitest/runner': 4.1.2
-      '@vitest/snapshot': 4.1.2
-      '@vitest/spy': 4.1.2
-      '@vitest/utils': 4.1.2
-      es-module-lexer: 2.0.0
-      expect-type: 1.3.0
-      magic-string: 0.30.21
-      obug: 2.1.1
-      pathe: 2.0.3
-      picomatch: 4.0.4
-      std-env: 4.0.0
-      tinybench: 2.9.0
-      tinyexec: 1.0.4
-      tinyglobby: 0.2.15
-      tinyrainbow: 3.1.0
-      vite: 8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)
-      why-is-node-running: 2.3.0
-    optionalDependencies:
-      '@types/node': 25.5.2
-    transitivePeerDependencies:
-      - msw
 
   vitest@4.1.2(@types/node@25.5.2)(msw@2.12.14(@types/node@25.5.2)(typescript@6.0.2))(vite@8.0.4(@emnapi/core@1.9.2)(@emnapi/runtime@1.9.2)(@types/node@25.5.2)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)):
     dependencies:
