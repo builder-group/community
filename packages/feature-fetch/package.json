@@ -43,7 +43,7 @@
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@types/url-parse": "^1.4.11",
-		"msw": "^2.12.10",
+		"msw": "^2.12.14",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [

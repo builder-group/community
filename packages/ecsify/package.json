@@ -41,7 +41,7 @@
 		"@blgc/config": "workspace:*",
 		"@lastolivegames/becsy": "^0.15.5",
 		"bitecs": "github:NateTheGreatt/bitECS#rc-0-4-0",
-		"elics": "^3.3.0",
+		"elics": "^3.4.2",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [
