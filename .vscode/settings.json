@@ -42,6 +42,11 @@
 		}
 	],
 
+	// TypeScript settings
+	// https://stackoverflow.com/questions/74642723/how-do-i-force-visual-studio-code-to-always-use-my-workspaces-version-of-typesc
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"typescript.enablePromptUseWorkspaceTsdk": true,
+
 	// Tailwind CSS settings
 	"tailwindCSS.experimental.classRegex": [
 		["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],

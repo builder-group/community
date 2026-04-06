@@ -38,7 +38,11 @@ export async function mapResponseToRequestError(
 // Helper function to extract error description from various possible fields
 function getErrorDescription(data: unknown): string | null {
 	if (isObject(data)) {
-		return data['message'] || data['detail'] || data['title'] || data['error']?.toString() || null;
+		const message = getObjectString(data['message']);
+		const detail = getObjectString(data['detail']);
+		const title = getObjectString(data['title']);
+		const error = getObjectString(data['error']);
+		return message ?? detail ?? title ?? error ?? null;
 	}
 	return null;
 }
@@ -46,7 +50,24 @@ function getErrorDescription(data: unknown): string | null {
 // Helper function to extract error code from various possible fields
 function getErrorCode(data: unknown): TErrorCode | null {
 	if (isObject(data)) {
-		return data['error_code'] || data['code'] || getErrorCode(data['error']) || null;
+		const errorCode = getErrorCodeValue(data['error_code']);
+		const code = getErrorCodeValue(data['code']);
+		const nestedError = getErrorCode(data['error']);
+		return errorCode ?? code ?? nestedError ?? null;
 	}
 	return null;
+}
+
+function getObjectString(value: unknown): string | null {
+	if (typeof value === 'string') {
+		return value;
+	}
+	if (value != null && typeof value !== 'object') {
+		return String(value);
+	}
+	return null;
+}
+
+function getErrorCodeValue(value: unknown): TErrorCode | null {
+	return typeof value === 'string' ? (value as TErrorCode) : null;
 }

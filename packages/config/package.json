@@ -20,6 +20,7 @@
 		"./prettier": "./prettier/index.js",
 		"./typescript/base": "./typescript/tsconfig.base.json",
 		"./typescript/library": "./typescript/tsconfig.library.json",
+		"./typescript/library-dom": "./typescript/tsconfig.library-dom.json",
 		"./typescript/next": "./typescript/tsconfig.next.json",
 		"./typescript/node20": "./typescript/tsconfig.node20.json",
 		"./typescript/react-internal": "./typescript/tsconfig.react-internal.json"
@@ -57,7 +58,7 @@
 		"@eslint/js": "^9.39.2",
 		"eslint": "^9.39.2",
 		"prettier": "^3.8.1",
-		"typescript": "^5.9.3",
+		"typescript": "^6.0.2",
 		"vitest": "^4.0.18"
 	}
 }

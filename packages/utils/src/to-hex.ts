@@ -12,10 +12,10 @@ for (let n = 0; n < 0x100; n++) {
  *
  * https://www.xaymar.com/articles/2020/12/08/fastest-uint8array-to-hex-string-conversion-in-javascript/
  *
- * @param buffer - A buffer of byte values, typically a Uint8Array or Buffer
+ * @param buffer - A buffer of byte values, typically a Uint8Array
  * @returns The hexadecimal string representation of the buffer
  */
-export function toHex(buffer: Uint8Array | Buffer): string {
+export function toHex(buffer: Uint8Array): string {
 	if (buffer.length === 0) {
 		return '';
 	}
@@ -23,7 +23,6 @@ export function toHex(buffer: Uint8Array | Buffer): string {
 	let out = '';
 	for (let idx = 0, len = buffer.length; idx < len; idx++) {
 		// @ts-expect-error - buffer can't be undefined because we check length in for loop
-
 		out += LUT_HEX_8b[buffer[idx]];
 	}
 

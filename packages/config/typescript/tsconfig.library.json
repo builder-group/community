@@ -9,7 +9,7 @@
 
 		// Modules
 		"module": "commonjs",
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 
 		// Javascript Support
 		"allowJs": true
