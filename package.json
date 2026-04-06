@@ -15,13 +15,13 @@
 	"author": "@bennobuilder",
 	"scripts": {
 		"build": "turbo run build",
-		"build:prod": "turbo run build:prod",
+		"build:packages": "turbo run build:prod --filter='./packages/*'",
 		"clean": "turbo run clean && shx rm -rf .turbo && shx rm -rf node_modules",
 		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
 		"install:clean": "pnpm clean && pnpm install && pnpm build",
 		"lint": "turbo run lint",
 		"packages:change": "changeset",
-		"packages:publish": "pnpm build:prod && changeset publish",
+		"packages:publish": "pnpm build:packages && changeset publish",
 		"packages:version": "changeset version",
 		"test": "turbo run test",
 		"update:latest": "turbo run update:latest --force && pnpm update --latest '!eslint' '!@eslint/js' && pnpm build"

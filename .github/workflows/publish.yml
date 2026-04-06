@@ -29,7 +29,7 @@ jobs:
         with:
           token: ${{ env.GITHUB_TOKEN }}
           fetch-depth: 0
-          ref: 'main'
+          ref: "main"
 
       # Setup node
       # https://github.com/actions/setup-node
@@ -70,10 +70,10 @@ jobs:
 
       # Build
 
-      - name: 🏗️ Build
-        id: build-monorepo
+      - name: 🏗️ Build Packages
+        id: build-packages
         shell: bash
-        run: pnpm build:prod
+        run: pnpm build:packages
 
       # Publish
       # https://github.com/changesets/action?tab=readme-ov-file#with-publishing
@@ -90,11 +90,11 @@ jobs:
         id: changesets
         uses: changesets/action@v1.4.7
         with:
-          title: '[ci] version packages 🦋'
+          title: "[ci] version packages 🦋"
           publish: pnpm packages:publish
           version: pnpm packages:version
-          commit: '[ci] version packages 🦋 [skip ci]'
-          branch: 'main'
+          commit: "[ci] version packages 🦋 [skip ci]"
+          branch: "main"
         env:
           GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ env.NPM_TOKEN }}
@@ -106,7 +106,7 @@ jobs:
         uses: tsickert/discord-webhook@v6.0.0
         with:
           webhook-url: ${{ env.DISCORD_WEBHOOK_URL }}
-          content: 'New versions of @blgc were published!'
+          content: "New versions of @blgc were published!"
 
       - name: 🔄 Merge main into develop
         if: steps.changesets.outputs.published == 'true'
