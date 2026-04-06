@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/*"]
+members = ["crates/*", "templates/*/src-tauri"]
 exclude = ["crates/_deprecated"]
 
 [workspace.package]
