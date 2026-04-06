@@ -1,26 +1,50 @@
 {
-  "name": "desktop-tauri",
-  "private": true,
-  "version": "0.1.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "tauri": "tauri"
-  },
-  "dependencies": {
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "@tauri-apps/api": "^2",
-    "@tauri-apps/plugin-opener": "^2"
-  },
-  "devDependencies": {
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^4.6.0",
-    "typescript": "~5.8.3",
-    "vite": "^7.0.4",
-    "@tauri-apps/cli": "^2"
-  }
+	"name": "@template/desktop-tauri",
+	"version": "0.0.1",
+	"private": true,
+	"description": "",
+	"keywords": [],
+	"bugs": {
+		"url": "https://github.com/builder-group/community/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/builder-group/community.git"
+	},
+	"license": "MIT",
+	"author": "@bennobuilder",
+	"type": "module",
+	"scripts": {
+		"build": "tauri build",
+		"build:prod": "tauri build --config src-tauri/tauri.prod.conf.json",
+		"clean": "shx rm -rf target && shx rm -rf dist && shx rm -rf .tanstack && shx rm -rf .turbo && shx rm -rf node_modules",
+		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
+		"install:clean": "pnpm run clean && pnpm install",
+		"lint": "eslint . --fix",
+		"start:dev": "tauri dev",
+		"test": "echo \"🧪 No tests defined yet.\"",
+		"typecheck": "tsc --noEmit",
+		"ui:build": "pnpm typecheck && vite build",
+		"ui:start:dev": "vite dev",
+		"update:latest": "pnpm update --latest"
+	},
+	"dependencies": {
+		"@tanstack/react-router": "^1.168.10",
+		"@tanstack/react-router-devtools": "^1.166.11",
+		"@tauri-apps/api": "^2.10.1",
+		"@tauri-apps/plugin-opener": "^2.5.3",
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4"
+	},
+	"devDependencies": {
+		"@blgc/config": "^0.0.40",
+		"@tailwindcss/vite": "^4.2.2",
+		"@tanstack/router-plugin": "^1.167.12",
+		"@tauri-apps/cli": "^2.10.1",
+		"@types/node": "^25.5.2",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^6.0.1",
+		"tailwindcss": "^4.2.2"
+	}
 }
