@@ -4,11 +4,11 @@
 	"tasks": {
 		"build": {
 			"dependsOn": ["^build"],
-			"outputs": [".next/**", "!.next/cache/**", "dist/**"]
+			"outputs": [".next/**", "!.next/cache/**", ".output/**", "dist/**"]
 		},
 		"build:prod": {
 			"dependsOn": ["^build:prod"],
-			"outputs": [".next/**", "!.next/cache/**", "dist/**"]
+			"outputs": [".next/**", "!.next/cache/**", ".output/**", "dist/**"]
 		},
 		"lint": {
 			"dependsOn": ["^lint"]
