@@ -18,7 +18,7 @@
 		"build": "tauri build",
 		"build:prod": "tauri build --config src-tauri/tauri.prod.conf.json",
 		"clean": "shx rm -rf target && shx rm -rf dist && shx rm -rf .tanstack && shx rm -rf .turbo && shx rm -rf node_modules",
-		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
+		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx,css}\"",
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint . --fix",
 		"start:dev": "tauri dev",

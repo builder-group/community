@@ -1,7 +1,9 @@
 const js = require('@eslint/js');
 const eslintConfigPrettier = require('eslint-config-prettier');
+const globals = require('globals');
 const onlyWarn = require('eslint-plugin-only-warn');
 const turboPlugin = require('eslint-plugin-turbo');
+const { globalIgnores } = require('eslint/config');
 const tseslint = require('typescript-eslint');
 
 /**
@@ -28,8 +30,18 @@ module.exports = [
 			onlyWarn
 		}
 	},
+	// Tooling config files run in Node and may intentionally use CommonJS
 	{
-		// files: ['src/**/*.ts', 'src/**/*.tsx', 'src/**/*.js', 'src/**/*.jsx'],
-		ignores: ['dist/', 'node_modules/', '.turbo/', 'eslint.config.js']
-	}
+		files: ['*.config.js', '*.config.cjs'],
+		languageOptions: {
+			globals: globals.node
+		},
+		rules: {
+			'@typescript-eslint/no-require-imports': 'off'
+		}
+	},
+	globalIgnores(
+		['**/dist/', '**/gen/', 'node_modules/', '.turbo/', 'eslint.config.*', '**/*.gen.ts'],
+		'Ignore generated files'
+	)
 ];

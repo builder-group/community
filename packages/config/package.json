@@ -49,6 +49,7 @@
 		"eslint-plugin-react": "^7.37.5",
 		"eslint-plugin-react-hooks": "^7.0.1",
 		"eslint-plugin-turbo": "^2.9.4",
+		"globals": "^17.4.0",
 		"prettier-plugin-css-order": "^2.2.0",
 		"prettier-plugin-packagejson": "^3.0.2",
 		"prettier-plugin-tailwindcss": "^0.7.2",

@@ -1,5 +1,7 @@
+import tanstack from '@blgc/config/eslint/tanstack';
+
 /**
  * @see https://eslint.org/docs/latest/use/configure/configuration-files
  * @type {import("eslint").Linter.Config}
  */
-module.exports = [...require('@blgc/config/eslint/react-internal')];
+export default [...tanstack];

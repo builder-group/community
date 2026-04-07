@@ -27,7 +27,7 @@ impl AppWindow {
 
     pub fn size(&self) -> (f64, f64) {
         return match self {
-            Self::Main => (800.0, 600.0),
+            Self::Main => (1200.0, 1000.0),
         };
     }
 

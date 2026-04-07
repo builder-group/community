@@ -6,7 +6,6 @@ import { CanvasBackground, CanvasFrame } from '@/components';
 import styles from '../styles.css?url';
 
 export const Route = createRootRoute({
-	notFoundComponent: NotFoundPage,
 	head: () => ({
 		meta: [
 			{ charSet: 'utf-8' },
@@ -69,10 +68,11 @@ export const Route = createRootRoute({
 			}
 		]
 	}),
-	shellComponent: RootDocument
+	shellComponent: ShellComponent,
+	notFoundComponent: NotFoundComponent
 });
 
-function RootDocument(props: { children: React.ReactNode }) {
+function ShellComponent(props: { children: React.ReactNode }) {
 	const { children } = props;
 
 	return (
@@ -90,7 +90,7 @@ function RootDocument(props: { children: React.ReactNode }) {
 	);
 }
 
-function NotFoundPage() {
+function NotFoundComponent() {
 	return (
 		<CanvasBackground className="flex min-h-screen items-center justify-center">
 			<CanvasFrame label="404">
