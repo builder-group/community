@@ -23,7 +23,8 @@
 		"./typescript/library-dom": "./typescript/tsconfig.library-dom.json",
 		"./typescript/next": "./typescript/tsconfig.next.json",
 		"./typescript/node20": "./typescript/tsconfig.node20.json",
-		"./typescript/react-internal": "./typescript/tsconfig.react-internal.json"
+		"./typescript/react-internal": "./typescript/tsconfig.react-internal.json",
+		"./typescript/tanstack": "./typescript/tsconfig.tanstack.json"
 	},
 	"files": [
 		"eslint",

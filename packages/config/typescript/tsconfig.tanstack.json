@@ -1,0 +1,13 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"display": "Typescript configuration for applications that use TanStack",
+	"extends": "./tsconfig.react-internal.json",
+	"compilerOptions": {
+		// Language and Environment
+		"target": "ES2022",
+		"lib": ["ES2022", "dom", "dom.iterable"],
+
+		// Emit
+		"noEmit": true
+	}
+}

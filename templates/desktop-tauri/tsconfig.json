@@ -1,13 +1,10 @@
 {
-	"extends": "@blgc/config/typescript/react-internal",
+	"extends": "@blgc/config/typescript/tanstack",
 	"compilerOptions": {
-		"target": "ES2022",
-		"lib": ["ES2022", "dom", "dom.iterable"],
 		"paths": {
 			"@/*": ["./src/*"]
 		}
 	},
 	"include": ["**/*.ts", "**/*.tsx"],
-	"exclude": ["node_modules"],
-	"noEmit": true
+	"exclude": ["node_modules"]
 }
