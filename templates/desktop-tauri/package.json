@@ -33,8 +33,10 @@
 		"@tanstack/react-router-devtools": "^1.166.11",
 		"@tauri-apps/api": "^2.10.1",
 		"@tauri-apps/plugin-opener": "^2.5.3",
+		"clsx": "^2.1.1",
 		"react": "^19.2.4",
-		"react-dom": "^19.2.4"
+		"react-dom": "^19.2.4",
+		"tailwind-merge": "^3.5.0"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",

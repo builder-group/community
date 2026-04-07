@@ -6,6 +6,7 @@ Write Rust that is explicit, predictable, and easy to maintain in Tauri and libr
 
 - Keep modules focused and use `snake_case` for files and module names
 - Prefer clear types and small functions over clever control flow
+- Prefer explicit `return` statements because they make the returned value easier to spot
 - Use doc comments on public APIs when they add behavior, constraints, or edge cases
 - Use `// MARK: -` only for major file-level sections in larger files
 - Return early for invalid states and error cases

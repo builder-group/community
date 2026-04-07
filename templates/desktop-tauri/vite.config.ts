@@ -3,6 +3,7 @@ import tanstackRouter from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
+// eslint-disable-next-line turbo/no-undeclared-env-vars
 const host = process.env['TAURI_DEV_HOST'];
 
 // https://vite.dev/config/
