@@ -9,7 +9,7 @@
 		"target": "es2022",
 
 		// Modules
-		"module": "node16",
+		"module": "nodenext",
 		"moduleResolution": "node16",
 
 		// Javascript Support

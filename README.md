@@ -73,6 +73,13 @@ A collection of open source libraries maintained by [builder.group](https://buil
 
 - [`xml-tokenizer/vanilla/playground`](https://github.com/builder-group/community/tree/develop/examples/xml-tokenizer/vanilla/playground)
 
+## 🧩 Templates
+
+| Template                                                                                         | Description                                         |
+| ------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| [desktop-tauri](https://github.com/builder-group/community/tree/develop/templates/desktop-tauri) | Tauri desktop app template with React and Specta    |
+| [web-tanstack](https://github.com/builder-group/community/tree/develop/templates/web-tanstack)   | TanStack Start web app template with React and Vite |
+
 ## ❓ FAQ
 
 ### What does `blgc` stand for?
