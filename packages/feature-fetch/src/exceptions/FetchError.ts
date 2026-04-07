@@ -9,7 +9,11 @@ export class FetchError extends Error {
 		this.throwable = throwable;
 
 		// https://stackoverflow.com/questions/59625425/understanding-error-capturestacktrace-and-stack-trace-persistance
-		Error.captureStackTrace(this);
+		(
+			Error as ErrorConstructor & {
+				captureStackTrace?: (targetObject: object, constructorOpt?: Function) => void;
+			}
+		).captureStackTrace?.(this, FetchError);
 	}
 }
 

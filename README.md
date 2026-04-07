@@ -85,7 +85,7 @@ Maintaining all libraries in a single repository keeps things simple and efficie
 
 The only disadvantage is that it's harder to discover individual libraries via SEO since they're all part of one repo. However, the benefits far outweigh this limitation.
 
-### Why two build modes (`build` vs `build:prod`)?
+### Why two package build modes (`build` vs `build:prod`)?
 
 Development builds (`pnpm build`):
 
@@ -97,7 +97,7 @@ Production builds (`pnpm build:prod`):
 - Smaller package size
 - No development artifacts in published packages
 - Code minification and optimizations enabled
-- Prevents npm errors with declaration maps (e.g., EINVALIDTAGNAME in GitHub CLI)
+- Prevents npm errors with declaration maps (e.g. `EINVALIDTAGNAME` in GitHub CLI)
 
 To switch between modes:
 

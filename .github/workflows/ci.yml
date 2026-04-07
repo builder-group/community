@@ -70,7 +70,9 @@ jobs:
         id: lint
         run: pnpm lint
 
+      # Exclude templates here because they are starter projects, not shipped artifacts
+      # and some of them require native toolchains that we validate separately
       - name: 🏗️ Build
         id: build-monorepo
         shell: bash
-        run: pnpm build
+        run: pnpm exec turbo run build --filter='!@template/*'

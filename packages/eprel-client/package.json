@@ -41,9 +41,8 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^25.2.3",
-		"dotenv": "^17.2.4",
-		"openapi-typescript": "^7.12.0",
+		"dotenv": "^17.4.1",
+		"openapi-typescript": "^7.13.0",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [

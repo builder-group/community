@@ -5,19 +5,31 @@
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit"
 	},
+	"editor.wordWrap": "on",
 
 	// Search settings
 	"search.exclude": {
 		"**/node_modules": true,
 		"**/dist": true,
-		"**/.next": true
+		"**/target": true,
+		"**/.turbo": true,
+		"**/.output": true,
+		"**/.tanstack": true,
+		"**/_deprecated": true,
+		"**/*.gen.ts": true
 	},
 
-	// File associations
+	// File settings
 	"files.associations": {
 		"*.scss": "postcss",
 		"*.ts": "typescript",
-		"*.tsconfig.json": "jsonc" // Allows comments in tsconfig.json
+		"*.tsconfig.json": "jsonc"
+	},
+	"files.watcherExclude": {
+		"**/*.gen.ts": true
+	},
+	"files.readonlyInclude": {
+		"**/*.gen.ts": true
 	},
 
 	// File nesting in explorer
@@ -27,12 +39,21 @@
 		"*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts, ${capture}.test.js, ${capture}.md",
 		"*.jsx": "${capture}.js, ${capture}.md",
 		"*.tsx": "${capture}.ts, ${capture}.stories.tsx, ${capture}.md",
-		".npmrc": ".nvmrc, .yarnrc.yml",
+		".npmrc": ".nvmrc",
 		".gitignore": ".eslintignore, .prettierignore, .dockerignore",
-		"README.md": "CONTRIBUTING.md, CODE_OF_CONDUCT.md",
-		".eslintrc.js": ".eslintcache",
-		"package.json": "package-lock.json, yarn.lock, pnpm-lock.yaml, pnpm-workspace.yaml, .pnp.cjs, .pnp.loader.mjs",
+		"README.md": "CONTRIBUTING.md, CODE_OF_CONDUCT.md, LICENSE",
+		"package.json": "package-lock.json, pnpm-lock.yaml, pnpm-workspace.yaml",
 		"tsconfig.json": "tsconfig.*.json"
+	},
+
+	// TypeScript settings
+	// https://stackoverflow.com/questions/74642723/how-do-i-force-visual-studio-code-to-always-use-my-workspaces-version-of-typesc
+	"typescript.tsdk": "./node_modules/typescript/lib",
+	"typescript.enablePromptUseWorkspaceTsdk": true,
+
+	// Rust settings
+	"[rust]": {
+		"editor.defaultFormatter": "rust-lang.rust-analyzer"
 	},
 
 	// ESLint settings
@@ -44,7 +65,7 @@
 
 	// Tailwind CSS settings
 	"tailwindCSS.experimental.classRegex": [
-		["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
-		["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+		["(?<=cva\\([\\s\\S]*?)[\"']([^\"']+)[\"']"],
+		["(?:cn|cx)\\(([^)]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"]
 	]
 }

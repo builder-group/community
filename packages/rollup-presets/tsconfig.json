@@ -2,7 +2,8 @@
 	"extends": "@blgc/config/typescript/library",
 	"compilerOptions": {
 		"outDir": "./dist",
-		"rootDir": "./src"
+		"rootDir": "./src",
+		"types": ["node"]
 	},
 	"include": ["src"],
 	"exclude": ["**/__tests__/*", "**/*.test.ts"]

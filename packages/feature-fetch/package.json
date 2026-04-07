@@ -42,9 +42,8 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^25.2.3",
 		"@types/url-parse": "^1.4.11",
-		"msw": "^2.12.10",
+		"msw": "^2.12.14",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [

@@ -1,0 +1,52 @@
+{
+	"name": "@template/desktop-tauri",
+	"version": "0.0.1",
+	"private": true,
+	"description": "",
+	"keywords": [],
+	"bugs": {
+		"url": "https://github.com/builder-group/community/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/builder-group/community.git"
+	},
+	"license": "MIT",
+	"author": "@bennobuilder",
+	"type": "module",
+	"scripts": {
+		"build": "tauri build",
+		"build:prod": "tauri build --config src-tauri/tauri.prod.conf.json",
+		"clean": "shx rm -rf target && shx rm -rf dist && shx rm -rf .tanstack && shx rm -rf .turbo && shx rm -rf node_modules",
+		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx,css}\"",
+		"install:clean": "pnpm run clean && pnpm install",
+		"lint": "eslint . --fix",
+		"start:dev": "tauri dev",
+		"test": "echo \"🧪 No tests defined yet.\"",
+		"typecheck": "tsc --noEmit",
+		"ui:build": "pnpm typecheck && vite build",
+		"ui:start:dev": "vite dev",
+		"update:latest": "pnpm update --latest"
+	},
+	"dependencies": {
+		"@tanstack/react-router": "^1.168.10",
+		"@tanstack/react-router-devtools": "^1.166.11",
+		"@tauri-apps/api": "^2.10.1",
+		"@tauri-apps/plugin-opener": "^2.5.3",
+		"clsx": "^2.1.1",
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4",
+		"tailwind-merge": "^3.5.0"
+	},
+	"devDependencies": {
+		"@blgc/config": "workspace:*",
+		"@tailwindcss/vite": "^4.2.2",
+		"@tanstack/router-plugin": "^1.167.12",
+		"@tauri-apps/cli": "^2.10.1",
+		"@types/node": "^25.5.2",
+		"@types/react": "^19.2.14",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^6.0.1",
+		"tailwindcss": "^4.2.2"
+	}
+}

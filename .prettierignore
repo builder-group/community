@@ -1,6 +1,26 @@
-# Deprecated packages
-packages/_deprecated/
+# Dependencies
+**/node_modules/
+
+# Local caches
+**/.turbo/
+**/.tanstack/
 
 # Generated files
 **/*.gen.ts
 generated/
+
+# Build outputs
+**/.build/
+**/.next/
+**/.output/
+**/build/
+**/coverage/
+**/dist/
+**/out/
+target/
+
+# Deployment outputs
+**/.vercel/
+
+# Deprecated packages
+packages/_deprecated/

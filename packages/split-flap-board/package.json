@@ -41,11 +41,10 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"lit": "^3.3.0"
+		"lit": "^3.3.2"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^25.2.3",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [
