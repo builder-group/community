@@ -1,21 +1,12 @@
 {
-	"$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
+	"$schema": "https://unpkg.com/@changesets/config@3.1.3/schema.json",
 	"changelog": ["@changesets/changelog-github", { "repo": "builder-group/community" }],
 	"commit": false,
 	"fixed": [],
 	"linked": [],
+	"privatePackages": false,
 	"access": "public",
 	"baseBranch": "origin/main",
 	"updateInternalDependencies": "patch",
-	"ignore": [
-		"ecsify-vanilla-basic",
-		"feature-fetch-vanilla-open-meteo",
-		"feature-form-react-basic",
-		"feature-state-react-counter",
-		"openapi-ts-router-express-petstore",
-		"openapi-ts-router-hono-petstore",
-		"tuple-result-vanilla-basic",
-		"xml-tokenizer-vanilla-playground",
-		"@repo/web"
-	]
+	"ignore": []
 }
