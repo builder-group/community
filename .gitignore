@@ -27,7 +27,6 @@ out/
 build
 dist
 target
-rust_modules
 
 # Debug
 npm-debug.log*
@@ -37,7 +36,5 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
-*-why.html
-*-why-*.html
 *.local
 .todo
