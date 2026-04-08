@@ -1,5 +1,14 @@
 # webito
 
+## 0.0.7
+
+### Patch Changes
+
+- updated deps
+
+- Updated dependencies []:
+  - ecsify@0.0.20
+
 ## 0.0.6
 
 ### Patch Changes

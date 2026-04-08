@@ -1,5 +1,15 @@
 # validatenv
 
+## 0.0.44
+
+### Patch Changes
+
+- updated deps
+
+- Updated dependencies []:
+  - validation-adapter@0.0.28
+  - @blgc/utils@0.0.62
+
 ## 0.0.43
 
 ### Patch Changes
