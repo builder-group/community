@@ -1,26 +1,24 @@
 # Dependencies
 **/node_modules/
 
-# Local caches
+# Tooling
 **/.turbo/
-**/.tanstack/
 
-# Generated files
-**/*.gen.ts
-generated/
+# Test artifacts
+**/coverage/
 
 # Build outputs
 **/.build/
-**/.next/
 **/.output/
 **/build/
-**/coverage/
 **/dist/
 **/out/
-target/
+**/target/
 
-# Deployment outputs
-**/.vercel/
+# Generated source
+**/*.gen.ts
+**/gen/
 
-# Deprecated packages
-packages/_deprecated/
+# Local files
+.todo
+.DS_Store
