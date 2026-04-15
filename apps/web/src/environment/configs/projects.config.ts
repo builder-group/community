@@ -4,6 +4,20 @@ export const projectsConfig: {
 	projects: TProject[];
 } = {
 	projects: [
+		// MARK: - SaaS: In Progress
+		{
+			id: 'abstand',
+			name: 'Abstand',
+			description: 'Desktop app for building intentional distance from distractions',
+			logo: { type: 'image', src: '/illustrations/logos/abstand.png' },
+			startedAt: { year: 2026, month: 4 },
+			status: 'in-progress',
+			category: 'saas',
+			tags: [
+				{ type: 'website', url: 'https://abstand.app/' },
+				{ type: 'github', url: `${appConfig.social.github}/abstand` }
+			]
+		},
 		// MARK: - SaaS: Maintenance
 		{
 			id: 'kairos',
