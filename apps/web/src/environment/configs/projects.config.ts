@@ -52,7 +52,7 @@ export const projectsConfig: {
 				},
 				{
 					type: 'github',
-					url: `${appConfig.social.github}/isshin/tree/develop/apps/focuscat-desktop`
+					url: `${appConfig.social.github}/focuscat`
 				}
 			]
 		},
