@@ -4,20 +4,6 @@ export const projectsConfig: {
 	projects: TProject[];
 } = {
 	projects: [
-		// MARK: - SaaS: In Progress
-		{
-			id: 'abstand',
-			name: 'Abstand',
-			description: 'Desktop app for building intentional distance from distractions',
-			logo: { type: 'image', src: '/illustrations/logos/abstand.png' },
-			startedAt: { year: 2026, month: 4 },
-			status: 'in-progress',
-			category: 'saas',
-			tags: [
-				{ type: 'website', url: 'https://abstand.app/' },
-				{ type: 'github', url: `${appConfig.social.github}/abstand` }
-			]
-		},
 		// MARK: - SaaS: Maintenance
 		{
 			id: 'kairos',
@@ -134,6 +120,16 @@ export const projectsConfig: {
 		},
 		// MARK: - SaaS: Paused
 		{
+			id: 'abstand',
+			name: 'Abstand',
+			description: 'Desktop app for building intentional distance from distractions',
+			logo: { type: 'image', src: '/illustrations/logos/abstand.png' },
+			startedAt: { year: 2026, month: 4 },
+			status: 'paused',
+			category: 'saas',
+			tags: [{ type: 'website', url: 'https://abstand.app/' }]
+		},
+		{
 			id: 'isshin',
 			name: 'Isshin',
 			description: 'macOS app that auto-adapts app blockers to your daily task plan',
@@ -141,10 +137,7 @@ export const projectsConfig: {
 			startedAt: { year: 2025, month: 11 },
 			status: 'paused',
 			category: 'saas',
-			tags: [
-				{ type: 'website', url: 'https://isshin.app/' },
-				{ type: 'github', url: `${appConfig.social.github}/isshin` }
-			]
+			tags: [{ type: 'website', url: 'https://isshin.app/' }]
 		},
 		// MARK: - SaaS: Completed
 		{
@@ -189,13 +182,13 @@ export const projectsConfig: {
 			endedAt: { year: 2024, month: 12 },
 			status: 'pivoted',
 			category: 'saas',
-			tags: [{ type: 'github', url: `${appConfig.social.github}/sub-me` }]
+			tags: []
 		},
 		// MARK: - SaaS: Discontinued
 		{
 			id: 'tasu',
 			name: 'Tasu',
-			description: 'Open-source, video-first customer support tool',
+			description: 'Video-first customer support tool',
 			logo: { type: 'image', src: '/illustrations/logos/tasu.png' },
 			startedAt: { year: 2025, month: 8 },
 			endedAt: { year: 2025, month: 10 },
@@ -223,10 +216,7 @@ export const projectsConfig: {
 			endedAt: { year: 2024, month: 12 },
 			status: 'discontinued',
 			category: 'saas',
-			tags: [
-				{ type: 'youtube', url: 'https://www.youtube.com/@chatdotsnap' },
-				{ type: 'github', url: `${appConfig.social.github}/shortify` }
-			]
+			tags: [{ type: 'youtube', url: 'https://www.youtube.com/@chatdotsnap' }]
 		},
 		{
 			id: 'midimarble',
@@ -237,10 +227,7 @@ export const projectsConfig: {
 			endedAt: { year: 2024, month: 12 },
 			status: 'discontinued',
 			category: 'saas',
-			tags: [
-				{ type: 'youtube', url: 'https://www.youtube.com/@midimarble' },
-				{ type: 'github', url: `${appConfig.social.github}/shortify` }
-			]
+			tags: [{ type: 'youtube', url: 'https://www.youtube.com/@midimarble' }]
 		},
 		{
 			id: 'eu-blocks',
@@ -251,7 +238,7 @@ export const projectsConfig: {
 			endedAt: { year: 2024, month: 9 },
 			status: 'discontinued',
 			category: 'saas',
-			tags: [{ type: 'github', url: `${appConfig.social.github}/shopify` }]
+			tags: []
 		},
 		{
 			id: 'shortify',
@@ -262,7 +249,7 @@ export const projectsConfig: {
 			endedAt: { year: 2024, month: 12 },
 			status: 'discontinued',
 			category: 'saas',
-			tags: [{ type: 'github', url: `${appConfig.social.github}/shortify` }]
+			tags: []
 		},
 		{
 			id: 'open-box',
@@ -273,7 +260,7 @@ export const projectsConfig: {
 			endedAt: { year: 2024, month: 11 },
 			status: 'discontinued',
 			category: 'saas',
-			tags: [{ type: 'github', url: `${appConfig.social.github}/shopify` }]
+			tags: []
 		},
 		// MARK: - Packages
 		{
