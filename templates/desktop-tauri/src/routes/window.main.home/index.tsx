@@ -12,7 +12,7 @@ function RouteComponent() {
 	const appInfo = useAppInfo();
 
 	return (
-		<main className="mx-auto flex h-screen w-full max-w-3xl flex-col justify-center overflow-hidden px-6 pt-16 pb-8">
+		<main className="mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-center px-6 pt-16 pb-8">
 			<WindowHeader floating title={appConfig.name} />
 			<section className="rounded-[28px] border border-black/10 bg-white/80 px-7 py-6 backdrop-blur-sm">
 				<h1 className="text-4xl font-bold tracking-tight text-black sm:text-5xl">

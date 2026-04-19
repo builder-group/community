@@ -2,7 +2,6 @@ const email = 'support@builder.group';
 
 export const appConfig = {
 	name: 'Web TanStack',
-	description: 'A small TanStack Start template for reusable web apps.',
 	website: 'https://builder.group',
 	help: {
 		email,
