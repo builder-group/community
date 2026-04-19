@@ -5,8 +5,14 @@
 
 
 export const commands = {
-async greet(name: string) : Promise<GreetingDto> {
-    return await TAURI_INVOKE("greet", { name });
+async getAppInfo() : Promise<AppInfoDto> {
+    return await TAURI_INVOKE("get_app_info");
+},
+async greetFromRust(name: string) : Promise<GreetingDto> {
+    return await TAURI_INVOKE("greet_from_rust", { name });
+},
+async greetFromSwift(name: string) : Promise<GreetingDto> {
+    return await TAURI_INVOKE("greet_from_swift", { name });
 }
 }
 
@@ -20,8 +26,11 @@ async greet(name: string) : Promise<GreetingDto> {
 
 /** user-defined types **/
 
+export type AppDistribution = "appStore" | "direct"
+export type AppInfoDto = { version: string; stage: Stage; distribution: AppDistribution }
 export type GreetingDto = { message: string; source: GreetingSource }
-export type GreetingSource = "rust"
+export type GreetingSource = "rust" | "swift"
+export type Stage = "dev" | "prod"
 
 /** tauri-specta globals **/
 

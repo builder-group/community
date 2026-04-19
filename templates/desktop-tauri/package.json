@@ -33,6 +33,7 @@
 		"@tanstack/react-router-devtools": "^1.166.13",
 		"@tauri-apps/api": "^2.10.1",
 		"@tauri-apps/plugin-opener": "^2.5.3",
+		"@tauri-apps/plugin-os": "^2.3.2",
 		"clsx": "^2.1.1",
 		"react": "^19.2.5",
 		"react-dom": "^19.2.5",

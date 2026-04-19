@@ -53,5 +53,5 @@ const sortedItems = items.slice().sort(compareItems);
  * Formats the status.
  * @param code The status code.
  */
-export function formatStatus(code: StatusCode): string
+export function formatStatus(code: StatusCode): string;
 ```

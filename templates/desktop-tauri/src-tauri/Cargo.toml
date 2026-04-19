@@ -7,6 +7,9 @@ license = { workspace = true }
 edition = { workspace = true }
 repository = { workspace = true }
 
+[features]
+app-store = ["desktop-tauri-macos/app-store"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
@@ -22,8 +25,12 @@ tauri-build = { version = "2.5.6", features = [] }
 [dependencies]
 tauri = { version = "2.10.3", features = [] }
 tauri-plugin-opener = "2.5.3"
+tauri-plugin-os = "2.3.2"
+
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 specta = { version = "2.0.0-rc.21", features = ["derive"] }
 tauri-specta = { version = "2.0.0-rc.21", features = ["derive", "typescript"] }
 specta-typescript = "0.0.9"
+
+desktop-tauri-macos = { path = "../crates/macos" }

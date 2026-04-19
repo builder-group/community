@@ -11,4 +11,5 @@ pub struct GreetingDto {
 #[serde(rename_all = "camelCase")]
 pub enum GreetingSource {
     Rust,
+    Swift,
 }

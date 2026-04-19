@@ -9,68 +9,93 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as WindowMainSplashIndexRouteImport } from './routes/window.main.splash/index'
+import { Route as WindowMainHomeIndexRouteImport } from './routes/window.main.home/index'
+import { Route as WindowMainAboutIndexRouteImport } from './routes/window.main.about/index'
 
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const WindowMainSplashIndexRoute = WindowMainSplashIndexRouteImport.update({
+  id: '/window/main/splash/',
+  path: '/window/main/splash/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const WindowMainHomeIndexRoute = WindowMainHomeIndexRouteImport.update({
+  id: '/window/main/home/',
+  path: '/window/main/home/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WindowMainAboutIndexRoute = WindowMainAboutIndexRouteImport.update({
+  id: '/window/main/about/',
+  path: '/window/main/about/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/window/main/about/': typeof WindowMainAboutIndexRoute
+  '/window/main/home/': typeof WindowMainHomeIndexRoute
+  '/window/main/splash/': typeof WindowMainSplashIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/window/main/about': typeof WindowMainAboutIndexRoute
+  '/window/main/home': typeof WindowMainHomeIndexRoute
+  '/window/main/splash': typeof WindowMainSplashIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/window/main/about/': typeof WindowMainAboutIndexRoute
+  '/window/main/home/': typeof WindowMainHomeIndexRoute
+  '/window/main/splash/': typeof WindowMainSplashIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about'
+  fullPaths:
+    | '/window/main/about/'
+    | '/window/main/home/'
+    | '/window/main/splash/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about'
-  id: '__root__' | '/' | '/about'
+  to: '/window/main/about' | '/window/main/home' | '/window/main/splash'
+  id:
+    | '__root__'
+    | '/window/main/about/'
+    | '/window/main/home/'
+    | '/window/main/splash/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
+  WindowMainAboutIndexRoute: typeof WindowMainAboutIndexRoute
+  WindowMainHomeIndexRoute: typeof WindowMainHomeIndexRoute
+  WindowMainSplashIndexRoute: typeof WindowMainSplashIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/window/main/splash/': {
+      id: '/window/main/splash/'
+      path: '/window/main/splash'
+      fullPath: '/window/main/splash/'
+      preLoaderRoute: typeof WindowMainSplashIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/window/main/home/': {
+      id: '/window/main/home/'
+      path: '/window/main/home'
+      fullPath: '/window/main/home/'
+      preLoaderRoute: typeof WindowMainHomeIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/window/main/about/': {
+      id: '/window/main/about/'
+      path: '/window/main/about'
+      fullPath: '/window/main/about/'
+      preLoaderRoute: typeof WindowMainAboutIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
+  WindowMainAboutIndexRoute: WindowMainAboutIndexRoute,
+  WindowMainHomeIndexRoute: WindowMainHomeIndexRoute,
+  WindowMainSplashIndexRoute: WindowMainSplashIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

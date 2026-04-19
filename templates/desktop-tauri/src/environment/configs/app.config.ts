@@ -2,7 +2,6 @@ const email = 'support@builder.group';
 
 export const appConfig = {
 	name: 'Desktop Tauri',
-	description: 'A small Tauri template for typed desktop apps.',
 	website: 'https://builder.group',
 	help: {
 		discord: 'https://discord.com/invite/w4xE3bSjhQ',
