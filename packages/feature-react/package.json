@@ -76,7 +76,7 @@
 		"@types/react": "^19.2.14",
 		"feature-form": "workspace:*",
 		"feature-state": "workspace:*",
-		"react": "^19.2.4",
+		"react": "^19.2.5",
 		"rollup-presets": "workspace:*"
 	},
 	"peerDependencies": {

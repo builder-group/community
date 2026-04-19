@@ -40,7 +40,7 @@
 		"@types/sax": "^1.2.7",
 		"@types/xml2js": "^0.4.14",
 		"camaro": "^6.2.3",
-		"fast-xml-parser": "^5.5.10",
+		"fast-xml-parser": "^5.7.1",
 		"rollup-presets": "workspace:*",
 		"sax": "^1.6.0",
 		"saxen": "^11.0.2",
