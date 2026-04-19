@@ -6,9 +6,9 @@ use serde::Serialize;
 pub fn get_app_info() -> AppInfoDto {
     let base_version = env!("CARGO_PKG_VERSION");
     let (stage, suffix) = if cfg!(debug_assertions) {
-        (Stage::Dev, "-dev")
+        (Stage::Dev, "d")
     } else {
-        (Stage::Prod, "")
+        (Stage::Prod, "p")
     };
 
     return AppInfoDto {
