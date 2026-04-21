@@ -12,6 +12,7 @@ export const TagList: React.FC<TTagListProps> = (props) => {
 			'app-store': 'App Store',
 			'chrome-store': 'Chrome Store',
 			'shopify-store': 'Shopify',
+			'crate': 'crate',
 			'npm': 'npm',
 			'youtube': 'YouTube',
 			'product-hunt': 'Product Hunt'

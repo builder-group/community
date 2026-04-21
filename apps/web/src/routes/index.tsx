@@ -126,7 +126,7 @@ function RouteComponent() {
 					<div className="bg-base-300 flex flex-col gap-px">
 						<div className="bg-base-100 px-5 py-3">
 							<p className="text-base-500 text-sm">
-								TypeScript libraries in the{' '}
+								Open-source libraries and developer tools in the{' '}
 								<a
 									href={`${appConfig.social.github}/community`}
 									target="_blank"
@@ -175,7 +175,7 @@ function RouteComponent() {
 
 const fetchNpmDownloads = createServerFn().handler(async () => {
 	const packageNames = projectsConfig.projects
-		.filter((p) => p.category === 'package')
+		.filter((p) => p.tags.some((tag) => tag.type === 'npm'))
 		.map((p) => p.name);
 	return getNpmTotalDownloads(packageNames);
 });

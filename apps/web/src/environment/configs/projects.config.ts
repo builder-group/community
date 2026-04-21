@@ -4,6 +4,7 @@ export const projectsConfig: {
 	projects: TProject[];
 } = {
 	projects: [
+		// MARK: - SaaS: In Progress
 		{
 			id: 'abstand',
 			name: 'Abstand',
@@ -423,6 +424,21 @@ export const projectsConfig: {
 			]
 		},
 		{
+			id: 'mado',
+			name: 'mado',
+			description: 'A macOS-focused Rust library for active window monitoring and app metadata',
+			startedAt: { year: 2026, month: 1 },
+			status: 'maintenance',
+			category: 'package',
+			tags: [
+				{ type: 'crate', url: 'https://crates.io/crates/mado' },
+				{
+					type: 'github',
+					url: `${appConfig.social.github}/community/tree/develop/crates/mado`
+				}
+			]
+		},
+		{
 			id: 'utils',
 			name: '@blgc/utils',
 			description: 'Typesafe, tree-shakable collection of utility functions',
@@ -530,6 +546,7 @@ export type TProjectTag =
 	| { type: 'app-store'; url: string }
 	| { type: 'chrome-store'; url: string }
 	| { type: 'shopify-store'; url: string }
+	| { type: 'crate'; url: string }
 	| { type: 'npm'; url: string }
 	| { type: 'product-hunt'; url: string }
 	| { type: 'youtube'; url: string }
