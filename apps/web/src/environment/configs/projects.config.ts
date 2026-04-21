@@ -4,6 +4,19 @@ export const projectsConfig: {
 	projects: TProject[];
 } = {
 	projects: [
+		{
+			id: 'abstand',
+			name: 'Abstand',
+			description: 'Desktop app for building intentional distance from distractions',
+			logo: { type: 'image', src: '/illustrations/logos/abstand.png' },
+			startedAt: { year: 2026, month: 4 },
+			status: 'in-progress',
+			category: 'saas',
+			tags: [
+				{ type: 'website', url: 'https://abstand.app/' },
+				{ type: 'github', url: 'https://github.com/builder-group/abstand' }
+			]
+		},
 		// MARK: - SaaS: Maintenance
 		{
 			id: 'kairos',
@@ -119,16 +132,6 @@ export const projectsConfig: {
 			]
 		},
 		// MARK: - SaaS: Paused
-		{
-			id: 'abstand',
-			name: 'Abstand',
-			description: 'Desktop app for building intentional distance from distractions',
-			logo: { type: 'image', src: '/illustrations/logos/abstand.png' },
-			startedAt: { year: 2026, month: 4 },
-			status: 'paused',
-			category: 'saas',
-			tags: [{ type: 'website', url: 'https://abstand.app/' }]
-		},
 		{
 			id: 'isshin',
 			name: 'Isshin',
