@@ -13,6 +13,10 @@ Follow the established project React pattern unless the local code clearly does 
 - Keep helper subcomponents in the same file when they are tightly coupled to the parent view
 - Use short JSX comments only when they help readers skim a dense visual structure
 
+### TanStack Router
+
+- Use `function RouteComponent()` so the `Route` definition can appear above it
+
 ## Avoid
 
 - Do not switch to function declarations for ordinary components when the surrounding code uses typed arrow components
