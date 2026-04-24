@@ -6,6 +6,7 @@ Follow the established project React pattern unless the local code clearly does 
 
 - Prefer `export const ComponentName: React.FC<TProps> = (props) => { ... }` for components
 - Destructure props at the top of the component and define prop interfaces near the bottom of the file
+- Prefer keeping the main component near the top of ordinary component files, with supporting code below it in a natural order such as component -> local constants (like variants) -> types -> helper functions
 - Use `React.useState`, `React.useMemo`, `React.useCallback`, `React.useEffect`, and related hooks through the `React.` namespace
 - Keep larger components in a predictable top-to-bottom flow: props, state and refs, derived values, `// MARK: - Actions`, `// MARK: - Effects`, `// MARK: - UI`
 - Use `React.useMemo` for meaningful derived collections, computed view state, or grouped derived values
