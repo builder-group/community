@@ -13,6 +13,7 @@ Write Rust that is explicit, predictable, and easy to maintain in Tauri and libr
 - Keep the main logic near the top and place supporting structs, enums, and helpers close below the code that uses them
 - Prefer options or config structs over scattering top-level constants through the file
 - Keep domain structs and DTOs descriptively named
+- Keep imports compact and easy to scan; prefer grouped imports from the same path when that improves readability
 
 ## Avoid
 
@@ -21,6 +22,7 @@ Write Rust that is explicit, predictable, and easy to maintain in Tauri and libr
 - Do not hide important branching inside dense nested matches or conditionals without a reason
 - Do not front-load files with long blocks of constants, types, or helpers before the main logic
 - Do not use vague type names like `Data`, `Info`, or `Manager` when the domain can be named directly
+- Do not use wildcard imports except in narrow test preludes
 
 ## Examples
 
