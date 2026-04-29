@@ -8,9 +8,9 @@ Add comments when they make the code easier to understand or maintain. Omit them
 - Place the comment directly above the code it explains
 - Omit the trailing period in a short single-line regular comment
 - Use plain punctuation only
-- Use `// MARK: -` sparingly as a file-level or large-structure navigation aid, mainly in long files
-- Add doc comments to public and exported functions, methods, and types when the name and signature alone don't make the behavior clear; describe what it does first, then note constraints, side effects, or non-obvious return or error behavior when needed
+- Add doc comments to public and exported functions, methods, and types only when the name and signature alone do not make the behavior or contract clear; describe what it does first, then note constraints, side effects, or non-obvious return or error behavior when needed
 - Start doc comments with a single sentence in active voice and end it with a period
+- Use `// MARK: -` sparingly as a file-level or large-structure navigation aid, mainly in long files
 - Use `// Note:` for intentional constraints, omissions, or deferrals that a reader might otherwise mistake for a bug or incomplete work
 - Use `// TODO:` for known future work; keep it specific and actionable
 
@@ -25,6 +25,7 @@ Add comments when they make the code easier to understand or maintain. Omit them
 - Do not document session history, refactor history, or rejected alternatives
 - Do not repeat type information that is already obvious from the code
 - Do not add doc comments to private helpers unless the contract is non-obvious to a caller within the same module
+- Do not add doc comments just for consistency across a file; each comment should earn its place
 - Do not fill doc comments with implementation details or obvious parameter-by-parameter paraphrases
 - Do not frame doc comments around why the code exists or what layer uses it unless that context is necessary to call it correctly
 
