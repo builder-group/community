@@ -5,13 +5,14 @@ Add comments when they make the code easier to understand or maintain. Omit them
 ## Enforce
 
 - Add regular comments to explain **why**, a constraint, domain behavior, or to orient the reader at the start of a non-obvious block
-- Keep comments useful beyond the current task or refactor
 - Place the comment directly above the code it explains
 - Omit the trailing period in a short single-line regular comment
 - Use plain punctuation only
 - Use `// MARK: -` sparingly as a file-level or large-structure navigation aid, mainly in long files
 - Add doc comments to public and exported functions, methods, and types when the name and signature alone don't make the behavior clear; describe what it does first, then note constraints, side effects, or non-obvious return or error behavior when needed
 - Start doc comments with a single sentence in active voice and end it with a period
+- Use `// Note:` for intentional constraints, omissions, or deferrals that a reader might otherwise mistake for a bug or incomplete work
+- Use `// TODO:` for known future work; keep it specific and actionable
 
 ## Avoid
 
@@ -63,8 +64,17 @@ pub fn load_items(config: &LoadConfig) -> Result<Vec<Item>, LoadItemsError>
 ```
 
 ```ts
-// Self-explanatory; no doc comment needed
 export function isAuthenticated(): boolean;
+```
+
+```ts
+// Note: Skips permission check here; caller is expected to pre-validate
+applyChange(payload);
+```
+
+```ts
+// TODO: replace with incremental sync once the API supports cursors
+const items = await fetchAll(query);
 ```
 
 ### Avoid
@@ -72,14 +82,6 @@ export function isAuthenticated(): boolean;
 ```ts
 // Sort the items
 const sortedItems = items.slice().sort(compareItems);
-```
-
-```ts
-// Retry — rate limit 
-for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-	const result = await fetchWithDelay(attempt);
-	if (result.ok) return result;
-}
 ```
 
 ```ts
@@ -97,11 +99,6 @@ export function formatStatus(code: StatusCode): string;
 
 ```rust
 /// This is used by the sidebar to show items quickly.
-pub fn load_items(config: &LoadConfig) -> Result<Vec<Item>, LoadItemsError>
-```
-
-```rust
-/// Loads items.
 pub fn load_items(config: &LoadConfig) -> Result<Vec<Item>, LoadItemsError>
 ```
 
