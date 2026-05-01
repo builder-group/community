@@ -16,13 +16,13 @@ fn main() {
 
     benchmark_app("Finder", "com.apple.finder");
 
-    if let Some(app) = apps
-        .iter()
-        .find(|app| !app.bundle_id.starts_with("com.apple."))
-    {
-        println!();
-        benchmark_app(&app.name, &app.bundle_id);
-    }
+    apps.iter()
+        .filter(|app| !app.bundle_id.starts_with("com.apple."))
+        .take(20)
+        .for_each(|app| {
+            println!();
+            benchmark_app(&app.name, &app.bundle_id);
+        });
 }
 
 fn benchmark_app(name: &str, bundle_id: &str) {
