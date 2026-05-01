@@ -3,15 +3,15 @@
 /// Configuration for the window monitor.
 #[derive(Debug, Clone, Copy)]
 pub struct MonitorConfig {
-    /// Whether to include the app icon and dominant color.
-    ///
-    /// When enabled, extracts the app icon as a base64 PNG data URL
-    /// and the dominant brand color as a hex string.
-    ///
-    /// Local file read, fast (~5-20ms).
+    /// Whether to include the app icon.
     ///
     /// Default: `false`
     pub include_app_icon: bool,
+
+    /// Whether to derive the dominant app color when `include_app_icon` is enabled.
+    ///
+    /// Default: `false`
+    pub include_app_color: bool,
 
     /// Whether to extract browser info (URL and private mode).
     ///
@@ -49,6 +49,7 @@ impl Default for MonitorConfig {
     fn default() -> Self {
         Self {
             include_app_icon: false,
+            include_app_color: false,
             include_browser_info: false,
             include_website_info: false,
             track_window_changes: true,
@@ -59,15 +60,15 @@ impl Default for MonitorConfig {
 /// Configuration for querying window/app information.
 #[derive(Debug, Clone, Copy)]
 pub struct QueryConfig {
-    /// Whether to include the app icon and dominant color.
-    ///
-    /// When enabled, extracts the app icon as a base64 PNG data URL
-    /// and the dominant brand color as a hex string.
-    ///
-    /// Local file read, fast (~5-20ms).
+    /// Whether to include the app icon.
     ///
     /// Default: `false`
     pub include_app_icon: bool,
+
+    /// Whether to derive the dominant app color when `include_app_icon` is enabled.
+    ///
+    /// Default: `false`
+    pub include_app_color: bool,
 
     /// Whether to extract browser info (URL and private mode).
     ///
@@ -93,6 +94,7 @@ impl Default for QueryConfig {
     fn default() -> Self {
         Self {
             include_app_icon: false,
+            include_app_color: false,
             include_browser_info: false,
             include_website_info: false,
         }
@@ -106,11 +108,13 @@ impl Default for QueryConfig {
 pub struct InstalledAppsConfig {
     /// Include icon in the results.
     ///
-    /// When enabled, extracts each app's icon as a base64 PNG data URL
-    /// and the dominant brand color as a hex string.
-    ///
     /// Default: `false` (faster without icon)
     pub include_icon: bool,
+
+    /// Whether to derive the dominant app color when `include_icon` is enabled.
+    ///
+    /// Default: `false`
+    pub include_app_color: bool,
 
     /// Icon size in pixels.
     ///
@@ -124,6 +128,7 @@ impl Default for InstalledAppsConfig {
     fn default() -> Self {
         Self {
             include_icon: false,
+            include_app_color: false,
             icon_size: 32,
         }
     }

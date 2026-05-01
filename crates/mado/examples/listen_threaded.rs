@@ -64,6 +64,7 @@ fn main() -> Result<(), mado::Error> {
             },
             MonitorConfig {
                 include_app_icon: true,
+                include_app_color: false,
                 include_browser_info: true,
                 include_website_info: true,
                 track_window_changes: true,

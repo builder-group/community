@@ -23,8 +23,10 @@ fn main() -> Result<(), mado::Error> {
     loop {
         let config = mado::QueryConfig {
             include_app_icon: true,
+            include_app_color: false,
             include_browser_info: true,
             include_website_info: true,
+            ..Default::default()
         };
 
         match mado::get_active_app_with_config(config) {

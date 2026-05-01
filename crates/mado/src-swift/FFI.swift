@@ -9,6 +9,7 @@ public func madoStartMonitor(
     callbackPtr: UnsafeRawPointer,
     trackWindowChanges: Bool,
     includeAppIcon: Bool,
+    includeAppColor: Bool,
     includeBrowserInfo: Bool,
     includeWebsiteInfo: Bool
 ) {
@@ -21,6 +22,7 @@ public func madoStartMonitor(
         callback: callback,
         trackWindowChanges: trackWindowChanges,
         includeAppIcon: includeAppIcon,
+        includeAppColor: includeAppColor,
         includeBrowserInfo: includeBrowserInfo,
         includeWebsiteInfo: includeWebsiteInfo
     )
@@ -44,8 +46,16 @@ public func madoIsTrusted() -> Bool {
 // MARK: - Queries
 
 @_cdecl("mado_get_active_app")
-public func madoGetActiveApp(includeAppIcon: Bool) -> SRString? {
-    guard let appInfo = AppInfo.getFrontmost(includeIcon: includeAppIcon) else {
+public func madoGetActiveApp(
+    includeAppIcon: Bool,
+    includeAppColor: Bool
+) -> SRString? {
+    guard
+        let appInfo = AppInfo.getFrontmost(
+            includeIcon: includeAppIcon,
+            includeColor: includeAppColor
+        )
+    else {
         return nil
     }
     return toJson(appInfo.toDictionary())
@@ -54,12 +64,14 @@ public func madoGetActiveApp(includeAppIcon: Bool) -> SRString? {
 @_cdecl("mado_get_active_window")
 public func madoGetActiveWindow(
     includeAppIcon: Bool,
+    includeAppColor: Bool,
     includeBrowserInfo: Bool,
     includeWebsiteInfo: Bool
 ) -> SRString? {
     guard
         let windowInfo = WindowInfo.getFrontmost(
             includeAppIcon: includeAppIcon,
+            includeAppColor: includeAppColor,
             includeBrowserInfo: includeBrowserInfo,
             includeWebsiteInfo: includeWebsiteInfo
         )
@@ -70,11 +82,16 @@ public func madoGetActiveWindow(
 // MARK: - Installed Apps
 
 @_cdecl("mado_get_installed_apps")
-public func madoGetInstalledApps(includeIcon: Bool, iconSize: Int32)
+public func madoGetInstalledApps(
+    includeIcon: Bool,
+    includeAppColor: Bool,
+    iconSize: Int32
+)
     -> SRString?
 {
     let apps = scanInstalledApps(
         includeIcon: includeIcon,
+        includeAppColor: includeAppColor,
         iconSize: Int(iconSize)
     )
     let dicts = apps.map { $0.toDictionary() }
@@ -90,9 +107,26 @@ public func madoGetInstalledApps(includeIcon: Bool, iconSize: Int32)
 }
 
 @_cdecl("mado_get_app_icon")
-public func madoGetAppIcon(bundleId: SRString, iconSize: Int32) -> SRString? {
-    let icon = getAppIconByBundleId(bundleId.toString(), size: Int(iconSize))
+public func madoGetAppIcon(
+    bundleId: SRString,
+    iconSize: Int32,
+    includeColor: Bool
+) -> SRString? {
+    let icon = getAppIconByBundleId(
+        bundleId.toString(),
+        size: Int(iconSize),
+        includeColor: includeColor
+    )
     return toJson(icon.toDictionary())
+}
+
+@_cdecl("mado_get_app_color")
+public func madoGetAppColor(bundleId: SRString) -> SRString? {
+    guard let color = getAppColorByBundleId(bundleId.toString()) else {
+        return nil
+    }
+
+    return SRString(color)
 }
 
 // MARK: - Helpers

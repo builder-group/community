@@ -14,7 +14,7 @@ pub struct AppInfo {
     pub bundle_id: Option<String>,
     /// Path to the executable
     pub process_path: Option<String>,
-    /// App icon and brand color (only populated if `include_app_icon` is enabled)
+    /// App icon payload (only populated if `include_app_icon` is enabled)
     pub icon: Option<AppIcon>,
 }
 
@@ -27,7 +27,11 @@ impl fmt::Display for AppInfo {
         writeln!(f, "      Path:       {}", fmt_display(&self.process_path))?;
         if let Some(icon) = &self.icon {
             if let Some(data_url) = &icon.data_url {
-                writeln!(f, "      Icon:       (base64 PNG, {} bytes)", data_url.len())?;
+                writeln!(
+                    f,
+                    "      Icon:       (base64 PNG, {} bytes)",
+                    data_url.len()
+                )?;
             }
             if let Some(color) = &icon.color {
                 writeln!(f, "      Color:      {}", color)?;
@@ -197,11 +201,11 @@ pub struct InstalledApp {
     pub name: String,
     /// Path to the application bundle
     pub path: String,
-    /// App icon and brand color (only populated if `include_icon` is enabled)
+    /// App icon payload (only populated if `include_icon` is enabled)
     pub icon: Option<AppIcon>,
 }
 
-/// App icon with brand color.
+/// App icon payload with optional brand color.
 #[derive(Debug, Clone, Default, Serialize, Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AppIcon {

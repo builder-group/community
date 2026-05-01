@@ -22,14 +22,22 @@ struct AppInfo {
     }
 
     /// Create from NSRunningApplication.
-    static func fromNS(_ app: NSRunningApplication, includeIcon: Bool = false)
+    static func fromNS(
+        _ app: NSRunningApplication,
+        includeIcon: Bool = false,
+        includeColor: Bool = false
+    )
         -> AppInfo
     {
         let bundlePath = app.bundleURL?.path
         let bundleId = app.bundleIdentifier
         let icon: AppIcon? =
             includeIcon
-            ? getAppIcon(forPath: bundlePath, bundleId: bundleId)
+            ? getAppIcon(
+                forPath: bundlePath,
+                forBundleId: bundleId,
+                includeColor: true
+            )
             : nil
 
         return AppInfo(
@@ -42,10 +50,18 @@ struct AppInfo {
     }
 
     /// Create from PID.
-    static func fromPID(_ pid: pid_t, includeIcon: Bool = false) -> AppInfo {
+    static func fromPID(
+        _ pid: pid_t,
+        includeIcon: Bool = false,
+        includeColor: Bool = false
+    ) -> AppInfo {
         // Try to get full info from NSRunningApplication
         if let app = NSRunningApplication(processIdentifier: pid) {
-            return fromNS(app, includeIcon: includeIcon)
+            return fromNS(
+                app,
+                includeIcon: includeIcon,
+                includeColor: includeColor
+            )
         }
         // Fallback to minimal info with just PID
         return AppInfo(
@@ -58,10 +74,13 @@ struct AppInfo {
     }
 
     /// Get frontmost app info.
-    static func getFrontmost(includeIcon: Bool = false) -> AppInfo? {
+    static func getFrontmost(
+        includeIcon: Bool = false,
+        includeColor: Bool = false
+    ) -> AppInfo? {
         guard let app = NSWorkspace.shared.frontmostApplication else {
             return nil
         }
-        return fromNS(app, includeIcon: includeIcon)
+        return fromNS(app, includeIcon: includeIcon, includeColor: includeColor)
     }
 }

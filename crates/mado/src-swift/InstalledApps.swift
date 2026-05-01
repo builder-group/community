@@ -1,7 +1,9 @@
 import AppKit
 import Foundation
 
-func scanInstalledApps(includeIcon: Bool, iconSize: Int) -> [InstalledApp] {
+func scanInstalledApps(includeIcon: Bool, includeAppColor: Bool, iconSize: Int)
+    -> [InstalledApp]
+{
     var apps: [InstalledApp] = []
     var seenBundleIds = Set<String>()
 
@@ -45,8 +47,9 @@ func scanInstalledApps(includeIcon: Bool, iconSize: Int) -> [InstalledApp] {
                 includeIcon
                 ? getAppIcon(
                     forPath: appPath,
-                    bundleId: bundleId,
-                    size: iconSize
+                    forBundleId: bundleId,
+                    size: iconSize,
+                    includeColor: includeAppColor
                 )
                 : nil
 

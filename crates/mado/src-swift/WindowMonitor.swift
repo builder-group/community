@@ -19,6 +19,7 @@ final class WindowMonitor: NSObject {
     private let callback: WindowEventCallback
     private let trackWindowChanges: Bool
     private let includeAppIcon: Bool
+    private let includeAppColor: Bool
     private let includeBrowserInfo: Bool
     private let includeWebsiteInfo: Bool
 
@@ -50,12 +51,14 @@ final class WindowMonitor: NSObject {
         callback: @escaping WindowEventCallback,
         trackWindowChanges: Bool,
         includeAppIcon: Bool,
+        includeAppColor: Bool,
         includeBrowserInfo: Bool,
         includeWebsiteInfo: Bool
     ) {
         self.callback = callback
         self.trackWindowChanges = trackWindowChanges
         self.includeAppIcon = includeAppIcon
+        self.includeAppColor = includeAppColor
         self.includeBrowserInfo = includeBrowserInfo
         self.includeWebsiteInfo = includeWebsiteInfo
     }
@@ -129,7 +132,8 @@ final class WindowMonitor: NSObject {
             perform: { _ in }
         )
 
-        if let source = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &context) {
+        if let source = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &context)
+        {
             keepAliveSource = source
             CFRunLoopAddSource(runLoop, source, .defaultMode)
         }
@@ -367,6 +371,7 @@ final class WindowMonitor: NSObject {
         let windowInfo = WindowInfo.fromPID(
             currentPID,
             includeAppIcon: includeAppIcon,
+            includeAppColor: includeAppColor,
             includeBrowserInfo: includeBrowserInfo,
             includeWebsiteInfo: includeWebsiteInfo
         )
@@ -392,7 +397,11 @@ final class WindowMonitor: NSObject {
     // MARK: - Events
 
     private func sendAppActivatedEvent(app: NSRunningApplication) {
-        let appInfo = AppInfo.fromNS(app, includeIcon: includeAppIcon)
+        let appInfo = AppInfo.fromNS(
+            app,
+            includeIcon: includeAppIcon,
+            includeColor: includeAppColor
+        )
         let eventData: [String: Any] = ["app": appInfo.toDictionary()]
         sendEvent(type: EventType.appActivated, data: eventData)
     }
@@ -405,6 +414,7 @@ final class WindowMonitor: NSObject {
         let windowInfo = WindowInfo.fromPID(
             currentPID,
             includeAppIcon: includeAppIcon,
+            includeAppColor: includeAppColor,
             includeBrowserInfo: includeBrowserInfo,
             includeWebsiteInfo: includeWebsiteInfo
         )

@@ -119,7 +119,8 @@ monitor.run()?;
 
 | Option                 | Default | Description                                                          |
 | ---------------------- | ------- | -------------------------------------------------------------------- |
-| `include_app_icon`     | `false` | Extract app icon as base64 PNG and dominant color (~5-20ms)          |
+| `include_app_icon`     | `false` | Extract app icon as base64 PNG                                       |
+| `include_app_color`    | `false` | Also derive the dominant app color when `include_app_icon` is enabled |
 | `include_browser_info` | `false` | Extract browser URL and private mode                                 |
 | `include_website_info` | `false` | Extract domain, fetch favicon, and extract color (~50-500ms, cached) |
 | `track_window_changes` | `true`  | Track window focus/title changes (requires Accessibility permission) |
@@ -163,11 +164,11 @@ for app in &apps {
 }
 
 // Get icon for a specific app
-let icon = mado::get_app_icon("com.apple.finder", 64);
+let icon = mado::get_app_icon("com.apple.finder", 64, false);
 if let Some(data_url) = &icon.data_url {
     println!("Icon: {} bytes", data_url.len());
 }
-if let Some(color) = &icon.color {
+if let Some(color) = mado::get_app_color("com.apple.finder") {
     println!("Brand color: {}", color);
 }
 ```
@@ -176,8 +177,9 @@ if let Some(color) = &icon.color {
 
 | Option         | Default | Description                                    |
 | -------------- | ------- | ---------------------------------------------- |
-| `include_icon` | `false` | Extract icons as base64 PNG and dominant color |
-| `icon_size`    | `32`    | Icon size in pixels                            |
+| `include_icon`      | `false` | Extract icons as base64 PNG                                      |
+| `include_app_color` | `false` | Also derive the dominant app color when `include_icon` is enabled |
+| `icon_size`         | `32`    | Icon size in pixels                                              |
 
 ## 📐 Architecture
 
@@ -243,6 +245,7 @@ let config = MonitorConfig {
     track_window_changes: false, // AX observers won't work
     include_browser_info: false, // URL extraction uses AX API
     include_app_icon: true,      // Works fine in sandbox
+    include_app_color: false,
     include_website_info: false,
 };
 ```

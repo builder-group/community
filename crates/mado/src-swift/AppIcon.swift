@@ -1,10 +1,11 @@
 import AppKit
 
-/// Extract app icon as base64 PNG data URL with brand color.
+/// Extract app icon as a base64 PNG data URL.
 func getAppIcon(
     forPath appPath: String?,
-    bundleId: String?,
-    size: Int = 32
+    forBundleId bundleId: String?,
+    size: Int = 32,
+    includeColor: Bool = false
 ) -> AppIcon {
     guard let appPath = appPath else {
         return AppIcon(dataUrl: nil, color: nil)
@@ -14,13 +15,20 @@ func getAppIcon(
     let dataUrl = icon.pngData(size: size).map {
         "data:image/png;base64,\($0.base64EncodedString())"
     }
-    let color = getAppColor(forBundleId: bundleId, icon: icon)
+    let color =
+        includeColor
+        ? getAppColor(forBundleId: bundleId, icon: icon)
+        : nil
 
     return AppIcon(dataUrl: dataUrl, color: color)
 }
 
 /// Get app icon by bundle identifier only (finds path via NSWorkspace).
-func getAppIconByBundleId(_ bundleId: String, size: Int = 32) -> AppIcon {
+func getAppIconByBundleId(
+    _ bundleId: String,
+    size: Int = 32,
+    includeColor: Bool = false
+) -> AppIcon {
     guard
         let appUrl = NSWorkspace.shared.urlForApplication(
             withBundleIdentifier: bundleId
@@ -29,7 +37,12 @@ func getAppIconByBundleId(_ bundleId: String, size: Int = 32) -> AppIcon {
         return AppIcon(dataUrl: nil, color: nil)
     }
 
-    return getAppIcon(forPath: appUrl.path, bundleId: bundleId, size: size)
+    return getAppIcon(
+        forPath: appUrl.path,
+        forBundleId: bundleId,
+        size: size,
+        includeColor: includeColor
+    )
 }
 
 /// App icon with brand color.

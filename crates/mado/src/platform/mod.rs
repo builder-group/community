@@ -132,16 +132,27 @@ pub fn get_installed_apps(config: InstalledAppsConfig) -> Vec<InstalledApp> {
 
 /// Get icon for a specific app by bundle identifier.
 ///
-/// Returns the app icon as a base64 PNG data URL and the dominant brand color.
+/// Returns the app icon as a base64 PNG data URL.
 ///
 /// On non-macOS platforms, returns default (empty) result.
-pub fn get_app_icon(bundle_id: &str, size: u32) -> AppIcon {
+pub fn get_app_icon(bundle_id: &str, size: u32, include_color: bool) -> AppIcon {
     #[cfg(target_os = "macos")]
-    return macos::get_app_icon(bundle_id, size);
+    return macos::get_app_icon(bundle_id, size, include_color);
 
     #[cfg(not(target_os = "macos"))]
     {
-        let _ = (bundle_id, size);
+        let _ = (bundle_id, size, include_color);
         return AppIcon::default();
+    }
+}
+
+pub fn get_app_color(bundle_id: &str) -> Option<String> {
+    #[cfg(target_os = "macos")]
+    return macos::get_app_color(bundle_id);
+
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = bundle_id;
+        return None;
     }
 }

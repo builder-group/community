@@ -133,7 +133,10 @@ mod tests {
         assert!(browser.website.is_some());
         let website = browser.website.unwrap();
         assert_eq!(website.domain, "github.com");
-        assert_eq!(website.favicon, Some("data:image/png;base64,ABC123".to_string()));
+        assert_eq!(
+            website.favicon,
+            Some("data:image/png;base64,ABC123".to_string())
+        );
         assert_eq!(website.color, Some("#24292E".to_string()));
     }
 

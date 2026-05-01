@@ -65,8 +65,7 @@ pub use error::Error;
 pub use listener::WindowListener;
 pub use monitor::WindowMonitor;
 pub use types::{
-    AppIcon, AppInfo, BrowserInfo, InstalledApp, WebsiteInfo, WindowBounds, WindowEvent,
-    WindowInfo,
+    AppIcon, AppInfo, BrowserInfo, InstalledApp, WebsiteInfo, WindowBounds, WindowEvent, WindowInfo,
 };
 
 // MARK: - Window Monitoring
@@ -105,6 +104,7 @@ pub fn get_active_app() -> Result<AppInfo, Error> {
 ///
 /// let config = QueryConfig {
 ///     include_app_icon: true,
+///     include_app_color: false,
 ///     ..Default::default()
 /// };
 /// let app = mado::get_active_app_with_config(config)?;
@@ -166,8 +166,10 @@ pub fn get_active_window() -> Result<WindowInfo, Error> {
 /// // With app icon, browser info, and website info (favicon + color)
 /// let config = QueryConfig {
 ///     include_app_icon: true,
+///     include_app_color: false,
 ///     include_browser_info: true,
 ///     include_website_info: true,
+///     ..Default::default()
 /// };
 /// let window = mado::get_active_window_with_config(config)?;
 /// if let Some(browser) = &window.browser {
@@ -231,6 +233,7 @@ pub fn is_accessibility_trusted() -> bool {
 /// // With icons (slower)
 /// let config = InstalledAppsConfig {
 ///     include_icon: true,
+///     include_app_color: false,
 ///     icon_size: 64,
 /// };
 /// let apps = mado::get_installed_apps(config);
@@ -241,7 +244,7 @@ pub fn get_installed_apps(config: InstalledAppsConfig) -> Vec<InstalledApp> {
 
 /// Get icon for a specific app by bundle identifier.
 ///
-/// Returns the app icon as a base64 PNG data URL and the dominant brand color.
+/// Returns the app icon as a base64 PNG data URL.
 ///
 /// On non-macOS platforms, returns default (empty) result.
 ///
@@ -249,18 +252,23 @@ pub fn get_installed_apps(config: InstalledAppsConfig) -> Vec<InstalledApp> {
 ///
 /// * `bundle_id` - The app's bundle identifier (e.g., "com.apple.Safari")
 /// * `size` - Icon size in pixels (default: 32 if 0)
+/// * `include_color` - Whether to also derive the dominant brand color
 ///
 /// # Example
 ///
 /// ```rust,no_run
-/// let result = mado::get_app_icon("com.apple.finder", 64);
+/// let result = mado::get_app_icon("com.apple.finder", 64, false);
 /// if let Some(icon) = result.data_url {
 ///     println!("Icon: {} bytes", icon.len());
 /// }
-/// if let Some(color) = result.color {
-///     println!("Brand color: {}", color);
-/// }
 /// ```
-pub fn get_app_icon(bundle_id: &str, size: u32) -> AppIcon {
-    platform::get_app_icon(bundle_id, size)
+pub fn get_app_icon(bundle_id: &str, size: u32, include_color: bool) -> AppIcon {
+    platform::get_app_icon(bundle_id, size, include_color)
+}
+
+/// Get the dominant brand color for a specific app by bundle identifier.
+///
+/// On non-macOS platforms, returns `None`.
+pub fn get_app_color(bundle_id: &str) -> Option<String> {
+    platform::get_app_color(bundle_id)
 }

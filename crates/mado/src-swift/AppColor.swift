@@ -11,6 +11,24 @@ func getAppColor(forBundleId bundleId: String?, icon: NSImage?) -> String? {
     return extractBrandColor(from: icon)
 }
 
+/// Get app brand color by bundle identifier, resolving the icon only if needed.
+func getAppColorByBundleId(_ bundleId: String) -> String? {
+    if let preset = getAppColor(forBundleId: bundleId, icon: nil) {
+        return preset
+    }
+
+    guard
+        let appUrl = NSWorkspace.shared.urlForApplication(
+            withBundleIdentifier: bundleId
+        )
+    else {
+        return nil
+    }
+
+    let icon = NSWorkspace.shared.icon(forFile: appUrl.path)
+    return getAppColor(forBundleId: bundleId, icon: icon)
+}
+
 // MARK: - Color Extraction
 
 /// Extract brand color using k-means palette.

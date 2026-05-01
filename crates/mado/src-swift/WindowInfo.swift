@@ -25,12 +25,14 @@ struct WindowInfo {
     static func fromNS(
         _ app: NSRunningApplication,
         includeAppIcon: Bool = false,
+        includeAppColor: Bool = false,
         includeBrowserInfo: Bool = false,
         includeWebsiteInfo: Bool = false
     ) -> WindowInfo {
         return fromPID(
             app.processIdentifier,
             includeAppIcon: includeAppIcon,
+            includeAppColor: includeAppColor,
             includeBrowserInfo: includeBrowserInfo,
             includeWebsiteInfo: includeWebsiteInfo
         )
@@ -40,11 +42,16 @@ struct WindowInfo {
     static func fromPID(
         _ pid: pid_t,
         includeAppIcon: Bool = false,
+        includeAppColor: Bool = false,
         includeBrowserInfo: Bool = false,
         includeWebsiteInfo: Bool = false
     ) -> WindowInfo {
         let appElement = AXUIElementCreateApplication(pid)
-        let appInfo = AppInfo.fromPID(pid, includeIcon: includeAppIcon)
+        let appInfo = AppInfo.fromPID(
+            pid,
+            includeIcon: includeAppIcon,
+            includeColor: includeAppColor
+        )
         let bundleId = appInfo.bundleId
 
         // Get focused window via Accessibility API
@@ -89,6 +96,7 @@ struct WindowInfo {
     /// Get frontmost window info.
     static func getFrontmost(
         includeAppIcon: Bool = false,
+        includeAppColor: Bool = false,
         includeBrowserInfo: Bool = false,
         includeWebsiteInfo: Bool = false
     ) -> WindowInfo? {
@@ -98,6 +106,7 @@ struct WindowInfo {
         return fromNS(
             app,
             includeAppIcon: includeAppIcon,
+            includeAppColor: includeAppColor,
             includeBrowserInfo: includeBrowserInfo,
             includeWebsiteInfo: includeWebsiteInfo
         )

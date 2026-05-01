@@ -24,11 +24,11 @@ fn main() {
     println!("\n{}", "─".repeat(60));
     println!("\nFetching Finder icon...\n");
 
-    let icon = mado::get_app_icon("com.apple.finder", 64);
+    let icon = mado::get_app_icon("com.apple.finder", 64, false);
     if let Some(data_url) = &icon.data_url {
         println!("  Icon:  {} bytes", data_url.len());
     }
-    if let Some(color) = &icon.color {
+    if let Some(color) = mado::get_app_color("com.apple.finder") {
         println!("  Color: {}", color);
     }
 }
