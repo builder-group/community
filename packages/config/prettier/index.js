@@ -29,7 +29,11 @@ module.exports = {
 		require.resolve('prettier-plugin-packagejson')
 	],
 
-	// Import Sorting Configuration
+	// prettier-plugin-tailwindcss configuration
+	// https://github.com/tailwindlabs/prettier-plugin-tailwindcss
+	tailwindFunctions: ['clsx', 'cn', 'cva'],
+
+	// prettier-plugin-sort-imports configuration
 	// https://github.com/IanVS/prettier-plugin-sort-imports
 	importOrder: [
 		// External packages
@@ -41,5 +45,5 @@ module.exports = {
 		'^[./]'
 	],
 	importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
-	importOrderTypeScriptVersion: '5.2.2'
+	importOrderTypeScriptVersion: '6.0.3'
 };
