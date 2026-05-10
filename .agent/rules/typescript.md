@@ -5,7 +5,7 @@ This file covers TypeScript- and TSX-specific enforcement.
 ## Enforce
 
 - Keep `strict`-friendly code. Prefer explicit types at module boundaries
-- Use `interface` for object shapes that may be extended; use `type` for unions, mapped types, and aliases
+- Prefer `interface` for object shapes; use `type` for unions, mapped types, and aliases
 - Use clear naming conventions consistently:
   - `T*` for project types and interfaces
   - `E*` for enums
@@ -16,10 +16,12 @@ This file covers TypeScript- and TSX-specific enforcement.
 - Keep conditionals flat; use guard clauses for invalid states
 - Prefer named booleans for complex checks
 - Use `!items.length` for empty checks and `items.length > 0` for non-empty checks
-- Prefer config objects, props, or options with defaults over static constants when values belong to feature behavior
 - Prefer inline defaults for simple option values instead of extracting a constant too early
-- Use `UPPER_CASE` only for true stable module-level constants
+- Use `camelCase` for module-level constants
+- Group values in config objects only when the grouping reflects a real owner, domain, or shared import boundary
 - Use `export * from` in barrel files
+- Keep supporting types, config, and helpers close to the function, class, or exported value that owns or uses them
+- Let the main exported API lead a file unless a dependency must be declared first
 
 ## Avoid
 
@@ -27,8 +29,9 @@ This file covers TypeScript- and TSX-specific enforcement.
 - Do not rely on truthiness when nullability matters
 - Do not use nested ternaries for non-trivial logic
 - Do not use static class constants as a default pattern
-- Do not use `UPPER_CASE` for ordinary variables or class members
+- Do not use `UPPER_CASE` for module-level constants — this codebase uses `camelCase` throughout
 - Do not use function expressions for named top-level functions without a reason
+- Do not group unrelated code at the file level just for ordering
 
 ## Example
 

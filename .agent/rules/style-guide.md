@@ -9,7 +9,8 @@ This file covers repo-wide coding preferences. Keep it high-level; language-spec
 - Keep related code close together
 - Group nearby lines into small local clusters by domain or concern
 - Keep each cluster contiguous; do not interleave unrelated concerns
-- Keep the main logic near the top of the file and place supporting types, helpers, and config as close below the source as practical
+- Keep the main logic near the top of the file and place supporting code as close to its owner as practical
+- Prefer ownership and locality over rigid global ordering
 - Use predictable names and directory structures
 - Prefer explicit code over clever code
 - Prefer named conditions over comments when a boolean is non-obvious

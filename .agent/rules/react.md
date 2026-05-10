@@ -5,8 +5,8 @@ Follow the established project React pattern unless the local code clearly does 
 ## Enforce
 
 - Prefer `export const ComponentName: React.FC<TProps> = (props) => { ... }` for components
-- Destructure props at the top of the component and define prop interfaces near the bottom of the file
-- Prefer keeping the main component near the top of ordinary component files, with supporting code below it in a natural order such as component -> local constants (like variants) -> types -> helper functions
+- Destructure props at the top of the component
+- In component files, each component owns a local cluster: component body, then its props interface, then its component-owned constants or variants. This cluster repeats per component. Helpers or subcomponents shared across multiple components go after all clusters.
 - Use `React.useState`, `React.useMemo`, `React.useCallback`, `React.useEffect`, and related hooks through the `React.` namespace
 - Keep larger components in a predictable top-to-bottom flow: props, state and refs, derived values, `// MARK: - Actions`, `// MARK: - Effects`, `// MARK: - UI`
 - Use `React.useMemo` for meaningful derived collections, computed view state, or grouped derived values
@@ -22,7 +22,8 @@ Follow the established project React pattern unless the local code clearly does 
 
 - Do not switch to function declarations for ordinary components when the surrounding code uses typed arrow components
 - Do not mix bare hook imports with `React.useX` in the same file
-- Do not move prop interfaces above the component unless the file already follows that pattern
+- Do not hoist prop interfaces into a file header unless the file already follows that pattern
+- Do not extract component-owned config into a separate file until more than one module genuinely shares it
 - Do not add `// MARK: -` sections to small components that do not need them
 - Do not add `useMemo` or `useCallback` when the code becomes more indirect without a clear readability benefit
 - Do not inline dense event logic directly in JSX when a named callback would read better
@@ -50,6 +51,7 @@ export const ItemList: React.FC<TItemListProps> = (props) => {
 
 	const handleSelect = React.useCallback(
 		(id: string) => {
+			setFocusedId(id);
 			onSelect(id);
 		},
 		[onSelect]
