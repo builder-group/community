@@ -6,11 +6,11 @@ Follow the established project React pattern unless the local code clearly does 
 
 - Prefer `export const ComponentName: React.FC<TProps> = (props) => { ... }` for components
 - Destructure props at the top of the component
-- In component files, each component owns a local cluster: component body, then its props interface, then its component-owned constants or variants. This cluster repeats per component. Helpers or subcomponents shared across multiple components go after all clusters.
+- In component files, each component owns a local cluster: component body, then its props interface, then its component-owned constants like variants; this cluster repeats per component
 - Use `React.useState`, `React.useMemo`, `React.useCallback`, `React.useEffect`, and related hooks through the `React.` namespace
 - Keep larger components in a predictable top-to-bottom flow: props, state and refs, derived values, `// MARK: - Actions`, `// MARK: - Effects`, `// MARK: - UI`
 - Use `React.useMemo` for meaningful derived collections, computed view state, or grouped derived values
-- Use `React.useCallback` for handlers, imperative actions, and functions passed to children or hooks when that matches the surrounding style
+- Use `React.useCallback` for handlers, imperative actions, and functions passed to children or hooks
 - Keep helper subcomponents in the same file when they are tightly coupled to the parent view
 - Use short JSX comments only when they help readers skim a dense visual structure
 
@@ -21,9 +21,7 @@ Follow the established project React pattern unless the local code clearly does 
 ## Avoid
 
 - Do not switch to function declarations for ordinary components when the surrounding code uses typed arrow components
-- Do not mix bare hook imports with `React.useX` in the same file
-- Do not hoist prop interfaces into a file header unless the file already follows that pattern
-- Do not extract component-owned config into a separate file until more than one module genuinely shares it
+- Do not hoist prop interfaces into a file header
 - Do not add `// MARK: -` sections to small components that do not need them
 - Do not add `useMemo` or `useCallback` when the code becomes more indirect without a clear readability benefit
 - Do not inline dense event logic directly in JSX when a named callback would read better
@@ -38,7 +36,7 @@ export const ItemList: React.FC<TItemListProps> = (props) => {
 	const [focusedId, setFocusedId] = React.useState<string | null>(null);
 
 	const visibleLabels = React.useMemo(() => {
-		const result: Array<{ id: string; label: string }> = [];
+		const result: { id: string; label: string }[] = [];
 		for (const item of items) {
 			if (!item.hidden) {
 				result.push({ id: item.id, label: item.label });
@@ -80,11 +78,11 @@ export const ItemList: React.FC<TItemListProps> = (props) => {
 };
 
 interface TItemListProps {
-	items: Array<{
+	items: {
 		id: string;
 		label: string;
 		hidden: boolean;
-	}>;
+	}[];
 	selectedId: string | null;
 	onSelect: (id: string) => void;
 }
