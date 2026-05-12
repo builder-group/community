@@ -108,8 +108,8 @@ export function createFormField<GValue>(
 				// Validate on change
 				this.listen(
 					async ({ source }) => {
-						// Skip when value changed by reset so we don't validate and show errors after a clean reset
-						if (source === 'form-field_reset') {
+						// Skip non-value changes so they do not trigger value-change validation
+						if (source === 'form-field_reset' || source === 'form-field_status-change') {
 							return;
 						}
 
