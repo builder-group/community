@@ -6,11 +6,22 @@ describe('feature-core types', () => {
 		const counter = createCounter(0);
 		const resetCounter = counter.with(resetFeature());
 		const fullCounter = counter.with(resetFeature(), resetTwiceFeature(), loggerFeature());
+		const extendedCounter = counter.with(
+			resetFeature(),
+			resetTwiceFeature(),
+			loggerFeature(),
+			labelFeature(),
+			metaFeature()
+		);
 
 		assertType<number>(counter.get());
 		assertType<number>(fullCounter.log());
+		assertType<string>(extendedCounter.label());
 		expectTypeOf(resetCounter.reset).returns.toBeVoid();
 		expectTypeOf(fullCounter.resetTwice).returns.toBeVoid();
+		expectTypeOf(extendedCounter._features).toEqualTypeOf<
+			readonly ('reset' | 'resetTwice' | 'logger' | 'label' | 'meta')[]
+		>();
 		expectTypeOf(fullCounter._features).toEqualTypeOf<
 			readonly ('reset' | 'resetTwice' | 'logger')[]
 		>();
@@ -99,6 +110,28 @@ function loggerFeature() {
 	});
 }
 
+function labelFeature() {
+	return defineFeature({
+		key: 'label',
+		install<GFeatures extends TCounterFeature[]>(counter: TCounter<GFeatures>) {
+			return {
+				label() {
+					return `Count: ${counter.get()}`;
+				}
+			};
+		}
+	});
+}
+
+function metaFeature() {
+	return defineFeature({
+		key: 'meta',
+		install() {
+			return {};
+		}
+	});
+}
+
 function logFeature() {
 	return defineFeature({
 		key: 'log',
@@ -136,6 +169,8 @@ type TCounterFeature =
 	| TResetFeature
 	| TResetTwiceFeature
 	| TLoggerFeature
+	| TLabelFeature
+	| TMetaFeature
 	| TLogFeature
 	| TConstrainedFeature;
 
@@ -158,6 +193,18 @@ interface TLoggerFeature {
 	api: {
 		log: () => number;
 	};
+}
+
+interface TLabelFeature {
+	key: 'label';
+	api: {
+		label: () => string;
+	};
+}
+
+interface TMetaFeature {
+	key: 'meta';
+	api: Record<never, never>;
 }
 
 interface TLogFeature {

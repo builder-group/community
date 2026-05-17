@@ -4,6 +4,7 @@ import {
 	defineFeature,
 	hasFeature,
 	installFeature,
+	type TAnyFeature,
 	type TFeatureDefinition,
 	type TFeatureHost
 } from './index';
@@ -46,6 +47,17 @@ describe('feature-core', () => {
 		expect(counter.log()).toBe(2);
 	});
 
+	it('should support api-less features', () => {
+		// Prepare
+		const counter = createCounter(0);
+
+		// Act
+		const counterWithMeta = counter.with(metaFeature());
+
+		// Assert
+		expect(counterWithMeta._features).toStrictEqual(['meta']);
+	});
+
 	it('should support feature methods that declare this explicitly', () => {
 		// Prepare
 		const counter = createCounter(0).with(resetWithThisFeature());
@@ -61,13 +73,11 @@ describe('feature-core', () => {
 	it('should throw when a feature requirement is missing at runtime', () => {
 		// Prepare
 		const counter = createCounter(0);
+		const feature = resetTwiceFeature() as unknown as TAnyFeature;
 
 		// Act & Assert
 		expect(() => {
-			installFeature(
-				counter as TFeatureHost<object, TFeatureDefinition[]>,
-				resetTwiceFeature() as any
-			);
+			installFeatureUnchecked(counter as TFeatureHost<object, TFeatureDefinition[]>, feature);
 		}).toThrow('Feature "resetTwice" requires missing feature "reset"');
 	});
 
@@ -193,6 +203,15 @@ function loggerFeature() {
 	});
 }
 
+function metaFeature() {
+	return defineFeature({
+		key: 'meta',
+		install() {
+			return {};
+		}
+	});
+}
+
 function overwriteGetFeature() {
 	return defineFeature({
 		key: 'overwriteGet',
@@ -241,4 +260,15 @@ interface TLoggerFeature {
 	api: {
 		log: () => number;
 	};
+}
+
+function installFeatureUnchecked(
+	host: TFeatureHost<object, TFeatureDefinition[]>,
+	feature: TAnyFeature
+): unknown {
+	const uncheckedInstallFeature = installFeature as unknown as (
+		host: TFeatureHost<object, TFeatureDefinition[]>,
+		feature: TAnyFeature
+	) => unknown;
+	return uncheckedInstallFeature(host, feature);
 }

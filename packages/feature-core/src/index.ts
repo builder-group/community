@@ -38,10 +38,7 @@ export function installFeature<
 		TFeatureInstallConstraint<GFeature, GHost>
 ): TApplyFeature<GHost, GFeature> {
 	assertFeatureRequirements(host, feature);
-
-	if (host._features.includes(feature.key)) {
-		throw new Error(`Feature "${feature.key}" is already installed`);
-	}
+	assertFeatureNotInstalled(host, feature);
 
 	const api = feature.install(host as never);
 	assertFeatureApiKeys(host, feature, api);
@@ -95,6 +92,15 @@ function assertFeatureRequirements(
 	}
 }
 
+function assertFeatureNotInstalled(
+	host: TFeatureHost<object, TFeatureDefinition[]>,
+	feature: TAnyFeature
+): void {
+	if (host._features.includes(feature.key)) {
+		throw new Error(`Feature "${feature.key}" is already installed`);
+	}
+}
+
 function assertFeatureApiKeys(
 	host: TFeatureHost<object, TFeatureDefinition[]>,
 	feature: TAnyFeature,
@@ -112,11 +118,23 @@ export interface TDefineFeatureOptions<
 	GRequiredFeatures extends readonly string[],
 	GInstall extends TFeatureInstall
 > {
+	/**
+	 * Unique feature key used for runtime dependency checks.
+	 */
 	key: GKey;
+	/**
+	 * Feature keys that must already be installed before this feature can be installed.
+	 */
 	requires?: GRequiredFeatures;
+	/**
+	 * Adds behavior to the host and returns the public API exposed by this feature.
+	 */
 	install: GInstall;
 }
 
+/**
+ * Runtime feature object created by `defineFeature()`.
+ */
 export interface TFeature<
 	GKey extends string = string,
 	GRequiredFeatures extends readonly string[] = readonly string[],
@@ -144,23 +162,23 @@ export interface TFeatureHostApi<GBase extends object, GFeatures extends TFeatur
 	 * @internal Feature metadata used by feature-core. Prefer `hasFeature()` for app code.
 	 */
 	readonly _features: readonly TFeatureKeys<GFeatures>[];
+	/**
+	 * Installs features on this host. Chaining is preferred for long feature lists.
+	 */
 	with: TWithFeatureMethod<TFeatureHost<GBase, GFeatures>>;
 }
 
 export interface TWithFeatureMethod<GHost extends TFeatureHost<object, TFeatureDefinition[]>> {
 	<GFeature extends TAnyFeature>(
-		feature: TFeatureRequirementConstraint<GFeature, TFeatureDefinitionsOf<GHost>> &
-			TFeatureInstallConstraint<GFeature, GHost>
+		feature: TInstallableFeature<GFeature, GHost>
 	): TApplyFeature<GHost, GFeature>;
 	<
 		GFeature1 extends TAnyFeature,
 		GHost1 extends TApplyFeature<GHost, GFeature1>,
 		GFeature2 extends TAnyFeature
 	>(
-		feature1: TFeatureRequirementConstraint<GFeature1, TFeatureDefinitionsOf<GHost>> &
-			TFeatureInstallConstraint<GFeature1, GHost>,
-		feature2: TFeatureRequirementConstraint<GFeature2, TFeatureDefinitionsOf<GHost1>> &
-			TFeatureInstallConstraint<GFeature2, GHost1>
+		feature1: TInstallableFeature<GFeature1, GHost>,
+		feature2: TInstallableFeature<GFeature2, GHost1>
 	): TApplyFeature<GHost1, GFeature2>;
 	<
 		GFeature1 extends TAnyFeature,
@@ -169,13 +187,41 @@ export interface TWithFeatureMethod<GHost extends TFeatureHost<object, TFeatureD
 		GHost2 extends TApplyFeature<GHost1, GFeature2>,
 		GFeature3 extends TAnyFeature
 	>(
-		feature1: TFeatureRequirementConstraint<GFeature1, TFeatureDefinitionsOf<GHost>> &
-			TFeatureInstallConstraint<GFeature1, GHost>,
-		feature2: TFeatureRequirementConstraint<GFeature2, TFeatureDefinitionsOf<GHost1>> &
-			TFeatureInstallConstraint<GFeature2, GHost1>,
-		feature3: TFeatureRequirementConstraint<GFeature3, TFeatureDefinitionsOf<GHost2>> &
-			TFeatureInstallConstraint<GFeature3, GHost2>
+		feature1: TInstallableFeature<GFeature1, GHost>,
+		feature2: TInstallableFeature<GFeature2, GHost1>,
+		feature3: TInstallableFeature<GFeature3, GHost2>
 	): TApplyFeature<GHost2, GFeature3>;
+	<
+		GFeature1 extends TAnyFeature,
+		GHost1 extends TApplyFeature<GHost, GFeature1>,
+		GFeature2 extends TAnyFeature,
+		GHost2 extends TApplyFeature<GHost1, GFeature2>,
+		GFeature3 extends TAnyFeature,
+		GHost3 extends TApplyFeature<GHost2, GFeature3>,
+		GFeature4 extends TAnyFeature
+	>(
+		feature1: TInstallableFeature<GFeature1, GHost>,
+		feature2: TInstallableFeature<GFeature2, GHost1>,
+		feature3: TInstallableFeature<GFeature3, GHost2>,
+		feature4: TInstallableFeature<GFeature4, GHost3>
+	): TApplyFeature<GHost3, GFeature4>;
+	<
+		GFeature1 extends TAnyFeature,
+		GHost1 extends TApplyFeature<GHost, GFeature1>,
+		GFeature2 extends TAnyFeature,
+		GHost2 extends TApplyFeature<GHost1, GFeature2>,
+		GFeature3 extends TAnyFeature,
+		GHost3 extends TApplyFeature<GHost2, GFeature3>,
+		GFeature4 extends TAnyFeature,
+		GHost4 extends TApplyFeature<GHost3, GFeature4>,
+		GFeature5 extends TAnyFeature
+	>(
+		feature1: TInstallableFeature<GFeature1, GHost>,
+		feature2: TInstallableFeature<GFeature2, GHost1>,
+		feature3: TInstallableFeature<GFeature3, GHost2>,
+		feature4: TInstallableFeature<GFeature4, GHost3>,
+		feature5: TInstallableFeature<GFeature5, GHost4>
+	): TApplyFeature<GHost4, GFeature5>;
 }
 
 export type TAnyFeature = TFeature<string, readonly string[], TFeatureInstall>;
@@ -207,6 +253,12 @@ export type TFeatureApiOf<
 export type TFeatureKeyOf<GFeature extends TAnyFeature> = GFeature['key'];
 
 export type TFeatureRequirementsOf<GFeature extends TAnyFeature> = GFeature['requires'];
+
+export type TInstallableFeature<
+	GFeature extends TAnyFeature,
+	GHost extends TFeatureHost<object, TFeatureDefinition[]>
+> = TFeatureRequirementConstraint<GFeature, TFeatureDefinitionsOf<GHost>> &
+	TFeatureInstallConstraint<GFeature, GHost>;
 
 export type TFeatureRequirementConstraint<
 	GFeature extends TAnyFeature,
