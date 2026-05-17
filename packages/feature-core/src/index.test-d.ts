@@ -5,7 +5,8 @@ import {
 	hasFeature,
 	installFeature,
 	type TFeature,
-	type TFeatureHost
+	type TFeatureHost,
+	type TInstalledFeaturesOf
 } from './index';
 
 describe('feature-core types', () => {
@@ -44,6 +45,27 @@ describe('feature-core types', () => {
 			});
 
 			assertType<TResetTwiceFeature>(feature);
+		});
+
+		it('should allow dependent features to annotate a full host when base APIs are needed', () => {
+			const feature = defineFeature<TResetAndReadFeature>({
+				key: 'resetAndRead',
+				requires: ['reset'],
+				install(counter: TCounter<[TResetFeature]>) {
+					assertType<number>(counter.get());
+					assertType<() => void>(counter.reset);
+
+					return {
+						resetAndRead() {
+							counter.reset();
+
+							return counter.get();
+						}
+					};
+				}
+			});
+
+			assertType<TResetAndReadFeature>(feature);
 		});
 
 		it('should reject a runtime key that does not match the declared feature', () => {
@@ -162,6 +184,18 @@ describe('feature-core types', () => {
 			assertType<number>(counter.audit());
 			expectTypeOf(counter._features).toEqualTypeOf<
 				readonly ('reset' | 'resetTwice' | 'logger' | 'label' | 'meta' | 'audit')[]
+			>();
+		});
+
+		it('should extract the installed feature tuple from a host type', () => {
+			const counter = createCounter(0)
+				.with(resetFeature())
+				.with(resetTwiceFeature())
+				.with(loggerFeature());
+
+			assertType<number>(counter.log());
+			expectTypeOf<TInstalledFeaturesOf<typeof counter>>().toEqualTypeOf<
+				[TResetFeature, TResetTwiceFeature, TLoggerFeature]
 			>();
 		});
 
@@ -313,6 +347,7 @@ type TCounter<GFeatures extends TCounterFeature[]> = TFeatureHost<TCounterBase, 
 
 type TResetFeature = TFeature<'reset', { reset(): void }>;
 type TResetTwiceFeature = TFeature<'resetTwice', { resetTwice(): void }, [TResetFeature]>;
+type TResetAndReadFeature = TFeature<'resetAndRead', { resetAndRead(): number }, [TResetFeature]>;
 type TResetLoggerFeature = TFeature<
 	'resetLogger',
 	{ resetLogger(): void },
@@ -326,6 +361,7 @@ type TAuditFeature = TFeature<'audit', { audit(): number }>;
 type TCounterFeature =
 	| TResetFeature
 	| TResetTwiceFeature
+	| TResetAndReadFeature
 	| TLoggerFeature
 	| TLabelFeature
 	| TMetaFeature

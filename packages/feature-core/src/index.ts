@@ -175,6 +175,9 @@ export interface TAnyFeature {
 	install: (host: never) => object;
 }
 
+/**
+ * A base object extended with installed feature APIs and the `.with()` method.
+ */
 export type TFeatureHost<GBase extends object, GInstalledFeatures extends TAnyFeature[]> = Omit<
 	GBase,
 	keyof TFeatureHostApi<object, []>
@@ -249,14 +252,14 @@ export type TFeatureDefinition<GFeature extends TAnyFeature> =
 	TRequiredFeaturesOf<GFeature> extends readonly []
 		? {
 				key: GFeature['key'];
-				install: (host: never) => TFeatureApi<GFeature>;
+				install(host: never): TFeatureApi<GFeature>;
 			}
 		: {
 				key: GFeature['key'];
 				requires: GFeature['requires'];
-				install: (
+				install(
 					host: TFeatureApiIntersection<TRequiredFeaturesOf<GFeature>>
-				) => TFeatureApi<GFeature>;
+				): TFeatureApi<GFeature>;
 			};
 
 type TFeatureApi<GFeature extends TAnyFeature> =
@@ -278,3 +281,9 @@ type TRequiredFeaturesOf<GFeature extends TAnyFeature> =
 	GFeature extends TFeature<string, object, infer GRequiredFeatures extends readonly TAnyFeature[]>
 		? GRequiredFeatures
 		: readonly [];
+
+/**
+ * Extracts the installed features tuple from a feature host type.
+ */
+export type TInstalledFeaturesOf<GHost> =
+	GHost extends TFeatureHost<object, infer GFeatures> ? GFeatures : [];

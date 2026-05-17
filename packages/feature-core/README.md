@@ -122,6 +122,8 @@ The third generic is optional and defaults to `[]`.
 
 Use `TAnyFeature` as the feature type in generic utilities that work across any feature type, for example a function that accepts any feature host.
 
+Use `TInstalledFeaturesOf<THost>` when a generic utility needs to recover the installed feature tuple from a host type.
+
 ## Feature Author
 
 Use `defineFeature()`. Pass the feature type explicitly to get a typed install host and validated `requires`:
