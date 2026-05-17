@@ -2,7 +2,7 @@
 	"name": "feature-core",
 	"version": "0.0.1",
 	"private": false,
-	"description": "Composable feature primitives for builder.group libraries",
+	"description": "Composable feature primitives for TypeScript libraries",
 	"keywords": [],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {

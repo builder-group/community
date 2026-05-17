@@ -1,5 +1,7 @@
 /**
- * Adds feature composition metadata and `.with()` to a plain object.
+ * Adds feature metadata and `.with()` to a plain object.
+ *
+ * Mutates and returns the provided object.
  */
 export function createFeatureHost<GBase extends object>(base: GBase): TFeatureHost<GBase, []> {
 	assertFeatureHostApiKeys(base);
@@ -15,30 +17,34 @@ export function createFeatureHost<GBase extends object>(base: GBase): TFeatureHo
  */
 export function defineFeature<
 	const GKey extends string,
-	const GRequiredFeatures extends readonly string[] = [],
+	const GRequiredFeatureKeys extends readonly string[] = [],
 	GInstall extends TFeatureInstall = TFeatureInstall
 >(
-	definition: TDefineFeatureOptions<GKey, GRequiredFeatures, GInstall>
-): TFeature<GKey, GRequiredFeatures, GInstall> {
+	options: TDefineFeatureOptions<GKey, GRequiredFeatureKeys, GInstall>
+): TFeature<GKey, GRequiredFeatureKeys, GInstall> {
 	return {
-		key: definition.key,
-		requires: definition.requires ?? ([] as unknown as GRequiredFeatures),
-		install: definition.install
+		key: options.key,
+		requires: options.requires ?? ([] as unknown as GRequiredFeatureKeys),
+		install: options.install
 	};
 }
 
 /**
- * Installs one feature on a host and returns the host typed with the feature API.
+ * Installs one feature on a host.
+ *
+ * Mutates and returns the host. Throws when requirements are missing, the feature is already
+ * installed, or the feature API would overwrite an existing property.
  */
 export function installFeature<
-	GHost extends TFeatureHost<object, TFeatureDefinition[]>,
+	GBase extends object,
+	GFeatures extends TInstalledFeature[],
 	GFeature extends TAnyFeature
 >(
-	host: GHost,
+	host: TFeatureHost<GBase, GFeatures>,
 	feature: GFeature &
-		TFeatureRequirementConstraint<GFeature, TFeatureDefinitionsOf<GHost>> &
-		TFeatureInstallConstraint<GFeature, GHost>
-): TApplyFeature<GHost, GFeature> {
+		TFeatureRequirementConstraint<GFeature, GFeatures> &
+		TFeatureInstallConstraint<GFeature, TFeatureHost<GBase, GFeatures>>
+): TFeatureHost<GBase, TInstalledFeaturesAfter<GBase, GFeatures, GFeature>> {
 	assertFeatureRequirements(host, feature);
 	assertFeatureNotInstalled(host, feature);
 
@@ -47,13 +53,16 @@ export function installFeature<
 	Object.assign(host, api);
 	(host._features as string[]).push(feature.key);
 
-	return host as unknown as TApplyFeature<GHost, GFeature>;
+	return host as unknown as TFeatureHost<
+		GBase,
+		TInstalledFeaturesAfter<GBase, GFeatures, GFeature>
+	>;
 }
 
 /**
  * Checks whether a value is a feature host with a specific installed feature.
  */
-export function hasFeature<GFeature extends TFeatureDefinition>(
+export function hasFeature<GFeature extends TInstalledFeature>(
 	host: unknown,
 	key: GFeature['key']
 ): host is TFeatureHost<object, [GFeature]>;
@@ -62,19 +71,23 @@ export function hasFeature<GKey extends string>(
 	key: GKey
 ): host is TFeatureHost<object, [{ key: GKey; api: object }]>;
 export function hasFeature(host: unknown, key: string): boolean {
-	return (
-		typeof host === 'object' &&
-		host != null &&
-		'_features' in host &&
-		Array.isArray(host._features) &&
-		host._features.includes(key)
-	);
+	if (typeof host !== 'object' || host == null) {
+		return false;
+	}
+	if (!('_features' in host) || !Array.isArray(host._features)) {
+		return false;
+	}
+	if (!('with' in host) || typeof host.with !== 'function') {
+		return false;
+	}
+
+	return host._features.includes(key);
 }
 
 function withFeature(
-	this: TFeatureHost<object, TFeatureDefinition[]>,
+	this: TFeatureHost<object, TInstalledFeature[]>,
 	...features: TAnyFeature[]
-): TFeatureHost<object, TFeatureDefinition[]> {
+): TFeatureHost<object, TInstalledFeature[]> {
 	for (const feature of features) {
 		const installableFeature = feature as TAnyFeature &
 			TFeatureInstallConstraint<TAnyFeature, typeof this>;
@@ -85,7 +98,7 @@ function withFeature(
 }
 
 function assertFeatureRequirements(
-	host: TFeatureHost<object, TFeatureDefinition[]>,
+	host: TFeatureHost<object, TInstalledFeature[]>,
 	feature: TAnyFeature
 ): void {
 	const missingFeature = feature.requires.find((key) => !host._features.includes(key));
@@ -95,7 +108,7 @@ function assertFeatureRequirements(
 }
 
 function assertFeatureNotInstalled(
-	host: TFeatureHost<object, TFeatureDefinition[]>,
+	host: TFeatureHost<object, TInstalledFeature[]>,
 	feature: TAnyFeature
 ): void {
 	if (host._features.includes(feature.key)) {
@@ -104,13 +117,15 @@ function assertFeatureNotInstalled(
 }
 
 function assertFeatureApiKeys(
-	host: TFeatureHost<object, TFeatureDefinition[]>,
+	host: TFeatureHost<object, TInstalledFeature[]>,
 	feature: TAnyFeature,
 	api: object
 ): void {
-	for (const key of Object.keys(api)) {
+	for (const key of Reflect.ownKeys(api)) {
 		if (key in host) {
-			throw new Error(`Feature "${feature.key}" cannot overwrite existing property "${key}"`);
+			throw new Error(
+				`Feature "${feature.key}" cannot overwrite existing property "${String(key)}"`
+			);
 		}
 	}
 }
@@ -127,7 +142,7 @@ const featureHostApiKeys = ['_features', 'with'] as const;
 
 export interface TDefineFeatureOptions<
 	GKey extends string,
-	GRequiredFeatures extends readonly string[],
+	GRequiredFeatureKeys extends readonly string[],
 	GInstall extends TFeatureInstall
 > {
 	/**
@@ -137,7 +152,7 @@ export interface TDefineFeatureOptions<
 	/**
 	 * Feature keys that must already be installed before this feature can be installed.
 	 */
-	requires?: GRequiredFeatures;
+	requires?: GRequiredFeatureKeys;
 	/**
 	 * Adds behavior to the host and returns the public API exposed by this feature.
 	 */
@@ -149,144 +164,166 @@ export interface TDefineFeatureOptions<
  */
 export interface TFeature<
 	GKey extends string = string,
-	GRequiredFeatures extends readonly string[] = readonly string[],
-	GInstall extends TFeatureInstall = TFeatureInstall
+	GRequiredFeatureKeys extends readonly string[] = readonly string[],
+	GInstall extends TFeatureInstall = TFeatureInstall,
+	GInstalledFeature extends TInstalledFeature<GKey, object> = never
 > {
 	key: GKey;
-	requires: GRequiredFeatures;
+	requires: GRequiredFeatureKeys;
 	install: GInstall;
+	/**
+	 * @internal Type-only link to the installed feature contract.
+	 */
+	readonly __installedFeature?: GInstalledFeature;
 }
 
-export interface TFeatureDefinition<GKey extends string = string, GApi extends object = object> {
+/**
+ * Feature contract after a runtime feature has been installed on a host.
+ */
+export interface TInstalledFeature<GKey extends string = string, GApi extends object = object> {
 	key: GKey;
 	api: GApi;
 }
 
-export type TFeatureHost<GBase extends object, GFeatures extends TFeatureDefinition[]> = Omit<
+export type TFeatureHost<GBase extends object, GFeatures extends TInstalledFeature[]> = Omit<
 	GBase,
-	keyof TFeatureHostApi<object, TFeatureDefinition[]>
+	keyof TFeatureHostApi<object, TInstalledFeature[]>
 > &
 	TFeatureApis<GFeatures> &
 	TFeatureHostApi<GBase, GFeatures>;
 
-export interface TFeatureHostApi<GBase extends object, GFeatures extends TFeatureDefinition[]> {
+export interface TFeatureHostApi<GBase extends object, GFeatures extends TInstalledFeature[]> {
 	/**
 	 * @internal Feature metadata used by feature-core. Prefer `hasFeature()` for app code.
 	 */
 	readonly _features: readonly TFeatureKeys<GFeatures>[];
 	/**
-	 * Installs features on this host. Chaining is preferred for long feature lists.
+	 * Installs features on this host.
 	 */
-	with: TWithFeatureMethod<TFeatureHost<GBase, GFeatures>>;
+	with: TWithFeatureMethod<GBase, GFeatures>;
 }
 
-export interface TWithFeatureMethod<GHost extends TFeatureHost<object, TFeatureDefinition[]>> {
-	<GFeature extends TAnyFeature>(
-		feature: TInstallableFeature<GFeature, GHost>
-	): TApplyFeature<GHost, GFeature>;
-	<
-		GFeature1 extends TAnyFeature,
-		GHost1 extends TApplyFeature<GHost, GFeature1>,
-		GFeature2 extends TAnyFeature
-	>(
-		feature1: TInstallableFeature<GFeature1, GHost>,
-		feature2: TInstallableFeature<GFeature2, GHost1>
-	): TApplyFeature<GHost1, GFeature2>;
-	<
-		GFeature1 extends TAnyFeature,
-		GHost1 extends TApplyFeature<GHost, GFeature1>,
-		GFeature2 extends TAnyFeature,
-		GHost2 extends TApplyFeature<GHost1, GFeature2>,
-		GFeature3 extends TAnyFeature
-	>(
-		feature1: TInstallableFeature<GFeature1, GHost>,
-		feature2: TInstallableFeature<GFeature2, GHost1>,
-		feature3: TInstallableFeature<GFeature3, GHost2>
-	): TApplyFeature<GHost2, GFeature3>;
-	<
-		GFeature1 extends TAnyFeature,
-		GHost1 extends TApplyFeature<GHost, GFeature1>,
-		GFeature2 extends TAnyFeature,
-		GHost2 extends TApplyFeature<GHost1, GFeature2>,
-		GFeature3 extends TAnyFeature,
-		GHost3 extends TApplyFeature<GHost2, GFeature3>,
-		GFeature4 extends TAnyFeature
-	>(
-		feature1: TInstallableFeature<GFeature1, GHost>,
-		feature2: TInstallableFeature<GFeature2, GHost1>,
-		feature3: TInstallableFeature<GFeature3, GHost2>,
-		feature4: TInstallableFeature<GFeature4, GHost3>
-	): TApplyFeature<GHost3, GFeature4>;
-	<
-		GFeature1 extends TAnyFeature,
-		GHost1 extends TApplyFeature<GHost, GFeature1>,
-		GFeature2 extends TAnyFeature,
-		GHost2 extends TApplyFeature<GHost1, GFeature2>,
-		GFeature3 extends TAnyFeature,
-		GHost3 extends TApplyFeature<GHost2, GFeature3>,
-		GFeature4 extends TAnyFeature,
-		GHost4 extends TApplyFeature<GHost3, GFeature4>,
-		GFeature5 extends TAnyFeature
-	>(
-		feature1: TInstallableFeature<GFeature1, GHost>,
-		feature2: TInstallableFeature<GFeature2, GHost1>,
-		feature3: TInstallableFeature<GFeature3, GHost2>,
-		feature4: TInstallableFeature<GFeature4, GHost3>,
-		feature5: TInstallableFeature<GFeature5, GHost4>
-	): TApplyFeature<GHost4, GFeature5>;
+export interface TWithFeatureMethod<GBase extends object, GFeatures extends TInstalledFeature[]> {
+	<const GFeaturesToInstall extends TAnyFeature[]>(
+		...features: GFeaturesToInstall & TInstallableFeatures<GBase, GFeatures, GFeaturesToInstall>
+	): TFeatureHost<GBase, TInstalledFeaturesAfterAll<GBase, GFeatures, GFeaturesToInstall>>;
 }
 
-export type TAnyFeature = TFeature<string, readonly string[], TFeatureInstall>;
-
-export type TFeatureInstall = (host: never) => object;
-
-export type TApplyFeature<
-	GHost extends TFeatureHost<object, TFeatureDefinition[]>,
-	GFeature extends TAnyFeature
-> = TFeatureHost<
-	TFeatureBaseOf<GHost>,
-	[TFeatureDefinitionFrom<GFeature, GHost>, ...TFeatureDefinitionsOf<GHost>]
+export type TAnyFeature = TFeature<
+	string,
+	readonly string[],
+	TFeatureInstall,
+	TInstalledFeature<string, object>
 >;
 
-export type TFeatureDefinitionFrom<
+/**
+ * Runtime feature object with an explicit installed feature contract.
+ */
+export type TDeclaredFeature<
+	GInstalledFeature extends TInstalledFeature,
+	GRequiredInstalledFeatures extends readonly TInstalledFeature[] = [],
+	GInstall extends TFeatureInstall<GInstalledFeature['api']> = TFeatureInstall<
+		GInstalledFeature['api']
+	>
+> = TFeature<
+	GInstalledFeature['key'],
+	TFeatureKeyTuple<GRequiredInstalledFeatures>,
+	GInstall,
+	GInstalledFeature
+>;
+
+/**
+ * Generic feature install function. The `never` host keeps unconstrained feature installs
+ * assignable while concrete features can still narrow the host parameter.
+ */
+export type TFeatureInstall<GApi extends object = object> = (host: never) => GApi;
+
+export type TInstalledFeaturesAfter<
+	GBase extends object,
+	GFeatures extends TInstalledFeature[],
+	GFeature extends TAnyFeature
+> = [...GFeatures, TInstalledFeatureFrom<GFeature, TFeatureHost<GBase, GFeatures>>];
+
+export type TInstalledFeaturesAfterAll<
+	GBase extends object,
+	GFeatures extends TInstalledFeature[],
+	GFeaturesToInstall extends TAnyFeature[]
+> = GFeaturesToInstall extends [
+	infer GFeature extends TAnyFeature,
+	...infer GRestFeatures extends TAnyFeature[]
+]
+	? TInstalledFeaturesAfterAll<
+			GBase,
+			TInstalledFeaturesAfter<GBase, GFeatures, GFeature>,
+			GRestFeatures
+		>
+	: GFeatures;
+
+export type TInstallableFeatures<
+	GBase extends object,
+	GFeatures extends TInstalledFeature[],
+	GFeaturesToInstall extends TAnyFeature[]
+> = GFeaturesToInstall extends [
+	infer GFeature extends TAnyFeature,
+	...infer GRestFeatures extends TAnyFeature[]
+]
+	? [
+			TInstallableFeature<GFeature, TFeatureHost<GBase, GFeatures>>,
+			...TInstallableFeatures<
+				GBase,
+				TInstalledFeaturesAfter<GBase, GFeatures, GFeature>,
+				GRestFeatures
+			>
+		]
+	: [];
+
+export type TInstalledFeatureFrom<
 	GFeature extends TAnyFeature,
-	GHost extends TFeatureHost<object, TFeatureDefinition[]>
-> = TFeatureDefinition<TFeatureKeyOf<GFeature>, TFeatureApiOf<GFeature, GHost>>;
+	GHost extends TFeatureHost<object, TInstalledFeature[]>
+> =
+	TDeclaredInstalledFeatureOf<GFeature> extends TInstalledFeature
+		? TDeclaredInstalledFeatureOf<GFeature>
+		: TInstalledFeature<GFeature['key'], TFeatureApiOf<GFeature, GHost>>;
+
+export type TDeclaredInstalledFeatureOf<GFeature extends TAnyFeature> =
+	GFeature extends TFeature<string, readonly string[], TFeatureInstall, infer GInstalledFeature>
+		? [GInstalledFeature] extends [never]
+			? undefined
+			: GInstalledFeature
+		: undefined;
 
 export type TFeatureApiOf<
 	GFeature extends TAnyFeature,
-	GHost extends TFeatureHost<object, TFeatureDefinition[]>
+	GHost extends TFeatureHost<object, TInstalledFeature[]>
 > = GFeature extends { install: (host: GHost) => infer GApi }
 	? GApi extends object
 		? GApi
 		: object
 	: object;
 
-export type TFeatureKeyOf<GFeature extends TAnyFeature> = GFeature['key'];
-
-export type TFeatureRequirementsOf<GFeature extends TAnyFeature> = GFeature['requires'];
-
 export type TInstallableFeature<
 	GFeature extends TAnyFeature,
-	GHost extends TFeatureHost<object, TFeatureDefinition[]>
-> = TFeatureRequirementConstraint<GFeature, TFeatureDefinitionsOf<GHost>> &
+	GHost extends TFeatureHost<object, TInstalledFeature[]>
+> = TFeatureRequirementConstraint<GFeature, TInstalledFeaturesOf<GHost>> &
 	TFeatureInstallConstraint<GFeature, GHost>;
 
 export type TFeatureRequirementConstraint<
 	GFeature extends TAnyFeature,
-	GFeatures extends TFeatureDefinition[]
+	GFeatures extends TInstalledFeature[]
 > =
-	TMissingFeatureKeys<GFeatures, TFeatureRequirementsOf<GFeature>> extends never
+	TMissingFeatureKeys<GFeatures, GFeature['requires']> extends never
 		? GFeature
-		: TMissingFeatureError<TMissingFeatureKeys<GFeatures, TFeatureRequirementsOf<GFeature>>>;
+		: TMissingFeatureError<TMissingFeatureKeys<GFeatures, GFeature['requires']>>;
 
 export type TFeatureInstallConstraint<
 	GFeature extends TAnyFeature,
-	GHost extends TFeatureHost<object, TFeatureDefinition[]>
+	GHost extends TFeatureHost<object, TInstalledFeature[]>
 > = GFeature extends { install: (host: infer GInstallHost) => object }
-	? GHost extends GInstallHost
+	? [GInstallHost] extends [never]
 		? GFeature
-		: TIncompatibleFeatureHostError
+		: GHost extends GInstallHost
+			? GFeature
+			: TIncompatibleFeatureHostError
 	: GFeature;
 
 export interface TMissingFeatureError<GMissingFeatures extends string> {
@@ -298,23 +335,24 @@ export interface TIncompatibleFeatureHostError {
 	error: 'Feature install host is incompatible';
 }
 
-export type TFeatureDefinitionsOf<GHost> =
+export type TInstalledFeaturesOf<GHost> =
 	GHost extends TFeatureHostApi<object, infer GFeatures> ? GFeatures : [];
 
-export type TFeatureBaseOf<GHost> = Omit<
-	GHost,
-	keyof TFeatureHostApi<object, TFeatureDefinition[]>
->;
+export type TFeatureKeys<GFeatures extends TInstalledFeature[]> = GFeatures[number]['key'];
 
-export type TFeatureKeys<GFeatures extends TFeatureDefinition[]> = GFeatures[number]['key'];
+export type TFeatureKeyTuple<GFeatures extends readonly TInstalledFeature[]> = Readonly<{
+	[GIndex in keyof GFeatures]: GFeatures[GIndex] extends TInstalledFeature<infer GKey>
+		? GKey
+		: never;
+}>;
 
 export type TMissingFeatureKeys<
-	GFeatures extends TFeatureDefinition[],
-	GRequiredFeatures extends readonly string[]
-> = Exclude<GRequiredFeatures[number], TFeatureKeys<GFeatures>>;
+	GFeatures extends TInstalledFeature[],
+	GRequiredFeatureKeys extends readonly string[]
+> = Exclude<GRequiredFeatureKeys[number], TFeatureKeys<GFeatures>>;
 
-export type TFeatureApis<GFeatures extends TFeatureDefinition[]> = TIntersectAll<{
-	[GIndex in keyof GFeatures]: GFeatures[GIndex] extends TFeatureDefinition<string, infer GApi>
+export type TFeatureApis<GFeatures extends TInstalledFeature[]> = TIntersectAll<{
+	[GIndex in keyof GFeatures]: GFeatures[GIndex] extends TInstalledFeature<string, infer GApi>
 		? GApi
 		: object;
 }>;

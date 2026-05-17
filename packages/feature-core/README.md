@@ -54,7 +54,7 @@ const state = createState(0).with(
 );
 ```
 
-The variadic form is typed for up to five features. Prefer chained `.with(...)` calls for longer feature lists because each call gives TypeScript a concrete host type before the next feature is applied.
+The variadic form is typed in install order, so each feature is checked against the host produced by the features before it. Prefer chained `.with(...)` calls when a long feature list becomes harder to scan.
 
 ## 📙 Building Libraries
 
@@ -105,14 +105,21 @@ interface TResetTwiceFeature {
 
 Feature hosts include `_features` metadata for `feature-core` internals. It is visible for transparency, marked internal in the type docs, and readonly in the public type. Prefer `hasFeature(host, key)` for app-level feature checks.
 
+### Type Names
+
+- `TFeature` is the runtime object returned by `defineFeature()`
+- `TInstalledFeature` is the `{ key, api }` contract once a feature is installed
+- `TDeclaredFeature` is a runtime feature with an explicit installed feature contract
+- `TFeatureHost` is the base object plus installed feature APIs and `.with()`
+
 ## 📙 Creating Features
 
 Feature authors use `defineFeature()`.
 
 ```ts
-import { defineFeature } from 'feature-core';
+import { defineFeature, type TDeclaredFeature } from 'feature-core';
 
-export function resetFeature() {
+export function resetFeature(): TDeclaredFeature<TResetFeature> {
 	return defineFeature({
 		key: 'reset',
 		install<GFeatures extends TCounterFeature[]>(counter: TCounter<GFeatures>) {
@@ -128,14 +135,16 @@ export function resetFeature() {
 }
 ```
 
+The `TDeclaredFeature<TResetFeature>` return type is optional but recommended for reusable library features. It checks that the runtime key and returned API match the declared installed feature contract, and `.with()` carries that named feature into the host feature list.
+
 Prefer closing over the host passed to `install()` instead of relying on `this`. A returned method can still declare a `this` type, but closure-based methods are easier to write, refactor, and infer.
 
 ### Dependent Features
 
-If a feature depends on another feature, declare both `requires` and a constrained install host:
+If a feature depends on another feature, declare the required installed feature contracts, runtime `requires`, and a constrained install host:
 
 ```ts
-export function resetTwiceFeature() {
+export function resetTwiceFeature(): TDeclaredFeature<TResetTwiceFeature, [TResetFeature]> {
 	return defineFeature({
 		key: 'resetTwice',
 		requires: ['reset'] as const,
@@ -151,7 +160,9 @@ export function resetTwiceFeature() {
 }
 ```
 
-`requires` provides runtime validation. The constrained `install()` host provides compile-time validation. Using both gives better errors for humans and agents.
+`TDeclaredFeature<TFeature, [TDependency]>` and `requires` provide install-order validation. The constrained `install()` host lets the implementation use dependency APIs without casts. Using all three gives better errors for humans and agents.
+
+The second `TDeclaredFeature` generic lists required installed feature contracts. `feature-core` derives the required key tuple from those contracts and checks it against the runtime `requires` value.
 
 ### API-less Features
 
