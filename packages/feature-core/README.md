@@ -68,7 +68,7 @@ interface TCounterBase {
 	set: (nextValue: number) => void;
 }
 
-type TCounterFeature = TUndoFeature | TPersistFeature;
+type TCounterFeature = TResetFeature | TResetTwiceFeature;
 
 export type TCounter<GFeatures extends TCounterFeature[]> = TFeatureHost<
 	TCounterBase,
@@ -87,6 +87,20 @@ export function createCounter(initialValue: number): TCounter<[]> {
 		}
 	});
 }
+
+interface TResetFeature {
+	key: 'reset';
+	api: {
+		reset: () => void;
+	};
+}
+
+interface TResetTwiceFeature {
+	key: 'resetTwice';
+	api: {
+		resetTwice: () => void;
+	};
+}
 ```
 
 Feature hosts include `_features` metadata for `feature-core` internals. It is visible for transparency, marked internal in the type docs, and readonly in the public type. Prefer `hasFeature(host, key)` for app-level feature checks.
@@ -98,25 +112,15 @@ Feature authors use `defineFeature()`.
 ```ts
 import { defineFeature } from 'feature-core';
 
-export function undoFeature(historyLimit = 50) {
+export function resetFeature() {
 	return defineFeature({
-		key: 'undo',
+		key: 'reset',
 		install<GFeatures extends TCounterFeature[]>(counter: TCounter<GFeatures>) {
-			const history = [counter.get()];
-
-			counter.listen?.(({ value }) => {
-				if (history.length >= historyLimit) {
-					history.shift();
-				}
-				history.push(value);
-			});
+			const initialValue = counter.get();
 
 			return {
-				undo() {
-					const previousValue = history.pop();
-					if (previousValue != null) {
-						counter.set(previousValue);
-					}
+				reset() {
+					counter.set(initialValue);
 				}
 			};
 		}
@@ -131,16 +135,15 @@ Prefer closing over the host passed to `install()` instead of relying on `this`.
 If a feature depends on another feature, declare both `requires` and a constrained install host:
 
 ```ts
-export function multiUndoFeature() {
+export function resetTwiceFeature() {
 	return defineFeature({
-		key: 'multiUndo',
-		requires: ['undo'] as const,
-		install(counter: TCounter<[TUndoFeature]>) {
+		key: 'resetTwice',
+		requires: ['reset'] as const,
+		install(counter: TCounter<[TResetFeature]>) {
 			return {
-				multiUndo(count: number) {
-					for (let i = 0; i < count; i++) {
-						counter.undo();
-					}
+				resetTwice() {
+					counter.reset();
+					counter.reset();
 				}
 			};
 		}
@@ -171,16 +174,16 @@ export function cacheFeature() {
 Use `hasFeature()` for runtime checks:
 
 ```ts
-if (hasFeature(counter, 'undo')) {
-	console.log('Undo is installed');
+if (hasFeature(counter, 'reset')) {
+	console.log('Reset is installed');
 }
 ```
 
 Pass the feature type when you want TypeScript to narrow the API:
 
 ```ts
-if (hasFeature<TUndoFeature>(value, 'undo')) {
-	value.undo();
+if (hasFeature<TResetFeature>(value, 'reset')) {
+	value.reset();
 }
 ```
 

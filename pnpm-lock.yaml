@@ -486,6 +486,15 @@ importers:
         specifier: workspace:*
         version: link:../rollup-presets
 
+  packages/feature-core:
+    devDependencies:
+      '@blgc/config':
+        specifier: workspace:*
+        version: link:../config
+      rollup-presets:
+        specifier: workspace:*
+        version: link:../rollup-presets
+
   packages/feature-fetch:
     dependencies:
       '@0no-co/graphql.web':
@@ -776,19 +785,6 @@ importers:
       zod:
         specifier: ^4.4.2
         version: 4.4.2
-
-  packages/webito:
-    dependencies:
-      ecsify:
-        specifier: workspace:*
-        version: link:../ecsify
-    devDependencies:
-      '@blgc/config':
-        specifier: workspace:*
-        version: link:../config
-      rollup-presets:
-        specifier: workspace:*
-        version: link:../rollup-presets
 
   packages/xml-tokenizer:
     devDependencies:

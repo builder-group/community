@@ -101,6 +101,20 @@ describe('feature-core', () => {
 		}).toThrow('Feature "overwriteGet" cannot overwrite existing property "get"');
 	});
 
+	it('should throw when a base object already uses feature host properties', () => {
+		// Prepare
+		const base = {
+			with() {
+				return undefined;
+			}
+		};
+
+		// Act & Assert
+		expect(() => {
+			createFeatureHost(base);
+		}).toThrow('Feature host cannot overwrite existing property "with"');
+	});
+
 	it('should check installed features', () => {
 		// Prepare
 		const counter = createCounter(0).with(resetFeature());

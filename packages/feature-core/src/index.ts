@@ -2,6 +2,8 @@
  * Adds feature composition metadata and `.with()` to a plain object.
  */
 export function createFeatureHost<GBase extends object>(base: GBase): TFeatureHost<GBase, []> {
+	assertFeatureHostApiKeys(base);
+
 	return Object.assign(base, {
 		_features: [],
 		with: withFeature
@@ -112,6 +114,16 @@ function assertFeatureApiKeys(
 		}
 	}
 }
+
+function assertFeatureHostApiKeys(base: object): void {
+	for (const key of featureHostApiKeys) {
+		if (key in base) {
+			throw new Error(`Feature host cannot overwrite existing property "${key}"`);
+		}
+	}
+}
+
+const featureHostApiKeys = ['_features', 'with'] as const;
 
 export interface TDefineFeatureOptions<
 	GKey extends string,
