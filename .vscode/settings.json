@@ -35,7 +35,7 @@
 	// File nesting in explorer
 	"explorer.fileNesting.enabled": true,
 	"explorer.fileNesting.patterns": {
-		"*.ts": "${capture}.js, ${capture}.test.ts, ${capture}.md",
+		"*.ts": "${capture}.js, ${capture}.test.ts, ${capture}.test-d.ts, ${capture}.md",
 		"*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts, ${capture}.test.js, ${capture}.md",
 		"*.jsx": "${capture}.js, ${capture}.md",
 		"*.tsx": "${capture}.ts, ${capture}.stories.tsx, ${capture}.md",

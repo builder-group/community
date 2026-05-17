@@ -2,7 +2,7 @@
 	"name": "feature-core",
 	"version": "0.0.1",
 	"private": false,
-	"description": "",
+	"description": "Composable feature primitives for builder.group libraries",
 	"keywords": [],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
@@ -32,6 +32,7 @@
 		"size": "size-limit --why",
 		"start:dev": "tsc -w",
 		"test": "vitest run",
+		"test:types": "vitest run --typecheck.only",
 		"update:latest": "pnpm update --latest"
 	},
 	"devDependencies": {
