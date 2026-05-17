@@ -1,8 +1,8 @@
 {
-	"name": "webito",
-	"version": "0.0.7",
+	"name": "feature-core",
+	"version": "0.0.1",
 	"private": false,
-	"description": "A flexible, typesafe, and performance-focused Web Editor powered by an Entity Component System (ECS)",
+	"description": "",
 	"keywords": [],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
@@ -33,9 +33,6 @@
 		"start:dev": "tsc -w",
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest"
-	},
-	"dependencies": {
-		"ecsify": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
