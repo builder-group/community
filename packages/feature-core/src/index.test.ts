@@ -4,103 +4,231 @@ import {
 	defineFeature,
 	hasFeature,
 	installFeature,
-	type TAnyFeature,
-	type TDeclaredFeature,
-	type TInstalledFeature,
+	type TFeature,
 	type TFeatureHost
 } from './index';
 
 describe('feature-core', () => {
-	it('should install ordered features through variadic and chained calls', () => {
-		// Prepare
-		const counter = createCounter(0).with(resetFeature(), resetTwiceFeature()).with(loggerFeature());
+	describe('createFeatureHost', () => {
+		it('should add feature host metadata to a base object', () => {
+			// Prepare
+			const base = { value: 1 };
 
-		// Act
-		counter.set(5);
-		const loggedValue = counter.log();
-		counter.resetTwice();
+			// Act
+			const host = createFeatureHost(base);
 
-		// Assert
-		expect(loggedValue).toBe(5);
-		expect(counter.get()).toBe(0);
-		expect(counter._features).toStrictEqual(['reset', 'resetTwice', 'logger']);
-		expect(hasFeature(counter, 'reset')).toBe(true);
-		expect(hasFeature(counter, 'missing')).toBe(false);
-		expect(hasFeature({}, 'reset')).toBe(false);
-		expect(hasFeature({ _features: ['reset'] }, 'reset')).toBe(false);
+			// Assert
+			expect(host).toBe(base);
+			expect(host.value).toBe(1);
+			expect(host._features).toStrictEqual([]);
+			expect(host.with).toBeTypeOf('function');
+		});
+
+		it('should throw when the base object already defines with', () => {
+			// Prepare
+			const base = {
+				with() {
+					return undefined;
+				}
+			};
+
+			// Act & Assert
+			expect(() => {
+				createFeatureHost(base);
+			}).toThrow('Feature host cannot overwrite existing property "with"');
+		});
+
+		it('should throw when the base object already defines _features', () => {
+			// Prepare
+			const base = {
+				_features: []
+			};
+
+			// Act & Assert
+			expect(() => {
+				createFeatureHost(base);
+			}).toThrow('Feature host cannot overwrite existing property "_features"');
+		});
 	});
 
-	it('should support api-less features', () => {
-		// Prepare
-		const counter = createCounter(0);
+	describe('defineFeature', () => {
+		it('should create a feature with empty requirements by default', () => {
+			// Prepare
+			const feature = defineFeature({
+				key: 'enabled',
+				install() {
+					return {
+						isEnabled() {
+							return true;
+						}
+					};
+				}
+			});
 
-		// Act
-		const counterWithMeta = counter.with(metaFeature());
+			// Act
+			const api = feature.install(undefined as never);
 
-		// Assert
-		expect(counterWithMeta._features).toStrictEqual(['meta']);
+			// Assert
+			expect(feature.key).toBe('enabled');
+			expect(feature.requires).toStrictEqual([]);
+			expect(api.isEnabled()).toBe(true);
+		});
+
+		it('should keep declared runtime requirements', () => {
+			// Act
+			const feature = resetTwiceFeature();
+
+			// Assert
+			expect(feature.key).toBe('resetTwice');
+			expect(feature.requires).toStrictEqual(['reset']);
+		});
 	});
 
-	it('should support feature methods that declare this explicitly', () => {
-		// Prepare
-		const counter = createCounter(0).with(resetWithThisFeature());
+	describe('installFeature', () => {
+		it('should install a feature API on a host', () => {
+			// Prepare
+			const counter = createCounter(0);
 
-		// Act
-		counter.set(10);
-		counter.resetWithThis();
+			// Act
+			const counterWithReset = installFeature(counter, resetFeature());
+			counterWithReset.set(5);
+			counterWithReset.reset();
 
-		// Assert
-		expect(counter.get()).toBe(0);
+			// Assert
+			expect(counterWithReset.get()).toBe(0);
+			expect(counterWithReset._features).toStrictEqual(['reset']);
+		});
+
+		it('should throw when a required feature is missing', () => {
+			// Prepare
+			const counter = createCounter(0);
+			const feature = resetTwiceFeature();
+
+			// Act & Assert
+			expect(() => {
+				installFeature(counter, feature as unknown as TFeature<string, object>);
+			}).toThrow('Feature "resetTwice" requires missing feature "reset"');
+		});
+
+		it('should throw when a feature is installed twice', () => {
+			// Prepare
+			const counter = createCounter(0).with(resetFeature());
+
+			// Act & Assert
+			expect(() => {
+				installFeature(counter, resetFeature());
+			}).toThrow('Feature "reset" is already installed');
+		});
+
+		it('should throw when a feature API overwrites an existing string property', () => {
+			// Prepare
+			const counter = createCounter(0);
+
+			// Act & Assert
+			expect(() => {
+				installFeature(counter, overwriteGetFeature());
+			}).toThrow('Feature "overwriteGet" cannot overwrite existing property "get"');
+		});
+
+		it('should throw when a feature API overwrites an existing symbol property', () => {
+			// Prepare
+			const symbolKey = Symbol('value');
+			const host = createFeatureHost({ [symbolKey]: 1 });
+
+			// Act & Assert
+			expect(() => {
+				installFeature(host, overwriteSymbolFeature(symbolKey));
+			}).toThrow('Feature "overwriteSymbol" cannot overwrite existing property "Symbol(value)"');
+		});
 	});
 
-	it('should throw when a feature requirement is missing at runtime', () => {
-		// Prepare
-		const counter = createCounter(0);
-		const feature = resetTwiceFeature() as unknown as TAnyFeature;
+	describe('hasFeature', () => {
+		it('should return true when a feature key is installed', () => {
+			// Prepare
+			const counter = createCounter(0).with(resetFeature());
 
-		// Act & Assert
-		expect(() => {
-			installFeatureUnchecked(counter as TFeatureHost<object, TInstalledFeature[]>, feature);
-		}).toThrow('Feature "resetTwice" requires missing feature "reset"');
+			// Act
+			const result = hasFeature(counter, 'reset');
+
+			// Assert
+			expect(result).toBe(true);
+		});
+
+		it('should return false when a feature key is missing', () => {
+			// Prepare
+			const counter = createCounter(0).with(resetFeature());
+
+			// Act
+			const result = hasFeature(counter, 'logger');
+
+			// Assert
+			expect(result).toBe(false);
+		});
+
+		it('should return false for values that are not feature hosts', () => {
+			// Act & Assert
+			expect(hasFeature({}, 'reset')).toBe(false);
+			expect(hasFeature({ _features: ['reset'] }, 'reset')).toBe(false);
+			expect(hasFeature(null, 'reset')).toBe(false);
+		});
 	});
 
-	it('should throw when a feature is installed twice', () => {
-		// Prepare
-		const counter = createCounter(0).with(resetFeature());
+	describe('host.with', () => {
+		it('should install chained features in order', () => {
+			// Prepare
+			const counter = createCounter(0)
+				.with(resetFeature())
+				.with(resetTwiceFeature())
+				.with(loggerFeature());
 
-		// Act & Assert
-		expect(() => {
-			counter.with(resetFeature());
-		}).toThrow('Feature "reset" is already installed');
-	});
+			// Act
+			counter.set(5);
+			const loggedValue = counter.log();
+			counter.resetTwice();
 
-	it('should throw when a feature overwrites an existing property', () => {
-		// Prepare
-		const counter = createCounter(0);
-		const symbolKey = Symbol('value');
-		const symbolHost = createFeatureHost({ [symbolKey]: 1 });
+			// Assert
+			expect(loggedValue).toBe(5);
+			expect(counter.get()).toBe(0);
+			expect(counter._features).toStrictEqual(['reset', 'resetTwice', 'logger']);
+		});
 
-		// Act & Assert
-		expect(() => {
-			counter.with(overwriteGetFeature());
-		}).toThrow('Feature "overwriteGet" cannot overwrite existing property "get"');
-		expect(() => {
-			symbolHost.with(overwriteSymbolFeature(symbolKey));
-		}).toThrow('Feature "overwriteSymbol" cannot overwrite existing property "Symbol(value)"');
-	});
+		it('should install variadic features in order', () => {
+			// Prepare
+			const counter = createCounter(0).with(resetFeature(), resetTwiceFeature(), loggerFeature());
 
-	it('should throw when a base object already uses feature host properties', () => {
-		// Prepare
-		const base = {
-			with() {
-				return undefined;
-			}
-		};
+			// Act
+			counter.set(5);
+			const loggedValue = counter.log();
+			counter.resetTwice();
 
-		// Act & Assert
-		expect(() => {
-			createFeatureHost(base);
-		}).toThrow('Feature host cannot overwrite existing property "with"');
+			// Assert
+			expect(loggedValue).toBe(5);
+			expect(counter.get()).toBe(0);
+			expect(counter._features).toStrictEqual(['reset', 'resetTwice', 'logger']);
+		});
+
+		it('should support api-less features', () => {
+			// Prepare
+			const counter = createCounter(0);
+
+			// Act
+			const counterWithMeta = counter.with(metaFeature());
+
+			// Assert
+			expect(counterWithMeta._features).toStrictEqual(['meta']);
+		});
+
+		it('should support feature methods that declare this explicitly', () => {
+			// Prepare
+			const counter = createCounter(0).with(resetWithThisFeature());
+
+			// Act
+			counter.set(10);
+			counter.resetWithThis();
+
+			// Assert
+			expect(counter.get()).toBe(0);
+		});
 	});
 });
 
@@ -118,10 +246,10 @@ function createCounter(initialValue: number): TCounter<[]> {
 	return createFeatureHost(base);
 }
 
-function resetFeature(): TDeclaredFeature<TResetFeature> {
-	return defineFeature({
+function resetFeature(): TResetFeature {
+	return defineFeature<TResetFeature>({
 		key: 'reset',
-		install<GFeatures extends TCounterFeature[]>(counter: TCounter<GFeatures>) {
+		install(counter: TCounterBase) {
 			const initialValue = counter.get();
 
 			return {
@@ -133,11 +261,11 @@ function resetFeature(): TDeclaredFeature<TResetFeature> {
 	});
 }
 
-function resetTwiceFeature(): TDeclaredFeature<TResetTwiceFeature, [TResetFeature]> {
-	return defineFeature({
+function resetTwiceFeature(): TResetTwiceFeature {
+	return defineFeature<TResetTwiceFeature>({
 		key: 'resetTwice',
-		requires: ['reset'] as const,
-		install(counter: TCounter<[TResetFeature]>) {
+		requires: ['reset'],
+		install(counter) {
 			return {
 				resetTwice() {
 					counter.reset();
@@ -148,10 +276,10 @@ function resetTwiceFeature(): TDeclaredFeature<TResetTwiceFeature, [TResetFeatur
 	});
 }
 
-function resetWithThisFeature(): TDeclaredFeature<TResetWithThisFeature> {
-	return defineFeature({
+function resetWithThisFeature(): TResetWithThisFeature {
+	return defineFeature<TResetWithThisFeature>({
 		key: 'resetWithThis',
-		install<GFeatures extends TCounterFeature[]>(counter: TCounter<GFeatures>) {
+		install(counter: TCounterBase) {
 			const initialValue = counter.get();
 
 			return {
@@ -163,10 +291,10 @@ function resetWithThisFeature(): TDeclaredFeature<TResetWithThisFeature> {
 	});
 }
 
-function loggerFeature(): TDeclaredFeature<TLoggerFeature> {
-	return defineFeature({
+function loggerFeature(): TLoggerFeature {
+	return defineFeature<TLoggerFeature>({
 		key: 'logger',
-		install<GFeatures extends TCounterFeature[]>(counter: TCounter<GFeatures>) {
+		install(counter: TCounterBase) {
 			return {
 				log() {
 					return counter.get();
@@ -176,8 +304,8 @@ function loggerFeature(): TDeclaredFeature<TLoggerFeature> {
 	});
 }
 
-function metaFeature(): TDeclaredFeature<TMetaFeature> {
-	return defineFeature({
+function metaFeature(): TMetaFeature {
+	return defineFeature<TMetaFeature>({
 		key: 'meta',
 		install() {
 			return {};
@@ -216,53 +344,15 @@ interface TCounterBase {
 
 type TCounter<GFeatures extends TCounterFeature[]> = TFeatureHost<TCounterBase, GFeatures>;
 
+type TResetFeature = TFeature<'reset', { reset(): void }>;
+type TResetTwiceFeature = TFeature<'resetTwice', { resetTwice(): void }, [TResetFeature]>;
+type TResetWithThisFeature = TFeature<'resetWithThis', { resetWithThis(this: TCounterBase): void }>;
+type TLoggerFeature = TFeature<'logger', { log(): number }>;
+type TMetaFeature = TFeature<'meta', Record<never, never>>;
+
 type TCounterFeature =
 	| TResetFeature
 	| TResetTwiceFeature
 	| TResetWithThisFeature
 	| TLoggerFeature
 	| TMetaFeature;
-
-interface TResetFeature {
-	key: 'reset';
-	api: {
-		reset: () => void;
-	};
-}
-
-interface TResetTwiceFeature {
-	key: 'resetTwice';
-	api: {
-		resetTwice: () => void;
-	};
-}
-
-interface TResetWithThisFeature {
-	key: 'resetWithThis';
-	api: {
-		resetWithThis: (this: TCounterBase) => void;
-	};
-}
-
-interface TLoggerFeature {
-	key: 'logger';
-	api: {
-		log: () => number;
-	};
-}
-
-interface TMetaFeature {
-	key: 'meta';
-	api: Record<never, never>;
-}
-
-function installFeatureUnchecked(
-	host: TFeatureHost<object, TInstalledFeature[]>,
-	feature: TAnyFeature
-): unknown {
-	const uncheckedInstallFeature = installFeature as unknown as (
-		host: TFeatureHost<object, TInstalledFeature[]>,
-		feature: TAnyFeature
-	) => unknown;
-	return uncheckedInstallFeature(host, feature);
-}

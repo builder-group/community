@@ -19,61 +19,75 @@
 
 > Status: Experimental
 
-`feature-core` is a small, typesafe foundation for building feature-based JavaScript and TypeScript libraries.
+`feature-core` is a small, typesafe foundation for building extensible JavaScript and TypeScript libraries using a `.with(feature())` composition model.
 
-- **Lightweight & Tree Shakable**: Object-based composition with no class hierarchy
-- **Modular & Extendable**: Add capabilities with `.with(feature())` instead of nested wrappers
-- **Typesafe**: Feature APIs and dependencies are tracked in TypeScript
-- **Author Friendly**: Custom features are plain objects created with `defineFeature()`
-- **Framework Agnostic**: Works for state containers, fetch clients, loggers, and other object-based libraries
-
-### 🌟 Motivation
-
-Feature-based libraries often repeat the same difficult parts: applying feature APIs, tracking installed features, validating dependencies, and preserving strong TypeScript inference. `feature-core` centralizes those mechanics so libraries can expose a consistent `.with(...)` extension model while feature authors only define a key, optional requirements, and an install function.
-
-## 📖 Usage
-
-Consumers compose features on a host object:
+Every extensible library eventually solves the same problems: applying feature APIs onto a host object, tracking what is installed, and validating dependencies. It does all of this without losing TypeScript inference. `feature-core` centralizes those mechanics once so library authors can focus on features, not plumbing.
 
 ```ts
-const state = createState(0)
-	.with(undoFeature(4))
-	.with(storageFeature(storage, 'count'))
-	.with(loggerFeature());
+const counter = createCounter(0).with(resetFeature()).with(resetTwiceFeature()); // type error if resetFeature() is missing
 
-state.undo();
+counter.reset(); // typed
+counter.resetTwice(); // typed
+counter.missing(); // type error
 ```
 
-Features can also be applied in order through one call:
+## Three Roles
+
+There are three roles in the feature model:
+
+| Role               | Responsibility                                 |
+| ------------------ | ---------------------------------------------- |
+| **Consumer**       | Composes features on a host with `.with()`     |
+| **Library author** | Wraps a base object with `createFeatureHost()` |
+| **Feature author** | Creates features with `defineFeature()`        |
+
+## Consumer
+
+Call `.with()` with one or more features. Features are validated in order. Each one is checked against the host produced by all preceding features:
 
 ```ts
-const state = createState(0).with(
-	undoFeature(4),
-	storageFeature(storage, 'count'),
-	loggerFeature()
-);
+// Chained: one feature at a time
+const counter = createCounter(0).with(resetFeature()).with(resetTwiceFeature());
+
+// Variadic: all at once, validated left to right
+const counter = createCounter(0).with(resetFeature(), resetTwiceFeature());
 ```
 
-The variadic form is typed in install order, so each feature is checked against the host produced by the features before it. Prefer chained `.with(...)` calls when a long feature list becomes harder to scan.
+Both forms are equivalent. Prefer chained calls when the list gets long.
 
-## 📙 Building Libraries
-
-Libraries wrap their base object with `createFeatureHost()`.
+`.with()` mutates the original object and returns it. The base reference and the result are the same object:
 
 ```ts
-import { createFeatureHost, type TFeatureHost } from 'feature-core';
+const base = createCounter(0);
+const withReset = base.with(resetFeature());
+// base === withReset, same object, reset() is now on both
+```
+
+Use `hasFeature()` for runtime checks:
+
+```ts
+if (hasFeature<TResetFeature>(value, 'reset')) {
+	value.reset(); // narrowed
+}
+```
+
+## Library Author
+
+Wrap the base object with `createFeatureHost()` and export a typed host alias:
+
+```ts
+import { createFeatureHost, type TFeature, type TFeatureHost } from 'feature-core';
 
 interface TCounterBase {
 	get: () => number;
 	set: (nextValue: number) => void;
 }
 
-type TCounterFeature = TResetFeature | TResetTwiceFeature;
+type TResetFeature = TFeature<'reset', { reset(): void }>;
+type TResetTwiceFeature = TFeature<'resetTwice', { resetTwice(): void }, [TResetFeature]>;
 
-export type TCounter<GFeatures extends TCounterFeature[]> = TFeatureHost<
-	TCounterBase,
-	GFeatures
->;
+type TCounterFeature = TResetFeature | TResetTwiceFeature;
+export type TCounter<GFeatures extends TCounterFeature[]> = TFeatureHost<TCounterBase, GFeatures>;
 
 export function createCounter(initialValue: number): TCounter<[]> {
 	let value = initialValue;
@@ -87,42 +101,40 @@ export function createCounter(initialValue: number): TCounter<[]> {
 		}
 	});
 }
-
-interface TResetFeature {
-	key: 'reset';
-	api: {
-		reset: () => void;
-	};
-}
-
-interface TResetTwiceFeature {
-	key: 'resetTwice';
-	api: {
-		resetTwice: () => void;
-	};
-}
 ```
 
-Feature hosts include `_features` metadata for `feature-core` internals. It is visible for transparency, marked internal in the type docs, and readonly in the public type. Prefer `hasFeature(host, key)` for app-level feature checks.
-
-### Type Names
-
-- `TFeature` is the runtime object returned by `defineFeature()`
-- `TInstalledFeature` is the `{ key, api }` contract once a feature is installed
-- `TDeclaredFeature` is a runtime feature with an explicit installed feature contract
-- `TFeatureHost` is the base object plus installed feature APIs and `.with()`
-
-## 📙 Creating Features
-
-Feature authors use `defineFeature()`.
+`TFeature` has three parts:
 
 ```ts
-import { defineFeature, type TDeclaredFeature } from 'feature-core';
+type TMyFeature = TFeature<'my-feature', TMyFeatureApi, [TRequiredFeature]>;
+//                          ^ runtime key  ^ API shape   ^ required features
+```
 
-export function resetFeature(): TDeclaredFeature<TResetFeature> {
-	return defineFeature({
+The third generic is optional and defaults to `[]`.
+
+**Checklist:**
+
+- Define the base API as an interface
+- Define feature contracts with named `TFeature` aliases
+- Export the host type as `TFeatureHost<TBase, GFeatures>`
+- Return `createFeatureHost(base)` from the factory
+- Keep feature keys unique. The runtime throws on duplicate installation.
+
+Use `TAnyFeature` as the feature type in generic utilities that work across any feature type, for example a function that accepts any feature host.
+
+## Feature Author
+
+Use `defineFeature()`. Pass the feature type explicitly to get a typed install host and validated `requires`:
+
+```ts
+import { defineFeature, type TFeature } from 'feature-core';
+
+type TResetFeature = TFeature<'reset', { reset(): void }>;
+
+export function resetFeature(): TResetFeature {
+	return defineFeature<TResetFeature>({
 		key: 'reset',
-		install<GFeatures extends TCounterFeature[]>(counter: TCounter<GFeatures>) {
+		install(counter: TCounterBase) {
 			const initialValue = counter.get();
 
 			return {
@@ -135,20 +147,36 @@ export function resetFeature(): TDeclaredFeature<TResetFeature> {
 }
 ```
 
-The `TDeclaredFeature<TResetFeature>` return type is optional but recommended for reusable library features. It checks that the runtime key and returned API match the declared installed feature contract, and `.with()` carries that named feature into the host feature list.
+Annotate the `install()` parameter with the base host type when the feature needs base APIs. The parameter is `never` by default. There is no implicit host type because features are designed to work across different host shapes.
 
-Prefer closing over the host passed to `install()` instead of relying on `this`. A returned method can still declare a `this` type, but closure-based methods are easier to write, refactor, and infer.
+For local or one-off features, the generic can be omitted and the type is inferred:
+
+```ts
+const debugFeature = () =>
+	defineFeature({
+		key: 'debug',
+		install() {
+			return {
+				debug() {
+					return true;
+				}
+			};
+		}
+	});
+```
 
 ### Dependent Features
 
-If a feature depends on another feature, declare the required installed feature contracts, runtime `requires`, and a constrained install host:
+List required feature types in the third `TFeature` generic and mirror those keys in `requires`. The order must match:
 
 ```ts
-export function resetTwiceFeature(): TDeclaredFeature<TResetTwiceFeature, [TResetFeature]> {
-	return defineFeature({
+type TResetTwiceFeature = TFeature<'resetTwice', { resetTwice(): void }, [TResetFeature]>;
+
+export function resetTwiceFeature(): TResetTwiceFeature {
+	return defineFeature<TResetTwiceFeature>({
 		key: 'resetTwice',
-		requires: ['reset'] as const,
-		install(counter: TCounter<[TResetFeature]>) {
+		requires: ['reset'],
+		install(counter) {
 			return {
 				resetTwice() {
 					counter.reset();
@@ -160,19 +188,23 @@ export function resetTwiceFeature(): TDeclaredFeature<TResetTwiceFeature, [TRese
 }
 ```
 
-`TDeclaredFeature<TFeature, [TDependency]>` and `requires` provide install-order validation. The constrained `install()` host lets the implementation use dependency APIs without casts. Using all three gives better errors for humans and agents.
+The `install()` host is typed from the required feature APIs, so `counter.reset()` above is available without any cast. If the feature also needs base APIs, annotate the parameter with the full host type:
 
-The second `TDeclaredFeature` generic lists required installed feature contracts. `feature-core` derives the required key tuple from those contracts and checks it against the runtime `requires` value.
+```ts
+install(counter: TCounter<[TResetFeature]>) { ... }
+```
 
 ### API-less Features
 
-Some features only mutate internal configuration and do not expose new methods. Return an empty object for those features:
+Features that only mutate internal configuration return an empty object:
 
 ```ts
-export function cacheFeature() {
-	return defineFeature({
+type TCacheFeature = TFeature<'cache', Record<never, never>>;
+
+export function cacheFeature(): TCacheFeature {
+	return defineFeature<TCacheFeature>({
 		key: 'cache',
-		install<GFeatures extends TFetchFeature[]>(client: TFetchClient<GFeatures>) {
+		install(client: TFetchClientBase) {
 			client._config.requestMiddlewares.push(cacheMiddleware());
 			return {};
 		}
@@ -180,43 +212,36 @@ export function cacheFeature() {
 }
 ```
 
-## 🔍 Feature Checks
-
-Use `hasFeature()` for runtime checks:
-
-```ts
-if (hasFeature(counter, 'reset')) {
-	console.log('Reset is installed');
-}
-```
-
-Pass the feature type when you want TypeScript to narrow the API:
-
-```ts
-if (hasFeature<TResetFeature>(value, 'reset')) {
-	value.reset();
-}
-```
-
 ## ❓ FAQ
 
-### Why features instead of plugins?
+### Why "features" instead of "plugins"?
 
-`feature-core` composes typed capabilities directly onto a host object. "Feature" describes that narrower contract better than "plugin", which often implies discovery, lifecycle hooks, registries, or installable packages.
+"Plugin" implies discovery, lifecycle hooks, registries, or installable packages. `feature-core` composes typed capabilities directly onto a host object. That narrower contract is better described as a feature.
 
-### Can features overwrite existing properties?
+### Why does the host get mutated instead of copied?
 
-No. Feature keys must be unique per host, and returned API keys must not overwrite existing host properties. `feature-core` throws when a feature is installed twice, when required features are missing, or when a feature tries to overwrite an existing property.
+Feature installation happens at construction time, not at runtime. Mutation keeps the model simple: there is one object, its identity never changes, and installed feature APIs are just properties on it. Copying would require re-typing the result on every `.with()` call anyway, so there is no practical benefit.
 
-### Should features use `this`?
+### Why does `requires` order have to mirror the dependency tuple?
 
-Prefer closing over the host passed to `install()`. `this` methods can work, but they are easier to call incorrectly and harder for agents to author consistently.
+An unordered approach (union array) would only validate that listed keys are _allowed_, not that _every_ required key is present. A partial `requires` would silently pass. The positional tuple enforces completeness, with one rule: the `requires` array order must mirror the `GRequiredFeatures` tuple order.
 
-### What should feature authors remember?
+### Why do I have to annotate the `install()` parameter myself?
 
-- Use a unique feature key
-- Declare `requires` for runtime dependencies
-- Type the `install()` host when the feature depends on another feature
-- Return only new API keys
-- Return `{}` for features that only mutate internal configuration
-- Prefer chained `.with(...)` calls for long feature lists
+Features are host-agnostic. The same feature can be installed on different host shapes, so there is no single type to infer. Annotate the parameter with whatever the feature actually needs: the library base type, a full host type, or nothing at all if the feature does not use the host:
+
+```ts
+install(host: TCounterBase) { ... }              // needs base APIs
+install(host: TCounter<[TResetFeature]>) { ... } // needs base + reset
+install() { ... }                                // does not use the host
+```
+
+### Does `feature-core` validate the base host type?
+
+No. `feature-core` validates feature dependencies and the APIs added by installed features, but it does not carry a global base-host constraint per feature. If a feature needs base APIs, annotate the `install()` parameter with the host shape it actually uses.
+
+This keeps features reusable across libraries and avoids making every feature carry extra generic state. Package-specific tests should cover whether a feature is valid for that package's base host.
+
+### When should I use explicit `defineFeature<TMyFeature>()` vs inferred?
+
+Use explicit when the feature is exported or referenced by name elsewhere. TypeScript will validate that the key, API shape, and `requires` all match the declared type contract, catching mismatches at definition time. Use inferred for local or one-off features where no external contract exists.

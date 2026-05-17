@@ -4,107 +4,36 @@ import {
 	defineFeature,
 	hasFeature,
 	installFeature,
-	type TDeclaredFeature,
+	type TFeature,
 	type TFeatureHost
 } from './index';
 
 describe('feature-core types', () => {
-	it('should infer consumer APIs and installed feature tuples', () => {
-		const counter = createCounter(0);
-		const resetCounter = createCounter(0).with(resetFeature());
-		const fullCounter = createCounter(0)
-			.with(resetFeature(), resetTwiceFeature())
-			.with(loggerFeature());
-		const longCounter = createCounter(0).with(
-			resetFeature(),
-			resetTwiceFeature(),
-			loggerFeature(),
-			labelFeature(),
-			metaFeature(),
-			auditFeature()
-		);
+	describe('createFeatureHost types', () => {
+		it('should preserve the base API and expose an empty feature tuple', () => {
+			const counter = createCounter(0);
 
-		assertType<number>(counter.get());
-		assertType<number>(fullCounter.log());
-		assertType<string>(longCounter.label());
-		assertType<number>(longCounter.audit());
-		expectTypeOf(resetCounter.reset).returns.toBeVoid();
-		expectTypeOf(fullCounter.resetTwice).returns.toBeVoid();
-		expectTypeOf(longCounter._features).toEqualTypeOf<
-			readonly ('reset' | 'resetTwice' | 'logger' | 'label' | 'meta' | 'audit')[]
-		>();
-		expectTypeOf(fullCounter._features).toEqualTypeOf<
-			readonly ('reset' | 'resetTwice' | 'logger')[]
-		>();
-		expectTypeOf(resetCounter).toEqualTypeOf<TCounter<[TResetFeature]>>();
-		expectTypeOf(fullCounter).toEqualTypeOf<
-			TCounter<[TResetFeature, TResetTwiceFeature, TLoggerFeature]>
-		>();
-		expectTypeOf(installFeature(createCounter(0), resetFeature())).toEqualTypeOf<
-			TCounter<[TResetFeature]>
-		>();
+			assertType<number>(counter.get());
+			expectTypeOf(counter).toEqualTypeOf<TCounter<[]>>();
+		});
 	});
 
-	it('should reject missing dependencies and unavailable APIs', () => {
-		const counter = createCounter(0);
+	describe('defineFeature types', () => {
+		it('should infer feature keys and APIs without an explicit feature type', () => {
+			const feature = inferredFeature();
+			const counter = createCounter(0).with(feature);
 
-		// @ts-expect-error resetTwiceFeature requires resetFeature first.
-		counter.with(resetTwiceFeature());
-
-		// @ts-expect-error reset is not available before resetFeature is installed.
-		counter.reset();
-
-		// @ts-expect-error _features is visible but readonly.
-		counter._features.push('reset');
-	});
-
-	it('should narrow a matching key capability with hasFeature', () => {
-		const counter = createCounter(0).with(loggerFeature());
-		const unknownCounter: unknown = counter;
-
-		if (hasFeature<TLoggerFeature>(unknownCounter, 'logger')) {
-			assertType<number>(unknownCounter.log());
-		}
-	});
-
-	it('should reject features with incompatible install hosts', () => {
-		const counter = createCounter(0);
-
-		// @ts-expect-error inferredConstrainedFeature requires a host with resetFeature installed.
-		counter.with(inferredConstrainedFeature());
-	});
-
-	it('should reject declared features with mismatching contracts', () => {
-		// @ts-expect-error declared feature key must match the runtime feature key.
-		const wrongKeyFeature: TDeclaredFeature<TResetFeature> = defineFeature({
-			key: 'wrong',
-			install<GFeatures extends TCounterFeature[]>(counter: TCounter<GFeatures>) {
-				return {
-					reset() {
-						counter.set(0);
-					}
-				};
-			}
+			assertType<TFeature<'inferred', { inferred(): boolean }>>(feature);
+			assertType<boolean>(counter.inferred());
 		});
 
-		// @ts-expect-error declared feature API must match the install return value.
-		const wrongApiFeature: TDeclaredFeature<TResetFeature> = defineFeature({
-			key: 'reset',
-			install() {
-				return {
-					wrong() {
-						return undefined;
-					}
-				};
-			}
-		});
-
-		// @ts-expect-error declared required features must match runtime requires.
-		const wrongRequiredFeature: TDeclaredFeature<TResetTwiceFeature, [TResetFeature]> =
-			defineFeature({
+		it('should type the install host from required feature APIs', () => {
+			const feature = defineFeature<TResetTwiceFeature>({
 				key: 'resetTwice',
-				requires: ['logger'] as const,
-				install(counter: TCounter<[TResetFeature]>) {
+				requires: ['reset'],
+				install(counter) {
+					assertType<() => void>(counter.reset);
+
 					return {
 						resetTwice() {
 							counter.reset();
@@ -114,9 +43,159 @@ describe('feature-core types', () => {
 				}
 			});
 
-		assertType<TDeclaredFeature<TResetFeature>>(wrongKeyFeature);
-		assertType<TDeclaredFeature<TResetFeature>>(wrongApiFeature);
-		assertType<TDeclaredFeature<TResetTwiceFeature, [TResetFeature]>>(wrongRequiredFeature);
+			assertType<TResetTwiceFeature>(feature);
+		});
+
+		it('should reject a runtime key that does not match the declared feature', () => {
+			defineFeature<TResetFeature>({
+				// @ts-expect-error declared feature key must match the runtime feature key.
+				key: 'wrong',
+				install(counter: TCounterBase) {
+					return {
+						reset() {
+							counter.set(0);
+						}
+					};
+				}
+			});
+		});
+
+		it('should reject an API that does not match the declared feature', () => {
+			defineFeature<TResetFeature>({
+				key: 'reset',
+				// @ts-expect-error declared feature API must match the install return value.
+				install() {
+					return {
+						wrong() {
+							return undefined;
+						}
+					};
+				}
+			});
+		});
+
+		it('should reject a required key that is not declared by the feature', () => {
+			defineFeature<TResetTwiceFeature>({
+				key: 'resetTwice',
+				// @ts-expect-error declared required feature keys must match runtime requires.
+				requires: ['logger'],
+				install() {
+					return { resetTwice() {} };
+				}
+			});
+		});
+
+		it('should reject missing required feature keys', () => {
+			defineFeature<TResetLoggerFeature>({
+				key: 'resetLogger',
+				// @ts-expect-error every declared required feature key must be listed.
+				requires: ['reset'],
+				install(counter) {
+					return {
+						resetLogger() {
+							counter.reset();
+							counter.log();
+						}
+					};
+				}
+			});
+		});
+
+		it('should reject required feature keys in the wrong order', () => {
+			defineFeature<TResetLoggerFeature>({
+				key: 'resetLogger',
+				// @ts-expect-error requires mirrors the declared required feature tuple.
+				requires: ['logger', 'reset'],
+				install(counter) {
+					return {
+						resetLogger() {
+							counter.reset();
+							counter.log();
+						}
+					};
+				}
+			});
+		});
+	});
+
+	describe('installFeature types', () => {
+		it('should append an installed feature to the host tuple', () => {
+			const counter = installFeature(createCounter(0), resetFeature());
+
+			assertType<() => void>(counter.reset);
+			expectTypeOf(counter).toEqualTypeOf<TCounter<[TResetFeature]>>();
+		});
+
+		it('should reject a feature with missing dependencies', () => {
+			const counter = createCounter(0);
+
+			// @ts-expect-error resetTwiceFeature requires resetFeature first.
+			installFeature(counter, resetTwiceFeature());
+		});
+	});
+
+	describe('host.with types', () => {
+		it('should infer chained feature order', () => {
+			const counter = createCounter(0)
+				.with(resetFeature())
+				.with(resetTwiceFeature())
+				.with(loggerFeature());
+
+			assertType<number>(counter.log());
+			expectTypeOf(counter.resetTwice).returns.toBeVoid();
+			expectTypeOf(counter).toEqualTypeOf<
+				TCounter<[TResetFeature, TResetTwiceFeature, TLoggerFeature]>
+			>();
+		});
+
+		it('should infer variadic feature order', () => {
+			const counter = createCounter(0).with(
+				resetFeature(),
+				resetTwiceFeature(),
+				loggerFeature(),
+				labelFeature(),
+				metaFeature(),
+				auditFeature()
+			);
+
+			assertType<string>(counter.label());
+			assertType<number>(counter.audit());
+			expectTypeOf(counter._features).toEqualTypeOf<
+				readonly ('reset' | 'resetTwice' | 'logger' | 'label' | 'meta' | 'audit')[]
+			>();
+		});
+
+		it('should reject unavailable APIs before their feature is installed', () => {
+			const counter = createCounter(0);
+
+			// @ts-expect-error reset is not available before resetFeature is installed.
+			counter.reset();
+		});
+
+		it('should reject missing dependencies in install order', () => {
+			const counter = createCounter(0);
+
+			// @ts-expect-error resetTwiceFeature requires resetFeature first.
+			counter.with(resetTwiceFeature());
+		});
+
+		it('should expose readonly feature metadata', () => {
+			const counter = createCounter(0);
+
+			// @ts-expect-error _features is visible but readonly.
+			counter._features.push('reset');
+		});
+	});
+
+	describe('hasFeature types', () => {
+		it('should narrow a matching feature key capability', () => {
+			const counter = createCounter(0).with(loggerFeature());
+			const unknownCounter: unknown = counter;
+
+			if (hasFeature<TLoggerFeature>(unknownCounter, 'logger')) {
+				assertType<number>(unknownCounter.log());
+			}
+		});
 	});
 });
 
@@ -134,10 +213,10 @@ function createCounter(initialValue: number): TCounter<[]> {
 	return createFeatureHost(base);
 }
 
-function resetFeature(): TDeclaredFeature<TResetFeature> {
-	return defineFeature({
+function resetFeature(): TResetFeature {
+	return defineFeature<TResetFeature>({
 		key: 'reset',
-		install<GFeatures extends TCounterFeature[]>(counter: TCounter<GFeatures>) {
+		install(counter: TCounterBase) {
 			const initialValue = counter.get();
 
 			return {
@@ -149,11 +228,11 @@ function resetFeature(): TDeclaredFeature<TResetFeature> {
 	});
 }
 
-function resetTwiceFeature(): TDeclaredFeature<TResetTwiceFeature, [TResetFeature]> {
-	return defineFeature({
+function resetTwiceFeature(): TResetTwiceFeature {
+	return defineFeature<TResetTwiceFeature>({
 		key: 'resetTwice',
-		requires: ['reset'] as const,
-		install(counter: TCounter<[TResetFeature]>) {
+		requires: ['reset'],
+		install(counter) {
 			return {
 				resetTwice() {
 					counter.reset();
@@ -164,10 +243,10 @@ function resetTwiceFeature(): TDeclaredFeature<TResetTwiceFeature, [TResetFeatur
 	});
 }
 
-function loggerFeature(): TDeclaredFeature<TLoggerFeature> {
-	return defineFeature({
+function loggerFeature(): TLoggerFeature {
+	return defineFeature<TLoggerFeature>({
 		key: 'logger',
-		install<GFeatures extends TCounterFeature[]>(counter: TCounter<GFeatures>) {
+		install(counter: TCounterBase) {
 			return {
 				log() {
 					return counter.get();
@@ -177,10 +256,10 @@ function loggerFeature(): TDeclaredFeature<TLoggerFeature> {
 	});
 }
 
-function labelFeature(): TDeclaredFeature<TLabelFeature> {
-	return defineFeature({
+function labelFeature(): TLabelFeature {
+	return defineFeature<TLabelFeature>({
 		key: 'label',
-		install<GFeatures extends TCounterFeature[]>(counter: TCounter<GFeatures>) {
+		install(counter: TCounterBase) {
 			return {
 				label() {
 					return `Count: ${counter.get()}`;
@@ -190,8 +269,8 @@ function labelFeature(): TDeclaredFeature<TLabelFeature> {
 	});
 }
 
-function metaFeature(): TDeclaredFeature<TMetaFeature> {
-	return defineFeature({
+function metaFeature(): TMetaFeature {
+	return defineFeature<TMetaFeature>({
 		key: 'meta',
 		install() {
 			return {};
@@ -199,10 +278,10 @@ function metaFeature(): TDeclaredFeature<TMetaFeature> {
 	});
 }
 
-function auditFeature(): TDeclaredFeature<TAuditFeature> {
-	return defineFeature({
+function auditFeature(): TAuditFeature {
+	return defineFeature<TAuditFeature>({
 		key: 'audit',
-		install<GFeatures extends TCounterFeature[]>(counter: TCounter<GFeatures>) {
+		install(counter: TCounterBase) {
 			return {
 				audit() {
 					return counter.get();
@@ -212,13 +291,13 @@ function auditFeature(): TDeclaredFeature<TAuditFeature> {
 	});
 }
 
-function inferredConstrainedFeature() {
+function inferredFeature() {
 	return defineFeature({
-		key: 'constrained',
-		install(counter: TCounter<[TResetFeature]>) {
+		key: 'inferred',
+		install() {
 			return {
-				constrained() {
-					counter.reset();
+				inferred() {
+					return true;
 				}
 			};
 		}
@@ -232,6 +311,18 @@ interface TCounterBase {
 
 type TCounter<GFeatures extends TCounterFeature[]> = TFeatureHost<TCounterBase, GFeatures>;
 
+type TResetFeature = TFeature<'reset', { reset(): void }>;
+type TResetTwiceFeature = TFeature<'resetTwice', { resetTwice(): void }, [TResetFeature]>;
+type TResetLoggerFeature = TFeature<
+	'resetLogger',
+	{ resetLogger(): void },
+	[TResetFeature, TLoggerFeature]
+>;
+type TLoggerFeature = TFeature<'logger', { log(): number }>;
+type TLabelFeature = TFeature<'label', { label(): string }>;
+type TMetaFeature = TFeature<'meta', Record<never, never>>;
+type TAuditFeature = TFeature<'audit', { audit(): number }>;
+
 type TCounterFeature =
 	| TResetFeature
 	| TResetTwiceFeature
@@ -239,43 +330,3 @@ type TCounterFeature =
 	| TLabelFeature
 	| TMetaFeature
 	| TAuditFeature;
-
-interface TResetFeature {
-	key: 'reset';
-	api: {
-		reset: () => void;
-	};
-}
-
-interface TResetTwiceFeature {
-	key: 'resetTwice';
-	api: {
-		resetTwice: () => void;
-	};
-}
-
-interface TLoggerFeature {
-	key: 'logger';
-	api: {
-		log: () => number;
-	};
-}
-
-interface TLabelFeature {
-	key: 'label';
-	api: {
-		label: () => string;
-	};
-}
-
-interface TMetaFeature {
-	key: 'meta';
-	api: Record<never, never>;
-}
-
-interface TAuditFeature {
-	key: 'audit';
-	api: {
-		audit: () => number;
-	};
-}
