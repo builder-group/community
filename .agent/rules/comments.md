@@ -87,7 +87,7 @@ const sortedItems = items.slice().sort(compareItems);
 
 ```ts
 /** Returns whether the user is authenticated. */
-export function isAuthenticated(): boolean
+export function isAuthenticated(): boolean;
 ```
 
 ```ts

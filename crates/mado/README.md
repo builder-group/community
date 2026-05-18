@@ -117,13 +117,13 @@ monitor.run()?;
 
 **Config options:**
 
-| Option                 | Default | Description                                                          |
-| ---------------------- | ------- | -------------------------------------------------------------------- |
-| `include_app_icon`     | `false` | Extract app icon as base64 PNG                                       |
+| Option                 | Default | Description                                                           |
+| ---------------------- | ------- | --------------------------------------------------------------------- |
+| `include_app_icon`     | `false` | Extract app icon as base64 PNG                                        |
 | `include_app_color`    | `false` | Also derive the dominant app color when `include_app_icon` is enabled |
-| `include_browser_info` | `false` | Extract browser URL and private mode                                 |
-| `include_website_info` | `false` | Extract domain, fetch favicon, and extract color (~50-500ms, cached) |
-| `track_window_changes` | `true`  | Track window focus/title changes (requires Accessibility permission) |
+| `include_browser_info` | `false` | Extract browser URL and private mode                                  |
+| `include_website_info` | `false` | Extract domain, fetch favicon, and extract color (~50-500ms, cached)  |
+| `track_window_changes` | `true`  | Track window focus/title changes (requires Accessibility permission)  |
 
 ### Stop monitoring
 
@@ -175,11 +175,11 @@ if let Some(color) = mado::get_app_color("com.apple.finder") {
 
 **Config options:**
 
-| Option         | Default | Description                                    |
-| -------------- | ------- | ---------------------------------------------- |
-| `include_icon`      | `false` | Extract icons as base64 PNG                                      |
+| Option              | Default | Description                                                       |
+| ------------------- | ------- | ----------------------------------------------------------------- |
+| `include_icon`      | `false` | Extract icons as base64 PNG                                       |
 | `include_app_color` | `false` | Also derive the dominant app color when `include_icon` is enabled |
-| `icon_size`         | `32`    | Icon size in pixels                                              |
+| `icon_size`         | `32`    | Icon size in pixels                                               |
 
 ## 📐 Architecture
 

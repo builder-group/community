@@ -1,10 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createState } from '../create-state';
-import {
-	missingStorageValue,
-	storageFeature,
-	type TStorageInterface
-} from './storage';
+import { missingStorageValue, storageFeature, type TStorageInterface } from './storage';
 
 class MockStorage<GValue> implements TStorageInterface<GValue> {
 	private store: Record<string, GValue> = {};

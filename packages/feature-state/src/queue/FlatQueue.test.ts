@@ -98,12 +98,7 @@ describe('FlatQueue', () => {
 			// Assert
 			expect(removedCount).toBe(2);
 			expect(queue.length).toBe(3);
-			expect([queue.pop(), queue.pop(), queue.pop(), queue.pop()]).toEqual([
-				'e',
-				'c',
-				'a',
-				null
-			]);
+			expect([queue.pop(), queue.pop(), queue.pop(), queue.pop()]).toEqual(['e', 'c', 'a', null]);
 		});
 	});
 });

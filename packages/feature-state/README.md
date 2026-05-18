@@ -50,8 +50,8 @@ const $status = createState<'idle' | 'loading' | 'error'>('idle');
 
 **Options**
 
-| Option | Default | Description |
-|--------|---------|-------------|
+| Option  | Default  | Description                                                                                                                                                     |
+| ------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `queue` | `'sync'` | Listener queue used to schedule callbacks. Pass a string key to share a queue across states, or a config object `{ key, async }` to create a named async queue. |
 
 ### `value` / `get()` / `set()` / `notify()`
@@ -76,7 +76,7 @@ Use `notify()` when you need to trigger listeners without changing the value, or
 
 ```ts
 const unlisten = $count.listen(({ value, prevValue, source }) => {
-    console.log(value, prevValue, source);
+	console.log(value, prevValue, source);
 });
 
 unlisten(); // remove listener
@@ -84,27 +84,27 @@ unlisten(); // remove listener
 
 **Listener context**
 
-| Field | Description |
-|-------|-------------|
-| `value` | The new value. |
-| `prevValue` | The previous value. Undefined when `notify()` is called without one. |
-| `source` | What triggered the change. `'state_set'` for `set()`. Features may set their own values. |
-| `background` | Optional flag set by the caller. Useful for suppressing UI updates on background syncs. |
+| Field        | Description                                                                              |
+| ------------ | ---------------------------------------------------------------------------------------- |
+| `value`      | The new value.                                                                           |
+| `prevValue`  | The previous value. Undefined when `notify()` is called without one.                     |
+| `source`     | What triggered the change. `'state_set'` for `set()`. Features may set their own values. |
+| `background` | Optional flag set by the caller. Useful for suppressing UI updates on background syncs.  |
 
 **Listener options**
 
-| Option | Default | Description |
-|--------|---------|-------------|
+| Option     | Default                                     | Description             |
+| ---------- | ------------------------------------------- | ----------------------- |
 | `priority` | `EStateListenerQueuePriority.DEFAULT` (250) | Lower values run first. |
 
 **Priority constants**
 
 ```ts
-EStateListenerQueuePriority.FIRST   // 0
-EStateListenerQueuePriority.EARLY   // 125
-EStateListenerQueuePriority.DEFAULT // 250
-EStateListenerQueuePriority.LATE    // 375
-EStateListenerQueuePriority.LAST    // 500
+EStateListenerQueuePriority.FIRST; // 0
+EStateListenerQueuePriority.EARLY; // 125
+EStateListenerQueuePriority.DEFAULT; // 250
+EStateListenerQueuePriority.LATE; // 375
+EStateListenerQueuePriority.LAST; // 500
 ```
 
 ## Built-in Features
@@ -117,12 +117,18 @@ Adds `persist()`, `loadFromStorage()`, and `deleteFromStorage()`.
 
 ```ts
 const storage = {
-    save(key, value) { localStorage.setItem(key, JSON.stringify(value)); return true; },
-    load(key) {
-        const raw = localStorage.getItem(key);
-        return raw != null ? JSON.parse(raw) : null; // return null when absent
-    },
-    delete(key) { localStorage.removeItem(key); return true; }
+	save(key, value) {
+		localStorage.setItem(key, JSON.stringify(value));
+		return true;
+	},
+	load(key) {
+		const raw = localStorage.getItem(key);
+		return raw != null ? JSON.parse(raw) : null; // return null when absent
+	},
+	delete(key) {
+		localStorage.removeItem(key);
+		return true;
+	}
 };
 
 const $tasks = createState<Task[]>([]).with(storageFeature(storage, 'tasks'));
@@ -153,9 +159,7 @@ $count.undo(); // no-op, already at oldest
 Adds `multiUndo(count)`. Requires `undoFeature` to be installed first.
 
 ```ts
-const $count = createState(0)
-    .with(undoFeature())
-    .with(multiUndoFeature());
+const $count = createState(0).with(undoFeature()).with(multiUndoFeature());
 
 $count.set(1);
 $count.set(2);
@@ -174,22 +178,22 @@ import { type TStateBase } from 'feature-state';
 type TLogFeature = TFeature<'log', { getLog(): string[] }>;
 
 export function logFeature<GValue>(): TLogFeature {
-    return defineFeature<TLogFeature>({
-        key: 'log',
-        install(state: TStateBase<GValue>) {
-            const log: string[] = [];
+	return defineFeature<TLogFeature>({
+		key: 'log',
+		install(state: TStateBase<GValue>) {
+			const log: string[] = [];
 
-            state.listen(({ value }) => {
-                log.push(String(value));
-            });
+			state.listen(({ value }) => {
+				log.push(String(value));
+			});
 
-            return {
-                getLog() {
-                    return log;
-                }
-            };
-        }
-    });
+			return {
+				getLog() {
+					return log;
+				}
+			};
+		}
+	});
 }
 ```
 
