@@ -116,7 +116,7 @@ function withFeature(
 	...features: TAnyFeature[]
 ): TFeatureHost<object, TAnyFeature[]> {
 	for (const feature of features) {
-		// Note: The public `.with()` signature validates order; runtime checks handle this body
+		// Note: TWithFeatureMethod enforces type safety on the public signature; the casts here are safe because installFeature validates at runtime
 		installFeature(this as TFeatureHost<object, []>, feature as TFeature<string, object>);
 	}
 
@@ -144,8 +144,8 @@ export interface TFeature<
 	install: (host: never) => GApi;
 }
 
-// Note: Positional tuple, not a union array to enforce that every required key is listed and
-// mirrors the GRequiredFeatures generic. A union array would only validate allowed keys, not coverage.
+// Note: Positional tuple rather than a union array so requires must list every key in order.
+// A union array would accept partial lists, e.g. ['foo'] when ['foo', 'bar'] is required.
 type TRequiredFeatureKeyTuple<GFeatures extends readonly TAnyFeature[]> =
 	GFeatures extends readonly [
 		infer GFeature extends TAnyFeature,
@@ -183,7 +183,13 @@ type TFeatureApiIntersection<GFeatures extends readonly TAnyFeature[]> =
 		? TFeatureApi<GFeature> & TFeatureApiIntersection<GRest>
 		: object;
 
-type TFeatureApi<GFeature extends TAnyFeature> = ReturnType<GFeature['install']>;
+// Note: Cannot simplify to ReturnType<GFeature['install']> because through the TAnyFeature constraint,
+// install is typed as (host: never) => object, so ReturnType degrades to object
+// and the return type check in TFeatureDefinition stops catching wrong implementations.
+type TFeatureApi<GFeature extends TAnyFeature> =
+	GFeature extends TFeature<string, infer GApi, readonly TAnyFeature[]>
+		? GApi
+		: ReturnType<GFeature['install']>;
 
 interface TFeatureHostApi<GBase extends object, GInstalledFeatures extends TAnyFeature[]> {
 	/** @internal Prefer `hasFeature()` to check installed features. */
@@ -198,8 +204,8 @@ interface TWithFeatureMethod<GBase extends object, GInstalledFeatures extends TA
 	): TFeatureHost<GBase, [...GInstalledFeatures, ...GFeaturesToInstall]>;
 }
 
-// Note: GInstalledFeatures accumulates across the tuple so each feature validates against
-// all previously listed features in the same .with() call, not just the initial installed set.
+// Note: GInstalledFeatures grows with each recursive step so a feature can declare dependencies
+// on features earlier in the same .with() call, not only on already-installed ones.
 type TInstallableFeatureTuple<
 	GInstalledFeatures extends TAnyFeature[],
 	GFeaturesToInstall extends TAnyFeature[]
@@ -225,7 +231,7 @@ type TInstallableFeature<
 				>
 		: TDuplicateFeatureError<TDuplicateFeatureKey<GInstalledFeatures, GFeatureToInstall>>;
 
-// Note: when installed keys widen to string (e.g. TFeatureHost<object, TAnyFeature[]>),
+// Note: When installed keys widen to string (e.g. TFeatureHost<object, TAnyFeature[]>),
 // literal comparison is meaningless; return never to skip duplicate detection for broad hosts.
 type TDuplicateFeatureKey<
 	GInstalledFeatures extends TAnyFeature[],
@@ -255,7 +261,7 @@ interface TMissingFeatureRequirementError<GMissingFeatureKeys extends string> {
  * When `GFeature` has required features, `requires` is mandatory and type-checked against
  * the declared requirements.
  */
-// Note: install uses method syntax (not property syntax) for bivariant parameter checking,
+// Note: Install uses method syntax (not property syntax) for bivariant parameter checking,
 // so feature authors can annotate a wider host type than the required-feature intersection.
 export type TFeatureDefinition<GFeature extends TAnyFeature> =
 	TRequiredFeaturesOf<GFeature> extends readonly []
