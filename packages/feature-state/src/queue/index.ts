@@ -1,2 +1,3 @@
+export * from './FifoQueue';
 export * from './FlatQueue';
-export * from './listener-queue';
+export * from './ListenerQueue';

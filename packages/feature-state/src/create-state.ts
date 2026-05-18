@@ -1,5 +1,5 @@
 import { createFeatureHost } from 'feature-core';
-import { createListenerQueue, getListenerQueue, type TCreateListenerQueueOptions } from './queue';
+import { SyncListenerQueue, type TListenerQueue } from './queue';
 import type { TListener, TListenerContext, TState, TStateBase } from './types';
 
 /**
@@ -13,22 +13,7 @@ export function createState<GValue>(
 ): TState<GValue, []> {
 	type TQueueItem = Parameters<TStateBase<GValue>['_queue']['push']>[0];
 
-	const { queue: queueConfigOrKey = 'sync' } = options;
-	const queueConfig =
-		typeof queueConfigOrKey === 'string'
-			? {
-					key: queueConfigOrKey,
-					// Note: Sync avoids side effects that can appear when state updates are deferred
-					// https://evilmartians.com/chronicles/how-to-avoid-tricky-async-state-manager-pitfalls-react
-					async: queueConfigOrKey === 'async'
-				}
-			: queueConfigOrKey;
-
-	let queue = getListenerQueue(queueConfig.key);
-	if (queue == null) {
-		const { key, ...queueOptions } = queueConfig;
-		queue = createListenerQueue(key, queueOptions);
-	}
+	const { queue = defaultListenerQueue } = options;
 
 	const baseState: TStateBase<GValue> = {
 		_listeners: [],
@@ -50,11 +35,13 @@ export function createState<GValue>(
 					prevValue
 				};
 				// Note: queues can be shared by states with different value types
-				const queueItem = {
-					callback: listener.callback,
-					context
-				} as TQueueItem;
-				this._queue.push(queueItem, listener.priority);
+				this._queue.push(
+					{
+						callback: listener.callback,
+						context
+					} as TQueueItem,
+					listener
+				);
 			}
 
 			if (processListenerQueue) {
@@ -86,9 +73,8 @@ export function createState<GValue>(
 			});
 		},
 		listen(callback, listenOptions = {}) {
-			const { priority = EStateListenerQueuePriority.DEFAULT } = listenOptions;
 			const listener: TListener<GValue> = {
-				priority,
+				...listenOptions,
 				callback
 			};
 			this._listeners.push(listener);
@@ -112,19 +98,15 @@ export function createState<GValue>(
 	return createFeatureHost(baseState);
 }
 
+// Note: Defaults to sync FIFO because sync avoids deferred-update side effects and FIFO keeps
+// registration order, which is the least surprising default for most use cases
+// https://evilmartians.com/chronicles/how-to-avoid-tricky-async-state-manager-pitfalls-react
+const defaultListenerQueue = new SyncListenerQueue();
+
 /** Source key set on the listener context when a value is changed via `set()`. */
 export const setSourceKey = 'state_set';
 
 export interface TCreateStateOptions {
-	/** Listener queue used to schedule and process callbacks. Defaults to `'sync'`. */
-	queue?: ({ key: string } & TCreateListenerQueueOptions) | string;
-}
-
-/** Defines listener priority values. Lower values are processed earlier. */
-export enum EStateListenerQueuePriority {
-	FIRST = 0,
-	EARLY = 125,
-	DEFAULT = 250,
-	LATE = 375,
-	LAST = 500
+	/** Listener queue used to schedule and process callbacks. Defaults to a shared sync queue. */
+	queue?: TListenerQueue;
 }

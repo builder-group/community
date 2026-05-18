@@ -30,6 +30,14 @@ module.exports = [
 			onlyWarn
 		}
 	},
+	{
+		rules: {
+			'@typescript-eslint/no-unused-vars': [
+				'error',
+				{ ignoreRestSiblings: true, varsIgnorePattern: '^_', argsIgnorePattern: '^_' }
+			]
+		}
+	},
 	// Tooling config files run in Node and may intentionally use CommonJS
 	{
 		files: ['*.config.js', '*.config.cjs'],

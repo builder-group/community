@@ -1,5 +1,5 @@
 import { type TAnyFeature, type TFeatureHost } from 'feature-core';
-import type { TListenerQueue } from './queue';
+import type { TListenerQueue, TQueueOptions } from './queue';
 
 /** State object returned by `createState()`. */
 export type TState<GValue, GFeatures extends TAnyFeature[]> = TFeatureHost<
@@ -46,13 +46,9 @@ export interface TStateNotifyOptions<GValue> {
 
 export type TStateSetOptions<GValue> = Omit<TStateNotifyOptions<GValue>, 'prevValue'>;
 
-export interface TStateListenerOptions {
-	/** Determines execution order relative to other listeners. Lower values run first. */
-	priority?: number;
-}
+export type TStateListenerOptions = TQueueOptions;
 
-export interface TListener<GValue> {
-	priority: number;
+export interface TListener<GValue> extends TQueueOptions {
 	callback: TListenerCallback<GValue>;
 }
 

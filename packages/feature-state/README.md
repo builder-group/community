@@ -50,9 +50,9 @@ const $status = createState<'idle' | 'loading' | 'error'>('idle');
 
 **Options**
 
-| Option  | Default  | Description                                                                                                                                                     |
-| ------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `queue` | `'sync'` | Listener queue used to schedule callbacks. Pass a string key to share a queue across states, or a config object `{ key, async }` to create a named async queue. |
+| Option  | Default                | Description            |
+| ------- | ---------------------- | ---------------------- |
+| `queue` | shared sync FIFO queue | Custom listener queue. |
 
 ### `value` / `get()` / `set()` / `notify()`
 
@@ -93,18 +93,48 @@ unlisten(); // remove listener
 
 **Listener options**
 
-| Option     | Default                                     | Description             |
-| ---------- | ------------------------------------------- | ----------------------- |
-| `priority` | `EStateListenerQueuePriority.DEFAULT` (250) | Lower values run first. |
+| Option        | Description                                                 |
+| ------------- | ----------------------------------------------------------- |
+| custom fields | Forwarded to the listener queue. Useful with custom queues. |
 
-**Priority constants**
+### Custom Listener Queues
+
+Most states can use the default shared sync FIFO queue. Pass a queue instance when multiple states should share scheduling, or when listener callbacks should be processed manually.
 
 ```ts
-EStateListenerQueuePriority.FIRST; // 0
-EStateListenerQueuePriority.EARLY; // 125
-EStateListenerQueuePriority.DEFAULT; // 250
-EStateListenerQueuePriority.LATE; // 375
-EStateListenerQueuePriority.LAST; // 500
+import { createState, SyncListenerQueue } from 'feature-state';
+
+const queue = new SyncListenerQueue();
+
+const $count = createState(0, { queue });
+const $label = createState('', { queue });
+
+$count.set(1, { processListenerQueue: false });
+$label.set('ready', { processListenerQueue: false });
+
+queue.process();
+```
+
+Use `SyncPriorityListenerQueue` when listener execution order should be driven by `priority` instead of registration order. Lower values run first.
+
+```ts
+import { createState, EListenerQueuePriority, SyncPriorityListenerQueue } from 'feature-state';
+
+const $count = createState(0, {
+	queue: new SyncPriorityListenerQueue()
+});
+
+$count.listen(() => {}, { priority: EListenerQueuePriority.EARLY }); // 125 — runs before DEFAULT (250)
+```
+
+**Priority constants** (only meaningful with `SyncPriorityListenerQueue`)
+
+```ts
+EListenerQueuePriority.FIRST; // 0
+EListenerQueuePriority.EARLY; // 125
+EListenerQueuePriority.DEFAULT; // 250
+EListenerQueuePriority.LATE; // 375
+EListenerQueuePriority.LAST; // 500
 ```
 
 ## Built-in Features

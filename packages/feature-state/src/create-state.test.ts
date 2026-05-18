@@ -1,7 +1,14 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
-import { createState, EStateListenerQueuePriority, setSourceKey } from './create-state';
+import { createState, setSourceKey } from './create-state';
 import { multiUndoFeature, undoFeature } from './features';
-import { processListenerQueue } from './queue';
+import {
+	EListenerQueuePriority,
+	SyncListenerQueue,
+	SyncPriorityListenerQueue,
+	type TListenerQueue,
+	type TListenerQueueItem,
+	type TQueueOptions
+} from './queue';
 
 describe('createState', () => {
 	describe('types', () => {
@@ -15,6 +22,40 @@ describe('createState', () => {
 			expectTypeOf(state.value).toEqualTypeOf<string>();
 			expectTypeOf(state._history).toEqualTypeOf<string[]>();
 			expectTypeOf(state.multiUndo).toEqualTypeOf<(count: number) => void>();
+		});
+
+		it('should accept structural listener queues', () => {
+			// Prepare
+			const items: TListenerQueueItem[] = [];
+			const queue: TListenerQueue = {
+				get length() {
+					return items.length;
+				},
+				push(item) {
+					items.push(item);
+				},
+				removeWhere(predicate) {
+					const prevLength = items.length;
+					for (let i = items.length - 1; i >= 0; i--) {
+						const item = items[i];
+						if (item != null && predicate(item)) {
+							items.splice(i, 1);
+						}
+					}
+					return prevLength - items.length;
+				},
+				process() {
+					for (const item of items.splice(0)) {
+						void item.callback(item.context);
+					}
+				}
+			};
+
+			// Act
+			const state = createState(0, { queue });
+
+			// Assert
+			expectTypeOf(state._queue).toEqualTypeOf<TListenerQueue>();
 		});
 	});
 
@@ -169,7 +210,7 @@ describe('createState', () => {
 			});
 		});
 
-		it('should call listeners by priority', () => {
+		it('should call listeners in registration order by default', () => {
 			// Prepare
 			const state = createState(10);
 			const calls: string[] = [];
@@ -177,13 +218,37 @@ describe('createState', () => {
 				() => {
 					calls.push('late');
 				},
-				{ priority: EStateListenerQueuePriority.LATE }
+				{ priority: EListenerQueuePriority.LATE }
 			);
 			state.listen(
 				() => {
 					calls.push('early');
 				},
-				{ priority: EStateListenerQueuePriority.EARLY }
+				{ priority: EListenerQueuePriority.EARLY }
+			);
+
+			// Act
+			state.set(20);
+
+			// Assert
+			expect(calls).toEqual(['late', 'early']);
+		});
+
+		it('should call listeners by priority when using a priority queue', () => {
+			// Prepare
+			const state = createState(10, { queue: new SyncPriorityListenerQueue() });
+			const calls: string[] = [];
+			state.listen(
+				() => {
+					calls.push('late');
+				},
+				{ priority: EListenerQueuePriority.LATE }
+			);
+			state.listen(
+				() => {
+					calls.push('early');
+				},
+				{ priority: EListenerQueuePriority.EARLY }
 			);
 
 			// Act
@@ -191,6 +256,37 @@ describe('createState', () => {
 
 			// Assert
 			expect(calls).toEqual(['early', 'late']);
+		});
+
+		it('should pass custom queue options to the queue', () => {
+			// Prepare
+			const queueOptions: TQueueOptions[] = [];
+			const queue: TListenerQueue = {
+				get length() {
+					return 0;
+				},
+				push(_item, options) {
+					queueOptions.push(options);
+				},
+				removeWhere() {
+					return 0;
+				},
+				process() {}
+			};
+			const state = createState(10, { queue });
+			state.listen(() => {}, {
+				channel: 'analytics'
+			});
+
+			// Act
+			state.set(20);
+
+			// Assert
+			expect(queueOptions).toHaveLength(1);
+			expect(queueOptions[0]).toMatchObject({
+				channel: 'analytics'
+			});
+			expect(queueOptions[0]?.priority).toBeUndefined();
 		});
 
 		it('should remove a listener with the returned unbind function', () => {
@@ -209,7 +305,8 @@ describe('createState', () => {
 
 		it('should remove queued listener calls when unbound', async () => {
 			// Prepare
-			const state = createState(10, { queue: { key: 'unbind-test' } });
+			const queue = new SyncListenerQueue();
+			const state = createState(10, { queue });
 			const listener = vi.fn();
 			const unbind = state.listen(listener);
 
@@ -221,7 +318,7 @@ describe('createState', () => {
 
 			// Act
 			unbind();
-			await processListenerQueue('unbind-test');
+			await queue.process();
 
 			// Assert
 			expect(listener).not.toHaveBeenCalled();
