@@ -39,7 +39,7 @@ $tasks.undo(); // []
 
 ## Core API
 
-### `createState(initialValue, options?)`
+### `createState(initialValue)`
 
 Creates a state container and returns it as a feature host.
 
@@ -47,12 +47,6 @@ Creates a state container and returns it as a feature host.
 const $count = createState(0);
 const $status = createState<'idle' | 'loading' | 'error'>('idle');
 ```
-
-**Options**
-
-| Option  | Default                | Description            |
-| ------- | ---------------------- | ---------------------- |
-| `queue` | shared sync FIFO queue | Custom listener queue. |
 
 ### `value` / `get()` / `set()` / `notify()`
 
@@ -70,7 +64,7 @@ $count.value = 10; // same as set(10)
 
 Use `notify()` when you need to trigger listeners without changing the value, or when a feature updates internal state by other means.
 
-### `listen(callback, options?)` / `subscribe(callback, options?)`
+### `listen(callback)` / `subscribe(callback)`
 
 `listen` registers a callback for future changes and returns an unsubscribe function. `subscribe` does the same but also calls the callback immediately with the current value.
 
@@ -91,55 +85,46 @@ unlisten(); // remove listener
 | `source`     | What triggered the change. `'state_set'` for `set()`. Features may set their own values. |
 | `background` | Optional flag set by the caller. Useful for suppressing UI updates on background syncs.  |
 
-**Listener options**
-
-| Option        | Description                                                 |
-| ------------- | ----------------------------------------------------------- |
-| custom fields | Forwarded to the listener queue. Useful with custom queues. |
-
-### Custom Listener Queues
-
-Most states can use the default shared sync FIFO queue. Pass a queue instance when multiple states should share scheduling, or when listener callbacks should be processed manually.
-
-```ts
-import { createState, SyncListenerQueue } from 'feature-state';
-
-const queue = new SyncListenerQueue();
-
-const $count = createState(0, { queue });
-const $label = createState('', { queue });
-
-$count.set(1, { processListenerQueue: false });
-$label.set('ready', { processListenerQueue: false });
-
-queue.process();
-```
-
-Use `SyncPriorityListenerQueue` when listener execution order should be driven by `priority` instead of registration order. Lower values run first.
-
-```ts
-import { createState, EListenerQueuePriority, SyncPriorityListenerQueue } from 'feature-state';
-
-const $count = createState(0, {
-	queue: new SyncPriorityListenerQueue()
-});
-
-$count.listen(() => {}, { priority: EListenerQueuePriority.EARLY }); // 125 — runs before DEFAULT (250)
-```
-
-**Priority constants** (only meaningful with `SyncPriorityListenerQueue`)
-
-```ts
-EListenerQueuePriority.FIRST; // 0
-EListenerQueuePriority.EARLY; // 125
-EListenerQueuePriority.DEFAULT; // 250
-EListenerQueuePriority.LATE; // 375
-EListenerQueuePriority.LAST; // 500
-```
+Listeners run synchronously in registration order.
 
 ## Built-in Features
 
 Features are installed via `.with()` and extend the state with new methods.
+
+### `asyncQueueFeature()`
+
+Replaces the default sync listener queue with a microtask-based FIFO queue. Listener callbacks still run in registration order, but they run after the current call stack and async listeners are awaited one by one.
+
+```ts
+import { asyncQueueFeature } from 'feature-state';
+
+const $count = createState(0).with(asyncQueueFeature<number>());
+
+$count.listen(async ({ value }) => {
+	await save(value);
+});
+
+await $count.notify(); // resolves when all listeners have completed
+```
+
+`notify()` returns the active queue flush promise. `set()` still returns `void`, so listener errors from `set()` are not awaitable through `set()` itself.
+
+All states using `asyncQueueFeature()` share one module-level queue. Calls to `set()` or `notify()` on any of them enqueue into the same microtask batch.
+
+### `priorityQueueFeature()`
+
+Replaces the default sync listener queue with a priority-based sync queue. Lower priority values run first. Listeners with the same priority keep registration order.
+
+```ts
+import { EListenerPriority, priorityQueueFeature } from 'feature-state';
+
+const $count = createState(0).with(priorityQueueFeature<number>());
+
+$count.listen(() => {}, { priority: EListenerPriority.LATE });
+$count.listen(() => {}, { priority: EListenerPriority.EARLY }); // runs first
+```
+
+`notify()` and `set()` remain synchronous. Use this when listener order matters more than registration order.
 
 ### `storageFeature(storage, key)`
 

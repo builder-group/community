@@ -1,5 +1,5 @@
 import { bench, describe } from 'vitest';
-import { FifoQueue, FlatQueue } from '../queue';
+import { FlatQueue } from '../features';
 
 const dataSets: TBenchmarkDataSet[] = [
 	{ name: 'Tiny data (5 items)', data: createDataSet(5) },
@@ -14,11 +14,6 @@ describe('queue benchmark', () => {
 			bench('array insertion order', () => {
 				const queue = createArrayQueue(data);
 				drainArrayQueueInInsertionOrder(queue);
-			});
-
-			bench('FifoQueue insertion order', () => {
-				const queue = createFifoQueue(data);
-				drainFifoQueue(queue);
 			});
 
 			bench('array priority sort', () => {
@@ -66,29 +61,6 @@ function createArrayQueue(data: TDataSet): TDataItem[] {
 	}
 
 	return queue;
-}
-
-function createFifoQueue(data: TDataSet): FifoQueue<TDataItem> {
-	const queue = new FifoQueue<TDataItem>();
-
-	for (const item of data) {
-		queue.push(item);
-	}
-
-	return queue;
-}
-
-function drainFifoQueue(queue: FifoQueue<TDataItem>): number {
-	let sum = 0;
-
-	while (queue.length > 0) {
-		const item = queue.pop();
-		if (item != null) {
-			sum += item.id;
-		}
-	}
-
-	return sum;
 }
 
 function drainArrayQueueInInsertionOrder(queue: TDataItem[]): number {

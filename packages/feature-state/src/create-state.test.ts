@@ -1,14 +1,6 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { createState, setSourceKey } from './create-state';
 import { multiUndoFeature, undoFeature } from './features';
-import {
-	EListenerQueuePriority,
-	SyncListenerQueue,
-	SyncPriorityListenerQueue,
-	type TListenerQueue,
-	type TListenerQueueItem,
-	type TQueueOptions
-} from './queue';
 
 describe('createState', () => {
 	describe('types', () => {
@@ -22,40 +14,6 @@ describe('createState', () => {
 			expectTypeOf(state.value).toEqualTypeOf<string>();
 			expectTypeOf(state._history).toEqualTypeOf<string[]>();
 			expectTypeOf(state.multiUndo).toEqualTypeOf<(count: number) => void>();
-		});
-
-		it('should accept structural listener queues', () => {
-			// Prepare
-			const items: TListenerQueueItem[] = [];
-			const queue: TListenerQueue = {
-				get length() {
-					return items.length;
-				},
-				push(item) {
-					items.push(item);
-				},
-				removeWhere(predicate) {
-					const prevLength = items.length;
-					for (let i = items.length - 1; i >= 0; i--) {
-						const item = items[i];
-						if (item != null && predicate(item)) {
-							items.splice(i, 1);
-						}
-					}
-					return prevLength - items.length;
-				},
-				process() {
-					for (const item of items.splice(0)) {
-						void item.callback(item.context);
-					}
-				}
-			};
-
-			// Act
-			const state = createState(0, { queue });
-
-			// Assert
-			expectTypeOf(state._queue).toEqualTypeOf<TListenerQueue>();
 		});
 	});
 
@@ -214,79 +172,18 @@ describe('createState', () => {
 			// Prepare
 			const state = createState(10);
 			const calls: string[] = [];
-			state.listen(
-				() => {
-					calls.push('late');
-				},
-				{ priority: EListenerQueuePriority.LATE }
-			);
-			state.listen(
-				() => {
-					calls.push('early');
-				},
-				{ priority: EListenerQueuePriority.EARLY }
-			);
-
-			// Act
-			state.set(20);
-
-			// Assert
-			expect(calls).toEqual(['late', 'early']);
-		});
-
-		it('should call listeners by priority when using a priority queue', () => {
-			// Prepare
-			const state = createState(10, { queue: new SyncPriorityListenerQueue() });
-			const calls: string[] = [];
-			state.listen(
-				() => {
-					calls.push('late');
-				},
-				{ priority: EListenerQueuePriority.LATE }
-			);
-			state.listen(
-				() => {
-					calls.push('early');
-				},
-				{ priority: EListenerQueuePriority.EARLY }
-			);
-
-			// Act
-			state.set(20);
-
-			// Assert
-			expect(calls).toEqual(['early', 'late']);
-		});
-
-		it('should pass custom queue options to the queue', () => {
-			// Prepare
-			const queueOptions: TQueueOptions[] = [];
-			const queue: TListenerQueue = {
-				get length() {
-					return 0;
-				},
-				push(_item, options) {
-					queueOptions.push(options);
-				},
-				removeWhere() {
-					return 0;
-				},
-				process() {}
-			};
-			const state = createState(10, { queue });
-			state.listen(() => {}, {
-				channel: 'analytics'
+			state.listen(() => {
+				calls.push('first');
+			});
+			state.listen(() => {
+				calls.push('second');
 			});
 
 			// Act
 			state.set(20);
 
 			// Assert
-			expect(queueOptions).toHaveLength(1);
-			expect(queueOptions[0]).toMatchObject({
-				channel: 'analytics'
-			});
-			expect(queueOptions[0]?.priority).toBeUndefined();
+			expect(calls).toEqual(['first', 'second']);
 		});
 
 		it('should remove a listener with the returned unbind function', () => {
@@ -303,26 +200,21 @@ describe('createState', () => {
 			expect(listener).not.toHaveBeenCalled();
 		});
 
-		it('should remove queued listener calls when unbound', async () => {
+		it('should remove queued listener calls by callback when unbound during notification', () => {
 			// Prepare
-			const queue = new SyncListenerQueue();
-			const state = createState(10, { queue });
+			const state = createState(10);
+			let unbindSecond = () => {};
 			const listener = vi.fn();
-			const unbind = state.listen(listener);
+			state.listen(() => {
+				unbindSecond();
+			});
+			unbindSecond = state.listen(listener);
 
 			// Act
-			state.set(20, { processListenerQueue: false });
-
-			// Assert
-			expect(state._queue.length).toBe(1);
-
-			// Act
-			unbind();
-			await queue.process();
+			state.set(20);
 
 			// Assert
 			expect(listener).not.toHaveBeenCalled();
-			expect(state._queue.length).toBe(0);
 		});
 	});
 

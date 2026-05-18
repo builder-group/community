@@ -1,5 +1,4 @@
 import { createFeatureHost } from 'feature-core';
-import { SyncListenerQueue, type TListenerQueue } from './queue';
 import type { TListener, TListenerContext, TState, TStateBase } from './types';
 
 /**
@@ -7,17 +6,9 @@ import type { TListener, TListenerContext, TState, TStateBase } from './types';
  *
  * Returns a feature host so capabilities can be added with `.with(feature())`.
  */
-export function createState<GValue>(
-	initialValue: GValue,
-	options: TCreateStateOptions = {}
-): TState<GValue, []> {
-	type TQueueItem = Parameters<TStateBase<GValue>['_queue']['push']>[0];
-
-	const { queue = defaultListenerQueue } = options;
-
+export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 	const baseState: TStateBase<GValue> = {
 		_listeners: [],
-		_queue: queue,
 		_v: initialValue,
 		get value() {
 			return this._v;
@@ -26,7 +17,9 @@ export function createState<GValue>(
 			this.set(newValue);
 		},
 		notify(notifyOptions = {}) {
-			const { processListenerQueue = true, listenerContext = {}, prevValue } = notifyOptions;
+			const { listenerContext = {}, prevValue } = notifyOptions;
+			// Note: Only the outermost notify drains the queue; nested notify calls append work to the active flush
+			const shouldProcessListenerQueue = !listenerQueue.length;
 
 			for (const listener of this._listeners) {
 				const context: TListenerContext<GValue> = {
@@ -34,18 +27,14 @@ export function createState<GValue>(
 					value: this._v,
 					prevValue
 				};
-				// Note: queues can be shared by states with different value types
-				this._queue.push(
-					{
-						callback: listener.callback,
-						context
-					} as TQueueItem,
-					listener
-				);
+				listenerQueue.push({
+					callback: listener.callback,
+					context: context as never
+				});
 			}
 
-			if (processListenerQueue) {
-				void this._queue.process();
+			if (shouldProcessListenerQueue) {
+				processListenerQueue();
 			}
 		},
 		get() {
@@ -61,34 +50,32 @@ export function createState<GValue>(
 				return;
 			}
 
-			const { listenerContext = {}, processListenerQueue = true } = setOptions;
+			const { listenerContext = {} } = setOptions;
 			this._v = newValue;
 			this.notify({
 				listenerContext: {
 					...listenerContext,
 					source: listenerContext.source ?? setSourceKey
 				},
-				processListenerQueue,
 				prevValue
 			});
 		},
-		listen(callback, listenOptions = {}) {
+		listen(callback) {
 			const listener: TListener<GValue> = {
-				...listenOptions,
 				callback
 			};
 			this._listeners.push(listener);
 
 			return () => {
-				this._queue.removeWhere((item) => item.callback === callback);
+				removeQueuedListenerCalls(callback);
 				const index = this._listeners.indexOf(listener);
 				if (index !== -1) {
 					this._listeners.splice(index, 1);
 				}
 			};
 		},
-		subscribe(callback, subscribeOptions) {
-			const unbind = this.listen(callback, subscribeOptions);
+		subscribe(callback) {
+			const unbind = this.listen(callback);
 			// Note: prevValue mirrors value on the initial call so listeners never receive undefined for prevValue
 			void callback({ value: this._v, prevValue: this._v });
 			return unbind;
@@ -98,15 +85,38 @@ export function createState<GValue>(
 	return createFeatureHost(baseState);
 }
 
-// Note: Defaults to sync FIFO because sync avoids deferred-update side effects and FIFO keeps
-// registration order, which is the least surprising default for most use cases
-// https://evilmartians.com/chronicles/how-to-avoid-tricky-async-state-manager-pitfalls-react
-const defaultListenerQueue = new SyncListenerQueue();
-
 /** Source key set on the listener context when a value is changed via `set()`. */
 export const setSourceKey = 'state_set';
 
-export interface TCreateStateOptions {
-	/** Listener queue used to schedule and process callbacks. Defaults to a shared sync queue. */
-	queue?: TListenerQueue;
+// MARK: - Queue
+
+const listenerQueue: TListenerQueueItem[] = [];
+let listenerQueueIndex = 0;
+
+interface TListenerQueueItem {
+	callback: (context: never) => Promise<void> | void;
+	context: never;
+}
+
+function processListenerQueue(): void {
+	try {
+		for (listenerQueueIndex = 0; listenerQueueIndex < listenerQueue.length; listenerQueueIndex++) {
+			const item = listenerQueue[listenerQueueIndex];
+			if (item != null) {
+				void item.callback(item.context);
+			}
+		}
+	} finally {
+		listenerQueue.length = 0;
+		listenerQueueIndex = 0;
+	}
+}
+
+function removeQueuedListenerCalls<GValue>(callback: TListener<GValue>['callback']): void {
+	for (let i = listenerQueueIndex + 1; i < listenerQueue.length; i++) {
+		if (listenerQueue[i]?.callback === callback) {
+			listenerQueue.splice(i, 1);
+			i--;
+		}
+	}
 }

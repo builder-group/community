@@ -219,12 +219,7 @@ export function cacheFeature(): TCacheFeature {
 Most features add new methods. When a feature intentionally replaces an existing host method, declare that in `overrides` and in the fourth `TFeature` generic:
 
 ```ts
-type TLoggedSetFeature = TFeature<
-	'logged-set',
-	{ set(nextValue: number): void },
-	[],
-	'set'
->;
+type TLoggedSetFeature = TFeature<'logged-set', { set(nextValue: number): void }, [], 'set'>;
 
 export function loggedSetFeature(): TLoggedSetFeature {
 	return defineFeature<TLoggedSetFeature>({

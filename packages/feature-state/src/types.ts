@@ -1,5 +1,4 @@
 import { type TAnyFeature, type TFeatureHost } from 'feature-core';
-import type { TListenerQueue, TQueueOptions } from './queue';
 
 /** State object returned by `createState()`. */
 export type TState<GValue, GFeatures extends TAnyFeature[]> = TFeatureHost<
@@ -15,8 +14,6 @@ export type TState<GValue, GFeatures extends TAnyFeature[]> = TFeatureHost<
 export interface TStateBase<GValue> {
 	/** @internal */
 	_listeners: TListener<GValue>[];
-	/** @internal */
-	_queue: TListenerQueue;
 	/** Raw backing value. Mutate it directly only when you will call `notify()` yourself. */
 	_v: GValue;
 	/** Current state value. Assigning a new value is equivalent to calling `set()`. */
@@ -30,14 +27,12 @@ export interface TStateBase<GValue> {
 		options?: TStateSetOptions<GValue>
 	): void;
 	/** Registers a callback for future changes. Returns an unsubscribe function. */
-	listen(callback: TListenerCallback<GValue>, options?: TStateListenerOptions): () => void;
+	listen(callback: TListenerCallback<GValue>): () => void;
 	/** Like `listen`, but also calls the callback immediately with the current value. */
-	subscribe(callback: TListenerCallback<GValue>, options?: TStateListenerOptions): () => void;
+	subscribe(callback: TListenerCallback<GValue>): () => void;
 }
 
 export interface TStateNotifyOptions<GValue> {
-	/** When false, listeners are queued but the queue is not flushed. Defaults to true. */
-	processListenerQueue?: boolean;
 	/** Extra fields merged into each listener's context for this notification. */
 	listenerContext?: TAdditionalListenerContext;
 	/** Previous value passed to listeners. Not inferred automatically; pass it when listeners need a snapshot. */
@@ -46,9 +41,7 @@ export interface TStateNotifyOptions<GValue> {
 
 export type TStateSetOptions<GValue> = Omit<TStateNotifyOptions<GValue>, 'prevValue'>;
 
-export type TStateListenerOptions = TQueueOptions;
-
-export interface TListener<GValue> extends TQueueOptions {
+export interface TListener<GValue> {
 	callback: TListenerCallback<GValue>;
 }
 

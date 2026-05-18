@@ -31,6 +31,20 @@ describe('FlatQueue', () => {
 			expect(queue.length).toBe(0);
 		});
 
+		it('should preserve insertion order for equal priorities', () => {
+			// Prepare
+			const queue = new FlatQueue<string>();
+			queue.push('first', 1);
+			queue.push('second', 1);
+			queue.push('third', 1);
+
+			// Act
+			const items = [queue.pop(), queue.pop(), queue.pop()];
+
+			// Assert
+			expect(items).toEqual(['first', 'second', 'third']);
+		});
+
 		it('should support pushing again after it was drained', () => {
 			// Prepare
 			const queue = new FlatQueue<string>();
@@ -99,6 +113,22 @@ describe('FlatQueue', () => {
 			expect(removedCount).toBe(2);
 			expect(queue.length).toBe(3);
 			expect([queue.pop(), queue.pop(), queue.pop(), queue.pop()]).toEqual(['e', 'c', 'a', null]);
+		});
+	});
+
+	describe('clear', () => {
+		it('should remove all queued items', () => {
+			// Prepare
+			const queue = new FlatQueue<string>();
+			queue.push('a', 2);
+			queue.push('b', 1);
+
+			// Act
+			queue.clear();
+
+			// Assert
+			expect(queue.length).toBe(0);
+			expect(queue.pop()).toBe(null);
 		});
 	});
 });
