@@ -118,7 +118,7 @@ The third generic is optional and defaults to `[]`.
 - Define feature contracts with named `TFeature` aliases
 - Export the host type as `TFeatureHost<TBase, GFeatures>`
 - Return `createFeatureHost(base)` from the factory
-- Keep feature keys unique. The runtime throws on duplicate installation.
+- Keep feature keys unique. Known duplicates fail at type level; dynamic duplicates still throw at runtime.
 
 Use `TAnyFeature` as the feature type in generic utilities that work across any feature type, for example a function that accepts any feature host.
 

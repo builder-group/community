@@ -116,7 +116,7 @@ describe('feature-core', () => {
 
 			// Act & Assert
 			expect(() => {
-				installFeature(counter, resetFeature());
+				installFeature(counter as unknown as TCounter<[]>, resetFeature());
 			}).toThrow('Feature "reset" is already installed');
 		});
 

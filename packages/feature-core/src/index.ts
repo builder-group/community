@@ -4,7 +4,12 @@
  * Mutates and returns the provided object.
  */
 export function createFeatureHost<GBase extends object>(base: GBase): TFeatureHost<GBase, []> {
-	assertBaseCanBecomeFeatureHost(base);
+	// Reserved host properties must not already exist on base
+	for (const key of reservedFeatureHostKeys) {
+		if (key in base) {
+			throw new Error(`Feature host cannot overwrite existing property "${key}"`);
+		}
+	}
 
 	return Object.assign(base, {
 		_features: [],
@@ -53,11 +58,28 @@ export function installFeature<
 	host: TFeatureHost<GBase, GInstalledFeatures>,
 	feature: GFeatureToInstall & TInstallableFeature<GFeatureToInstall, GInstalledFeatures>
 ): TFeatureHost<GBase, [...GInstalledFeatures, GFeatureToInstall]> {
-	assertRequiredFeaturesInstalled(host, feature);
-	assertFeatureNotInstalled(host, feature);
+	// Required features must already be installed
+	const missingFeatureKey = feature.requires.find((key) => !host._features.includes(key));
+	if (missingFeatureKey != null) {
+		throw new Error(`Feature "${feature.key}" requires missing feature "${missingFeatureKey}"`);
+	}
+
+	// Feature must not be installed twice
+	if (host._features.includes(feature.key)) {
+		throw new Error(`Feature "${feature.key}" is already installed`);
+	}
 
 	const api = feature.install(host as never);
-	assertFeatureApiCanBeAssignedToHost(host, feature, api);
+
+	// API keys must not collide with existing host properties before we mutate
+	for (const key of Reflect.ownKeys(api)) {
+		if (key in host) {
+			throw new Error(
+				`Feature "${feature.key}" cannot overwrite existing property "${String(key)}"`
+			);
+		}
+	}
+
 	Object.assign(host, api);
 	(host._features as string[]).push(feature.key);
 
@@ -95,51 +117,10 @@ function withFeature(
 ): TFeatureHost<object, TAnyFeature[]> {
 	for (const feature of features) {
 		// Note: The public `.with()` signature validates order; runtime checks handle this body
-		installFeature(this, feature as TFeature<string, object>);
+		installFeature(this as TFeatureHost<object, []>, feature as TFeature<string, object>);
 	}
 
 	return this;
-}
-
-function assertRequiredFeaturesInstalled(
-	host: TFeatureHost<object, TAnyFeature[]>,
-	feature: TAnyFeature
-): void {
-	const missingFeatureKey = feature.requires.find((key) => !host._features.includes(key));
-	if (missingFeatureKey != null) {
-		throw new Error(`Feature "${feature.key}" requires missing feature "${missingFeatureKey}"`);
-	}
-}
-
-function assertFeatureNotInstalled(
-	host: TFeatureHost<object, TAnyFeature[]>,
-	feature: TAnyFeature
-): void {
-	if (host._features.includes(feature.key)) {
-		throw new Error(`Feature "${feature.key}" is already installed`);
-	}
-}
-
-function assertFeatureApiCanBeAssignedToHost(
-	host: TFeatureHost<object, TAnyFeature[]>,
-	feature: TAnyFeature,
-	api: object
-): void {
-	for (const key of Reflect.ownKeys(api)) {
-		if (key in host) {
-			throw new Error(
-				`Feature "${feature.key}" cannot overwrite existing property "${String(key)}"`
-			);
-		}
-	}
-}
-
-function assertBaseCanBecomeFeatureHost(base: object): void {
-	for (const key of reservedFeatureHostKeys) {
-		if (key in base) {
-			throw new Error(`Feature host cannot overwrite existing property "${key}"`);
-		}
-	}
 }
 
 const reservedFeatureHostKeys = ['_features', 'with'] as const;
@@ -163,12 +144,21 @@ export interface TFeature<
 	install: (host: never) => GApi;
 }
 
+// Note: Positional tuple, not a union array to enforce that every required key is listed and
+// mirrors the GRequiredFeatures generic. A union array would only validate allowed keys, not coverage.
+type TRequiredFeatureKeyTuple<GFeatures extends readonly TAnyFeature[]> =
+	GFeatures extends readonly [
+		infer GFeature extends TAnyFeature,
+		...infer GRest extends TAnyFeature[]
+	]
+		? readonly [GFeature['key'], ...TRequiredFeatureKeyTuple<GRest>]
+		: readonly [];
+
 /**
  * Structural feature type for generic implementation code.
- *
- * Note: A plain interface rather than `TFeature<string, object, TAnyFeature[]>` to avoid a
- * self-referential type definition.
  */
+// Note: A plain interface rather than `TFeature<string, object, TAnyFeature[]>` to avoid a
+// self-referential type definition.
 export interface TAnyFeature {
 	key: string;
 	requires: readonly string[];
@@ -193,23 +183,24 @@ type TFeatureApiIntersection<GFeatures extends readonly TAnyFeature[]> =
 		? TFeatureApi<GFeature> & TFeatureApiIntersection<GRest>
 		: object;
 
+type TFeatureApi<GFeature extends TAnyFeature> = ReturnType<GFeature['install']>;
+
 interface TFeatureHostApi<GBase extends object, GInstalledFeatures extends TAnyFeature[]> {
-	/**
-	 * @internal Feature metadata used by feature-core. Prefer `hasFeature()` for app code.
-	 */
+	/** @internal Prefer `hasFeature()` to check installed features. */
 	readonly _features: readonly GInstalledFeatures[number]['key'][];
 	with: TWithFeatureMethod<GBase, GInstalledFeatures>;
 }
 
 interface TWithFeatureMethod<GBase extends object, GInstalledFeatures extends TAnyFeature[]> {
 	<const GFeaturesToInstall extends TAnyFeature[]>(
-		...features: GFeaturesToInstall & TInstallableFeatures<GInstalledFeatures, GFeaturesToInstall>
+		...features: GFeaturesToInstall &
+			TInstallableFeatureTuple<GInstalledFeatures, GFeaturesToInstall>
 	): TFeatureHost<GBase, [...GInstalledFeatures, ...GFeaturesToInstall]>;
 }
 
 // Note: GInstalledFeatures accumulates across the tuple so each feature validates against
 // all previously listed features in the same .with() call, not just the initial installed set.
-type TInstallableFeatures<
+type TInstallableFeatureTuple<
 	GInstalledFeatures extends TAnyFeature[],
 	GFeaturesToInstall extends TAnyFeature[]
 > = GFeaturesToInstall extends [
@@ -218,7 +209,7 @@ type TInstallableFeatures<
 ]
 	? [
 			TInstallableFeature<GFeatureToInstall, GInstalledFeatures>,
-			...TInstallableFeatures<[...GInstalledFeatures, GFeatureToInstall], GRest>
+			...TInstallableFeatureTuple<[...GInstalledFeatures, GFeatureToInstall], GRest>
 		]
 	: [];
 
@@ -226,15 +217,26 @@ type TInstallableFeature<
 	GFeatureToInstall extends TAnyFeature,
 	GInstalledFeatures extends TAnyFeature[]
 > =
-	TMissingRequiredFeatureKeys<GInstalledFeatures, GFeatureToInstall['requires']> extends never
-		? GFeatureToInstall
-		: TMissingFeatureRequirementError<
-				TMissingRequiredFeatureKeys<GInstalledFeatures, GFeatureToInstall['requires']>
-			>;
+	TDuplicateFeatureKey<GInstalledFeatures, GFeatureToInstall> extends never
+		? TMissingRequiredFeatureKeys<GInstalledFeatures, GFeatureToInstall['requires']> extends never
+			? GFeatureToInstall
+			: TMissingFeatureRequirementError<
+					TMissingRequiredFeatureKeys<GInstalledFeatures, GFeatureToInstall['requires']>
+				>
+		: TDuplicateFeatureError<TDuplicateFeatureKey<GInstalledFeatures, GFeatureToInstall>>;
 
-interface TMissingFeatureRequirementError<GMissingFeatureKeys extends string> {
-	error: 'Missing required features';
-	missing: GMissingFeatureKeys;
+// Note: when installed keys widen to string (e.g. TFeatureHost<object, TAnyFeature[]>),
+// literal comparison is meaningless; return never to skip duplicate detection for broad hosts.
+type TDuplicateFeatureKey<
+	GInstalledFeatures extends TAnyFeature[],
+	GFeatureToInstall extends TAnyFeature
+> = string extends GInstalledFeatures[number]['key']
+	? never
+	: Extract<GFeatureToInstall['key'], GInstalledFeatures[number]['key']>;
+
+interface TDuplicateFeatureError<GDuplicateFeatureKey extends string> {
+	error: 'Feature already installed';
+	duplicate: GDuplicateFeatureKey;
 }
 
 type TMissingRequiredFeatureKeys<
@@ -242,12 +244,19 @@ type TMissingRequiredFeatureKeys<
 	GRequiredKeys extends readonly string[]
 > = Exclude<GRequiredKeys[number], GInstalledFeatures[number]['key']>;
 
+interface TMissingFeatureRequirementError<GMissingFeatureKeys extends string> {
+	error: 'Missing required features';
+	missing: GMissingFeatureKeys;
+}
+
 /**
  * Definition object accepted by `defineFeature()`.
  *
  * When `GFeature` has required features, `requires` is mandatory and type-checked against
  * the declared requirements.
  */
+// Note: install uses method syntax (not property syntax) for bivariant parameter checking,
+// so feature authors can annotate a wider host type than the required-feature intersection.
 export type TFeatureDefinition<GFeature extends TAnyFeature> =
 	TRequiredFeaturesOf<GFeature> extends readonly []
 		? {
@@ -261,21 +270,6 @@ export type TFeatureDefinition<GFeature extends TAnyFeature> =
 					host: TFeatureApiIntersection<TRequiredFeaturesOf<GFeature>>
 				): TFeatureApi<GFeature>;
 			};
-
-type TFeatureApi<GFeature extends TAnyFeature> =
-	GFeature extends TFeature<string, infer GApi, readonly TAnyFeature[]>
-		? GApi
-		: ReturnType<GFeature['install']>;
-
-// Note: Positional tuple, not a union array to enforce that every required key is listed and
-// mirrors the GRequiredFeatures generic. A union array would only validate allowed keys, not coverage.
-type TRequiredFeatureKeyTuple<GFeatures extends readonly TAnyFeature[]> =
-	GFeatures extends readonly [
-		infer GFeature extends TAnyFeature,
-		...infer GRest extends TAnyFeature[]
-	]
-		? readonly [GFeature['key'], ...TRequiredFeatureKeyTuple<GRest>]
-		: readonly [];
 
 type TRequiredFeaturesOf<GFeature extends TAnyFeature> =
 	GFeature extends TFeature<string, object, infer GRequiredFeatures extends readonly TAnyFeature[]>

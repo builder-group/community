@@ -4,6 +4,7 @@ import {
 	defineFeature,
 	hasFeature,
 	installFeature,
+	type TAnyFeature,
 	type TFeature,
 	type TFeatureHost,
 	type TInstalledFeaturesOf
@@ -154,6 +155,13 @@ describe('feature-core types', () => {
 			// @ts-expect-error resetTwiceFeature requires resetFeature first.
 			installFeature(counter, resetTwiceFeature());
 		});
+
+		it('should reject a feature key that is already installed', () => {
+			const counter = createCounter(0).with(resetFeature());
+
+			// @ts-expect-error resetFeature is already installed.
+			installFeature(counter, resetFeature());
+		});
 	});
 
 	describe('host.with types', () => {
@@ -211,6 +219,27 @@ describe('feature-core types', () => {
 
 			// @ts-expect-error resetTwiceFeature requires resetFeature first.
 			counter.with(resetTwiceFeature());
+		});
+
+		it('should reject a feature key that is already installed in a later chain call', () => {
+			const counter = createCounter(0).with(resetFeature());
+
+			// @ts-expect-error resetFeature is already installed.
+			counter.with(resetFeature());
+		});
+
+		it('should reject a feature key that is repeated in the same variadic call', () => {
+			const counter = createCounter(0);
+
+			// @ts-expect-error resetFeature is already installed earlier in the same call.
+			counter.with(resetFeature(), resetFeature());
+		});
+
+		it('should allow installing a feature on a broadly typed host', () => {
+			const counter = createCounter(0) as TFeatureHost<TCounterBase, TAnyFeature[]>;
+			const counterWithReset = counter.with(resetFeature());
+
+			assertType<readonly string[]>(counterWithReset._features);
 		});
 
 		it('should expose readonly feature metadata', () => {
