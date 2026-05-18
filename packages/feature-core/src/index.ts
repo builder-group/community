@@ -7,7 +7,7 @@ export function createFeatureHost<GBase extends object>(base: GBase): TFeatureHo
 	// Reserved host properties must not already exist on base
 	for (const key of reservedFeatureHostKeys) {
 		if (key in base) {
-			throw new Error(`Feature host cannot overwrite existing property "${key}"`);
+			throw new Error(`Feature host cannot overwrite existing property "${String(key)}"`);
 		}
 	}
 
@@ -29,16 +29,27 @@ export function defineFeature<const GKey extends string, GApi extends object>(de
 	key: GKey;
 	install: (host: never) => GApi;
 }): TFeature<GKey, GApi>;
+export function defineFeature<
+	const GKey extends string,
+	GApi extends object,
+	const GOverrideKeys extends readonly TFeatureOverrideKey[]
+>(definition: {
+	key: GKey;
+	overrides: GOverrideKeys;
+	install: (host: never) => GApi;
+}): TFeature<GKey, GApi, [], GOverrideKeys[number]>;
 export function defineFeature<GFeature extends TAnyFeature>(
 	definition: TFeatureDefinition<GFeature>
 ): GFeature;
 export function defineFeature(definition: {
 	key: string;
+	overrides?: readonly TFeatureOverrideKey[];
 	requires?: readonly string[];
 	install: (host: never) => object;
 }): TAnyFeature {
 	return {
 		key: definition.key,
+		overrides: definition.overrides ?? [],
 		requires: definition.requires ?? [],
 		install: definition.install
 	};
@@ -71,9 +82,30 @@ export function installFeature<
 
 	const api = feature.install(host as never);
 
-	// API keys must not collide with existing host properties before we mutate
-	for (const key of Reflect.ownKeys(api)) {
-		if (key in host) {
+	const apiKeys = Reflect.ownKeys(api);
+	const overrideKeys = new Set<TFeatureOverrideKey>(feature.overrides);
+
+	// Each declared override must exist on the host, not be reserved, and be returned by the feature
+	for (const key of feature.overrides) {
+		const isReservedHostKey = reservedFeatureHostKeys.includes(key);
+		if (isReservedHostKey) {
+			throw new Error(
+				`Feature "${feature.key}" cannot override reserved property "${String(key)}"`
+			);
+		}
+		if (!(key in host)) {
+			throw new Error(`Feature "${feature.key}" cannot override missing property "${String(key)}"`);
+		}
+		if (!apiKeys.includes(key)) {
+			throw new Error(
+				`Feature "${feature.key}" declares override "${String(key)}" but does not return it`
+			);
+		}
+	}
+
+	// API keys must not collide with existing host properties
+	for (const key of apiKeys) {
+		if (key in host && !overrideKeys.has(key)) {
 			throw new Error(
 				`Feature "${feature.key}" cannot overwrite existing property "${String(key)}"`
 			);
@@ -123,7 +155,7 @@ function withFeature(
 	return this;
 }
 
-const reservedFeatureHostKeys = ['_features', 'with'] as const;
+const reservedFeatureHostKeys: readonly TFeatureOverrideKey[] = ['_features', 'with'];
 
 /**
  * A composable feature with a key, API contract, and optional required features.
@@ -137,9 +169,11 @@ const reservedFeatureHostKeys = ['_features', 'with'] as const;
 export interface TFeature<
 	GKey extends string = string,
 	GApi extends object = object,
-	GRequiredFeatures extends readonly TAnyFeature[] = []
+	GRequiredFeatures extends readonly TAnyFeature[] = [],
+	GOverrideKeys extends TFeatureOverrideKey = never
 > {
 	key: GKey;
+	overrides: readonly GOverrideKeys[];
 	requires: TRequiredFeatureKeyTuple<GRequiredFeatures>;
 	install: (host: never) => GApi;
 }
@@ -161,35 +195,45 @@ type TRequiredFeatureKeyTuple<GFeatures extends readonly TAnyFeature[]> =
 // self-referential type definition.
 export interface TAnyFeature {
 	key: string;
+	overrides: readonly TFeatureOverrideKey[];
 	requires: readonly string[];
 	install: (host: never) => object;
 }
+
+type TFeatureOverrideKey = string | symbol;
 
 /**
  * A base object extended with installed feature APIs and the `.with()` method.
  */
 export type TFeatureHost<GBase extends object, GInstalledFeatures extends TAnyFeature[]> = Omit<
-	GBase,
+	TApplyFeatureApis<Omit<GBase, keyof TFeatureHostApi<object, []>>, GInstalledFeatures>,
 	keyof TFeatureHostApi<object, []>
 > &
-	TFeatureApiIntersection<GInstalledFeatures> &
 	TFeatureHostApi<GBase, GInstalledFeatures>;
 
-type TFeatureApiIntersection<GFeatures extends readonly TAnyFeature[]> =
-	GFeatures extends readonly [
-		infer GFeature extends TAnyFeature,
-		...infer GRest extends TAnyFeature[]
-	]
-		? TFeatureApi<GFeature> & TFeatureApiIntersection<GRest>
-		: object;
+// Note: Omit before & so overriding features replace the overridden keys rather than intersecting with them
+type TApplyFeatureApis<
+	GApi extends object,
+	GFeatures extends readonly TAnyFeature[]
+> = GFeatures extends readonly [
+	infer GFeature extends TAnyFeature,
+	...infer GRest extends TAnyFeature[]
+]
+	? TApplyFeatureApis<Omit<GApi, TFeatureOverrideKeys<GFeature>> & TFeatureApi<GFeature>, GRest>
+	: GApi;
 
 // Note: Cannot simplify to ReturnType<GFeature['install']> because through the TAnyFeature constraint,
 // install is typed as (host: never) => object, so ReturnType degrades to object
 // and the return type check in TFeatureDefinition stops catching wrong implementations.
 type TFeatureApi<GFeature extends TAnyFeature> =
-	GFeature extends TFeature<string, infer GApi, readonly TAnyFeature[]>
+	GFeature extends TFeature<string, infer GApi, readonly TAnyFeature[], TFeatureOverrideKey>
 		? GApi
 		: ReturnType<GFeature['install']>;
+
+type TFeatureOverrideKeys<GFeature extends TAnyFeature> =
+	GFeature extends TFeature<string, object, readonly TAnyFeature[], infer GOverrideKeys>
+		? GOverrideKeys
+		: never;
 
 interface TFeatureHostApi<GBase extends object, GInstalledFeatures extends TAnyFeature[]> {
 	/** @internal Prefer `hasFeature()` to check installed features. */
@@ -263,22 +307,36 @@ interface TMissingFeatureRequirementError<GMissingFeatureKeys extends string> {
  */
 // Note: Install uses method syntax (not property syntax) for bivariant parameter checking,
 // so feature authors can annotate a wider host type than the required-feature intersection.
-export type TFeatureDefinition<GFeature extends TAnyFeature> =
+export type TFeatureDefinition<GFeature extends TAnyFeature> = {
+	key: GFeature['key'];
+} & TFeatureRequirementDefinition<GFeature> &
+	TFeatureOverrideDefinition<GFeature>;
+
+type TFeatureRequirementDefinition<GFeature extends TAnyFeature> =
 	TRequiredFeaturesOf<GFeature> extends readonly []
 		? {
-				key: GFeature['key'];
 				install(host: never): TFeatureApi<GFeature>;
 			}
 		: {
-				key: GFeature['key'];
 				requires: GFeature['requires'];
 				install(
-					host: TFeatureApiIntersection<TRequiredFeaturesOf<GFeature>>
+					host: TApplyFeatureApis<object, TRequiredFeaturesOf<GFeature>>
 				): TFeatureApi<GFeature>;
 			};
 
+type TFeatureOverrideDefinition<GFeature extends TAnyFeature> = [
+	TFeatureOverrideKeys<GFeature>
+] extends [never]
+	? { overrides?: readonly never[] }
+	: { overrides: readonly TFeatureOverrideKeys<GFeature>[] };
+
 type TRequiredFeaturesOf<GFeature extends TAnyFeature> =
-	GFeature extends TFeature<string, object, infer GRequiredFeatures extends readonly TAnyFeature[]>
+	GFeature extends TFeature<
+		string,
+		object,
+		infer GRequiredFeatures extends readonly TAnyFeature[],
+		TFeatureOverrideKey
+	>
 		? GRequiredFeatures
 		: readonly [];
 

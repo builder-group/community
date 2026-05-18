@@ -29,6 +29,27 @@ describe('feature-core types', () => {
 			assertType<boolean>(counter.inferred());
 		});
 
+		it('should allow declaring override keys', () => {
+			const feature = getAsStringFeature();
+
+			assertType<TGetAsStringFeature>(feature);
+			expectTypeOf(feature.overrides).toEqualTypeOf<readonly 'get'[]>();
+		});
+
+		it('should reject missing runtime override keys for a declared override feature', () => {
+			// @ts-expect-error declared override features must include runtime overrides.
+			defineFeature<TGetAsStringFeature>({
+				key: 'getAsString',
+				install() {
+					return {
+						get() {
+							return '0';
+						}
+					};
+				}
+			});
+		});
+
 		it('should type the install host from required feature APIs', () => {
 			const feature = defineFeature<TResetTwiceFeature>({
 				key: 'resetTwice',
@@ -147,6 +168,14 @@ describe('feature-core types', () => {
 
 			assertType<() => void>(counter.reset);
 			expectTypeOf(counter).toEqualTypeOf<TCounter<[TResetFeature]>>();
+		});
+
+		it('should type overridden base APIs from the feature API', () => {
+			const counter = installFeature(createCounter(0), getAsStringFeature());
+
+			assertType<string>(counter.get());
+			assertType<(nextValue: number) => void>(counter.set);
+			expectTypeOf(counter).toEqualTypeOf<TCounter<[TGetAsStringFeature]>>();
 		});
 
 		it('should reject a feature with missing dependencies', () => {
@@ -367,6 +396,20 @@ function inferredFeature() {
 	});
 }
 
+function getAsStringFeature(): TGetAsStringFeature {
+	return defineFeature<TGetAsStringFeature>({
+		key: 'getAsString',
+		overrides: ['get'],
+		install() {
+			return {
+				get() {
+					return '0';
+				}
+			};
+		}
+	});
+}
+
 interface TCounterBase {
 	get: () => number;
 	set: (nextValue: number) => void;
@@ -386,6 +429,7 @@ type TLoggerFeature = TFeature<'logger', { log(): number }>;
 type TLabelFeature = TFeature<'label', { label(): string }>;
 type TMetaFeature = TFeature<'meta', Record<never, never>>;
 type TAuditFeature = TFeature<'audit', { audit(): number }>;
+type TGetAsStringFeature = TFeature<'getAsString', { get(): string }, [], 'get'>;
 
 type TCounterFeature =
 	| TResetFeature
@@ -394,4 +438,5 @@ type TCounterFeature =
 	| TLoggerFeature
 	| TLabelFeature
 	| TMetaFeature
-	| TAuditFeature;
+	| TAuditFeature
+	| TGetAsStringFeature;

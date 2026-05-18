@@ -103,14 +103,14 @@ export function createCounter(initialValue: number): TCounter<[]> {
 }
 ```
 
-`TFeature` has three parts:
+`TFeature` has four parts:
 
 ```ts
-type TMyFeature = TFeature<'my-feature', TMyFeatureApi, [TRequiredFeature]>;
-//                          ^ runtime key  ^ API shape   ^ required features
+type TMyFeature = TFeature<'my-feature', TMyFeatureApi, [TRequiredFeature], 'methodToOverride'>;
+//                          ^ runtime key  ^ API shape   ^ required features  ^ override keys
 ```
 
-The third generic is optional and defaults to `[]`.
+The third and fourth generics are optional and default to `[]` and `never`.
 
 **Checklist:**
 
@@ -214,6 +214,39 @@ export function cacheFeature(): TCacheFeature {
 }
 ```
 
+### Overriding Host APIs
+
+Most features add new methods. When a feature intentionally replaces an existing host method, declare that in `overrides` and in the fourth `TFeature` generic:
+
+```ts
+type TLoggedSetFeature = TFeature<
+	'logged-set',
+	{ set(nextValue: number): void },
+	[],
+	'set'
+>;
+
+export function loggedSetFeature(): TLoggedSetFeature {
+	return defineFeature<TLoggedSetFeature>({
+		key: 'logged-set',
+		overrides: ['set'],
+		install(counter: TCounterBase) {
+			// Capture the original before Object.assign replaces it with this override
+			const originalSet = counter.set.bind(counter);
+
+			return {
+				set(nextValue) {
+					console.log('set', nextValue);
+					originalSet(nextValue);
+				}
+			};
+		}
+	});
+}
+```
+
+Capture the previous method before returning the override when you want `super`-style behavior. Calling `counter.set()` inside the returned `set()` method would call the override again after installation.
+
 ## ❓ FAQ
 
 ### Why "features" instead of "plugins"?
@@ -247,3 +280,9 @@ This keeps features reusable across libraries and avoids making every feature ca
 ### When should I use explicit `defineFeature<TMyFeature>()` vs inferred?
 
 Use explicit when the feature is exported or referenced by name elsewhere. TypeScript will validate that the key, API shape, and `requires` all match the declared type contract, catching mismatches at definition time. Use inferred for local or one-off features where no external contract exists.
+
+### Why does `overrides` require an explicit declaration instead of allowing any collision?
+
+The explicit declaration is what distinguishes an intentional replacement from a mistake. Without it, a typo in a returned method name would silently overwrite an existing host method instead of throwing. `overrides` makes the intent auditable at a glance and keeps the collision guard intact for everything not listed.
+
+It also avoids implicit chaining. An automatic `super`-style approach would call the previous method on your behalf, but that hides whether the original runs at all, and when. Capturing the previous method in a closure is one extra line and makes both facts explicit in the code.

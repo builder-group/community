@@ -70,6 +70,7 @@ describe('feature-core', () => {
 
 			// Assert
 			expect(feature.key).toBe('enabled');
+			expect(feature.overrides).toStrictEqual([]);
 			expect(feature.requires).toStrictEqual([]);
 			expect(api.isEnabled()).toBe(true);
 		});
@@ -80,6 +81,7 @@ describe('feature-core', () => {
 
 			// Assert
 			expect(feature.key).toBe('resetTwice');
+			expect(feature.overrides).toStrictEqual([]);
 			expect(feature.requires).toStrictEqual(['reset']);
 		});
 	});
@@ -128,6 +130,61 @@ describe('feature-core', () => {
 			expect(() => {
 				installFeature(counter, overwriteGetFeature());
 			}).toThrow('Feature "overwriteGet" cannot overwrite existing property "get"');
+		});
+
+		it('should allow a feature API to override an explicitly listed property', () => {
+			// Prepare
+			const counter = createCounter(0);
+
+			// Act
+			const counterWithOverride = installFeature(counter, overrideGetFeature());
+
+			// Assert
+			expect(counterWithOverride.get()).toBe(42);
+			expect(counterWithOverride._features).toStrictEqual(['overrideGet']);
+		});
+
+		it('should allow an override to call the previous host method', () => {
+			// Prepare
+			const counter = createCounter(0);
+
+			// Act
+			const counterWithOverride = installFeature(counter, overrideSetFeature());
+			counterWithOverride.set(4);
+
+			// Assert
+			expect(counterWithOverride.get()).toBe(5);
+			expect(counterWithOverride._features).toStrictEqual(['overrideSet']);
+		});
+
+		it('should throw when a feature overrides a missing host property', () => {
+			// Prepare
+			const counter = createCounter(0);
+
+			// Act & Assert
+			expect(() => {
+				installFeature(counter, overrideMissingFeature());
+			}).toThrow('Feature "overrideMissing" cannot override missing property "missing"');
+		});
+
+		it('should throw when a feature declares an override without returning that API', () => {
+			// Prepare
+			const counter = createCounter(0);
+
+			// Act & Assert
+			expect(() => {
+				installFeature(counter, missingOverrideApiFeature());
+			}).toThrow('Feature "missingOverrideApi" declares override "get" but does not return it');
+		});
+
+		it('should throw when a feature overrides a reserved host property', () => {
+			// Prepare
+			const counter = createCounter(0);
+
+			// Act & Assert
+			expect(() => {
+				installFeature(counter, overrideWithFeature());
+			}).toThrow('Feature "overrideWith" cannot override reserved property "with"');
 		});
 
 		it('should throw when a feature API overwrites an existing symbol property', () => {
@@ -337,6 +394,74 @@ function overwriteSymbolFeature(symbolKey: symbol) {
 	});
 }
 
+function overrideGetFeature(): TOverrideGetFeature {
+	return defineFeature<TOverrideGetFeature>({
+		key: 'overrideGet',
+		overrides: ['get'],
+		install() {
+			return {
+				get() {
+					return 42;
+				}
+			};
+		}
+	});
+}
+
+function overrideSetFeature(): TOverrideSetFeature {
+	return defineFeature<TOverrideSetFeature>({
+		key: 'overrideSet',
+		overrides: ['set'],
+		install(counter: TCounterBase) {
+			const set = counter.set.bind(counter);
+
+			return {
+				set(nextValue) {
+					set(nextValue + 1);
+				}
+			};
+		}
+	});
+}
+
+function overrideMissingFeature() {
+	return defineFeature({
+		key: 'overrideMissing',
+		overrides: ['missing'] as const,
+		install() {
+			return {
+				missing() {
+					return undefined;
+				}
+			};
+		}
+	});
+}
+
+function missingOverrideApiFeature() {
+	return defineFeature({
+		key: 'missingOverrideApi',
+		overrides: ['get'] as const,
+		install() {
+			return {};
+		}
+	});
+}
+
+function overrideWithFeature() {
+	return defineFeature({
+		key: 'overrideWith',
+		overrides: ['with'] as const,
+		install() {
+			return {
+				with() {
+					return undefined;
+				}
+			};
+		}
+	});
+}
+
 interface TCounterBase {
 	get: () => number;
 	set: (nextValue: number) => void;
@@ -349,10 +474,14 @@ type TResetTwiceFeature = TFeature<'resetTwice', { resetTwice(): void }, [TReset
 type TResetWithThisFeature = TFeature<'resetWithThis', { resetWithThis(this: TCounterBase): void }>;
 type TLoggerFeature = TFeature<'logger', { log(): number }>;
 type TMetaFeature = TFeature<'meta', Record<never, never>>;
+type TOverrideGetFeature = TFeature<'overrideGet', { get(): number }, [], 'get'>;
+type TOverrideSetFeature = TFeature<'overrideSet', { set(nextValue: number): void }, [], 'set'>;
 
 type TCounterFeature =
 	| TResetFeature
 	| TResetTwiceFeature
 	| TResetWithThisFeature
 	| TLoggerFeature
-	| TMetaFeature;
+	| TMetaFeature
+	| TOverrideGetFeature
+	| TOverrideSetFeature;
