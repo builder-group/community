@@ -5,7 +5,7 @@ import type {
 	TListenerContext,
 	TStateBase,
 	TStateNotifyOptions
-} from '../../types';
+} from '../types';
 
 /** Adds deferred FIFO listener scheduling to a state. */
 export function asyncQueueFeature<GValue>(): TAsyncQueueFeature<GValue> {

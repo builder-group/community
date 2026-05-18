@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
-import { createState } from '../../create-state';
-import type { TState } from '../../types';
+import { createState } from '../create-state';
+import type { TState } from '../types';
 import {
 	asyncQueueFeature,
 	type TAsyncQueueFeature,
