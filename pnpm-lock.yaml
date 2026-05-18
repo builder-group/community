@@ -591,12 +591,9 @@ importers:
 
   packages/feature-state:
     dependencies:
-      '@blgc/types':
+      feature-core:
         specifier: workspace:*
-        version: link:../types
-      '@blgc/utils':
-        specifier: workspace:*
-        version: link:../utils
+        version: link:../feature-core
     devDependencies:
       '@blgc/config':
         specifier: workspace:*

@@ -1,16 +1,18 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import { createState } from '../create-state';
-import { withUndo } from './with-undo';
+import { undoFeature } from './undo';
 
-describe('withUndo function', () => {
+describe('undoFeature function', () => {
 	it('should have correct types', () => {
-		const state = createState('Jeff');
-		const stateWithUndo = withUndo(state);
+		const state = createState('Jeff').with(undoFeature<string>());
+
+		expectTypeOf(state.get()).toEqualTypeOf<string>();
+		expectTypeOf(state._history).toEqualTypeOf<string[]>();
 	});
 
 	it('should allow undoing the last set operation', () => {
 		// Prepare
-		const state = withUndo(createState(10));
+		const state = createState(10).with(undoFeature<number>());
 
 		// Act
 		state.set(20);
@@ -22,7 +24,7 @@ describe('withUndo function', () => {
 
 	it('should handle multiple undos correctly', () => {
 		// Prepare
-		const state = withUndo(createState('initial'));
+		const state = createState('initial').with(undoFeature<string>());
 
 		// Act
 		state.set('first');
@@ -36,7 +38,7 @@ describe('withUndo function', () => {
 
 	it('should do nothing if there is nothing to undo', () => {
 		// Prepare
-		const state = withUndo(createState(10));
+		const state = createState(10).with(undoFeature<number>());
 
 		// Act
 		state.undo();
@@ -47,12 +49,12 @@ describe('withUndo function', () => {
 
 	it('should only record distinct consecutive values for undo', () => {
 		// Prepare
-		const state = withUndo(createState(10));
+		const state = createState(10).with(undoFeature<number>());
 
 		// Act
-		state.set(10); // Same as initial, should not be recorded
+		state.set(10);
 		state.set(20);
-		state.set(20); // Duplicate, should not be recorded again
+		state.set(20);
 		state.undo();
 
 		// Assert
@@ -62,7 +64,7 @@ describe('withUndo function', () => {
 	it('should respect the history stack size limit', () => {
 		// Prepare
 		const historyLimit = 5;
-		const state = withUndo(createState(0), historyLimit);
+		const state = createState(0).with(undoFeature<number>(historyLimit));
 
 		// Act
 		for (let i = 1; i <= 10; i++) {

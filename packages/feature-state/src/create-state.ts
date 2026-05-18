@@ -1,60 +1,62 @@
-import {
-	createListenerQueue,
-	getListenerQueue,
-	TCreateListenerQueueOptions
-} from './listener-queue';
-import type { TListener, TListenerContext, TState } from './types';
+import { createFeatureHost } from 'feature-core';
+import { createListenerQueue, getListenerQueue, type TCreateListenerQueueOptions } from './queue';
+import type { TListener, TListenerContext, TState, TStateBase } from './types';
 
-export const SET_SOURCE_KEY = 'state_set';
-
+/**
+ * Creates a reactive state container with `value`, `set`, `notify`, `listen`, and `subscribe`.
+ *
+ * Returns a feature host so capabilities can be added with `.with(feature())`.
+ */
 export function createState<GValue>(
 	initialValue: GValue,
 	options: TCreateStateOptions = {}
 ): TState<GValue, []> {
-	const {
-		queue:
-			// Default to sync queue to avoid side-effects
-			// https://evilmartians.com/chronicles/how-to-avoid-tricky-async-state-manager-pitfalls-react
-			queueConfigOrKey = 'sync'
-	} = options;
+	type TQueueItem = Parameters<TStateBase<GValue>['_queue']['push']>[0];
 
-	let queue = getListenerQueue(
-		typeof queueConfigOrKey === 'string' ? queueConfigOrKey : queueConfigOrKey.key
-	);
+	const { queue: queueConfigOrKey = 'sync' } = options;
+	const queueConfig =
+		typeof queueConfigOrKey === 'string'
+			? {
+					key: queueConfigOrKey,
+					// Note: Sync avoids side effects that can appear when state updates are deferred
+					// https://evilmartians.com/chronicles/how-to-avoid-tricky-async-state-manager-pitfalls-react
+					async: queueConfigOrKey === 'async'
+				}
+			: queueConfigOrKey;
+
+	let queue = getListenerQueue(queueConfig.key);
 	if (queue == null) {
-		const { key, ...queueOptions } =
-			typeof queueConfigOrKey === 'string'
-				? { key: queueConfigOrKey, async: queueConfigOrKey === 'async' }
-				: queueConfigOrKey;
+		const { key, ...queueOptions } = queueConfig;
 		queue = createListenerQueue(key, queueOptions);
 	}
 
-	return {
-		_features: [],
+	const baseState: TStateBase<GValue> = {
 		_listeners: [],
-		_v: initialValue,
 		_queue: queue,
-		_notify(notifyOptions = {}) {
+		_v: initialValue,
+		get value() {
+			return this._v;
+		},
+		set value(newValue) {
+			this.set(newValue);
+		},
+		notify(notifyOptions = {}) {
 			const { processListenerQueue = true, listenerContext = {}, prevValue } = notifyOptions;
 
-			// Push all listeners to the state's queue
 			for (const listener of this._listeners) {
-				const context: TListenerContext<GValue> = Object.assign(listenerContext, {
+				const context: TListenerContext<GValue> = {
+					...listenerContext,
 					value: this._v,
 					prevValue
-				});
-				if (listener.queueIf == null || listener.queueIf(context)) {
-					this._queue.push(
-						{
-							context,
-							callback: listener.callback
-						},
-						listener.priority
-					);
-				}
+				};
+				// Note: queues can be shared by states with different value types
+				const queueItem = {
+					callback: listener.callback,
+					context
+				} as TQueueItem;
+				this._queue.push(queueItem, listener.priority);
 			}
 
-			// Process the state's queue
 			if (processListenerQueue) {
 				void this._queue.process();
 			}
@@ -68,29 +70,31 @@ export function createState<GValue>(
 					? (newValueOrUpdater as (value: GValue) => GValue)(this._v)
 					: newValueOrUpdater;
 			const prevValue = this._v;
-			if (prevValue !== newValue) {
-				const { listenerContext = {}, processListenerQueue = true } = setOptions;
-				listenerContext.source = listenerContext.source ?? SET_SOURCE_KEY;
-				this._v = newValue;
-				this._notify({
-					listenerContext,
-					processListenerQueue,
-					prevValue
-				});
+			if (Object.is(prevValue, newValue)) {
+				return;
 			}
+
+			const { listenerContext = {}, processListenerQueue = true } = setOptions;
+			this._v = newValue;
+			this.notify({
+				listenerContext: {
+					...listenerContext,
+					source: listenerContext.source ?? setSourceKey
+				},
+				processListenerQueue,
+				prevValue
+			});
 		},
 		listen(callback, listenOptions = {}) {
-			const { priority = EStateListenerQueuePriority.DEFAULT, key, queueIf } = listenOptions;
+			const { priority = EStateListenerQueuePriority.DEFAULT } = listenOptions;
 			const listener: TListener<GValue> = {
-				key,
 				priority,
-				callback,
-				queueIf
+				callback
 			};
 			this._listeners.push(listener);
 
-			// Unbind
 			return () => {
+				this._queue.removeWhere((item) => item.callback === callback);
 				const index = this._listeners.indexOf(listener);
 				if (index !== -1) {
 					this._listeners.splice(index, 1);
@@ -99,16 +103,24 @@ export function createState<GValue>(
 		},
 		subscribe(callback, subscribeOptions) {
 			const unbind = this.listen(callback, subscribeOptions);
+			// Note: prevValue mirrors value on the initial call so listeners never receive undefined for prevValue
 			void callback({ value: this._v, prevValue: this._v });
 			return unbind;
 		}
 	};
+
+	return createFeatureHost(baseState);
 }
 
+/** Source key set on the listener context when a value is changed via `set()`. */
+export const setSourceKey = 'state_set';
+
 export interface TCreateStateOptions {
+	/** Listener queue used to schedule and process callbacks. Defaults to `'sync'`. */
 	queue?: ({ key: string } & TCreateListenerQueueOptions) | string;
 }
 
+/** Defines listener priority values. Lower values are processed earlier. */
 export enum EStateListenerQueuePriority {
 	FIRST = 0,
 	EARLY = 125,
