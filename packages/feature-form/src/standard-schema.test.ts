@@ -5,7 +5,7 @@ import { validateStandardSchema } from './standard-schema';
 describe('validateStandardSchema', () => {
 	it('should return valid status when the schema has no issues', async () => {
 		// Prepare
-		const schema = createStandardSchema<string>(() => ({ value: 'valid' }));
+		const schema = createStandardSchema<string>(async () => ({ value: 'valid' }));
 
 		// Act
 		const status = await validateStandardSchema(schema, 'valid', 'firstError');
@@ -31,7 +31,7 @@ describe('validateStandardSchema', () => {
 			issues: [
 				{
 					message: 'Required',
-					path: [{ key: 'profile' }, 'name']
+					path: [{ key: 'items' }, 0, 'name']
 				}
 			]
 		}));
@@ -42,7 +42,7 @@ describe('validateStandardSchema', () => {
 		// Assert
 		expect(status).toEqual({
 			type: 'invalid',
-			errors: [{ message: 'Required', path: ['profile', 'name'] }]
+			errors: [{ message: 'Required', path: ['items', 0, 'name'] }]
 		});
 	});
 
@@ -84,7 +84,9 @@ describe('validateStandardSchema', () => {
 });
 
 function createStandardSchema<GValue>(
-	validate: (value: GValue) => StandardSchemaV1.Result<GValue>
+	validate: (
+		value: GValue
+	) => Promise<StandardSchemaV1.Result<GValue>> | StandardSchemaV1.Result<GValue>
 ): StandardSchemaV1<GValue> {
 	return {
 		'~standard': {
