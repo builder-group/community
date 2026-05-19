@@ -35,13 +35,12 @@ export function createForm<GFormData extends TFormData>(
 	const {
 		fields,
 		fieldValidation = {},
-		notifyOnStatusUpdate = true,
 		onInvalidSubmit,
 		onValidSubmit,
 		validation: {
 			validator,
-			validateOn = ['submit'] satisfies TFormValidationConfig['validateOn'],
-			revalidateOn = ['change', 'submit'] satisfies TFormValidationConfig['revalidateOn'],
+			validateOn = ['submit'] as const,
+			revalidateOn = ['change', 'submit'] as const,
 			collectErrorMode = 'firstError'
 		} = {}
 	} = config;
@@ -59,7 +58,7 @@ export function createForm<GFormData extends TFormData>(
 						}
 					},
 		_validationRunId: 0,
-		_validationStatus: validator == null ? { type: 'valid' } : { type: 'unvalidated' },
+		_formValidatorStatus: validator == null ? { type: 'valid' } : { type: 'unvalidated' },
 		_callbacks: {
 			invalidSubmit: onInvalidSubmit == null ? [] : [onInvalidSubmit],
 			validSubmit: onValidSubmit == null ? [] : [onValidSubmit]
@@ -85,23 +84,37 @@ export function createForm<GFormData extends TFormData>(
 							validator: field.validator,
 							collectErrorMode: field.collectErrorMode ?? fieldValidation.collectErrorMode,
 							revalidateOn: field.revalidateOn ?? fieldValidation.revalidateOn,
-							validateOn: field.validateOn ?? fieldValidation.validateOn,
-							notifyOnStatusUpdate
+							validateOn: field.validateOn ?? fieldValidation.validateOn
 						})
 			])
 		) as TFormFields<GFormData>,
-		async _revalidate(this: TForm<GFormData, []>, options = {}) {
-			const { runValidators = true } = options;
-			return revalidateForm(this, {
-				runFieldValidators: runValidators,
-				runFormValidator: runValidators
-			});
+		onValidSubmit(this: TForm<GFormData, []>, callback) {
+			this._callbacks.validSubmit.push(callback);
+
+			return () => {
+				const index = this._callbacks.validSubmit.indexOf(callback);
+				if (index !== -1) {
+					this._callbacks.validSubmit.splice(index, 1);
+				}
+			};
+		},
+		onInvalidSubmit(this: TForm<GFormData, []>, callback) {
+			this._callbacks.invalidSubmit.push(callback);
+
+			return () => {
+				const index = this._callbacks.invalidSubmit.indexOf(callback);
+				if (index !== -1) {
+					this._callbacks.invalidSubmit.splice(index, 1);
+				}
+			};
 		},
 		async submit(this: TForm<GFormData, []>, options = {}) {
 			this.isSubmitting.set(true);
 			try {
-				await validateFormOnSubmit(this);
-				await this._revalidate({ runValidators: false });
+				await revalidateForm(this, {
+					runFieldValidators: true,
+					runFormValidator: true
+				});
 
 				for (const formField of getFormFields(this.fields)) {
 					formField.isSubmitted.set(true);
@@ -136,17 +149,21 @@ export function createForm<GFormData extends TFormData>(
 			}
 		},
 		async validate(this: TForm<GFormData, []>) {
-			return this._revalidate({ runValidators: true });
+			return revalidateForm(this, {
+				runFieldValidators: true,
+				runFormValidator: true
+			});
 		},
 		reset(this: TForm<GFormData, []>) {
 			for (const formField of getFormFields(this.fields)) {
 				formField.reset();
 			}
 			this._validationRunId++;
-			this._validationStatus =
+			this._formValidatorStatus =
 				this._validation == null ? { type: 'valid' } : { type: 'unvalidated' };
 			this.status.set(getAggregateFormStatus(this));
 			this.isValidating.set(false);
+			// Note: reset clears flags and invalidates validation runs, but does not cancel submit callbacks already in progress
 			this.isSubmitted.set(false);
 			this.isSubmitting.set(false);
 		},
@@ -168,7 +185,7 @@ export function createForm<GFormData extends TFormData>(
 		getErrors(this: TForm<GFormData, []>) {
 			return {
 				fields: getFormFieldErrors(this.fields),
-				form: getFormValidationErrors(this)
+				form: this._formValidatorStatus.type === 'invalid' ? this._formValidatorStatus.errors : []
 			};
 		}
 	});
@@ -186,8 +203,6 @@ export interface TCreateFormConfig<GFormData extends TFormData> {
 	validation?: TCreateFormValidation<GFormData>;
 	/** Default validation config applied to field configs that do not override it. */
 	fieldValidation?: Partial<TFormFieldValidationConfig>;
-	/** Calls `field.notify()` when a field status changes. */
-	notifyOnStatusUpdate?: boolean;
 	/** Called on every valid submit. Per-call overrides can be passed directly to `submit()`. */
 	onValidSubmit?: TFormValidSubmitCallback<GFormData>;
 	/** Called on every invalid submit. Per-call overrides can be passed directly to `submit()`. */
@@ -219,7 +234,7 @@ export interface TCreateFormConfigFormField<GValue> {
 function registerFormListeners<GFormData extends TFormData>(form: TForm<GFormData, []>): void {
 	for (const formField of getFormFields(form.fields)) {
 		formField.status.listen(() => {
-			void form._revalidate({ runValidators: false });
+			form.status.set(getAggregateFormStatus(form));
 		});
 
 		formField.onBlur(({ wasTouched }) => {
@@ -257,37 +272,6 @@ function registerFormListeners<GFormData extends TFormData>(form: TForm<GFormDat
 				runFormValidator: true
 			});
 		});
-	}
-}
-
-async function validateFormOnSubmit<GFormData extends TFormData>(
-	form: TForm<GFormData, []>
-): Promise<void> {
-	const fieldValidationPromises: Array<Promise<boolean>> = [];
-	for (const formField of getFormFields(form.fields)) {
-		if (formField._validation != null) {
-			fieldValidationPromises.push(formField.validate());
-		}
-	}
-
-	const shouldRunFormValidator = form._validation != null;
-	const shouldSetValidating = fieldValidationPromises.length > 0 || shouldRunFormValidator;
-	const validationRunId = shouldSetValidating ? ++form._validationRunId : null;
-	if (shouldSetValidating) {
-		form.isValidating.set(true);
-	}
-
-	try {
-		await Promise.all([
-			...fieldValidationPromises,
-			...(shouldRunFormValidator && validationRunId != null
-				? [validateFormValidator(form, validationRunId)]
-				: [])
-		]);
-	} finally {
-		if (validationRunId != null && validationRunId === form._validationRunId) {
-			form.isValidating.set(false);
-		}
 	}
 }
 
@@ -331,7 +315,7 @@ async function validateFormValidator<GFormData extends TFormData>(
 	validationRunId: number
 ): Promise<void> {
 	if (form._validation == null) {
-		form._validationStatus = { type: 'valid' };
+		form._formValidatorStatus = { type: 'valid' };
 		return;
 	}
 
@@ -358,7 +342,7 @@ async function validateFormValidator<GFormData extends TFormData>(
 		return;
 	}
 
-	form._validationStatus = status;
+	form._formValidatorStatus = status;
 }
 
 function getAggregateFormStatus<GFormData extends TFormData>(
@@ -367,23 +351,18 @@ function getAggregateFormStatus<GFormData extends TFormData>(
 	const errors: TValidationError[] = [];
 	let hasUnvalidatedStatus = false;
 
-	for (const [fieldKey, formField] of getFormFieldEntries(form.fields)) {
+	for (const formField of getFormFields(form.fields)) {
 		const status = formField.status.get();
 		if (status.type === 'invalid') {
-			errors.push(
-				...status.errors.map((error) => ({
-					...error,
-					path: getFormFieldErrorPath(fieldKey, error.path)
-				}))
-			);
+			errors.push(...status.errors);
 		} else if (status.type === 'unvalidated') {
 			hasUnvalidatedStatus = true;
 		}
 	}
 
-	if (form._validationStatus.type === 'invalid') {
-		errors.push(...form._validationStatus.errors);
-	} else if (form._validationStatus.type === 'unvalidated') {
+	if (form._formValidatorStatus.type === 'invalid') {
+		errors.push(...form._formValidatorStatus.errors);
+	} else if (form._formValidatorStatus.type === 'unvalidated') {
 		hasUnvalidatedStatus = true;
 	}
 
@@ -407,26 +386,6 @@ function getFormFieldErrors<GFormData extends TFormData>(
 	}
 
 	return errors;
-}
-
-function getFormValidationErrors<GFormData extends TFormData>(
-	form: TForm<GFormData, []>
-): readonly TValidationError[] {
-	if (form._validationStatus.type === 'invalid') {
-		return form._validationStatus.errors;
-	}
-
-	return [];
-}
-
-function getFormFieldErrorPath(
-	fieldKey: string,
-	path: TValidationError['path']
-): TValidationError['path'] {
-	if (path == null) {
-		return [fieldKey];
-	}
-	return [fieldKey, ...path];
 }
 
 function updateFieldDefaultValues<GFormData extends TFormData>(

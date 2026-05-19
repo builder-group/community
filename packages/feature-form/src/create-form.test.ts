@@ -93,7 +93,7 @@ describe('createForm', () => {
 		]);
 		expect(form.status.get()).toEqual({
 			type: 'invalid',
-			errors: [{ message: 'Required', path: ['conditions', 0, 'timeOfDayMs'] }]
+			errors: [{ message: 'Required', path: [0, 'timeOfDayMs'] }]
 		});
 		expect(invalidSubmissions).toHaveLength(1);
 		expect(form.isSubmitted.get()).toBe(true);
@@ -131,6 +131,29 @@ describe('createForm', () => {
 			type: 'invalid',
 			errors: [{ message: 'Passwords do not match', path: ['confirm'] }]
 		});
+	});
+
+	it('should register and unregister submit callbacks', async () => {
+		// Prepare
+		const submittedData: Array<Readonly<TUserFormData>> = [];
+		const form = createForm<TUserFormData>({
+			fields: {
+				name: { defaultValue: 'Alice' },
+				email: { defaultValue: 'alice@example.com' }
+			}
+		});
+		const unbind = form.onValidSubmit((data) => {
+			submittedData.push(data);
+		});
+
+		// Act
+		await form.submit();
+		unbind();
+		form.fields.name.set('Bob');
+		await form.submit();
+
+		// Assert
+		expect(submittedData).toEqual([{ name: 'Alice', email: 'alice@example.com' }]);
 	});
 
 	it('should reset field values and validation status', async () => {

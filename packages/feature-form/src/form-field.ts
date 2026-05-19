@@ -21,8 +21,7 @@ export function createFormField<GValue>(
 		validator,
 		validateOn = ['submit'],
 		revalidateOn = ['blur'],
-		collectErrorMode = 'firstError',
-		notifyOnStatusUpdate = true
+		collectErrorMode = 'firstError'
 	} = config;
 	const formField = createState(defaultValue).with(
 		formFieldFeature({
@@ -41,7 +40,7 @@ export function createFormField<GValue>(
 		})
 	);
 
-	registerFormFieldListeners(formField, notifyOnStatusUpdate);
+	registerFormFieldListeners(formField);
 
 	return formField;
 }
@@ -50,8 +49,6 @@ export interface TCreateFormFieldConfig<GValue> extends Partial<TFormFieldValida
 	/** Stable field key used in validation contexts and form error paths. */
 	key: string;
 	validator?: TFormFieldValidator<GValue>;
-	/** Calls `field.notify()` when the validation status changes. */
-	notifyOnStatusUpdate?: boolean;
 }
 
 export function isFormField<GValue = unknown>(value: unknown): value is TFormField<GValue> {
@@ -162,6 +159,7 @@ function formFieldFeature<GValue>(
 	});
 }
 
+/** Identifies listener events caused by field reset so validation can ignore reset changes. */
 export const formFieldResetSourceKey = 'form-field_reset';
 
 interface TResolvedFormFieldConfig<GValue> {
@@ -169,20 +167,15 @@ interface TResolvedFormFieldConfig<GValue> {
 	validation?: TFormFieldValidation<GValue>;
 }
 
-function registerFormFieldListeners<GValue>(
-	formField: TFormField<GValue>,
-	notifyOnStatusUpdate: boolean
-): void {
-	if (notifyOnStatusUpdate) {
-		formField.status.listen(({ value }) => {
-			formField.notify({
-				listenerContext: {
-					source: formFieldStatusChangeSourceKey,
-					status: value
-				}
-			});
+function registerFormFieldListeners<GValue>(formField: TFormField<GValue>): void {
+	formField.status.listen(({ value }) => {
+		formField.notify({
+			listenerContext: {
+				source: formFieldStatusChangeSourceKey,
+				status: value
+			}
 		});
-	}
+	});
 
 	formField.listen(({ source }) => {
 		if (source === formFieldResetSourceKey || source === formFieldStatusChangeSourceKey) {
@@ -203,4 +196,5 @@ function registerFormFieldListeners<GValue>(
 	});
 }
 
+/** Identifies listener events caused by status updates so validation does not loop. */
 export const formFieldStatusChangeSourceKey = 'form-field_status-change';

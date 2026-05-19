@@ -2,7 +2,7 @@
 	"name": "feature-form",
 	"version": "0.0.60",
 	"private": false,
-	"description": "Straightforward, typesafe, and feature-based form library for ReactJs",
+	"description": "Lightweight, typesafe, and feature-based form state library",
 	"keywords": [],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {

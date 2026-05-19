@@ -67,23 +67,22 @@ const $form = createForm({
 
 **Config options**
 
-| Option                 | Default  | Description                                                                                                  |
-| ---------------------- | -------- | ------------------------------------------------------------------------------------------------------------ |
-| `fields`               | required | Field configs or pre-built fields keyed by form data property.                                               |
-| `validation`           | none     | Form-level validator for cross-field constraints.                                                            |
-| `fieldValidation`      | `{}`     | Shared `validateOn`, `revalidateOn`, and `collectErrorMode` for all field configs that do not override them. |
-| `onValidSubmit`        | none     | Called on every valid submit. Per-call overrides can be passed to `submit()`.                                |
-| `onInvalidSubmit`      | none     | Called on every invalid submit. Per-call overrides can be passed to `submit()`.                              |
-| `notifyOnStatusUpdate` | `true`   | Re-notifies field listeners when the validation status changes, so state hooks pick up the new status.       |
+| Option            | Default  | Description                                                                                                  |
+| ----------------- | -------- | ------------------------------------------------------------------------------------------------------------ |
+| `fields`          | required | Field configs or pre-built fields keyed by form data property.                                               |
+| `validation`      | none     | Form-level validator for cross-field constraints.                                                            |
+| `fieldValidation` | `{}`     | Shared `validateOn`, `revalidateOn`, and `collectErrorMode` for all field configs that do not override them. |
+| `onValidSubmit`   | none     | Called on every valid submit. Per-call overrides can be passed to `submit()`.                                |
+| `onInvalidSubmit` | none     | Called on every invalid submit. Per-call overrides can be passed to `submit()`.                              |
 
 **Field config options**
 
-| Option             | Default        | Description                                                                 |
-| ------------------ | -------------- | --------------------------------------------------------------------------- |
-| `defaultValue`     | required       | Initial value and reset target.                                             |
-| `validator`        | none           | Field-level validator.                                                      |
-| `validateOn`       | `['submit']`   | Triggers that run the validator before the first submit.                    |
-| `revalidateOn`     | `['blur']`     | Triggers that run the validator after the first submit.                     |
+| Option             | Default        | Description                                                                      |
+| ------------------ | -------------- | -------------------------------------------------------------------------------- |
+| `defaultValue`     | required       | Initial value and reset target.                                                  |
+| `validator`        | none           | Field-level validator.                                                           |
+| `validateOn`       | `['submit']`   | Triggers that run the validator before the first submit.                         |
+| `revalidateOn`     | `['blur']`     | Triggers that run the validator after the first submit.                          |
 | `collectErrorMode` | `'firstError'` | `'firstError'` keeps the first Standard Schema issue; `'all'` keeps every issue. |
 
 ### `submit(options?)` / `validate()` / `reset()`
@@ -97,12 +96,15 @@ await $form.submit({
 	updateDefaultValues: true // resets will return to the submitted values after a valid submit
 });
 
+const unbind = $form.onValidSubmit((data) => save(data));
+unbind();
+
 const isValid = await $form.validate(); // runs all validators without submitting
 
 $form.reset(); // resets all fields to their default values, clears status
 ```
 
-`submit()` runs all field and form-level validators, aggregates current status, then fires the appropriate callbacks. Returns `true` if the form was valid, `false` otherwise.
+`submit()` runs all field and form-level validators, aggregates current status, then fires the appropriate callbacks. Returns `true` if the form was valid, `false` otherwise. `onValidSubmit()` and `onInvalidSubmit()` register persistent callbacks; `submit()` options register callbacks for that submit call only.
 
 ### `getData()` / `getValidData()` / `getErrors()`
 
@@ -111,8 +113,8 @@ const data = $form.getData(); // current field values, regardless of validity
 const data = $form.getValidData(); // current field values, or null if form is not valid
 
 const errors = $form.getErrors();
-errors.fields; // { [fieldKey]: TValidationError[] | undefined }
-errors.form; // TValidationError[] from the form-level validator
+errors.fields; // field-level errors keyed by field
+errors.form; // form-level errors from the form-level validator
 ```
 
 ### `fields` / `getField(key)`
@@ -244,7 +246,7 @@ const status = $form.fields.email.status.get();
 if (status.type === 'invalid') {
 	status.errors; // readonly TValidationError[]
 	status.errors[0].message; // string
-	status.errors[0].path; // field key or nested path, e.g. ['email'] or ['address', 'city']
+	status.errors[0].path; // validator path, e.g. ['address', 'city']
 }
 ```
 
@@ -335,6 +337,10 @@ The two phases have different UX goals. Before the first submit, aggressive vali
 ### What does `getErrors()` return before validation?
 
 Only fields with `'invalid'` status appear in `errors.fields`. Unvalidated fields are omitted. `errors.form` is always an empty array until the form-level validator has run.
+
+### How does `reset()` copy default values?
+
+`reset()` deep-copies plain objects and arrays. Non-plain objects such as `Date`, `Map`, class instances, and browser objects are kept by reference. If a field stores a mutable non-plain object, replace it with a new instance before updating the default value.
 
 ### When should I use `createFormField` instead of defining fields inside `createForm`?
 

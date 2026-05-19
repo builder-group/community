@@ -16,8 +16,8 @@ export interface TFormBase<GFormData extends TFormData> {
 	_validation?: TFormValidation<GFormData>;
 	/** @internal Increments to prevent stale async validation runs from committing after reset or newer validation. */
 	_validationRunId: number;
-	/** @internal Stores form-level validation separately so `getErrors().form` can stay distinct. */
-	_validationStatus: TValidationStatusValue;
+	/** @internal Stores form-level validator status separately so `getErrors().form` can stay distinct. */
+	_formValidatorStatus: TValidationStatusValue;
 	/** @internal */
 	_callbacks: TFormCallbacks<GFormData>;
 	status: TFormStatus;
@@ -25,8 +25,10 @@ export interface TFormBase<GFormData extends TFormData> {
 	isSubmitted: TState<boolean, []>;
 	isSubmitting: TState<boolean, []>;
 	fields: TFormFields<GFormData>;
-	/** @internal */
-	_revalidate(options?: TFormRevalidateOptions): Promise<boolean>;
+	/** Registers a callback for every valid submit. Returns an unsubscribe function. */
+	onValidSubmit(callback: TFormValidSubmitCallback<GFormData>): () => void;
+	/** Registers a callback for every invalid submit. Returns an unsubscribe function. */
+	onInvalidSubmit(callback: TFormInvalidSubmitCallback<GFormData>): () => void;
 	/** Validates the form, fires submit callbacks, and returns true if the form was valid. */
 	submit(options?: TFormSubmitOptions<GFormData>): Promise<boolean>;
 	/** Runs all validators and returns true if valid, false otherwise. */
@@ -65,11 +67,6 @@ export interface TFormSubmitOptions<GFormData extends TFormData> {
 	updateDefaultValues?: boolean;
 }
 
-export interface TFormRevalidateOptions {
-	/** When true (default), reruns validators before aggregating status. When false, aggregates from current field statuses only. */
-	runValidators?: boolean;
-}
-
 export type TFormValidSubmitCallback<GFormData extends TFormData> = (
 	formData: Readonly<GFormData>,
 	context?: TFormSubmitContext
@@ -92,21 +89,19 @@ export interface TFormValidation<GFormData extends TFormData> {
 
 export interface TFormValidationConfig {
 	/** Validation triggers used before the first submit. */
-	validateOn: readonly TFormValidateTrigger[];
+	validateOn: readonly TValidateTrigger[];
 	/** Validation triggers used after the first submit. */
-	revalidateOn: readonly TFormRevalidateTrigger[];
+	revalidateOn: readonly TRevalidateTrigger[];
 	collectErrorMode: TCollectErrorMode;
 }
 
-export type TFormValidateTrigger = TFormFieldValidateTrigger;
-
-export type TFormRevalidateTrigger = TFormFieldRevalidateTrigger;
-
 /** Validates the full form data for cross-field and form-level constraints. */
-export type TFormValidator<GFormData extends TFormData> = StandardSchemaV1<GFormData>;
+export type TFormValidator<GFormData extends TFormData> = StandardSchemaV1<GFormData, unknown>;
 
 export interface TFormErrors<GFormData extends TFormData> {
+	/** Field-level errors keyed by field. */
 	fields: TFormFieldErrors<GFormData>;
+	/** Form-level errors from the form validator. */
 	form: readonly TFormError[];
 }
 
@@ -134,6 +129,7 @@ export type TFormFieldFeature<GValue> = TFeature<
 		key: string;
 		defaultValue: GValue;
 		isTouched: TState<boolean, []>;
+		/** True after the standalone field or parent form has been submitted. */
 		isSubmitted: TState<boolean, []>;
 		isValidating: TState<boolean, []>;
 		status: TFormFieldStatus;
@@ -156,19 +152,13 @@ export interface TFormFieldValidation<GValue> {
 
 export interface TFormFieldValidationConfig {
 	/** Validation triggers used before the field is submitted. */
-	validateOn: readonly TFormFieldValidateTrigger[];
+	validateOn: readonly TValidateTrigger[];
 	/** Validation triggers used after the field is submitted. */
-	revalidateOn: readonly TFormFieldRevalidateTrigger[];
+	revalidateOn: readonly TRevalidateTrigger[];
 	collectErrorMode: TCollectErrorMode;
 }
 
-export type TFormFieldValidateTrigger = 'blur' | 'change' | 'submit' | 'touched';
-
-export type TFormFieldRevalidateTrigger = Exclude<TFormFieldValidateTrigger, 'touched'>;
-
-export type TCollectErrorMode = 'firstError' | 'all';
-
-export type TFormFieldValidator<GValue> = StandardSchemaV1<GValue>;
+export type TFormFieldValidator<GValue> = StandardSchemaV1<GValue, unknown>;
 
 export interface TFormFieldCallbacks {
 	blur: TFormFieldBlurCallback[];
@@ -180,7 +170,13 @@ export interface TFormFieldBlurContext {
 	wasTouched: boolean;
 }
 
-// MARK: - Validation Status
+// MARK: - Validation
+
+export type TCollectErrorMode = 'firstError' | 'all';
+
+export type TValidateTrigger = 'blur' | 'change' | 'submit' | 'touched';
+
+export type TRevalidateTrigger = Exclude<TValidateTrigger, 'touched'>;
 
 /** Validation status state used by forms and fields. */
 export type TValidationStatus = TState<TValidationStatusValue, []>;
