@@ -1,6 +1,7 @@
 import { defineFeature, hasFeature } from 'feature-core';
 import { createState, type TStateBase } from 'feature-state';
 import { deepCopy } from './lib';
+import { validateStandardSchema } from './standard-schema';
 import {
 	type TFormField,
 	type TFormFieldFeature,
@@ -9,7 +10,6 @@ import {
 	type TFormFieldValidator,
 	type TValidationStatusValue
 } from './types';
-import { createFormFieldValidationRunContext } from './validation-context';
 
 /** Creates a reactive form field with validation state and lifecycle flags. */
 export function createFormField<GValue>(
@@ -87,17 +87,24 @@ function formFieldFeature<GValue>(
 					}
 
 					const validationRunId = ++this._validationRunId;
-					const { collector, context } = createFormFieldValidationRunContext(this);
+					let status: TValidationStatusValue = { type: 'valid' };
 
 					this.isValidating.set(true);
 					try {
-						await this._validation.validator.validate(context);
+						status = await validateStandardSchema(
+							this._validation.validator,
+							this.get(),
+							this._validation.config.collectErrorMode
+						);
 					} catch (error) {
-						collector.registerError({
-							code: 'validation_error',
-							message: error instanceof Error ? error.message : String(error),
-							path: this.key
-						});
+						status = {
+							type: 'invalid',
+							errors: [
+								{
+									message: error instanceof Error ? error.message : String(error)
+								}
+							]
+						};
 					} finally {
 						if (validationRunId === this._validationRunId) {
 							this.isValidating.set(false);
@@ -108,9 +115,9 @@ function formFieldFeature<GValue>(
 						return this.status.get().type === 'valid';
 					}
 
-					this.status.set(collector.value ?? { type: 'valid' });
+					this.status.set(status);
 
-					return this.status.get().type === 'valid';
+					return status.type === 'valid';
 				},
 				onBlur(this: TFormField<GValue>, callback) {
 					this._callbacks.blur.push(callback);

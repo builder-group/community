@@ -525,15 +525,15 @@ importers:
 
   packages/feature-form:
     dependencies:
+      '@standard-schema/spec':
+        specifier: ^1.1.0
+        version: 1.1.0
       feature-core:
         specifier: workspace:*
         version: link:../feature-core
       feature-state:
         specifier: workspace:*
         version: link:../feature-state
-      validation-adapter:
-        specifier: workspace:*
-        version: link:../validation-adapter
     devDependencies:
       '@blgc/config':
         specifier: workspace:*

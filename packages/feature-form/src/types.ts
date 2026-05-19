@@ -1,10 +1,6 @@
+import type { StandardSchemaV1 } from '@standard-schema/spec';
 import { type TAnyFeature, type TFeature, type TFeatureHost } from 'feature-core';
 import { type TState } from 'feature-state';
-import {
-	type TBaseValidationContext,
-	type TCollectErrorMode,
-	type TValidator
-} from 'validation-adapter';
 
 export type TForm<GFormData extends TFormData, GFeatures extends TAnyFeature[] = []> = TFeatureHost<
 	TFormBase<GFormData>,
@@ -107,12 +103,7 @@ export type TFormValidateTrigger = TFormFieldValidateTrigger;
 export type TFormRevalidateTrigger = TFormFieldRevalidateTrigger;
 
 /** Validates the full form data for cross-field and form-level constraints. */
-export type TFormValidator<GFormData extends TFormData> = TValidator<
-	GFormData,
-	TFormValidationContext<GFormData>
->;
-
-export type TFormValidationContext<GFormData extends TFormData> = TBaseValidationContext<GFormData>;
+export type TFormValidator<GFormData extends TFormData> = StandardSchemaV1<GFormData>;
 
 export interface TFormErrors<GFormData extends TFormData> {
 	fields: TFormFieldErrors<GFormData>;
@@ -175,9 +166,9 @@ export type TFormFieldValidateTrigger = 'blur' | 'change' | 'submit' | 'touched'
 
 export type TFormFieldRevalidateTrigger = Exclude<TFormFieldValidateTrigger, 'touched'>;
 
-export type TFormFieldValidator<GValue> = TValidator<GValue, TFormFieldValidationContext<GValue>>;
+export type TCollectErrorMode = 'firstError' | 'all';
 
-export type TFormFieldValidationContext<GValue> = TBaseValidationContext<GValue>;
+export type TFormFieldValidator<GValue> = StandardSchemaV1<GValue>;
 
 export interface TFormFieldCallbacks {
 	blur: TFormFieldBlurCallback[];
@@ -205,11 +196,13 @@ export interface TInvalidValidationStatus {
 }
 
 export interface TValidationError {
-	code: string;
-	message?: string;
-	/** Field key or nested field path associated with the error. */
-	path?: string;
+	message: string;
+	/** Standard Schema-compatible path associated with the error. */
+	path?: TValidationPath;
 }
+
+/** Standard Schema-compatible validation path segments. */
+export type TValidationPath = readonly PropertyKey[];
 
 export interface TValidValidationStatus {
 	type: 'valid';

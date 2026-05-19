@@ -7,6 +7,7 @@ import {
 	isFormField
 } from './form-field';
 import { deepCopy } from './lib';
+import { validateStandardSchema } from './standard-schema';
 import {
 	type TForm,
 	type TFormBase,
@@ -26,7 +27,6 @@ import {
 	type TValidationError,
 	type TValidationStatusValue
 } from './types';
-import { createFormValidationRunContext } from './validation-context';
 
 /** Creates a form from field configs or existing form fields. */
 export function createForm<GFormData extends TFormData>(
@@ -335,22 +335,30 @@ async function validateFormValidator<GFormData extends TFormData>(
 		return;
 	}
 
-	const { collector, context } = createFormValidationRunContext(form);
+	let status: TValidationStatusValue = { type: 'valid' };
 	try {
-		await form._validation.validator.validate(context);
+		status = await validateStandardSchema(
+			form._validation.validator,
+			form.getData(),
+			form._validation.config.collectErrorMode
+		);
 	} catch (error) {
-		collector.registerError({
-			code: 'validation_error',
-			message: error instanceof Error ? error.message : String(error),
-			path: 'form'
-		});
+		status = {
+			type: 'invalid',
+			errors: [
+				{
+					message: error instanceof Error ? error.message : String(error),
+					path: ['form']
+				}
+			]
+		};
 	}
 
 	if (validationRunId !== form._validationRunId) {
 		return;
 	}
 
-	form._validationStatus = collector.value ?? { type: 'valid' };
+	form._validationStatus = status;
 }
 
 function getAggregateFormStatus<GFormData extends TFormData>(
@@ -365,7 +373,7 @@ function getAggregateFormStatus<GFormData extends TFormData>(
 			errors.push(
 				...status.errors.map((error) => ({
 					...error,
-					path: error.path ?? fieldKey
+					path: getFormFieldErrorPath(fieldKey, error.path)
 				}))
 			);
 		} else if (status.type === 'unvalidated') {
@@ -409,6 +417,16 @@ function getFormValidationErrors<GFormData extends TFormData>(
 	}
 
 	return [];
+}
+
+function getFormFieldErrorPath(
+	fieldKey: string,
+	path: TValidationError['path']
+): TValidationError['path'] {
+	if (path == null) {
+		return [fieldKey];
+	}
+	return [fieldKey, ...path];
 }
 
 function updateFieldDefaultValues<GFormData extends TFormData>(

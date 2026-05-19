@@ -19,17 +19,16 @@
 
 > Status: Experimental
 
-A lightweight, typesafe form library built on `feature-state`. Forms and fields are reactive states. Validators are adapters and behavior can be extended with features.
+A lightweight, typesafe form library built on `feature-state`. Forms and fields are reactive states. Validators are [Standard Schema](https://github.com/standard-schema/standard-schema) compatible schemas and behavior can be extended with features.
 
 ```ts
 import { createForm } from 'feature-form';
-import { zValidator } from 'validation-adapters/zod';
 import * as z from 'zod';
 
 const $form = createForm({
 	fields: {
-		name: { defaultValue: '', validator: zValidator(z.string().min(2)) },
-		email: { defaultValue: '', validator: zValidator(z.string().email()) }
+		name: { defaultValue: '', validator: z.string().min(2) },
+		email: { defaultValue: '', validator: z.string().email() }
 	},
 	onValidSubmit: (data) => save(data)
 });
@@ -58,7 +57,7 @@ const $form = createForm({
 		age: { defaultValue: 0 },
 		username: {
 			defaultValue: '',
-			validator: zValidator(z.string().min(3)),
+			validator: z.string().min(3),
 			validateOn: ['blur'],
 			revalidateOn: ['change', 'blur']
 		}
@@ -85,7 +84,7 @@ const $form = createForm({
 | `validator`        | none           | Field-level validator.                                                      |
 | `validateOn`       | `['submit']`   | Triggers that run the validator before the first submit.                    |
 | `revalidateOn`     | `['blur']`     | Triggers that run the validator after the first submit.                     |
-| `collectErrorMode` | `'firstError'` | `'firstError'` stops after the first failure; `'all'` collects every error. |
+| `collectErrorMode` | `'firstError'` | `'firstError'` keeps the first Standard Schema issue; `'all'` keeps every issue. |
 
 ### `submit(options?)` / `validate()` / `reset()`
 
@@ -204,7 +203,7 @@ const $form = createForm({
 	fields: {
 		email: {
 			defaultValue: '',
-			validator: zValidator(z.string().email()),
+			validator: z.string().email(),
 			validateOn: ['blur', 'submit'],
 			revalidateOn: ['change', 'submit']
 		}
@@ -223,14 +222,12 @@ const $form = createForm({
 		confirm: { defaultValue: '' }
 	},
 	validation: {
-		validator: zValidator(
-			z
-				.object({ password: z.string(), confirm: z.string() })
-				.refine((d) => d.password === d.confirm, {
-					message: 'Passwords do not match',
-					path: ['confirm']
-				})
-		),
+		validator: z
+			.object({ password: z.string(), confirm: z.string() })
+			.refine((d) => d.password === d.confirm, {
+				message: 'Passwords do not match',
+				path: ['confirm']
+			}),
 		validateOn: ['submit'],
 		revalidateOn: ['change', 'submit']
 	}
@@ -246,9 +243,8 @@ const status = $form.fields.email.status.get();
 
 if (status.type === 'invalid') {
 	status.errors; // readonly TValidationError[]
-	status.errors[0].code; // string
-	status.errors[0].message; // string | undefined
-	status.errors[0].path; // field key or nested path
+	status.errors[0].message; // string
+	status.errors[0].path; // field key or nested path, e.g. ['email'] or ['address', 'city']
 }
 ```
 
@@ -260,17 +256,19 @@ if (status.type === 'invalid') {
 
 ### Validators
 
-`feature-form` accepts any validator from [`validation-adapters`](https://github.com/builder-group/community/tree/develop/packages/validation-adapters), which wraps Zod, Valibot, Yup, and others.
+`feature-form` accepts any [Standard Schema](https://github.com/standard-schema/standard-schema) compatible validator. Schema libraries that implement the spec can be passed directly without an adapter.
 
 ```ts
 import * as v from 'valibot';
-import { vValidator } from 'validation-adapters/valibot';
-import { zValidator } from 'validation-adapters/zod';
 import * as z from 'zod';
 
-const zodValidator = zValidator(z.string().min(2).max(50));
-const valibotValidator = vValidator(v.pipe(v.string(), v.minLength(2), v.maxLength(50)));
+const zodValidator = z.string().min(2).max(50);
+const valibotValidator = v.pipe(v.string(), v.minLength(2), v.maxLength(50));
 ```
+
+For custom validators, implement the `StandardSchemaV1` interface from [`@standard-schema/spec`](https://github.com/standard-schema/standard-schema).
+
+Validators are used for validation only. If a schema transforms or coerces output values, `feature-form` does not write the parsed output back into the field state.
 
 ### Standalone fields
 
@@ -278,10 +276,11 @@ Fields can be created and used independently with `createFormField()`:
 
 ```ts
 import { createFormField } from 'feature-form';
+import * as z from 'zod';
 
 const $name = createFormField('', {
 	key: 'name',
-	validator: zValidator(z.string().min(2)),
+	validator: z.string().min(2),
 	validateOn: ['blur'],
 	revalidateOn: ['change']
 });

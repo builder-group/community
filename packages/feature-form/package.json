@@ -35,9 +35,9 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
+		"@standard-schema/spec": "^1.1.0",
 		"feature-core": "workspace:*",
-		"feature-state": "workspace:*",
-		"validation-adapter": "workspace:*"
+		"feature-state": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
