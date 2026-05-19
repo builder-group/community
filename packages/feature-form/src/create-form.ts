@@ -124,7 +124,9 @@ export function createForm<GFormData extends TFormData>(
 				const data = this.getValidData();
 				if (data != null) {
 					if (options.updateDefaultValues === true) {
-						updateFieldDefaultValues(this.fields, data);
+						for (const [fieldKey, formField] of getFormFieldEntries(this.fields)) {
+							formField.defaultValue = deepCopy(data[fieldKey]);
+						}
 					}
 
 					await runSubmitCallbacks(
@@ -386,15 +388,6 @@ function getFormFieldErrors<GFormData extends TFormData>(
 	}
 
 	return errors;
-}
-
-function updateFieldDefaultValues<GFormData extends TFormData>(
-	fields: TFormFields<GFormData>,
-	data: Readonly<GFormData>
-): void {
-	for (const [fieldKey, formField] of getFormFieldEntries(fields)) {
-		formField.defaultValue = deepCopy(data[fieldKey]);
-	}
 }
 
 async function runSubmitCallbacks<GValue>(
