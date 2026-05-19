@@ -20,15 +20,14 @@ export function priorityQueueFeature<GValue>(): TPriorityQueueFeature<GValue> {
 
 					for (const listener of this._listeners) {
 						const priority = getListenerPriority(listener);
-						const context: TListenerContext<GValue> = {
-							...listenerContext,
-							value: this._v,
-							prevValue
-						};
 						priorityListenerQueue.push(
 							{
 								callback: listener.callback,
-								context: context as never
+								context: {
+									...listenerContext,
+									value: this._v,
+									prevValue
+								}
 							},
 							priority
 						);
@@ -39,9 +38,10 @@ export function priorityQueueFeature<GValue>(): TPriorityQueueFeature<GValue> {
 					}
 				},
 				listen(this: TStateBase<GValue>, callback, options = {}) {
+					const { priority = EListenerPriority.DEFAULT } = options;
 					const listener: TPriorityListener<GValue> = {
 						callback,
-						priority: options.priority ?? EListenerPriority.DEFAULT
+						priority
 					};
 					this._listeners.push(listener);
 
@@ -96,8 +96,8 @@ interface TPriorityListener<GValue> extends TListener<GValue> {
 }
 
 function getListenerPriority<GValue>(listener: TListener<GValue>): number {
-	return 'priority' in listener && typeof listener.priority === 'number'
-		? listener.priority
+	return 'priority' in listener && typeof listener['priority'] === 'number'
+		? listener['priority']
 		: EListenerPriority.DEFAULT;
 }
 
@@ -106,9 +106,10 @@ function getListenerPriority<GValue>(listener: TListener<GValue>): number {
 const priorityListenerQueue = new FlatQueue<TPriorityListenerQueueItem>();
 let isProcessingPriorityListenerQueue = false;
 
-interface TPriorityListenerQueueItem {
-	callback: (context: never) => Promise<void> | void;
-	context: never;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- the shared queue stores listener calls from states with different value types
+interface TPriorityListenerQueueItem<GValue = any> {
+	callback: TListenerCallback<GValue>;
+	context: TListenerContext<GValue>;
 }
 
 function processPriorityListenerQueue(): void {

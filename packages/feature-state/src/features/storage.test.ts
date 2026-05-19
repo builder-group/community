@@ -2,27 +2,6 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { createState } from '../create-state';
 import { missingStorageValue, storageFeature, type TStorageInterface } from './storage';
 
-class MockStorage<GValue> implements TStorageInterface<GValue> {
-	private store: Record<string, GValue> = {};
-
-	public save(key: string, value: GValue): boolean {
-		this.store[key] = value;
-		return true;
-	}
-
-	public load(key: string): GValue | typeof missingStorageValue {
-		return this.store[key] ?? missingStorageValue;
-	}
-
-	public delete(key: string): boolean {
-		const hasValue = key in this.store;
-		const nextStore = { ...this.store };
-		Reflect.deleteProperty(nextStore, key);
-		this.store = nextStore;
-		return hasValue;
-	}
-}
-
 describe('storageFeature function', () => {
 	let mockStorage: MockStorage<number>;
 
@@ -86,7 +65,7 @@ describe('storageFeature function', () => {
 		expect(deleteResult).toBe(false);
 	});
 
-	it('should not override state with null if no persisted value', async () => {
+	it('should not override state if no persisted value exists', async () => {
 		// Prepare
 		const key = 'testKey';
 
@@ -97,4 +76,46 @@ describe('storageFeature function', () => {
 		// Assert
 		expect(state.get()).toBe(10);
 	});
+
+	it('should support null and undefined as persisted values', async () => {
+		// Prepare
+		const nullKey = 'nullKey';
+		const undefinedKey = 'undefinedKey';
+		const nullableStorage = new MockStorage<number | null | undefined>();
+		nullableStorage.save(nullKey, null);
+		nullableStorage.save(undefinedKey, undefined);
+		const nullState = createState<number | null | undefined>(10).with(
+			storageFeature<number | null | undefined>(nullableStorage, nullKey)
+		);
+		const undefinedState = createState<number | null | undefined>(10).with(
+			storageFeature<number | null | undefined>(nullableStorage, undefinedKey)
+		);
+
+		// Act
+		const nullResult = await nullState.persist();
+		const undefinedResult = await undefinedState.persist();
+
+		// Assert
+		expect(nullResult).toBe(true);
+		expect(nullState.get()).toBe(null);
+		expect(undefinedResult).toBe(true);
+		expect(undefinedState.get()).toBe(undefined);
+	});
 });
+
+class MockStorage<GValue> implements TStorageInterface<GValue> {
+	private store = new Map<string, GValue>();
+
+	public save(key: string, value: GValue): boolean {
+		this.store.set(key, value);
+		return true;
+	}
+
+	public load(key: string): GValue | typeof missingStorageValue {
+		return this.store.has(key) ? (this.store.get(key) as GValue) : missingStorageValue;
+	}
+
+	public delete(key: string): boolean {
+		return this.store.delete(key);
+	}
+}

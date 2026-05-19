@@ -18,14 +18,13 @@ export function asyncQueueFeature<GValue>(): TAsyncQueueFeature<GValue> {
 					const { listenerContext = {}, prevValue } = notifyOptions;
 
 					for (const listener of this._listeners) {
-						const context: TListenerContext<GValue> = {
-							...listenerContext,
-							value: this._v,
-							prevValue
-						};
 						asyncListenerQueue.push({
 							callback: listener.callback,
-							context: context as never
+							context: {
+								...listenerContext,
+								value: this._v,
+								prevValue
+							}
 						});
 					}
 
@@ -77,9 +76,10 @@ let asyncListenerQueueIndex = 0;
 let asyncListenerQueuePromise: Promise<void> | null = null;
 let isProcessingAsyncListenerQueue = false;
 
-interface TAsyncListenerQueueItem {
-	callback: (context: never) => Promise<void> | void;
-	context: never;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- the shared queue stores listener calls from states with different value types
+interface TAsyncListenerQueueItem<GValue = any> {
+	callback: TListenerCallback<GValue>;
+	context: TListenerContext<GValue>;
 }
 
 // Note: Returns the same promise for any notifications batched before the microtask fires
@@ -111,6 +111,7 @@ async function processAsyncListenerQueue(): Promise<void> {
 }
 
 function removeQueuedAsyncListenerCalls<GValue>(callback: TListener<GValue>['callback']): void {
+	// Note: Unlike the sync queue, items can be pending before the microtask fires, so start from 0 when not yet processing
 	const startIndex = isProcessingAsyncListenerQueue ? asyncListenerQueueIndex + 1 : 0;
 
 	for (let i = startIndex; i < asyncListenerQueue.length; i++) {

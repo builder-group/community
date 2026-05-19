@@ -42,6 +42,7 @@ export interface TStateNotifyOptions<GValue> {
 export type TStateSetOptions<GValue> = Omit<TStateNotifyOptions<GValue>, 'prevValue'>;
 
 export interface TListener<GValue> {
+	[key: string]: unknown;
 	callback: TListenerCallback<GValue>;
 }
 

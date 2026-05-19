@@ -109,8 +109,6 @@ await $count.notify(); // resolves when all listeners have completed
 
 `notify()` returns the active queue flush promise. `set()` still returns `void`, so listener errors from `set()` are not awaitable through `set()` itself.
 
-All states using `asyncQueueFeature()` share one module-level queue. Calls to `set()` or `notify()` on any of them enqueue into the same microtask batch.
-
 ### `priorityQueueFeature()`
 
 Replaces the default sync listener queue with a priority-based sync queue. Lower priority values run first. Listeners with the same priority keep registration order.
@@ -124,13 +122,13 @@ $count.listen(() => {}, { priority: EListenerPriority.LATE });
 $count.listen(() => {}, { priority: EListenerPriority.EARLY }); // runs first
 ```
 
-`notify()` and `set()` remain synchronous. Use this when listener order matters more than registration order.
-
 ### `storageFeature(storage, key)`
 
 Adds `persist()`, `loadFromStorage()`, and `deleteFromStorage()`.
 
 ```ts
+import { missingStorageValue } from 'feature-state';
+
 const storage = {
 	save(key, value) {
 		localStorage.setItem(key, JSON.stringify(value));
@@ -138,7 +136,7 @@ const storage = {
 	},
 	load(key) {
 		const raw = localStorage.getItem(key);
-		return raw != null ? JSON.parse(raw) : null; // return null when absent
+		return raw != null ? JSON.parse(raw) : missingStorageValue;
 	},
 	delete(key) {
 		localStorage.removeItem(key);
@@ -153,7 +151,7 @@ await $tasks.persist();
 
 `persist()` loads any previously saved value. If nothing is stored it saves the current state instead, then auto-saves on every subsequent `set()`.
 
-**`TStorageInterface` contract:** `load` must return `null` when the key is absent — not `undefined` and not a thrown error.
+**`TStorageInterface` contract:** `load` must return `missingStorageValue` when the key is absent. `null` and `undefined` are treated as stored values.
 
 ### `undoFeature(historyLimit?)`
 
@@ -174,7 +172,7 @@ $count.undo(); // no-op, already at oldest
 Adds `multiUndo(count)`. Requires `undoFeature` to be installed first.
 
 ```ts
-const $count = createState(0).with(undoFeature()).with(multiUndoFeature());
+const $count = createState(0).with(undoFeature(), multiUndoFeature());
 
 $count.set(1);
 $count.set(2);
@@ -209,26 +207,6 @@ export function logFeature<GValue>(): TLogFeature {
 			};
 		}
 	});
-}
-```
-
-When a feature depends on another feature, list it in `requires` and annotate the parameter with the full state type:
-
-```ts
-import { defineFeature, type TFeature } from 'feature-core';
-import { type TState, type TUndoFeature } from 'feature-state';
-
-type TMyFeature<GValue> = TFeature<'my-feature', { ... }, [TUndoFeature<GValue>]>;
-
-export function myFeature<GValue>(): TMyFeature<GValue> {
-    return defineFeature<TMyFeature<GValue>>({
-        key: 'my-feature',
-        requires: ['undo'],
-        install(state: TState<GValue, [TUndoFeature<GValue>]>) {
-            // state.undo() is available and typed
-            return { ... };
-        }
-    });
 }
 ```
 

@@ -36,6 +36,25 @@ describe('undoFeature function', () => {
 		expect(state.get()).toBe('initial');
 	});
 
+	it('should undo to null and undefined values', () => {
+		// Prepare
+		const state = createState<number | null | undefined>(undefined).with(
+			undoFeature<number | null | undefined>()
+		);
+
+		// Act
+		state.set(null);
+		state.set(1);
+		state.undo();
+		const nullValue = state.get();
+		state.undo();
+		const undefinedValue = state.get();
+
+		// Assert
+		expect(nullValue).toBe(null);
+		expect(undefinedValue).toBe(undefined);
+	});
+
 	it('should do nothing if there is nothing to undo', () => {
 		// Prepare
 		const state = createState(10).with(undoFeature<number>());

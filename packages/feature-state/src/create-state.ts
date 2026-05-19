@@ -1,5 +1,5 @@
 import { createFeatureHost } from 'feature-core';
-import type { TListener, TListenerContext, TState, TStateBase } from './types';
+import type { TListener, TListenerCallback, TListenerContext, TState, TStateBase } from './types';
 
 /**
  * Creates a reactive state container with `value`, `set`, `notify`, `listen`, and `subscribe`.
@@ -18,18 +18,17 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 		},
 		notify(notifyOptions = {}) {
 			const { listenerContext = {}, prevValue } = notifyOptions;
-			// Note: Only the outermost notify drains the queue; nested notify calls append work to the active flush
+			// Note: Only the outermost notify drains the queue. Nested notify calls append work to the active flush.
 			const shouldProcessListenerQueue = !listenerQueue.length;
 
 			for (const listener of this._listeners) {
-				const context: TListenerContext<GValue> = {
-					...listenerContext,
-					value: this._v,
-					prevValue
-				};
 				listenerQueue.push({
 					callback: listener.callback,
-					context: context as never
+					context: {
+						...listenerContext,
+						value: this._v,
+						prevValue
+					}
 				});
 			}
 
@@ -93,9 +92,10 @@ export const setSourceKey = 'state_set';
 const listenerQueue: TListenerQueueItem[] = [];
 let listenerQueueIndex = 0;
 
-interface TListenerQueueItem {
-	callback: (context: never) => Promise<void> | void;
-	context: never;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- the shared queue stores listener calls from states with different value types
+interface TListenerQueueItem<GValue = any> {
+	callback: TListenerCallback<GValue>;
+	context: TListenerContext<GValue>;
 }
 
 function processListenerQueue(): void {

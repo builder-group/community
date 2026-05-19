@@ -1,5 +1,5 @@
 import { defineFeature, type TFeature } from 'feature-core';
-import type { TStateBase, TStateSetOptions } from '../types';
+import type { TState, TStateBase, TStateSetOptions } from '../types';
 
 /**
  * Adds `undo()` to a state, stepping back through past values one at a time.
@@ -24,16 +24,15 @@ export function undoFeature<GValue>(historyLimit = 50): TUndoFeature<GValue> {
 
 			return {
 				_history: history,
-				undo(options) {
-					if (history.length <= 1) {
+				undo(this: TState<GValue, [TUndoFeature<GValue>]>, options) {
+					if (this._history.length <= 1) {
 						return;
 					}
 
-					history.pop();
-					const nextValue = history.pop();
-					if (nextValue != null) {
-						state.set(nextValue, options);
-					}
+					this._history.pop();
+					const nextValue = this._history.pop();
+					// Note: The length guard guarantees this pop reads a stored history entry, even when that value is undefined
+					this.set(nextValue as GValue, options);
 				}
 			};
 		}

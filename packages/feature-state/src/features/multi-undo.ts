@@ -11,11 +11,11 @@ export function multiUndoFeature<GValue>(): TMultiUndoFeature<GValue> {
 	return defineFeature<TMultiUndoFeature<GValue>>({
 		key: 'multi-undo',
 		requires: ['undo'],
-		install(state: TState<GValue, [TUndoFeature<GValue>]>) {
+		install() {
 			return {
-				multiUndo(count) {
+				multiUndo(this: TState<GValue, [TUndoFeature<GValue>]>, count) {
 					for (let i = 0; i < count; i++) {
-						state.undo();
+						this.undo();
 					}
 				}
 			};

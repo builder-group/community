@@ -1,5 +1,5 @@
 import { defineFeature, type TFeature } from 'feature-core';
-import type { TStateBase } from '../types';
+import type { TState } from '../types';
 
 /**
  * Adds `persist()`, `loadFromStorage()`, and `deleteFromStorage()` to a state.
@@ -14,34 +14,20 @@ export function storageFeature<GValue, GStorageValue extends GValue = GValue>(
 ): TStorageFeature {
 	return defineFeature<TStorageFeature>({
 		key: 'storage',
-		install(state: TStateBase<GValue>) {
-			async function loadFromStorage(): Promise<boolean> {
-				let success = false;
-
-				const persistedValue = await storage.load(key);
-				if (persistedValue !== missingStorageValue) {
-					state.set(persistedValue, {
-						listenerContext: { source: loadFromStorageSourceKey }
-					});
-					success = true;
-				}
-
-				return success;
-			}
-
+		install() {
 			let listening = false;
 
 			return {
-				async persist() {
-					let success = await loadFromStorage();
+				async persist(this: TState<GValue, [TStorageFeature]>) {
+					let success = await this.loadFromStorage();
 					if (!success) {
-						success = await storage.save(key, state.value as GStorageValue);
+						success = await storage.save(key, this.value as GStorageValue);
 					}
 
-					// Note: guard prevents registering a duplicate listener if persist() is called more than once
+					// Note: Guard prevents registering a duplicate listener if persist() is called more than once
 					if (!listening) {
 						listening = true;
-						state.listen(async ({ value, source }) => {
+						this.listen(async ({ value, source }) => {
 							if (source !== loadFromStorageSourceKey) {
 								await storage.save(key, value as GStorageValue);
 							}
@@ -50,7 +36,19 @@ export function storageFeature<GValue, GStorageValue extends GValue = GValue>(
 
 					return success;
 				},
-				loadFromStorage,
+				async loadFromStorage(this: TState<GValue, [TStorageFeature]>) {
+					let success = false;
+
+					const persistedValue = await storage.load(key);
+					if (persistedValue !== missingStorageValue) {
+						this.set(persistedValue, {
+							listenerContext: { source: loadFromStorageSourceKey }
+						});
+						success = true;
+					}
+
+					return success;
+				},
 				async deleteFromStorage() {
 					return storage.delete(key);
 				}
@@ -60,23 +58,22 @@ export function storageFeature<GValue, GStorageValue extends GValue = GValue>(
 }
 
 /** Sentinel returned by `TStorageInterface.load` when no value is stored for a key. */
-export const missingStorageValue = null;
+export const missingStorageValue = Symbol('missingStorageValue');
 /** Source key set on the listener context when a value is restored from storage. */
 export const loadFromStorageSourceKey = 'loadFromStorage';
 
-export type TStorageFeature = TFeature<
-	'storage',
-	{
-		persist(): Promise<boolean>;
-		loadFromStorage(): Promise<boolean>;
-		deleteFromStorage(): Promise<boolean>;
-	}
->;
+export type TStorageFeature = TFeature<'storage', TStorageFeatureApi>;
+
+export interface TStorageFeatureApi {
+	persist(): Promise<boolean>;
+	loadFromStorage(): Promise<boolean>;
+	deleteFromStorage(): Promise<boolean>;
+}
 
 /**
  * Minimal storage adapter required by `storageFeature`.
- * `load` must return `null` (via `missingStorageValue`) when
- * the key is absent, not `undefined` or a thrown error.
+ * `load` must return `missingStorageValue` when the key is absent.
+ * `null` and `undefined` are treated as stored values.
  */
 export interface TStorageInterface<GStorageValue> {
 	save(key: string, value: GStorageValue): Promise<boolean> | boolean;
