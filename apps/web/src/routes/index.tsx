@@ -57,6 +57,8 @@ function RouteComponent() {
 	const packages = projectsConfig.projects
 		.filter((p) => p.category === 'package')
 		.sort((a, b) => (npmDownloads[b.name] ?? 0) - (npmDownloads[a.name] ?? 0));
+	const activePackages = packages.filter((p) => p.status !== 'discontinued');
+	const discontinuedPackages = packages.filter((p) => p.status === 'discontinued');
 
 	return (
 		<CanvasBackground className="min-h-screen">
@@ -137,9 +139,21 @@ function RouteComponent() {
 								</a>
 							</p>
 						</div>
-						{packages.map((pkg) => (
+						{activePackages.map((pkg) => (
 							<PackageRow key={pkg.id} project={pkg} downloads={npmDownloads[pkg.name]} />
 						))}
+						{discontinuedPackages.length > 0 && (
+							<>
+								<div className="bg-base-100 px-5 py-3">
+									<p className="text-base-500 text-sm">
+										Discontinued libraries, kept available for existing users
+									</p>
+								</div>
+								{discontinuedPackages.map((pkg) => (
+									<PackageRow key={pkg.id} project={pkg} downloads={npmDownloads[pkg.name]} />
+								))}
+							</>
+						)}
 					</div>
 				</CanvasFrame>
 

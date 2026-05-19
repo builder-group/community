@@ -11,44 +11,56 @@
     </a>
 </p>
 
-A collection of open source libraries maintained by [builder.group](https://builder.group). Let's build together.
+Open source packages from [builder.group](https://builder.group) projects, shared in case they're useful.
 
 ## 📦 Packages
 
-| Package                                                                                                     | Description                                                                                                                                                                    | NPM Package                                                                |
-| ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
-| [config](https://github.com/builder-group/community/blob/develop/packages/config)                           | Collection of ESLint, Vite, and Typescript configurations                                                                                                                      | [`@blgc/config`](https://www.npmjs.com/package/@blgc/config)               |
-| [ecsify](https://github.com/builder-group/community/blob/develop/packages/ecsify)                           | A flexible, typesafe, and performance-focused Entity Component System (ECS) library for TypeScript                                                                             | [`ecsify`](https://www.npmjs.com/package/ecsify)                           |
-| [eprel-client](https://github.com/builder-group/community/blob/develop/packages/eprel-client)               | Typesafe and straightforward fetch client for interacting with the European Product Registry for Energy Labelling (EPREL) API using feature-fetch                              | [`eprel-client`](https://www.npmjs.com/package/eprel-client)               |
-| [feature-fetch](https://github.com/builder-group/community/blob/develop/packages/feature-fetch)             | Straightforward, typesafe, and feature-based fetch wrapper supporting OpenAPI types                                                                                            | [`feature-fetch`](https://www.npmjs.com/package/feature-fetch)             |
-| [feature-form](https://github.com/builder-group/community/blob/develop/packages/feature-form)               | Straightforward, typesafe, and feature-based form library                                                                                                                      | [`feature-form`](https://www.npmjs.com/package/feature-form)               |
-| [feature-logger](https://github.com/builder-group/community/blob/develop/packages/feature-logger)           | Straightforward, typesafe, and feature-based logging library                                                                                                                   | [`feature-logger`](https://www.npmjs.com/package/feature-logger)           |
-| [feature-react](https://github.com/builder-group/community/blob/develop/packages/feature-react)             | ReactJs extension for the feature-state and feature-form library, providing hooks and features for ReactJs                                                                     | [`feature-react`](https://www.npmjs.com/package/feature-react)             |
-| [feature-state](https://github.com/builder-group/community/blob/develop/packages/feature-state)             | Straightforward, typesafe, and feature-based state management library for ReactJs                                                                                              | [`feature-state`](https://www.npmjs.com/package/feature-state)             |
-| [head-metadata](https://github.com/builder-group/community/blob/develop/packages/head-metadata)             | Typesafe and straightforward utility for extracting structured metadata (like `<meta>`, `<title>`, and `<link>`) from the `<head>` of an HTML document.                        | [`head-metadata`](https://www.npmjs.com/package/head-metadata)             |
-| [openapi-ts-router](https://github.com/builder-group/community/blob/develop/packages/openapi-ts-router)     | Thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod | [`openapi-ts-router`](https://www.npmjs.com/package/openapi-ts-router)     |
-| [rollup-presets](https://github.com/builder-group/community/blob/develop/packages/rollup-presets)           | A collection of opinionated, production-ready Rollup presets                                                                                                                   | [`rollup-presets`](https://www.npmjs.com/package/rollup-presets)           |
-| [split-flap-board](https://github.com/builder-group/community/blob/develop/packages/split-flap-board)       | Web component that simulates a split-flap display, the mechanical boards found in airports and train stations                                                                  | [`split-flap-board`](https://www.npmjs.com/package/split-flap-board)       |
-| [tuple-result](https://github.com/builder-group/community/blob/develop/packages/tuple-result)               | A minimal, functional, and tree-shakable Result library for TypeScript that prioritizes simplicity and serialization                                                           | [`tuple-result`](https://www.npmjs.com/package/tuple-result)               |
-| [types](https://github.com/builder-group/community/blob/develop/packages/types)                             | Shared TypeScript type definitions used across builder.group community packages                                                                                                | [`@blgc/types`](https://www.npmjs.com/package/@blgc/types)                 |
-| [utils](https://github.com/builder-group/community/blob/develop/packages/utils)                             | Straightforward, typesafe, and tree-shakable collection of utility functions                                                                                                   | [`@blgc/utils`](https://www.npmjs.com/package/@blgc/utils)                 |
-| [validatenv](https://github.com/builder-group/community/blob/develop/packages/validatenv)                   | Type-safe, straightforward, and lightweight library for validating environment variables using existing validation libraries like Zod, Valibot, and Yup.                       | [`validatenv`](https://www.npmjs.com/package/validatenv)                   |
-| [validation-adapter](https://github.com/builder-group/community/blob/develop/packages/validation-adapter)   | Universal validation adapter that integrates various validation libraries like Zod, Valibot, and Yup                                                                           | [`validation-adapter`](https://www.npmjs.com/package/validation-adapter)   |
-| [validation-adapters](https://github.com/builder-group/community/blob/develop/packages/validation-adapters) | Pre-made validation adapters for the validation-adapter library, including adapters for Zod and Valibot                                                                        | [`validation-adapters`](https://www.npmjs.com/package/validation-adapters) |
-| [xml-tokenizer](https://github.com/builder-group/community/blob/develop/packages/xml-tokenizer)             | Straightforward and typesafe XML tokenizer that streams tokens through a callback mechanism                                                                                    | [`xml-tokenizer`](https://www.npmjs.com/package/xml-tokenizer)             |
+| Package                                                                                                 | Description                                                                            | NPM Package                                                            |
+| ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| [config](https://github.com/builder-group/community/blob/develop/packages/config)                       | Shared ESLint, Prettier, Vite, and TypeScript configuration presets                    | [`@blgc/config`](https://www.npmjs.com/package/@blgc/config)           |
+| [ecsify](https://github.com/builder-group/community/blob/develop/packages/ecsify)                       | Typesafe ECS library for building entity-component apps in TypeScript                  | [`ecsify`](https://www.npmjs.com/package/ecsify)                       |
+| [feature-core](https://github.com/builder-group/community/blob/develop/packages/feature-core)           | Typesafe `.with()` composition primitives for building extensible TypeScript libraries | [`feature-core`](https://www.npmjs.com/package/feature-core)           |
+| [feature-fetch](https://github.com/builder-group/community/blob/develop/packages/feature-fetch)         | Typesafe fetch wrapper with composable middleware and OpenAPI type support             | [`feature-fetch`](https://www.npmjs.com/package/feature-fetch)         |
+| [feature-form](https://github.com/builder-group/community/blob/develop/packages/feature-form)           | Lightweight typesafe form library with reactive fields and Standard Schema validation  | [`feature-form`](https://www.npmjs.com/package/feature-form)           |
+| [feature-logger](https://github.com/builder-group/community/blob/develop/packages/feature-logger)       | Typesafe logger with composable prefixes, labels, timestamps, and output styles        | [`feature-logger`](https://www.npmjs.com/package/feature-logger)       |
+| [feature-react](https://github.com/builder-group/community/blob/develop/packages/feature-react)         | React hooks for reactive state and form subscriptions                                  | [`feature-react`](https://www.npmjs.com/package/feature-react)         |
+| [feature-state](https://github.com/builder-group/community/blob/develop/packages/feature-state)         | Lightweight reactive state container with composable feature extensions                | [`feature-state`](https://www.npmjs.com/package/feature-state)         |
+| [head-metadata](https://github.com/builder-group/community/blob/develop/packages/head-metadata)         | HTML head metadata extractor for title, meta, and link tags                            | [`head-metadata`](https://www.npmjs.com/package/head-metadata)         |
+| [openapi-ts-router](https://github.com/builder-group/community/blob/develop/packages/openapi-ts-router) | OpenAPI-typed router helpers for Express and Hono with runtime validation              | [`openapi-ts-router`](https://www.npmjs.com/package/openapi-ts-router) |
+| [rollup-presets](https://github.com/builder-group/community/blob/develop/packages/rollup-presets)       | Rollup presets and plugins for building TypeScript libraries                           | [`rollup-presets`](https://www.npmjs.com/package/rollup-presets)       |
+| [tuple-result](https://github.com/builder-group/community/blob/develop/packages/tuple-result)           | Minimal, tree-shakable Result type using plain arrays for easy serialization           | [`tuple-result`](https://www.npmjs.com/package/tuple-result)           |
+| [types](https://github.com/builder-group/community/blob/develop/packages/types)                         | Shared utility, API, and OpenAPI TypeScript types for builder.group packages           | [`@blgc/types`](https://www.npmjs.com/package/@blgc/types)             |
+| [utils](https://github.com/builder-group/community/blob/develop/packages/utils)                         | Tree-shakable TypeScript utilities for colors, IDs, objects, URLs, and math            | [`@blgc/utils`](https://www.npmjs.com/package/@blgc/utils)             |
+| [validatenv](https://github.com/builder-group/community/blob/develop/packages/validatenv)               | Environment variable validation with Zod, Valibot, or Yup                              | [`validatenv`](https://www.npmjs.com/package/validatenv)               |
+| [xml-tokenizer](https://github.com/builder-group/community/blob/develop/packages/xml-tokenizer)         | Streaming XML tokenizer with callback-based parsing and object helpers                 | [`xml-tokenizer`](https://www.npmjs.com/package/xml-tokenizer)         |
 
-### 🚧 Deprecated
+### 🚧 Discontinued
 
-> **Note:** These packages are deprecated. I'm no longer using them, but if you need them maintained or have questions, please [open an issue](https://github.com/builder-group/community/issues). I'm open to keep maintaining them if there's community interest.
+> **Note:** These packages are no longer maintained. If you need support or have questions, please [open an issue](https://github.com/builder-group/community/issues). Happy to revisit if there's community interest.
 
-| Package                                                                                                                       | Description                                                                                                                           | NPM Package                                                                      | Deprecated Since |
-| ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------- |
-| [elevenlabs-client](https://github.com/builder-group/community/blob/develop/packages/_deprecated/elevenlabs-client)           | Typesafe and straightforward fetch client for interacting with the ElevenLabs API using feature-fetch                                 | [`elevenlabs-client`](https://www.npmjs.com/package/elevenlabs-client)           | November 6, 2025 |
-| [figma-connect](https://github.com/builder-group/community/blob/develop/packages/_deprecated/figma-connect)                   | Straightforward and typesafe wrapper around the communication between the app/ui (iframe) and plugin (sandbox) part of a Figma Plugin | [`figma-connect`](https://www.npmjs.com/package/figma-connect)                   | November 6, 2025 |
-| [google-webfonts-client](https://github.com/builder-group/community/blob/develop/packages/_deprecated/google-webfonts-client) | Typesafe and straightforward fetch client for interacting with the Google Web Fonts API using feature-fetch                           | [`google-webfonts-client`](https://www.npmjs.com/package/google-webfonts-client) | November 6, 2025 |
-| [kleinanzeigen-client](https://github.com/builder-group/community/blob/develop/packages/_deprecated/kleinanzeigen-client)     | Typesafe and straightforward fetch client for interacting with the Kleinanzeigen API using feature-fetch                              | [`kleinanzeigen-client`](https://www.npmjs.com/package/kleinanzeigen-client)     | November 6, 2025 |
+| Package                                                                                                                       | Description                                                                              | NPM Package                                                                      | Discontinued Since |
+| ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------ |
+| [@blgc/cli](https://github.com/builder-group/community/blob/develop/packages/_deprecated/cli)                                 | Rollup and Esbuild-powered CLI for bundling TypeScript libraries                         | [`@blgc/cli`](https://www.npmjs.com/package/@blgc/cli)                           | May 19, 2026       |
+| [elevenlabs-client](https://github.com/builder-group/community/blob/develop/packages/_deprecated/elevenlabs-client)           | Typesafe API client for the ElevenLabs text-to-speech API                                | [`elevenlabs-client`](https://www.npmjs.com/package/elevenlabs-client)           | November 6, 2025   |
+| [eprel-client](https://github.com/builder-group/community/blob/develop/packages/eprel-client)                                 | Typesafe API client for the EU EPREL energy label registry                               | [`eprel-client`](https://www.npmjs.com/package/eprel-client)                     | May 19, 2026       |
+| [figma-connect](https://github.com/builder-group/community/blob/develop/packages/_deprecated/figma-connect)                   | Typed message bridge between Figma plugin UI iframes and sandbox code                    | [`figma-connect`](https://www.npmjs.com/package/figma-connect)                   | November 6, 2025   |
+| [google-webfonts-client](https://github.com/builder-group/community/blob/develop/packages/_deprecated/google-webfonts-client) | Typesafe API client for Google Web Fonts metadata and font downloads                     | [`google-webfonts-client`](https://www.npmjs.com/package/google-webfonts-client) | November 6, 2025   |
+| [kleinanzeigen-client](https://github.com/builder-group/community/blob/develop/packages/_deprecated/kleinanzeigen-client)     | Typesafe API client for scraping and extracting Kleinanzeigen listings                   | [`kleinanzeigen-client`](https://www.npmjs.com/package/kleinanzeigen-client)     | November 6, 2025   |
+| [openapi-express](https://github.com/builder-group/community/blob/develop/packages/_deprecated/openapi-express)               | OpenAPI-typed Express router wrapper with Zod request validation                         | [`openapi-express`](https://www.npmjs.com/package/openapi-express)               | May 19, 2026       |
+| [split-flap-board](https://github.com/builder-group/community/blob/develop/packages/split-flap-board)                         | Web Components for animated split-flap boards with configurable spools and grids         | [`split-flap-board`](https://www.npmjs.com/package/split-flap-board)             | May 19, 2026       |
+| [validation-adapter](https://github.com/builder-group/community/blob/develop/packages/validation-adapter)                     | Universal validation abstraction for validators like Zod, Valibot, and Yup               | [`validation-adapter`](https://www.npmjs.com/package/validation-adapter)         | May 19, 2026       |
+| [validation-adapters](https://github.com/builder-group/community/blob/develop/packages/validation-adapters)                   | Ready-made validation-adapter implementations for Zod, Valibot, Yup, and Standard Schema | [`validation-adapters`](https://www.npmjs.com/package/validation-adapters)       | May 19, 2026       |
+| [webito](https://github.com/builder-group/community/blob/develop/packages/_deprecated/webito)                                 | ECS-powered web editor experiment for Tailwind-style component editing                   | [`webito`](https://www.npmjs.com/package/webito)                                 | May 19, 2026       |
+| widget-grid                                                                                                                   | Framework-agnostic widget grid model with cell-based layouts and widget data             | [`widget-grid`](https://www.npmjs.com/package/widget-grid)                       | May 19, 2026       |
 
-### 📚 Examples
+## 🧩 Templates
+
+| Template                                                                                         | Description                                         |
+| ------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| [desktop-tauri](https://github.com/builder-group/community/tree/develop/templates/desktop-tauri) | Tauri desktop app template with React and Specta    |
+| [web-tanstack](https://github.com/builder-group/community/tree/develop/templates/web-tanstack)   | TanStack Start web app template with React and Vite |
+
+## 📚 Examples
 
 > See [`/examples`](https://github.com/builder-group/community/tree/develop/examples)
 
@@ -73,13 +85,6 @@ A collection of open source libraries maintained by [builder.group](https://buil
 
 - [`xml-tokenizer/vanilla/playground`](https://github.com/builder-group/community/tree/develop/examples/xml-tokenizer/vanilla/playground)
 
-## 🧩 Templates
-
-| Template                                                                                         | Description                                         |
-| ------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
-| [desktop-tauri](https://github.com/builder-group/community/tree/develop/templates/desktop-tauri) | Tauri desktop app template with React and Specta    |
-| [web-tanstack](https://github.com/builder-group/community/tree/develop/templates/web-tanstack)   | TanStack Start web app template with React and Vite |
-
 ## ❓ FAQ
 
 ### What does `blgc` stand for?
@@ -88,54 +93,39 @@ A collection of open source libraries maintained by [builder.group](https://buil
 
 ### Why a Monorepo?
 
-Maintaining all libraries in a single repository keeps things simple and efficient. A monorepo allows for shared tooling, consistent versioning, and streamlined CI/CD workflows, while making cross-library changes easier. This approach simplifies collaboration and reduces overhead, ensuring all libraries remain in sync.
+Keeping all packages in one repository means shared tooling, consistent versioning, and streamlined CI/CD with no extra overhead. Cross-package changes are easier to make and stay in sync automatically.
 
-The only disadvantage is that it's harder to discover individual libraries via SEO since they're all part of one repo. However, the benefits far outweigh this limitation.
+The only trade-off is that individual packages are harder to discover via SEO since they all live under one repo, but that's an acceptable cost.
 
 ### Why two package build modes (`build` vs `build:prod`)?
 
-Development builds (`pnpm build`):
+`pnpm build` (development): includes TypeScript declaration maps so IDE navigation goes to source files instead of compiled definitions, and skips minification for easier debugging.
 
-- Includes TypeScript declaration maps (IDE navigation goes directly to source files instead of compiled definitions)
-- Easier debugging (no code minification and optimizations)
-
-Production builds (`pnpm build:prod`):
-
-- Smaller package size
-- No development artifacts in published packages
-- Code minification and optimizations enabled
-- Prevents npm errors with declaration maps (e.g. `EINVALIDTAGNAME` in GitHub CLI)
-
-To switch between modes:
-
-- Development: `pnpm build` (includes declaration maps)
-- Production: `pnpm build:prod` (excludes declaration maps)
+`pnpm build:prod` (production): smaller output, minification enabled, declaration maps excluded. Declaration maps cause npm publish errors (e.g. `EINVALIDTAGNAME` in GitHub CLI) so they must be stripped from published packages.
 
 ### Why is `@blgc/types` listed as a dependency instead of a devDependency?
 
-The `@blgc/types` package provides crucial TypeScript type definitions to ensure full type safety for feature-based libraries. When listed as a `devDependency`, these types are excluded from the final NPM package, resulting in broken type checks and missing autocompletions in projects consuming these libraries. By adding it as a `dependency`, we ensure that the type definitions are bundled and accessible to downstream projects, maintaining a seamless developer experience.
+The `@blgc/types` package provides TypeScript type definitions shared across packages in this repo. When listed as a `devDependency`, these types are excluded from the final npm package, causing broken type checks and missing autocompletions for consumers. Listing it as a `dependency` ensures the types are accessible downstream.
 
-### Why do we use the "wrapper pattern" (`withLogger(withStorage(withUndo(createState(0))))`) instead of a declarative API?
+### What are features?
 
-While declarative APIs like the following offer [better developer experience (DX)](https://www.reddit.com/r/reactjs/comments/1huxvci/i_built_a_bloated_state_manager_then_i_fixed_it/):
+A feature is a self-contained extension that adds typed methods or behaviour to a host object via `.with()`. The host starts with a base API, and each `.with(feature())` call extends it by adding methods, validating dependencies, and narrowing the TypeScript type. See [`feature-core`](https://www.npmjs.com/package/feature-core) for the underlying primitives.
+
+### Why do libraries use a `.with()` chain instead of a declarative feature array?
+
+The `.with()` chain (powered by [`feature-core`](https://www.npmjs.com/package/feature-core)) gives full TypeScript inference per step. Each call narrows the type based on what was installed before it, including dependency validation:
 
 ```ts
-createState({
-	defaultValue: 0,
-	features: [withUndo(), withStorage(), withLogger()]
-});
+const $count = createState(0).with(undoFeature()).with(storageFeature());
+
+$count.undo(); // typed
+$count.missing(); // type error
 ```
 
-We currently use the "wrapper pattern" because it ensures better TypeScript type inference. Each wrapper function modifies the state's type in a specific sequence, which is harder to achieve reliably with a feature array.
+A declarative feature array like `features: [undoFeature(), storageFeature()]` can't validate dependencies or accumulate types left-to-right reliably without losing inference. The chain solves both.
 
-We're [actively exploring solutions](https://github.com/builder-group/community/blob/develop/packages/feature-state/src/_experimental) to support both patterns, combining the type safety of the wrapper pattern with the simplicity of declarative APIs. Contributions and ideas are always welcome :)
-
-### Why do feature-based libraries use Objects instead of Classes?
+### Why objects instead of classes?
 
 This [Medium post](https://medium.com/@markmiro/thoughts-on-choosing-between-plain-js-objects-and-classes-6422af8aaad5) explains the key differences well.
 
-In short, we use objects because they are more flexible and allow for the kind of extensibility we need. Achieving this level of extensibility with classes isn't feasible for our use case, so using objects was the better choice.
-
-### What Features?
-
-Think of features like components in an Entity Component System (ECS). Every feature based object (e.g., feature-state) has base functionality, and additional components (features) can be added to extend it. Unlike traditional ECS, we only adopt the concept of Components, without Systems or Entities. Each component contains the necessary functions to interact with the feature based object.
+Objects are more flexible and allow for the kind of extensibility the `.with()` model needs. Achieving the same with classes isn't feasible, so objects were the better choice.
