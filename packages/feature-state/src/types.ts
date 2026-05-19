@@ -1,7 +1,7 @@
 import { type TAnyFeature, type TFeatureHost } from 'feature-core';
 
 /** State object returned by `createState()`. */
-export type TState<GValue, GFeatures extends TAnyFeature[]> = TFeatureHost<
+export type TState<GValue, GFeatures extends TAnyFeature[] = []> = TFeatureHost<
 	TStateBase<GValue>,
 	GFeatures
 >;

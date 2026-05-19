@@ -160,6 +160,11 @@ export class FlatQueue<GItem> {
 	}
 }
 
-function isBefore(priority: number, order: number, otherPriority: number, otherOrder: number): boolean {
+function isBefore(
+	priority: number,
+	order: number,
+	otherPriority: number,
+	otherOrder: number
+): boolean {
 	return priority < otherPriority || (priority === otherPriority && order < otherOrder);
 }

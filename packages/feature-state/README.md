@@ -17,6 +17,8 @@
     </a>
 </p>
 
+> Status: Experimental
+
 A lightweight, typesafe reactive state container. Extend it with features instead of pulling in a larger framework.
 
 ```ts
