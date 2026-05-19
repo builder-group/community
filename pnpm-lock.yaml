@@ -525,12 +525,9 @@ importers:
 
   packages/feature-form:
     dependencies:
-      '@blgc/types':
+      feature-core:
         specifier: workspace:*
-        version: link:../types
-      '@blgc/utils':
-        specifier: workspace:*
-        version: link:../utils
+        version: link:../feature-core
       feature-state:
         specifier: workspace:*
         version: link:../feature-state

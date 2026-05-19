@@ -1,267 +1,447 @@
-import { type TEntries } from '@blgc/types/utils';
-import { bitwiseFlag, deepCopy, withNew, type BitwiseFlag } from '@blgc/utils';
+import { createFeatureHost } from 'feature-core';
 import { createState } from 'feature-state';
-import { TCollectErrorMode } from 'validation-adapter';
-import { createFormField, isFormField } from './form-field';
 import {
-	FormFieldReValidateMode,
-	FormFieldValidateMode,
-	TFormField,
+	createFormField,
+	formFieldResetSourceKey,
+	formFieldStatusChangeSourceKey,
+	isFormField
+} from './form-field';
+import { deepCopy } from './lib';
+import {
 	type TForm,
-	type TFormConfig,
+	type TFormBase,
 	type TFormData,
+	type TFormField,
+	type TFormFieldErrors,
+	type TFormFieldKey,
 	type TFormFields,
-	type TFormFieldStateConfig,
+	type TFormFieldValidationConfig,
 	type TFormFieldValidator,
-	type TInvalidFormFieldError,
-	type TInvalidFormFieldErrors,
-	type TInvalidSubmitCallback,
-	type TSubmitCallbackResponse,
-	type TValidSubmitCallback
+	type TFormInvalidSubmitCallback,
+	type TFormStatus,
+	type TFormSubmitContext,
+	type TFormValidationConfig,
+	type TFormValidator,
+	type TFormValidSubmitCallback,
+	type TValidationError,
+	type TValidationStatusValue
 } from './types';
+import { createFormValidationRunContext } from './validation-context';
 
+/** Creates a form from field configs or existing form fields. */
 export function createForm<GFormData extends TFormData>(
 	config: TCreateFormConfig<GFormData>
 ): TForm<GFormData, []> {
 	const {
 		fields,
-		collectErrorMode = 'firstError',
-		disabled = false,
-		validateMode = bitwiseFlag(FormFieldValidateMode.OnSubmit),
-		reValidateMode = bitwiseFlag(FormFieldReValidateMode.OnBlur, FormFieldReValidateMode.OnSubmit),
-		onValidSubmit,
+		fieldValidation = {},
+		notifyOnStatusUpdate = true,
 		onInvalidSubmit,
-		notifyOnStatusChange = true
+		onValidSubmit,
+		validation: {
+			validator,
+			validateOn = ['submit'] satisfies TFormValidationConfig['validateOn'],
+			revalidateOn = ['change', 'submit'] satisfies TFormValidationConfig['revalidateOn'],
+			collectErrorMode = 'firstError'
+		} = {}
 	} = config;
 
-	return withNew<TForm<GFormData, []>>({
-		_features: [],
-		_config: {
-			disabled
+	const form = createFeatureHost<TFormBase<GFormData>>({
+		_validation:
+			validator == null
+				? undefined
+				: {
+						validator,
+						config: {
+							validateOn,
+							revalidateOn,
+							collectErrorMode
+						}
+					},
+		_validationRunId: 0,
+		_validationStatus: validator == null ? { type: 'valid' } : { type: 'unvalidated' },
+		_callbacks: {
+			invalidSubmit: onInvalidSubmit == null ? [] : [onInvalidSubmit],
+			validSubmit: onValidSubmit == null ? [] : [onValidSubmit]
 		},
-		_validSubmitCallbacks: onValidSubmit != null ? [onValidSubmit] : [],
-		_invalidSubmitCallbacks: onInvalidSubmit != null ? [onInvalidSubmit] : [],
-		fields: Object.fromEntries(
-			Object.entries(fields).map(
-				([fieldKey, field]: [
-					string,
-					TCreateFormConfigFormField<unknown> | TFormField<unknown>
-				]) => [
-					fieldKey,
-					isFormField(field)
-						? field
-						: createFormField(field.defaultValue, {
-								key: fieldKey,
-								validator: field.validator,
-								collectErrorMode: field.collectErrorMode ?? collectErrorMode,
-								validateMode: field.validateMode ?? validateMode,
-								reValidateMode: field.reValidateMode ?? reValidateMode,
-								editable: field.editable ?? true,
-								notifyOnStatusChange
-							})
-				]
-			)
-		) as TFormFields<GFormData>,
-		isValid: createState(false),
+		status: createState<TValidationStatusValue>({ type: 'unvalidated' }),
 		isValidating: createState(false),
 		isSubmitted: createState(false),
 		isSubmitting: createState(false),
-		_new(this: TForm<GFormData, []>) {
-			// Revalidate form on status change
-			for (const field of Object.values(this.fields)) {
-				field.status.listen(
-					async () => {
-						await this._revalidate(true);
-					},
-					{ key: 'form_revalidate' }
-				);
-			}
-		},
-		async _revalidate(this: TForm<GFormData, []>, cached = false) {
-			const formFields = Object.values(this.fields) as TFormFields<GFormData>[keyof GFormData][];
-
-			if (!cached) {
-				this.isValidating.set(true);
-				await Promise.all(formFields.map((formField) => formField.validate()));
-				this.isValidating.set(false);
-			}
-
-			this.isValid.set(formFields.every((formField) => formField.isValid()));
-			return this.isValid.get();
+		fields: Object.fromEntries(
+			(
+				Object.entries(fields) as Array<
+					[
+						TFormFieldKey<GFormData>,
+						TCreateFormConfigFormField<GFormData[TFormFieldKey<GFormData>]> | TFormField<unknown>
+					]
+				>
+			).map(([fieldKey, field]) => [
+				fieldKey,
+				isFormField(field)
+					? field
+					: createFormField(field.defaultValue, {
+							key: fieldKey,
+							validator: field.validator,
+							collectErrorMode: field.collectErrorMode ?? fieldValidation.collectErrorMode,
+							revalidateOn: field.revalidateOn ?? fieldValidation.revalidateOn,
+							validateOn: field.validateOn ?? fieldValidation.validateOn,
+							notifyOnStatusUpdate
+						})
+			])
+		) as TFormFields<GFormData>,
+		async _revalidate(this: TForm<GFormData, []>, options = {}) {
+			const { runValidators = true } = options;
+			return revalidateForm(this, {
+				runFieldValidators: runValidators,
+				runFormValidator: runValidators
+			});
 		},
 		async submit(this: TForm<GFormData, []>, options = {}) {
-			const {
-				context,
-				assignToInitial = false,
-				onInvalidSubmit: _onInvalidSubmit,
-				onValidSubmit: _onValidSubmit,
-				postSubmitCallback
-			} = options;
 			this.isSubmitting.set(true);
+			try {
+				await validateFormOnSubmit(this);
+				await this._revalidate({ runValidators: false });
 
-			// Validate form fields
-			const validationPromises: Promise<boolean>[] = [];
-			for (const formField of Object.values(
-				this.fields
-			) as TFormFields<GFormData>[keyof GFormData][]) {
-				formField.isSubmitting.set(true);
-				if (
-					(formField.isSubmitted.get() &&
-						formField._config.reValidateMode.has(FormFieldReValidateMode.OnSubmit)) ||
-					(!formField.isSubmitted.get() &&
-						formField._config.validateMode.has(FormFieldValidateMode.OnSubmit))
-				) {
-					validationPromises.push(formField.validate());
+				for (const formField of getFormFields(this.fields)) {
+					formField.isSubmitted.set(true);
 				}
-			}
-			await Promise.all(validationPromises);
+				this.isSubmitted.set(true);
 
-			// Note: We can't rely on the form field status listener to revalidate the form on time
-			// since the state queue is processed asynchronously
-			this._revalidate(true);
+				const data = this.getValidData();
+				if (data != null) {
+					if (options.updateDefaultValues === true) {
+						updateFieldDefaultValues(this.fields, data);
+					}
 
-			// Execute submit callbacks
-			const data = this.getValidData();
-			const submitCallbackPromises: TSubmitCallbackResponse[] = [];
-			if (data != null) {
-				for (const callback of this._validSubmitCallbacks) {
-					submitCallbackPromises.push(callback(data, context));
+					await runSubmitCallbacks(
+						this._callbacks.validSubmit,
+						options.onValidSubmit,
+						data,
+						options.context
+					);
+					return true;
 				}
-				if (typeof _onValidSubmit === 'function') {
-					submitCallbackPromises.push(_onValidSubmit(data, context));
-				}
-			} else {
+
 				const errors = this.getErrors();
-				for (const callback of this._invalidSubmitCallbacks) {
-					submitCallbackPromises.push(callback(errors, context));
-				}
-				if (typeof _onInvalidSubmit === 'function') {
-					submitCallbackPromises.push(_onInvalidSubmit(errors, context));
-				}
+				await runSubmitCallbacks(
+					this._callbacks.invalidSubmit,
+					options.onInvalidSubmit,
+					errors,
+					options.context
+				);
+				return false;
+			} finally {
+				this.isSubmitting.set(false);
 			}
-
-			let submitCallbackData: Record<string, unknown> | null = null;
-			if (postSubmitCallback != null) {
-				submitCallbackData = (await Promise.all(submitCallbackPromises)).reduce((acc, result) => {
-					if (result != null && typeof result === 'object') {
-						return { ...acc, ...result };
-					}
-					return acc;
-				}, {}) as Record<string, unknown>;
-			} else {
-				await Promise.all(submitCallbackPromises);
-			}
-
-			// Update form field states
-			for (const [fieldKey, formField] of Object.entries(this.fields) as TEntries<
-				TFormFields<GFormData>
-			>) {
-				if (data != null && Object.prototype.hasOwnProperty.call(data, fieldKey)) {
-					if (assignToInitial) {
-						formField._intialValue = deepCopy(data[fieldKey]);
-					}
-				}
-				formField.isSubmitted.set(true);
-				formField.isSubmitting.set(false);
-			}
-
-			this.isSubmitted.set(true);
-			this.isSubmitting.set(false);
-
-			postSubmitCallback?.(this, submitCallbackData ?? {});
-			return this.isValid.get();
 		},
 		async validate(this: TForm<GFormData, []>) {
-			return this._revalidate(false);
+			return this._revalidate({ runValidators: true });
+		},
+		reset(this: TForm<GFormData, []>) {
+			for (const formField of getFormFields(this.fields)) {
+				formField.reset();
+			}
+			this._validationRunId++;
+			this._validationStatus =
+				this._validation == null ? { type: 'valid' } : { type: 'unvalidated' };
+			this.status.set(getAggregateFormStatus(this));
+			this.isValidating.set(false);
+			this.isSubmitted.set(false);
+			this.isSubmitting.set(false);
 		},
 		getField(this: TForm<GFormData, []>, fieldKey) {
 			return this.fields[fieldKey];
 		},
+		getData(this: TForm<GFormData, []>) {
+			return Object.fromEntries(
+				getFormFieldEntries(this.fields).map(([fieldKey, formField]) => [fieldKey, formField.get()])
+			) as GFormData;
+		},
 		getValidData(this: TForm<GFormData, []>) {
-			if (!this.isValid.get()) {
+			if (this.status.get().type !== 'valid') {
 				return null;
 			}
 
-			// @ts-expect-error - Filled below
-			const preparedData: Readonly<GFormData> = {};
-
-			for (const [fieldKey, formField] of Object.entries(this.fields) as TEntries<
-				TFormFields<GFormData>
-			>) {
-				// @ts-expect-error - GFormFields is based on GFormData and the keys should be identical
-				preparedData[fieldKey] = formField.get();
-			}
-
-			return preparedData;
+			return this.getData();
 		},
 		getErrors(this: TForm<GFormData, []>) {
-			const errors: TInvalidFormFieldErrors<GFormData> = {};
-
-			for (const [fieldKey, formField] of Object.entries(this.fields) as TEntries<
-				TFormFields<GFormData>
-			>) {
-				switch (formField.status._v.type) {
-					case 'INVALID':
-						errors[fieldKey] = formField.status._v.errors;
-						break;
-					case 'UNVALIDATED':
-						errors[fieldKey] = [
-							{
-								code: 'unvalidated',
-								message: `${fieldKey.toString()} was not yet validated!`,
-								path: fieldKey
-							} as TInvalidFormFieldError
-						];
-						break;
-					default:
-				}
-			}
-
-			return errors;
-		},
-		reset(this: TForm<GFormData, []>) {
-			for (const formField of Object.values(
-				this.fields
-			) as TFormFields<GFormData>[keyof GFormData][]) {
-				formField.reset();
-			}
-			this.isSubmitted.set(false);
-			this._revalidate(true);
+			return {
+				fields: getFormFieldErrors(this.fields),
+				form: getFormValidationErrors(this)
+			};
 		}
 	});
+
+	registerFormListeners(form);
+	form.status.set(getAggregateFormStatus(form));
+
+	return form;
 }
 
-export interface TCreateFormConfig<GFormData extends TFormData> extends Partial<TFormConfig> {
-	/**
-	 * Form fields
-	 */
+export interface TCreateFormConfig<GFormData extends TFormData> {
+	/** Field configs or pre-built form fields keyed by form data property. */
 	fields: TCreateFormConfigFormFields<GFormData>;
-	/**
-	 * Error collection mode. 'firstError' gathers only the first error per field, 'all' gathers all errors.
-	 */
-	collectErrorMode?: TCollectErrorMode;
-	/**
-	 * Validation strategy **before** submitting.
-	 */
-	validateMode?: BitwiseFlag<FormFieldValidateMode>;
-	/**
-	 * Validation strategy **after** submitting.
-	 */
-	reValidateMode?: BitwiseFlag<FormFieldReValidateMode>;
-	/**
-	 * Whether to notify the form field if its status has changed
-	 */
-	notifyOnStatusChange?: boolean;
-
-	onInvalidSubmit?: TInvalidSubmitCallback<GFormData>;
-	onValidSubmit?: TValidSubmitCallback<GFormData>;
+	/** Optional form-level validator for cross-field constraints. */
+	validation?: TCreateFormValidation<GFormData>;
+	/** Default validation config applied to field configs that do not override it. */
+	fieldValidation?: Partial<TFormFieldValidationConfig>;
+	/** Calls `field.notify()` when a field status changes. */
+	notifyOnStatusUpdate?: boolean;
+	/** Called on every valid submit. Per-call overrides can be passed directly to `submit()`. */
+	onValidSubmit?: TFormValidSubmitCallback<GFormData>;
+	/** Called on every invalid submit. Per-call overrides can be passed directly to `submit()`. */
+	onInvalidSubmit?: TFormInvalidSubmitCallback<GFormData>;
 }
 
+export interface TCreateFormValidation<
+	GFormData extends TFormData
+> extends Partial<TFormValidationConfig> {
+	validator: TFormValidator<GFormData>;
+}
+
+/** Maps each form data property to a form field config or an existing form field. */
 export type TCreateFormConfigFormFields<GFormData extends TFormData> = {
-	[Key in keyof GFormData]: TCreateFormConfigFormField<GFormData[Key]> | TFormField<GFormData[Key]>;
+	[Key in TFormFieldKey<GFormData>]:
+		| TCreateFormConfigFormField<GFormData[Key]>
+		| TFormField<GFormData[Key]>;
 };
 
-export interface TCreateFormConfigFormField<GValue> extends Partial<TFormFieldStateConfig> {
-	defaultValue?: GValue;
+/** Configures one form field when `createForm()` should create the field. */
+export interface TCreateFormConfigFormField<GValue> {
+	defaultValue: GValue;
 	validator?: TFormFieldValidator<GValue>;
+	collectErrorMode?: TFormFieldValidationConfig['collectErrorMode'];
+	revalidateOn?: TFormFieldValidationConfig['revalidateOn'];
+	validateOn?: TFormFieldValidationConfig['validateOn'];
+}
+
+function registerFormListeners<GFormData extends TFormData>(form: TForm<GFormData, []>): void {
+	for (const formField of getFormFields(form.fields)) {
+		formField.status.listen(() => {
+			void form._revalidate({ runValidators: false });
+		});
+
+		formField.onBlur(({ wasTouched }) => {
+			// 'touched' fires the form validator once on first blur; 'blur' fires it on every blur
+			const shouldValidateFormOnBlur =
+				form._validation != null &&
+				(form.isSubmitted.get()
+					? form._validation.config.revalidateOn.includes('blur')
+					: form._validation.config.validateOn.includes('blur') ||
+						(!wasTouched && form._validation.config.validateOn.includes('touched')));
+			if (!shouldValidateFormOnBlur) {
+				return;
+			}
+
+			void revalidateForm(form, {
+				runFieldValidators: false,
+				runFormValidator: true
+			});
+		});
+
+		formField.listen(({ source }) => {
+			const shouldValidateFormOnFieldChange =
+				form._validation != null &&
+				source !== formFieldResetSourceKey &&
+				source !== formFieldStatusChangeSourceKey &&
+				(form.isSubmitted.get()
+					? form._validation.config.revalidateOn.includes('change')
+					: form._validation.config.validateOn.includes('change'));
+			if (!shouldValidateFormOnFieldChange) {
+				return;
+			}
+
+			void revalidateForm(form, {
+				runFieldValidators: false,
+				runFormValidator: true
+			});
+		});
+	}
+}
+
+async function validateFormOnSubmit<GFormData extends TFormData>(
+	form: TForm<GFormData, []>
+): Promise<void> {
+	const fieldValidationPromises: Array<Promise<boolean>> = [];
+	for (const formField of getFormFields(form.fields)) {
+		if (formField._validation != null) {
+			fieldValidationPromises.push(formField.validate());
+		}
+	}
+
+	const shouldRunFormValidator = form._validation != null;
+	const shouldSetValidating = fieldValidationPromises.length > 0 || shouldRunFormValidator;
+	const validationRunId = shouldSetValidating ? ++form._validationRunId : null;
+	if (shouldSetValidating) {
+		form.isValidating.set(true);
+	}
+
+	try {
+		await Promise.all([
+			...fieldValidationPromises,
+			...(shouldRunFormValidator && validationRunId != null
+				? [validateFormValidator(form, validationRunId)]
+				: [])
+		]);
+	} finally {
+		if (validationRunId != null && validationRunId === form._validationRunId) {
+			form.isValidating.set(false);
+		}
+	}
+}
+
+async function revalidateForm<GFormData extends TFormData>(
+	form: TForm<GFormData, []>,
+	options: TRevalidateFormOptions
+): Promise<boolean> {
+	const { runFieldValidators, runFormValidator } = options;
+
+	const shouldSetValidating = runFieldValidators || runFormValidator;
+	const validationRunId = shouldSetValidating ? ++form._validationRunId : null;
+	if (shouldSetValidating) {
+		form.isValidating.set(true);
+	}
+
+	try {
+		await Promise.all([
+			...(runFieldValidators ? getFormFields(form.fields).map((field) => field.validate()) : []),
+			...(runFormValidator && validationRunId != null
+				? [validateFormValidator(form, validationRunId)]
+				: [])
+		]);
+	} finally {
+		if (validationRunId != null && validationRunId === form._validationRunId) {
+			form.isValidating.set(false);
+		}
+	}
+
+	const status = getAggregateFormStatus(form);
+	form.status.set(status);
+	return status.type === 'valid';
+}
+
+interface TRevalidateFormOptions {
+	runFieldValidators: boolean;
+	runFormValidator: boolean;
+}
+
+async function validateFormValidator<GFormData extends TFormData>(
+	form: TForm<GFormData, []>,
+	validationRunId: number
+): Promise<void> {
+	if (form._validation == null) {
+		form._validationStatus = { type: 'valid' };
+		return;
+	}
+
+	const { collector, context } = createFormValidationRunContext(form);
+	try {
+		await form._validation.validator.validate(context);
+	} catch (error) {
+		collector.registerError({
+			code: 'validation_error',
+			message: error instanceof Error ? error.message : String(error),
+			path: 'form'
+		});
+	}
+
+	if (validationRunId !== form._validationRunId) {
+		return;
+	}
+
+	form._validationStatus = collector.value ?? { type: 'valid' };
+}
+
+function getAggregateFormStatus<GFormData extends TFormData>(
+	form: TForm<GFormData, []>
+): TFormStatus['value'] {
+	const errors: TValidationError[] = [];
+	let hasUnvalidatedStatus = false;
+
+	for (const [fieldKey, formField] of getFormFieldEntries(form.fields)) {
+		const status = formField.status.get();
+		if (status.type === 'invalid') {
+			errors.push(
+				...status.errors.map((error) => ({
+					...error,
+					path: error.path ?? fieldKey
+				}))
+			);
+		} else if (status.type === 'unvalidated') {
+			hasUnvalidatedStatus = true;
+		}
+	}
+
+	if (form._validationStatus.type === 'invalid') {
+		errors.push(...form._validationStatus.errors);
+	} else if (form._validationStatus.type === 'unvalidated') {
+		hasUnvalidatedStatus = true;
+	}
+
+	if (errors.length > 0) {
+		return { type: 'invalid', errors };
+	}
+
+	return hasUnvalidatedStatus ? { type: 'unvalidated' } : { type: 'valid' };
+}
+
+function getFormFieldErrors<GFormData extends TFormData>(
+	fields: TFormFields<GFormData>
+): TFormFieldErrors<GFormData> {
+	const errors: TFormFieldErrors<GFormData> = {};
+
+	for (const [fieldKey, formField] of getFormFieldEntries(fields)) {
+		const status = formField.status.get();
+		if (status.type === 'invalid') {
+			errors[fieldKey] = status.errors;
+		}
+	}
+
+	return errors;
+}
+
+function getFormValidationErrors<GFormData extends TFormData>(
+	form: TForm<GFormData, []>
+): readonly TValidationError[] {
+	if (form._validationStatus.type === 'invalid') {
+		return form._validationStatus.errors;
+	}
+
+	return [];
+}
+
+function updateFieldDefaultValues<GFormData extends TFormData>(
+	fields: TFormFields<GFormData>,
+	data: Readonly<GFormData>
+): void {
+	for (const [fieldKey, formField] of getFormFieldEntries(fields)) {
+		formField.defaultValue = deepCopy(data[fieldKey]);
+	}
+}
+
+async function runSubmitCallbacks<GValue>(
+	callbacks: Array<(value: GValue, context?: TFormSubmitContext) => Promise<void> | void>,
+	callback: ((value: GValue, context?: TFormSubmitContext) => Promise<void> | void) | undefined,
+	value: GValue,
+	context: TFormSubmitContext | undefined
+): Promise<void> {
+	await Promise.all([
+		...callbacks.map((_callback) => _callback(value, context)),
+		...(callback == null ? [] : [callback(value, context)])
+	]);
+}
+
+function getFormFields<GFormData extends TFormData>(
+	fields: TFormFields<GFormData>
+): Array<TFormFields<GFormData>[TFormFieldKey<GFormData>]> {
+	return Object.values(fields) as Array<TFormFields<GFormData>[TFormFieldKey<GFormData>]>;
+}
+
+function getFormFieldEntries<GFormData extends TFormData>(
+	fields: TFormFields<GFormData>
+): Array<[TFormFieldKey<GFormData>, TFormFields<GFormData>[TFormFieldKey<GFormData>]]> {
+	return Object.entries(fields) as Array<
+		[TFormFieldKey<GFormData>, TFormFields<GFormData>[TFormFieldKey<GFormData>]]
+	>;
 }
