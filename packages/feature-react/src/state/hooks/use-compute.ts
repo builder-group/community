@@ -1,89 +1,132 @@
 import { type TAnyFeature } from 'feature-core';
 import type { TState } from 'feature-state';
 import React from 'react';
-import { useEventCallback } from './use-event-callback';
 
 /**
- * Computes a derived value from one state or a tuple of states.
- * The component re-renders only when the computed value changes.
- * `compute` and `isEqual` run during render and must stay pure.
- * Pass `isEqual` to customize equality; also preserves referential stability for object and array returns.
+ * Derives a computed value from one state or a tuple of states.
+ * Re-renders only when the computed result changes.
+ *
+ * Pass deps for every value that `compute` reads outside the subscribed state.
+ * `compute` and `isEqual` must stay pure because React may call snapshots during render.
  */
-export function useCompute<GValue, GFeatures extends TAnyFeature[], GComputed>(
-	state: TState<GValue, GFeatures>,
-	compute: (value: GValue) => GComputed,
-	isEqual?: (next: GComputed, current: GComputed) => boolean
-): GComputed;
-export function useCompute<GValue, GFeatures extends TAnyFeature[], GComputed>(
-	state: TState<GValue, GFeatures> | null | undefined,
-	compute: (value: GValue | null) => GComputed,
-	isEqual?: (next: GComputed, current: GComputed) => boolean
+export function useCompute<GState extends TAnyComputeState, GComputed>(
+	state: GState,
+	compute: (value: TComputeValue<GState>) => GComputed,
+	deps?: React.DependencyList,
+	isEqual?: TComputeIsEqual<GComputed>
 ): GComputed;
 export function useCompute<const GStates extends readonly TAnyComputeState[], GComputed>(
 	states: GStates,
 	compute: (values: TComputeValues<GStates>) => GComputed,
-	isEqual?: (next: GComputed, current: GComputed) => boolean
+	deps?: React.DependencyList,
+	isEqual?: TComputeIsEqual<GComputed>
 ): GComputed;
 export function useCompute<GComputed>(
-	input: unknown,
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	input: TAnyComputeState | readonly TAnyComputeState[],
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any -- implementation accepts all public overload value shapes
 	compute: (value: any) => GComputed,
-	isEqual: (next: GComputed, current: GComputed) => boolean = Object.is
+	deps: React.DependencyList = [],
+	isEqual: TComputeIsEqual<GComputed> = Object.is
 ): GComputed {
 	const isTupleInput = Array.isArray(input);
 	const inputStates = (isTupleInput ? input : [input]) as readonly TAnyComputeState[];
+	const states = React.useMemo(() => [...inputStates], [isTupleInput, ...inputStates]);
+	const depsToken = React.useMemo(() => ({}), deps);
+	const cacheRef = React.useRef<TComputeCache<GComputed>>({
+		depsToken: null,
+		dirty: true,
+		hasValue: false,
+		isTupleInput,
+		value: undefined,
+		values: []
+	});
 
-	const [, forceRender] = React.useReducer((n: number) => n + 1, 0);
+	const getSnapshot = React.useCallback((): GComputed => {
+		const cache = cacheRef.current;
+		const values = states.map((state) => (state == null ? null : state.get()));
+		const didValuesChange =
+			values.length !== cache.values.length ||
+			values.some((value, index) => !Object.is(value, cache.values[index]));
+		const shouldCompute =
+			cache.dirty ||
+			!cache.hasValue ||
+			cache.isTupleInput !== isTupleInput ||
+			cache.depsToken !== depsToken ||
+			didValuesChange;
 
-	const stableCompute = useEventCallback(compute);
-	const stableIsEqual = useEventCallback(isEqual);
+		if (!shouldCompute) {
+			return cache.value as GComputed;
+		}
 
-	const computed = compute(resolveValue(inputStates, isTupleInput));
-	const computedRef = React.useRef(computed);
-	// Note: Preserves the existing reference when equal so downstream memos and effects stay stable
-	if (!isEqual(computed, computedRef.current)) {
-		computedRef.current = computed;
-	}
+		const nextValue = compute(isTupleInput ? values : values[0]);
 
-	React.useEffect(() => {
-		const unbinds = inputStates.map((state) => {
-			if (state == null) {
-				return;
-			}
+		cache.dirty = false;
+		cache.isTupleInput = isTupleInput;
+		cache.depsToken = depsToken;
+		cache.values = values;
 
-			return state.listen(({ background }) => {
-				const next = stableCompute(resolveValue(inputStates, isTupleInput));
-				if (!stableIsEqual(next, computedRef.current)) {
-					computedRef.current = next;
-					if (background !== true) {
-						forceRender();
-					}
+		if (cache.hasValue && isEqual !== false && isEqual(nextValue, cache.value as GComputed)) {
+			return cache.value as GComputed;
+		}
+
+		cache.hasValue = true;
+		cache.value = nextValue;
+		return nextValue;
+	}, [compute, depsToken, isEqual, isTupleInput, states]);
+
+	const subscribe = React.useCallback(
+		(onStoreChange: () => void) => {
+			const subscribedStates = new Set<TSubscribedState>();
+			const unbinds: Array<() => void> = [];
+
+			for (const state of states) {
+				if (state == null || subscribedStates.has(state)) {
+					continue;
 				}
-			});
-		});
 
-		return () => {
-			for (const unbind of unbinds) {
-				unbind?.();
+				subscribedStates.add(state);
+				unbinds.push(
+					state.listen(({ background }) => {
+						// Note: notify() invalidates compute even when the state value keeps the same reference
+						cacheRef.current.dirty = true;
+
+						if (background !== true) {
+							onStoreChange();
+						}
+					})
+				);
 			}
-		};
-	}, [isTupleInput, stableCompute, stableIsEqual, ...inputStates]);
 
-	return computedRef.current;
+			return () => {
+				for (const unbind of unbinds) {
+					unbind();
+				}
+			};
+		},
+		[states]
+	);
+
+	return React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
+
+export type TComputeIsEqual<GComputed> = ((next: GComputed, current: GComputed) => boolean) | false;
 
 type TComputeValues<GStates extends readonly TAnyComputeState[]> = {
 	readonly [GIndex in keyof GStates]: TComputeValue<GStates[GIndex]>;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- used only to accept arbitrary state value types in the public tuple overload
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- used only to accept arbitrary state value types in the public input
 type TAnyComputeState = TState<any, TAnyFeature[]> | null | undefined;
+
+type TSubscribedState = Exclude<TAnyComputeState, null | undefined>;
 
 type TComputeValue<GState> = GState extends TState<infer GValue, TAnyFeature[]> ? GValue : null;
 
-function resolveValue(states: readonly TAnyComputeState[], isTupleInput: boolean): unknown {
-	if (isTupleInput) {
-		return states.map((state) => state?.get() ?? null);
-	}
-	return states[0]?.get() ?? null;
+interface TComputeCache<GComputed> {
+	depsToken: object | null;
+	dirty: boolean;
+	hasValue: boolean;
+	isTupleInput: boolean;
+	value: GComputed | undefined;
+	values: readonly unknown[];
 }

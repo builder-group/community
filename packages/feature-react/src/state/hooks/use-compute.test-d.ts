@@ -51,10 +51,23 @@ describe('useCompute function', () => {
 		expectTypeOf(value).toEqualTypeOf<number | string>();
 	});
 
-	it('should accept custom equality options', () => {
+	it('should accept custom equality after deps', () => {
 		const value = useCompute(
 			createState(2),
 			(count) => ({ count }),
+			[],
+			(next, current) => next.count === current.count
+		);
+
+		expectTypeOf(value).toEqualTypeOf<{ count: number }>();
+	});
+
+	it('should accept explicit compute dependencies with custom equality', () => {
+		const multiplier = 2;
+		const value = useCompute(
+			createState(2),
+			(count) => ({ count: count * multiplier }),
+			[multiplier],
 			(next, current) => next.count === current.count
 		);
 

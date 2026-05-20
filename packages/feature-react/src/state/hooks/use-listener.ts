@@ -31,4 +31,5 @@ export function useListener<GValue, GFeatures extends TAnyFeature[]>(
 
 export type TUseListenerCallback<GValue> = (
 	context: TListenerContext<GValue>
+	// eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- callbacks may return nothing or a cleanup
 ) => (() => void) | void;
