@@ -78,23 +78,25 @@ const $form = createForm({
 });
 ```
 
-| Option            | Default  | Description                                                                                                  |
-| ----------------- | -------- | ------------------------------------------------------------------------------------------------------------ |
-| `fields`          | required | Field configs or pre-built fields keyed by form data property.                                               |
-| `validation`      | none     | Form-level validator for cross-field constraints.                                                            |
-| `fieldValidation` | `{}`     | Shared `validateOn`, `revalidateOn`, and `collectErrorMode` for all field configs that do not override them. |
-| `onValidSubmit`   | none     | Called on every valid submit. Per-call overrides can be passed to `submit()`.                                |
-| `onInvalidSubmit` | none     | Called on every invalid submit. Per-call overrides can be passed to `submit()`.                              |
+| Option             | Default                | Description                                                                                              |
+| ------------------ | ---------------------- | -------------------------------------------------------------------------------------------------------- |
+| `fields`           | required               | Field configs or pre-built fields keyed by form data property.                                           |
+| `validator`        | none                   | Form-level validator for cross-field constraints.                                                        |
+| `validateOn`       | `['submit']`           | Default triggers for the form validator and fields that do not override them.                            |
+| `revalidateOn`     | `['submit', 'change']` | Default revalidation triggers for the form validator and fields that do not override them.               |
+| `collectErrorMode` | `'firstError'`         | Default Standard Schema error collection mode for the form validator and fields that do not override it. |
+| `onValidSubmit`    | none                   | Called on every valid submit. Per-call overrides can be passed to `submit()`.                            |
+| `onInvalidSubmit`  | none                   | Called on every invalid submit. Per-call overrides can be passed to `submit()`.                          |
 
 **Field config options**
 
-| Option             | Default              | Description                                                                      |
-| ------------------ | -------------------- | -------------------------------------------------------------------------------- |
-| `defaultValue`     | required             | Initial value and reset target.                                                  |
-| `validator`        | none                 | Field-level validator.                                                           |
-| `validateOn`       | `['submit']`         | Triggers that run the validator before the first submit.                         |
-| `revalidateOn`     | `['submit', 'blur']` | Triggers that run the validator after the first submit.                          |
-| `collectErrorMode` | `'firstError'`       | `'firstError'` keeps the first Standard Schema issue; `'all'` keeps every issue. |
+| Option             | Default                | Description                                                                      |
+| ------------------ | ---------------------- | -------------------------------------------------------------------------------- |
+| `defaultValue`     | required               | Initial value and reset target.                                                  |
+| `validator`        | none                   | Field-level validator.                                                           |
+| `validateOn`       | `['submit']`           | Triggers that run the validator before the first submit.                         |
+| `revalidateOn`     | `['submit', 'change']` | Triggers that run the validator after the first submit.                          |
+| `collectErrorMode` | `'firstError'`         | `'firstError'` keeps the first Standard Schema issue; `'all'` keeps every issue. |
 
 ### `submit()` / `validate()` / `reset()`
 
@@ -104,20 +106,21 @@ const isValid = await $form.submit();
 await $form.submit({
 	onValidSubmit: (data) => save(data),
 	onInvalidSubmit: (errors) => showErrors(errors),
-	updateDefaultValues: true // treat submitted values as new reset baseline
+	updateDefaultValues: true, // treat submitted values as new reset baseline
+	context: { event } // passed through to onValidSubmit / onInvalidSubmit callbacks
 });
 
 const unbind = $form.onValidSubmit((data) => save(data));
 unbind();
 
-const isValid = await $form.validate(); // runs all validators, no side effects
+const isValid = await $form.validate(); // runs all validators without submitting
 
 $form.reset(); // resets values, validation status, isTouched, and isSubmitted
 ```
 
-`submit()` runs all field validators in parallel, then the form-level validator. It does not stop at the first invalid field. Returns `true` if the form was valid, `false` otherwise. Persistent callbacks registered via `onValidSubmit()` / `onInvalidSubmit()` and per-call options passed to `submit()` both run; they are combined and called in parallel.
+`submit()` runs validators configured for the submit trigger. Matching field validators and the form validator are awaited together; no matching validator is skipped because another failed. Returns `true` if the form was valid, `false` otherwise. Persistent callbacks registered via `onValidSubmit()` / `onInvalidSubmit()` and per-call options passed to `submit()` both run; they are combined and called in parallel.
 
-`validate()` runs all validators the same way but has no side effects: it does not set `isSubmitted`, does not fire `onValidSubmit` or `onInvalidSubmit`, and does not update default values.
+`validate()` runs all validators the same way but has no submit side effects: it updates validation state, but does not set `isSubmitted`, does not fire `onValidSubmit` or `onInvalidSubmit`, and does not update default values.
 
 `reset()` restores all fields to their `defaultValue`, and clears `status`, `isTouched`, and `isSubmitted` on both the form and every field. If an async validation is in progress when `reset()` is called, its result is discarded.
 
@@ -128,8 +131,8 @@ const data = $form.getData(); // current field values, regardless of validity
 const data = $form.getValidData(); // current field values, or null if form status is not 'valid'
 
 const errors = $form.getErrors();
-errors.fields; // only fields with 'invalid' status; unvalidated fields are omitted
-errors.form; // form-level errors; empty array until the form-level validator has run
+errors.fields; // invalid fields and form-level errors whose path points at a field
+errors.form; // pathless or unknown-path form-level errors
 ```
 
 ### `fields` / `getField(key)`
@@ -183,12 +186,12 @@ unbind();
 
 ### Reactive states
 
-| State          | Type                | Description                                                    |
-| -------------- | ------------------- | -------------------------------------------------------------- |
-| `status`       | `TValidationStatus` | Field validation status: `unvalidated`, `valid`, or `invalid`. |
-| `isTouched`    | `TState<boolean>`   | True after the field has been blurred at least once.           |
-| `isSubmitted`  | `TState<boolean>`   | True after the form has been submitted.                        |
-| `isValidating` | `TState<boolean>`   | True while the field validator is running.                     |
+| State          | Type                | Description                                                                          |
+| -------------- | ------------------- | ------------------------------------------------------------------------------------ |
+| `status`       | `TValidationStatus` | Field display status, including field validator errors and routed form-level errors. |
+| `isTouched`    | `TState<boolean>`   | True after the field has been blurred at least once.                                 |
+| `isSubmitted`  | `TState<boolean>`   | True after the form has been submitted.                                              |
+| `isValidating` | `TState<boolean>`   | True while the field validator is running.                                           |
 
 ### `defaultValue` / `key`
 
@@ -246,7 +249,9 @@ const $form = createForm({
 
 ### Form-level validator
 
-Use `validation` for cross-field constraints. Errors from the form-level validator appear in `getErrors().form`, not in individual field errors.
+Use `validator` for cross-field constraints. `validateOn`, `revalidateOn`, and `collectErrorMode` are shared defaults for the form validator and field validators unless a field overrides them.
+
+Errors from the form-level validator are routed by path. If a form-level issue points at a field, it appears in `getErrors().fields` and the matching field's `status` with the field key removed from the path. Pathless issues and paths that do not match a field appear in `getErrors().form`.
 
 ```ts
 const $form = createForm({
@@ -254,16 +259,14 @@ const $form = createForm({
 		password: { defaultValue: '' },
 		confirm: { defaultValue: '' }
 	},
-	validation: {
-		validator: z
-			.object({ password: z.string(), confirm: z.string() })
-			.refine((d) => d.password === d.confirm, {
-				message: 'Passwords do not match',
-				path: ['confirm']
-			}),
-		validateOn: ['submit'],
-		revalidateOn: ['change', 'submit']
-	}
+	validator: z
+		.object({ password: z.string(), confirm: z.string() })
+		.refine((d) => d.password === d.confirm, {
+			message: 'Passwords do not match',
+			path: ['confirm']
+		}),
+	validateOn: ['submit'],
+	revalidateOn: ['change', 'submit']
 });
 ```
 
@@ -342,11 +345,11 @@ Before the first submit, aggressive validation (e.g. `'change'`) can feel intrus
 
 ### What does `getErrors()` return before any validation has run?
 
-Only fields with `'invalid'` status appear in `errors.fields`. Unvalidated fields are omitted. `errors.form` is always an empty array until the form-level validator has run.
+Only fields with `'invalid'` status or form-level path errors appear in `errors.fields`. Unvalidated fields are omitted. `errors.form` contains only pathless form-level errors.
 
 ### Do all field validators run on submit, or does it stop at the first error?
 
-All field validators run in parallel via `Promise.all`. The form-level validator then runs after all field results are collected. No field is skipped because another failed. This means you get a complete picture of errors on the first submit.
+Validators configured for the submit trigger are awaited together. No matching field validator is skipped because another failed, so submit gives you a complete picture of configured submit errors.
 
 ### What is the difference between `validate()` and `submit()`?
 

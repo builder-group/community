@@ -16,7 +16,7 @@ export interface TFormBase<GFormData extends TFormData> {
 	_validation?: TFormValidation<GFormData>;
 	/** @internal Increments to prevent stale async validation runs from committing after reset or newer validation. */
 	_validationRunId: number;
-	/** @internal Stores form-level validator status separately so `getErrors().form` can stay distinct. */
+	/** @internal Stores form-level validator status after field-path errors have been routed to fields. */
 	_formValidatorStatus: TValidationStatusValue;
 	/** @internal */
 	_callbacks: TFormCallbacks<GFormData>;
@@ -79,6 +79,7 @@ export type TFormInvalidSubmitCallback<GFormData extends TFormData> = (
 
 export interface TFormSubmitContext {
 	[key: string]: unknown;
+	/** The HTML submit event, if the form was submitted via a DOM form element. */
 	event?: unknown;
 }
 
@@ -99,9 +100,9 @@ export interface TFormValidationConfig {
 export type TFormValidator<GFormData extends TFormData> = StandardSchemaV1<GFormData, unknown>;
 
 export interface TFormErrors<GFormData extends TFormData> {
-	/** Field-level errors keyed by field. */
+	/** Field-level errors keyed by field, including form-level validator errors routed by field path. */
 	fields: TFormFieldErrors<GFormData>;
-	/** Form-level errors from the form validator. */
+	/** Pathless form-level validator errors, plus errors whose path does not match a field. */
 	form: readonly TFormError[];
 }
 
@@ -124,6 +125,10 @@ export type TFormFieldFeature<GValue> = TFeature<
 		_validation?: TFormFieldValidation<GValue>;
 		/** @internal Increments to prevent stale async validation runs from committing after reset or newer validation. */
 		_validationRunId: number;
+		/** @internal Stores the field validator result before routed form-level errors are merged into `status`. */
+		_fieldValidatorStatus: TValidationStatusValue;
+		/** @internal Form-level validator errors routed to this field by path. */
+		_formValidatorErrors: readonly TValidationError[];
 		/** @internal */
 		_callbacks: TFormFieldCallbacks;
 		key: string;
@@ -132,7 +137,10 @@ export type TFormFieldFeature<GValue> = TFeature<
 		/** True after the standalone field or parent form has been submitted. */
 		isSubmitted: TState<boolean, []>;
 		isValidating: TState<boolean, []>;
+		/** Field display status, including this field's validator errors and routed form-level errors. */
 		status: TFormFieldStatus;
+		/** @internal Updates routed form-level errors and syncs the public field status. */
+		_applyFormValidatorErrors: (errors: readonly TValidationError[]) => void;
 		/** Runs the field validator and updates `status`. */
 		validate: () => Promise<boolean>;
 		/** Registers a callback for future blur events. Returns an unsubscribe function. */

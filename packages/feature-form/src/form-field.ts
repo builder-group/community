@@ -20,7 +20,7 @@ export function createFormField<GValue>(
 		key,
 		validator,
 		validateOn = ['submit'],
-		revalidateOn = ['submit', 'blur'],
+		revalidateOn = ['submit', 'change'],
 		collectErrorMode = 'firstError'
 	} = config;
 	const formField = createState(defaultValue).with(
@@ -63,9 +63,15 @@ function formFieldFeature<GValue>(
 	return defineFeature<TFormFieldFeature<GValue>>({
 		key: 'form-field',
 		install(state: TStateBase<GValue>) {
+			// Note: No validator means there is no pending validation work
+			const initialFieldValidatorStatus: TValidationStatusValue =
+				validation == null ? { type: 'valid' } : { type: 'unvalidated' };
+
 			return {
 				_validation: validation,
 				_validationRunId: 0,
+				_fieldValidatorStatus: initialFieldValidatorStatus,
+				_formValidatorErrors: [],
 				_callbacks: {
 					blur: []
 				},
@@ -74,14 +80,16 @@ function formFieldFeature<GValue>(
 				isTouched: createState(false),
 				isSubmitted: createState(false),
 				isValidating: createState(false),
-				status: createState<TValidationStatusValue>(
-					// Note: No validator means there is no pending validation work
-					validation == null ? { type: 'valid' } : { type: 'unvalidated' }
-				),
+				status: createState<TValidationStatusValue>(initialFieldValidatorStatus),
+				_applyFormValidatorErrors(this: TFormField<GValue>, errors) {
+					this._formValidatorErrors = errors;
+					this.status.set(getFormFieldStatus(this));
+				},
 				async validate(this: TFormField<GValue>) {
 					if (this._validation == null) {
-						this.status.set({ type: 'valid' });
-						return true;
+						this._fieldValidatorStatus = { type: 'valid' };
+						this.status.set(getFormFieldStatus(this));
+						return this.status.get().type === 'valid';
 					}
 
 					const validationRunId = ++this._validationRunId;
@@ -113,8 +121,9 @@ function formFieldFeature<GValue>(
 						return this.status.get().type === 'valid';
 					}
 
-					this.status.set(status);
-					return status.type === 'valid';
+					this._fieldValidatorStatus = status;
+					this.status.set(getFormFieldStatus(this));
+					return this.status.get().type === 'valid';
 				},
 				onBlur(this: TFormField<GValue>, callback) {
 					this._callbacks.blur.push(callback);
@@ -152,7 +161,10 @@ function formFieldFeature<GValue>(
 					this.isTouched.set(false);
 					this.isSubmitted.set(false);
 					this.isValidating.set(false);
-					this.status.set(this._validation == null ? { type: 'valid' } : { type: 'unvalidated' });
+					this._formValidatorErrors = [];
+					this._fieldValidatorStatus =
+						this._validation == null ? { type: 'valid' } : { type: 'unvalidated' };
+					this.status.set(getFormFieldStatus(this));
 				}
 			};
 		}
@@ -185,4 +197,16 @@ function registerFormFieldListeners<GValue>(formField: TFormField<GValue>): void
 			void formField.validate();
 		}
 	});
+}
+
+function getFormFieldStatus<GValue>(formField: TFormField<GValue>): TValidationStatusValue {
+	const errors =
+		formField._fieldValidatorStatus.type === 'invalid'
+			? [...formField._fieldValidatorStatus.errors, ...formField._formValidatorErrors]
+			: formField._formValidatorErrors;
+	if (errors.length > 0) {
+		return { type: 'invalid', errors };
+	}
+
+	return formField._fieldValidatorStatus;
 }
