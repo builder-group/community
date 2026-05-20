@@ -112,7 +112,7 @@ describe('asyncQueueFeature', () => {
 
 			// Assert
 			expect(listener).toHaveBeenCalledWith({
-				source: 'state_set',
+				source: 'stateSet',
 				value: 1,
 				prevValue: 0
 			});

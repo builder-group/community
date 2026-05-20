@@ -30,11 +30,25 @@ $tasks.set([{ id: 1, title: 'Buy milk' }]);
 $tasks.undo(); // []
 ```
 
-### Examples
+## Install
+
+```bash
+npm install feature-state
+```
+
+## Concepts
+
+**States are reactive containers.** A state holds a single value. When the value changes via `set()`, all registered listeners are called synchronously in registration order. Listeners receive the new value, the previous value, and an optional source string identifying what triggered the change.
+
+**Features extend the core.** `createState()` returns a feature host with a minimal API. Call `.with(feature())` to add capabilities like undo history, persistence, or async notification. Each installed feature adds typed methods to the state so the type system always reflects what is available.
+
+**Reference equality prevents noise.** `set()` skips notification when the new value is identical to the current one (`Object.is` comparison). Use `notify()` to force listeners when you mutate a value in place rather than replacing it.
+
+## Examples
 
 - [React Counter](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/counter) ([CodeSandbox](https://codesandbox.io/p/sandbox/counter-k74k9k))
 
-### Alternatives
+## Alternatives
 
 - [nanostores](https://github.com/nanostores/nanostores)
 - [jotai](https://github.com/pmndrs/jotai)
@@ -50,7 +64,7 @@ const $count = createState(0);
 const $status = createState<'idle' | 'loading' | 'error'>('idle');
 ```
 
-### `value` / `get()` / `set()` / `notify()`
+### `value` / `get()` / `set()`
 
 ```ts
 $count.value; // 0
@@ -64,7 +78,20 @@ $count.value = 10; // same as set(10)
 
 `set()` skips notification when the new value is identical to the current one (`Object.is` comparison).
 
-Use `notify()` when you need to trigger listeners without changing the value, or when a feature updates internal state by other means.
+### `notify()`
+
+Triggers all listeners without changing the value. Use this after mutating a value in place via `_v`, or when a feature updates internal state by other means.
+
+```ts
+$count._v = 42; // mutate directly, no notification
+$count.notify(); // notify listeners manually
+```
+
+You can pass custom metadata to every listener in the same notification:
+
+```ts
+$count.notify({ listenerContext: { source: 'mySync', background: true } });
+```
 
 ### `listen(callback)` / `subscribe(callback)`
 
@@ -78,86 +105,26 @@ const unlisten = $count.listen(({ value, prevValue, source }) => {
 unlisten(); // remove listener
 ```
 
+It is safe to call `unlisten()` inside the listener itself. Any pending call to that callback in the current notification cycle is removed immediately.
+
 **Listener context**
 
 | Field        | Description                                                                              |
 | ------------ | ---------------------------------------------------------------------------------------- |
 | `value`      | The new value.                                                                           |
-| `prevValue`  | The previous value. Undefined when `notify()` is called without one.                     |
-| `source`     | What triggered the change. `'state_set'` for `set()`. Features may set their own values. |
-| `background` | Optional flag set by the caller. Useful for suppressing UI updates on background syncs.  |
+| `prevValue`  | The previous value. Undefined when `notify()` is called without a prior value.           |
+| `source`     | What triggered the change. `'stateSet'` for `set()`. Features set their own source keys. |
+| `background` | When `true`, signals that the change is a background sync and UI updates can be skipped. |
 
-Listeners run synchronously in registration order.
+Listeners run synchronously in registration order. Nested `set()` calls inside a listener are batched: their listeners are appended to the current queue and drained after the outermost notification finishes.
 
 ## Built-in Features
 
 Features are installed via `.with()` and extend the state with new methods.
 
-### `asyncQueueFeature()`
-
-Replaces the default sync listener queue with a microtask-based FIFO queue. Listener callbacks still run in registration order, but they run after the current call stack and async listeners are awaited one by one.
-
-```ts
-import { asyncQueueFeature } from 'feature-state';
-
-const $count = createState(0).with(asyncQueueFeature<number>());
-
-$count.listen(async ({ value }) => {
-	await save(value);
-});
-
-await $count.notify(); // resolves when all listeners have completed
-```
-
-`notify()` returns the active queue flush promise. `set()` still returns `void`, so listener errors from `set()` are not awaitable through `set()` itself.
-
-### `priorityQueueFeature()`
-
-Replaces the default sync listener queue with a priority-based sync queue. Lower priority values run first. Listeners with the same priority keep registration order.
-
-```ts
-import { EListenerPriority, priorityQueueFeature } from 'feature-state';
-
-const $count = createState(0).with(priorityQueueFeature<number>());
-
-$count.listen(() => {}, { priority: EListenerPriority.LATE });
-$count.listen(() => {}, { priority: EListenerPriority.EARLY }); // runs first
-```
-
-### `storageFeature(storage, key)`
-
-Adds `persist()`, `loadFromStorage()`, and `deleteFromStorage()`.
-
-```ts
-import { missingStorageValue } from 'feature-state';
-
-const storage = {
-	save(key, value) {
-		localStorage.setItem(key, JSON.stringify(value));
-		return true;
-	},
-	load(key) {
-		const raw = localStorage.getItem(key);
-		return raw != null ? JSON.parse(raw) : missingStorageValue;
-	},
-	delete(key) {
-		localStorage.removeItem(key);
-		return true;
-	}
-};
-
-const $tasks = createState<Task[]>([]).with(storageFeature(storage, 'tasks'));
-
-await $tasks.persist();
-```
-
-`persist()` loads any previously saved value. If nothing is stored it saves the current state instead, then auto-saves on every subsequent `set()`.
-
-**`TStorageInterface` contract:** `load` must return `missingStorageValue` when the key is absent. `null` and `undefined` are treated as stored values.
-
 ### `undoFeature(historyLimit?)`
 
-Adds `undo()`. Keeps the last 50 values by default.
+Adds `undo()`. Keeps the last 50 values by default. History is seeded with the initial value at install time.
 
 ```ts
 const $count = createState(0).with(undoFeature());
@@ -182,44 +149,96 @@ $count.set(3);
 $count.multiUndo(2); // back to 1
 ```
 
-## Writing Features
+### `storageFeature(storage, key)`
 
-Features for `feature-state` are plain `defineFeature()` calls from `feature-core`. Annotate the `install()` parameter with `TStateBase<GValue>` to access the core state API.
+Adds `persist()`, `loadFromStorage()`, and `deleteFromStorage()`. The storage adapter is a plain object with `save`, `load`, and `delete` methods.
 
 ```ts
-import { defineFeature, type TFeature } from 'feature-core';
-import { type TStateBase } from 'feature-state';
+import { missingStorageValue } from 'feature-state';
 
-type TLogFeature = TFeature<'log', { getLog(): string[] }>;
+const storage = {
+	save(key, value) {
+		localStorage.setItem(key, JSON.stringify(value));
+		return true;
+	},
+	load(key) {
+		const raw = localStorage.getItem(key);
+		return raw != null ? JSON.parse(raw) : missingStorageValue;
+	},
+	delete(key) {
+		localStorage.removeItem(key);
+		return true;
+	}
+};
 
-export function logFeature<GValue>(): TLogFeature {
-	return defineFeature<TLogFeature>({
-		key: 'log',
-		install(state: TStateBase<GValue>) {
-			const log: string[] = [];
+const $tasks = createState<Task[]>([]).with(storageFeature(storage, 'tasks'));
 
-			state.listen(({ value }) => {
-				log.push(String(value));
-			});
-
-			return {
-				getLog() {
-					return log;
-				}
-			};
-		}
-	});
-}
+await $tasks.persist();
 ```
 
-See the [feature-core README](https://github.com/builder-group/community/tree/develop/packages/feature-core) for a full guide on `defineFeature()`, dependency declaration, and the feature model.
+`persist()` loads any previously saved value. If nothing is stored it saves the current state instead, then auto-saves on every subsequent `set()`. Calling `persist()` more than once is safe.
 
-## ❓ FAQ
+**`TStorageInterface` contract:** `load` must return `missingStorageValue` (a Symbol) when the key is absent. `null` and `undefined` are treated as valid stored values.
+
+### `asyncQueueFeature()`
+
+Replaces the default sync listener queue with a microtask-based FIFO queue. Listeners still run in registration order, but after the current call stack resolves. Async listeners are awaited one by one.
+
+```ts
+import { asyncQueueFeature } from 'feature-state';
+
+const $count = createState(0).with(asyncQueueFeature<number>());
+
+$count.listen(async ({ value }) => {
+	await save(value);
+});
+
+await $count.notify(); // resolves when all listeners have completed
+```
+
+`notify()` returns the active queue flush promise. Multiple `notify()` calls before the microtask fires share the same promise. `set()` still returns `void`, so listener errors from `set()` are not awaitable through `set()` itself.
+
+### `priorityQueueFeature()`
+
+Replaces the default sync listener queue with a priority-based sync queue. Lower priority values run first. Listeners with the same priority keep registration order.
+
+```ts
+import { EListenerPriority, priorityQueueFeature } from 'feature-state';
+
+const $count = createState(0).with(priorityQueueFeature<number>());
+
+$count.listen(() => {}, { priority: EListenerPriority.LATE });
+$count.listen(() => {}, { priority: EListenerPriority.EARLY }); // runs first
+```
+
+`EListenerPriority` provides named constants: `FIRST = 0`, `EARLY = 125`, `DEFAULT = 250`, `LATE = 375`, `LAST = 500`. Any number is valid.
+
+## Extending with features
+
+States are `feature-core` feature hosts. Add behavior with `.with(yourFeature())`. See the [feature-core README](https://github.com/builder-group/community/tree/develop/packages/feature-core) for a full guide on `defineFeature()`, dependency declaration, and the feature model.
+
+## FAQ
 
 ### Why does `set()` skip notification when the value is the same?
 
 Skipping on reference equality (`Object.is`) prevents redundant re-renders and listener calls. If you need to force a notification without changing the value, call `notify()` directly.
 
-### Why does `subscribe()` pass `prevValue === value` on the initial call?
+### Why does `subscribe()` pass `prevValue` equal to `value` on the initial call?
 
 The initial call has no prior state, so `prevValue` is set to the current value. This means listeners never receive `undefined` for `prevValue` and can be written without a null check.
+
+### Is it safe to unsubscribe inside a listener?
+
+Yes. The unsubscribe function removes the callback from `_listeners` and also removes any pending call to that callback already queued in the current notification cycle. The listener will not fire again even if `notify()` is still draining.
+
+### Can I combine `asyncQueueFeature` and `priorityQueueFeature`?
+
+No. Both features override the same internal queue (`listen`, `subscribe`, and `notify`). Installing both means the last one installed takes effect and the first is silently ignored. Pick one.
+
+### When should I use `_v` directly instead of `set()`?
+
+Use `_v` when you need to mutate a value in place, for example pushing to an array, without going through `set()`'s reference equality check. Mutate via `_v`, then call `notify()` manually to trigger listeners. This is an escape hatch; prefer replacing the value with `set()` when possible.
+
+### How does `storageFeature` prevent save loops?
+
+When `loadFromStorage()` calls `set()` internally it passes `source: 'loadFromStorage'` in the listener context. The auto-save listener ignores changes with that source, so loading a value does not immediately write it back to storage.

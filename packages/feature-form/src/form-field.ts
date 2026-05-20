@@ -160,7 +160,7 @@ function formFieldFeature<GValue>(
 }
 
 /** Identifies listener events caused by field reset so validation can ignore reset changes. */
-export const formFieldResetSourceKey = 'form-field_reset';
+export const formFieldResetSourceKey = 'formFieldReset';
 
 interface TFormFieldFeatureConfig<GValue> {
 	key: string;

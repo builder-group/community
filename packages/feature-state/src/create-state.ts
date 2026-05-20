@@ -85,7 +85,7 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 }
 
 /** Source key set on the listener context when a value is changed via `set()`. */
-export const setSourceKey = 'state_set';
+export const setSourceKey = 'stateSet';
 
 // MARK: - Queue
 

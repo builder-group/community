@@ -55,7 +55,7 @@ export interface TListenerContext<GValue> extends TAdditionalListenerContext {
 
 export interface TAdditionalListenerContext {
 	[key: string]: unknown;
-	/** Identifies what triggered the change, e.g. `'state_set'` for `set()`. */
+	/** Identifies what triggered the change, e.g. `'stateSet'` for `set()`. */
 	source?: string;
 	/** When true, signals that the change is a background sync. Consumers can use this to suppress UI updates. */
 	background?: boolean;

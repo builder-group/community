@@ -1,13 +1,12 @@
 # Comment Rules
 
-Add comments when they make the code easier to understand or maintain. Omit them when the code speaks for itself.
+Add comments when they make the code easier to understand or maintain. Omit them when the code speaks for itself. For prose style within comments, see `writing.md`.
 
 ## Enforce
 
 - Add regular comments to explain **why**, a constraint, domain behavior, or to orient the reader at the start of a non-obvious block
 - Place the comment directly above the code it explains
 - Omit the trailing period in a short single-line regular comment
-- Use plain punctuation only
 - Add doc comments to public and exported functions, methods, and types only when the name and signature alone do not make the behavior or contract clear; describe what it does first, then note constraints, side effects, or non-obvious return or error behavior when needed
 - Start doc comments with a single sentence in active voice and end it with a period
 - Use `// MARK: -` sparingly as a file-level or large-structure navigation aid, mainly in long files
@@ -16,7 +15,6 @@ Add comments when they make the code easier to understand or maintain. Omit them
 
 ## Avoid
 
-- Do not use em dashes (—) in comments
 - Do not restate what the code already says in regular comments
 - Do not use comments as a substitute for good naming
 - Do not add comments above a block when the intent is already obvious from the code
