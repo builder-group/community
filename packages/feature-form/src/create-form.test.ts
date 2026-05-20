@@ -1,8 +1,44 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import { createForm } from './create-form';
+import { createFormField } from './form-field';
+import type { TForm, TFormField } from './types';
 
 describe('createForm function', () => {
+	describe('types', () => {
+		it('should infer form data from field defaults', () => {
+			const form = createForm({
+				fields: {
+					name: { defaultValue: 'Alice' },
+					age: { defaultValue: 42 }
+				}
+			});
+
+			expectTypeOf(form).toExtend<TForm<{ name: string; age: number }, []>>();
+			expectTypeOf(form.fields.name).toExtend<TFormField<string>>();
+			expectTypeOf(form.fields.age).toExtend<TFormField<number>>();
+			expectTypeOf(form.getData()).toEqualTypeOf<Readonly<{ name: string; age: number }>>();
+			expectTypeOf(form.getValidData()).toEqualTypeOf<Readonly<{
+				name: string;
+				age: number;
+			}> | null>();
+		});
+
+		it('should infer form data from existing form fields', () => {
+			const form = createForm({
+				fields: {
+					name: createFormField('Alice', { key: 'name' }),
+					age: createFormField(42, { key: 'age' })
+				}
+			});
+
+			expectTypeOf(form).toExtend<TForm<{ name: string; age: number }, []>>();
+			expectTypeOf(form.fields.name).toExtend<TFormField<string>>();
+			expectTypeOf(form.fields.age).toExtend<TFormField<number>>();
+			expectTypeOf(form.getData()).toEqualTypeOf<Readonly<{ name: string; age: number }>>();
+		});
+	});
+
 	it('should create form fields and return current data', () => {
 		// Prepare
 		const form = createForm<TUserFormData>({

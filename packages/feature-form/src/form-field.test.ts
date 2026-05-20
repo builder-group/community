@@ -1,8 +1,24 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import { createFormField, isFormField } from './form-field';
+import type { TFormField } from './types';
 
 describe('createFormField function', () => {
+	it('should have correct types', () => {
+		const field = createFormField('Alice', {
+			key: 'name',
+			validator: createStandardSchema<string>((value) => ({ value }))
+		});
+
+		expectTypeOf(field).toEqualTypeOf<TFormField<string>>();
+		expectTypeOf(field.get()).toEqualTypeOf<string>();
+		expectTypeOf(field.defaultValue).toEqualTypeOf<string>();
+		expectTypeOf(field.validate()).toEqualTypeOf<Promise<boolean>>();
+		expectTypeOf(field.onBlur)
+			.parameter(0)
+			.toEqualTypeOf<(context: { wasTouched: boolean }) => void>();
+	});
+
 	it('should create a form field state with field metadata', () => {
 		// Prepare
 		const field = createFormField('Alice', { key: 'name' });

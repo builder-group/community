@@ -24,6 +24,13 @@ import {
 } from './types';
 
 /** Creates a form from field configs or existing form fields. */
+export function createForm<GFields extends TCreateFormFieldsInput>(
+	config: TCreateFormConfig<TCreateFormDataFromFields<GFields>> & { fields: GFields }
+): TForm<TCreateFormDataFromFields<GFields>, []>;
+/** Creates a form from field configs or existing form fields. */
+export function createForm<GFormData extends TFormData>(
+	config: TCreateFormConfig<GFormData>
+): TForm<GFormData, []>;
 export function createForm<GFormData extends TFormData>(
 	config: TCreateFormConfig<GFormData>
 ): TForm<GFormData, []> {
@@ -210,7 +217,7 @@ export interface TCreateFormConfig<GFormData extends TFormData> {
 	/** Field configs or pre-built form fields keyed by form data property. */
 	fields: TCreateFormConfigFormFields<GFormData>;
 	/** Optional form-level validator for cross-field constraints. */
-	validation?: TCreateFormValidation<GFormData>;
+	validation?: TCreateFormValidation<NoInfer<GFormData>>;
 	/** Default validation config applied to field configs that do not override it. */
 	fieldValidation?: Partial<TFormFieldValidationConfig>;
 	/** Called on every valid submit. Per-call overrides can be passed directly to `submit()`. */
@@ -232,10 +239,23 @@ export type TCreateFormConfigFormFields<GFormData extends TFormData> = {
 		| TFormField<GFormData[Key]>;
 };
 
+export type TCreateFormDataFromFields<GFields extends TCreateFormFieldsInput> = {
+	[Key in Extract<keyof GFields, string>]: GFields[Key] extends TFormField<infer GValue>
+		? GValue
+		: GFields[Key] extends { defaultValue: infer GValue }
+			? GValue
+			: never;
+};
+
+export type TCreateFormFieldsInput = Record<
+	string,
+	TCreateFormConfigFormField<unknown> | TFormField<unknown>
+>;
+
 /** Configures one form field when `createForm()` should create the field. */
 export interface TCreateFormConfigFormField<GValue> {
 	defaultValue: GValue;
-	validator?: TFormFieldValidator<GValue>;
+	validator?: TFormFieldValidator<NoInfer<GValue>>;
 	collectErrorMode?: TFormFieldValidationConfig['collectErrorMode'];
 	revalidateOn?: TFormFieldValidationConfig['revalidateOn'];
 	validateOn?: TFormFieldValidationConfig['validateOn'];
