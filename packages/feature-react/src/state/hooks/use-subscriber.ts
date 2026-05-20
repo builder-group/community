@@ -1,36 +1,34 @@
-import { TFeatureDefinition } from '@blgc/types/features';
-import type { TListenerContext, TListenerOptions, TState } from 'feature-state';
+import { type TAnyFeature } from 'feature-core';
+import type { TListenerContext, TState } from 'feature-state';
 import React from 'react';
+import { useEventCallback } from './use-event-callback';
 
-export function useSubscriber<GValue, GFeatures extends TFeatureDefinition[]>(
+/**
+ * Subscribes to a state immediately and cleans the subscription up with the component.
+ * The subscriber may return a cleanup function that runs before the next subscriber call and on unmount.
+ */
+export function useSubscriber<GValue, GFeatures extends TAnyFeature[]>(
 	state: TState<GValue, GFeatures> | null | undefined,
-	callback: TUseSubscriberCallback<GValue>,
-	deps: React.DependencyList = [],
-	options: TUseSubscriberOptions<GValue> = {}
+	callback: TUseSubscriberCallback<GValue>
 ): void {
-	const { ...listenerOptions } = options;
+	const stableCallback = useEventCallback(callback);
 
 	React.useEffect(() => {
 		let cleanup: (() => void) | undefined;
 
-		const unbind = state?.subscribe(
-			async (cx) => {
-				cleanup?.();
-				const result = await callback(cx);
-				cleanup = typeof result === 'function' ? result : undefined;
-			},
-			{ key: 'use-subscriber', ...listenerOptions }
-		);
+		const unbind = state?.subscribe((context) => {
+			cleanup?.();
+			const result = stableCallback(context);
+			cleanup = typeof result === 'function' ? result : undefined;
+		});
 
 		return () => {
 			cleanup?.();
 			unbind?.();
 		};
-	}, [state, ...deps]);
+	}, [state, stableCallback]);
 }
-
-export interface TUseSubscriberOptions<GValue> extends TListenerOptions<GValue> {}
 
 export type TUseSubscriberCallback<GValue> = (
 	context: TListenerContext<GValue>
-) => (() => void) | Promise<() => void> | void | Promise<void>;
+) => (() => void) | void;

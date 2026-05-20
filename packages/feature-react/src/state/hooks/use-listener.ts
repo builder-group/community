@@ -1,36 +1,34 @@
-import { TFeatureDefinition } from '@blgc/types/features';
-import type { TListenerContext, TListenerOptions, TState } from 'feature-state';
+import { type TAnyFeature } from 'feature-core';
+import type { TListenerContext, TState } from 'feature-state';
 import React from 'react';
+import { useEventCallback } from './use-event-callback';
 
-export function useListener<GValue, GFeatures extends TFeatureDefinition[]>(
+/**
+ * Registers a state listener for side effects and cleans it up with the component.
+ * The listener may return a cleanup function that runs before the next listener call and on unmount.
+ */
+export function useListener<GValue, GFeatures extends TAnyFeature[]>(
 	state: TState<GValue, GFeatures> | null | undefined,
-	callback: TUseListenerCallback<GValue>,
-	deps: React.DependencyList = [],
-	options: TUseListenerOptions<GValue> = {}
+	callback: TUseListenerCallback<GValue>
 ): void {
-	const { ...listenerOptions } = options;
+	const stableCallback = useEventCallback(callback);
 
 	React.useEffect(() => {
 		let cleanup: (() => void) | undefined;
 
-		const unbind = state?.listen(
-			async (cx) => {
-				cleanup?.();
-				const result = await callback(cx);
-				cleanup = typeof result === 'function' ? result : undefined;
-			},
-			{ key: 'use-listener', ...listenerOptions }
-		);
+		const unbind = state?.listen((context) => {
+			cleanup?.();
+			const result = stableCallback(context);
+			cleanup = typeof result === 'function' ? result : undefined;
+		});
 
 		return () => {
 			cleanup?.();
 			unbind?.();
 		};
-	}, [state, ...deps]);
+	}, [state, stableCallback]);
 }
-
-export interface TUseListenerOptions<GValue> extends TListenerOptions<GValue> {}
 
 export type TUseListenerCallback<GValue> = (
 	context: TListenerContext<GValue>
-) => (() => void) | Promise<() => void> | void | Promise<void>;
+) => (() => void) | void;

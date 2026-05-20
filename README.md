@@ -13,7 +13,7 @@
 
 Open source packages from [builder.group](https://builder.group) projects, shared in case they're useful.
 
-## 📦 Packages
+## Packages
 
 | Package                                                                                                 | Description                                                                            | NPM Package                                                            |
 | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
@@ -34,7 +34,7 @@ Open source packages from [builder.group](https://builder.group) projects, share
 | [validatenv](https://github.com/builder-group/community/blob/develop/packages/validatenv)               | Environment variable validation with Zod, Valibot, or Yup                              | [`validatenv`](https://www.npmjs.com/package/validatenv)               |
 | [xml-tokenizer](https://github.com/builder-group/community/blob/develop/packages/xml-tokenizer)         | Streaming XML tokenizer with callback-based parsing and object helpers                 | [`xml-tokenizer`](https://www.npmjs.com/package/xml-tokenizer)         |
 
-### 🚧 Discontinued
+### Discontinued
 
 > **Note:** These packages are no longer maintained. If you need support or have questions, please [open an issue](https://github.com/builder-group/community/issues). Happy to revisit if there's community interest.
 
@@ -52,14 +52,14 @@ Open source packages from [builder.group](https://builder.group) projects, share
 | [validation-adapters](https://github.com/builder-group/community/blob/develop/packages/validation-adapters)                   | Ready-made validation-adapter implementations for Zod, Valibot, Yup, and Standard Schema | [`validation-adapters`](https://www.npmjs.com/package/validation-adapters)       | May 19, 2026       |
 | [webito](https://github.com/builder-group/community/blob/develop/packages/_deprecated/webito)                                 | ECS-powered web editor experiment for Tailwind-style component editing                   | [`webito`](https://www.npmjs.com/package/webito)                                 | May 17, 2026       |
 
-## 🧩 Templates
+## Templates
 
 | Template                                                                                         | Description                                         |
 | ------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
 | [desktop-tauri](https://github.com/builder-group/community/tree/develop/templates/desktop-tauri) | Tauri desktop app template with React and Specta    |
 | [web-tanstack](https://github.com/builder-group/community/tree/develop/templates/web-tanstack)   | TanStack Start web app template with React and Vite |
 
-## 📚 Examples
+## Examples
 
 > See [`/examples`](https://github.com/builder-group/community/tree/develop/examples)
 
@@ -84,7 +84,7 @@ Open source packages from [builder.group](https://builder.group) projects, share
 
 - [`xml-tokenizer/vanilla/playground`](https://github.com/builder-group/community/tree/develop/examples/xml-tokenizer/vanilla/playground)
 
-## ❓ FAQ
+## FAQ
 
 ### What does `blgc` stand for?
 
