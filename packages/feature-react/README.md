@@ -20,7 +20,7 @@
 `feature-react` is the ReactJs extension for the `feature-state` and `feature-form` library, providing hooks and features for easy state management in ReactJs.
 
 - **Lightweight & Tree Shakable**: Function-based and modular design (< 1KB minified)
-- **Modular & Extendable**: Easily extendable with features like `withLocalStorage()`, ..
+- **Modular & Extendable**: Easily extendable with features like `localStorageFeature()`, ..
 - **Seamless Integration**: Designed to work effortlessly with `feature-state`
 - **Typesafe**: Build with TypeScript for strong type safety
 
@@ -53,42 +53,40 @@ export const Tasks = () => {
 
 ## 📙 Features
 
-### `withLocalStorage()`
+### `localStorageFeature()`
 
 Adds persistence functionality to the state, using [`localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage?retiredLocale=de) to save and load the state.
 
 ```ts
+import { localStorageFeature } from 'feature-react/state';
 import { createState } from 'feature-state';
-import { withLocalStorage } from 'feature-react';
 
-const state = withLocalStorage(createState([]), 'tasks');
+const state = createState<Array<{ id: number; title: string }>>([]).with(
+	localStorageFeature('tasks')
+);
 
 await state.persist();
 
-state.set([..., state.get(), { id: 1, title: 'Task 1' }]);
+state.set([...state.get(), { id: 1, title: 'Task 1' }]);
 ```
 
 - **`key`**: The key used to identify the state in `localStorage`.
 
-### `withGlobalBind()`
+### `globalBindFeature()`
 
-Binds a value to the global scope, using [`globalThis`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis) to make the value accessible globally.
+Binds a state to the global scope, using [`globalThis`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/globalThis) to make it accessible globally for debugging.
 
 ```ts
-import { withGlobalBind } from 'feature-global';
+import { globalBindFeature } from 'feature-react/state';
+import { createState } from 'feature-state';
 
-// Define a value to be bound globally
-const $state = createState([]);
-
-// Bind the value to the global scope
-withGlobalBind('_state', $state);
+const $state = createState([]).with(globalBindFeature('_state'));
 
 // Now `$state` is accessible globally
 console.log(globalThis._state); // { /* $state */ }
 ```
 
 - **`key`**: The key used to identify the value in the global scope.
-- **`value`**: The value to be bound to the global scope.
 
 # [`feature-form`](https://github.com/builder-group/community/tree/develop/packages/feature-form)
 

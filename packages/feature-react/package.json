@@ -69,7 +69,8 @@
 	},
 	"dependencies": {
 		"@blgc/types": "workspace:*",
-		"@blgc/utils": "workspace:*"
+		"@blgc/utils": "workspace:*",
+		"feature-core": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",

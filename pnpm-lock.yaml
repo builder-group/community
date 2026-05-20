@@ -566,6 +566,9 @@ importers:
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
+      feature-core:
+        specifier: workspace:*
+        version: link:../feature-core
     devDependencies:
       '@blgc/config':
         specifier: workspace:*
