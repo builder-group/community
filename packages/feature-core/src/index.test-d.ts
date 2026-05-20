@@ -10,8 +10,8 @@ import {
 	type TInstalledFeaturesOf
 } from './index';
 
-describe('feature-core types', () => {
-	describe('createFeatureHost types', () => {
+describe('feature-core package', () => {
+	describe('createFeatureHost function', () => {
 		it('should preserve the base API and expose an empty feature tuple', () => {
 			const counter = createCounter(0);
 
@@ -20,7 +20,7 @@ describe('feature-core types', () => {
 		});
 	});
 
-	describe('defineFeature types', () => {
+	describe('defineFeature function', () => {
 		it('should infer feature keys and APIs without an explicit feature type', () => {
 			const feature = inferredFeature();
 			const counter = createCounter(0).with(feature);
@@ -162,7 +162,7 @@ describe('feature-core types', () => {
 		});
 	});
 
-	describe('installFeature types', () => {
+	describe('installFeature function', () => {
 		it('should append an installed feature to the host tuple', () => {
 			const counter = installFeature(createCounter(0), resetFeature());
 
@@ -193,7 +193,7 @@ describe('feature-core types', () => {
 		});
 	});
 
-	describe('host.with types', () => {
+	describe('host.with method', () => {
 		it('should infer chained feature order', () => {
 			const counter = createCounter(0)
 				.with(resetFeature())
@@ -279,7 +279,7 @@ describe('feature-core types', () => {
 		});
 	});
 
-	describe('hasFeature types', () => {
+	describe('hasFeature function', () => {
 		it('should narrow a matching feature key capability', () => {
 			const counter = createCounter(0).with(loggerFeature());
 			const unknownCounter: unknown = counter;

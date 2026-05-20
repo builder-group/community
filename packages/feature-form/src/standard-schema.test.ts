@@ -2,7 +2,7 @@ import type { StandardSchemaV1 } from '@standard-schema/spec';
 import { describe, expect, it } from 'vitest';
 import { validateStandardSchema } from './standard-schema';
 
-describe('validateStandardSchema', () => {
+describe('validateStandardSchema function', () => {
 	it('should return valid status when the schema has no issues', async () => {
 		// Prepare
 		const schema = createStandardSchema<string>(async () => ({ value: 'valid' }));

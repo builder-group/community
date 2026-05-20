@@ -1,12 +1,28 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, expectTypeOf, it } from 'vitest';
 import { createState } from '../create-state';
-import { missingStorageValue, storageFeature, type TStorageInterface } from './storage';
+import type { TState } from '../types';
+import {
+	missingStorageValue,
+	storageFeature,
+	type TStorageFeature,
+	type TStorageFeatureApi,
+	type TStorageInterface
+} from './storage';
 
 describe('storageFeature function', () => {
 	let mockStorage: MockStorage<number>;
 
 	beforeEach(() => {
 		mockStorage = new MockStorage();
+	});
+
+	it('should have correct types', () => {
+		const state = createState(0).with(storageFeature<number>(mockStorage, 'testKey'));
+
+		expectTypeOf(state.persist).toEqualTypeOf<TStorageFeatureApi['persist']>();
+		expectTypeOf(state.loadFromStorage).toEqualTypeOf<TStorageFeatureApi['loadFromStorage']>();
+		expectTypeOf(state.deleteFromStorage).toEqualTypeOf<TStorageFeatureApi['deleteFromStorage']>();
+		expectTypeOf(state).toEqualTypeOf<TState<number, [TStorageFeature]>>();
 	});
 
 	it('should initialize state with persisted value if available', async () => {

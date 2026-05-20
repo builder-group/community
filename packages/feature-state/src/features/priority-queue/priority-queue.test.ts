@@ -8,7 +8,7 @@ import {
 	type TPriorityQueueFeatureApi
 } from './priority-queue';
 
-describe('priorityQueueFeature', () => {
+describe('priorityQueueFeature function', () => {
 	describe('types', () => {
 		it('should add priority listener options to listen and subscribe', () => {
 			// Act
@@ -22,7 +22,7 @@ describe('priorityQueueFeature', () => {
 		});
 	});
 
-	describe('listen', () => {
+	describe('listen method', () => {
 		it('should call listeners by priority', () => {
 			// Prepare
 			const state = createState(0).with(priorityQueueFeature<number>());
@@ -103,7 +103,7 @@ describe('priorityQueueFeature', () => {
 		});
 	});
 
-	describe('notify', () => {
+	describe('notify method', () => {
 		it('should pass custom listener context to listeners', () => {
 			// Prepare
 			const state = createState(10).with(priorityQueueFeature<number>());
@@ -122,7 +122,7 @@ describe('priorityQueueFeature', () => {
 		});
 	});
 
-	describe('subscribe', () => {
+	describe('subscribe method', () => {
 		it('should call listeners immediately with the current value', () => {
 			// Prepare
 			const state = createState(10).with(priorityQueueFeature<number>());

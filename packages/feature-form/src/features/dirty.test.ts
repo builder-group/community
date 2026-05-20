@@ -1,9 +1,24 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import { createForm } from '../create-form';
-import { dirtyFeature } from './dirty';
+import type { TForm } from '../types';
+import { dirtyFeature, type TDirtyFeature, type TDirtyFields } from './dirty';
 
-describe('dirtyFeature', () => {
+describe('dirtyFeature function', () => {
+	it('should have correct types', () => {
+		const form = createForm<TUserFormData>({
+			fields: {
+				name: { defaultValue: 'Alice' },
+				email: { defaultValue: 'alice@example.com' }
+			}
+		}).with(dirtyFeature<TUserFormData>());
+
+		expectTypeOf(form).toEqualTypeOf<TForm<TUserFormData, [TDirtyFeature<TUserFormData>]>>();
+		expectTypeOf(form.isDirty.get()).toEqualTypeOf<boolean>();
+		expectTypeOf(form.dirtyFields.get()).toEqualTypeOf<TDirtyFields<TUserFormData>>();
+		expectTypeOf(form.submit).toEqualTypeOf<TForm<TUserFormData>['submit']>();
+	});
+
 	it('should track dirty fields', () => {
 		// Prepare
 		const form = createForm<TUserFormData>({

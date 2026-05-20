@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { FlatQueue } from './FlatQueue';
 
-describe('FlatQueue', () => {
-	describe('pop', () => {
+describe('FlatQueue class', () => {
+	describe('pop method', () => {
 		it('should return null when the queue is empty', () => {
 			// Prepare
 			const queue = new FlatQueue<string>();
@@ -64,7 +64,7 @@ describe('FlatQueue', () => {
 		});
 	});
 
-	describe('removeWhere', () => {
+	describe('removeWhere method', () => {
 		it('should remove matching queued items', () => {
 			// Prepare
 			const queue = new FlatQueue<string>();
@@ -116,7 +116,7 @@ describe('FlatQueue', () => {
 		});
 	});
 
-	describe('clear', () => {
+	describe('clear method', () => {
 		it('should remove all queued items', () => {
 			// Prepare
 			const queue = new FlatQueue<string>();

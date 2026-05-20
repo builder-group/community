@@ -7,7 +7,7 @@ import {
 	type TAsyncQueueFeatureApi
 } from './async-queue';
 
-describe('asyncQueueFeature', () => {
+describe('asyncQueueFeature function', () => {
 	describe('types', () => {
 		it('should make notify return the async queue flush promise', () => {
 			// Act
@@ -20,7 +20,7 @@ describe('asyncQueueFeature', () => {
 		});
 	});
 
-	describe('notify', () => {
+	describe('notify method', () => {
 		it('should defer listener calls', async () => {
 			// Prepare
 			const state = createState(0).with(asyncQueueFeature<number>());
@@ -119,7 +119,7 @@ describe('asyncQueueFeature', () => {
 		});
 	});
 
-	describe('subscribe', () => {
+	describe('subscribe method', () => {
 		it('should call listeners immediately with the current value', () => {
 			// Prepare
 			const state = createState(10).with(asyncQueueFeature<number>());

@@ -2,7 +2,7 @@ import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { createState, setSourceKey } from './create-state';
 import { multiUndoFeature, undoFeature } from './features';
 
-describe('createState', () => {
+describe('createState function', () => {
 	describe('types', () => {
 		it('should infer value and feature types', () => {
 			// Act
@@ -17,7 +17,7 @@ describe('createState', () => {
 		});
 	});
 
-	describe('value', () => {
+	describe('value property', () => {
 		it('should initialize with the provided value', () => {
 			// Prepare
 			const initialValue = { count: 0 };
@@ -62,7 +62,7 @@ describe('createState', () => {
 		});
 	});
 
-	describe('set', () => {
+	describe('set method', () => {
 		it('should update with a direct value', () => {
 			// Prepare
 			const state = createState(10);
@@ -112,7 +112,7 @@ describe('createState', () => {
 		});
 	});
 
-	describe('notify', () => {
+	describe('notify method', () => {
 		it('should notify listeners with the current value', () => {
 			// Prepare
 			const state = createState(10);
@@ -150,7 +150,7 @@ describe('createState', () => {
 		});
 	});
 
-	describe('listen', () => {
+	describe('listen method', () => {
 		it('should call listeners when the value changes', () => {
 			// Prepare
 			const state = createState(10);
@@ -218,7 +218,7 @@ describe('createState', () => {
 		});
 	});
 
-	describe('subscribe', () => {
+	describe('subscribe method', () => {
 		it('should call listeners immediately with the current value', () => {
 			// Prepare
 			const state = createState(10);

@@ -2,7 +2,7 @@ import type { StandardSchemaV1 } from '@standard-schema/spec';
 import { describe, expect, it } from 'vitest';
 import { createFormField, isFormField } from './form-field';
 
-describe('createFormField', () => {
+describe('createFormField function', () => {
 	it('should create a form field state with field metadata', () => {
 		// Prepare
 		const field = createFormField('Alice', { key: 'name' });

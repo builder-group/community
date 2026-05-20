@@ -8,8 +8,8 @@ import {
 	type TFeatureHost
 } from './index';
 
-describe('feature-core', () => {
-	describe('createFeatureHost', () => {
+describe('feature-core package', () => {
+	describe('createFeatureHost function', () => {
 		it('should add feature host metadata to a base object', () => {
 			// Prepare
 			const base = { value: 1 };
@@ -51,7 +51,7 @@ describe('feature-core', () => {
 		});
 	});
 
-	describe('defineFeature', () => {
+	describe('defineFeature function', () => {
 		it('should create a feature with empty requirements by default', () => {
 			// Prepare
 			const feature = defineFeature({
@@ -86,7 +86,7 @@ describe('feature-core', () => {
 		});
 	});
 
-	describe('installFeature', () => {
+	describe('installFeature function', () => {
 		it('should install a feature API on a host', () => {
 			// Prepare
 			const counter = createCounter(0);
@@ -199,7 +199,7 @@ describe('feature-core', () => {
 		});
 	});
 
-	describe('hasFeature', () => {
+	describe('hasFeature function', () => {
 		it('should return true when a feature key is installed', () => {
 			// Prepare
 			const counter = createCounter(0).with(resetFeature());
@@ -230,7 +230,7 @@ describe('feature-core', () => {
 		});
 	});
 
-	describe('host.with', () => {
+	describe('host.with method', () => {
 		it('should install chained features in order', () => {
 			// Prepare
 			const counter = createCounter(0)
