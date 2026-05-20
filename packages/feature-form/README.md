@@ -77,13 +77,13 @@ const $form = createForm({
 
 **Field config options**
 
-| Option             | Default        | Description                                                                      |
-| ------------------ | -------------- | -------------------------------------------------------------------------------- |
-| `defaultValue`     | required       | Initial value and reset target.                                                  |
-| `validator`        | none           | Field-level validator.                                                           |
-| `validateOn`       | `['submit']`   | Triggers that run the validator before the first submit.                         |
-| `revalidateOn`     | `['blur']`     | Triggers that run the validator after the first submit.                          |
-| `collectErrorMode` | `'firstError'` | `'firstError'` keeps the first Standard Schema issue; `'all'` keeps every issue. |
+| Option             | Default              | Description                                                                      |
+| ------------------ | -------------------- | -------------------------------------------------------------------------------- |
+| `defaultValue`     | required             | Initial value and reset target.                                                  |
+| `validator`        | none                 | Field-level validator.                                                           |
+| `validateOn`       | `['submit']`         | Triggers that run the validator before the first submit.                         |
+| `revalidateOn`     | `['submit', 'blur']` | Triggers that run the validator after the first submit.                          |
+| `collectErrorMode` | `'firstError'`       | `'firstError'` keeps the first Standard Schema issue; `'all'` keeps every issue. |
 
 ### `submit(options?)` / `validate()` / `reset()`
 
@@ -104,7 +104,7 @@ const isValid = await $form.validate(); // runs all validators without submittin
 $form.reset(); // resets all fields to their default values, clears status
 ```
 
-`submit()` runs all field and form-level validators, aggregates current status, then fires the appropriate callbacks. Returns `true` if the form was valid, `false` otherwise. `onValidSubmit()` and `onInvalidSubmit()` register persistent callbacks; `submit()` options register callbacks for that submit call only.
+`submit()` runs field and form-level validators configured for `'submit'`, aggregates current status, then fires the appropriate callbacks. Returns `true` if the form was valid, `false` otherwise. `validate()` always runs all validators without marking the form as submitted. `onValidSubmit()` and `onInvalidSubmit()` register persistent callbacks; `submit()` options register callbacks for that submit call only.
 
 ### `getData()` / `getValidData()` / `getErrors()`
 

@@ -25,6 +25,7 @@ describe('createForm', () => {
 			name: 'Bob',
 			email: 'alice@example.com'
 		});
+		expect(form.status.get()).toEqual({ type: 'valid' });
 	});
 
 	it('should submit valid data and update default values when configured', async () => {
@@ -97,6 +98,57 @@ describe('createForm', () => {
 		});
 		expect(invalidSubmissions).toHaveLength(1);
 		expect(form.isSubmitted.get()).toBe(true);
+	});
+
+	it('should respect submit validation triggers', async () => {
+		// Prepare
+		let validationCount = 0;
+		const form = createForm<TUserFormData>({
+			fields: {
+				name: {
+					defaultValue: '',
+					validateOn: ['blur'],
+					revalidateOn: ['blur'],
+					validator: createStandardSchema<string>((value) => {
+						validationCount++;
+						return value.length > 0 ? { value } : { issues: [{ message: 'Required' }] };
+					})
+				},
+				email: { defaultValue: 'alice@example.com' }
+			}
+		});
+
+		// Act
+		const isValid = await form.submit();
+
+		// Assert
+		expect(isValid).toBe(false);
+		expect(validationCount).toBe(0);
+		expect(form.status.get()).toEqual({ type: 'unvalidated' });
+	});
+
+	it('should revalidate on submit by default', async () => {
+		// Prepare
+		const form = createForm<TUserFormData>({
+			fields: {
+				name: {
+					defaultValue: 'Alice',
+					validator: createStandardSchema<string>((value) =>
+						value.length > 0 ? { value } : { issues: [{ message: 'Required' }] }
+					)
+				},
+				email: { defaultValue: 'alice@example.com' }
+			}
+		});
+		await form.submit();
+		form.fields.name.set('');
+
+		// Act
+		const isValid = await form.submit();
+
+		// Assert
+		expect(isValid).toBe(false);
+		expect(form.getErrors().fields.name).toEqual([{ message: 'Required', path: undefined }]);
 	});
 
 	it('should validate form-level constraints', async () => {

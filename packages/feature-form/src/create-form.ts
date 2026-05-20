@@ -1,11 +1,6 @@
 import { createFeatureHost } from 'feature-core';
 import { createState } from 'feature-state';
-import {
-	createFormField,
-	formFieldResetSourceKey,
-	formFieldStatusChangeSourceKey,
-	isFormField
-} from './form-field';
+import { createFormField, formFieldResetSourceKey, isFormField } from './form-field';
 import { deepCopy } from './lib';
 import { validateStandardSchema } from './standard-schema';
 import {
@@ -58,6 +53,7 @@ export function createForm<GFormData extends TFormData>(
 						}
 					},
 		_validationRunId: 0,
+		// Note: No validator means there is no pending validation work
 		_formValidatorStatus: validator == null ? { type: 'valid' } : { type: 'unvalidated' },
 		_callbacks: {
 			invalidSubmit: onInvalidSubmit == null ? [] : [onInvalidSubmit],
@@ -112,8 +108,16 @@ export function createForm<GFormData extends TFormData>(
 			this.isSubmitting.set(true);
 			try {
 				await revalidateForm(this, {
-					runFieldValidators: true,
-					runFormValidator: true
+					shouldValidateField: (formField) =>
+						formField._validation != null &&
+						(formField.isSubmitted.get()
+							? formField._validation.config.revalidateOn.includes('submit')
+							: formField._validation.config.validateOn.includes('submit')),
+					shouldValidateForm:
+						this._validation != null &&
+						(this.isSubmitted.get()
+							? this._validation.config.revalidateOn.includes('submit')
+							: this._validation.config.validateOn.includes('submit'))
 				});
 
 				for (const formField of getFormFields(this.fields)) {
@@ -123,15 +127,16 @@ export function createForm<GFormData extends TFormData>(
 
 				const data = this.getValidData();
 				if (data != null) {
-					if (options.updateDefaultValues === true) {
+					if (options.updateDefaultValues) {
 						for (const [fieldKey, formField] of getFormFieldEntries(this.fields)) {
 							formField.defaultValue = deepCopy(data[fieldKey]);
 						}
 					}
 
 					await runSubmitCallbacks(
-						this._callbacks.validSubmit,
-						options.onValidSubmit,
+						options.onValidSubmit != null
+							? [...this._callbacks.validSubmit, options.onValidSubmit]
+							: this._callbacks.validSubmit,
 						data,
 						options.context
 					);
@@ -140,8 +145,9 @@ export function createForm<GFormData extends TFormData>(
 
 				const errors = this.getErrors();
 				await runSubmitCallbacks(
-					this._callbacks.invalidSubmit,
-					options.onInvalidSubmit,
+					options.onInvalidSubmit != null
+						? [...this._callbacks.invalidSubmit, options.onInvalidSubmit]
+						: this._callbacks.invalidSubmit,
 					errors,
 					options.context
 				);
@@ -152,10 +158,11 @@ export function createForm<GFormData extends TFormData>(
 		},
 		async validate(this: TForm<GFormData, []>) {
 			return revalidateForm(this, {
-				runFieldValidators: true,
-				runFormValidator: true
+				shouldValidateField: (formField) => formField._validation != null,
+				shouldValidateForm: this._validation != null
 			});
 		},
+		// Note: reset clears flags and invalidates validation runs, but does not cancel submit callbacks already in progress
 		reset(this: TForm<GFormData, []>) {
 			for (const formField of getFormFields(this.fields)) {
 				formField.reset();
@@ -165,7 +172,6 @@ export function createForm<GFormData extends TFormData>(
 				this._validation == null ? { type: 'valid' } : { type: 'unvalidated' };
 			this.status.set(getAggregateFormStatus(this));
 			this.isValidating.set(false);
-			// Note: reset clears flags and invalidates validation runs, but does not cancel submit callbacks already in progress
 			this.isSubmitted.set(false);
 			this.isSubmitting.set(false);
 		},
@@ -193,6 +199,8 @@ export function createForm<GFormData extends TFormData>(
 	});
 
 	registerFormListeners(form);
+
+	// Initialize aggregate status after fields exist
 	form.status.set(getAggregateFormStatus(form));
 
 	return form;
@@ -240,7 +248,7 @@ function registerFormListeners<GFormData extends TFormData>(form: TForm<GFormDat
 		});
 
 		formField.onBlur(({ wasTouched }) => {
-			// 'touched' fires the form validator once on first blur; 'blur' fires it on every blur
+			// Note: 'touched' validates the form on the first field blur; 'blur' validates on every field blur
 			const shouldValidateFormOnBlur =
 				form._validation != null &&
 				(form.isSubmitted.get()
@@ -252,16 +260,18 @@ function registerFormListeners<GFormData extends TFormData>(form: TForm<GFormDat
 			}
 
 			void revalidateForm(form, {
-				runFieldValidators: false,
-				runFormValidator: true
+				shouldValidateField: () => false,
+				shouldValidateForm: true
 			});
 		});
 
 		formField.listen(({ source }) => {
+			if (source === formFieldResetSourceKey) {
+				return;
+			}
+
 			const shouldValidateFormOnFieldChange =
 				form._validation != null &&
-				source !== formFieldResetSourceKey &&
-				source !== formFieldStatusChangeSourceKey &&
 				(form.isSubmitted.get()
 					? form._validation.config.revalidateOn.includes('change')
 					: form._validation.config.validateOn.includes('change'));
@@ -270,8 +280,8 @@ function registerFormListeners<GFormData extends TFormData>(form: TForm<GFormDat
 			}
 
 			void revalidateForm(form, {
-				runFieldValidators: false,
-				runFormValidator: true
+				shouldValidateField: () => false,
+				shouldValidateForm: true
 			});
 		});
 	}
@@ -279,11 +289,14 @@ function registerFormListeners<GFormData extends TFormData>(form: TForm<GFormDat
 
 async function revalidateForm<GFormData extends TFormData>(
 	form: TForm<GFormData, []>,
-	options: TRevalidateFormOptions
+	options: TRevalidateFormOptions<GFormData>
 ): Promise<boolean> {
-	const { runFieldValidators, runFormValidator } = options;
+	const { shouldValidateField, shouldValidateForm } = options;
+	const fieldValidationPromises = getFormFields(form.fields)
+		.filter(shouldValidateField)
+		.map((field) => field.validate());
 
-	const shouldSetValidating = runFieldValidators || runFormValidator;
+	const shouldSetValidating = fieldValidationPromises.length > 0 || shouldValidateForm;
 	const validationRunId = shouldSetValidating ? ++form._validationRunId : null;
 	if (shouldSetValidating) {
 		form.isValidating.set(true);
@@ -291,8 +304,8 @@ async function revalidateForm<GFormData extends TFormData>(
 
 	try {
 		await Promise.all([
-			...(runFieldValidators ? getFormFields(form.fields).map((field) => field.validate()) : []),
-			...(runFormValidator && validationRunId != null
+			...fieldValidationPromises,
+			...(shouldValidateForm && validationRunId != null
 				? [validateFormValidator(form, validationRunId)]
 				: [])
 		]);
@@ -307,9 +320,9 @@ async function revalidateForm<GFormData extends TFormData>(
 	return status.type === 'valid';
 }
 
-interface TRevalidateFormOptions {
-	runFieldValidators: boolean;
-	runFormValidator: boolean;
+interface TRevalidateFormOptions<GFormData extends TFormData> {
+	shouldValidateField: (field: TFormFields<GFormData>[TFormFieldKey<GFormData>]) => boolean;
+	shouldValidateForm: boolean;
 }
 
 async function validateFormValidator<GFormData extends TFormData>(
@@ -392,14 +405,10 @@ function getFormFieldErrors<GFormData extends TFormData>(
 
 async function runSubmitCallbacks<GValue>(
 	callbacks: Array<(value: GValue, context?: TFormSubmitContext) => Promise<void> | void>,
-	callback: ((value: GValue, context?: TFormSubmitContext) => Promise<void> | void) | undefined,
 	value: GValue,
 	context: TFormSubmitContext | undefined
 ): Promise<void> {
-	await Promise.all([
-		...callbacks.map((_callback) => _callback(value, context)),
-		...(callback == null ? [] : [callback(value, context)])
-	]);
+	await Promise.all(callbacks.map((callback) => callback(value, context)));
 }
 
 function getFormFields<GFormData extends TFormData>(

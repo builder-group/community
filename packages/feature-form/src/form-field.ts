@@ -20,7 +20,7 @@ export function createFormField<GValue>(
 		key,
 		validator,
 		validateOn = ['submit'],
-		revalidateOn = ['blur'],
+		revalidateOn = ['submit', 'blur'],
 		collectErrorMode = 'firstError'
 	} = config;
 	const formField = createState(defaultValue).with(
@@ -56,7 +56,7 @@ export function isFormField<GValue = unknown>(value: unknown): value is TFormFie
 }
 
 function formFieldFeature<GValue>(
-	config: TResolvedFormFieldConfig<GValue>
+	config: TFormFieldFeatureConfig<GValue>
 ): TFormFieldFeature<GValue> {
 	const { key, validation } = config;
 
@@ -75,6 +75,7 @@ function formFieldFeature<GValue>(
 				isSubmitted: createState(false),
 				isValidating: createState(false),
 				status: createState<TValidationStatusValue>(
+					// Note: No validator means there is no pending validation work
 					validation == null ? { type: 'valid' } : { type: 'unvalidated' }
 				),
 				async validate(this: TFormField<GValue>) {
@@ -113,7 +114,6 @@ function formFieldFeature<GValue>(
 					}
 
 					this.status.set(status);
-
 					return status.type === 'valid';
 				},
 				onBlur(this: TFormField<GValue>, callback) {
@@ -128,7 +128,7 @@ function formFieldFeature<GValue>(
 				},
 				blur(this: TFormField<GValue>) {
 					const wasTouched = this.isTouched.get();
-					// 'touched' validates on the first blur only; 'blur' validates on every blur
+					// Note: 'touched' validates on the first blur only; 'blur' validates on every blur
 					const shouldValidateOnBlur =
 						this._validation != null &&
 						(this.isSubmitted.get()
@@ -162,27 +162,18 @@ function formFieldFeature<GValue>(
 /** Identifies listener events caused by field reset so validation can ignore reset changes. */
 export const formFieldResetSourceKey = 'form-field_reset';
 
-interface TResolvedFormFieldConfig<GValue> {
+interface TFormFieldFeatureConfig<GValue> {
 	key: string;
 	validation?: TFormFieldValidation<GValue>;
 }
 
 function registerFormFieldListeners<GValue>(formField: TFormField<GValue>): void {
-	formField.status.listen(({ value }) => {
-		formField.notify({
-			listenerContext: {
-				source: formFieldStatusChangeSourceKey,
-				status: value
-			}
-		});
-	});
-
 	formField.listen(({ source }) => {
-		if (source === formFieldResetSourceKey || source === formFieldStatusChangeSourceKey) {
+		if (source === formFieldResetSourceKey) {
 			return;
 		}
 
-		// 'touched' validates on change only after the field has been interacted with at least once
+		// Note: 'touched' validates pre-submit changes after the field has been blurred once
 		const shouldValidateOnChange =
 			formField._validation != null &&
 			(formField.isSubmitted.get()
@@ -195,6 +186,3 @@ function registerFormFieldListeners<GValue>(formField: TFormField<GValue>): void
 		}
 	});
 }
-
-/** Identifies listener events caused by status updates so validation does not loop. */
-export const formFieldStatusChangeSourceKey = 'form-field_status-change';
