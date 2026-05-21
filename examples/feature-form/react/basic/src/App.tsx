@@ -1,6 +1,7 @@
 import {
 	createForm,
 	dirtyFeature,
+	type TFormErrors,
 	type TFormFieldKey,
 	type TValidationStatusValue
 } from 'feature-form';
@@ -53,20 +54,23 @@ interface TFormData {
 type TRole = 'reader' | 'admin';
 
 export const App: React.FC = () => {
-	const [submittedData, setSubmittedData] = React.useState<Readonly<TFormData> | null>(null);
+	const [submitResult, setSubmitResult] = React.useState<TSubmitResult>(null);
 
 	const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		void $form.submit({
 			onValidSubmit(data) {
-				setSubmittedData(data);
+				setSubmitResult({ type: 'valid', data });
+			},
+			onInvalidSubmit(errors) {
+				setSubmitResult({ type: 'invalid', errors });
 			}
 		});
 	}, []);
 
 	const handleReset = React.useCallback(() => {
 		$form.reset();
-		setSubmittedData(null);
+		setSubmitResult(null);
 	}, []);
 
 	return (
@@ -99,12 +103,23 @@ export const App: React.FC = () => {
 						<button type="submit">Submit</button>
 						<button type="reset">Reset</button>
 					</div>
-					{submittedData == null ? null : <pre>{JSON.stringify(submittedData, null, 2)}</pre>}
+					{submitResult == null ? null : <pre>{JSON.stringify(submitResult, null, 2)}</pre>}
 				</ExampleSection>
 			</form>
 		</main>
 	);
 };
+
+type TSubmitResult =
+	| {
+			type: 'valid';
+			data: Readonly<TFormData>;
+	  }
+	| {
+			type: 'invalid';
+			errors: TFormErrors<TFormData>;
+	  }
+	| null;
 
 const FormStateExample: React.FC = () => {
 	const formStatus = useFeatureState($form.status);
