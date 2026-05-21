@@ -51,7 +51,7 @@ export function useForm<GFormData extends TFormData, GFeatures extends TAnyFeatu
 		) {
 			return getFieldInputProps<GKey, GFormData[GKey]>(
 				form.getField(formFieldKey),
-				// Note: options must be re-spread as a tuple because TypeScript cannot forward
+				// Note: Options must be re-spread as a tuple because TypeScript cannot forward
 				// conditional rest params directly; the conditional spread preserves the required/optional distinction.
 				...((options == null ? [] : [options]) as TFieldInputOptionsArgs<GFormData[GKey]>)
 			);

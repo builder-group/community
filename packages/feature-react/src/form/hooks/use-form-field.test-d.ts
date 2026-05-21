@@ -13,16 +13,18 @@ const form = createForm<TTestFormData>({
 describe('useFormField function', () => {
 	it('should infer field, status, and input types', () => {
 		const name = useFormField(form, 'name');
-		const age = useFormField(form, 'age', {
-			format: (value) => String(value),
-			parse: (value) => Number(value)
-		});
+		const age = useFormField(form, 'age');
 
 		expectTypeOf(name.field).toEqualTypeOf<TFormField<string>>();
 		expectTypeOf(name.status).toEqualTypeOf<TValidationStatusValue>();
 		expectTypeOf(name.input().name).toEqualTypeOf<'name'>();
 		expectTypeOf(age.field).toEqualTypeOf<TFormField<number>>();
-		expectTypeOf(age.input().name).toEqualTypeOf<'age'>();
+		expectTypeOf(
+			age.input({
+				format: (value) => String(value),
+				parse: (value) => Number(value)
+			}).name
+		).toEqualTypeOf<'age'>();
 
 		// @ts-expect-error uncontrolled fields do not expose value
 		name.value;
@@ -30,11 +32,7 @@ describe('useFormField function', () => {
 
 	it('should expose field value in controlled mode', () => {
 		const name = useFormField(form, 'name', { controlled: true });
-		const age = useFormField(form, 'age', {
-			controlled: true,
-			format: (value) => String(value),
-			parse: (value) => Number(value)
-		});
+		const age = useFormField(form, 'age', { controlled: true });
 
 		expectTypeOf(name.value).toEqualTypeOf<string>();
 		expectTypeOf(age.value).toEqualTypeOf<number>();
@@ -44,20 +42,24 @@ describe('useFormField function', () => {
 	});
 
 	it('should require parse and format for non-string and union fields', () => {
-		// @ts-expect-error non-string fields need parse and format
-		useFormField(form, 'age');
+		const age = useFormField(form, 'age');
+		const scope = useFormField(form, 'scope');
 
-		// @ts-expect-error controlled non-string fields need parse and format
-		useFormField(form, 'age', { controlled: true });
+		// @ts-expect-error non-string fields need parse and format
+		age.input();
+
+		age.input({
+			format: (value) => String(value),
+			parse: (value) => Number(value)
+		});
 
 		// @ts-expect-error string union fields need parse and format
-		useFormField(form, 'scope');
+		scope.input();
 
-		const scope = useFormField(form, 'scope', {
+		scope.input({
 			format: (value) => value,
 			parse: (value) => (value === 'wholeDevice' ? 'wholeDevice' : 'blockTargets')
 		});
-		expectTypeOf(scope.input().name).toEqualTypeOf<'scope'>();
 	});
 });
 

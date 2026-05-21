@@ -10,11 +10,7 @@ export function getFieldInputProps<GKey extends string = string, GValue = string
 	formField: TFormField<GValue>,
 	...[options]: TFieldInputOptionsArgs<GValue>
 ): TFieldInputProps<GKey> {
-	const {
-		controlled = false,
-		format,
-		parse
-	} = (options as TAnyFieldInputOptions<GValue> | undefined) ?? {};
+	const { controlled = false, format, parse } = options ?? {};
 	const value = format == null ? (formField.get() as string | undefined) : format(formField.get());
 
 	return {
@@ -46,10 +42,10 @@ export interface TFieldInputProps<GKey extends string> {
 
 export type TFieldInputOptionsArgs<GValue> =
 	TIsWideString<GValue> extends true
-		? [options?: TStringFieldInputOptions<GValue>]
+		? [options?: TFieldInputOptions<GValue>]
 		: [options: TParsedFieldInputOptions<GValue>];
 
-export interface TStringFieldInputOptions<GValue> {
+export interface TFieldInputOptions<GValue> {
 	controlled?: boolean;
 	format?: (value: GValue) => string | undefined;
 	parse?: (value: string) => GValue;
@@ -60,9 +56,5 @@ export interface TParsedFieldInputOptions<GValue> {
 	format: (value: GValue) => string | undefined;
 	parse: (value: string) => GValue;
 }
-
-type TAnyFieldInputOptions<GValue> =
-	| TStringFieldInputOptions<GValue>
-	| TParsedFieldInputOptions<GValue>;
 
 type TFieldInputElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;

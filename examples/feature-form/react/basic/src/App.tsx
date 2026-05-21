@@ -142,27 +142,34 @@ const EmailField: React.FC = () => {
 };
 
 const AgeField: React.FC = () => {
-	const { input, status } = useFormField($form, 'age', {
-		format: (value) => String(value),
-		parse: (value) => Number(value)
-	});
+	const { input, status } = useFormField($form, 'age');
 
 	return (
 		<FieldRow fieldKey="age" label="Age" renderLabel="AgeField" status={status}>
-			<input {...input()} id="age" type="number" />
+			<input
+				{...input({
+					format: (value) => String(value),
+					parse: (value) => Number(value)
+				})}
+				id="age"
+				type="number"
+			/>
 		</FieldRow>
 	);
 };
 
 const RoleField: React.FC = () => {
-	const { input, status } = useFormField($form, 'role', {
-		format: (value) => value,
-		parse: (value) => (value === 'admin' ? 'admin' : 'reader')
-	});
+	const { input, status } = useFormField($form, 'role');
 
 	return (
 		<FieldRow fieldKey="role" label="Role" renderLabel="RoleField" status={status}>
-			<select {...input()} id="role">
+			<select
+				{...input({
+					format: (value) => value,
+					parse: (value) => (value === 'admin' ? 'admin' : 'reader')
+				})}
+				id="role"
+			>
 				<option value="reader">Reader</option>
 				<option value="admin">Admin</option>
 			</select>

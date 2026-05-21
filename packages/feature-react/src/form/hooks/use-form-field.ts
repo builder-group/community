@@ -11,9 +11,7 @@ import { useFeatureState } from '../../state/hooks/use-feature-state';
 import {
 	getFieldInputProps,
 	type TFieldInputOptionsArgs,
-	type TFieldInputProps,
-	type TParsedFieldInputOptions,
-	type TStringFieldInputOptions
+	type TFieldInputProps
 } from '../get-field-input-props';
 import { type TIsWideString } from '../types';
 
@@ -28,7 +26,7 @@ export function useFormField<
 >(
 	form: TForm<GFormData, GFeatures>,
 	key: GKey,
-	...options: TControlledUseFormFieldOptionsArgs<GFormData[GKey]>
+	options: TControlledUseFormFieldOptions
 ): TControlledUseFormFieldResponse<GFormData, GKey>;
 export function useFormField<
 	GFormData extends TFormData,
@@ -37,7 +35,7 @@ export function useFormField<
 >(
 	form: TForm<GFormData, GFeatures>,
 	key: GKey,
-	...options: TUseFormFieldOptionsArgs<GFormData[GKey]>
+	options?: TUseFormFieldOptions
 ): TUseFormFieldResponse<GFormData, GKey>;
 export function useFormField<
 	GFormData extends TFormData,
@@ -46,7 +44,7 @@ export function useFormField<
 >(
 	form: TForm<GFormData, GFeatures>,
 	key: GKey,
-	...[options]: TAnyUseFormFieldOptionsArgs<GFormData[GKey]>
+	options?: TUseFormFieldOptions | TControlledUseFormFieldOptions
 ): TUseFormFieldResponse<GFormData, GKey> | TControlledUseFormFieldResponse<GFormData, GKey> {
 	const controlled = options?.controlled ?? false;
 	const field = form.getField(key);
@@ -57,12 +55,14 @@ export function useFormField<
 		field,
 		...(controlled ? { value } : {}),
 		status,
-		input() {
+		input(...[inputOptions]: TUseFormFieldInputOptionsArgs<GFormData[GKey]>) {
 			return getFieldInputProps<GKey, GFormData[GKey]>(
 				field,
-				// Note: options must be re-spread as a tuple because TypeScript cannot forward
+				// Note: Input options must be re-spread as a tuple because TypeScript cannot forward
 				// conditional rest params directly; the conditional spread preserves the required/optional distinction.
-				...((options == null ? [] : [options]) as TFieldInputOptionsArgs<GFormData[GKey]>)
+				...((controlled || inputOptions != null
+					? [{ ...inputOptions, controlled }]
+					: []) as TFieldInputOptionsArgs<GFormData[GKey]>)
 			);
 		}
 	};
@@ -74,7 +74,22 @@ export interface TUseFormFieldResponse<
 > {
 	field: TFormField<GFormData[GKey]>;
 	status: TValidationStatusValue;
-	input: () => TFieldInputProps<GKey>;
+	input: (...options: TUseFormFieldInputOptionsArgs<GFormData[GKey]>) => TFieldInputProps<GKey>;
+}
+
+export type TUseFormFieldInputOptionsArgs<GValue> =
+	TIsWideString<GValue> extends true
+		? [options?: TUseFormFieldInputOptions<GValue>]
+		: [options: TUseFormFieldParsedInputOptions<GValue>];
+
+export interface TUseFormFieldInputOptions<GValue> {
+	format?: (value: GValue) => string | undefined;
+	parse?: (value: string) => GValue;
+}
+
+export interface TUseFormFieldParsedInputOptions<GValue> {
+	format: (value: GValue) => string | undefined;
+	parse: (value: string) => GValue;
 }
 
 export interface TControlledUseFormFieldResponse<
@@ -84,45 +99,10 @@ export interface TControlledUseFormFieldResponse<
 	value: GFormData[GKey];
 }
 
-export type TUseFormFieldOptionsArgs<GValue> =
-	TIsWideString<GValue> extends true
-		? [options?: TUseFormFieldOptions<GValue>]
-		: [options: TUseFormFieldParsedOptions<GValue>];
-
-export type TControlledUseFormFieldOptionsArgs<GValue> =
-	TIsWideString<GValue> extends true
-		? [options: TControlledUseFormFieldOptions<GValue>]
-		: [options: TControlledUseFormFieldParsedOptions<GValue>];
-
-type TAnyUseFormFieldOptionsArgs<GValue> =
-	TIsWideString<GValue> extends true
-		? [options?: TUseFormFieldOptions<GValue> | TControlledUseFormFieldOptions<GValue>]
-		: [options: TUseFormFieldParsedOptions<GValue> | TControlledUseFormFieldParsedOptions<GValue>];
-
-export interface TUseFormFieldOptions<GValue> extends Omit<
-	TStringFieldInputOptions<GValue>,
-	'controlled'
-> {
+export interface TUseFormFieldOptions {
 	controlled?: false;
 }
 
-export interface TControlledUseFormFieldOptions<GValue> extends Omit<
-	TStringFieldInputOptions<GValue>,
-	'controlled'
-> {
-	controlled: true;
-}
-
-export interface TUseFormFieldParsedOptions<GValue> extends Omit<
-	TParsedFieldInputOptions<GValue>,
-	'controlled'
-> {
-	controlled?: false;
-}
-
-export interface TControlledUseFormFieldParsedOptions<GValue> extends Omit<
-	TParsedFieldInputOptions<GValue>,
-	'controlled'
-> {
+export interface TControlledUseFormFieldOptions {
 	controlled: true;
 }
