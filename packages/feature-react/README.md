@@ -19,7 +19,7 @@
 
 > Status: Experimental
 
-React bindings for [`feature-state`](https://github.com/builder-group/community/tree/develop/packages/feature-state) and [`feature-form`](https://github.com/builder-group/community/tree/develop/packages/feature-form).
+Hooks for [`feature-state`](https://github.com/builder-group/community/tree/develop/packages/feature-state) and [`feature-form`](https://github.com/builder-group/community/tree/develop/packages/feature-form). Subscribe to state and wire forms in any component, without providers or wrappers.
 
 ```ts
 import { createState } from 'feature-state';
@@ -108,7 +108,7 @@ export const ContactForm = () => {
 
 - [React Basic](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/basic)
 
-## State API
+## State Hooks
 
 ### `useFeatureState(state)`
 
@@ -225,7 +225,7 @@ const $tasks = createState<Task[]>([]).with(globalBindFeature('_tasks'));
 // globalThis._tasks.get()
 ```
 
-## Form API
+## Form Hooks
 
 ### `useForm(form)`
 
@@ -297,44 +297,14 @@ const { value, status, input } = useFormField($form, 'name', { controlled: true 
 
 **Return value**
 
-| Property          | Description                                                    |
-| ----------------- | -------------------------------------------------------------- |
-| `field`           | The `TFormField` instance for the given key                    |
-| `value`           | The current field value. Only returned when `controlled: true` |
-| `status`          | The current validation status value                            |
-| `input(options?)` | Returns props for a native input, textarea, or select          |
+| Property  | Description                                                    |
+| --------- | -------------------------------------------------------------- |
+| `field`   | The `TFormField` instance for the given key                    |
+| `value`   | The current field value. Only returned when `controlled: true` |
+| `status`  | The current validation status value                            |
+| `input()` | Returns props for a native input, textarea, or select          |
 
-### Input options
-
-`useForm().input()` and `getFieldInputProps()` accept `controlled`, `format`, and `parse`.
-`useFormField()` accepts `controlled` at the hook level because it controls value subscription. Its `input()` helper accepts only `format` and `parse`.
-
-For string-valued fields, all options are optional:
-
-| Option       | Description                                                                                               |
-| ------------ | --------------------------------------------------------------------------------------------------------- |
-| `controlled` | When `true`, renders as a controlled input. On `useFormField`, pass this to the hook instead of `input()` |
-| `format`     | Maps the field value to a display string                                                                  |
-| `parse`      | Maps the input string back to the field value                                                             |
-
-For non-string fields, `format` and `parse` are required.
-
-```ts
-// useForm: options belong to each input call
-input('name');
-input('age', {
-	format: (v) => String(v),
-	parse: (s) => Number(s),
-	controlled: true
-});
-
-// useFormField: controlled belongs to the hook; format and parse belong to input()
-const { input: ageInput } = useFormField($form, 'age', { controlled: true });
-ageInput({
-	format: (v) => String(v),
-	parse: (s) => Number(s)
-});
-```
+## Form Utilities
 
 ### `getFieldInputProps(formField, options?)`
 
@@ -348,7 +318,33 @@ export const CustomInput = ({ field }: { field: TFormField<string> }) => (
 );
 ```
 
-Accepts the same options as `useForm().input()`.
+#### Input options
+
+`useForm().input()` and `getFieldInputProps()` accept options per call. `useFormField()` accepts options at the hook level; the returned `input()` helper takes no arguments.
+
+For string-valued fields, all options are optional:
+
+| Option       | Description                                                                                                        |
+| ------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `controlled` | When `true`, renders as a controlled input. On `useFormField`, pass this to the hook instead of a per-call option. |
+| `format`     | Maps the field value to a display string                                                                           |
+| `parse`      | Maps the input string back to the field value                                                                      |
+
+For non-string fields, `format` and `parse` are required.
+
+```ts
+// useForm: options per input call
+input('name');
+input('age', { format: (v) => String(v), parse: (s) => Number(s), controlled: true });
+
+// useFormField: all options go to the hook; input() takes no args
+const { input: ageInput } = useFormField($form, 'age', {
+	controlled: true,
+	format: (v) => String(v),
+	parse: (s) => Number(s)
+});
+ageInput();
+```
 
 ## FAQ
 

@@ -67,6 +67,18 @@ $count.undo(); // 2
 $count.multiUndo(2); // 0
 ```
 
+Derive a read-only value from one or more states with `createComputed`. It recomputes whenever a source state changes:
+
+```ts
+import { createComputed, createState } from 'feature-state';
+
+const $tasks = createState<Task[]>([]);
+const $done = createComputed($tasks, (tasks) => tasks.filter((t) => t.done));
+
+$tasks.set([{ id: 1, title: 'Buy milk', done: true }]);
+$done.get(); // [{ id: 1, title: 'Buy milk', done: true }]
+```
+
 Persist state across sessions with `storageFeature`. Pass any storage adapter that implements `save`, `load`, and `delete`:
 
 ```ts
@@ -96,12 +108,7 @@ await $tasks.persist(); // loads saved value on first call; auto-saves on every 
 
 - [React Basic](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/basic)
 
-## Alternatives
-
-- [nanostores](https://github.com/nanostores/nanostores)
-- [jotai](https://github.com/pmndrs/jotai)
-
-## Core API
+## State
 
 ### `createState(initialValue)`
 
@@ -164,7 +171,7 @@ It is safe to call `unlisten()` inside the listener itself. Any pending call to 
 | `source`     | What triggered the change. `'stateSet'` for `set()`. Features set their own source keys. |
 | `background` | When `true`, signals that the change is a background sync and UI updates can be skipped. |
 
-Listeners run synchronously in registration order. Nested `set()` calls inside a listener are batched: their listeners are appended to the current queue and drained after the outermost notification finishes.
+Listeners run synchronously in registration order. Nested `set()` calls inside a listener are batched: their listeners join the current queue and run after the outermost notification finishes.
 
 ### `createComputed(source, compute, options?)`
 
@@ -299,6 +306,11 @@ $count.listen(() => {}, { priority: EListenerPriority.EARLY }); // runs first
 ## Extending with features
 
 States are `feature-core` feature hosts. Add behavior with `.with(yourFeature())`. See the [feature-core README](https://github.com/builder-group/community/tree/develop/packages/feature-core) for a full guide on `defineFeature()`, dependency declaration, and the feature model.
+
+## Alternatives
+
+- [nanostores](https://github.com/nanostores/nanostores)
+- [jotai](https://github.com/pmndrs/jotai)
 
 ## FAQ
 

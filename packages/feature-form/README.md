@@ -101,12 +101,7 @@ $form.dirtyFields.get(); // { name: true }
 
 - [React Basic](https://github.com/builder-group/community/tree/develop/examples/feature-form/react/basic) ([CodeSandbox](https://codesandbox.io/p/sandbox/basic-c4gd3t))
 
-## Alternatives
-
-- [react-hook-form](https://github.com/react-hook-form/react-hook-form)
-- [TanStack Form](https://tanstack.com/form)
-
-## Form API
+## Form
 
 ### `createForm(config)`
 
@@ -164,11 +159,11 @@ const isValid = await $form.validate(); // runs all validators without submittin
 $form.reset(); // resets values, validation status, isTouched, and isSubmitted
 ```
 
-`submit()` runs validators configured for the submit trigger. Matching field validators and the form validator are awaited together; no matching validator is skipped because another failed. Returns `true` if the form was valid, `false` otherwise. Persistent callbacks registered via `onValidSubmit()` / `onInvalidSubmit()` and per-call options passed to `submit()` both run; they are combined and called in parallel.
+`submit()` runs validators configured for the submit trigger. All matching field validators and the form validator run together; no failing validator prevents the others from completing. Returns `true` if the form was valid, `false` otherwise. Persistent callbacks registered via `onValidSubmit()` / `onInvalidSubmit()` and per-call options passed to `submit()` both run in parallel.
 
 `validate()` runs all validators the same way but has no submit side effects: it updates validation state, but does not set `isSubmitted`, does not fire `onValidSubmit` or `onInvalidSubmit`, and does not update default values.
 
-`reset()` restores all fields to their `defaultValue`, and clears `status`, `isTouched`, and `isSubmitted` on both the form and every field. If an async validation is in progress when `reset()` is called, its result is discarded.
+`reset()` restores all fields to their `defaultValue` and clears `status`, `isTouched`, and `isSubmitted` on both the form and every field. Any in-flight async validation is cancelled so stale results cannot update field status.
 
 ### `getData()` / `getValidData()` / `getErrors()`
 
@@ -197,7 +192,7 @@ $form.getField('name'); // same, useful when the key is dynamic
 | `isSubmitted`  | `TState<boolean>`   | True after the first submit attempt.                         |
 | `isSubmitting` | `TState<boolean>`   | True while `submit()` is in progress.                        |
 
-## Field API
+## Field
 
 Each entry in `form.fields` is a `TFormField<GValue>`, which is a full `feature-state` state with form-specific methods added.
 
@@ -297,7 +292,7 @@ const $form = createForm({
 
 Use `validator` for cross-field constraints. `validateOn`, `revalidateOn`, and `collectErrorMode` are shared defaults for the form validator and field validators unless a field overrides them.
 
-Errors from the form-level validator are routed by path. If a form-level issue points at a field, it appears in `getErrors().fields` and the matching field's `status` with the field key removed from the path. Pathless issues and paths that do not match a field appear in `getErrors().form`.
+The library routes form-level validator errors by path. An issue that points at a field appears in `getErrors().fields` and in the matching field's `status`, with the field key stripped from the path. Pathless issues and paths with no matching field appear in `getErrors().form`.
 
 ```ts
 const $form = createForm({
@@ -350,7 +345,7 @@ const valibotValidator = v.pipe(v.string(), v.minLength(2), v.maxLength(50));
 
 For custom validators, implement the `StandardSchemaV1` interface from [`@standard-schema/spec`](https://github.com/standard-schema/standard-schema).
 
-Validators are used for validation only. If a schema transforms or coerces output values, the parsed output is not written back into the field state.
+Validators run for validation only. If a schema transforms or coerces output values, the parsed output does not write back into the field state.
 
 ## Built-in Features
 
@@ -382,6 +377,11 @@ $form.isDirty.get(); // false
 ## Extending with features
 
 Forms are `feature-core` feature hosts. Add behavior with `.with(yourFeature())`. See the [feature-core README](https://github.com/builder-group/community/tree/develop/packages/feature-core) for a full guide on `defineFeature()`, dependency declaration, and the feature model.
+
+## Alternatives
+
+- [react-hook-form](https://github.com/react-hook-form/react-hook-form)
+- [TanStack Form](https://tanstack.com/form)
 
 ## FAQ
 
