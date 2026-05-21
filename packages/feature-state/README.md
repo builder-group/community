@@ -67,9 +67,25 @@ $count.undo(); // 2
 $count.multiUndo(2); // 0
 ```
 
+Persist state across sessions with `storageFeature`. Pass any storage adapter that implements `save`, `load`, and `delete`:
+
+```ts
+import { createState, missingStorageValue, storageFeature } from 'feature-state';
+
+const localAdapter = {
+	save: (key: string, value: unknown) => { localStorage.setItem(key, JSON.stringify(value)); return true; },
+	load: (key: string) => { const raw = localStorage.getItem(key); return raw != null ? JSON.parse(raw) : missingStorageValue; },
+	delete: (key: string) => { localStorage.removeItem(key); return true; }
+};
+
+const $tasks = createState<Task[]>([]).with(storageFeature(localAdapter, 'tasks'));
+
+await $tasks.persist(); // loads saved value on first call; auto-saves on every set()
+```
+
 ## Examples
 
-- [React Counter](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/counter) ([CodeSandbox](https://codesandbox.io/p/sandbox/counter-k74k9k))
+- [React Basic](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/basic)
 
 ## Alternatives
 

@@ -64,7 +64,7 @@ $form.fields.email.status.listen(({ value }) => {
 	}
 });
 
-$form.fields.email.set('not-an-email');
+$form.fields.email.set('not-an-email'); // set() alone does not validate (validateOn defaults to ['submit'])
 await $form.submit(); // triggers validation, listener fires with error
 ```
 

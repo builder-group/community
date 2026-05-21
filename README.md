@@ -73,7 +73,7 @@ Open source packages from [builder.group](https://builder.group) projects, share
 
 ### `feature-state`
 
-- [`feature-state/react/counter`](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/counter)
+- [`feature-state/react/basic`](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/basic)
 
 ### `openapi-ts-router`
 

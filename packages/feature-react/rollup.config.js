@@ -3,4 +3,6 @@ const { libraryPreset } = require('rollup-presets');
 /**
  * @type {import('rollup').RollupOptions[]}
  */
-module.exports = libraryPreset();
+module.exports = libraryPreset({
+	crossModuleImports: true
+});

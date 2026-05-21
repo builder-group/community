@@ -106,7 +106,7 @@ export const ContactForm = () => {
 
 ## Examples
 
-- [React Counter](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/counter) ([CodeSandbox](https://codesandbox.io/p/sandbox/counter-k74k9k))
+- [React Basic](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/basic)
 
 ## State API
 
@@ -345,6 +345,10 @@ Accepts the same options as `input()` above.
 ### When should I use `useFormField` instead of `useForm`?
 
 Use `useFormField` when a field lives in its own component or when re-rendering the entire form on every keystroke is too expensive. `useFormField` subscribes to one field and returns `value` and `status` already unwrapped, so no additional `useFeatureState` call is needed. Use `useForm` when a single component renders the whole form and the extra re-renders are not a concern.
+
+### When should I use `status(key)` from `useForm` instead of `useFormField`?
+
+`useFormField` re-renders when either the field value or status changes. If a component only needs to show validation feedback and never reads the field value, pass `status(key)` to `useFeatureState` directly. The component then re-renders only on status changes, not on every keystroke.
 
 ### What is the difference between `useListener` and `useSubscriber`?
 
