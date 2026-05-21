@@ -1,63 +1,75 @@
-import { TFeatureDefinition } from '@blgc/types/features';
+import { type TAnyFeature } from 'feature-core';
 import {
 	type TForm,
 	type TFormData,
 	type TFormField,
+	type TFormFieldKey,
 	type TFormFieldStatus,
-	type TSubmitOptions
+	type TFormSubmitOptions
 } from 'feature-form';
 import React from 'react';
-import { registerFormField, type TRegisterFormFieldResponse } from '../register-form-field';
+import {
+	getFieldInputProps,
+	type TFieldInputOptionsArgs,
+	type TFieldInputProps
+} from '../get-field-input-props';
 
-export function useForm<GFormData extends TFormData, GFeatures extends TFeatureDefinition[]>(
-	formOrFactory: TForm<GFormData, GFeatures> | (() => TForm<GFormData, GFeatures>),
-	deps: React.DependencyList = []
+/**
+ * Subscribes to a form and re-renders the component when any field changes.
+ */
+export function useForm<GFormData extends TFormData, GFeatures extends TAnyFeature[]>(
+	form: TForm<GFormData, GFeatures>
 ): TUseFormResponse<GFormData, GFeatures> {
-	const [, forceRender] = React.useReducer((s: number) => s + 1, 0);
-	const form = React.useMemo(
-		() => (typeof formOrFactory === 'function' ? formOrFactory() : formOrFactory),
-		deps
-	);
+	const [, forceRender] = React.useReducer((value: number) => value + 1, 0);
 
+	// Note: useEffect is intentional here; useForm subscribes to multiple field sources
+	// which makes useSyncExternalStore impractical. Post-paint timing is fine for forms.
 	React.useEffect(() => {
-		const unbindCallbacks: (() => void)[] = [];
+		const unbinds: Array<() => void> = [];
 		for (const formField of Object.values(form.fields) as TFormField<unknown>[]) {
-			const unbind = formField.listen(
-				({ background }) => {
-					if (!background) {
+			unbinds.push(
+				formField.listen(({ background }) => {
+					if (background !== true) {
 						forceRender();
 					}
-				},
-				{ key: `use-form_${formField.key}` }
+				})
 			);
-			unbindCallbacks.push(unbind);
 		}
+
 		return () => {
-			unbindCallbacks.forEach((callback) => {
-				callback();
-			});
+			for (const unbind of unbinds) {
+				unbind();
+			}
 		};
 	}, [form]);
 
 	return {
 		form,
-		register<GKey extends keyof GFormData>(formFieldKey: GKey, controlled = false) {
-			return registerFormField<GFormData[GKey], GKey>(form.getField(formFieldKey), controlled);
+		input<GKey extends TFormFieldKey<GFormData>>(
+			formFieldKey: GKey,
+			...[options]: TFieldInputOptionsArgs<GFormData[GKey]>
+		) {
+			return getFieldInputProps<GKey, GFormData[GKey]>(
+				form.getField(formFieldKey),
+				// Note: options must be re-spread as a tuple because TypeScript cannot forward
+				// conditional rest params directly; the conditional spread preserves the required/optional distinction.
+				...((options == null ? [] : [options]) as TFieldInputOptionsArgs<GFormData[GKey]>)
+			);
 		},
 		handleSubmit: (options = {}) => {
-			const { preventDefault = true, ...submitOptions } = options;
+			const { context, preventDefault = true, ...submitOptions } = options;
 			return (event?: React.BaseSyntheticEvent) => {
 				if (preventDefault) {
 					event?.preventDefault();
 				}
 
-				if (submitOptions.context != null) {
-					submitOptions.context.event = event;
-				} else {
-					submitOptions.context = { event };
-				}
-
-				return form.submit(submitOptions);
+				return form.submit({
+					...submitOptions,
+					context: {
+						...context,
+						event
+					}
+				});
 			};
 		},
 		field(formFieldKey) {
@@ -69,25 +81,19 @@ export function useForm<GFormData extends TFormData, GFeatures extends TFeatureD
 	};
 }
 
-export interface TUseFormResponse<
-	GFormData extends TFormData,
-	GFeatures extends TFeatureDefinition[]
-> {
+export interface TUseFormResponse<GFormData extends TFormData, GFeatures extends TAnyFeature[]> {
 	form: TForm<GFormData, GFeatures>;
 	handleSubmit: (
-		options?: THandleSubmitOptions<GFormData, GFeatures>
+		options?: THandleSubmitOptions<GFormData>
 	) => (event?: React.BaseSyntheticEvent) => Promise<boolean>;
-	register: <GKey extends keyof GFormData>(
+	input: <GKey extends TFormFieldKey<GFormData>>(
 		formFieldKey: GKey,
-		controlled?: boolean
-	) => TRegisterFormFieldResponse<GKey, GFormData[GKey]>;
-	field: <GKey extends keyof GFormData>(formFieldKey: GKey) => TFormField<GFormData[GKey]>;
-	status: <GKey extends keyof GFormData>(formFieldKey: GKey) => TFormFieldStatus;
+		...options: TFieldInputOptionsArgs<GFormData[GKey]>
+	) => TFieldInputProps<GKey>;
+	field: <GKey extends TFormFieldKey<GFormData>>(formFieldKey: GKey) => TFormField<GFormData[GKey]>;
+	status: <GKey extends TFormFieldKey<GFormData>>(formFieldKey: GKey) => TFormFieldStatus;
 }
 
-interface THandleSubmitOptions<
-	GFormData extends TFormData,
-	GFeatures extends TFeatureDefinition[]
-> extends TSubmitOptions<GFormData, GFeatures> {
+interface THandleSubmitOptions<GFormData extends TFormData> extends TFormSubmitOptions<GFormData> {
 	preventDefault?: boolean;
 }

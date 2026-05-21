@@ -544,12 +544,12 @@ importers:
 
   packages/feature-logger:
     dependencies:
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
       '@blgc/utils':
         specifier: workspace:*
         version: link:../utils
+      feature-core:
+        specifier: workspace:*
+        version: link:../feature-core
     devDependencies:
       '@blgc/config':
         specifier: workspace:*
@@ -560,12 +560,6 @@ importers:
 
   packages/feature-react:
     dependencies:
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
-      '@blgc/utils':
-        specifier: workspace:*
-        version: link:../utils
       feature-core:
         specifier: workspace:*
         version: link:../feature-core

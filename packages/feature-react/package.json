@@ -69,8 +69,6 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@blgc/types": "workspace:*",
-		"@blgc/utils": "workspace:*",
 		"feature-core": "workspace:*"
 	},
 	"devDependencies": {
@@ -82,7 +80,17 @@
 		"rollup-presets": "workspace:*"
 	},
 	"peerDependencies": {
+		"feature-form": "workspace:*",
+		"feature-state": "workspace:*",
 		"react": "^18.3.1"
+	},
+	"peerDependenciesMeta": {
+		"feature-form": {
+			"optional": true
+		},
+		"feature-state": {
+			"optional": true
+		}
 	},
 	"size-limit": [
 		{
