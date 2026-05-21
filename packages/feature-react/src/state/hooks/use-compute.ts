@@ -31,54 +31,60 @@ export function useCompute<GComputed>(
 	const isTupleInput = Array.isArray(input);
 	const inputStates = (isTupleInput ? input : [input]) as readonly TAnyComputeState[];
 	const states = React.useMemo(() => [...inputStates], [isTupleInput, ...inputStates]);
+	// Note: depsToken is a stable object whose identity changes when deps change, used as a cache key
+	// to detect external dependency changes without tracking the compute function reference
 	const depsToken = React.useMemo(() => ({}), deps);
-	const cacheRef = React.useRef<TComputeCache<GComputed>>({
-		depsToken: null,
-		dirty: true,
-		hasValue: false,
-		isTupleInput,
-		value: undefined,
-		values: []
-	});
+	// Note: Wrapping computed value in a snapshot object (not returning the raw value) lets useSyncExternalStore
+	// detect re-renders via reference equality: returning a new object forces a re-render even
+	// when the raw computed value reference is unchanged (e.g. notify() called on a mutable object)
+	const forceSnapshotRef = React.useRef(false);
+	const snapshotRef = React.useRef<TComputeSnapshot<GComputed> | null>(null);
+	const snapshotMetaRef = React.useRef<TComputeSnapshotMeta | null>(null);
 
-	const getSnapshot = React.useCallback((): GComputed => {
-		const cache = cacheRef.current;
+	const getSnapshot = React.useCallback((): TComputeSnapshot<GComputed> => {
+		const snapshot = snapshotRef.current;
+		const meta = snapshotMetaRef.current;
 		const values = states.map((state) => (state == null ? null : state.get()));
-		const didValuesChange =
-			values.length !== cache.values.length ||
-			values.some((value, index) => !Object.is(value, cache.values[index]));
-		const shouldCompute =
-			cache.dirty ||
-			!cache.hasValue ||
-			cache.isTupleInput !== isTupleInput ||
-			cache.depsToken !== depsToken ||
-			didValuesChange;
 
-		if (!shouldCompute) {
-			return cache.value as GComputed;
+		const shouldReuseSnapshot =
+			!forceSnapshotRef.current &&
+			snapshot != null &&
+			meta != null &&
+			meta.depsToken === depsToken &&
+			meta.states === states &&
+			meta.values.length === values.length &&
+			values.every((value, index) => Object.is(value, meta.values[index]));
+		forceSnapshotRef.current = false;
+		if (shouldReuseSnapshot) {
+			return snapshot;
 		}
 
 		const nextValue = compute(isTupleInput ? values : values[0]);
-
-		cache.dirty = false;
-		cache.isTupleInput = isTupleInput;
-		cache.depsToken = depsToken;
-		cache.values = values;
-
-		if (cache.hasValue && isEqual !== false && isEqual(nextValue, cache.value as GComputed)) {
-			return cache.value as GComputed;
+		const nextMeta = { depsToken, states, values };
+		if (snapshot != null && isEqual !== false && isEqual(nextValue, snapshot.value)) {
+			snapshotMetaRef.current = nextMeta;
+			return snapshot;
 		}
 
-		cache.hasValue = true;
-		cache.value = nextValue;
-		return nextValue;
+		const nextSnapshot = { value: nextValue };
+		snapshotRef.current = nextSnapshot;
+		snapshotMetaRef.current = nextMeta;
+		return nextSnapshot;
 	}, [compute, depsToken, isEqual, isTupleInput, states]);
 
 	const subscribe = React.useCallback(
 		(onStoreChange: () => void) => {
-			const subscribedStates = new Set<TSubscribedState>();
-			const unbinds: Array<() => void> = [];
+			// Note: Force is set even for background updates so the next render picks up the
+			// change lazily without triggering an immediate re-render
+			function emit(background: boolean | undefined): void {
+				forceSnapshotRef.current = true;
+				if (background !== true) {
+					onStoreChange();
+				}
+			}
 
+			const subscribedStates = new Set<NonNullable<TAnyComputeState>>();
+			const unbinds: Array<() => void> = [];
 			for (const state of states) {
 				if (state == null || subscribedStates.has(state)) {
 					continue;
@@ -87,12 +93,7 @@ export function useCompute<GComputed>(
 				subscribedStates.add(state);
 				unbinds.push(
 					state.listen(({ background }) => {
-						// Note: notify() invalidates compute even when the state value keeps the same reference
-						cacheRef.current.dirty = true;
-
-						if (background !== true) {
-							onStoreChange();
-						}
+						emit(background);
 					})
 				);
 			}
@@ -106,7 +107,7 @@ export function useCompute<GComputed>(
 		[states]
 	);
 
-	return React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+	return React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot).value;
 }
 
 export type TComputeIsEqual<GComputed> = ((next: GComputed, current: GComputed) => boolean) | false;
@@ -118,15 +119,14 @@ type TComputeValues<GStates extends readonly TAnyComputeState[]> = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- used only to accept arbitrary state value types in the public input
 type TAnyComputeState = TState<any, TAnyFeature[]> | null | undefined;
 
-type TSubscribedState = Exclude<TAnyComputeState, null | undefined>;
-
 type TComputeValue<GState> = GState extends TState<infer GValue, TAnyFeature[]> ? GValue : null;
 
-interface TComputeCache<GComputed> {
-	depsToken: object | null;
-	dirty: boolean;
-	hasValue: boolean;
-	isTupleInput: boolean;
-	value: GComputed | undefined;
+interface TComputeSnapshot<GComputed> {
+	readonly value: GComputed;
+}
+
+interface TComputeSnapshotMeta {
+	depsToken: object;
+	states: readonly TAnyComputeState[];
 	values: readonly unknown[];
 }
