@@ -30,7 +30,9 @@ describe('isEqualFeature function', () => {
 
 	it('should preserve set updater and listener context behavior', () => {
 		// Prepare
-		const state = createState(10).with(isEqualFeature<number>((prevValue, nextValue) => prevValue === nextValue));
+		const state = createState(10).with(
+			isEqualFeature<number>((prevValue, nextValue) => prevValue === nextValue)
+		);
 		const listener = vi.fn();
 		state.listen(listener);
 
