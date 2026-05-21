@@ -116,10 +116,10 @@ type TComputeValues<GStates extends readonly TAnyComputeState[]> = {
 	readonly [GIndex in keyof GStates]: TComputeValue<GStates[GIndex]>;
 };
 
+type TComputeValue<GState> = GState extends TState<infer GValue, TAnyFeature[]> ? GValue : null;
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- used only to accept arbitrary state value types in the public input
 type TAnyComputeState = TState<any, TAnyFeature[]> | null | undefined;
-
-type TComputeValue<GState> = GState extends TState<infer GValue, TAnyFeature[]> ? GValue : null;
 
 interface TComputeSnapshot<GComputed> {
 	readonly value: GComputed;

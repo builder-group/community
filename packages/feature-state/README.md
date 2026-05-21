@@ -166,6 +166,29 @@ It is safe to call `unlisten()` inside the listener itself. Any pending call to 
 
 Listeners run synchronously in registration order. Nested `set()` calls inside a listener are batched: their listeners are appended to the current queue and drained after the outermost notification finishes.
 
+### `createComputed(source, compute, options?)`
+
+Creates a read-only state derived from one source state:
+
+```ts
+import { createComputed, createState } from 'feature-state';
+
+const $tasks = createState<Task[]>([]);
+const $completedCount = createComputed($tasks, (tasks) => tasks.filter((task) => task.done).length);
+```
+
+Pass a tuple when the value depends on multiple states:
+
+```ts
+const $filteredTasks = createComputed([$tasks, $filter] as const, ([tasks, filter]) =>
+	tasks.filter((task) => task.category === filter)
+);
+```
+
+Computed states expose the normal read and subscription API (`value`, `get()`, `listen()`, and `subscribe()`), but `set()` and assigning `value` throw because source states own the data. Call `destroy()` when the containing object is torn down to unsubscribe from source states.
+
+`isEqual` defaults to `Object.is`. Pass a custom comparator to suppress notifications when the computed structure is equivalent but not referentially identical. Pass `false` to notify on every source update.
+
 ## Built-in Features
 
 Features are installed via `.with()` and extend the state with new methods.
