@@ -73,9 +73,18 @@ Persist state across sessions with `storageFeature`. Pass any storage adapter th
 import { createState, missingStorageValue, storageFeature } from 'feature-state';
 
 const localAdapter = {
-	save: (key: string, value: unknown) => { localStorage.setItem(key, JSON.stringify(value)); return true; },
-	load: (key: string) => { const raw = localStorage.getItem(key); return raw != null ? JSON.parse(raw) : missingStorageValue; },
-	delete: (key: string) => { localStorage.removeItem(key); return true; }
+	save: (key: string, value: unknown) => {
+		localStorage.setItem(key, JSON.stringify(value));
+		return true;
+	},
+	load: (key: string) => {
+		const raw = localStorage.getItem(key);
+		return raw != null ? JSON.parse(raw) : missingStorageValue;
+	},
+	delete: (key: string) => {
+		localStorage.removeItem(key);
+		return true;
+	}
 };
 
 const $tasks = createState<Task[]>([]).with(storageFeature(localAdapter, 'tasks'));

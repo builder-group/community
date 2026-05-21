@@ -6,32 +6,21 @@
 	padding: 40px 24px;
 }
 
-form,
-.section {
+.grid {
 	display: grid;
 	gap: 16px;
 }
 
 .section {
 	border: 1px solid #d8d8d8;
-	padding: 16px;
-}
-
-.field-grid {
 	display: grid;
 	gap: 12px;
+	padding: 16px;
 }
 
 .stack {
 	display: grid;
 	gap: 10px;
-}
-
-.field-row {
-	align-items: start;
-	display: grid;
-	gap: 8px;
-	grid-template-columns: 140px minmax(160px, 1fr) minmax(180px, 1fr) 110px 180px;
 }
 
 .actions {
@@ -43,10 +32,4 @@ form,
 .render-count {
 	color: #666;
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-}
-
-@media (max-width: 760px) {
-	.field-row {
-		grid-template-columns: 1fr;
-	}
 }

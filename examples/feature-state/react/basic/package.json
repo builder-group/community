@@ -1,5 +1,5 @@
 {
-	"name": "feature-form-react-basic",
+	"name": "feature-state-react-basic",
 	"version": "0.0.0",
 	"private": true,
 	"type": "module",
@@ -10,11 +10,10 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"feature-form": "workspace:*",
 		"feature-react": "workspace:*",
+		"feature-state": "workspace:*",
 		"react": "^19.2.6",
-		"react-dom": "^19.2.6",
-		"zod": "^4.4.3"
+		"react-dom": "^19.2.6"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
