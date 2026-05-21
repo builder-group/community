@@ -35,6 +35,13 @@ describe('useListener function', () => {
 
 		useListener(createState(0), callback);
 	});
+
+	it('should accept async listeners', () => {
+		useListener(createState(0), async ({ value }) => {
+			assertType<number>(value);
+			await Promise.resolve();
+		});
+	});
 });
 
 function testFeature(): TTestFeature {

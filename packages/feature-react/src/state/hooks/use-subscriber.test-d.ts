@@ -35,6 +35,13 @@ describe('useSubscriber function', () => {
 
 		useSubscriber(createState(0), callback);
 	});
+
+	it('should accept async subscribers', () => {
+		useSubscriber(createState(0), async ({ value }) => {
+			assertType<number>(value);
+			await Promise.resolve();
+		});
+	});
 });
 
 function testFeature(): TTestFeature {
