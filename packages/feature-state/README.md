@@ -124,7 +124,7 @@ $count.set((v) => v + 1); // updater form
 $count.value = 10; // same as set(10)
 ```
 
-`set()` skips notification when the new value is identical to the current one (`Object.is` comparison).
+`set()` skips updating and notifying when the new value is identical to the current one (`Object.is` comparison).
 
 ### `notify()`
 
@@ -227,6 +227,18 @@ await $tasks.persist();
 `persist()` loads any previously saved value. If nothing is stored it saves the current state instead, then auto-saves on every subsequent `set()`. Calling `persist()` more than once is safe.
 
 **`TStorageInterface` contract:** `load` must return `missingStorageValue` (a Symbol) when the key is absent. `null` and `undefined` are treated as valid stored values.
+
+### `isEqualFeature(isEqual)`
+
+Overrides `set()` with a domain-specific equality check. Use it for derived values where reference equality would notify even when the visible state did not change.
+
+```ts
+import { createState, isEqualFeature } from 'feature-state';
+
+const $status = createState({ type: 'valid' }).with(
+	isEqualFeature((prevValue, nextValue) => prevValue.type === nextValue.type)
+);
+```
 
 ### `asyncQueueFeature()`
 

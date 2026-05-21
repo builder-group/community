@@ -75,6 +75,27 @@ describe('createFormField function', () => {
 		});
 	});
 
+	it('should not notify status listeners when validation returns the same status', async () => {
+		// Prepare
+		const field = createFormField('', {
+			key: 'name',
+			validateOn: ['change'],
+			validator: createStandardSchema<string>(() => ({ issues: [{ message: 'Required' }] }))
+		});
+		await field.validate();
+		let statusChangeCount = 0;
+		field.status.listen(() => {
+			statusChangeCount++;
+		});
+
+		// Act
+		field.set('A');
+		await waitForQueuedValidation();
+
+		// Assert
+		expect(statusChangeCount).toBe(0);
+	});
+
 	it('should validate on first blur when touched is configured', async () => {
 		// Prepare
 		let validationCount = 0;

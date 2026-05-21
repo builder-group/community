@@ -344,6 +344,30 @@ describe('createForm function', () => {
 			});
 		});
 
+		it('should not notify status listeners when form revalidation returns the same status', async () => {
+			// Prepare
+			const form = createForm<TUserFormData>({
+				fields: {
+					name: { defaultValue: 'Alice' },
+					email: { defaultValue: 'alice@example.com' }
+				},
+				validator: createStandardSchema<TUserFormData>((value) => ({ value }))
+			});
+			await form.submit();
+			let statusChangeCount = 0;
+			form.status.listen(() => {
+				statusChangeCount++;
+			});
+
+			// Act
+			form.fields.name.set('Bob');
+			await waitForQueuedValidation();
+
+			// Assert
+			expect(form.status.get()).toEqual({ type: 'valid' });
+			expect(statusChangeCount).toBe(0);
+		});
+
 		it('should revalidate touched form-level constraints on field change', async () => {
 			// Prepare
 			const form = createForm<TUserFormData>({

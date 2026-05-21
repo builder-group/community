@@ -1,5 +1,5 @@
 import { createFeatureHost } from 'feature-core';
-import { createState } from 'feature-state';
+import { createState, isEqualFeature } from 'feature-state';
 import { createFormField, formFieldResetSourceKey, isFormField } from './form-field';
 import { deepCopy } from './lib';
 import { validateStandardSchema } from './standard-schema';
@@ -22,6 +22,7 @@ import {
 	type TValidationError,
 	type TValidationStatusValue
 } from './types';
+import { areValidationStatusesEqual } from './validation-status';
 
 /** Creates a form from field configs or existing form fields. */
 export function createForm<GFields extends TCreateFormFieldsInput>(
@@ -65,7 +66,9 @@ export function createForm<GFormData extends TFormData>(
 			invalidSubmit: onInvalidSubmit == null ? [] : [onInvalidSubmit],
 			validSubmit: onValidSubmit == null ? [] : [onValidSubmit]
 		},
-		status: createState<TValidationStatusValue>(initialFormValidatorStatus),
+		status: createState<TValidationStatusValue>(initialFormValidatorStatus).with(
+			isEqualFeature(areValidationStatusesEqual)
+		),
 		isValidating: createState(false),
 		isSubmitted: createState(false),
 		isSubmitting: createState(false),

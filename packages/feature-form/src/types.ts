@@ -1,6 +1,6 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
 import { type TAnyFeature, type TFeature, type TFeatureHost } from 'feature-core';
-import { type TState } from 'feature-state';
+import { type TIsEqualFeature, type TState } from 'feature-state';
 
 export type TForm<GFormData extends TFormData, GFeatures extends TAnyFeature[] = []> = TFeatureHost<
 	TFormBase<GFormData>,
@@ -187,7 +187,10 @@ export type TValidateTrigger = 'blur' | 'change' | 'submit' | 'touched';
 export type TRevalidateTrigger = Exclude<TValidateTrigger, 'touched'>;
 
 /** Validation status state used by forms and fields. */
-export type TValidationStatus = TState<TValidationStatusValue, []>;
+export type TValidationStatus = TState<
+	TValidationStatusValue,
+	[TIsEqualFeature<TValidationStatusValue>]
+>;
 
 export type TValidationStatusValue =
 	| TInvalidValidationStatus

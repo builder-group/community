@@ -1,5 +1,5 @@
 import { defineFeature, hasFeature } from 'feature-core';
-import { createState, type TStateBase } from 'feature-state';
+import { createState, isEqualFeature, type TStateBase } from 'feature-state';
 import { deepCopy } from './lib';
 import { validateStandardSchema } from './standard-schema';
 import {
@@ -10,6 +10,7 @@ import {
 	type TFormFieldValidator,
 	type TValidationStatusValue
 } from './types';
+import { areValidationStatusesEqual } from './validation-status';
 
 /** Creates a reactive form field with validation state and lifecycle flags. */
 export function createFormField<GValue>(
@@ -80,7 +81,9 @@ function formFieldFeature<GValue>(
 				isTouched: createState(false),
 				isSubmitted: createState(false),
 				isValidating: createState(false),
-				status: createState<TValidationStatusValue>(initialFieldValidatorStatus),
+				status: createState<TValidationStatusValue>(initialFieldValidatorStatus).with(
+					isEqualFeature(areValidationStatusesEqual)
+				),
 				_applyFormValidatorErrors(this: TFormField<GValue>, errors) {
 					this._formValidatorErrors = errors;
 					this.status.set(getFormFieldStatus(this));
