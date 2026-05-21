@@ -43,13 +43,59 @@ await $form.submit();
 npm install feature-form
 ```
 
-## Concepts
+## Usage
 
-**Fields are states.** Each field is a `feature-state` reactive state: call `.set()` to update, `.get()` or `.value` to read, and subscribe to changes. The form is also a state, exposing aggregate status like `isSubmitting` or `isSubmitted`.
+Fields are reactive states. Subscribe to status changes to wire validation feedback directly into your UI:
 
-**Two-phase validation.** `validateOn` controls which events trigger validation _before_ the first submit. `revalidateOn` controls the same _after_ the first submit. This lets you avoid noisy errors while the user is still filling in a field, and switch to immediate feedback once they've tried to submit.
+```ts
+import { createForm } from 'feature-form';
+import * as z from 'zod';
 
-**Extensible via features.** Forms are `feature-core` feature hosts. Built-in features like `dirtyFeature` are installed with `.with(dirtyFeature())`, and custom features follow the same pattern.
+const $form = createForm({
+	fields: {
+		email: { defaultValue: '', validator: z.string().email() }
+	},
+	onValidSubmit: (data) => save(data)
+});
+
+$form.fields.email.status.listen(({ value }) => {
+	if (value.type === 'invalid') {
+		console.log(value.errors[0].message);
+	}
+});
+
+$form.fields.email.set('not-an-email');
+await $form.submit(); // triggers validation, listener fires with error
+```
+
+Control when validation fires with per-field triggers. Keep errors quiet before the user has finished, then switch to immediate feedback once they have tried to submit:
+
+```ts
+const $form = createForm({
+	fields: {
+		email: {
+			defaultValue: '',
+			validator: z.string().email(),
+			validateOn: ['blur', 'submit'], // quiet while typing, fires on blur
+			revalidateOn: ['change', 'submit'] // immediate feedback after first submit
+		}
+	}
+});
+```
+
+Extend the form with features using `.with()`:
+
+```ts
+import { dirtyFeature } from 'feature-form';
+
+const $form = createForm({
+	fields: { name: { defaultValue: 'Alice' } }
+}).with(dirtyFeature());
+
+$form.fields.name.set('Bob');
+$form.isDirty.get(); // true
+$form.dirtyFields.get(); // { name: true }
+```
 
 ## Examples
 

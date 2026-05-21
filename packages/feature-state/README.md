@@ -36,13 +36,36 @@ $tasks.undo(); // []
 npm install feature-state
 ```
 
-## Concepts
+## Usage
 
-**States are reactive containers.** A state holds a single value. When the value changes via `set()`, all registered listeners are called synchronously in registration order. Listeners receive the new value, the previous value, and an optional source string identifying what triggered the change.
+A state holds a single value and notifies listeners when it changes:
 
-**Features extend the core.** `createState()` returns a feature host with a minimal API. Call `.with(feature())` to add capabilities like undo history, persistence, or async notification. Each installed feature adds typed methods to the state so the type system always reflects what is available.
+```ts
+import { createState } from 'feature-state';
 
-**Reference equality prevents noise.** `set()` skips notification when the new value is identical to the current one (`Object.is` comparison). Use `notify()` to force listeners when you mutate a value in place rather than replacing it.
+const $count = createState(0);
+
+$count.listen(({ value, prevValue }) => {
+	console.log(value, prevValue);
+});
+
+$count.set(5);
+$count.set((v) => v + 1); // updater form, value is now 6
+```
+
+Extend a state with features using `.with()`. Each installed feature adds typed methods:
+
+```ts
+import { multiUndoFeature, undoFeature } from 'feature-state';
+
+const $count = createState(0).with(undoFeature(), multiUndoFeature());
+
+$count.set(1);
+$count.set(2);
+$count.set(3);
+$count.undo(); // 2
+$count.multiUndo(2); // 0
+```
 
 ## Examples
 
