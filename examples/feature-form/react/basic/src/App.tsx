@@ -80,7 +80,7 @@ export const App: React.FC = () => {
 				<RenderCount label="App" />
 			</header>
 
-			<form onSubmit={handleSubmit}>
+			<form onReset={handleReset} onSubmit={handleSubmit}>
 				<ExampleSection title="Fields">
 					<div className="field-grid">
 						<FirstNameField />
@@ -97,9 +97,7 @@ export const App: React.FC = () => {
 				<ExampleSection title="Submit">
 					<div className="actions">
 						<button type="submit">Submit</button>
-						<button type="button" onClick={handleReset}>
-							Reset
-						</button>
+						<button type="reset">Reset</button>
 					</div>
 					{submittedData == null ? null : <pre>{JSON.stringify(submittedData, null, 2)}</pre>}
 				</ExampleSection>
@@ -128,7 +126,7 @@ const FirstNameField: React.FC = () => {
 
 	return (
 		<FieldRow fieldKey="firstName" label="First name" renderLabel="FirstNameField" status={status}>
-			<input {...input({ controlled: true })} id="firstName" />
+			<input {...input()} id="firstName" />
 		</FieldRow>
 	);
 };
@@ -138,42 +136,33 @@ const EmailField: React.FC = () => {
 
 	return (
 		<FieldRow fieldKey="email" label="Email" renderLabel="EmailField" status={status}>
-			<input {...input({ controlled: true })} id="email" />
+			<input {...input()} id="email" />
 		</FieldRow>
 	);
 };
 
 const AgeField: React.FC = () => {
-	const { input, status } = useFormField($form, 'age');
+	const { input, status } = useFormField($form, 'age', {
+		format: (value) => String(value),
+		parse: (value) => Number(value)
+	});
 
 	return (
 		<FieldRow fieldKey="age" label="Age" renderLabel="AgeField" status={status}>
-			<input
-				{...input({
-					controlled: true,
-					format: (value) => String(value),
-					parse: (value) => Number(value)
-				})}
-				id="age"
-				type="number"
-			/>
+			<input {...input()} id="age" type="number" />
 		</FieldRow>
 	);
 };
 
 const RoleField: React.FC = () => {
-	const { input, status } = useFormField($form, 'role');
+	const { input, status } = useFormField($form, 'role', {
+		format: (value) => value,
+		parse: (value) => (value === 'admin' ? 'admin' : 'reader')
+	});
 
 	return (
 		<FieldRow fieldKey="role" label="Role" renderLabel="RoleField" status={status}>
-			<select
-				{...input({
-					controlled: true,
-					format: (value) => value,
-					parse: (value) => (value === 'admin' ? 'admin' : 'reader')
-				})}
-				id="role"
-			>
+			<select {...input()} id="role">
 				<option value="reader">Reader</option>
 				<option value="admin">Admin</option>
 			</select>

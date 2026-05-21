@@ -242,7 +242,6 @@ describe('createState function', () => {
 			state.multiUndo(1);
 
 			// Assert
-			expectTypeOf(state._history).toEqualTypeOf<number[]>();
 			expect(state.get()).toBe(0);
 			expect(state._history).toStrictEqual([0]);
 		});

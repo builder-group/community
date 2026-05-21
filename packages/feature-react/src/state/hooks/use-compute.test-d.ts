@@ -1,57 +1,49 @@
 import { type TFeature } from 'feature-core';
 import { createState } from 'feature-state';
-import { assertType, describe, expectTypeOf, it } from 'vitest';
+import { describe, expectTypeOf, it } from 'vitest';
 import { useCompute } from './use-compute';
 
 describe('useCompute function', () => {
-	it('should infer computed values from one state', () => {
-		const value = useCompute(createState(2), (count) => count * 2);
-
-		assertType<number>(value);
+	it('should infer the computed value type from a single state', () => {
+		expectTypeOf(useCompute(createState(2), (count) => count * 2)).toEqualTypeOf<number>();
 	});
 
-	it('should infer nullable values from nullable state input', () => {
-		const state = Math.random() > 0.5 ? createState('Jeff') : null;
-		const value = useCompute(state, (name) => name?.length ?? 0);
-
-		assertType<number>(value);
-	});
-
-	it('should infer computed values from states with installed features', () => {
-		const state = createState(2).with(testFeature());
-		const value = useCompute(state, (count) => count * 2);
-
-		assertType<number>(value);
-		assertType<() => string>(state.test);
-	});
-
-	it('should infer computed values from a tuple of states', () => {
+	it('should infer the computed value type from a tuple of states', () => {
 		const count = createState(2);
 		const label = createState('count');
 		const value = useCompute([count, label] as const, ([countValue, labelValue]) => {
-			assertType<number>(countValue);
-			assertType<string>(labelValue);
-
+			expectTypeOf(countValue).toEqualTypeOf<number>();
+			expectTypeOf(labelValue).toEqualTypeOf<string>();
 			return `${labelValue}:${countValue}`;
 		});
 
-		assertType<string>(value);
+		expectTypeOf(value).toEqualTypeOf<string>();
 	});
 
-	it('should infer null for nullable tuple entries', () => {
+	it('should handle nullable state input', () => {
+		const state = Math.random() > 0.5 ? createState('Jeff') : null;
+
+		expectTypeOf(useCompute(state, (name) => name?.length ?? 0)).toEqualTypeOf<number>();
+	});
+
+	it('should handle nullable entries in a state tuple', () => {
 		const count = createState(2);
 		const label = Math.random() > 0.5 ? createState('count') : null;
 		const value = useCompute([count, label] as const, ([countValue, labelValue]) => {
-			assertType<number>(countValue);
 			expectTypeOf(labelValue).toEqualTypeOf<string | null>();
-
 			return labelValue == null ? countValue : `${labelValue}:${countValue}`;
 		});
 
 		expectTypeOf(value).toEqualTypeOf<number | string>();
 	});
 
-	it('should accept custom equality after deps', () => {
+	it('should infer the computed value type for states with installed features', () => {
+		const state = createState(2).with(testFeature());
+
+		expectTypeOf(useCompute(state, (count) => count * 2)).toEqualTypeOf<number>();
+	});
+
+	it('should accept a custom equality function', () => {
 		const value = useCompute(
 			createState(2),
 			(count) => ({ count }),
@@ -81,11 +73,7 @@ function testFeature(): TTestFeature {
 		overrides: [],
 		requires: [],
 		install() {
-			return {
-				test() {
-					return 'test';
-				}
-			};
+			return { test: () => 'test' };
 		}
 	};
 }

@@ -270,15 +270,15 @@ export const ContactForm = () => {
 | `field(key)`             | Returns the `TFormField` for the given key                                                                                                                        |
 | `status(key)`            | Returns the field's status state. Pass it to `useFeatureState` to subscribe to status changes for a specific field                                                |
 
-### `useFormField(form, key)`
+### `useFormField(form, key, options?)`
 
-Subscribes to a single field and returns its current value and status already unwrapped. Re-renders only when that field changes. Use this for isolated field components or large forms where re-rendering the whole form on every keystroke is expensive.
+Subscribes to a single field's status and returns input props for uncontrolled fields by default. Use this for isolated field components or large forms where re-rendering on every keystroke is expensive.
 
 ```ts
 import { useFormField } from 'feature-react/form';
 
 export const NameField = () => {
-	const { value, status, input } = useFormField($form, 'name');
+	const { status, input } = useFormField($form, 'name');
 
 	return (
 		<div>
@@ -289,18 +289,25 @@ export const NameField = () => {
 };
 ```
 
+Pass `{ controlled: true }` when React should subscribe to and render the field value:
+
+```ts
+const { value, status, input } = useFormField($form, 'name', { controlled: true });
+```
+
 **Return value**
 
-| Property          | Description                                                                                |
-| ----------------- | ------------------------------------------------------------------------------------------ |
-| `field`           | The `TFormField` instance for the given key                                                |
-| `value`           | The current field value. Updates on every change                                           |
-| `status`          | The current validation status value. Updates on every change                               |
-| `input(options?)` | Returns props for a native input, textarea, or select. See [input options](#input-options) |
+| Property  | Description                                                    |
+| --------- | -------------------------------------------------------------- |
+| `field`   | The `TFormField` instance for the given key                    |
+| `value`   | The current field value. Only returned when `controlled: true` |
+| `status`  | The current validation status value                            |
+| `input()` | Returns props for a native input, textarea, or select          |
 
 ### Input options
 
-`input()` on both `useForm` and `useFormField` accepts the same options object.
+`useForm().input()` and `getFieldInputProps()` accept `controlled`, `format`, and `parse`.
+`useFormField()` accepts those options at the hook level and returns an `input()` helper with no arguments.
 
 For string-valued fields, all options are optional:
 
@@ -313,17 +320,19 @@ For string-valued fields, all options are optional:
 For non-string fields, `format` and `parse` are required.
 
 ```ts
-// Uncontrolled string field (default)
+// useForm: options belong to each input call
 input('name');
-
-// Controlled string field
-input('name', { controlled: true });
-
-// Non-string field with explicit format and parse
 input('age', {
 	format: (v) => String(v),
 	parse: (s) => Number(s)
 });
+
+// useFormField: options belong to the field hook
+const { input: ageInput } = useFormField($form, 'age', {
+	format: (v) => String(v),
+	parse: (s) => Number(s)
+});
+ageInput();
 ```
 
 ### `getFieldInputProps(formField, options?)`
@@ -344,11 +353,11 @@ Accepts the same options as `input()` above.
 
 ### When should I use `useFormField` instead of `useForm`?
 
-Use `useFormField` when a field lives in its own component or when re-rendering the entire form on every keystroke is too expensive. `useFormField` subscribes to one field and returns `value` and `status` already unwrapped, so no additional `useFeatureState` call is needed. Use `useForm` when a single component renders the whole form and the extra re-renders are not a concern.
+Use `useFormField` when a field lives in its own component or when re-rendering the entire form on every keystroke is too expensive. Uncontrolled `useFormField` subscribes to status only; controlled mode also subscribes to the field value. Use `useForm` when a single component renders the whole form and the extra re-renders are not a concern.
 
 ### When should I use `status(key)` from `useForm` instead of `useFormField`?
 
-`useFormField` re-renders when either the field value or status changes. If a component only needs to show validation feedback and never reads the field value, pass `status(key)` to `useFeatureState` directly. The component then re-renders only on status changes, not on every keystroke.
+Uncontrolled `useFormField` already subscribes to status only. If a component only needs validation feedback and does not need `field` or `input()`, pass `status(key)` to `useFeatureState` directly for the most minimal subscription.
 
 ### What is the difference between `useListener` and `useSubscriber`?
 

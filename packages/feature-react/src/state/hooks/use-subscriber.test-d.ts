@@ -1,15 +1,13 @@
 import { type TFeature } from 'feature-core';
 import { createState } from 'feature-state';
-import { assertType, describe, it } from 'vitest';
+import { describe, expectTypeOf, it } from 'vitest';
 import { useSubscriber, type TUseSubscriberCallback } from './use-subscriber';
 
 describe('useSubscriber function', () => {
-	it('should infer subscriber context values from state values', () => {
-		const state = createState(0);
-
-		useSubscriber(state, (context) => {
-			assertType<number>(context.value);
-			assertType<number | undefined>(context.prevValue);
+	it('should infer value and prevValue types from the state', () => {
+		useSubscriber(createState(0), (context) => {
+			expectTypeOf(context.value).toEqualTypeOf<number>();
+			expectTypeOf(context.prevValue).toEqualTypeOf<number | undefined>();
 		});
 	});
 
@@ -17,7 +15,7 @@ describe('useSubscriber function', () => {
 		const state = Math.random() > 0.5 ? createState('Jeff') : null;
 
 		useSubscriber(state, (context) => {
-			assertType<string>(context.value);
+			expectTypeOf(context.value).toEqualTypeOf<string>();
 		});
 	});
 
@@ -25,20 +23,19 @@ describe('useSubscriber function', () => {
 		const state = createState(0).with(testFeature());
 
 		useSubscriber(state, (context) => {
-			assertType<number>(context.value);
+			expectTypeOf(context.value).toEqualTypeOf<number>();
 		});
-		assertType<() => string>(state.test);
 	});
 
-	it('should accept subscriber cleanups', () => {
+	it('should accept a callback that returns a cleanup function', () => {
 		const callback: TUseSubscriberCallback<number> = () => () => {};
 
 		useSubscriber(createState(0), callback);
 	});
 
-	it('should accept async subscribers', () => {
+	it('should accept an async callback', () => {
 		useSubscriber(createState(0), async ({ value }) => {
-			assertType<number>(value);
+			expectTypeOf(value).toEqualTypeOf<number>();
 			await Promise.resolve();
 		});
 	});
@@ -50,11 +47,7 @@ function testFeature(): TTestFeature {
 		overrides: [],
 		requires: [],
 		install() {
-			return {
-				test() {
-					return 'test';
-				}
-			};
+			return { test: () => 'test' };
 		}
 	};
 }

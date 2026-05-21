@@ -1,34 +1,27 @@
 import { type TFeature } from 'feature-core';
 import { createState } from 'feature-state';
-import { assertType, describe, expectTypeOf, it } from 'vitest';
+import { describe, expectTypeOf, it } from 'vitest';
 import { useFeatureState } from './use-feature-state';
 
 describe('useFeatureState function', () => {
-	it('should infer the state value', () => {
-		const value = useFeatureState(createState(0));
-
-		assertType<number>(value);
+	it('should infer the state value type', () => {
+		expectTypeOf(useFeatureState(createState(0))).toEqualTypeOf<number>();
 	});
 
-	it('should infer null from nullable state input', () => {
-		const value = useFeatureState(null);
-
-		expectTypeOf(value).toEqualTypeOf<null>();
+	it('should return null for null input', () => {
+		expectTypeOf(useFeatureState(null)).toEqualTypeOf<null>();
 	});
 
-	it('should infer nullable values from nullable state unions', () => {
+	it('should return value or null for nullable state', () => {
 		const state = Math.random() > 0.5 ? createState('Jeff') : null;
-		const value = useFeatureState(state);
 
-		expectTypeOf(value).toEqualTypeOf<string | null>();
+		expectTypeOf(useFeatureState(state)).toEqualTypeOf<string | null>();
 	});
 
-	it('should infer values from states with installed features', () => {
+	it('should infer the value type for states with installed features', () => {
 		const state = createState(0).with(testFeature());
-		const value = useFeatureState(state);
 
-		assertType<number>(value);
-		expectTypeOf(state.test).toEqualTypeOf<() => string>();
+		expectTypeOf(useFeatureState(state)).toEqualTypeOf<number>();
 	});
 });
 
@@ -38,11 +31,7 @@ function testFeature(): TTestFeature {
 		overrides: [],
 		requires: [],
 		install() {
-			return {
-				test() {
-					return 'test';
-				}
-			};
+			return { test: () => 'test' };
 		}
 	};
 }

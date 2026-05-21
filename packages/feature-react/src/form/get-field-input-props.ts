@@ -1,5 +1,6 @@
 import { type TFormField } from 'feature-form';
 import { type ChangeEventHandler, type FocusEventHandler } from 'react';
+import { type TIsWideString } from './types';
 
 /**
  * Returns props for binding a native input, textarea, or select to a form field.
@@ -63,14 +64,5 @@ export interface TParsedFieldInputOptions<GValue> {
 type TAnyFieldInputOptions<GValue> =
 	| TStringFieldInputOptions<GValue>
 	| TParsedFieldInputOptions<GValue>;
-
-// Distinguishes the wide string type from string literal unions: 'a' | 'b' extends string,
-// but string does not extend 'a' | 'b', so the second check filters out narrow unions.
-type TIsWideString<GValue> =
-	Exclude<GValue, undefined> extends string
-		? string extends Exclude<GValue, undefined>
-			? true
-			: false
-		: false;
 
 type TFieldInputElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;

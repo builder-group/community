@@ -4,11 +4,11 @@ import {
 	type TFormField,
 	type TValidationStatusValue
 } from 'feature-form';
-import { assertType, describe, expectTypeOf, it } from 'vitest';
+import { describe, expectTypeOf, it } from 'vitest';
 import { useForm } from './use-form';
 
 describe('useForm function', () => {
-	it('should infer form field helpers from form data', () => {
+	it('should infer field, status, and input types from form data', () => {
 		const form = createForm<TTestFormData>({
 			fields: {
 				age: { defaultValue: 32 },
@@ -25,6 +25,18 @@ describe('useForm function', () => {
 		expectTypeOf(response.status('name').get()).toEqualTypeOf<TValidationStatusValue>();
 		expectTypeOf(response.input('name').name).toEqualTypeOf<'name'>();
 		expectTypeOf(response.input('nickname').name).toEqualTypeOf<'nickname'>();
+	});
+
+	it('should require parse and format for non-string and union fields', () => {
+		const form = createForm<TTestFormData>({
+			fields: {
+				age: { defaultValue: 32 },
+				name: { defaultValue: 'Jeff' },
+				nickname: { defaultValue: undefined },
+				scope: { defaultValue: 'blockTargets' }
+			}
+		});
+		const response = useForm(form);
 
 		// @ts-expect-error non-string fields need parse and format
 		response.input('age');
@@ -53,7 +65,7 @@ describe('useForm function', () => {
 			context: { source: 'test' },
 			onValidSubmit(data, context) {
 				expectTypeOf(data).toEqualTypeOf<Readonly<{ name: string }>>();
-				assertType<unknown>(context?.event);
+				expectTypeOf(context?.event).toEqualTypeOf<unknown>();
 			}
 		});
 	});
