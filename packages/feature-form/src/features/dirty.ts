@@ -59,6 +59,7 @@ export function dirtyFeature<GFormData extends TFormData = TFormData>(
 }
 
 export interface TDirtyFeatureConfig {
+	/** Custom equality function. Defaults to deep structural equality. */
 	isEqual?: TDirtyFieldComparator;
 }
 

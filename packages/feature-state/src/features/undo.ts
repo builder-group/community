@@ -7,6 +7,8 @@ import type { TState, TStateBase, TStateSetOptions } from '../types';
  * History is seeded with the current value when `undoFeature` is installed, so
  * `undo()` is a no-op when already at the oldest recorded state. The `historyLimit`
  * caps the number of entries kept; older entries are dropped as new ones arrive.
+ *
+ * @param historyLimit - Maximum number of history entries to keep. Defaults to `50`.
  */
 export function undoFeature<GValue>(historyLimit = 50): TUndoFeature<GValue> {
 	return defineFeature<TUndoFeature<GValue>>({

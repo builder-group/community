@@ -8,7 +8,7 @@ export type TState<GValue, GFeatures extends TAnyFeature[] = []> = TFeatureHost<
 
 /**
  * Core state API used by feature installers.
- * Use this type when a feature only needs the base methods and internal slots,
+ * Use this type when a feature only needs the base methods,
  * regardless of which other features are already installed on the host.
  */
 export interface TStateBase<GValue> {

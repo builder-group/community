@@ -119,6 +119,7 @@ export interface TCreateComputedOptions<GValue> {
 
 export type TComputedIsEqual<GValue> = ((prevValue: GValue, nextValue: GValue) => boolean) | false;
 
+/** Read-only state derived from one or more source states. Created by `createComputed()`. */
 export type TComputedState<GValue, GSources extends readonly TAnyComputedSourceState[]> = TState<
 	GValue,
 	[TComputedFeature<GValue, GSources>]
@@ -135,6 +136,7 @@ export interface TComputedFeatureApi<GValue, GSources extends readonly TAnyCompu
 	readonly _sources: GSources;
 	/** Unsubscribes from all source states. Call this when the computed state is no longer needed to prevent memory leaks. */
 	destroy(): void;
+	/** Always throws. Update the source states instead. */
 	set(value: never, options?: never): void;
 }
 
