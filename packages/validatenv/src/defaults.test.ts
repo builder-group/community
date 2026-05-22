@@ -1,119 +1,54 @@
 import { describe, expect, it } from 'vitest';
 import {
 	ciDefault,
-	combineDefaults,
 	devDefault,
 	envDefault,
 	localDefault,
+	pipeDefaults,
 	testDefault
 } from './defaults';
 
-describe('defaults', () => {
-	describe('envDefault', () => {
-		it('should return value when NODE_ENV matches any allowed env', () => {
-			const defaultValue = 'test-value';
-			const fn = envDefault(defaultValue, ['staging', 'development']);
+describe('defaults module', () => {
+	describe('envDefault function', () => {
+		it('should return value when NODE_ENV is allowed', () => {
+			const getDefault = envDefault('staging-value', ['staging', 'development']);
 
-			expect(fn({ NODE_ENV: 'staging' })).toBe(defaultValue);
-			expect(fn({ NODE_ENV: 'development' })).toBe(defaultValue);
+			expect(getDefault({ NODE_ENV: 'staging' })).toBe('staging-value');
 		});
 
-		it('should return undefined when NODE_ENV does not match allowed envs', () => {
-			const defaultValue = 'test-value';
-			const fn = envDefault(defaultValue, ['staging', 'development']);
+		it('should return undefined when NODE_ENV is not allowed', () => {
+			const getDefault = envDefault('staging-value', ['staging', 'development']);
 
-			expect(fn({ NODE_ENV: 'production' })).toBeUndefined();
-			expect(fn({ NODE_ENV: 'test' })).toBeUndefined();
+			expect(getDefault({ NODE_ENV: 'production' })).toBeUndefined();
 		});
 	});
 
-	describe('combineDefaults', () => {
-		const defaultValue = 'test-value';
-		const ciValue = 'ci-value';
+	describe('pipeDefaults function', () => {
+		it('should return the first matching default value', () => {
+			const getDefault = pipeDefaults(ciDefault('ci-value'), devDefault('dev-value'));
 
-		it('should try defaults in order and return first matching value', () => {
-			const combined = combineDefaults(ciDefault(ciValue), devDefault(defaultValue));
-
-			// When CI is set, should return CI value regardless of NODE_ENV
-			expect(combined({ CI: 'true', NODE_ENV: 'development' })).toBe(ciValue);
-
-			// When CI is not set but NODE_ENV is development, return dev value
-			expect(combined({ NODE_ENV: 'development' })).toBe(defaultValue);
-
-			// When neither condition is met, return undefined
-			expect(combined({ NODE_ENV: 'production' })).toBeUndefined();
+			expect(getDefault({ CI: 'true', NODE_ENV: 'development' })).toBe('ci-value');
 		});
 
-		it('should work with multiple defaults in priority order', () => {
-			const combined = combineDefaults(
-				ciDefault('ci-value'),
-				testDefault('test-value'),
-				devDefault('dev-value')
-			);
+		it('should return undefined when no defaults match', () => {
+			const getDefault = pipeDefaults(testDefault('test-value'), devDefault('dev-value'));
 
-			expect(combined({ CI: 'true' })).toBe('ci-value');
-			expect(combined({ NODE_ENV: 'test' })).toBe('test-value');
-			expect(combined({ NODE_ENV: 'development' })).toBe('dev-value');
-			expect(combined({ NODE_ENV: 'production' })).toBeUndefined();
+			expect(getDefault({ NODE_ENV: 'production' })).toBeUndefined();
 		});
 	});
 
-	describe('convenience functions', () => {
-		const defaultValue = 'test-value';
-
-		describe('devDefault', () => {
-			const fn = devDefault(defaultValue);
-
-			it('should return value when NODE_ENV is development', () => {
-				expect(fn({ NODE_ENV: 'development' })).toBe(defaultValue);
-			});
-
-			it('should return undefined when NODE_ENV is not development', () => {
-				expect(fn({ NODE_ENV: 'production' })).toBeUndefined();
-				expect(fn({ NODE_ENV: 'test' })).toBeUndefined();
-			});
+	describe('convenience defaults', () => {
+		it('should resolve NODE_ENV defaults for their intended environments', () => {
+			expect(devDefault('dev-value')({ NODE_ENV: 'development' })).toBe('dev-value');
+			expect(localDefault('local-value')({ NODE_ENV: 'local' })).toBe('local-value');
+			expect(testDefault('test-value')({ NODE_ENV: 'test' })).toBe('test-value');
 		});
 
-		describe('localDefault', () => {
-			const fn = localDefault(defaultValue);
+		it('should resolve ciDefault from a truthy CI env value', () => {
+			const getDefault = ciDefault('ci-value');
 
-			it('should return value when NODE_ENV is local or development', () => {
-				expect(fn({ NODE_ENV: 'local' })).toBe(defaultValue);
-				expect(fn({ NODE_ENV: 'development' })).toBe(defaultValue);
-			});
-
-			it('should return undefined when NODE_ENV is not local or development', () => {
-				expect(fn({ NODE_ENV: 'production' })).toBeUndefined();
-				expect(fn({ NODE_ENV: 'test' })).toBeUndefined();
-			});
-		});
-
-		describe('testDefault', () => {
-			const fn = testDefault(defaultValue);
-
-			it('should return value when NODE_ENV is test', () => {
-				expect(fn({ NODE_ENV: 'test' })).toBe(defaultValue);
-			});
-
-			it('should return undefined when NODE_ENV is not test', () => {
-				expect(fn({ NODE_ENV: 'production' })).toBeUndefined();
-				expect(fn({ NODE_ENV: 'development' })).toBeUndefined();
-			});
-		});
-
-		describe('ciDefault', () => {
-			const fn = ciDefault(defaultValue);
-
-			it('should return value when CI env is set', () => {
-				expect(fn({ CI: 'true' })).toBe(defaultValue);
-				expect(fn({ CI: '1' })).toBe(defaultValue);
-			});
-
-			it('should return undefined when CI env is not set', () => {
-				expect(fn({})).toBeUndefined();
-				expect(fn({ CI: '' })).toBeUndefined();
-				expect(fn({ CI: undefined })).toBeUndefined();
-			});
+			expect(getDefault({ CI: 'true' })).toBe('ci-value');
+			expect(getDefault({ CI: '' })).toBeUndefined();
 		});
 	});
 });

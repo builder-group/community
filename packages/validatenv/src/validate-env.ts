@@ -1,106 +1,193 @@
-import { createValidationContext, TValidationError } from 'validation-adapter';
-import { TDefaultValueFn, TEnv, TEnvData, TEnvSpec, TEnvSpecs, TEnvSpecValue } from './types';
+import { formatThrownError } from './error';
+import { isStandardSchemaValidator, validateStandardSchema } from './standard-schema';
+import {
+	type TEnv,
+	type TEnvData,
+	type TEnvDefaultFn,
+	type TEnvSpec,
+	type TEnvSpecs,
+	type TEnvValidator
+} from './types';
 
-export function validateEnv<GEnvData extends TEnvData>(
+/** Validates environment variables and throws one error containing every failed variable. */
+export function validateEnv<GSpecs extends Record<string, unknown>>(
 	env: TEnv,
-	specs: TEnvSpecs<GEnvData>
-): GEnvData {
-	const result: Partial<GEnvData> = {};
+	specs: TEnvSpecs<GSpecs>
+): TEnvData<GSpecs> {
+	const envData: Partial<TEnvData<GSpecs>> = {};
 	const errors: string[] = [];
 
-	for (const [recordKey, spec] of Object.entries(specs) as [
-		keyof GEnvData,
-		TEnvSpecValue<GEnvData[keyof GEnvData]>
-	][]) {
-		if (!isEnvSpec(spec)) {
-			result[recordKey] = spec as GEnvData[keyof GEnvData];
+	for (const outputKey of Object.keys(specs) as Array<keyof GSpecs & string>) {
+		const specValue = specs[outputKey];
+		if (!isStandardSchemaValidator(specValue) && !isEnvSpecLike(specValue)) {
+			envData[outputKey] = specValue as TEnvData<GSpecs>[typeof outputKey];
 			continue;
 		}
 
-		const processResult = processEnvVar({ ...spec, envKey: spec.envKey ?? String(recordKey) }, env);
-		if (!processResult.success) {
-			errors.push(processResult.error);
+		const resolvedSpec = resolveEnvSpec(outputKey, specValue);
+		if (!resolvedSpec.success) {
+			errors.push(resolvedSpec.error);
 			continue;
 		}
-		result[recordKey] = processResult.value;
+
+		const validationResult = validateEnvSpec(resolvedSpec.spec, env);
+		if (!validationResult.success) {
+			errors.push(validationResult.error);
+			continue;
+		}
+
+		envData[outputKey] = validationResult.value as TEnvData<GSpecs>[typeof outputKey];
 	}
 
 	if (errors.length > 0) {
 		throw new Error(`Environment validation failed:\n\n${errors.join('\n\n')}`);
 	}
 
-	return result as GEnvData;
+	return envData as TEnvData<GSpecs>;
 }
 
-export function validateEnvVar<GValue>(spec: TEnvSpec<GValue>, env: TEnv = process.env): GValue {
-	const result = processEnvVar(spec, env);
+/** Validates one environment variable and throws when validation fails. */
+export function validateEnvVar<GInput, GOutput>(
+	env: TEnv,
+	envKey: string,
+	spec: TEnvValidator<GInput, GOutput> | Omit<TEnvSpec<GInput, GOutput>, 'envKey'>
+): GOutput;
+export function validateEnvVar<GInput, GOutput>(
+	env: TEnv,
+	spec: TEnvSpecWithEnvKey<GInput, GOutput>
+): GOutput;
+export function validateEnvVar<GInput, GOutput>(
+	env: TEnv,
+	specOrEnvKey: string | TEnvSpecWithEnvKey<GInput, GOutput>,
+	spec?: TEnvValidator<GInput, GOutput> | Omit<TEnvSpec<GInput, GOutput>, 'envKey'>
+): GOutput {
+	const isKeySpec = typeof specOrEnvKey === 'string';
+	const resolvedSpec = isKeySpec
+		? resolveEnvSpec<GInput, GOutput>(specOrEnvKey, spec)
+		: resolveEnvSpec<GInput, GOutput>(specOrEnvKey.envKey, specOrEnvKey);
+	if (!resolvedSpec.success) {
+		throw new Error(`Environment validation failed: ${resolvedSpec.error}`);
+	}
+
+	const result = validateEnvSpec(resolvedSpec.spec, env);
 	if (!result.success) {
 		throw new Error(`Environment validation failed: ${result.error}`);
 	}
+
 	return result.value;
 }
 
-function processEnvVar<GValue>(
-	spec: TEnvSpec<GValue>,
-	env: TEnv
-): { success: true; value: GValue } | { success: false; error: string } {
-	const { validator, defaultValue, middlewares = [], description, example, envKey } = spec;
+type TEnvSpecWithEnvKey<GInput, GOutput> = TEnvSpec<GInput, GOutput> & {
+	envKey: string;
+};
 
-	let value: unknown;
-	if (spec.value != null) {
-		value = spec.value;
-	} else if (envKey != null) {
-		value = env[envKey];
-	} else {
-		value = undefined;
-	}
-
-	// Apply middlewares if any
-	if (middlewares.length > 0) {
-		for (const middleware of middlewares) {
-			value = middleware(value as string);
-		}
-	}
-
-	// Handle undefined values with defaultValue
-	if (value === undefined) {
-		if (typeof defaultValue === 'function') {
-			try {
-				value = (defaultValue as TDefaultValueFn<GValue>)(env);
-			} catch (error) {
-				return {
-					success: false,
-					error: `Error evaluating default value for ${String(envKey)}: ${error}`
-				};
+function resolveEnvSpec<GInput, GOutput>(
+	outputKey: string,
+	specValue: unknown
+): TResolveEnvSpecResult<GInput, GOutput> {
+	if (isStandardSchemaValidator<GInput, GOutput>(specValue)) {
+		return {
+			success: true,
+			spec: {
+				envKey: outputKey,
+				validator: specValue
 			}
-		} else if (defaultValue !== undefined) {
-			value = defaultValue;
-		}
+		};
 	}
 
-	const validationContext = createValidationContext<GValue>(value as GValue);
-	// TODO: Support async validators?
-	void validator.validate(validationContext);
-
-	if (validationContext.hasError()) {
-		const finalDescription = description != null ? `\nDescription: ${description}` : '';
-		const finalExample = example != null ? `\nExample: ${example}` : '';
-		const finalErrors = `\nError: ${validationContext.errors
-			.map((e: TValidationError) => e.message)
-			.join(', ')}`;
-
+	if (!isEnvSpecLike<GInput, GOutput>(specValue)) {
 		return {
 			success: false,
-			error: `Invalid value for ${String(envKey)}${finalDescription}${finalExample}${finalErrors}`
+			error: `Spec for ${outputKey} must be a Standard Schema validator or env spec.`
+		};
+	}
+
+	const { validator, envKey = outputKey } = specValue;
+	if (!isStandardSchemaValidator<GInput, GOutput>(validator)) {
+		return {
+			success: false,
+			error: `Validator for ${outputKey} must implement the Standard Schema interface.`
 		};
 	}
 
 	return {
 		success: true,
-		value: validationContext.value as GValue
+		spec: {
+			...specValue,
+			envKey,
+			validator
+		}
 	};
 }
 
-function isEnvSpec<GValue>(value: TEnvSpecValue<GValue>): value is TEnvSpec<GValue> {
+type TResolveEnvSpecResult<GInput, GOutput> =
+	| {
+			success: true;
+			spec: TEnvSpecWithEnvKey<GInput, GOutput>;
+	  }
+	| {
+			success: false;
+			error: string;
+	  };
+
+function isEnvSpecLike<GInput, GOutput>(
+	value: unknown
+): value is TEnvSpecCandidate<GInput, GOutput> {
 	return typeof value === 'object' && value != null && 'validator' in value;
 }
+
+type TEnvSpecCandidate<GInput, GOutput> = Omit<TEnvSpec<GInput, GOutput>, 'validator'> & {
+	validator: unknown;
+};
+
+function validateEnvSpec<GInput, GOutput>(
+	spec: TEnvSpecWithEnvKey<GInput, GOutput>,
+	env: TEnv
+): TEnvSpecValidationResult<GOutput> {
+	const { validator, defaultValue, preprocess, description, example, envKey } = spec;
+	let value: unknown = env[envKey];
+
+	// Preprocess
+	if (preprocess != null) {
+		try {
+			value = preprocess(value);
+		} catch (error) {
+			return {
+				success: false,
+				error: `Error preprocessing ${envKey}: ${formatThrownError(error)}`
+			};
+		}
+	}
+
+	// Apply default
+	if (value === undefined) {
+		try {
+			value =
+				typeof defaultValue === 'function'
+					? (defaultValue as TEnvDefaultFn<GInput>)(env)
+					: defaultValue;
+		} catch (error) {
+			return {
+				success: false,
+				error: `Error evaluating default value for ${envKey}: ${formatThrownError(error)}`
+			};
+		}
+	}
+
+	// Validate
+	return validateStandardSchema<GOutput>(validator, value, {
+		envKey,
+		description,
+		example
+	});
+}
+
+type TEnvSpecValidationResult<GOutput> =
+	| {
+			success: true;
+			value: GOutput;
+	  }
+	| {
+			success: false;
+			error: string;
+	  };

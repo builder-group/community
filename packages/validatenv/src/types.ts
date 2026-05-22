@@ -1,86 +1,64 @@
-import type { TBaseValidationContext, TValidator } from 'validation-adapter';
+import type { StandardSchemaV1 } from '@standard-schema/spec';
 
-export type TEnvData = Record<string, any>;
+/** Environment variable source read by `validateEnv()` and `validateEnvVar()`. */
+export type TEnv = Record<string, unknown>;
 
-export type TEnv = NodeJS.ProcessEnv | Record<string, unknown>;
-
-export type TEnvMiddleware<GValue> = (value: string | undefined) => GValue | undefined;
-
-export type TDefaultValueFn<GValue> = (env: TEnv) => GValue | undefined;
-
-export type TEnvSpec<GValue> = {
-	/**
-	 * Optional custom environment variable key to look up in process.env.
-	 * If not provided, the object property name will be used.
-	 * @example
-	 * ```ts
-	 * // Will look for process.env.DATABASE_URL instead of process.env.dbUrl
-	 * dbUrl: {
-	 *   envKey: 'DATABASE_URL',
-	 * }
-	 * ```
-	 */
+/** Configures how a single environment value is resolved and validated. */
+export interface TEnvSpec<GInput = unknown, GOutput = GInput> {
+	/** Environment key to read. Defaults to the output object key. */
 	envKey?: string;
 
-	/**
-	 * Optional value to use instead of looking up in process.env.
-	 * @example
-	 * ```ts
-	 * value: 'https://example.com'
-	 * ```
-	 */
-	value?: string;
+	/** Standard Schema-compatible validator for the final value. */
+	validator: TEnvValidator<GInput, GOutput>;
 
-	/**
-	 * The validator function to validate the environment variable
-	 */
-	validator: TValidator<GValue, TBaseValidationContext<GValue>>;
+	/** Default used when the resolved value is `undefined`. */
+	defaultValue?: GInput | TEnvDefaultFn<GInput>;
 
-	/**
-	 * Optional default value or function to generate default value.
-	 * @example
-	 * ```ts
-	 * // Static default value
-	 * defaultValue: 3000
-	 *
-	 * // Function that returns default based on other env vars
-	 * defaultValue: (env) => env.NODE_ENV === 'development' ? 3000 : 8080
-	 * ```
-	 */
-	defaultValue?: GValue | TDefaultValueFn<GValue>;
+	/** Cleans the raw value before defaults and validation run. */
+	preprocess?: TEnvPreprocess<GInput>;
 
-	/**
-	 * Optional array of middleware functions to transform the value.
-	 * @example
-	 * ```ts
-	 * middlewares: [
-	 *   (value) => value?.toLowerCase(),
-	 *   (value) => value === 'true' ? true : false
-	 * ]
-	 * ```
-	 */
-	middlewares?: TEnvMiddleware<GValue>[];
-
-	/**
-	 * Optional description of the environment variable.
-	 * Used in error messages to provide more context.
-	 * @example "The port number for the server to listen on"
-	 */
+	/** Extra context added to validation errors. */
 	description?: string;
 
-	/**
-	 * Optional example of valid values.
-	 * Used in error messages to help users fix invalid values.
-	 * @example "3000, 8080, etc."
-	 */
+	/** Valid value example added to validation errors. */
 	example?: string;
+}
+
+/** Standard Schema-compatible validator used by an env spec. */
+export type TEnvValidator<GInput = unknown, GOutput = GInput> = StandardSchemaV1<GInput, GOutput>;
+
+/** Cleans a raw env value before defaults and validation run. */
+export type TEnvPreprocess<GValue = unknown> = (value: unknown) => GValue | undefined;
+
+/** Computes a default value from the full env source. */
+export type TEnvDefaultFn<GValue> = (env: TEnv) => GValue | undefined;
+
+/** Env spec object accepted by `validateEnv()` and `createViteEnvDefine()`. */
+export type TEnvSpecs<GSpecs extends Record<string, unknown>> = GSpecs &
+	TEnvSpecEntriesConstraint<GSpecs>;
+
+// Note: Keep defaultValue and preprocess tied to the validator input type
+// without widening validateEnv inference
+type TEnvSpecEntriesConstraint<GSpecs extends Record<string, unknown>> = {
+	[Key in keyof GSpecs]: TEnvSpecEntryConstraint<GSpecs[Key]>;
 };
 
-export type TEnvSpecValue<GValue> =
-	| TEnvSpec<GValue>
-	// | TValidator<GValue, TBaseValidationContext<GValue>>
-	| GValue;
+type TEnvSpecEntryConstraint<GSpecEntry> = GSpecEntry extends { validator: infer GValidator }
+	? GValidator extends TEnvValidator<infer GInput, infer GOutput>
+		? TEnvSpec<GInput, GOutput>
+		: never
+	: GSpecEntry extends TEnvValidator<infer GInput, infer GOutput>
+		? TEnvValidator<GInput, GOutput>
+		: GSpecEntry;
 
-export type TEnvSpecs<GEnvData extends TEnvData> = {
-	[Key in keyof GEnvData]: TEnvSpecValue<GEnvData[Key]>;
+/** Validated env object returned from a spec object. */
+export type TEnvData<GSpecs extends Record<string, unknown>> = {
+	[Key in keyof GSpecs]: TEnvSpecEntryOutput<GSpecs[Key]>;
 };
+
+type TEnvSpecEntryOutput<GSpecEntry> =
+	GSpecEntry extends TEnvSpec<infer _GInput, infer GOutput>
+		? GOutput
+		: GSpecEntry extends TEnvValidator<infer _GInput, infer GOutput>
+			? GOutput
+			: GSpecEntry;

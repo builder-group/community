@@ -1,9 +1,26 @@
 {
 	"name": "validatenv",
-	"version": "0.0.44",
+	"version": "0.1.0-beta.1",
 	"private": false,
-	"description": "Validate environment variables",
-	"keywords": [],
+	"description": "Validate env variables into typed config with Standard Schema validators and fail-fast errors.",
+	"keywords": [
+		"env",
+		"environment-variables",
+		"env-validation",
+		"validation",
+		"typescript",
+		"standard-schema",
+		"zod",
+		"valibot",
+		"arktype",
+		"dotenv",
+		"config",
+		"vite",
+		"startup-validation",
+		"fail-fast",
+		"type-safe",
+		"process-env"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
@@ -35,8 +52,7 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@blgc/utils": "workspace:*",
-		"validation-adapter": "workspace:*"
+		"@standard-schema/spec": "^1.1.0"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",

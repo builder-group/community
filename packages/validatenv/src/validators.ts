@@ -1,164 +1,188 @@
-import { isFQDN, isIP } from '@blgc/utils';
-import { createValidator } from 'validation-adapter';
+import type { StandardSchemaV1 } from '@standard-schema/spec';
+import type { TEnvValidator } from './types';
 
-export const stringValidator = createValidator<string>([
-	{
-		key: 'string',
-		validate: (ctx) => {
-			if (typeof ctx.value !== 'string') {
-				ctx.registerError({
-					code: 'invalid_type',
-					message: 'Must be a string'
-				});
-			}
-		}
+/** Requires a string value. */
+export const stringValidator = defineEnvValidator<string>((value) => {
+	if (typeof value !== 'string') {
+		return invalid('Must be a string');
 	}
-]);
 
-const VALID_TRUE_VALUES = ['true', 't', 'yes', 'on', '1'];
-const VALID_FALSE_VALUES = ['false', 'f', 'no', 'off', '0'];
-export const booleanValidator = createValidator<boolean>([
-	{
-		key: 'boolean',
-		validate: (ctx) => {
-			if (typeof ctx.value !== 'string') {
-				ctx.registerError({
-					code: 'invalid_boolean',
-					message: 'Must be a valid boolean value'
-				});
-				return;
-			}
+	return valid(value);
+});
 
-			const value = ctx.value.toLowerCase();
-			if (!VALID_TRUE_VALUES.includes(value) && !VALID_FALSE_VALUES.includes(value)) {
-				ctx.registerError({
-					code: 'invalid_boolean',
-					message: 'Must be a valid boolean value'
-				});
-				return;
-			}
-
-			ctx.value = VALID_TRUE_VALUES.includes(value);
-		}
+/** Accepts "true", "t", "yes", "on", "1" and their false counterparts. Returns a boolean. */
+export const booleanValidator = defineEnvValidator<boolean>((value) => {
+	if (typeof value === 'boolean') {
+		return valid(value);
 	}
-]);
 
-export const numberValidator = createValidator<number>([
-	{
-		key: 'number',
-		validate: (ctx) => {
-			const num = Number(ctx.value);
-			if (Number.isNaN(num)) {
-				ctx.registerError({
-					code: 'invalid_number',
-					message: 'Must be a valid number'
-				});
-				return;
-			}
-			ctx.value = num;
-		}
+	if (typeof value !== 'string') {
+		return invalid('Must be a valid boolean value');
 	}
-]);
 
-// Intentionally non-exhaustive email validation
-export const emailValidator = createValidator<string>([
-	{
-		key: 'email',
-		validate: (ctx) => {
-			if (typeof ctx.value !== 'string') {
-				ctx.registerError({
-					code: 'invalid_email',
-					message: 'Must be a string'
-				});
-				return;
-			}
-
-			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-			if (!emailRegex.test(ctx.value)) {
-				ctx.registerError({
-					code: 'invalid_email',
-					message: 'Must be a valid email address'
-				});
-			}
-		}
+	const normalizedValue = value.toLowerCase();
+	if (validTrueValues.includes(normalizedValue)) {
+		return valid(true);
 	}
-]);
 
-export const hostValidator = createValidator<string>([
-	{
-		key: 'host',
-		validate: (ctx) => {
-			if (!isFQDN(ctx.value) && !isIP(ctx.value)) {
-				ctx.registerError({
-					code: 'invalid_host',
-					message: 'Must be a valid domain name or IP address'
-				});
-			}
-		}
+	if (validFalseValues.includes(normalizedValue)) {
+		return valid(false);
 	}
-]);
 
-export const portValidator = createValidator<number>([
-	{
-		key: 'port',
-		validate: (ctx) => {
-			const portNum = Number(ctx.value);
-			if (Number.isNaN(portNum) || !Number.isInteger(portNum) || portNum < 1 || portNum > 65535) {
-				ctx.registerError({
-					code: 'invalid_port',
-					message: 'Must be a valid port number (1-65535)'
-				});
-				return;
-			}
-			ctx.value = portNum;
-		}
+	return invalid('Must be a valid boolean value');
+});
+
+const validTrueValues = ['true', 't', 'yes', 'on', '1'];
+const validFalseValues = ['false', 'f', 'no', 'off', '0'];
+
+/** Parses finite numbers from strings or number values. */
+export const numberValidator = defineEnvValidator<number>((value) => {
+	const numberValue = parseNumberValue(value);
+	if (numberValue == null) {
+		return invalid('Must be a valid number');
 	}
-]);
 
-export const urlValidator = createValidator<string>([
-	{
-		key: 'url',
-		validate: (ctx) => {
-			if (typeof ctx.value !== 'string') {
-				ctx.registerError({
-					code: 'invalid_url',
-					message: 'Must be a string'
-				});
-				return;
-			}
+	return valid(numberValue);
+});
 
-			try {
-				new URL(ctx.value);
-			} catch {
-				ctx.registerError({
-					code: 'invalid_url',
-					message: 'Must be a valid URL'
-				});
-			}
-		}
+/** Checks a practical email shape: local part, at sign, domain with at least one dot. */
+export const emailValidator = defineEnvValidator<string>((value) => {
+	if (typeof value !== 'string') {
+		return invalid('Must be a string');
 	}
-]);
 
-export const jsonValidator = createValidator<unknown>([
-	{
-		key: 'json',
-		validate: (ctx) => {
-			if (typeof ctx.value !== 'string') {
-				ctx.registerError({
-					code: 'invalid_json',
-					message: 'Must be a string'
-				});
-				return;
-			}
-
-			try {
-				ctx.value = JSON.parse(ctx.value);
-			} catch {
-				ctx.registerError({
-					code: 'invalid_json',
-					message: 'Must be valid JSON'
-				});
-			}
-		}
+	if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+		return invalid('Must be a valid email address');
 	}
-]);
+
+	return valid(value);
+});
+
+/** Accepts fully qualified domain names and IPv4 or IPv6 addresses. */
+export const hostValidator = defineEnvValidator<string>((value) => {
+	if (typeof value !== 'string' || (!isFqdn(value) && !isIpAddress(value))) {
+		return invalid('Must be a valid domain name or IP address');
+	}
+
+	return valid(value);
+});
+
+/** Validates integer port numbers in the range 1 to 65535. */
+export const portValidator = defineEnvValidator<number>((value) => {
+	const portValue = parseNumberValue(value);
+	if (portValue == null || !Number.isInteger(portValue) || portValue < 1 || portValue > 65535) {
+		return invalid('Must be a valid port number (1-65535)');
+	}
+
+	return valid(portValue);
+});
+
+/** Requires a valid URL parseable by the WHATWG URL standard. */
+export const urlValidator = defineEnvValidator<string>((value) => {
+	if (typeof value !== 'string') {
+		return invalid('Must be a string');
+	}
+
+	try {
+		new URL(value);
+	} catch {
+		return invalid('Must be a valid URL');
+	}
+
+	return valid(value);
+});
+
+/** Parses a JSON string and returns the parsed value. Output type is unknown. */
+export const jsonValidator = defineEnvValidator<unknown>((value) => {
+	if (typeof value !== 'string') {
+		return invalid('Must be a string');
+	}
+
+	try {
+		return valid(JSON.parse(value));
+	} catch {
+		return invalid('Must be valid JSON');
+	}
+});
+
+function defineEnvValidator<GValue>(
+	validate: (value: unknown) => StandardSchemaV1.Result<GValue>
+): TEnvValidator<unknown, GValue> {
+	return {
+		'~standard': {
+			version: 1,
+			vendor: 'validatenv',
+			validate
+		}
+	};
+}
+
+function valid<GValue>(value: GValue): StandardSchemaV1.SuccessResult<GValue> {
+	return { value };
+}
+
+function invalid(message: string): StandardSchemaV1.FailureResult {
+	return {
+		issues: [{ message }]
+	};
+}
+
+function parseNumberValue(value: unknown): number | null {
+	if (typeof value === 'number' && Number.isFinite(value)) {
+		return value;
+	}
+
+	if (typeof value !== 'string' || value.trim() === '') {
+		return null;
+	}
+
+	const numberValue = Number(value);
+	if (!Number.isFinite(numberValue)) {
+		return null;
+	}
+
+	return numberValue;
+}
+
+function isFqdn(value: string): boolean {
+	const normalizedValue = value.endsWith('.') ? value.slice(0, -1) : value;
+	const labels = normalizedValue.split('.');
+	if (normalizedValue.length > 253 || labels.length < 2) {
+		return false;
+	}
+
+	return labels.every(isFqdnLabel) && /[a-z]/i.test(labels[labels.length - 1] ?? '');
+}
+
+function isFqdnLabel(label: string): boolean {
+	return /^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/i.test(label);
+}
+
+function isIpAddress(value: string): boolean {
+	return isIpv4Address(value) || isIpv6Address(value);
+}
+
+function isIpv4Address(value: string): boolean {
+	const segments = value.split('.');
+	if (segments.length !== 4) {
+		return false;
+	}
+
+	return segments.every((segment) => {
+		if (!/^\d+$/.test(segment)) {
+			return false;
+		}
+
+		const numberValue = Number(segment);
+		return numberValue >= 0 && numberValue <= 255;
+	});
+}
+
+function isIpv6Address(value: string): boolean {
+	try {
+		new URL(`http://[${value}]/`);
+		return true;
+	} catch {
+		return false;
+	}
+}

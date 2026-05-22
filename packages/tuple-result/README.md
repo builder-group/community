@@ -132,7 +132,7 @@ const jsonCountArray = JSON.parse(JSON.stringify(countArray)) as TResultArray<nu
 fromArray(jsonCountArray).unwrap(); // 42
 ```
 
-## Result API
+## API
 
 ### Core
 
