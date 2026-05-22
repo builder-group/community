@@ -1,111 +1,141 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { mockConsole, restoreConsoleMock, type TConsoleSpies } from './__tests__/mock-console';
-import { createLogger, LOG_LEVEL } from './create-logger';
-import { type TLoggerMiddleware } from './types';
+import { createLogger, ELogLevel } from './create-logger';
+import { logIdFeature, prefixFeature } from './features';
+import type { TLoggerMiddleware } from './types';
 
 describe('createLogger function', () => {
 	const consoleSpies: TConsoleSpies = {};
 
 	beforeEach(() => {
-		mockConsole(['log', 'trace', 'info', 'warn', 'error'], consoleSpies);
+		mockConsole(['trace', 'debug', 'log', 'info', 'warn', 'error'], consoleSpies);
 	});
 
 	afterEach(() => {
 		restoreConsoleMock(consoleSpies);
 	});
 
-	it('should log messages based on default log levels', () => {
-		const logger = createLogger();
+	describe('types', () => {
+		it('should infer installed feature APIs through the feature-core chain', () => {
+			// Act
+			const logger = createLogger().with(prefixFeature('[App]'), logIdFeature());
 
-		logger.trace('trace message');
-		expect(consoleSpies.trace).toHaveBeenCalledWith('trace message');
-
-		logger.log('log message');
-		expect(consoleSpies.log).toHaveBeenCalledWith('log message');
-
-		logger.info('info message');
-		expect(consoleSpies.info).toHaveBeenCalledWith('info message');
-
-		logger.warn('warn message');
-		expect(consoleSpies.warn).toHaveBeenCalledWith('warn message');
-
-		logger.error('error message');
-		expect(consoleSpies.error).toHaveBeenCalledWith('error message');
+			// Assert
+			expectTypeOf(logger.log).toEqualTypeOf<(...data: unknown[]) => string>();
+			expectTypeOf(logger._features).toEqualTypeOf<readonly ('prefix' | 'log-id')[]>();
+		});
 	});
 
-	it('should not log messages below the set log level', () => {
-		const logger = createLogger({ level: LOG_LEVEL.WARN });
+	describe('log methods', () => {
+		it('should call console methods at the default level', () => {
+			// Prepare
+			const logger = createLogger();
 
-		logger.trace('trace message');
-		expect(consoleSpies.trace).not.toHaveBeenCalled();
+			// Act
+			logger.trace('trace message');
+			logger.debug('debug message');
+			logger.log('log message');
+			logger.info('info message');
+			logger.warn('warn message');
+			logger.error('error message');
 
-		logger.log('log message');
-		expect(consoleSpies.log).not.toHaveBeenCalled();
+			// Assert
+			expect(consoleSpies.trace).toHaveBeenCalledWith('trace message');
+			expect(consoleSpies.debug).toHaveBeenCalledWith('debug message');
+			expect(consoleSpies.log).toHaveBeenCalledWith('log message');
+			expect(consoleSpies.info).toHaveBeenCalledWith('info message');
+			expect(consoleSpies.warn).toHaveBeenCalledWith('warn message');
+			expect(consoleSpies.error).toHaveBeenCalledWith('error message');
+		});
 
-		logger.info('info message');
-		expect(consoleSpies.info).not.toHaveBeenCalled();
+		it('should skip messages below the configured level', () => {
+			// Prepare
+			const logger = createLogger({ level: ELogLevel.WARN });
 
-		logger.warn('warn message');
-		expect(consoleSpies.warn).toHaveBeenCalledWith('warn message');
+			// Act
+			logger.info('info message');
+			logger.warn('warn message');
+			logger.error('error message');
 
-		logger.error('error message');
-		expect(consoleSpies.error).toHaveBeenCalledWith('error message');
+			// Assert
+			expect(consoleSpies.info).not.toHaveBeenCalled();
+			expect(consoleSpies.warn).toHaveBeenCalledWith('warn message');
+			expect(consoleSpies.error).toHaveBeenCalledWith('error message');
+		});
+
+		it('should skip all messages when inactive', () => {
+			// Prepare
+			const logger = createLogger({ active: false });
+
+			// Act
+			logger.error('error message');
+
+			// Assert
+			expect(consoleSpies.error).not.toHaveBeenCalled();
+		});
 	});
 
-	it('should respect the active flag', () => {
-		const logger = createLogger({ active: false });
+	describe('_baseLog method', () => {
+		it('should compose global and context middlewares from right to left', () => {
+			// Prepare
+			const calls: string[] = [];
+			const globalMiddleware: TLoggerMiddleware = (next) => {
+				return (data, context) => {
+					calls.push('global');
+					next([`global:${data[0]}`], context);
+				};
+			};
+			const contextMiddleware: TLoggerMiddleware = (next) => {
+				return (data, context) => {
+					calls.push('context');
+					next([`context:${data[0]}`], context);
+				};
+			};
+			const invokeConsole = vi.fn();
+			const logger = createLogger({ invokeConsole, middlewares: [globalMiddleware] });
 
-		logger.trace('trace message');
-		expect(consoleSpies.trace).not.toHaveBeenCalled();
+			// Act
+			logger._baseLog(['message'], {
+				logMethod: 'log',
+				level: ELogLevel.LOG,
+				middlewares: [contextMiddleware]
+			});
 
-		logger.log('log message');
-		expect(consoleSpies.log).not.toHaveBeenCalled();
-
-		logger.info('info message');
-		expect(consoleSpies.info).not.toHaveBeenCalled();
-
-		logger.warn('warn message');
-		expect(consoleSpies.warn).not.toHaveBeenCalled();
-
-		logger.error('error message');
-		expect(consoleSpies.error).not.toHaveBeenCalled();
+			// Assert
+			expect(calls).toEqual(['global', 'context']);
+			expect(invokeConsole).toHaveBeenCalledWith(
+				['context:global:message'],
+				expect.objectContaining({ logMethod: 'log' })
+			);
+		});
 	});
 
-	it('should apply middlewares correctly', () => {
-		const middleware: TLoggerMiddleware = vi.fn((next: Function) => next) as any;
-		const logger = createLogger({ middlewares: [middleware] });
+	describe('invokeConsole option', () => {
+		it('should use a custom console invoker when provided', () => {
+			// Prepare
+			const invokeConsole = vi.fn();
+			const logger = createLogger({ invokeConsole });
 
-		logger.log('log message');
-		expect(middleware).toHaveBeenCalled();
-	});
+			// Act
+			logger.log('log message');
 
-	it('should invoke custom invokeConsole if provided', () => {
-		const customInvokeConsole = vi.fn();
-		const logger = createLogger({ invokeConsole: customInvokeConsole });
+			// Assert
+			expect(invokeConsole).toHaveBeenCalledWith(
+				['log message'],
+				expect.objectContaining({ logMethod: 'log' })
+			);
+		});
 
-		logger.log('log message');
-		expect(customInvokeConsole).toHaveBeenCalledWith('log', ['log message']);
-	});
+		it('should forward an empty data array when called without data', () => {
+			// Prepare
+			const invokeConsole = vi.fn();
+			const logger = createLogger({ invokeConsole });
 
-	it('should call the baseLog method correctly', () => {
-		const logger = createLogger({ level: LOG_LEVEL.LOG });
-		const baseLogSpy = vi.spyOn(logger, '_baseLog' as any);
+			// Act
+			logger.log();
 
-		logger.log('log message');
-		expect(baseLogSpy).toHaveBeenCalledWith({ logMethod: 'log', level: LOG_LEVEL.LOG }, [
-			'log message'
-		]);
-	});
-
-	it('should handle custom category middlewares correctly', () => {
-		const categoryMiddleware: TLoggerMiddleware = vi.fn((next: Function) => next) as any;
-		const logger = createLogger();
-		(logger as any)._baseLog = vi.fn(logger._baseLog.bind(logger));
-
-		logger._baseLog({ logMethod: 'log', level: LOG_LEVEL.LOG, middlewares: [categoryMiddleware] }, [
-			'log message'
-		]);
-
-		expect(categoryMiddleware).toHaveBeenCalled();
+			// Assert
+			expect(invokeConsole).toHaveBeenCalledWith([], expect.objectContaining({ logMethod: 'log' }));
+		});
 	});
 });
