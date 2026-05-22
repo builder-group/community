@@ -39,47 +39,66 @@ describe('createForm function', () => {
 		});
 	});
 
-	it('should create form fields and return current data', () => {
-		// Prepare
-		const form = createForm<TUserFormData>({
-			fields: {
-				name: { defaultValue: 'Alice' },
-				email: { defaultValue: 'alice@example.com' }
-			}
-		});
+	describe('fields', () => {
+		it('should create form fields and return current data', () => {
+			// Prepare
+			const form = createForm<TUserFormData>({
+				fields: {
+					name: { defaultValue: 'Alice' },
+					email: { defaultValue: 'alice@example.com' }
+				}
+			});
 
-		// Act
-		form.getField('name').set('Bob');
+			// Act
+			form.getField('name').set('Bob');
 
-		// Assert
-		expect(form.fields.name).toBe(form.getField('name'));
-		expect(form.getData()).toEqual({
-			name: 'Bob',
-			email: 'alice@example.com'
+			// Assert
+			expect(form.fields.name).toBe(form.getField('name'));
+			expect(form.getData()).toEqual({
+				name: 'Bob',
+				email: 'alice@example.com'
+			});
+			expect(form.getValidData()).toEqual({
+				name: 'Bob',
+				email: 'alice@example.com'
+			});
+			expect(form.status.get()).toEqual({ type: 'valid' });
 		});
-		expect(form.getValidData()).toEqual({
-			name: 'Bob',
-			email: 'alice@example.com'
-		});
-		expect(form.status.get()).toEqual({ type: 'valid' });
 	});
 
 	describe('submit method', () => {
-		it('should submit valid data and update default values when configured', async () => {
+		it('should submit valid data to valid submit callbacks', async () => {
 			// Prepare
 			const submittedData: Array<Readonly<TUserFormData>> = [];
 			const form = createForm<TUserFormData>({
 				fields: {
 					name: {
 						defaultValue: '',
-						validator: createStandardSchema<string>((value) =>
-							value.length > 0 ? { value } : { issues: [{ message: 'Required' }] }
-						)
+						validator: createRequiredStringSchema()
 					},
 					email: { defaultValue: 'alice@example.com' }
 				},
 				onValidSubmit(data) {
 					submittedData.push(data);
+				}
+			});
+			form.fields.name.set('Bob');
+
+			// Act
+			const isValid = await form.submit();
+
+			// Assert
+			expect(isValid).toBe(true);
+			expect(submittedData).toEqual([{ name: 'Bob', email: 'alice@example.com' }]);
+			expect(form.isSubmitted.get()).toBe(true);
+		});
+
+		it('should update default values when configured', async () => {
+			// Prepare
+			const form = createForm<TUserFormData>({
+				fields: {
+					name: { defaultValue: 'Alice' },
+					email: { defaultValue: 'alice@example.com' }
 				}
 			});
 			form.fields.name.set('Bob');
@@ -91,7 +110,6 @@ describe('createForm function', () => {
 
 			// Assert
 			expect(isValid).toBe(true);
-			expect(submittedData).toEqual([{ name: 'Bob', email: 'alice@example.com' }]);
 			expect(form.fields.name.get()).toBe('Bob');
 			expect(form.isSubmitted.get()).toBe(false);
 		});
@@ -170,9 +188,7 @@ describe('createForm function', () => {
 				fields: {
 					name: {
 						defaultValue: 'Alice',
-						validator: createStandardSchema<string>((value) =>
-							value.length > 0 ? { value } : { issues: [{ message: 'Required' }] }
-						)
+						validator: createRequiredStringSchema()
 					},
 					email: { defaultValue: 'alice@example.com' }
 				}
@@ -190,232 +206,219 @@ describe('createForm function', () => {
 	});
 
 	describe('validation', () => {
-		it('should validate form-level constraints', async () => {
-			// Prepare
-			interface TPasswordFormData {
-				password: string;
-				confirm: string;
-			}
-			const form = createForm<TPasswordFormData>({
-				fields: {
-					password: { defaultValue: 'secret' },
-					confirm: { defaultValue: 'different' }
-				},
-				validator: createStandardSchema<TPasswordFormData>((value) =>
-					value.password === value.confirm
-						? { value }
-						: { issues: [{ message: 'Passwords do not match', path: ['confirm'] }] }
-				)
-			});
-
-			// Act
-			const isValid = await form.validate();
-
-			// Assert
-			expect(isValid).toBe(false);
-			expect(form.getErrors().fields.confirm).toEqual([
-				{ message: 'Passwords do not match', path: undefined }
-			]);
-			expect(form.getErrors().form).toEqual([]);
-			expect(form.fields.confirm.status.get()).toEqual({
-				type: 'invalid',
-				errors: [{ message: 'Passwords do not match', path: undefined }]
-			});
-			expect(form.status.get()).toEqual({
-				type: 'invalid',
-				errors: [{ message: 'Passwords do not match', path: undefined }]
-			});
-		});
-
-		it('should clear routed form-level field errors after the form validator passes', async () => {
-			// Prepare
-			interface TPasswordFormData {
-				password: string;
-				confirm: string;
-			}
-			const form = createForm<TPasswordFormData>({
-				fields: {
-					password: { defaultValue: 'secret' },
-					confirm: { defaultValue: 'different' }
-				},
-				validator: createStandardSchema<TPasswordFormData>((value) =>
-					value.password === value.confirm
-						? { value }
-						: { issues: [{ message: 'Passwords do not match', path: ['confirm'] }] }
-				)
-			});
-			await form.validate();
-
-			// Act
-			form.fields.confirm.set('secret');
-			const isValid = await form.validate();
-
-			// Assert
-			expect(isValid).toBe(true);
-			expect(form.fields.confirm.status.get()).toEqual({ type: 'valid' });
-			expect(form.getErrors()).toEqual({ fields: {}, form: [] });
-		});
-
-		it('should keep field validator errors when routed form-level errors clear', async () => {
-			// Prepare
-			const form = createForm<TUserFormData>({
-				fields: {
-					name: {
-						defaultValue: '',
-						validator: createStandardSchema<string>(() => ({
-							issues: [{ message: 'Field required' }]
-						}))
+		describe('field error routing', () => {
+			it('should route form-level field errors to matching fields', async () => {
+				// Prepare
+				const form = createForm<TPasswordFormData>({
+					fields: {
+						password: { defaultValue: 'secret' },
+						confirm: { defaultValue: 'different' }
 					},
-					email: { defaultValue: 'invalid@example.com' }
-				},
-				validator: createStandardSchema<TUserFormData>((value) =>
-					value.email === 'alice@example.com'
-						? { value }
-						: { issues: [{ message: 'Form email error', path: ['name'] }] }
-				)
+					validator: createStandardSchema<TPasswordFormData>((value) =>
+						value.password === value.confirm
+							? { value }
+							: { issues: [{ message: 'Passwords do not match', path: ['confirm'] }] }
+					)
+				});
+
+				// Act
+				const isValid = await form.validate();
+
+				// Assert
+				expect(isValid).toBe(false);
+				expect(form.getErrors()).toEqual({
+					fields: {
+						confirm: [{ message: 'Passwords do not match', path: undefined }]
+					},
+					form: []
+				});
 			});
-			await form.validate();
 
-			// Act
-			form.fields.email.set('alice@example.com');
-			await form.validate();
+			it('should clear routed form-level field errors after the form validator passes', async () => {
+				// Prepare
+				const form = createForm<TPasswordFormData>({
+					fields: {
+						password: { defaultValue: 'secret' },
+						confirm: { defaultValue: 'different' }
+					},
+					validator: createStandardSchema<TPasswordFormData>((value) =>
+						value.password === value.confirm
+							? { value }
+							: { issues: [{ message: 'Passwords do not match', path: ['confirm'] }] }
+					)
+				});
+				await form.validate();
 
-			// Assert
-			expect(form.fields.name.status.get()).toEqual({
-				type: 'invalid',
-				errors: [{ message: 'Field required', path: undefined }]
+				// Act
+				form.fields.confirm.set('secret');
+				const isValid = await form.validate();
+
+				// Assert
+				expect(isValid).toBe(true);
+				expect(form.getErrors()).toEqual({ fields: {}, form: [] });
 			});
-		});
 
-		it('should keep pathless and unknown form-level errors on the form', async () => {
-			// Prepare
-			const form = createForm<TUserFormData>({
-				fields: {
-					name: { defaultValue: '' },
-					email: { defaultValue: 'alice@example.com' }
-				},
-				collectErrorMode: 'all',
-				validator: createStandardSchema<TUserFormData>(() => ({
-					issues: [
-						{ message: 'General form error' },
+			it('should keep field validator errors when routed form-level errors clear', async () => {
+				// Prepare
+				const form = createForm<TUserFormData>({
+					fields: {
+						name: {
+							defaultValue: '',
+							validator: createRequiredStringSchema('Field required')
+						},
+						email: { defaultValue: 'invalid@example.com' }
+					},
+					validator: createStandardSchema<TUserFormData>((value) =>
+						value.email === 'alice@example.com'
+							? { value }
+							: { issues: [{ message: 'Form email error', path: ['name'] }] }
+					)
+				});
+				await form.validate();
+
+				// Act
+				form.fields.email.set('alice@example.com');
+				await form.validate();
+
+				// Assert
+				expect(form.fields.name.status.get()).toEqual({
+					type: 'invalid',
+					errors: [{ message: 'Field required', path: undefined }]
+				});
+			});
+
+			it('should keep pathless and unknown form-level errors on the form', async () => {
+				// Prepare
+				const form = createForm<TUserFormData>({
+					fields: {
+						name: { defaultValue: '' },
+						email: { defaultValue: 'alice@example.com' }
+					},
+					collectErrorMode: 'all',
+					validator: createStandardSchema<TUserFormData>(() => ({
+						issues: [
+							{ message: 'General form error' },
+							{ message: 'Unknown field error', path: ['unknown'] }
+						]
+					}))
+				});
+
+				// Act
+				await form.validate();
+
+				// Assert
+				expect(form.getErrors()).toEqual({
+					fields: {},
+					form: [
+						{ message: 'General form error', path: undefined },
 						{ message: 'Unknown field error', path: ['unknown'] }
 					]
-				}))
-			});
-
-			// Act
-			await form.validate();
-
-			// Assert
-			expect(form.getErrors()).toEqual({
-				fields: {},
-				form: [
-					{ message: 'General form error', path: undefined },
-					{ message: 'Unknown field error', path: ['unknown'] }
-				]
+				});
 			});
 		});
 
-		it('should validate form-level constraints on field change when configured', async () => {
-			// Prepare
-			const form = createForm<TUserFormData>({
-				fields: {
-					name: { defaultValue: '' },
-					email: { defaultValue: 'alice@example.com' }
-				},
-				validateOn: ['change'],
-				validator: createStandardSchema<TUserFormData>((value) =>
-					value.name.length > 0
-						? { value }
-						: { issues: [{ message: 'Name required', path: ['name'] }] }
-				)
-			});
-
-			// Act
-			form.fields.name.set('Bob');
-			await waitForQueuedValidation();
-			form.fields.name.set('');
-			await waitForQueuedValidation();
-
-			// Assert
-			expect(form.status.get()).toEqual({
-				type: 'invalid',
-				errors: [{ message: 'Name required', path: undefined }]
-			});
-		});
-
-		it('should not notify status listeners when form revalidation returns the same status', async () => {
-			// Prepare
-			const form = createForm<TUserFormData>({
-				fields: {
-					name: { defaultValue: 'Alice' },
-					email: { defaultValue: 'alice@example.com' }
-				},
-				validator: createStandardSchema<TUserFormData>((value) => ({ value }))
-			});
-			await form.submit();
-			let statusChangeCount = 0;
-			form.status.listen(() => {
-				statusChangeCount++;
-			});
-
-			// Act
-			form.fields.name.set('Bob');
-			await waitForQueuedValidation();
-
-			// Assert
-			expect(form.status.get()).toEqual({ type: 'valid' });
-			expect(statusChangeCount).toBe(0);
-		});
-
-		it('should revalidate touched form-level constraints on field change', async () => {
-			// Prepare
-			const form = createForm<TUserFormData>({
-				fields: {
-					name: { defaultValue: '' },
-					email: { defaultValue: 'alice@example.com' }
-				},
-				validateOn: ['touched'],
-				validator: createStandardSchema<TUserFormData>((value) =>
-					value.name.length > 0
-						? { value }
-						: { issues: [{ message: 'Name required', path: ['name'] }] }
-				)
-			});
-
-			// Act
-			form.fields.name.blur();
-			await waitForQueuedValidation();
-			form.fields.name.set('Alice');
-			await waitForQueuedValidation();
-
-			// Assert
-			expect(form.status.get()).toEqual({ type: 'valid' });
-			expect(form.getErrors()).toEqual({ fields: {}, form: [] });
-		});
-
-		it('should apply form validation defaults to generated fields', async () => {
-			// Prepare
-			const form = createForm<TUserFormData>({
-				fields: {
-					name: {
-						defaultValue: '',
-						validator: createStandardSchema<string>((value) =>
-							value.length > 0 ? { value } : { issues: [{ message: 'Required' }] }
-						)
+		describe('validation triggers', () => {
+			it('should validate form-level constraints on field change when configured', async () => {
+				// Prepare
+				const form = createForm<TUserFormData>({
+					fields: {
+						name: { defaultValue: '' },
+						email: { defaultValue: 'alice@example.com' }
 					},
-					email: { defaultValue: 'alice@example.com' }
-				},
-				validateOn: ['blur'],
-				revalidateOn: ['submit', 'change']
+					validateOn: ['change'],
+					validator: createStandardSchema<TUserFormData>((value) =>
+						value.name.length > 0
+							? { value }
+							: { issues: [{ message: 'Name required', path: ['name'] }] }
+					)
+				});
+
+				// Act
+				form.fields.name.set('Bob');
+				await waitForQueuedValidation();
+				form.fields.name.set('');
+				await waitForQueuedValidation();
+
+				// Assert
+				expect(form.status.get()).toEqual({
+					type: 'invalid',
+					errors: [{ message: 'Name required', path: undefined }]
+				});
 			});
 
-			// Act
-			form.fields.name.blur();
-			await waitForQueuedValidation();
+			it('should revalidate touched form-level constraints on field change', async () => {
+				// Prepare
+				const form = createForm<TUserFormData>({
+					fields: {
+						name: { defaultValue: '' },
+						email: { defaultValue: 'alice@example.com' }
+					},
+					validateOn: ['touched'],
+					validator: createStandardSchema<TUserFormData>((value) =>
+						value.name.length > 0
+							? { value }
+							: { issues: [{ message: 'Name required', path: ['name'] }] }
+					)
+				});
 
-			// Assert
-			expect(form.getErrors().fields.name).toEqual([{ message: 'Required', path: undefined }]);
+				// Act
+				form.fields.name.blur();
+				await waitForQueuedValidation();
+				form.fields.name.set('Alice');
+				await waitForQueuedValidation();
+
+				// Assert
+				expect(form.status.get()).toEqual({ type: 'valid' });
+				expect(form.getErrors()).toEqual({ fields: {}, form: [] });
+			});
+
+			it('should apply form validation defaults to generated fields', async () => {
+				// Prepare
+				const form = createForm<TUserFormData>({
+					fields: {
+						name: {
+							defaultValue: '',
+							validator: createRequiredStringSchema()
+						},
+						email: { defaultValue: 'alice@example.com' }
+					},
+					validateOn: ['blur'],
+					revalidateOn: ['submit', 'change']
+				});
+
+				// Act
+				form.fields.name.blur();
+				await waitForQueuedValidation();
+
+				// Assert
+				expect(form.getErrors().fields.name).toEqual([{ message: 'Required', path: undefined }]);
+			});
+		});
+
+		describe('status notifications', () => {
+			it('should not notify status listeners when form revalidation returns the same status', async () => {
+				// Prepare
+				const form = createForm<TUserFormData>({
+					fields: {
+						name: { defaultValue: 'Alice' },
+						email: { defaultValue: 'alice@example.com' }
+					},
+					validator: createStandardSchema<TUserFormData>((value) => ({ value }))
+				});
+				await form.submit();
+				let statusChangeCount = 0;
+				form.status.listen(() => {
+					statusChangeCount++;
+				});
+
+				// Act
+				form.fields.name.set('Bob');
+				await waitForQueuedValidation();
+
+				// Assert
+				expect(form.status.get()).toEqual({ type: 'valid' });
+				expect(statusChangeCount).toBe(0);
+			});
 		});
 	});
 
@@ -451,9 +454,7 @@ describe('createForm function', () => {
 				fields: {
 					name: {
 						defaultValue: '',
-						validator: createStandardSchema<string>(() => ({
-							issues: [{ message: 'Required' }]
-						}))
+						validator: createRequiredStringSchema()
 					},
 					email: { defaultValue: 'alice@example.com' }
 				}
@@ -478,6 +479,17 @@ describe('createForm function', () => {
 interface TUserFormData {
 	name: string;
 	email: string;
+}
+
+interface TPasswordFormData {
+	password: string;
+	confirm: string;
+}
+
+function createRequiredStringSchema(message = 'Required'): StandardSchemaV1<string> {
+	return createStandardSchema<string>((value) =>
+		value.length > 0 ? { value } : { issues: [{ message }] }
+	);
 }
 
 function createStandardSchema<GValue>(

@@ -27,7 +27,7 @@ describe('useFormField function', () => {
 		).toEqualTypeOf<'age'>();
 
 		// @ts-expect-error uncontrolled fields do not expose value
-		name.value;
+		expectTypeOf(name.value).toEqualTypeOf<never>();
 	});
 
 	it('should expose field value in controlled mode', () => {
