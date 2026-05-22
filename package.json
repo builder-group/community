@@ -28,7 +28,7 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@changesets/changelog-github": "^0.6.0",
+		"@changesets/changelog-github": "^0.7.0",
 		"@changesets/cli": "^2.31.0",
 		"@eslint/js": "^9.39.2",
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
@@ -37,13 +37,13 @@
 		"@size-limit/preset-small-lib": "^12.1.0",
 		"eslint": "^9.39.2",
 		"prettier": "^3.8.3",
-		"rollup": "^4.60.2",
+		"rollup": "^4.60.4",
 		"shx": "^0.4.0",
 		"size-limit": "^12.1.0",
-		"turbo": "^2.9.8",
+		"turbo": "^2.9.14",
 		"typescript": "^6.0.3",
-		"vite": "^8.0.10",
-		"vitest": "^4.1.5"
+		"vite": "^8.0.14",
+		"vitest": "^4.1.7"
 	},
 	"packageManager": "pnpm@10.33.2",
 	"engines": {
