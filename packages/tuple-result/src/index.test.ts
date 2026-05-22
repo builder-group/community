@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import {
 	Err,
+	err,
 	fromArray,
 	isErr,
 	isOk,
@@ -8,288 +9,282 @@ import {
 	mapOk,
 	match,
 	Ok,
+	ok,
 	t,
 	tAsync,
 	toArray,
+	unwrap,
 	unwrapErr,
 	unwrapOk,
 	unwrapOr,
 	unwrapOrNull,
 	unwrapOrUndefined,
-	type TResult
+	type TResult,
+	type TResultArray
 } from './index';
 
-describe('tuple-result', () => {
-	describe('OkResult class', () => {
-		it('should create Ok results with correct behavior', () => {
-			const result = Ok(42);
-			expect(result.value).toBe(42);
-			expect(result.unwrap()).toBe(42);
-			expect(result.isOk()).toBe(true);
-			expect(result.isErr()).toBe(false);
+describe('tuple-result package', () => {
+	describe('constructors', () => {
+		it('should create destructurable Ok results', () => {
+			// Prepare
+			const userResult = Ok({ name: 'Ada' });
+
+			// Act
+			const [isUserOk, userErr, user] = userResult;
+
+			// Assert
+			expect(isUserOk).toBe(true);
+			expect(userErr).toBeUndefined();
+			expect(user).toEqual({ name: 'Ada' });
+			expect(userResult.value).toEqual({ name: 'Ada' });
+			expect(userResult.unwrap()).toEqual({ name: 'Ada' });
+			expect(userResult.isOk()).toBe(true);
+			expect(userResult.isErr()).toBe(false);
 		});
 
-		it('should support array destructuring', () => {
-			const result = Ok('hello');
-			const [ok, error, value] = result;
-			expect(ok).toBe(true);
-			expect(error).toBe(undefined);
-			expect(value).toBe('hello');
+		it('should create destructurable Err results', () => {
+			// Prepare
+			const configResult = Err<{ url: string }, string>('Missing config');
+
+			// Act
+			const [isConfigOk, configErr, config] = configResult;
+
+			// Assert
+			expect(isConfigOk).toBe(false);
+			expect(configErr).toBe('Missing config');
+			expect(config).toBeUndefined();
+			expect(configResult.error).toBe('Missing config');
+			expect(configResult.isOk()).toBe(false);
+			expect(configResult.isErr()).toBe(true);
 		});
 
-		it('should handle edge cases', () => {
-			const result = Ok(null);
-			expect(result.value).toBe(null);
-			expect(result.unwrap()).toBe(null);
+		it('should expose lowercase constructor aliases', () => {
+			// Assert
+			expect(ok('value').value).toBe('value');
+			expect(err('error').error).toBe('error');
 		});
 	});
 
-	describe('ErrResult class', () => {
-		it('should create Err results with correct behavior', () => {
-			const result = Err('Some error');
-			expect(result.error).toBe('Some error');
-			expect(() => result.unwrap()).toThrowError();
-			expect(result.isOk()).toBe(false);
-			expect(result.isErr()).toBe(true);
+	describe('type guards', () => {
+		it('should narrow method-based result instances', () => {
+			// Prepare
+			const userResult: TResult<{ name: string }, Error> = Ok({ name: 'Ada' });
+
+			// Assert
+			if (isOk(userResult)) {
+				expectTypeOf(userResult.value).toEqualTypeOf<{ name: string }>();
+				expect(userResult.value.name).toBe('Ada');
+			}
 		});
 
-		it('should support array destructuring', () => {
-			const result = Err('oops');
-			const [ok, error, value] = result;
-			expect(ok).toBe(false);
-			expect(error).toBe('oops');
-			expect(value).toBe(undefined);
-		});
-	});
+		it('should narrow plain result arrays', () => {
+			// Prepare
+			const configResult = createConfigArrayResult();
 
-	describe('isOk function', () => {
-		it('should narrow types correctly', () => {
-			const okResult: TResult<number, string> = Ok(99);
-			if (isOk(okResult)) {
-				expect(okResult.value).toBe(99);
+			// Assert
+			if (isErr(configResult)) {
+				expectTypeOf(configResult[1]).toEqualTypeOf<string>();
+				expect(configResult[1]).toBe('Missing config');
 			}
 		});
 	});
 
-	describe('isErr function', () => {
-		it('should narrow types correctly', () => {
-			const errResult: TResult<number, string> = Err('Failure');
-			if (isErr(errResult)) {
-				expect(errResult.error).toBe('Failure');
+	describe('unwrapping', () => {
+		it('should unwrap success values', () => {
+			// Prepare
+			const userResult = Ok({ name: 'Ada' });
+
+			// Assert
+			expect(unwrap(userResult)).toEqual({ name: 'Ada' });
+			expect(unwrapOk(userResult)).toEqual({ name: 'Ada' });
+		});
+
+		it('should unwrap error values', () => {
+			// Prepare
+			const configResult = Err<{ url: string }, string>('Missing config');
+
+			// Assert
+			expect(unwrapErr(configResult)).toBe('Missing config');
+		});
+
+		it('should throw the stored error when unwrapping Err results', () => {
+			// Prepare
+			const configErr = { code: 'missing_config' };
+			const configResult = Err(configErr);
+			let thrownByFunction: unknown;
+			let thrownByMethod: unknown;
+
+			// Act
+			try {
+				unwrap(configResult);
+			} catch (error) {
+				thrownByFunction = error;
 			}
+			try {
+				configResult.unwrap();
+			} catch (error) {
+				thrownByMethod = error;
+			}
+
+			// Assert
+			expect(thrownByFunction).toBe(configErr);
+			expect(thrownByMethod).toBe(configErr);
+		});
+
+		it('should throw branch assertion errors when unwrapping the wrong branch', () => {
+			// Assert
+			expect(() => unwrapOk(Err('Missing value'))).toThrow('Expected an Ok result');
+			expect(() => unwrapErr(Ok('value'))).toThrow('Expected an Err result');
+		});
+
+		it('should use fallback values for Err results', () => {
+			// Prepare
+			const userResult = Err<{ name: string }, string>('Missing user');
+
+			// Assert
+			expect(unwrapOr(userResult, { name: 'Fallback' })).toEqual({ name: 'Fallback' });
+			expect(unwrapOrNull(userResult)).toBeNull();
+			expect(unwrapOrUndefined(userResult)).toBeUndefined();
 		});
 	});
 
-	describe('unwrapOk function', () => {
-		it('should extract value from Ok result', () => {
-			const result = Ok('Success');
-			expect(unwrapOk(result)).toBe('Success');
+	describe('transformation', () => {
+		it('should transform success values and pass errors through', () => {
+			// Prepare
+			const countResult = Ok<number, string>(21);
+			const missingCountResult = Err<number, string>('Missing count');
+
+			// Act
+			const doubledCountResult = mapOk(countResult, (count) => count * 2);
+			const unchangedMissingCountResult = mapOk(missingCountResult, (count) => count * 2);
+
+			// Assert
+			expect(unwrap(doubledCountResult)).toBe(42);
+			expect(unwrapErr(unchangedMissingCountResult)).toBe('Missing count');
 		});
 
-		it('should throw error for Err result', () => {
-			const result = Err('Error occurred');
-			expect(() => unwrapOk(result)).toThrow();
-		});
-	});
+		it('should transform error values and pass successes through', () => {
+			// Prepare
+			const countResult = Ok<number, number>(42);
+			const missingCountResult = Err<number, number>(404);
 
-	describe('unwrapErr function', () => {
-		it('should extract error from Err result', () => {
-			const result = Err('Error occurred');
-			expect(unwrapErr(result)).toBe('Error occurred');
-		});
+			// Act
+			const unchangedCountResult = mapErr(countResult, (code) => `HTTP ${code}`);
+			const wrappedMissingCountResult = mapErr(missingCountResult, (code) => `HTTP ${code}`);
 
-		it('should throw error for Ok result', () => {
-			const result = Ok('No error');
-			expect(() => unwrapErr(result)).toThrow();
-		});
-	});
-
-	describe('unwrapOr function', () => {
-		it('should return value for Ok result', () => {
-			const result = Ok(42);
-			expect(unwrapOr(result, 0)).toBe(42);
+			// Assert
+			expect(unwrap(unchangedCountResult)).toBe(42);
+			expect(unwrapErr(wrappedMissingCountResult)).toBe('HTTP 404');
 		});
 
-		it('should return default for Err result', () => {
-			const result = Err('Error occurred');
-			expect(unwrapOr(result, 0)).toBe(0);
-		});
-	});
+		it('should match on both result branches', () => {
+			// Prepare
+			const userResult = Ok<{ name: string }, string>({ name: 'Ada' });
+			const missingUserResult = Err<{ name: string }, string>('Missing user');
 
-	describe('unwrapOrNull function', () => {
-		it('should return value for Ok result', () => {
-			const result = Ok(42);
-			expect(unwrapOrNull(result)).toBe(42);
-		});
-
-		it('should return null for Err result', () => {
-			const result = Err('Error occurred');
-			expect(unwrapOrNull(result)).toBe(null);
-		});
-	});
-
-	describe('unwrapOrUndefined function', () => {
-		it('should return value for Ok result', () => {
-			const result = Ok(42);
-			expect(unwrapOrUndefined(result)).toBe(42);
-		});
-
-		it('should return undefined for Err result', () => {
-			const result = Err('Error occurred');
-			expect(unwrapOrUndefined(result)).toBe(undefined);
-		});
-	});
-
-	describe('mapOk function', () => {
-		it('should transform Ok values', () => {
-			const result = Ok(21);
-			const doubled = mapOk(result, (x: number) => x * 2);
-			expect(doubled.unwrap()).toBe(42);
-		});
-
-		it('should leave Err results unchanged', () => {
-			const result = Err('Error occurred');
-			const mapped = mapOk(result, (x: number) => x * 2);
-			expect(mapped.isErr()).toBe(true);
-			expect(mapped.error).toBe('Error occurred');
-		});
-	});
-
-	describe('mapErr function', () => {
-		it('should transform Err values', () => {
-			const result = Err('Error occurred');
-			const wrapped = mapErr(result, (err) => `Wrapped: ${err}`);
-			expect(wrapped.error).toBe('Wrapped: Error occurred');
-		});
-
-		it('should leave Ok results unchanged', () => {
-			const result = Ok(42);
-			const mapped = mapErr(result, (err) => `Wrapped: ${err}`);
-			expect(mapped.isOk()).toBe(true);
-			expect(mapped.unwrap()).toBe(42);
-		});
-	});
-
-	describe('match function', () => {
-		it('should call ok handler for Ok results', () => {
-			const result = Ok(42);
-			const message = match(result, {
-				ok: (value) => `Success: ${value}`,
-				err: (error) => `Error: ${error}`
+			// Act
+			const userLabel = match(userResult, {
+				ok: (user) => user.name,
+				err: (userErr) => userErr
 			});
-			expect(message).toBe('Success: 42');
-		});
-
-		it('should call err handler for Err results', () => {
-			const result = Err('Something went wrong');
-			const message = match(result, {
-				ok: (value) => `Success: ${value}`,
-				err: (error) => `Error: ${error}`
+			const missingUserLabel = match(missingUserResult, {
+				ok: (user) => user.name,
+				err: (userErr) => userErr
 			});
-			expect(message).toBe('Error: Something went wrong');
-		});
 
-		it('should work with complex transformations', () => {
-			const result = Ok({ name: 'John', age: 30 });
-			const processed = match(result, {
-				ok: (user) => ({ ...user, displayName: user.name.toUpperCase() }),
-				err: (error) => ({ name: 'Unknown', age: 0, displayName: 'UNKNOWN' })
-			});
-			expect(processed).toEqual({
-				name: 'John',
-				age: 30,
-				displayName: 'JOHN'
-			});
-		});
-
-		it('should work with plain arrays', () => {
-			const okArray: [true, undefined, string] = [true, undefined, 'hello'];
-			const errArray: [false, string, undefined] = [false, 'oops', undefined];
-
-			const okMessage = match(okArray, {
-				ok: (value) => `Got: ${value}`,
-				err: (error) => `Failed: ${error}`
-			});
-			expect(okMessage).toBe('Got: hello');
-
-			const errMessage = match(errArray, {
-				ok: (value) => `Got: ${value}`,
-				err: (error) => `Failed: ${error}`
-			});
-			expect(errMessage).toBe('Failed: oops');
+			// Assert
+			expect(userLabel).toBe('Ada');
+			expect(missingUserLabel).toBe('Missing user');
 		});
 	});
 
-	describe('toArray function', () => {
-		it('should convert Ok and Err results to arrays', () => {
-			const okResult = Ok('success');
-			const errResult = Err('error');
+	describe('wrappers', () => {
+		it('should wrap synchronous functions', () => {
+			// Prepare
+			const parseConfig = (input: string) => JSON.parse(input) as { port: number };
+			const parseErr = new SyntaxError('Invalid JSON');
 
-			expect(toArray(okResult)).toEqual([true, undefined, 'success']);
-			expect(toArray(errResult)).toEqual([false, 'error', undefined]);
+			// Act
+			const configResult = t(parseConfig, '{"port":3000}');
+			const invalidConfigResult = t(() => {
+				throw parseErr;
+			});
+
+			// Assert
+			expect(unwrap(configResult)).toEqual({ port: 3000 });
+			expect(unwrapErr(invalidConfigResult)).toBe(parseErr);
+		});
+
+		it('should wrap promises', async () => {
+			// Prepare
+			const requestErr = new Error('Request failed');
+
+			// Act
+			const userResult = await tAsync(Promise.resolve({ name: 'Ada' }));
+			const missingUserResult = await tAsync(Promise.reject(requestErr));
+
+			// Assert
+			expect(unwrap(userResult)).toEqual({ name: 'Ada' });
+			expect(unwrapErr(missingUserResult)).toBe(requestErr);
 		});
 	});
 
-	describe('fromArray function', () => {
-		it('should create results from arrays', () => {
-			const okArray: [true, undefined, string] = [true, undefined, 'success'];
-			const errArray: [false, string, undefined] = [false, 'error', undefined];
+	describe('serialization', () => {
+		it('should convert method-based results to plain arrays', () => {
+			// Prepare
+			const userResult = Ok<{ name: string }, string>({ name: 'Ada' });
+			const missingUserResult = Err<{ name: string }, string>('Missing user');
 
-			const okResult = fromArray(okArray);
-			const errResult = fromArray(errArray);
+			// Act
+			const userArray = toArray(userResult);
+			const missingUserArray = toArray(missingUserResult);
 
-			expect(okResult.unwrap()).toBe('success');
-			expect(() => errResult.unwrap()).toThrow();
-		});
-	});
-
-	describe('t function', () => {
-		it('should wrap successful and throwing functions', () => {
-			const successFn = (x: number) => x * 2;
-			const result = t(successFn, 21);
-			expect(result.unwrap()).toBe(42);
-
-			const throwingFn = () => {
-				throw new Error('oops');
-			};
-			const errorResult = t(throwingFn);
-			expect(errorResult.isErr()).toBe(true);
+			// Assert
+			expect(userArray).toEqual([true, undefined, { name: 'Ada' }]);
+			expect(missingUserArray).toEqual([false, 'Missing user', undefined]);
 		});
 
-		it('should work with URL constructor when wrapped in function', () => {
-			const createUrl = (url: string) => new URL(url);
+		it('should reconstruct method-based results from plain arrays', () => {
+			// Prepare
+			const userArray = [true, undefined, { name: 'Ada' }] as const satisfies TResultArray<
+				{ name: string },
+				string
+			>;
+			const missingUserArray = [false, 'Missing user', undefined] as const satisfies TResultArray<
+				{ name: string },
+				string
+			>;
 
-			// Valid URL
-			const validResult = t(createUrl, 'https://example.com');
-			expect(validResult.isOk()).toBe(true);
-			expect(validResult.unwrap().href).toBe('https://example.com/');
+			// Act
+			const userResult = fromArray(userArray);
+			const missingUserResult = fromArray(missingUserArray);
 
-			// Invalid URL
-			const invalidResult = t(createUrl, 'not-a-valid-url');
-			expect(invalidResult.isErr()).toBe(true);
-			expect(invalidResult.error).toBeInstanceOf(TypeError);
+			// Assert
+			expect(unwrap(userResult)).toEqual({ name: 'Ada' });
+			expect(unwrapErr(missingUserResult)).toBe('Missing user');
 		});
-	});
 
-	describe('tAsync function', () => {
-		it('should wrap resolved and rejected promises', async () => {
-			const promise = Promise.resolve(42);
-			const result = await tAsync(promise);
-			expect(result.unwrap()).toBe(42);
+		it('should support JSON roundtrips', () => {
+			// Prepare
+			const countResult = Ok<number, string>(42);
+			const missingCountResult = Err<number, string>('Missing count');
 
-			const rejectingPromise = Promise.reject('oops');
-			const errorResult = await tAsync(rejectingPromise);
-			expect(errorResult.isErr()).toBe(true);
-		});
-	});
+			// Act
+			const countArray = JSON.parse(JSON.stringify(countResult)) as TResultArray<number, string>;
+			const missingCountArray = JSON.parse(JSON.stringify(missingCountResult)) as TResultArray<
+				number,
+				string
+			>;
 
-	describe('JSON serialization', () => {
-		it('should be directly stringifiable', () => {
-			const okResult = Ok(42);
-			const errResult = Err('error');
-
-			expect(JSON.stringify(okResult)).toBe('[true,null,42]');
-			expect(JSON.stringify(errResult)).toBe('[false,"error",null]');
+			// Assert
+			expect(JSON.stringify(Ok(42))).toBe('[true,null,42]');
+			expect(JSON.stringify(Err('error'))).toBe('[false,"error",null]');
+			expect(unwrap(countArray)).toBe(42);
+			expect(unwrapErr(missingCountArray)).toBe('Missing count');
 		});
 	});
 });
+
+function createConfigArrayResult(): TResultArray<{ url: string }, string> {
+	return [false, 'Missing config', undefined];
+}
