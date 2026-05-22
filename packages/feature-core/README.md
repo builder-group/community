@@ -19,16 +19,29 @@
 
 > Status: Experimental
 
-`feature-core` is a small, typesafe foundation for building extensible JavaScript and TypeScript libraries using a `.with(feature())` composition model.
+The `.with(feature())` composition layer for extensible TypeScript libraries. Write the feature logic; `feature-core` handles type tracking, dependency validation, and API merging.
 
-Every extensible library eventually solves the same problems: applying feature APIs onto a host object, tracking what is installed, and validating dependencies. It does all of this without losing TypeScript inference. `feature-core` centralizes those mechanics once so library authors can focus on features, not plumbing.
+- TypeScript enforces feature dependencies at the call site: a missing required feature is a compile error, not a runtime crash
+- No registries, no lifecycles, no decorators: features install directly onto a plain object via `.with()`
+- No custom type gymnastics: the `.with()` signature, dependency checking, and API merging come built in
+- Features are host-agnostic: the same feature installs on any object that provides the base API it needs
 
 ```ts
-const counter = createCounter(0).with(resetFeature()).with(resetTwiceFeature()); // type error if resetFeature() is missing
+const counter = createCounter(0).with(resetFeature(), resetTwiceFeature());
 
-counter.reset(); // typed
-counter.resetTwice(); // typed
-counter.missing(); // type error
+counter.reset();      // typed
+counter.resetTwice(); // typed: type error if resetFeature() was not passed first
+counter.missing();    // type error: property does not exist on this type
+
+if (hasFeature<TResetFeature>(counter, 'reset')) {
+	counter.reset(); // narrowed
+}
+```
+
+## Install
+
+```bash
+npm install feature-core
 ```
 
 ## Three Roles
@@ -242,7 +255,7 @@ export function loggedSetFeature(): TLoggedSetFeature {
 
 Capture the previous method before returning the override when you want `super`-style behavior. Calling `counter.set()` inside the returned `set()` method would call the override again after installation.
 
-## ❓ FAQ
+## FAQ
 
 ### Why "features" instead of "plugins"?
 

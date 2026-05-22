@@ -224,6 +224,7 @@ export interface TInvalidValidationStatus {
 }
 
 export interface TValidationError {
+	/** Human-readable error description. */
 	message: string;
 	/** Standard Schema-compatible path associated with the error. */
 	path?: TValidationPath;

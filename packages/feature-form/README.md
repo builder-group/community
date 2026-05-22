@@ -19,7 +19,12 @@
 
 > Status: Experimental
 
-A lightweight, typesafe form state library. Fields and forms are reactive states. Validators are [Standard Schema](https://github.com/standard-schema/standard-schema) compatible (Zod, Valibot, or custom).
+Form state that works in any framework. Fields are reactive states you subscribe to directly, validators are [Standard Schema](https://github.com/standard-schema/standard-schema) compatible, and validation timing is configured per field.
+
+- Framework-agnostic: fields are reactive states, subscribe to status changes in React, Vue, or vanilla JS
+- Standard Schema compatible: Zod, Valibot, or any custom validator works without adapters or wrappers
+- Two-phase validation built in: quiet before submit, immediate feedback after, configured per field
+- Extend with `.with()` instead of fighting a plugin system or forking for custom behavior
 
 ```ts
 import { createForm } from 'feature-form';
@@ -27,13 +32,20 @@ import * as z from 'zod';
 
 const $form = createForm({
 	fields: {
-		name: { defaultValue: '', validator: z.string().min(2) },
-		email: { defaultValue: '', validator: z.string().email() }
-	},
-	onValidSubmit: (data) => save(data)
+		email: {
+			defaultValue: '',
+			validator: z.string().email(),
+			validateOn: ['blur', 'submit'],    // quiet while typing
+			revalidateOn: ['change', 'submit'] // immediate after first submit
+		}
+	}
 });
 
-$form.fields.name.set('Alice');
+// Fields are reactive states: subscribe in any framework
+$form.fields.email.status.listen(({ value }) => {
+	if (value.type === 'invalid') showError(value.errors[0].message);
+});
+
 await $form.submit();
 ```
 

@@ -53,6 +53,7 @@ export interface TListener<GValue> {
 export type TListenerCallback<GValue> = (context: TListenerContext<GValue>) => Promise<void> | void;
 
 export interface TListenerContext<GValue> extends TAdditionalListenerContext {
+	/** The new state value. */
 	value: GValue;
 	/** Previous value snapshot. Equals `value` on the initial call from `subscribe()`. */
 	prevValue?: GValue;

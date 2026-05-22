@@ -19,14 +19,21 @@
 
 > Status: Experimental
 
-A lightweight, typesafe reactive state container. Extend it with features instead of pulling in a larger framework.
+Reactive state that ships only what you install. Start with `createState()` and add undo, persistence, or custom equality with `.with()`.
+
+- Framework-agnostic: works in vanilla JS, React, Vue, or any environment without adapters
+- Compose behavior with `.with()` instead of bundling a monolith: only ship undo or persistence if you need it
+- Computed derivations are built in: no selector library or memoization boilerplate needed
+- TypeScript tracks installed features: calling an uninstalled method is a compile error
 
 ```ts
-import { createState, undoFeature } from 'feature-state';
+import { createComputed, createState, undoFeature } from 'feature-state';
 
 const $tasks = createState<Task[]>([]).with(undoFeature());
+const $done = createComputed($tasks, (tasks) => tasks.filter((t) => t.done));
 
-$tasks.set([{ id: 1, title: 'Buy milk' }]);
+$tasks.set([{ id: 1, title: 'Buy milk', done: true }]);
+$done.get();   // [{ id: 1, title: 'Buy milk', done: true }]
 $tasks.undo(); // []
 ```
 

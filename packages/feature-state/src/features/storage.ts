@@ -7,8 +7,7 @@ import type { TState } from '../types';
  * `persist()` tries to load a previously saved value first; if none exists it
  * saves the current state instead. After that, every `set()` call saves the new
  * value automatically. Saves triggered by loading are skipped to prevent loops.
- */
-/**
+ *
  * @param storage - The storage adapter implementing `TStorageInterface`.
  * @param key - The key used to identify this state's value in storage.
  */
@@ -87,12 +86,18 @@ export interface TStorageFeatureApi {
  * `null` and `undefined` are treated as stored values.
  */
 export interface TStorageInterface<GStorageValue> {
+	/** Saves `value` under `key`. Returns `true` on success. */
 	save(key: string, value: GStorageValue): Promise<boolean> | boolean;
+	/**
+	 * Loads the value stored under `key`.
+	 * Returns `missingStorageValue` when the key is absent; `null` and `undefined` are valid stored values.
+	 */
 	load(
 		key: string
 	):
 		| Promise<GStorageValue | typeof missingStorageValue>
 		| GStorageValue
 		| typeof missingStorageValue;
+	/** Deletes the value stored under `key`. Returns `true` on success. */
 	delete(key: string): Promise<boolean> | boolean;
 }

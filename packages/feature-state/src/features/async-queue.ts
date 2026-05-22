@@ -71,9 +71,11 @@ export type TAsyncQueueFeature<GValue> = TFeature<
 >;
 
 export interface TAsyncQueueFeatureApi<GValue> {
+	/** Registers a callback for future changes and returns an unsubscribe function. */
 	listen(callback: TListenerCallback<GValue>): () => void;
 	/** Enqueues listeners and returns a promise that resolves when all have completed. */
 	notify(options?: TStateNotifyOptions<GValue>): Promise<void>;
+	/** Registers a callback, calls it immediately with the current value, and returns an unsubscribe function. */
 	subscribe(callback: TListenerCallback<GValue>): () => void;
 }
 

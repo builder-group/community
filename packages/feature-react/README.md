@@ -21,15 +21,27 @@
 
 Hooks for [`feature-state`](https://github.com/builder-group/community/tree/develop/packages/feature-state) and [`feature-form`](https://github.com/builder-group/community/tree/develop/packages/feature-form). Subscribe to state and wire forms in any component, without providers or wrappers.
 
+- No providers or context wrappers: import state globally and subscribe in any component
+- `useCompute` re-renders only when the derived value changes, not on every source update
+- Form fields are uncontrolled by default: subscribe to status only, not every keystroke
+- Pass `null` to any hook to opt out conditionally without breaking the rules of hooks
+
 ```ts
 import { createState } from 'feature-state';
-import { useFeatureState } from 'feature-react/state';
+import { useCompute, useFeatureState } from 'feature-react/state';
 
-const $count = createState(0);
+const $tasks = createState<Task[]>([]);
 
-export const Counter = () => {
-	const count = useFeatureState($count);
-	return <button onClick={() => $count.set(count + 1)}>{count}</button>;
+// Re-renders only when the count changes, not on every task update
+const CompletedCount = () => {
+	const count = useCompute($tasks, (tasks) => tasks.filter((t) => t.done).length);
+	return <span>{count} completed</span>;
+};
+
+// Re-renders whenever tasks change
+const TaskList = () => {
+	const tasks = useFeatureState($tasks);
+	return <ul>{tasks.map((t) => <li key={t.id}>{t.title}</li>)}</ul>;
 };
 ```
 
@@ -345,6 +357,12 @@ const { input: ageInput } = useFormField($form, 'age', {
 });
 ageInput();
 ```
+
+## Alternatives
+
+- [Zustand](https://github.com/pmndrs/zustand)
+- [Jotai](https://github.com/pmndrs/jotai)
+- [TanStack Form](https://tanstack.com/form) (for form bindings)
 
 ## FAQ
 

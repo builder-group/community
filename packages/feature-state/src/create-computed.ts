@@ -131,6 +131,7 @@ export type TComputedFeature<
 > = TFeature<'computed', TComputedFeatureApi<GValue, GSources>, [], 'value' | 'set'>;
 
 export interface TComputedFeatureApi<GValue, GSources extends readonly TAnyComputedSourceState[]> {
+	/** The current computed value. Read-only: update the source states to change it. */
 	readonly value: GValue;
 	/** @internal */
 	readonly _sources: GSources;

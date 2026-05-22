@@ -19,20 +19,22 @@
 
 > Status: Experimental
 
-A lightweight, typesafe console logger. Start minimal and compose formatting, prefixes, and id tracking with `.with()`.
+A minimal console logger built around `.with()`. Start with six log methods and add prefixes, timestamps, id tracking, and CSS styles only when you need them.
 
-- Six log methods with level filtering and an on/off switch
-- Compose formatting with features: prefixes, timestamps, log-level labels, CSS styles
-- Swap the console invoker to capture output in tests without patching `console`
-- Zero dependencies, tree-shakable, works in any JS environment
+- Swap `invokeConsole` in tests to capture output without patching `console` or using spies
+- Compose formatting with `.with()` instead of configuring transports: add only what you need
+- Level filtering and an on/off switch with no config overhead
+- `active: false` silences all output at runtime with no conditional guards needed in calling code
 
 ```ts
-import { createLogger, logIdFeature, prefixFeature } from 'feature-logger';
+import { createLogger, ELogLevel, logIdFeature, prefixFeature } from 'feature-logger';
 
-const logger = createLogger().with(prefixFeature('[App]'), logIdFeature());
+const logger = createLogger({ level: ELogLevel.INFO })
+	.with(prefixFeature('[App]'), logIdFeature());
 
-logger.info('Started');
-const id = logger.error('Request failed', { status: 500 });
+logger.debug('hidden');                               // below INFO, not emitted
+logger.info('server ready');                          // "[App] server ready"
+const id = logger.error('request failed', 500); // "[App] [abc123] request failed 500"
 ```
 
 ## Install

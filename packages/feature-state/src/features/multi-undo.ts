@@ -26,6 +26,7 @@ export function multiUndoFeature<GValue>(): TMultiUndoFeature<GValue> {
 export type TMultiUndoFeature<GValue> = TFeature<
 	'multi-undo',
 	{
+		/** Steps back `count` entries in the undo history by calling `undo()` repeatedly. */
 		multiUndo(count: number): void;
 	},
 	[TUndoFeature<GValue>]
