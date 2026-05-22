@@ -24,7 +24,16 @@ import {
 } from './types';
 import { areValidationStatusesEqual } from './validation-status';
 
-/** Creates a form from field configs or existing form fields. */
+/**
+ * Creates a reactive form.
+ *
+ * Each field is a reactive state with its own `status`, `isTouched`, and `isSubmitted` states.
+ * Field configs in `fields` are upgraded to reactive form fields automatically.
+ * Validators must implement the Standard Schema interface (Zod, Valibot, or custom).
+ * Extend the form with features using `.with(feature())`.
+ *
+ * @param config - Form configuration: fields, optional validators, triggers, and submit callbacks.
+ */
 export function createForm<GFields extends TCreateFormFieldsInput>(
 	config: TCreateFormConfig<TCreateFormDataFromFields<GFields>> & { fields: GFields }
 ): TForm<TCreateFormDataFromFields<GFields>, []>;

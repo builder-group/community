@@ -636,9 +636,6 @@ importers:
 
   packages/feature-logger:
     dependencies:
-      '@blgc/utils':
-        specifier: workspace:*
-        version: link:../utils
       feature-core:
         specifier: workspace:*
         version: link:../feature-core

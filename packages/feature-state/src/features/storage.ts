@@ -65,8 +65,15 @@ export const loadFromStorageSourceKey = 'loadFromStorage';
 export type TStorageFeature = TFeature<'storage', TStorageFeatureApi>;
 
 export interface TStorageFeatureApi {
+	/**
+	 * Loads the persisted value if one exists, otherwise saves the current value.
+	 * After the first call, every `set()` saves automatically. Returns `true` on success.
+	 * Safe to call multiple times: registers the auto-save listener only once.
+	 */
 	persist(): Promise<boolean>;
+	/** Loads the persisted value and updates the state. Returns `true` if a value was found. */
 	loadFromStorage(): Promise<boolean>;
+	/** Deletes the persisted value from storage. Returns `true` on success. */
 	deleteFromStorage(): Promise<boolean>;
 }
 

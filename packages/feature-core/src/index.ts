@@ -172,9 +172,13 @@ export interface TFeature<
 	GRequiredFeatures extends readonly TAnyFeature[] = [],
 	GOverrideKeys extends TFeatureOverrideKey = never
 > {
+	/** Unique identifier. Used to detect duplicates and satisfy dependency checks. */
 	key: GKey;
+	/** Host property keys this feature replaces. Declared overrides bypass the collision check. */
 	overrides: readonly GOverrideKeys[];
+	/** Keys of features that must be installed before this one. */
 	requires: TRequiredFeatureKeyTuple<GRequiredFeatures>;
+	/** Called during `.with()` to merge the feature's API onto the host. */
 	install: (host: never) => GApi;
 }
 
@@ -238,6 +242,7 @@ type TFeatureOverrideKeys<GFeature extends TAnyFeature> =
 interface TFeatureHostApi<GBase extends object, GInstalledFeatures extends TAnyFeature[]> {
 	/** @internal Prefer `hasFeature()` to check installed features. */
 	readonly _features: readonly GInstalledFeatures[number]['key'][];
+	/** Installs one or more features and returns the updated host with their APIs merged in. */
 	with: TWithFeatureMethod<GBase, GInstalledFeatures>;
 }
 

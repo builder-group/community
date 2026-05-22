@@ -12,7 +12,16 @@ import {
 } from './types';
 import { areValidationStatusesEqual } from './validation-status';
 
-/** Creates a reactive form field with validation state and lifecycle flags. */
+/**
+ * Creates a standalone reactive form field.
+ *
+ * Use this when a field should exist independently of a specific form, for example a shared
+ * search input or a field composed into different forms. Pass the result directly into
+ * `createForm`'s `fields` config.
+ *
+ * @param defaultValue - The initial value, also restored by `reset()`.
+ * @param config - Field configuration: stable key, optional validator, and trigger settings.
+ */
 export function createFormField<GValue>(
 	defaultValue: GValue,
 	config: TCreateFormFieldConfig<GValue>

@@ -3,6 +3,16 @@ import { createState, type TState } from 'feature-state';
 import { deepCopy } from '../lib';
 import { type TForm, type TFormData, type TFormFieldKey, type TFormFields } from '../types';
 
+/**
+ * Adds `isDirty`, `dirtyFields`, and `resetDirty()` to a form.
+ *
+ * Tracks whether each field differs from its `defaultValue` using deep structural equality.
+ * `isDirty` and `dirtyFields` are reactive states. `resetDirty()` makes the current values
+ * the new baseline without clearing them. Dirty state clears automatically when
+ * `submit({ updateDefaultValues: true })` succeeds.
+ *
+ * @param config - Optional. Pass `isEqual` to override the default deep equality check.
+ */
 export function dirtyFeature<GFormData extends TFormData = TFormData>(
 	config: TDirtyFeatureConfig = {}
 ): TDirtyFeature<GFormData> {

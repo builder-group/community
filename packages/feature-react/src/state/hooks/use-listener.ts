@@ -4,8 +4,14 @@ import React from 'react';
 import { useEventCallback } from './use-event-callback';
 
 /**
- * Registers a state listener for side effects and cleans it up with the component.
- * The listener may return a cleanup function that runs before the next listener call and on unmount.
+ * Registers a listener for state changes as a side effect and removes it when the component unmounts.
+ *
+ * The callback fires on every future change, matching `state.listen()`. It can return a cleanup
+ * function that runs before the next invocation and on unmount. Pass `null` or `undefined`
+ * for `state` to register no listener.
+ *
+ * @param state - The state to listen to, or `null`/`undefined` to skip.
+ * @param callback - Runs on each state change. May return a cleanup function.
  */
 export function useListener<GValue, GFeatures extends TAnyFeature[]>(
 	state: TState<GValue, GFeatures> | null | undefined,

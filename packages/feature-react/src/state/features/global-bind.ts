@@ -2,7 +2,11 @@ import { defineFeature, type TFeature } from 'feature-core';
 import type { TStateBase } from 'feature-state';
 
 /**
- * Exposes a state on `globalThis` for browser console debugging.
+ * Exposes a state on `globalThis` under `key` for browser console debugging.
+ * After installing, `globalThis[key]` holds the state object so you can call
+ * `get()`, `set()`, and inspect `_v` directly from the browser console.
+ *
+ * @param key - The property name to assign on `globalThis`.
  */
 export function globalBindFeature<GValue>(key: string): TGlobalBindFeature {
 	return defineFeature<TGlobalBindFeature>({

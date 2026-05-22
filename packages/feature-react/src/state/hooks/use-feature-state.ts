@@ -3,8 +3,12 @@ import type { TState } from 'feature-state';
 import React from 'react';
 
 /**
- * Returns the current state value and re-renders when the state changes.
- * Passing `null` or `undefined` returns `null`; background updates do not force a render.
+ * Returns the current value of a state and re-renders the component on each change.
+ *
+ * Pass `null` or `undefined` to opt out: the hook returns `null` and registers no listener.
+ * Background updates mark the change for the next render without forcing an immediate re-render.
+ *
+ * @param state - The state to subscribe to, or `null`/`undefined` to skip subscription.
  */
 export function useFeatureState<GState extends TAnyFeatureState>(
 	state: GState

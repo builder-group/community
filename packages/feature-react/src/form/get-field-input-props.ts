@@ -3,8 +3,15 @@ import { type ChangeEventHandler, type FocusEventHandler } from 'react';
 import { type TIsWideString } from './types';
 
 /**
- * Returns props for binding a native input, textarea, or select to a form field.
- * Non-string fields require explicit parse and format functions.
+ * Returns `name`, `defaultValue`/`value`, `onChange`, and `onBlur` props for binding
+ * a native input, textarea, or select to a form field.
+ *
+ * Uncontrolled by default: `onChange` sets the field value with `background: true` so React
+ * does not re-render on every keystroke. Set `controlled: true` for a controlled input.
+ * Non-string fields require `format` (field value to display string) and `parse` (string to field value).
+ *
+ * @param formField - The form field to bind.
+ * @param options - Optional for string fields. Non-string fields require `format` and `parse`.
  */
 export function getFieldInputProps<GKey extends string = string, GValue = string>(
 	formField: TFormField<GValue>,
@@ -46,14 +53,20 @@ export type TFieldInputOptionsArgs<GValue> =
 		: [options: TParsedFieldInputOptions<GValue>];
 
 export interface TFieldInputOptions<GValue> {
+	/** Use a controlled input. Defaults to `false`. */
 	controlled?: boolean;
+	/** Converts the field value to a display string. */
 	format?: (value: GValue) => string | undefined;
+	/** Converts the input string back to the field value type. */
 	parse?: (value: string) => GValue;
 }
 
 export interface TParsedFieldInputOptions<GValue> {
+	/** Use a controlled input. Defaults to `false`. */
 	controlled?: boolean;
+	/** Converts the field value to a display string. */
 	format: (value: GValue) => string | undefined;
+	/** Converts the input string back to the field value type. */
 	parse: (value: string) => GValue;
 }
 

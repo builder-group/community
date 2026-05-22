@@ -2,9 +2,13 @@ import { createFeatureHost } from 'feature-core';
 import type { TListener, TListenerCallback, TListenerContext, TState, TStateBase } from './types';
 
 /**
- * Creates a reactive state container with `value`, `set`, `notify`, `listen`, and `subscribe`.
+ * Creates a reactive state container.
  *
- * Returns a feature host so capabilities can be added with `.with(feature())`.
+ * The state exposes `value`, `get()`, `set()`, `notify()`, `listen()`, and `subscribe()`.
+ * `set()` skips notification when the new value equals the current one (`Object.is`).
+ * Extend the state with features by calling `.with(feature())`.
+ *
+ * @param initialValue - The initial state value.
  */
 export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 	const baseState: TStateBase<GValue> = {

@@ -4,8 +4,13 @@ import React from 'react';
 import { useEventCallback } from './use-event-callback';
 
 /**
- * Subscribes to a state immediately and cleans the subscription up with the component.
- * The subscriber may return a cleanup function that runs before the next subscriber call and on unmount.
+ * Calls `callback` immediately with the current state value, then on every future change,
+ * matching `state.subscribe()`. The callback may return a cleanup function that runs before
+ * the next call and on unmount. Pass `null` or `undefined` as `state` to opt out without
+ * conditionally calling the hook.
+ *
+ * @param state - The state to subscribe to, or `null`/`undefined` to skip.
+ * @param callback - Receives the listener context on every call. May return a cleanup function.
  */
 export function useSubscriber<GValue, GFeatures extends TAnyFeature[]>(
 	state: TState<GValue, GFeatures> | null | undefined,

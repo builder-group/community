@@ -2,7 +2,17 @@ import { defineFeature, type TAnyFeature, type TFeature } from 'feature-core';
 import { createState } from './create-state';
 import type { TState, TStateBase, TStateValue } from './types';
 
-/** Creates a read-only derived state. */
+/**
+ * Creates a read-only state derived from one source state or a tuple of source states.
+ *
+ * Recomputes and notifies listeners whenever a source changes. Calling `set()` or
+ * assigning `value` throws: update the source states instead. Call `destroy()` when
+ * the computed state is no longer needed to unsubscribe from its sources.
+ *
+ * @param source - A single source state, or a tuple of source states.
+ * @param compute - Derives the computed value from the current source value(s).
+ * @param options - Pass `isEqual` to suppress notifications on structurally equivalent results.
+ */
 export function createComputed<GState extends TAnyComputedSourceState, GValue>(
 	source: GState,
 	compute: (value: TStateValue<GState>) => GValue,
@@ -123,6 +133,7 @@ export interface TComputedFeatureApi<GValue, GSources extends readonly TAnyCompu
 	readonly value: GValue;
 	/** @internal */
 	readonly _sources: GSources;
+	/** Unsubscribes from all source states. Call this when the computed state is no longer needed to prevent memory leaks. */
 	destroy(): void;
 	set(value: never, options?: never): void;
 }

@@ -7,7 +7,15 @@ import type {
 	TStateNotifyOptions
 } from '../types';
 
-/** Adds deferred FIFO listener scheduling to a state. */
+/**
+ * Defers listener calls to a shared microtask queue instead of running them synchronously.
+ * Listeners fire in FIFO order after the current call stack clears. Multiple `notify()` calls
+ * before the microtask fires are batched: all listeners join the same queue and the returned
+ * promise resolves when every enqueued call has completed.
+ *
+ * Overrides `listen`, `subscribe`, and `notify`. Do not combine with other features that
+ * override `notify`, as the last installed override wins and earlier ones are discarded.
+ */
 export function asyncQueueFeature<GValue>(): TAsyncQueueFeature<GValue> {
 	return defineFeature<TAsyncQueueFeature<GValue>>({
 		key: 'async-queue',

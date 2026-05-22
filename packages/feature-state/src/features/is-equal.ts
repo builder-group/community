@@ -2,7 +2,14 @@ import { defineFeature, type TFeature } from 'feature-core';
 import { setSourceKey } from '../create-state';
 import type { TStateBase, TStateSetOptions } from '../types';
 
-/** Overrides `set()` with a domain-specific equality check. */
+/**
+ * Replaces the default `Object.is` equality check in `set()` with a custom comparator.
+ * Useful for value types that are structurally equal but not referentially equal, such as
+ * arrays or objects where re-notifying listeners on the same logical value is wasteful.
+ * `set()` calls `isEqual(prevValue, newValue)` and skips notification when it returns `true`.
+ *
+ * @param isEqual - Returns `true` when the previous and next values are considered equal.
+ */
 export function isEqualFeature<GValue>(isEqual: TStateEquality<GValue>): TIsEqualFeature<GValue> {
 	return defineFeature<TIsEqualFeature<GValue>>({
 		key: 'is-equal',

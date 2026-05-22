@@ -2,14 +2,16 @@ import type { StandardSchemaV1 } from '@standard-schema/spec';
 import { type TAnyFeature, type TFeature, type TFeatureHost } from 'feature-core';
 import { type TIsEqualFeature, type TState } from 'feature-state';
 
+/** Form object returned by `createForm()`. */
 export type TForm<GFormData extends TFormData, GFeatures extends TAnyFeature[] = []> = TFeatureHost<
 	TFormBase<GFormData>,
 	GFeatures
 >;
 
 /**
- * Core form API available on every form.
- * Reactive values are states; callbacks and config are plain properties.
+ * Core form API used by feature installers.
+ * Use this type when a feature only needs the base methods,
+ * regardless of which other features are already installed on the host.
  */
 export interface TFormBase<GFormData extends TFormData> {
 	/** @internal */
@@ -20,20 +22,27 @@ export interface TFormBase<GFormData extends TFormData> {
 	_formValidatorStatus: TValidationStatusValue;
 	/** @internal */
 	_callbacks: TFormCallbacks<GFormData>;
+	/** Reactive aggregate validation status for the whole form. */
 	status: TFormStatus;
+	/** True while any async validator is running. */
 	isValidating: TState<boolean, []>;
+	/** True after the first submit attempt, regardless of validity. */
 	isSubmitted: TState<boolean, []>;
+	/** True while the submit handler is executing. */
 	isSubmitting: TState<boolean, []>;
+	/** Map of field keys to their reactive `TFormField` instances. */
 	fields: TFormFields<GFormData>;
 	/** Registers a callback for every valid submit. Returns an unsubscribe function. */
 	onValidSubmit(callback: TFormValidSubmitCallback<GFormData>): () => void;
 	/** Registers a callback for every invalid submit. Returns an unsubscribe function. */
 	onInvalidSubmit(callback: TFormInvalidSubmitCallback<GFormData>): () => void;
-	/** Validates the form, fires submit callbacks, and returns true if the form was valid. */
+	/** Runs all validators (including async), fires submit callbacks, and returns `true` if the form was valid. */
 	submit(options?: TFormSubmitOptions<GFormData>): Promise<boolean>;
 	/** Runs all validators and returns true if valid, false otherwise. */
 	validate(): Promise<boolean>;
+	/** Resets all fields to their default values and clears validation state. */
 	reset(): void;
+	/** Returns the `TFormField` for the given key. */
 	getField<GKey extends TFormFieldKey<GFormData>>(key: GKey): TFormFields<GFormData>[GKey];
 	/** Returns current field values without checking validity. */
 	getData(): Readonly<GFormData>;
@@ -60,8 +69,11 @@ export interface TFormCallbacks<GFormData extends TFormData> {
 }
 
 export interface TFormSubmitOptions<GFormData extends TFormData> {
+	/** One-time valid-submit callback for this call, in addition to registered listeners. */
 	onValidSubmit?: TFormValidSubmitCallback<GFormData>;
+	/** One-time invalid-submit callback for this call, in addition to registered listeners. */
 	onInvalidSubmit?: TFormInvalidSubmitCallback<GFormData>;
+	/** Arbitrary data forwarded to all submit callbacks as the second argument. */
 	context?: TFormSubmitContext;
 	/** Updates field default values after a successful submit so future resets return to submitted data. */
 	updateDefaultValues?: boolean;
@@ -93,6 +105,7 @@ export interface TFormValidationConfig {
 	validateOn: readonly TValidateTrigger[];
 	/** Validation triggers used after the first submit. */
 	revalidateOn: readonly TRevalidateTrigger[];
+	/** `'firstError'` stops after the first error; `'all'` collects every error. */
 	collectErrorMode: TCollectErrorMode;
 }
 
@@ -116,6 +129,7 @@ export type TFormFieldError = TValidationError;
 
 // MARK: - Form Field
 
+/** Form field object returned by `createFormField()`. */
 export type TFormField<GValue> = TState<GValue, [TFormFieldFeature<GValue>]>;
 
 export type TFormFieldFeature<GValue> = TFeature<
@@ -131,11 +145,15 @@ export type TFormFieldFeature<GValue> = TFeature<
 		_formValidatorErrors: readonly TValidationError[];
 		/** @internal */
 		_callbacks: TFormFieldCallbacks;
+		/** The field's key within the form data shape. */
 		key: string;
+		/** The value this field resets to. Updated by `resetDirty()` or a successful `submit({ updateDefaultValues: true })`. */
 		defaultValue: GValue;
+		/** True after the field has been blurred at least once. */
 		isTouched: TState<boolean, []>;
 		/** True after the standalone field or parent form has been submitted. */
 		isSubmitted: TState<boolean, []>;
+		/** True while an async field validator is running. */
 		isValidating: TState<boolean, []>;
 		/** Field display status, including this field's validator errors and routed form-level errors. */
 		status: TFormFieldStatus;
@@ -147,6 +165,7 @@ export type TFormFieldFeature<GValue> = TFeature<
 		onBlur: (callback: TFormFieldBlurCallback) => () => void;
 		/** Marks the field as touched and runs blur validation when configured. */
 		blur: () => void;
+		/** Resets the field to `defaultValue` and clears validation state. */
 		reset: () => void;
 	}
 >;
@@ -163,6 +182,7 @@ export interface TFormFieldValidationConfig {
 	validateOn: readonly TValidateTrigger[];
 	/** Validation triggers used after the field is submitted. */
 	revalidateOn: readonly TRevalidateTrigger[];
+	/** `'firstError'` stops after the first error; `'all'` collects every error. */
 	collectErrorMode: TCollectErrorMode;
 }
 
@@ -175,6 +195,7 @@ export interface TFormFieldCallbacks {
 export type TFormFieldBlurCallback = (context: TFormFieldBlurContext) => void;
 
 export interface TFormFieldBlurContext {
+	/** True if the field was already touched before this blur. */
 	wasTouched: boolean;
 }
 

@@ -18,8 +18,12 @@ export interface TStateBase<GValue> {
 	_v: GValue;
 	/** Current state value. Assigning a new value is equivalent to calling `set()`. */
 	value: GValue;
-	/** Notifies listeners with the current value. Useful after mutating `value` in place. */
+	/**
+	 * Notifies all listeners. Bypasses the equality check, so it fires even if the value
+	 * has not changed. Useful after mutating `_v` or `value` in place.
+	 */
 	notify(options?: TStateNotifyOptions<GValue>): void;
+	/** Returns the current state value. */
 	get(): GValue;
 	/** Sets the value and notifies listeners if it changed by reference. */
 	set(
@@ -50,6 +54,7 @@ export type TListenerCallback<GValue> = (context: TListenerContext<GValue>) => P
 
 export interface TListenerContext<GValue> extends TAdditionalListenerContext {
 	value: GValue;
+	/** Previous value snapshot. Equals `value` on the initial call from `subscribe()`. */
 	prevValue?: GValue;
 }
 

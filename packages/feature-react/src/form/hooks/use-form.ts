@@ -15,7 +15,14 @@ import {
 } from '../get-field-input-props';
 
 /**
- * Subscribes to a form and re-renders the component when any field changes.
+ * Subscribes a component to a form and re-renders when any field value changes.
+ *
+ * Returns `input(key)` to bind a field to a native input, `handleSubmit()` to wire a submit
+ * event, `field(key)` to access the raw `TFormField`, and `status(key)` to get a field's
+ * status state for a targeted subscription via `useFeatureState`. Use `useFormField` instead
+ * for isolated field components or large forms where per-keystroke re-renders are expensive.
+ *
+ * @param form - The form instance returned by `createForm`.
  */
 export function useForm<GFormData extends TFormData, GFeatures extends TAnyFeature[]>(
 	form: TForm<GFormData, GFeatures>
@@ -82,18 +89,24 @@ export function useForm<GFormData extends TFormData, GFeatures extends TAnyFeatu
 }
 
 export interface TUseFormResponse<GFormData extends TFormData, GFeatures extends TAnyFeature[]> {
+	/** The form instance passed to the hook. */
 	form: TForm<GFormData, GFeatures>;
+	/** Returns an event handler that calls `form.submit()`. Prevents the default browser action by default. */
 	handleSubmit: (
 		options?: THandleSubmitOptions<GFormData>
 	) => (event?: React.BaseSyntheticEvent) => Promise<boolean>;
+	/** Returns ready-to-spread input props for a field. Calls `getFieldInputProps` under the hood. */
 	input: <GKey extends TFormFieldKey<GFormData>>(
 		formFieldKey: GKey,
 		...options: TFieldInputOptionsArgs<GFormData[GKey]>
 	) => TFieldInputProps<GKey>;
+	/** Returns the raw `TFormField` for the given key. */
 	field: <GKey extends TFormFieldKey<GFormData>>(formFieldKey: GKey) => TFormField<GFormData[GKey]>;
+	/** Returns the validation status state for the given field. Pass to `useFeatureState` for a targeted subscription. */
 	status: <GKey extends TFormFieldKey<GFormData>>(formFieldKey: GKey) => TFormFieldStatus;
 }
 
 interface THandleSubmitOptions<GFormData extends TFormData> extends TFormSubmitOptions<GFormData> {
+	/** Calls `event.preventDefault()` before submitting. Defaults to `true`. */
 	preventDefault?: boolean;
 }

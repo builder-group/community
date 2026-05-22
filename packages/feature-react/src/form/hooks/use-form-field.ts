@@ -16,8 +16,17 @@ import {
 import { type TIsWideString } from '../types';
 
 /**
- * Subscribes to one form field's status and returns its field API and input props helper.
- * Pass `{ controlled: true }` to also subscribe to the field value.
+ * Subscribes to a form field's status and re-renders when it changes. Uncontrolled by
+ * default: only re-renders on status changes, not on every keystroke. Pass
+ * `{ controlled: true }` to also subscribe to the field value and re-render on change.
+ *
+ * Returns `field` (the `TFormField` instance), `status()` (the current validation status),
+ * and `input()` (ready-to-spread input props). All options (`controlled`, `format`, `parse`)
+ * go to this hook; the returned `input()` takes no arguments.
+ *
+ * @param form - The form that owns the field.
+ * @param key - The field key within the form's data shape.
+ * @param options - Optional for string fields. Non-string fields require `format` and `parse`.
  */
 export function useFormField<
 	GFormData extends TFormData,
@@ -72,8 +81,11 @@ export interface TUseFormFieldResponse<
 	GFormData extends TFormData,
 	GKey extends TFormFieldKey<GFormData>
 > {
+	/** The raw `TFormField` instance for the subscribed field. */
 	field: TFormField<GFormData[GKey]>;
+	/** Current validation status value. */
 	status: TValidationStatusValue;
+	/** Returns ready-to-spread input props. Takes no arguments; pass `format` and `parse` to `useFormField` instead. */
 	input: (...options: TUseFormFieldInputOptionsArgs<GFormData[GKey]>) => TFieldInputProps<GKey>;
 }
 
@@ -83,12 +95,16 @@ export type TUseFormFieldInputOptionsArgs<GValue> =
 		: [options: TUseFormFieldParsedInputOptions<GValue>];
 
 export interface TUseFormFieldInputOptions<GValue> {
+	/** Converts the field value to a display string. */
 	format?: (value: GValue) => string | undefined;
+	/** Converts the input string back to the field value type. */
 	parse?: (value: string) => GValue;
 }
 
 export interface TUseFormFieldParsedInputOptions<GValue> {
+	/** Converts the field value to a display string. */
 	format: (value: GValue) => string | undefined;
+	/** Converts the input string back to the field value type. */
 	parse: (value: string) => GValue;
 }
 
@@ -96,13 +112,16 @@ export interface TControlledUseFormFieldResponse<
 	GFormData extends TFormData,
 	GKey extends TFormFieldKey<GFormData>
 > extends TUseFormFieldResponse<GFormData, GKey> {
+	/** Current field value. Only present when `controlled: true` is passed. */
 	value: GFormData[GKey];
 }
 
 export interface TUseFormFieldOptions {
+	/** `false` (default). Subscribes to status changes only; does not re-render on every keystroke. */
 	controlled?: false;
 }
 
 export interface TControlledUseFormFieldOptions {
+	/** Subscribes to both value and status changes. Re-renders on every keystroke. */
 	controlled: true;
 }

@@ -6,7 +6,14 @@ import {
 } from 'feature-state';
 
 /**
- * Adds `storageFeature()` backed by browser `localStorage`.
+ * Adds `persist()`, `loadFromStorage()`, and `deleteFromStorage()` to a state,
+ * backed by browser `localStorage`.
+ *
+ * Values are serialized with `JSON.stringify` and deserialized with `JSON.parse`.
+ * Returns `false` silently when `localStorage` is unavailable (SSR, private mode).
+ * See `storageFeature` in `feature-state` for the full `persist()` contract.
+ *
+ * @param key - The `localStorage` key under which the value is stored.
  */
 export function localStorageFeature<GValue, GStorageValue extends GValue = GValue>(
 	key: string

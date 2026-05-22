@@ -42,6 +42,7 @@ export function undoFeature<GValue>(historyLimit = 50): TUndoFeature<GValue> {
 export type TUndoFeature<GValue> = TFeature<
 	'undo',
 	{
+		/** Steps back to the previous value. No-op when already at the oldest recorded entry. */
 		undo(options?: TStateSetOptions<GValue>): void;
 		/** @internal */
 		_history: GValue[];
