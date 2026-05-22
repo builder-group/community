@@ -75,7 +75,7 @@ describe('dirtyFeature function', () => {
 						)
 					},
 					email: { defaultValue: 'alice@example.com' }
-				},
+				}
 			}).with(dirtyFeature<TUserFormData>());
 			form.fields.name.set('Bob');
 

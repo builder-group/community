@@ -22,7 +22,9 @@ describe('storageFeature function', () => {
 
 			expectTypeOf(state.persist).toEqualTypeOf<TStorageFeatureApi['persist']>();
 			expectTypeOf(state.loadFromStorage).toEqualTypeOf<TStorageFeatureApi['loadFromStorage']>();
-			expectTypeOf(state.deleteFromStorage).toEqualTypeOf<TStorageFeatureApi['deleteFromStorage']>();
+			expectTypeOf(state.deleteFromStorage).toEqualTypeOf<
+				TStorageFeatureApi['deleteFromStorage']
+			>();
 			expectTypeOf(state).toEqualTypeOf<TState<number, [TStorageFeature]>>();
 		});
 	});

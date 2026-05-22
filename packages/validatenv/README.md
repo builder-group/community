@@ -98,7 +98,7 @@ const env = validateEnv(process.env, {
 });
 ```
 
-Each spec entry is either a validator directly, or an object with these fields:
+Each spec entry can be a validator directly, an object spec, or a static config value copied into the output without validation. Object specs support these fields:
 
 | Field          | Required | Description                                                       |
 | -------------- | -------- | ----------------------------------------------------------------- |
