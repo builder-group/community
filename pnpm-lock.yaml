@@ -803,7 +803,7 @@ importers:
         specifier: workspace:*
         version: link:../config
       '@types/node':
-        specifier: ^25.9.1
+        specifier: ^25.6.0
         version: 25.9.1
       rollup-presets:
         specifier: workspace:*

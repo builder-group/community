@@ -2,8 +2,8 @@
 	"name": "feature-state",
 	"version": "0.1.0-beta.1",
 	"private": false,
-	"description": "Straightforward, typesafe, and feature-based state management library for ReactJs",
-	"keywords": [],
+	"description": "Reactive state with composable .with() features for undo, persistence, and computed values.",
+	"keywords": ["state", "state-management", "reactive", "typescript", "undo-redo", "framework-agnostic", "vanilla", "undo", "persistence", "computed", "store", "signal", "observable"],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"

@@ -2,8 +2,8 @@
 	"name": "feature-logger",
 	"version": "0.1.0-beta.1",
 	"private": false,
-	"description": "Straightforward, typesafe, and feature-based logging library",
-	"keywords": [],
+	"description": "Composable console logger: add prefixes, timestamps, and CSS styles via .with().",
+	"keywords": ["logger", "logging", "console", "typescript", "composable", "extensible", "prefix", "middleware", "log-level", "debug", "node", "browser", "testable"],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
