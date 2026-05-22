@@ -29,11 +29,10 @@ A minimal console logger built around `.with()`. Start with six log methods and 
 ```ts
 import { createLogger, ELogLevel, logIdFeature, prefixFeature } from 'feature-logger';
 
-const logger = createLogger({ level: ELogLevel.INFO })
-	.with(prefixFeature('[App]'), logIdFeature());
+const logger = createLogger({ level: ELogLevel.INFO }).with(prefixFeature('[App]'), logIdFeature());
 
-logger.debug('hidden');                               // below INFO, not emitted
-logger.info('server ready');                          // "[App] server ready"
+logger.debug('hidden'); // below INFO, not emitted
+logger.info('server ready'); // "[App] server ready"
 const id = logger.error('request failed', 500); // "[App] [abc123] request failed 500"
 ```
 
@@ -158,8 +157,8 @@ const logger = createLogger().with(
 logger.info('ready');
 ```
 
-| Option            | Default                   | Description                                    |
-| ----------------- | ------------------------- | ---------------------------------------------- |
+| Option            | Default                   | Description                                     |
+| ----------------- | ------------------------- | ----------------------------------------------- |
 | `formatTimestamp` | `[date.toLocaleString()]` | Formats the timestamp prefix for each log call. |
 
 ### `logMethodPrefixFeature(options?)`
@@ -206,10 +205,10 @@ const id = logger.log('created');
 
 The existing `trace`, `debug`, `log`, `info`, `warn`, and `error` methods keep their console-like arguments, but return the generated id.
 
-| Option       | Default        | Description                                   |
-| ------------ | -------------- | --------------------------------------------- |
-| `generateId` | 16-char hex id | Creates the id returned by each log call.     |
-| `formatId`   | `[id]`         | Formats the id before it is prefixed.         |
+| Option       | Default        | Description                               |
+| ------------ | -------------- | ----------------------------------------- |
+| `generateId` | 16-char hex id | Creates the id returned by each log call. |
+| `formatId`   | `[id]`         | Formats the id before it is prefixed.     |
 
 ## Extending with features
 

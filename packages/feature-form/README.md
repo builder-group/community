@@ -35,7 +35,7 @@ const $form = createForm({
 		email: {
 			defaultValue: '',
 			validator: z.string().email(),
-			validateOn: ['blur', 'submit'],    // quiet while typing
+			validateOn: ['blur', 'submit'], // quiet while typing
 			revalidateOn: ['change', 'submit'] // immediate after first submit
 		}
 	}

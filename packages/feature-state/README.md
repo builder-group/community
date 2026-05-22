@@ -33,7 +33,7 @@ const $tasks = createState<Task[]>([]).with(undoFeature());
 const $done = createComputed($tasks, (tasks) => tasks.filter((t) => t.done));
 
 $tasks.set([{ id: 1, title: 'Buy milk', done: true }]);
-$done.get();   // [{ id: 1, title: 'Buy milk', done: true }]
+$done.get(); // [{ id: 1, title: 'Buy milk', done: true }]
 $tasks.undo(); // []
 ```
 

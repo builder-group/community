@@ -53,9 +53,7 @@ describe('prefixFeature function', () => {
 
 		it('should support prefixing every multiline row', () => {
 			// Prepare
-			const logger = createLogger().with(
-				prefixFeature('[Test]', { newLineBehavior: 'prefix' })
-			);
+			const logger = createLogger().with(prefixFeature('[Test]', { newLineBehavior: 'prefix' }));
 
 			// Act
 			logger.log('first line\nsecond line');

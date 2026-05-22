@@ -29,9 +29,9 @@ The `.with(feature())` composition layer for extensible TypeScript libraries. Wr
 ```ts
 const counter = createCounter(0).with(resetFeature(), resetTwiceFeature());
 
-counter.reset();      // typed
+counter.reset(); // typed
 counter.resetTwice(); // typed: type error if resetFeature() was not passed first
-counter.missing();    // type error: property does not exist on this type
+counter.missing(); // type error: property does not exist on this type
 
 if (hasFeature<TResetFeature>(counter, 'reset')) {
 	counter.reset(); // narrowed
