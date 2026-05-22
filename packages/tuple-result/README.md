@@ -17,35 +17,46 @@
     </a>
 </p>
 
-A Result type for TypeScript where errors are values, not exceptions. The `[ok, error, value]` tuple destructures natively, works across JSON boundaries, and needs no library knowledge to read.
+`tuple-result` is a TypeScript Result that stays plain JavaScript. Success and failure use `[isOk, error, value]`, so normal destructuring, `if/else`, and JSON serialization work without adapters or a chained API.
 
-- Serializable: use plain `[isOk, error, value]` tuples for JSON, React Router loaders, and APIs
-- Destructure like native JS: `const [isUserOk, userErr, user] = result` with no library knowledge required
-- Instance methods when you want them, plain tuples when you need serialization: most helpers accept both
-- No forced chaining: use plain `if/else`, or helpers like `mapOk`, `mapErr`, and `match` when they simplify code
+- Return typed errors as values for expected failure paths
+- Let TypeScript narrow `error` and `value` after the `isOk` check
+- Use helpers like `mapOk`, `mapErr`, and `match` only when they reduce noise
+- Send results through loaders, workers, APIs, or storage as plain arrays
 
 ```ts
-import { tAsync } from 'tuple-result';
+import { Err, fromArray, Ok, tAsync } from 'tuple-result';
 
-const userResult = await tAsync(loadUser());
-const [isUserOk, userErr, user] = userResult;
-
-if (isUserOk) {
-	console.log(user.name);
-} else {
-	console.error(userErr);
+async function loadUser(id: string) {
+	const [isFetchOk, fetchErr, response] = await tAsync(fetch(`/api/users/${id}`));
+	if (!isFetchOk) return Err(fetchErr);
+	if (!response.ok) return Err(new Error(`HTTP ${response.status}`));
+	return tAsync(response.json() as Promise<{ name: string }>);
 }
+
+const [isOk, userErr, user] = await loadUser('42');
+
+if (isOk) {
+	console.log(user.name); // TypeScript knows user is defined here
+} else {
+	console.error(userErr); // TypeScript knows userErr is defined here
+}
+
+// Results are arrays, so JSON round-trips without a custom serializer
+const serialized = JSON.stringify(Ok(42)); // '[true,null,42]'
+const result = fromArray<number, Error>(JSON.parse(serialized));
+result.unwrap(); // 42
 ```
 
 ## Install
 
-```sh
+```bash
 npm install tuple-result
 ```
 
 ## Usage
 
-### Creating and reading results
+Create a result with `Ok` or `Err`, then read it with array destructuring. TypeScript narrows the type automatically after the `isOk` check:
 
 ```ts
 import { Err, Ok } from 'tuple-result';
@@ -53,7 +64,7 @@ import { Err, Ok } from 'tuple-result';
 const countResult = Ok(42);
 const configResult = Err('Missing config');
 
-// Array destructuring
+// Array destructuring: readable without knowing the library
 const [isCountOk, countErr, count] = countResult;
 if (isCountOk) {
 	console.log(count); // 42
@@ -61,42 +72,40 @@ if (isCountOk) {
 	console.error(countErr);
 }
 
-// Method-based
+// Method-based access is also available
 if (countResult.isOk()) {
 	console.log(countResult.value); // 42
 }
 ```
 
-### Wrapping functions
+Wrap a call that may throw or a promise that may reject with `t` or `tAsync`:
 
 ```ts
 import { t, tAsync } from 'tuple-result';
 
-// Wrap synchronous calls
+// Wrap a synchronous call that may throw
 const result = t(() => JSON.parse('invalid')); // Err(SyntaxError)
 
-// Wrap promises
+// Wrap a promise that may reject
 const userResult = await tAsync(
 	fetch('/api/user').then(async (response) => {
 		if (!response.ok) {
 			throw new Error(`HTTP ${response.status}`);
 		}
-
 		return (await response.json()) as { name: string };
 	})
 );
 ```
 
-### Transforming results
+Transform the success or error value without unpacking the result first:
 
 ```ts
 import { Err, mapErr, mapOk, match, Ok, unwrapOr } from 'tuple-result';
 
 const doubled = mapOk(Ok(21), (x) => x * 2); // Ok(42)
 const wrapped = mapErr(Err(404), (c) => `HTTP ${c}`); // Err('HTTP 404')
-const configResult = Err('Missing config');
 
-const message = match(configResult, {
+const message = match(Err('Missing config'), {
 	ok: (config) => `Config: ${config}`,
 	err: (configErr) => `Error: ${configErr}`
 });
@@ -104,7 +113,7 @@ const message = match(configResult, {
 const count = unwrapOr(Err('Missing count'), 0); // 0
 ```
 
-### Serialization
+Results serialize to plain arrays and reconstruct from them without a custom serializer:
 
 ```ts
 import { fromArray, isOk, Ok, type TResultArray } from 'tuple-result';
@@ -123,9 +132,11 @@ const jsonCountArray = JSON.parse(JSON.stringify(countArray)) as TResultArray<nu
 fromArray(jsonCountArray).unwrap(); // 42
 ```
 
-## Result
+## Result API
 
 ### Core
+
+The constructors and types that form every result value.
 
 | Export                      | Description                                                                    |
 | --------------------------- | ------------------------------------------------------------------------------ |
@@ -139,12 +150,16 @@ fromArray(jsonCountArray).unwrap(); // 42
 
 ### Type guards
 
+Narrow a result to its `Ok` or `Err` branch. Both functions accept `TResult` and `TResultArray` so no conversion is needed before calling them.
+
 | Export          | Description                                                |
 | --------------- | ---------------------------------------------------------- |
 | `isOk(result)`  | Returns `true` and narrows to the successful result shape. |
 | `isErr(result)` | Returns `true` and narrows to the error result shape.      |
 
 ### Unwrapping
+
+Extract the inner value when you are confident about the branch, or provide a fallback for the error case.
 
 | Export                      | Description                                                 |
 | --------------------------- | ----------------------------------------------------------- |
@@ -157,6 +172,8 @@ fromArray(jsonCountArray).unwrap(); // 42
 
 ### Transformation
 
+Transform the value inside a result without unwrapping it. Each helper returns a new result, leaving the original unchanged.
+
 | Export                    | Description                                                               |
 | ------------------------- | ------------------------------------------------------------------------- |
 | `mapOk(result, fn)`       | Transforms the success value with `fn`. Passes errors through unchanged.  |
@@ -165,6 +182,8 @@ fromArray(jsonCountArray).unwrap(); // 42
 
 ### Wrappers
 
+Convert throwing functions and rejecting promises into results.
+
 | Export            | Description                                              |
 | ----------------- | -------------------------------------------------------- |
 | `t(fn, ...args)`  | Wraps a synchronous call. Returns `Err` if it throws.    |
@@ -172,21 +191,26 @@ fromArray(jsonCountArray).unwrap(); // 42
 
 ### Serialization
 
+Convert between result instances and plain arrays for storage, JSON, or cross-boundary transport.
+
 | Export             | Description                                                            |
 | ------------------ | ---------------------------------------------------------------------- |
-| `toArray(result)`  | Converts to an in-memory plain tuple with `undefined` inactive slots.  |
+| `toArray(result)`  | Converts to a plain tuple with `undefined` in the inactive slot.       |
 | `fromArray(array)` | Reconstructs an `OkResult` or `ErrResult` instance from a plain tuple. |
-
-## Alternatives
-
-- [ts-results](https://github.com/vultix/ts-results)
-- [neverthrow](https://github.com/supermacro/neverthrow)
 
 ## FAQ
 
+### How does it compare to neverthrow, ts-results, and Effect?
+
+`tuple-result` optimizes for plain JavaScript control flow and serialization. Use it when you want typed error values without committing the whole code path to chained Result methods or a larger effect system.
+
+- [neverthrow](https://github.com/supermacro/neverthrow): Result type with a class-based API and rich transformation methods
+- [ts-results](https://github.com/vultix/ts-results): Result and Option types with a class-based API
+- [Effect](https://github.com/Effect-TS/effect): full FP ecosystem with typed errors, concurrency, and dependency injection
+
 ### What is the difference between `TResult` and `TResultArray`?
 
-`TResult` is an `OkResult` or `ErrResult` instance with convenience methods (`.isOk()`, `.unwrap()`, `.value`). `TResultArray` is the plain tuple shape with the same `[isOk, error, value]` structure but no methods: useful for serialization, JSON, and frameworks like React Router.
+`TResult` is an `OkResult` or `ErrResult` instance with convenience methods (`.isOk()`, `.unwrap()`, `.value`). `TResultArray` is the plain tuple shape with the same `[isOk, error, value]` structure but no methods. It is useful for serialization, JSON, and frameworks like React Router.
 
 Most standalone helpers accept both types, so no conversion is needed in normal control flow. Use `fromArray()` to add methods back after deserializing.
 
@@ -194,18 +218,16 @@ Most standalone helpers accept both types, so no conversion is needed in normal 
 
 In memory, `Ok(value).toArray()` returns `[true, undefined, value]` and `Err(error).toArray()` returns `[false, error, undefined]`.
 
-JSON arrays cannot preserve `undefined`, so `JSON.stringify()` turns the inactive slot into `null`. `TResultArray<T, E>` accepts both `undefined` and `null` in inactive slots so roundtrips keep working without an extra conversion step.
+JSON cannot preserve `undefined`, so `JSON.stringify()` turns the inactive slot into `null`. `TResultArray<T, E>` accepts both `undefined` and `null` in inactive slots so roundtrips keep working without an extra conversion step.
 
 ### Why array destructuring instead of chaining or `.match()`?
 
-Array destructuring is native JavaScript, requires no library knowledge, and maps naturally to `if/else` control flow. Treat the first slot as the branch condition and name the tuple from the domain value, such as `[isUserOk, userErr, user]`. The pattern is inspired by the [try operator proposal](https://github.com/arthurfiorette/proposal-try-operator).
+Array destructuring is native JavaScript. It requires no library knowledge and maps naturally to `if/else` control flow. Name the tuple from the domain value: `const [isUserOk, userErr, user] = result`. The pattern is inspired by the [try operator proposal](https://github.com/arthurfiorette/proposal-try-operator).
 
 ### Why do `unwrap` and `unwrapOk` both exist?
 
-Use `unwrap` when you want Err results to throw their stored error. Use `unwrapOk` when you want a branch assertion that throws `Expected an Ok result` if the result is Err.
+Use `unwrap` when you want an Err result to throw its stored error value. Use `unwrapOk` when you want a branch assertion that throws `Expected an Ok result` if the result is Err.
 
 ### Does `unwrap` always throw an `Error` instance?
 
-No. JavaScript can throw any value, and `unwrap` preserves the `Err` payload instead of converting it. `unwrap(Err('Missing config'))` throws the string, and `unwrap(Err({ code: 'missing_config' }))` throws that object.
-
-Use `Err(new Error('Missing config'))` when you want conventional exception behavior with an `Error` instance and stack trace. Prefer normal tuple branching when you want typed domain errors.
+No. JavaScript can throw any value, and `unwrap` preserves the Err payload instead of converting it. `unwrap(Err('Missing config'))` throws the string `'Missing config'`. Use `Err(new Error('Missing config'))` when you want conventional exception behavior with a stack trace. Prefer normal tuple destructuring when you want typed domain errors.

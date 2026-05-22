@@ -2,8 +2,22 @@
 	"name": "feature-react",
 	"version": "0.1.0-beta.1",
 	"private": false,
-	"description": "React hooks for feature-state and feature-form: no providers, re-renders only on computed value change.",
-	"keywords": ["react", "hooks", "state", "state-management", "react-hooks", "typescript", "computed", "form", "useSyncExternalStore", "provider-free", "selector", "feature-state", "feature-form"],
+	"description": "React hooks for provider-free feature-state and feature-form subscriptions.",
+	"keywords": [
+		"react",
+		"hooks",
+		"react-hooks",
+		"state",
+		"state-management",
+		"form",
+		"computed",
+		"selector",
+		"provider-free",
+		"useSyncExternalStore",
+		"feature-state",
+		"feature-form",
+		"typescript"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"

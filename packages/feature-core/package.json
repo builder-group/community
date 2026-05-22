@@ -2,8 +2,21 @@
 	"name": "feature-core",
 	"version": "0.0.1",
 	"private": false,
-	"description": "Typesafe .with(feature()) composition layer for building extensible TypeScript libraries",
-	"keywords": ["typescript", "composition", "extensible", "composable", "plugin", "library-authoring", "feature", "typesafe", "mixin", "dependency-validation"],
+	"description": "Typed .with() feature composition for extensible TypeScript objects.",
+	"keywords": [
+		"typescript",
+		"composition",
+		"feature-composition",
+		"extensible",
+		"composable",
+		"library-authoring",
+		"feature",
+		"typesafe",
+		"with",
+		"mixin",
+		"plugin",
+		"dependency-validation"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"

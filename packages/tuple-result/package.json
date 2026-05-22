@@ -2,8 +2,22 @@
 	"name": "tuple-result",
 	"version": "0.1.0-beta.1",
 	"private": false,
-	"description": "TypeScript Result type where errors are values, destructures natively, and serializes to JSON.",
-	"keywords": ["result", "error-handling", "typescript", "either", "functional", "serializable", "destructuring", "result-type", "error-as-value", "fp", "neverthrow", "ts-results", "effect-ts"],
+	"description": "TypeScript Result as [isOk, error, value] tuples with typed errors and JSON serialization.",
+	"keywords": [
+		"result",
+		"result-type",
+		"error-handling",
+		"typed-errors",
+		"error-as-value",
+		"typescript",
+		"tuple",
+		"json",
+		"serializable",
+		"destructuring",
+		"either",
+		"functional",
+		"fp"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"

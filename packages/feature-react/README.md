@@ -17,31 +17,41 @@
     </a>
 </p>
 
-> Status: Experimental
+`feature-react` connects React components to [`feature-state`](https://github.com/builder-group/community/tree/develop/packages/feature-state) and [`feature-form`](https://github.com/builder-group/community/tree/develop/packages/feature-form) objects outside the React tree. Hooks subscribe directly, so no provider is required and computed hooks re-render only when selected values change.
 
-Hooks for [`feature-state`](https://github.com/builder-group/community/tree/develop/packages/feature-state) and [`feature-form`](https://github.com/builder-group/community/tree/develop/packages/feature-form). Subscribe to state and wire forms in any component, without providers or wrappers.
+- Use module, service, or form state directly from components
+- Derive slices with `useCompute` instead of re-rendering on every source update
+- Bind `feature-form` fields with focused field subscriptions
+- Pass `null` for conditional subscriptions without breaking hook rules
 
-- No providers or context wrappers: import state globally and subscribe in any component
-- `useCompute` re-renders only when the derived value changes, not on every source update
-- Form fields are uncontrolled by default: subscribe to status only, not every keystroke
-- Pass `null` to any hook to opt out conditionally without breaking the rules of hooks
-
-```ts
+```tsx
+import { createForm } from 'feature-form';
+import { useFormField } from 'feature-react/form';
+import { useCompute } from 'feature-react/state';
 import { createState } from 'feature-state';
-import { useCompute, useFeatureState } from 'feature-react/state';
+import * as z from 'zod';
 
 const $tasks = createState<Task[]>([]);
+const $profileForm = createForm({
+	fields: {
+		email: { defaultValue: '', validator: z.string().email(), validateOn: ['blur'] }
+	}
+});
 
-// Re-renders only when the count changes, not on every task update
 const CompletedCount = () => {
 	const count = useCompute($tasks, (tasks) => tasks.filter((t) => t.done).length);
 	return <span>{count} completed</span>;
 };
 
-// Re-renders whenever tasks change
-const TaskList = () => {
-	const tasks = useFeatureState($tasks);
-	return <ul>{tasks.map((t) => <li key={t.id}>{t.title}</li>)}</ul>;
+const EmailField = () => {
+	const { input, status } = useFormField($profileForm, 'email');
+	return (
+		<label>
+			Email
+			<input {...input()} />
+			{status.type === 'invalid' && <span>{status.errors[0].message}</span>}
+		</label>
+	);
 };
 ```
 
@@ -53,59 +63,43 @@ npm install feature-react
 
 ## Usage
 
-Bind state to a component with `useFeatureState`. The component re-renders whenever the state changes:
+Use `useFeatureState` to subscribe a component to a state value and re-render when it changes. Use `useCompute` when you only care about a derived slice: the component skips re-renders unless the computed result itself changes.
 
 ```ts
 import { createState } from 'feature-state';
-import { useFeatureState } from 'feature-react/state';
+import { useFeatureState, useCompute } from 'feature-react/state';
 
 const $tasks = createState<Task[]>([]);
 
 export const Tasks = () => {
 	const tasks = useFeatureState($tasks);
-	return <ul>{tasks.map((t) => <li key={t.id}>{t.title}</li>)}</ul>;
+
+	return (
+		<ul>
+			{tasks.map((task) => (
+				<li key={task.id}>{task.title}</li>
+			))}
+		</ul>
+	);
 };
 ```
 
-Derive a value from one or more states with `useCompute`. The component only re-renders when the computed result changes:
-
-```ts
-import { useCompute } from 'feature-react/state';
-
-const completedCount = useCompute($tasks, (tasks) => tasks.filter((t) => t.done).length);
-
-const filtered = useCompute([$tasks, $filter], ([tasks, filter]) =>
-	tasks.filter((t) => t.category === filter)
-);
-```
-
-Persist state in `localStorage` with `localStorageFeature`. The component picks up the saved value automatically on first render:
-
-```ts
-import { createState } from 'feature-state';
-import { localStorageFeature, useFeatureState } from 'feature-react/state';
-
-const $theme = createState<'light' | 'dark'>('light').with(localStorageFeature('theme'));
-await $theme.persist();
-
-export const ThemeToggle = () => {
-	const theme = useFeatureState($theme);
-	return <button onClick={() => $theme.set(theme === 'light' ? 'dark' : 'light')}>{theme}</button>;
-};
-```
-
-Wire up a form with `useForm`. Spread `input(key)` onto a native input to register it:
+Bind a form with `useForm` to get input helpers and a submit handler in one call:
 
 ```ts
 import { createForm } from 'feature-form';
 import { useForm } from 'feature-react/form';
 
 const $form = createForm<{ name: string; email: string }>({
-	fields: { name: { defaultValue: '' }, email: { defaultValue: '' } }
+	fields: {
+		name: { defaultValue: '' },
+		email: { defaultValue: '' }
+	}
 });
 
 export const ContactForm = () => {
 	const { input, handleSubmit } = useForm($form);
+
 	return (
 		<form onSubmit={handleSubmit({ onValidSubmit: console.log })}>
 			<input {...input('name')} />
@@ -116,11 +110,7 @@ export const ContactForm = () => {
 };
 ```
 
-## Examples
-
-- [React Basic](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/basic)
-
-## State Hooks
+## Hooks
 
 ### `useFeatureState(state)`
 
@@ -171,73 +161,33 @@ const filtered = useCompute([$tasks, $filter], ([tasks, filter]) =>
 
 ### `useListener(state, callback)`
 
-Registers a listener for side effects and cleans it up when the component unmounts. The callback runs on every future state change, matching the behavior of `state.listen()`.
+Calls `callback` whenever the state changes without subscribing the component to re-renders. Use this for side effects triggered by state changes.
 
 ```ts
 import { useListener } from 'feature-react/state';
 
-useListener($tasks, ({ value }) => {
-	document.title = `${value.length} tasks`;
-});
+export const Analytics = () => {
+	useListener($tasks, (tasks) => {
+		analytics.track('tasks_changed', { count: tasks.length });
+	});
+
+	return null;
+};
 ```
 
-The callback can return a cleanup function that runs before the next invocation and on unmount.
-
-```ts
-useListener($status, ({ value }) => {
-	const id = setTimeout(() => syncToServer(value), 500);
-	return () => clearTimeout(id);
-});
-```
+The callback must be synchronous. It runs after every state change, including background updates.
 
 ### `useSubscriber(state, callback)`
 
-Identical to `useListener`, but also calls the callback immediately with the current state value on mount. Matches the behavior of `state.subscribe()`.
+Like `useListener`, but runs the callback immediately on mount with the current state value.
 
 ```ts
 import { useSubscriber } from 'feature-react/state';
 
-useSubscriber($tasks, ({ value }) => {
-	Analytics.track('tasks.snapshot', { count: value.length });
+useSubscriber($theme, (theme) => {
+	document.documentElement.setAttribute('data-theme', theme);
 });
 ```
-
-The callback can return a cleanup function that runs before the next invocation and on unmount.
-
-## State Features
-
-Features are installed via `.with()` and extend a state before it is passed to a hook.
-
-### `localStorageFeature(key)`
-
-Persists state in `localStorage`. Built on top of `storageFeature` from `feature-state`.
-
-```ts
-import { localStorageFeature } from 'feature-react/state';
-import { createState } from 'feature-state';
-
-const $tasks = createState<Task[]>([]).with(localStorageFeature('tasks'));
-
-await $tasks.persist();
-```
-
-`persist()` loads any previously saved value. If nothing is stored it saves the current value instead, then auto-saves on every subsequent `set()`. See `storageFeature` in the [feature-state README](https://github.com/builder-group/community/tree/develop/packages/feature-state) for the full contract.
-
-### `globalBindFeature(key)`
-
-Exposes the state on `globalThis[key]` for debugging in the browser console.
-
-```ts
-import { globalBindFeature } from 'feature-react/state';
-import { createState } from 'feature-state';
-
-const $tasks = createState<Task[]>([]).with(globalBindFeature('_tasks'));
-
-// In the browser console:
-// globalThis._tasks.get()
-```
-
-## Form Hooks
 
 ### `useForm(form)`
 
@@ -316,19 +266,9 @@ const { value, status, input } = useFormField($form, 'name', { controlled: true 
 | `status`  | The current validation status value                            |
 | `input()` | Returns props for a native input, textarea, or select          |
 
-## Form Utilities
-
 ### `getFieldInputProps(formField, options?)`
 
-Standalone version of `input()`. Takes a `TFormField` directly instead of a field key. Useful outside of hooks, for example when building a custom field component that receives a field as a prop.
-
-```ts
-import { getFieldInputProps } from 'feature-react/form';
-
-export const CustomInput = ({ field }: { field: TFormField<string> }) => (
-	<input {...getFieldInputProps(field)} />
-);
-```
+Builds input props from a `TFormField` directly, without a hook. Use this outside components or when you already hold the field reference.
 
 #### Input options
 
@@ -358,33 +298,76 @@ const { input: ageInput } = useFormField($form, 'age', {
 ageInput();
 ```
 
-## Alternatives
+## Built-in Features
 
-- [Zustand](https://github.com/pmndrs/zustand)
-- [Jotai](https://github.com/pmndrs/jotai)
-- [TanStack Form](https://tanstack.com/form) (for form bindings)
+Features are installed via `.with()` and extend a state with new capabilities.
+
+### `localStorageFeature(key)`
+
+Persists state in `localStorage`. Built on top of `storageFeature` from `feature-state`.
+
+```ts
+import { createState } from 'feature-state';
+import { localStorageFeature, useFeatureState } from 'feature-react/state';
+
+const $theme = createState<'light' | 'dark'>('light').with(localStorageFeature('theme'));
+await $theme.persist();
+
+export const ThemeToggle = () => {
+	const theme = useFeatureState($theme);
+	return <button onClick={() => $theme.set(theme === 'light' ? 'dark' : 'light')}>{theme}</button>;
+};
+```
+
+`persist()` loads any previously saved value. If nothing is stored it saves the current value instead, then auto-saves on every subsequent `set()`. See `storageFeature` in the [feature-state README](https://github.com/builder-group/community/tree/develop/packages/feature-state) for the full contract.
+
+### `globalBindFeature(key)`
+
+Exposes the state on `globalThis[key]` for debugging in the browser console.
+
+```ts
+import { globalBindFeature } from 'feature-react/state';
+import { createState } from 'feature-state';
+
+const $tasks = createState<Task[]>([]).with(globalBindFeature('_tasks'));
+
+// In the browser console:
+// globalThis._tasks.get()
+```
+
+## Examples
+
+- [React Basic](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/basic)
 
 ## FAQ
 
+### How does it compare to Zustand, Jotai, and React context?
+
+`feature-react` is a binding layer, not a state model by itself. Use it when your state already lives in `feature-state` or your forms already live in `feature-form`, and React should subscribe to those objects without providers.
+
+- [zustand](https://github.com/pmndrs/zustand): store-based state with a built-in selector hook
+- [jotai](https://github.com/pmndrs/jotai): atom-based state defined outside components
+- [React context](https://react.dev/reference/react/createContext): built-in context API that re-renders consumers when the provided value changes
+
 ### When should I use `useFormField` instead of `useForm`?
 
-Use `useFormField` when a field lives in its own component or when re-rendering the entire form on every keystroke is too expensive. Uncontrolled `useFormField` subscribes to status only; controlled mode also subscribes to the field value. Use `useForm` when a single component renders the whole form and the extra re-renders are not a concern.
+Use `useFormField` when a field component should re-render only on its own status changes. With `useForm`, any field change in the form re-renders the whole component. For large forms, `useFormField` in isolated field components is significantly cheaper.
 
 ### When should I use `status(key)` from `useForm` instead of `useFormField`?
 
-Uncontrolled `useFormField` already subscribes to status only. If a component only needs validation feedback and does not need `field` or `input()`, pass `status(key)` to `useFeatureState` directly for the most minimal subscription.
+Use `status(key)` when you want to subscribe to a single field's status from within a component that already calls `useForm`. Pass the returned state to `useFeatureState` to get a focused subscription without adding a second `useFormField` call.
 
 ### What is the difference between `useListener` and `useSubscriber`?
 
-`useListener` fires only on future changes. `useSubscriber` also fires immediately on mount with the current value. Use `useSubscriber` when the side effect must run once with the initial value, for example seeding an analytics session or syncing initial state to an external system.
+`useListener` runs the callback only on subsequent state changes. `useSubscriber` also runs it immediately on mount with the current value. Use `useSubscriber` when the side effect must reflect the current state on first render, such as syncing a DOM attribute.
 
 ### When should I use `useListener` instead of `useFeatureState`?
 
-Use `useFeatureState` when the component renders based on state. Use `useListener` when the component needs to run a side effect in response to a change but does not need to re-render, for example updating the document title or writing to an external service.
+Use `useListener` when you need to react to state changes as a side effect but the component does not render anything derived from that state. Avoids an unnecessary re-render.
 
 ### Can I reference the latest values in a `useListener` or `useSubscriber` callback?
 
-Yes. The callback always sees the latest values at the time it runs. You do not need to add outside variables to any dependency array.
+Yes. Both hooks use a stable callback ref internally, so you can close over other state or props without stale value issues. The callback itself must be synchronous.
 
 ### Can I pass `null` or `undefined` as the state argument?
 
@@ -392,12 +375,12 @@ Yes. All hooks accept `null` and `undefined` without subscribing. `useFeatureSta
 
 ### Why do background updates not trigger an immediate re-render?
 
-Background updates signal that a change is a background sync, for example a periodic refresh from a server. Re-rendering immediately for every background update can cause unnecessary flicker. The hooks still record the change so the component reflects it on its next render.
+States can emit updates marked as background, meaning the change should be picked up on the next render rather than forced immediately. `useFeatureState` and `useCompute` record the change so the next render reflects it, but they do not schedule an extra re-render.
 
 ### What does passing `isEqual = false` to `useCompute` do?
 
-It skips the equality check entirely. The component re-renders whenever any subscribed state changes, regardless of whether the computed value differs. This is useful when the computed value is a mutable object that would compare as unchanged even after mutation.
+It disables the equality check entirely. The component re-renders every time any subscribed state emits a change, regardless of whether the computed value actually changed. Useful when the compute function has deliberate side effects or when you always want the freshest object reference.
 
 ### Does `useFeatureState` re-render when I call `notify()` without replacing the value?
 
-Yes. Calling `notify()` after mutating a value in place, as documented in `feature-state`, causes `useFeatureState` to re-render with the updated value.
+Yes. `notify()` signals a change regardless of whether the value reference changed. `useFeatureState` uses `useSyncExternalStore` with a snapshot wrapper, so a `notify()` call produces a new snapshot and triggers a re-render.

@@ -2,8 +2,23 @@
 	"name": "feature-form",
 	"version": "0.1.0-beta.1",
 	"private": false,
-	"description": "Framework-agnostic form state with Standard Schema validation and per-field validation timing.",
-	"keywords": ["form", "form-state", "form-validation", "validation", "standard-schema", "zod", "valibot", "arktype", "reactive", "framework-agnostic", "typescript", "react", "vue", "svelte"],
+	"description": "Framework-agnostic form state with reactive fields and per-field validation timing.",
+	"keywords": [
+		"form",
+		"form-state",
+		"form-validation",
+		"validation",
+		"validation-timing",
+		"standard-schema",
+		"zod",
+		"valibot",
+		"arktype",
+		"reactive",
+		"reactive-form",
+		"dirty-state",
+		"framework-agnostic",
+		"typescript"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"

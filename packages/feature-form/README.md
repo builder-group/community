@@ -17,17 +17,15 @@
     </a>
 </p>
 
-> Status: Experimental
+`feature-form` is framework-agnostic form state built from reactive fields. It uses Standard Schema validators directly, lets each field choose when validation runs, and keeps submit handling on the form object.
 
-Form state that works in any framework. Fields are reactive states you subscribe to directly, validators are [Standard Schema](https://github.com/standard-schema/standard-schema) compatible, and validation timing is configured per field.
-
-- Framework-agnostic: fields are reactive states, subscribe to status changes in React, Vue, or vanilla JS
-- Standard Schema compatible: Zod, Valibot, or any custom validator works without adapters or wrappers
-- Two-phase validation built in: quiet before submit, immediate feedback after, configured per field
-- Extend with `.with()` instead of fighting a plugin system or forking for custom behavior
+- Validate with Zod, Valibot, ArkType, or any [Standard Schema](https://github.com/standard-schema/standard-schema) validator without resolver packages
+- Tune validation per field: stay quiet while typing, validate on blur or submit, then revalidate on change
+- Subscribe only to the state a view renders: value, status, touched, submitted, dirty
+- Add typed behavior with `.with()` features, including built-in dirty tracking
 
 ```ts
-import { createForm } from 'feature-form';
+import { createForm, dirtyFeature } from 'feature-form';
 import * as z from 'zod';
 
 const $form = createForm({
@@ -35,18 +33,30 @@ const $form = createForm({
 		email: {
 			defaultValue: '',
 			validator: z.string().email(),
-			validateOn: ['blur', 'submit'], // quiet while typing
-			revalidateOn: ['change', 'submit'] // immediate after first submit
+			validateOn: ['blur', 'submit'], // no errors while typing
+			revalidateOn: ['change', 'submit'] // revalidate after first submit
+		},
+		password: {
+			defaultValue: '',
+			validator: z.string().min(8),
+			validateOn: ['touched', 'submit'], // first blur, subsequent changes, and submit
+			revalidateOn: ['change', 'submit']
 		}
-	}
-});
+	},
+	onValidSubmit: (data) => saveAccount(data)
+}).with(dirtyFeature());
 
-// Fields are reactive states: subscribe in any framework
-$form.fields.email.status.listen(({ value }) => {
+const unbind = $form.fields.email.status.listen(({ value }) => {
 	if (value.type === 'invalid') showError(value.errors[0].message);
+	if (value.type === 'valid') clearError();
 });
 
-await $form.submit();
+$form.fields.email.set('not-an-email');
+$form.fields.email.blur(); // validates email and notifies the status listener
+
+await $form.submit(); // runs every validator and calls onValidSubmit when valid
+$form.isDirty.get(); // true if any field differs from its default value
+unbind();
 ```
 
 ## Install
@@ -95,27 +105,11 @@ const $form = createForm({
 });
 ```
 
-Extend the form with features using `.with()`:
-
-```ts
-import { dirtyFeature } from 'feature-form';
-
-const $form = createForm({
-	fields: { name: { defaultValue: 'Alice' } }
-}).with(dirtyFeature());
-
-$form.fields.name.set('Bob');
-$form.isDirty.get(); // true
-$form.dirtyFields.get(); // { name: true }
-```
-
-## Examples
-
-- [React Basic](https://github.com/builder-group/community/tree/develop/examples/feature-form/react/basic) ([CodeSandbox](https://codesandbox.io/p/sandbox/basic-c4gd3t))
-
 ## Form
 
 ### `createForm(config)`
+
+Creates a form and returns it as a feature host. Each key in `fields` becomes a reactive `TFormField` with validation, blur tracking, and status.
 
 ```ts
 const $form = createForm({
@@ -171,7 +165,7 @@ const isValid = await $form.validate(); // runs all validators without submittin
 $form.reset(); // resets values, validation status, isTouched, and isSubmitted
 ```
 
-`submit()` runs validators configured for the submit trigger. All matching field validators and the form validator run together; no failing validator prevents the others from completing. Returns `true` if the form was valid, `false` otherwise. Persistent callbacks registered via `onValidSubmit()` / `onInvalidSubmit()` and per-call options passed to `submit()` both run in parallel.
+`submit()` runs validators configured for the submit trigger. All matching field validators and the form validator run together. No failing validator prevents the others from completing, so submit gives you a complete error picture. Returns `true` if the form was valid, `false` otherwise. Persistent callbacks registered via `onValidSubmit()` / `onInvalidSubmit()` and per-call options passed to `submit()` both run in parallel.
 
 `validate()` runs all validators the same way but has no submit side effects: it updates validation state, but does not set `isSubmitted`, does not fire `onValidSubmit` or `onInvalidSubmit`, and does not update default values.
 
@@ -204,76 +198,7 @@ $form.getField('name'); // same, useful when the key is dynamic
 | `isSubmitted`  | `TState<boolean>`   | True after the first submit attempt.                         |
 | `isSubmitting` | `TState<boolean>`   | True while `submit()` is in progress.                        |
 
-## Field
-
-Each entry in `form.fields` is a `TFormField<GValue>`, which is a full `feature-state` state with form-specific methods added.
-
-### `set()` / `get()` / `value`
-
-```ts
-$form.fields.name.set('Alice');
-$form.fields.name.get(); // 'Alice'
-$form.fields.name.value; // 'Alice'
-$form.fields.name.value = 'Bob'; // same as set('Bob')
-```
-
-### `blur()` / `validate()` / `reset()`
-
-```ts
-$form.fields.name.blur(); // marks touched, runs blur/touched validators
-await $form.fields.name.validate(); // runs the field validator, returns true if valid
-$form.fields.name.reset(); // resets value, touched, submitted, and status
-```
-
-### `onBlur(callback)`
-
-```ts
-const unbind = $form.fields.name.onBlur(({ wasTouched }) => {
-	if (!wasTouched) {
-		// first time this field was blurred
-	}
-});
-
-unbind();
-```
-
-### Reactive states
-
-| State          | Type                | Description                                                                          |
-| -------------- | ------------------- | ------------------------------------------------------------------------------------ |
-| `status`       | `TValidationStatus` | Field display status, including field validator errors and routed form-level errors. |
-| `isTouched`    | `TState<boolean>`   | True after the field has been blurred at least once.                                 |
-| `isSubmitted`  | `TState<boolean>`   | True after the form has been submitted.                                              |
-| `isValidating` | `TState<boolean>`   | True while the field validator is running.                                           |
-
-### `defaultValue` / `key`
-
-```ts
-$form.fields.name.defaultValue; // the value used when reset() is called
-$form.fields.name.key; // 'name', used in validation error paths
-```
-
-## Standalone fields
-
-Fields can be created and used independently with `createFormField()`:
-
-```ts
-import { createFormField } from 'feature-form';
-
-const $name = createFormField('', {
-	key: 'name',
-	validator: z.string().min(2),
-	validateOn: ['blur'],
-	revalidateOn: ['change']
-});
-
-$name.set('Alice');
-await $name.validate();
-```
-
-## Validation
-
-### Triggers
+### Validation triggers
 
 `validateOn` controls which events run the validator before the first submit. `revalidateOn` controls the same after the first submit.
 
@@ -284,7 +209,7 @@ await $name.validate();
 | `'change'`  | On every value change via `set()`.                                                                                  |
 | `'touched'` | On the first `blur()`, and on every subsequent `set()` once the field has been touched. Only valid in `validateOn`. |
 
-The `'touched'` trigger is useful for a "validate once the user has interacted with this field" pattern: no validation fires until the first blur, then validation follows every change from that point on. In `revalidateOn` use `'blur'` instead.
+The `'touched'` trigger covers the "validate once the user has interacted" pattern: no validation fires until the first blur, then validation follows every change from that point on. In `revalidateOn` use `'blur'` instead.
 
 ```ts
 // validate on blur before submit, revalidate on every change after
@@ -359,7 +284,76 @@ For custom validators, implement the `StandardSchemaV1` interface from [`@standa
 
 Validators run for validation only. If a schema transforms or coerces output values, the parsed output does not write back into the field state.
 
+## Field
+
+Each entry in `form.fields` is a `TFormField<GValue>`: a full `feature-state` state with form-specific methods added.
+
+### `createFormField(defaultValue, options?)`
+
+Creates a field independently of any form. Use this for a shared search input or a field conditionally composed into different forms. Pass the resulting `TFormField` directly into the `createForm` fields config.
+
+```ts
+import { createFormField } from 'feature-form';
+
+const $name = createFormField('', {
+	key: 'name',
+	validator: z.string().min(2),
+	validateOn: ['blur'],
+	revalidateOn: ['change']
+});
+
+$name.set('Alice');
+await $name.validate();
+```
+
+### `set()` / `get()` / `value`
+
+```ts
+$form.fields.name.set('Alice');
+$form.fields.name.get(); // 'Alice'
+$form.fields.name.value; // 'Alice'
+$form.fields.name.value = 'Bob'; // same as set('Bob')
+```
+
+### `blur()` / `validate()` / `reset()`
+
+```ts
+$form.fields.name.blur(); // marks touched, runs blur/touched validators
+await $form.fields.name.validate(); // runs the field validator, returns true if valid
+$form.fields.name.reset(); // resets value, touched, submitted, and status
+```
+
+### `onBlur(callback)`
+
+```ts
+const unbind = $form.fields.name.onBlur(({ wasTouched }) => {
+	if (!wasTouched) {
+		// first time this field was blurred
+	}
+});
+
+unbind();
+```
+
+### Reactive states
+
+| State          | Type                | Description                                                                          |
+| -------------- | ------------------- | ------------------------------------------------------------------------------------ |
+| `status`       | `TValidationStatus` | Field display status, including field validator errors and routed form-level errors. |
+| `isTouched`    | `TState<boolean>`   | True after the field has been blurred at least once.                                 |
+| `isSubmitted`  | `TState<boolean>`   | True after the form has been submitted.                                              |
+| `isValidating` | `TState<boolean>`   | True while the field validator is running.                                           |
+
+### `defaultValue` / `key`
+
+```ts
+$form.fields.name.defaultValue; // the value used when reset() is called
+$form.fields.name.key; // 'name', used in validation error paths
+```
+
 ## Built-in Features
+
+Features are installed via `.with()` and extend the form with new methods.
 
 ### `dirtyFeature()`
 
@@ -386,53 +380,48 @@ $form.isDirty.get(); // false
 
 `isDirty` and `dirtyFields` are reactive states. `resetDirty()` makes the current values the new baseline without clearing them. When `submit({ updateDefaultValues: true })` succeeds, dirty state clears automatically.
 
-## Extending with features
+## Extending with Features
 
 Forms are `feature-core` feature hosts. Add behavior with `.with(yourFeature())`. See the [feature-core README](https://github.com/builder-group/community/tree/develop/packages/feature-core) for a full guide on `defineFeature()`, dependency declaration, and the feature model.
 
-## Alternatives
+## Examples
 
-- [react-hook-form](https://github.com/react-hook-form/react-hook-form)
-- [TanStack Form](https://tanstack.com/form)
+- [React Basic](https://github.com/builder-group/community/tree/develop/examples/feature-form/react/basic) ([CodeSandbox](https://codesandbox.io/p/sandbox/basic-c4gd3t))
 
 ## FAQ
 
+### How does it compare to react-hook-form, Formik, and TanStack Form?
+
+`feature-form` puts the form object outside the UI framework. That makes it closer to a reactive model than a React hook. Use it when you want one form core that can be reused across React, Vue, Svelte, tests, and plain JavaScript.
+
+- [react-hook-form](https://github.com/react-hook-form/react-hook-form): strong React-first uncontrolled form library with validation resolvers
+- [Formik](https://formik.org): mature controlled React form library
+- [TanStack Form](https://tanstack.com/form): framework-agnostic form library with official framework adapters
+
+### Does it work outside React?
+
+Yes. The form and field objects are plain JavaScript. Fields are reactive states from `feature-state`, which has no framework dependency. Subscribe with `.listen()` in Vue, Svelte, vanilla JS, or any runtime. The [feature-react](https://github.com/builder-group/community/tree/develop/packages/feature-react) package provides React hooks if you want them.
+
 ### Why separate `validateOn` and `revalidateOn`?
 
-Before the first submit, aggressive validation (e.g. `'change'`) can feel intrusive because the user hasn't finished yet. After submit they expect immediate feedback as they correct errors. Keeping the phases separate lets you configure each independently without a single `mode` flag that tries to cover both.
+Before the first submit, aggressive validation (e.g. `'change'`) can feel intrusive because the user has not finished yet. After submit they expect immediate feedback as they correct errors. Keeping the phases separate lets you configure each independently without a single `mode` flag that tries to cover both.
+
+### Does it support async validators?
+
+Yes. Any Standard Schema validator can be async. `submit()` and `validate()` are both async and await all validators. The `isValidating` state on both the form and each field reflects whether a run is in progress. In-flight async runs are cancelled (by run ID) when `reset()` is called, so stale results never overwrite reset state.
+
+### Do all field validators run on submit, or does it stop at the first error?
+
+All validators configured for the submit trigger run together. No failing validator skips the others, so submit always gives a complete picture of every validation error.
 
 ### What does `getErrors()` return before any validation has run?
 
 Only fields with `'invalid'` status or form-level path errors appear in `errors.fields`. Unvalidated fields are omitted. `errors.form` contains only pathless form-level errors.
 
-### Do all field validators run on submit, or does it stop at the first error?
-
-Validators configured for the submit trigger are awaited together. No matching field validator is skipped because another failed, so submit gives you a complete picture of configured submit errors.
-
-### What is the difference between `validate()` and `submit()`?
-
-`validate()` runs all validators and returns whether the form is valid, but has no other side effects. It does not set `isSubmitted`, does not fire `onValidSubmit` or `onInvalidSubmit`, and does not update default values. Use it to check validity without treating the action as a submit attempt.
-
 ### Can I register multiple `onValidSubmit` callbacks?
 
-Yes. Callbacks registered via `form.onValidSubmit(callback)` are additive; each call adds to the list. On submit, the persistent callbacks and any per-call callback passed to `submit({ onValidSubmit })` are all called in parallel. There is no guaranteed order between them.
-
-### How does `reset()` handle default values that are objects or arrays?
-
-`reset()` deep-copies plain objects and arrays so each reset gets a fresh copy. Non-plain objects (`Date`, `Map`, class instances, browser objects) are kept by reference. If a field stores a mutable non-plain object, replace it with a new instance before relying on reset.
-
-### Why is `updateDefaultValues` opt-in?
-
-After a successful submit, some forms should reset to blank (registration), while others should treat the submitted data as the new baseline (settings pages). `updateDefaultValues: true` opts into the latter; the default keeps the original `defaultValue` so reset always returns to a known state.
-
-### What happens to an in-flight async validator when `reset()` is called?
-
-`reset()` increments an internal validation run ID. When the async result arrives, it checks whether the run ID still matches. If not, the result is discarded and the field status is not updated. This prevents stale validation results from overwriting the reset state.
-
-### Does `dirtyFeature` use deep equality or reference equality?
-
-Deep structural equality. Two plain objects with the same shape and values are considered equal. This means mutating an object in place without replacing it will not be detected as a change; always pass a new object to `set()`.
+Yes. Callbacks registered via `form.onValidSubmit(callback)` are additive. On submit, all persistent callbacks and any per-call callback passed to `submit({ onValidSubmit })` run in parallel. There is no guaranteed order between them.
 
 ### When should I use `createFormField` instead of defining fields inside `createForm`?
 
-Use `createFormField` when a field needs to exist independently of any specific form, for example a shared search input or a field that is conditionally composed into different forms. Pass the resulting `TFormField` directly into the `createForm` fields config.
+Use `createFormField` when a field needs to exist independently of any specific form: a shared search input, or a field conditionally composed into different forms. Pass the resulting `TFormField` directly into the `createForm` fields config.

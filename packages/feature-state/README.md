@@ -17,24 +17,28 @@
     </a>
 </p>
 
-> Status: Experimental
+`feature-state` is reactive state that grows by installing features. Start with one observable value, then add undo, storage, computed values, custom equality, queues, or custom capabilities with `.with()` only where you need them.
 
-Reactive state that ships only what you install. Start with `createState()` and add undo, persistence, or custom equality with `.with()`.
-
-- Framework-agnostic: works in vanilla JS, React, Vue, or any environment without adapters
-- Compose behavior with `.with()` instead of bundling a monolith: only ship undo or persistence if you need it
-- Computed derivations are built in: no selector library or memoization boilerplate needed
-- TypeScript tracks installed features: calling an uninstalled method is a compile error
+- Install capabilities per state: undo, storage, queues, and equality stay opt-in
+- Use one `createState()` API in vanilla JS, React, Vue, Svelte, Node.js, and tests
+- Let TypeScript track installed capabilities: `undo()` exists only after `undoFeature()`
+- Build custom feature packs on the same typed host model as the built-ins
 
 ```ts
 import { createComputed, createState, undoFeature } from 'feature-state';
 
 const $tasks = createState<Task[]>([]).with(undoFeature());
-const $done = createComputed($tasks, (tasks) => tasks.filter((t) => t.done));
+const $openTasks = createComputed($tasks, (tasks) => tasks.filter((task) => !task.done));
 
-$tasks.set([{ id: 1, title: 'Buy milk', done: true }]);
-$done.get(); // [{ id: 1, title: 'Buy milk', done: true }]
-$tasks.undo(); // []
+const unlisten = $openTasks.listen(({ value }) => {
+	renderOpenTasks(value);
+});
+
+$tasks.set([{ id: 1, title: 'Buy milk', done: false }]);
+
+$openTasks.get(); // [{ id: 1, title: 'Buy milk', done: false }]
+$tasks.undo(); // back to []
+unlisten();
 ```
 
 ## Install
@@ -111,10 +115,6 @@ const $tasks = createState<Task[]>([]).with(storageFeature(localAdapter, 'tasks'
 await $tasks.persist(); // loads saved value on first call; auto-saves on every set()
 ```
 
-## Examples
-
-- [React Basic](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/basic)
-
 ## State
 
 ### `createState(initialValue)`
@@ -149,7 +149,7 @@ $count._v = 42; // mutate directly, no notification
 $count.notify(); // notify listeners manually
 ```
 
-You can pass custom metadata to every listener in the same notification:
+Pass custom metadata to every listener in the same notification:
 
 ```ts
 $count.notify({ listenerContext: { source: 'mySync', background: true } });
@@ -167,7 +167,7 @@ const unlisten = $count.listen(({ value, prevValue, source }) => {
 unlisten(); // remove listener
 ```
 
-It is safe to call `unlisten()` inside the listener itself. Any pending call to that callback in the current notification cycle is removed immediately.
+Calling `unlisten()` inside the listener itself is safe. Any pending call to that callback in the current notification cycle is removed immediately.
 
 **Listener context**
 
@@ -267,7 +267,7 @@ await $tasks.persist();
 
 ### `isEqualFeature(isEqual)`
 
-Overrides `set()` with a domain-specific equality check. Use it for derived values where reference equality would notify even when the visible state did not change.
+Overrides `set()` with a domain-specific equality check. Use it when reference equality would notify listeners even though the visible state did not change.
 
 ```ts
 import { createState, isEqualFeature } from 'feature-state';
@@ -310,24 +310,31 @@ $count.listen(() => {}, { priority: EListenerPriority.EARLY }); // runs first
 
 `EListenerPriority` provides named constants: `FIRST = 0`, `EARLY = 125`, `DEFAULT = 250`, `LATE = 375`, `LAST = 500`. Any number is valid.
 
-## Extending with features
+## Extending with Features
 
 States are `feature-core` feature hosts. Add behavior with `.with(yourFeature())`. See the [feature-core README](https://github.com/builder-group/community/tree/develop/packages/feature-core) for a full guide on `defineFeature()`, dependency declaration, and the feature model.
 
-## Alternatives
+## Examples
 
-- [nanostores](https://github.com/nanostores/nanostores)
-- [jotai](https://github.com/pmndrs/jotai)
+- [React Basic](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/basic)
 
 ## FAQ
 
+### How does it compare to Nanostores, Zustand, and MobX?
+
+`feature-state` is centered on composable feature hosts. Use it when you want state objects that can gain typed capabilities over time without committing to proxies, decorators, or a React-specific store model.
+
+- [nanostores](https://github.com/nanostores/nanostores): framework-agnostic atom-based state with framework integrations
+- [zustand](https://github.com/pmndrs/zustand): store-based state management, primarily for React
+- [MobX](https://mobx.js.org): reactive state via proxies and decorators, class-oriented
+
 ### Why does `set()` skip notification when the value is the same?
 
-Skipping on reference equality (`Object.is`) prevents redundant re-renders and listener calls. If you need to force a notification without changing the value, call `notify()` directly.
+Skipping on reference equality (`Object.is`) prevents redundant re-renders and listener calls. To force a notification without changing the value, call `notify()` directly.
 
 ### Why does `subscribe()` pass `prevValue` equal to `value` on the initial call?
 
-The initial call has no prior state, so `prevValue` is set to the current value. This means listeners never receive `undefined` for `prevValue` and can be written without a null check.
+The initial call has no prior state, so `prevValue` is set to the current value. Listeners never receive `undefined` for `prevValue` and can be written without a null check.
 
 ### Is it safe to unsubscribe inside a listener?
 
