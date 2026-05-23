@@ -1,3 +1,4 @@
+export * from './create-env';
 export * from './defaults';
 export * from './preprocess';
 export * from './types';

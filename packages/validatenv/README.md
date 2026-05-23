@@ -121,6 +121,32 @@ const port = validateEnvVar(process.env, 'PORT', portValidator);
 
 Pass the source explicitly so the same helper works in Node.js, Bun, Deno, Vite, and tests.
 
+### `createEnv(options)`
+
+Validates grouped server, client, and shared specs. On the client, server specs are not validated, but reading a server-only key throws:
+
+```ts
+import { createEnv, urlValidator } from 'validatenv';
+
+const env = createEnv({
+	env: process.env,
+	isServer: typeof window === 'undefined',
+	server: {
+		DATABASE_URL: urlValidator
+	},
+	client: {
+		NEXT_PUBLIC_API_URL: urlValidator
+	},
+	shared: {
+		APP_VERSION: '1.2.3'
+	}
+});
+```
+
+This helper is useful when you want one typed env object with a runtime access guard. It does not stop bundlers from including imported schema code or variable names in client bundles. Use separate server and client modules when those names are sensitive.
+
+Access is guarded by the returned output key. For example, `{ dbUrl: { envKey: 'DATABASE_URL', validator } }` blocks `env.dbUrl` in client mode.
+
 ## Validators
 
 Built-in validators implement the Standard Schema interface and require no schema library:
@@ -289,6 +315,12 @@ Only keys listed in the spec are injected. Keep server-only values out of this s
 - [envalid](https://github.com/af/envalid): env validation with built-in validators and a custom validator API
 - [t3-env](https://github.com/t3-oss/t3-env): type-safe env validation with Zod, designed around Next.js and tRPC
 - [dotenv-safe](https://github.com/rolodato/dotenv-safe): checks that required env keys are present
+
+### When should I use `validateEnv` or `createEnv`?
+
+Use `validateEnv` when you want the smallest primitive: pass one env-like source and one spec, then get validated typed config back. It is the best default for scripts, CLIs, server-only apps, Vite config, and separate server/client modules.
+
+Use `createEnv` when you want one app-level env object split into `server`, `client`, and `shared` specs. It validates only client-safe specs in client mode and throws if server-only output keys are read there. This is a DX guard, not a bundler security boundary.
 
 ### When should I use `preprocess` instead of a schema transform?
 
