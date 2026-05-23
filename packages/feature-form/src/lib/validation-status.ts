@@ -1,4 +1,4 @@
-import { type TValidationError, type TValidationPath, type TValidationStatusValue } from './types';
+import { type TValidationError, type TValidationPath, type TValidationStatusValue } from '../types';
 
 export function areValidationStatusesEqual(
 	current: TValidationStatusValue,

@@ -1,5 +1,9 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
-import { type TCollectErrorMode, type TValidationPath, type TValidationStatusValue } from './types';
+import {
+	type TCollectErrorMode,
+	type TValidationPath,
+	type TValidationStatusValue
+} from '../types';
 
 export async function validateStandardSchema<GValue>(
 	schema: StandardSchemaV1<GValue, unknown>,

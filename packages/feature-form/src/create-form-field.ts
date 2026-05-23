@@ -1,7 +1,6 @@
 import { defineFeature, hasFeature } from 'feature-core';
 import { createState, isEqualFeature, type TStateBase } from 'feature-state';
-import { deepCopy } from './lib';
-import { validateStandardSchema } from './standard-schema';
+import { areValidationStatusesEqual, deepCopy, validateStandardSchema } from './lib';
 import {
 	type TFormField,
 	type TFormFieldFeature,
@@ -10,7 +9,6 @@ import {
 	type TFormFieldValidator,
 	type TValidationStatusValue
 } from './types';
-import { areValidationStatusesEqual } from './validation-status';
 
 /**
  * Creates a standalone reactive form field.

@@ -78,7 +78,7 @@
 		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
 		"size": "size-limit --why",
 		"start:dev": "tsc -w",
-		"test": "vitest run --passWithNoTests",
+		"test": "vitest run",
 		"test:types": "vitest run --typecheck.only",
 		"update:latest": "pnpm update --latest"
 	},

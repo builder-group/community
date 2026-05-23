@@ -1,6 +1,6 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
 import { describe, expect, expectTypeOf, it } from 'vitest';
-import { createFormField, isFormField } from './form-field';
+import { createFormField, isFormField } from './create-form-field';
 import type { TFormField } from './types';
 
 describe('createFormField function', () => {

@@ -1,5 +1,4 @@
-import { formatThrownError } from './error';
-import { isStandardSchemaValidator, validateStandardSchema } from './standard-schema';
+import { formatThrownError, isStandardSchemaValidator, validateStandardSchema } from './lib';
 import {
 	type TEnv,
 	type TEnvData,
