@@ -40,7 +40,7 @@ describe('headers module', () => {
 			});
 
 			expect(headers).toEqual({
-				'accept': 'application/json, text/plain'
+				accept: 'application/json, text/plain'
 			});
 		});
 
@@ -51,14 +51,20 @@ describe('headers module', () => {
 			]);
 
 			expect(headers).toEqual({
-				'accept': 'application/json, text/plain'
+				accept: 'application/json, text/plain'
 			});
+		});
+
+		it('should support header names matching object prototype keys', () => {
+			const headers = normalizeHeaders([['toString', 'custom']]);
+
+			expect(getHeader(headers, 'toString')).toBe('custom');
 		});
 
 		it('should read native Headers inputs', () => {
 			const headers = normalizeHeaders(
 				new Headers({
-					Accept: 'application/json',
+					'Accept': 'application/json',
 					'X-Trace-Id': 'trace-1'
 				})
 			);
@@ -92,7 +98,24 @@ describe('headers module', () => {
 			);
 
 			expect(headers).toEqual({
-				'authorization': 'Bearer request'
+				authorization: 'Bearer request'
+			});
+		});
+
+		it('should let later native Headers values replace earlier native Headers values', () => {
+			const headers = mergeHeaders(
+				new Headers({
+					Accept: 'application/json',
+					Authorization: 'Bearer default'
+				}),
+				new Headers({
+					Authorization: 'Bearer request'
+				})
+			);
+
+			expect(headers).toEqual({
+				accept: 'application/json',
+				authorization: 'Bearer request'
 			});
 		});
 
@@ -129,7 +152,7 @@ describe('headers module', () => {
 	});
 
 	describe('setHeader function', () => {
-		it('should set one header case-insensitively', () => {
+		it('should set one normalized header', () => {
 			const headers = normalizeHeaders();
 
 			setHeader(headers, 'Content-Type', 'application/json');
@@ -137,7 +160,50 @@ describe('headers module', () => {
 			expect(headers).toEqual({
 				'content-type': 'application/json'
 			});
+		});
+	});
+
+	describe('getHeader function', () => {
+		it('should get one header case-insensitively', () => {
+			const headers = normalizeHeaders({
+				'Content-Type': 'application/json'
+			});
+
 			expect(getHeader(headers, 'CONTENT-TYPE')).toBe('application/json');
+		});
+
+		it('should return null when the header is missing', () => {
+			const headers = normalizeHeaders();
+
+			expect(getHeader(headers, 'Content-Type')).toBeNull();
+		});
+
+		it('should ignore inherited object keys', () => {
+			const headers = normalizeHeaders();
+
+			expect(getHeader(headers, 'toString')).toBeNull();
+		});
+	});
+
+	describe('hasHeader function', () => {
+		it('should check one header case-insensitively', () => {
+			const headers = normalizeHeaders({
+				'Content-Type': 'application/json'
+			});
+
+			expect(hasHeader(headers, 'CONTENT-TYPE')).toBe(true);
+		});
+
+		it('should return false when the header is missing', () => {
+			const headers = normalizeHeaders();
+
+			expect(hasHeader(headers, 'Content-Type')).toBe(false);
+		});
+
+		it('should ignore inherited object keys', () => {
+			const headers = normalizeHeaders();
+
+			expect(hasHeader(headers, 'toString')).toBe(false);
 		});
 	});
 
@@ -149,8 +215,7 @@ describe('headers module', () => {
 
 			deleteHeader(headers, 'content-type');
 
-			expect(hasHeader(headers, 'Content-Type')).toBe(false);
-			expect(getHeader(headers, 'Content-Type')).toBeNull();
+			expect(headers).toEqual({});
 		});
 	});
 });

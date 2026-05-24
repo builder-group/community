@@ -1,8 +1,9 @@
 import type { TFetchHeaderPrimitive, TFetchHeadersInit, TResolvedFetchHeaders } from '../types';
 
-/** Converts one header input into the normalized record shape used by feature-fetch. */
+/** Converts one header input into the normalized record shape. */
 export function normalizeHeaders(headersInit?: TFetchHeadersInit): TResolvedFetchHeaders {
-	const headers: TResolvedFetchHeaders = {};
+	// Note: Header names are dynamic, so avoid Object.prototype keys like toString
+	const headers = Object.create(null) as TResolvedFetchHeaders;
 	applyHeaders(headers, headersInit);
 	return headers;
 }
@@ -14,7 +15,8 @@ export function normalizeHeaders(headersInit?: TFetchHeadersInit): TResolvedFetc
 export function mergeHeaders(
 	...headersList: Array<TFetchHeadersInit | undefined>
 ): TResolvedFetchHeaders {
-	const headers: TResolvedFetchHeaders = {};
+	// Note: Header names are dynamic, so avoid Object.prototype keys like toString
+	const headers = Object.create(null) as TResolvedFetchHeaders;
 
 	for (const headersInit of headersList) {
 		applyHeaders(headers, headersInit);
@@ -24,11 +26,12 @@ export function mergeHeaders(
 }
 
 export function getHeader(headers: TResolvedFetchHeaders, name: string): string | null {
-	return headers[normalizeHeaderName(name)] ?? null;
+	const key = normalizeHeaderName(name);
+	return Object.hasOwn(headers, key) ? (headers[key] ?? null) : null;
 }
 
 export function hasHeader(headers: TResolvedFetchHeaders, name: string): boolean {
-	return normalizeHeaderName(name) in headers;
+	return Object.hasOwn(headers, normalizeHeaderName(name));
 }
 
 export function setHeader(
@@ -40,7 +43,8 @@ export function setHeader(
 }
 
 export function deleteHeader(headers: TResolvedFetchHeaders, name: string): void {
-	Reflect.deleteProperty(headers, normalizeHeaderName(name));
+	// eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Header names are normalized dynamic keys
+	delete headers[normalizeHeaderName(name)];
 }
 
 function applyHeaders(headers: TResolvedFetchHeaders, headersInit?: TFetchHeadersInit): void {
@@ -48,13 +52,17 @@ function applyHeaders(headers: TResolvedFetchHeaders, headersInit?: TFetchHeader
 		return;
 	}
 
+	// Tuple inputs append repeated names, matching Headers constructor behavior
 	if (Array.isArray(headersInit)) {
 		for (const [name, value] of headersInit) {
-			appendHeader(headers, name, value);
+			const key = normalizeHeaderName(name);
+			const normalizedValue = normalizeHeaderValue(value);
+			headers[key] = headers[key] == null ? normalizedValue : `${headers[key]}, ${normalizedValue}`;
 		}
 		return;
 	}
 
+	// Headers-like inputs are already flattened by their own implementation
 	if (isHeadersLike(headersInit)) {
 		headersInit.forEach((value, name) => {
 			setHeader(headers, name, value);
@@ -62,13 +70,14 @@ function applyHeaders(headers: TResolvedFetchHeaders, headersInit?: TFetchHeader
 		return;
 	}
 
+	// Record inputs replace values and use null as an explicit delete signal
 	for (const [name, value] of Object.entries(headersInit)) {
 		if (value === null) {
 			deleteHeader(headers, name);
 			continue;
 		}
 
-		if (value == null) {
+		if (value === undefined) {
 			continue;
 		}
 
@@ -83,16 +92,6 @@ function applyHeaders(headers: TResolvedFetchHeaders, headersInit?: TFetchHeader
 	}
 }
 
-function appendHeader(
-	headers: TResolvedFetchHeaders,
-	name: string,
-	value: TFetchHeaderPrimitive
-): void {
-	const key = normalizeHeaderName(name);
-	const normalizedValue = normalizeHeaderValue(value);
-	headers[key] = headers[key] == null ? normalizedValue : `${headers[key]}, ${normalizedValue}`;
-}
-
 function normalizeHeaderName(name: string): string {
 	return name.toLowerCase().trim();
 }
@@ -101,6 +100,7 @@ function normalizeHeaderValue(value: TFetchHeaderPrimitive): string {
 	return String(value).trim();
 }
 
+// Note: Avoids instanceof Headers so compatible inputs work when native Headers is unavailable
 function isHeadersLike(value: unknown): value is THeadersLike {
 	return (
 		typeof value === 'object' &&
