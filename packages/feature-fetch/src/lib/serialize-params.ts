@@ -35,7 +35,7 @@ export function serializePathParams(
 		}
 
 		throw new FetchError('#ERR_SERIALIZE_PARAMS', {
-			description: `Path param "${pathParam.name}" is not serializable.`
+			message: `Path param "${pathParam.name}" is not serializable.`
 		});
 	});
 }
@@ -272,7 +272,7 @@ function serializeNamedParam(name: string, value: unknown, allowReserved = false
 function serializeParamValue(value: unknown, allowReserved = false): string {
 	if (!isParamPrimitive(value)) {
 		throw new FetchError('#ERR_SERIALIZE_PARAMS', {
-			description:
+			message:
 				'Only string, number, boolean, arrays of primitives, and plain objects with primitive values are supported by the default param serializers.'
 		});
 	}

@@ -1,6 +1,6 @@
 import type { TAnyFeature, TFeatureHost } from 'feature-core';
 import type { TResult } from 'tuple-result';
-import type { FetchError, NetworkError, RequestError } from './exceptions';
+import type { FetchError, HttpError, NetworkError } from './errors';
 
 // MARK: - Client
 
@@ -163,7 +163,7 @@ export type TFetchResponse<
 
 export type TFetchResponseError<GErrorResponseBody = unknown> =
 	| NetworkError
-	| RequestError<GErrorResponseBody>
+	| HttpError<GErrorResponseBody>
 	| FetchError;
 
 export type TFetchResponseSuccess<
