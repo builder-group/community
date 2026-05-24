@@ -31,18 +31,41 @@ export interface TFetchClientConfig {
 	bodySerializer: TBodySerializer;
 	requestInit: TFetchRequestInit;
 	headers: TResolvedFetchHeaders;
-	beforeRequest: TBeforeRequestHook[];
+	prepareRequest: TPrepareRequestHook[];
+	prepareResponse: TPrepareResponseHook[];
 	middleware: TFetchMiddleware[];
 }
 
-export type TBeforeRequestHook = (data: TBeforeRequestHookData) => void | Promise<void>;
+export type TPrepareRequestHook = (cx: TPrepareRequestContext) => void | Promise<void>;
 
-export interface TBeforeRequestHookData {
+/** Mutable request context passed to `prepareRequest` hooks before URL/body creation. */
+export interface TPrepareRequestContext {
+	method: TRequestMethod;
+	baseUrl: string;
+	meta: unknown;
+	headers: TResolvedFetchHeaders;
+	body: TUnserializedBody | undefined;
 	path: string;
-	context: unknown;
-	requestInit: TRequestInitWithResolvedHeaders;
 	pathParams: TPathParams;
 	queryParams: TQueryParams;
+	requestInit: TFetchRequestInit;
+}
+
+export type TPrepareResponseHook = (cx: TPrepareResponseContext) => void | Promise<void>;
+
+/**
+ * Mutable response context passed to `prepareResponse` hooks before response parsing.
+ * Replace `response` when reading its body so the client can still parse the final response.
+ */
+export interface TPrepareResponseContext {
+	response: Response;
+	request: TSentRequestContext;
+}
+
+/** Final request context used for the fetch call. Mutating it only affects later response hooks. */
+export interface TSentRequestContext extends Omit<TPrepareRequestContext, 'requestInit'> {
+	url: string;
+	requestInit: TRequestInitWithResolvedHeaders;
 }
 
 export type TRequestInitWithResolvedHeaders = Omit<RequestInit, 'headers'> & {
@@ -57,8 +80,8 @@ export interface TFetchRequest {
 		GErrorResponseBody = unknown,
 		GParseAs extends TParseAs = 'json'
 	>(
-		path: string,
 		method: TRequestMethod,
+		path: string,
 		options: TFetchOptionsWithBody<TUnserializedBody, GParseAs> & { withResponse: true }
 	): Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs, true>>;
 	<
@@ -66,8 +89,8 @@ export interface TFetchRequest {
 		GErrorResponseBody = unknown,
 		GParseAs extends TParseAs = 'json'
 	>(
-		path: string,
 		method: TRequestMethod,
+		path: string,
 		options?: TFetchOptionsWithBody<TUnserializedBody, GParseAs> & { withResponse?: false }
 	): Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 	<
@@ -76,8 +99,8 @@ export interface TFetchRequest {
 		GParseAs extends TParseAs = 'json',
 		GWithResponse extends boolean = boolean
 	>(
-		path: string,
 		method: TRequestMethod,
+		path: string,
 		options?: TFetchOptionsWithBody<TUnserializedBody, GParseAs> & {
 			withResponse?: GWithResponse;
 		}
@@ -104,7 +127,7 @@ export interface TFetchOptions<GParseAs extends TParseAs = TParseAs> {
 	headers?: TFetchHeadersInit;
 	baseUrl?: string;
 	requestInit?: TFetchRequestInit;
-	context?: unknown;
+	meta?: unknown;
 	middleware?: TFetchMiddleware[];
 	pathParams?: TPathParams;
 	queryParams?: TQueryParams;

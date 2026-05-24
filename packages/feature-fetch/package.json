@@ -1,9 +1,17 @@
 {
 	"name": "feature-fetch",
-	"version": "0.0.55",
+	"version": "0.1.0-beta.1",
 	"private": false,
-	"description": "Straightforward, typesafe, and feature-based fetch wrapper supporting OpenAPI types",
-	"keywords": [],
+	"description": "Typed fetch client with opt-in .with() features for APIs, OpenAPI, GraphQL, retry, delay, and caching.",
+	"keywords": [
+		"fetch",
+		"http-client",
+		"api-client",
+		"typescript",
+		"openapi",
+		"graphql",
+		"feature-composition"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
@@ -32,18 +40,18 @@
 		"size": "size-limit --why",
 		"start:dev": "tsc -w",
 		"test": "vitest run",
+		"test:types": "vitest run --typecheck.only",
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
 		"@0no-co/graphql.web": "^1.2.0",
-		"@blgc/types": "workspace:*",
-		"@blgc/utils": "workspace:*",
+		"feature-core": "workspace:*",
+		"openapi-typescript-helpers": "^0.1.0",
 		"tuple-result": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/url-parse": "^1.4.11",
-		"msw": "^2.14.2",
+		"msw": "^2.14.6",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [

@@ -1,100 +1,513 @@
-import { http, HttpResponse } from 'msw';
-import { setupServer } from 'msw/node';
 import { unwrapErr } from 'tuple-result';
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { createFetchClient } from './create-fetch-client';
-
-const server = setupServer();
-
-const BASE_URL = 'https://api.example.com';
+import { FetchError, HttpError, NetworkError } from './errors';
+import type { TFetchLike } from './types';
 
 describe('createFetchClient function', () => {
-	beforeAll(() => {
-		server.listen();
-	});
-	afterEach(() => {
-		server.resetHandlers();
-	});
-	afterAll(() => {
-		server.close();
-	});
+	describe('request building', () => {
+		it('should build the request from client defaults and request options', async () => {
+			// Prepare
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return Response.json({ id: 'post-1' });
+			});
+			const client = createFetchClient({
+				baseUrl: 'https://api.example.com',
+				fetch: fetchLike,
+				headers: {
+					Authorization: 'Bearer default'
+				},
+				requestInit: {
+					credentials: 'include'
+				}
+			});
 
-	it('should make a GET request successfully', async () => {
-		server.use(
-			http.get(new URL('/test', BASE_URL).toString(), () => {
-				return HttpResponse.json(
-					{ message: 'Success' },
-					{
-						status: 200
-					}
-				);
-			})
-		);
+			// Act
+			const result = await client.request('POST', '/posts/{postId}', {
+				body: {
+					title: 'Hello'
+				},
+				headers: {
+					Authorization: 'Bearer request'
+				},
+				pathParams: { postId: 'post-1' },
+				queryParams: { preview: true },
+				requestInit: {
+					cache: 'no-store'
+				}
+			});
 
-		const client = createFetchClient({ prefixUrl: BASE_URL });
-		const result = await client._baseFetch('/test', 'GET', {});
-
-		expect(result.isOk()).toBe(true);
-		expect(result.unwrap().data).toEqual({ message: 'Success' });
-	});
-
-	it('should handle network errors gracefully', async () => {
-		server.use(
-			http.get(new URL('/test', BASE_URL).toString(), () => {
-				return HttpResponse.json(
-					{ code: 500, message: 'Internal Server Error' },
-					{
-						status: 500
-					}
-				);
-			})
-		);
-
-		const client = createFetchClient({ prefixUrl: BASE_URL });
-		const result = await client._baseFetch('/test', 'GET', {});
-
-		expect(result.isErr()).toBe(true);
-		expect(unwrapErr(result)).toBeInstanceOf(Error);
-	});
-
-	it('should handle FormData uploads correctly', async () => {
-		// Prepare
-		const formData = new FormData();
-		formData.append('file', new Blob(['test content'], { type: 'text/plain' }), 'test.txt');
-		formData.append('description', 'Test file upload');
-
-		let receivedFormData: FormData | undefined;
-
-		server.use(
-			http.post(new URL('/upload', BASE_URL).toString(), async ({ request }) => {
-				// Store the received FormData for assertion
-				receivedFormData = await request.formData();
-				return HttpResponse.json({ message: 'Upload successful' }, { status: 200 });
-			})
-		);
-
-		// Act
-		const client = createFetchClient({ prefixUrl: BASE_URL });
-		const result = await client._baseFetch('/upload', 'POST', {
-			body: formData
+			// Assert
+			expect(result.unwrap()).toEqual({ id: 'post-1' });
+			expect(fetchLike).toHaveBeenCalledWith(
+				'https://api.example.com/posts/post-1?preview=true',
+				expect.objectContaining({
+					body: JSON.stringify({ title: 'Hello' }),
+					cache: 'no-store',
+					credentials: 'include',
+					headers: {
+						'authorization': 'Bearer request',
+						'content-type': 'application/json; charset=utf-8'
+					},
+					method: 'POST'
+				})
+			);
 		});
 
-		// Assert
-		expect(result.isOk()).toBe(true);
-		expect(result.unwrap().data).toEqual({ message: 'Upload successful' });
+		it('should return response details when requested', async () => {
+			// Prepare
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return Response.json({ id: 'post-1' });
+			});
+			const client = createFetchClient({ fetch: fetchLike });
 
-		// Verify FormData was received correctly
-		expect(receivedFormData).toBeDefined();
-		expect(receivedFormData?.get('description')).toBe('Test file upload');
+			// Act
+			const result = await client.request<{ id: string }>('GET', '/posts/post-1', {
+				withResponse: true
+			});
 
-		// Verify file content
-		const uploadedFile = receivedFormData?.get('file') as File;
-		expect(uploadedFile).toBeInstanceOf(File);
-		expect(uploadedFile.name).toBe('test.txt');
-		expect(uploadedFile.type).toBe('text/plain');
+			// Assert
+			const value = result.unwrap();
+			expect(value.data).toEqual({ id: 'post-1' });
+			expect(value.response).toBeInstanceOf(Response);
+			expectTypeOf(value).toEqualTypeOf<{
+				data: {
+					id: string;
+				};
+				response: Response;
+			}>();
+		});
 
-		// Verify file content
-		const fileContent = await uploadedFile.text();
-		expect(fileContent).toBe('test content');
+		it('should leave multipart content type to fetch for FormData bodies', async () => {
+			// Prepare
+			const formData = new FormData();
+			formData.append('file', new Blob(['content']), 'file.txt');
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return Response.json({ ok: true });
+			});
+			const client = createFetchClient({
+				fetch: fetchLike,
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+
+			// Act
+			await client.request('POST', '/upload', {
+				body: formData
+			});
+
+			// Assert
+			expect(fetchLike).toHaveBeenCalledWith(
+				'/upload',
+				expect.objectContaining({
+					body: formData,
+					headers: {}
+				})
+			);
+		});
+
+		it('should serialize explicit null bodies as JSON', async () => {
+			// Prepare
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return Response.json({ ok: true });
+			});
+			const client = createFetchClient({ fetch: fetchLike });
+
+			// Act
+			await client.request('POST', '/items', {
+				body: null
+			});
+
+			// Assert
+			expect(fetchLike).toHaveBeenCalledWith(
+				'/items',
+				expect.objectContaining({
+					body: 'null',
+					headers: {
+						'content-type': 'application/json; charset=utf-8'
+					}
+				})
+			);
+		});
+	});
+
+	describe('lifecycle hooks', () => {
+		it('should prepare request data before URL and body are built', async () => {
+			// Prepare
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return Response.json({ ok: true });
+			});
+			const prepareRequest = vi.fn((cx) => {
+				cx.headers.authorization = 'Bearer prepare';
+				cx.pathParams.itemId = 'item-1';
+				cx.queryParams.trace = '1';
+				cx.requestInit.cache = 'no-store';
+			});
+			const client = createFetchClient({
+				fetch: fetchLike,
+				prepareRequest: [prepareRequest]
+			});
+
+			// Act
+			await client.request('GET', '/items/{itemId}', {
+				meta: {
+					requestId: 'request-1'
+				}
+			});
+
+			// Assert
+			expect(prepareRequest).toHaveBeenCalledWith(
+				expect.objectContaining({
+					meta: {
+						requestId: 'request-1'
+					},
+					method: 'GET',
+					path: '/items/{itemId}'
+				})
+			);
+			expect(fetchLike).toHaveBeenCalledWith(
+				'/items/item-1?trace=1',
+				expect.objectContaining({
+					cache: 'no-store',
+					headers: {
+						authorization: 'Bearer prepare'
+					}
+				})
+			);
+		});
+
+		it('should prepare responses before parsing', async () => {
+			// Prepare
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return Response.json({ status: 'raw' });
+			});
+			const prepareResponse = vi.fn((cx) => {
+				expect(cx.request.meta).toEqual({ requestId: 'request-1' });
+				expect(cx.request.url).toBe('/items');
+				expect(cx.request.requestInit.method).toBe('GET');
+
+				cx.response = Response.json({ status: 'prepared' });
+			});
+			const client = createFetchClient({
+				fetch: fetchLike,
+				prepareResponse: [prepareResponse]
+			});
+
+			// Act
+			const result = await client.request<{ status: string }>('GET', '/items', {
+				meta: {
+					requestId: 'request-1'
+				}
+			});
+
+			// Assert
+			expect(result.unwrap()).toEqual({ status: 'prepared' });
+			expect(prepareResponse).toHaveBeenCalledOnce();
+		});
+	});
+
+	describe('middleware', () => {
+		it('should apply global and request middleware around fetch', async () => {
+			// Prepare
+			const calls: string[] = [];
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				calls.push('fetch');
+				return Response.json({ ok: true });
+			});
+			const globalMiddleware =
+				(next: TFetchLike): TFetchLike =>
+				async (url, init) => {
+					calls.push('global:before');
+					const response = await next(url, init);
+					calls.push('global:after');
+					return response;
+				};
+			const requestMiddleware =
+				(next: TFetchLike): TFetchLike =>
+				async (url, init) => {
+					calls.push('request:before');
+					const response = await next(url, init);
+					calls.push('request:after');
+					return response;
+				};
+			const client = createFetchClient({
+				fetch: fetchLike,
+				middleware: [globalMiddleware]
+			});
+
+			// Act
+			await client.request('GET', '/items', {
+				middleware: [requestMiddleware]
+			});
+
+			// Assert
+			expect(calls).toEqual([
+				'global:before',
+				'request:before',
+				'fetch',
+				'request:after',
+				'global:after'
+			]);
+		});
+	});
+
+	describe('response parsing', () => {
+		it('should normalize method casing for empty response handling', async () => {
+			// Prepare
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return new Response('invalid-json', {
+					status: 200,
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				});
+			});
+			const client = createFetchClient({ fetch: fetchLike });
+
+			// Act
+			const result = await client.request('head', '/items');
+
+			// Assert
+			expect(result.unwrap()).toBeUndefined();
+			expect(fetchLike).toHaveBeenCalledWith(
+				'/items',
+				expect.objectContaining({
+					method: 'HEAD'
+				})
+			);
+		});
+
+		it.each([204, 205])(
+			'should return undefined data for %i responses without parsing',
+			async (status) => {
+				// Prepare
+				const fetchLike = vi.fn<TFetchLike>(async () => {
+					return new Response(null, { status });
+				});
+				const client = createFetchClient({ fetch: fetchLike });
+
+				// Act
+				const result = await client.request('GET', '/items', {
+					parseAs: 'text'
+				});
+
+				// Assert
+				expect(result.unwrap()).toBeUndefined();
+			}
+		);
+
+		it('should return undefined data for empty successful responses', async () => {
+			// Prepare
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return new Response('', {
+					status: 200,
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				});
+			});
+			const client = createFetchClient({ fetch: fetchLike });
+
+			// Act
+			const result = await client.request('GET', '/items');
+
+			// Assert
+			expect(result.unwrap()).toBeUndefined();
+		});
+
+		it('should parse chunked responses with zero content length', async () => {
+			// Prepare
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return new Response(JSON.stringify({ ok: true }), {
+					headers: {
+						'Content-Length': '0',
+						'Transfer-Encoding': 'Chunked'
+					}
+				});
+			});
+			const client = createFetchClient({ fetch: fetchLike });
+
+			// Act
+			const result = await client.request<{ ok: boolean }>('GET', '/items');
+
+			// Assert
+			expect(result.unwrap()).toEqual({ ok: true });
+		});
+	});
+
+	describe('error mapping', () => {
+		it('should map missing global fetch to a fetch error', async () => {
+			// Prepare
+			const originalFetch = globalThis.fetch;
+			vi.stubGlobal('fetch', undefined);
+			try {
+				const client = createFetchClient();
+
+				// Act
+				const result = await client.request('GET', '/items');
+
+				// Assert
+				const error = unwrapErr(result);
+				expect(error).toBeInstanceOf(FetchError);
+				expect((error as FetchError).code).toBe('#ERR_MISSING_FETCH');
+			} finally {
+				vi.stubGlobal('fetch', originalFetch);
+			}
+		});
+
+		it('should map non-OK responses to http errors', async () => {
+			// Prepare
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return Response.json({ message: 'Not found' }, { status: 404 });
+			});
+			const client = createFetchClient({ fetch: fetchLike });
+
+			// Act
+			const result = await client.request('GET', '/missing');
+
+			// Assert
+			const error = unwrapErr(result);
+			expect(error).toBeInstanceOf(HttpError);
+			expect((error as HttpError).status).toBe(404);
+			expect((error as HttpError).data).toEqual({ message: 'Not found' });
+		});
+
+		it('should map thrown fetch errors to network errors', async () => {
+			// Prepare
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				throw new Error('offline');
+			});
+			const client = createFetchClient({ fetch: fetchLike });
+
+			// Act
+			const result = await client.request('GET', '/items');
+
+			// Assert
+			expect(unwrapErr(result)).toBeInstanceOf(NetworkError);
+		});
+
+		it('should keep fetch errors thrown by middleware unchanged', async () => {
+			// Prepare
+			const thrownError = new FetchError('#ERR_CUSTOM', {
+				message: 'Middleware failed'
+			});
+			const client = createFetchClient({
+				middleware: [
+					() => async () => {
+						throw thrownError;
+					}
+				]
+			});
+
+			// Act
+			const result = await client.request('GET', '/items');
+
+			// Assert
+			expect(unwrapErr(result)).toBe(thrownError);
+		});
+
+		it('should map prepare request failures to fetch errors', async () => {
+			// Prepare
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return Response.json({ ok: true });
+			});
+			const client = createFetchClient({
+				fetch: fetchLike,
+				prepareRequest: [
+					() => {
+						throw new Error('Prepare failed');
+					}
+				]
+			});
+
+			// Act
+			const result = await client.request('GET', '/items');
+
+			// Assert
+			const error = unwrapErr(result);
+			expect(error).toBeInstanceOf(FetchError);
+			expect((error as FetchError).code).toBe('#ERR_PREPARE_REQUEST');
+			expect(fetchLike).not.toHaveBeenCalled();
+		});
+
+		it('should map prepare response failures to fetch errors', async () => {
+			// Prepare
+			const client = createFetchClient({
+				fetch: async () => Response.json({ ok: true }),
+				prepareResponse: [
+					() => {
+						throw new Error('Prepare response failed');
+					}
+				]
+			});
+
+			// Act
+			const result = await client.request('GET', '/items');
+
+			// Assert
+			const error = unwrapErr(result);
+			expect(error).toBeInstanceOf(FetchError);
+			expect((error as FetchError).code).toBe('#ERR_PREPARE_RESPONSE');
+		});
+
+		it('should map middleware setup failures to fetch errors', async () => {
+			// Prepare
+			const client = createFetchClient({
+				middleware: [
+					() => {
+						throw new Error('Middleware setup failed');
+					}
+				]
+			});
+
+			// Act
+			const result = await client.request('GET', '/items');
+
+			// Assert
+			const error = unwrapErr(result);
+			expect(error).toBeInstanceOf(FetchError);
+			expect((error as FetchError).code).toBe('#ERR_FETCH_MIDDLEWARE');
+		});
+
+		it('should map response parse failures to fetch errors', async () => {
+			// Prepare
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return new Response('invalid-json', {
+					status: 200,
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				});
+			});
+			const client = createFetchClient({ fetch: fetchLike });
+
+			// Act
+			const result = await client.request('GET', '/items');
+
+			// Assert
+			expect(unwrapErr(result)).toBeInstanceOf(FetchError);
+		});
+
+		it('should map URL build failures to fetch errors', async () => {
+			// Prepare
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return Response.json({ ok: true });
+			});
+			const client = createFetchClient({ fetch: fetchLike });
+
+			// Act
+			const result = await client.request('GET', '/items', {
+				pathSerializer: () => {
+					throw new Error('Failed to serialize path');
+				}
+			});
+
+			// Assert
+			const error = unwrapErr(result);
+			expect(error).toBeInstanceOf(FetchError);
+			expect((error as FetchError).code).toBe('#ERR_BUILD_URL');
+			expect(fetchLike).not.toHaveBeenCalled();
+		});
 	});
 });
