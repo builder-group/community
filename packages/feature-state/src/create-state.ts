@@ -11,7 +11,7 @@ import type { TListener, TListenerCallback, TListenerContext, TState, TStateBase
  * @param initialValue - The initial state value.
  */
 export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
-	const baseState: TStateBase<GValue> = {
+	return createFeatureHost<TStateBase<GValue>>({
 		_listeners: [],
 		_v: initialValue,
 		get value() {
@@ -83,9 +83,7 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 			void callback({ value: this._v, prevValue: this._v });
 			return unbind;
 		}
-	};
-
-	return createFeatureHost(baseState);
+	});
 }
 
 /** Source key set on the listener context when a value is changed via `set()`. */

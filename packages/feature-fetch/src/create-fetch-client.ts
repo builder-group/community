@@ -60,6 +60,7 @@ export function createFetchClient(options: TCreateFetchClientOptions = {}): TFet
 		middleware = [],
 		fetch
 	} = options;
+
 	return createFeatureHost<TFetchClientBase>({
 		_config: {
 			baseUrl,
