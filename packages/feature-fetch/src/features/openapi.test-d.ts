@@ -1,11 +1,13 @@
+import type { $Read, $Write } from 'openapi-typescript-helpers';
 import { describe, expectTypeOf, it } from 'vitest';
 import type { components, paths } from '../__tests__/resources/mock-openapi-types';
 import { createFetchClient } from '../create-fetch-client';
+import { HttpError } from '../errors';
 import type { TFetchClient } from '../types';
 import { createOpenApiFetchClient, openApiFeature, type TOpenApiFeature } from './openapi';
 
 describe('openApiFeature function', () => {
-	describe('types', () => {
+	describe('feature composition', () => {
 		it('should add OpenAPI helpers through the feature-core chain', () => {
 			const client = createFetchClient().with(openApiFeature<paths>());
 
@@ -15,7 +17,9 @@ describe('openApiFeature function', () => {
 			expectTypeOf(client._features).toEqualTypeOf<readonly 'openapi'[]>();
 			expectTypeOf(client).toEqualTypeOf<TFetchClient<[TOpenApiFeature<paths>]>>();
 		});
+	});
 
+	describe('schema paths', () => {
 		it('should only accept schema paths for the selected method', () => {
 			const client = createOpenApiFetchClient<paths>();
 
@@ -38,6 +42,17 @@ describe('openApiFeature function', () => {
 			void client.get('/missing');
 		});
 
+		it('should only accept string schema paths', () => {
+			const client = createOpenApiFetchClient<TNumericPathKeyPaths>();
+
+			void client.get('/items');
+
+			// @ts-expect-error fetch paths must be strings even if a generic path map has numeric keys.
+			void client.get(1);
+		});
+	});
+
+	describe('request options', () => {
 		it('should require path params declared by the operation', () => {
 			const client = createOpenApiFetchClient<paths>();
 
@@ -94,58 +109,6 @@ describe('openApiFeature function', () => {
 			});
 		});
 
-		it('should infer success data by default', async () => {
-			const client = createOpenApiFetchClient<paths>();
-
-			const result = await client.get('/pet/{petId}', {
-				pathParams: {
-					petId: 10
-				}
-			});
-			if (result.isOk()) {
-				expectTypeOf(result.value).toEqualTypeOf<components['schemas']['Pet']>();
-			}
-		});
-
-		it('should infer response details when requested', async () => {
-			const client = createOpenApiFetchClient<paths>();
-
-			const result = await client.get('/pet/{petId}', {
-				pathParams: {
-					petId: 10
-				},
-				withResponse: true
-			});
-			if (result.isOk()) {
-				expectTypeOf(result.value).toEqualTypeOf<{
-					data: components['schemas']['Pet'];
-					response: Response;
-				}>();
-			}
-		});
-
-		it('should infer JSON suffix media types', async () => {
-			const client = createOpenApiFetchClient<TJsonSuffixPaths>();
-
-			const result = await client.get('/problem');
-			if (result.isOk()) {
-				expectTypeOf(result.value).toEqualTypeOf<{ ok: boolean }>();
-			}
-		});
-
-		it('should keep default responses out of the success branch', async () => {
-			const client = createOpenApiFetchClient<paths>();
-
-			const result = await client.post('/user', {
-				body: {
-					username: 'jeff'
-				}
-			});
-			if (result.isOk()) {
-				expectTypeOf(result.value).toEqualTypeOf<never>();
-			}
-		});
-
 		it('should require OpenAPI header params and allow additional headers', () => {
 			const client = createOpenApiFetchClient<THeaderPaths>();
 
@@ -191,6 +154,113 @@ describe('openApiFeature function', () => {
 			});
 		});
 	});
+
+	describe('response inference', () => {
+		it('should infer success data by default', async () => {
+			const client = createOpenApiFetchClient<paths>();
+
+			const result = await client.get('/pet/{petId}', {
+				pathParams: {
+					petId: 10
+				}
+			});
+			if (result.isOk()) {
+				expectTypeOf(result.value).toEqualTypeOf<components['schemas']['Pet']>();
+			}
+		});
+
+		it('should infer response details when requested', async () => {
+			const client = createOpenApiFetchClient<paths>();
+
+			const result = await client.get('/pet/{petId}', {
+				pathParams: {
+					petId: 10
+				},
+				withResponse: true
+			});
+			if (result.isOk()) {
+				expectTypeOf(result.value).toEqualTypeOf<{
+					data: components['schemas']['Pet'];
+					response: Response;
+				}>();
+			}
+		});
+
+		it('should infer JSON suffix media types', async () => {
+			const client = createOpenApiFetchClient<TJsonSuffixPaths>();
+
+			const result = await client.get('/problem');
+			if (result.isOk()) {
+				expectTypeOf(result.value).toEqualTypeOf<{ ok: boolean }>();
+			}
+		});
+
+		it('should infer parser return types for non-json parse modes', async () => {
+			const client = createOpenApiFetchClient<paths>();
+
+			const result = await client.get('/pet/{petId}', {
+				pathParams: {
+					petId: 10
+				},
+				parseAs: 'text'
+			});
+			if (result.isOk()) {
+				expectTypeOf(result.value).toEqualTypeOf<string>();
+			}
+		});
+
+		it('should keep default responses out of the success branch', async () => {
+			const client = createOpenApiFetchClient<paths>();
+
+			const result = await client.post('/user', {
+				body: {
+					username: 'jeff'
+				}
+			});
+			if (result.isOk()) {
+				expectTypeOf(result.value).toEqualTypeOf<never>();
+			}
+		});
+	});
+
+	describe('read and write markers', () => {
+		it('should apply OpenAPI read and write markers', async () => {
+			const client = createOpenApiFetchClient<TReadWritePaths>();
+
+			void client.post('/users', {
+				body: {
+					username: 'jeff',
+					password: 'secret'
+				}
+			});
+
+			void client.post('/users', {
+				body: {
+					// @ts-expect-error readOnly fields cannot be sent in request bodies.
+					id: 'user-1',
+					username: 'jeff',
+					password: 'secret'
+				}
+			});
+
+			const result = await client.post('/users', {
+				body: {
+					username: 'jeff',
+					password: 'secret'
+				}
+			});
+			if (result.isOk()) {
+				expectTypeOf(result.value).toEqualTypeOf<{
+					id: string;
+					username: string;
+				}>();
+			}
+			if (result.isErr() && result.error instanceof HttpError) {
+				const errorData: { message: string } | undefined = result.error.data;
+				void errorData;
+			}
+		});
+	});
 });
 
 interface THeaderPaths {
@@ -210,6 +280,72 @@ interface THeaderPaths {
 					content: {
 						'application/json': {
 							ok: boolean;
+						};
+					};
+				};
+			};
+		};
+	};
+}
+
+interface TNumericPathKeyPaths {
+	1: {
+		get: {
+			requestBody?: never;
+			responses: {
+				200: {
+					content: {
+						'application/json': {
+							ok: boolean;
+						};
+					};
+				};
+			};
+		};
+	};
+	'/items': {
+		get: {
+			requestBody?: never;
+			responses: {
+				200: {
+					content: {
+						'application/json': {
+							ok: boolean;
+						};
+					};
+				};
+			};
+		};
+	};
+}
+
+interface TReadWritePaths {
+	'/users': {
+		post: {
+			requestBody: {
+				content: {
+					'application/json': {
+						id?: $Read<string>;
+						username: string;
+						password: $Write<string>;
+					};
+				};
+			};
+			responses: {
+				200: {
+					content: {
+						'application/json': {
+							id: $Read<string>;
+							username: string;
+							password: $Write<string>;
+						};
+					};
+				};
+				400: {
+					content: {
+						'application/json': {
+							message: string;
+							debug: $Write<string>;
 						};
 					};
 				};

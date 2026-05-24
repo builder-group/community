@@ -88,56 +88,52 @@ function createOpenApiMethod<GPaths extends object, GMethod extends HttpMethod>(
 }
 
 export interface TOpenApiMethod<GPaths extends object, GMethod extends HttpMethod> {
-	<GPath extends TOpenApiPathWithMethod<GPaths, GMethod>, GParseAs extends TParseAs = 'json'>(
+	<GPath extends TOpenApiMethodPath<GPaths, GMethod>, GParseAs extends TParseAs = 'json'>(
 		path: GPath,
-		...args: TOpenApiFetchOptionsArgs<
-			TOpenApiFetchOptions<TOpenApiOperationForPath<GPaths, GMethod, GPath>, GParseAs> & {
+		...args: TOpenApiMethodOptionsArgs<
+			TOpenApiFetchOptions<TOpenApiPathOperation<GPaths, GMethod, GPath>, GParseAs> & {
 				withResponse: true;
 			}
 		>
-	): Promise<
-		TOpenApiFetchResponse<TOpenApiOperationForPath<GPaths, GMethod, GPath>, GParseAs, true>
-	>;
-	<GPath extends TOpenApiPathWithMethod<GPaths, GMethod>, GParseAs extends TParseAs = 'json'>(
+	): Promise<TOpenApiFetchResponse<TOpenApiPathOperation<GPaths, GMethod, GPath>, GParseAs, true>>;
+	<GPath extends TOpenApiMethodPath<GPaths, GMethod>, GParseAs extends TParseAs = 'json'>(
 		path: GPath,
-		...args: TOpenApiFetchOptionsArgs<
-			TOpenApiFetchOptions<TOpenApiOperationForPath<GPaths, GMethod, GPath>, GParseAs> & {
+		...args: TOpenApiMethodOptionsArgs<
+			TOpenApiFetchOptions<TOpenApiPathOperation<GPaths, GMethod, GPath>, GParseAs> & {
 				withResponse?: false;
 			}
 		>
-	): Promise<TOpenApiFetchResponse<TOpenApiOperationForPath<GPaths, GMethod, GPath>, GParseAs>>;
+	): Promise<TOpenApiFetchResponse<TOpenApiPathOperation<GPaths, GMethod, GPath>, GParseAs>>;
 	<
-		GPath extends TOpenApiPathWithMethod<GPaths, GMethod>,
+		GPath extends TOpenApiMethodPath<GPaths, GMethod>,
 		GParseAs extends TParseAs = 'json',
 		GWithResponse extends boolean = boolean
 	>(
 		path: GPath,
-		...args: TOpenApiFetchOptionsArgs<
-			TOpenApiFetchOptions<TOpenApiOperationForPath<GPaths, GMethod, GPath>, GParseAs> & {
+		...args: TOpenApiMethodOptionsArgs<
+			TOpenApiFetchOptions<TOpenApiPathOperation<GPaths, GMethod, GPath>, GParseAs> & {
 				withResponse?: GWithResponse;
 			}
 		>
 	): Promise<
-		TOpenApiFetchResponse<TOpenApiOperationForPath<GPaths, GMethod, GPath>, GParseAs, GWithResponse>
+		TOpenApiFetchResponse<TOpenApiPathOperation<GPaths, GMethod, GPath>, GParseAs, GWithResponse>
 	>;
 }
 
-type TOpenApiPathWithMethod<GPaths extends object, GMethod extends HttpMethod> = PathsWithMethod<
-	GPaths,
-	GMethod
-> &
-	string;
+// Note: Wrap PathsWithMethod because it preserves number keys from arbitrary path maps, but fetch paths are strings
+type TOpenApiMethodPath<GPaths extends object, GMethod extends HttpMethod> = Extract<
+	PathsWithMethod<GPaths, GMethod>,
+	string
+>;
 
-type TOpenApiOperationForPath<
+type TOpenApiPathOperation<
 	GPaths extends object,
 	GMethod extends HttpMethod,
-	GPath extends TOpenApiPathWithMethod<GPaths, GMethod>
+	GPath extends TOpenApiMethodPath<GPaths, GMethod>
 > = FilterKeys<GPaths[GPath], GMethod>;
 
-type TOpenApiFetchOptionsArgs<GOptions extends object> =
+type TOpenApiMethodOptionsArgs<GOptions extends object> =
 	RequiredKeysOf<GOptions> extends never ? [options?: GOptions] : [options: GOptions];
-
-// MARK: - Options
 
 export type TOpenApiFetchOptions<GOperation, GParseAs extends TParseAs = 'json'> = Omit<
 	TFetchOptions<GParseAs>,
@@ -170,27 +166,31 @@ export type TOpenApiFetchResponse<
 	GWithResponse
 >;
 
+// Note: Readable removes OpenAPI writeOnly fields from response bodies
 type TOpenApiSuccessResponse<GOperation, GParseAs extends TParseAs> = Readable<
-	SuccessResponse<TOpenApiResponseMap<GOperation>, TOpenApiResponseMedia<GParseAs>>
+	SuccessResponse<TOpenApiResponseMap<GOperation>, TOpenApiResponseMediaType<GParseAs>>
 >;
 
+// Note: Readable removes OpenAPI writeOnly fields from error response bodies
 type TOpenApiErrorResponse<GOperation, GParseAs extends TParseAs> = Readable<
-	ErrorResponse<TOpenApiResponseMap<GOperation>, TOpenApiResponseMedia<GParseAs>>
+	ErrorResponse<TOpenApiResponseMap<GOperation>, TOpenApiResponseMediaType<GParseAs>>
 >;
 
+// Note: Wrap ResponseObjectMap because it falls back to unknown, but SuccessResponse and ErrorResponse require a record
 type TOpenApiResponseMap<GOperation> =
 	ResponseObjectMap<GOperation> extends Record<string | number, unknown>
 		? ResponseObjectMap<GOperation>
 		: Record<string | number, never>;
 
-type TOpenApiResponseMedia<GParseAs extends TParseAs> = GParseAs extends 'json'
-	? TOpenApiJsonMedia
+type TOpenApiResponseMediaType<GParseAs extends TParseAs> = GParseAs extends 'json'
+	? TOpenApiJsonMediaType
 	: MediaType;
 
-type TOpenApiJsonMedia = `${string}/json` | `${string}/${string}+json`;
+type TOpenApiJsonMediaType = `${string}/json` | `${string}/${string}+json`;
 
 // MARK: - Request Body
 
+// Note: Writable removes OpenAPI readOnly fields from request bodies
 type TOpenApiRequestBody<GOperation> = Writable<OperationRequestBodyContent<GOperation>>;
 
 type TOpenApiRequestBodyOption<GOperation> = [TOpenApiRequestBody<GOperation>] extends [never]
@@ -252,10 +252,8 @@ type TOpenApiQuerySerializerParams<GOperation> = [TOpenApiQueryParams<GOperation
 type TOpenApiHeadersOption<GOperation> = [TOpenApiHeaderParams<GOperation>] extends [never]
 	? { headers?: TFetchHeadersInit }
 	: TOpenApiHasRequiredHeaderParams<GOperation> extends true
-		? { headers: TOpenApiHeaders<GOperation> }
-		: { headers?: TOpenApiHeaders<GOperation> };
-
-type TOpenApiHeaders<GOperation> = TOpenApiHeaderParams<GOperation> & TFetchHeadersInitRecord;
+		? { headers: TOpenApiHeaderParams<GOperation> & TFetchHeadersInitRecord }
+		: { headers?: TOpenApiHeaderParams<GOperation> & TFetchHeadersInitRecord };
 
 type TOpenApiHeaderParams<GOperation> = GOperation extends {
 	parameters: { header?: infer GHeaderParams };
