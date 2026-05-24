@@ -84,6 +84,26 @@ describe('openApiFeature function', () => {
 			});
 		});
 
+		it('should require query params declared by the operation', () => {
+			const client = createOpenApiFetchClient<TRequiredQueryPaths>();
+
+			void client.get('/search', {
+				queryParams: {
+					q: 'jeff'
+				}
+			});
+
+			// @ts-expect-error queryParams is required by the OpenAPI operation.
+			void client.get('/search');
+
+			void client.get('/search', {
+				// @ts-expect-error q is required inside queryParams.
+				queryParams: {
+					limit: 10
+				}
+			});
+		});
+
 		it('should require request bodies declared by the operation', () => {
 			const client = createOpenApiFetchClient<paths>();
 
@@ -273,6 +293,32 @@ interface THeaderPaths {
 				cookie?: never;
 				path?: never;
 				query?: never;
+			};
+			requestBody?: never;
+			responses: {
+				200: {
+					content: {
+						'application/json': {
+							ok: boolean;
+						};
+					};
+				};
+			};
+		};
+	};
+}
+
+interface TRequiredQueryPaths {
+	'/search': {
+		get: {
+			parameters: {
+				cookie?: never;
+				header?: never;
+				path?: never;
+				query: {
+					q: string;
+					limit?: number;
+				};
 			};
 			requestBody?: never;
 			responses: {
