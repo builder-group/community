@@ -44,6 +44,9 @@ import type {
 	TUnserializedBody
 } from './types';
 
+/**
+ * Creates a feature host around fetch.
+ */
 export function createFetchClient(options: TCreateFetchClientOptions = {}): TFetchClient<[]> {
 	const {
 		baseUrl = '',
@@ -219,15 +222,25 @@ export function createFetchClient(options: TCreateFetchClientOptions = {}): TFet
 }
 
 export interface TCreateFetchClientOptions {
+	/** Base URL prepended to relative request paths. */
 	baseUrl?: string;
+	/** Native fetch init defaults except `body`, `method`, and `headers`. */
 	requestInit?: TFetchRequestInit;
+	/** Headers applied to every request. */
 	headers?: TFetchHeadersInit;
+	/** Default body serializer. */
 	bodySerializer?: TBodySerializer;
+	/** Default path param serializer. */
 	pathSerializer?: TPathSerializer;
+	/** Default query param serializer. */
 	querySerializer?: TQuerySerializer;
+	/** Hooks that can mutate request data before URL/body creation. */
 	prepareRequest?: TPrepareRequestHook[];
+	/** Hooks that can inspect or replace the response before parsing/error mapping. */
 	prepareResponse?: TPrepareResponseHook[];
+	/** Middleware applied around fetch for every request. */
 	middleware?: TFetchMiddleware[];
+	/** Fetch implementation. Defaults to `globalThis.fetch`. */
 	fetch?: TFetchLike;
 }
 
