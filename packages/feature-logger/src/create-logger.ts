@@ -10,22 +10,22 @@ import type { TInvokeConsole, TLogger, TLoggerBase, TLoggerMiddleware } from './
  * Extend with features using `.with(feature())`.
  */
 export function createLogger(options: TCreateLoggerOptions = {}): TLogger<[]> {
-	const { active = true, level = ELogLevel.ALL, middlewares, invokeConsole } = options;
+	const { active = true, level = ELogLevel.ALL, middleware = [], invokeConsole } = options;
 
 	return createFeatureHost<TLoggerBase>({
 		_invokeConsole: resolveInvokeConsole(invokeConsole),
 		active,
 		level,
-		middlewares: [...(middlewares ?? [])],
+		_middleware: middleware,
 		_baseLog(data, context) {
 			if (!this.active || context.level < this.level) {
 				return;
 			}
 
-			const invokeConsoleWithMiddlewares = this.middlewares
-				.concat(context.middlewares ?? [])
+			const invokeConsoleWithMiddleware = this._middleware
+				.concat(context.middleware ?? [])
 				.reduceRight((next, middleware) => middleware(next), this._invokeConsole);
-			invokeConsoleWithMiddlewares(data, context);
+			invokeConsoleWithMiddleware(data, context);
 		},
 		trace(...data) {
 			this._baseLog(data, { logMethod: 'trace', level: ELogLevel.TRACE });
@@ -53,8 +53,8 @@ export interface TCreateLoggerOptions {
 	active?: boolean;
 	/** Minimum log level. Calls below this level are suppressed. Defaults to `ELogLevel.ALL`. */
 	level?: number;
-	/** Initial middleware stack. Merged with middlewares added later via `.with()`. */
-	middlewares?: TLoggerMiddleware[];
+	/** Initial middleware stack. Merged with middleware added later via `.with()`. */
+	middleware?: TLoggerMiddleware[];
 	/** Custom console invoker. Use to redirect output or capture logs in tests. */
 	invokeConsole?: TInvokeConsole;
 }

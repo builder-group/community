@@ -9,7 +9,7 @@ export function logMethodPrefixFeature(
 	return defineFeature<TLogMethodPrefixFeature>({
 		key: 'log-method-prefix',
 		install(logger: TLoggerBase) {
-			logger.middlewares.push(logMethodPrefixMiddleware(options));
+			logger._middleware.push(logMethodPrefixMiddleware(options));
 
 			return {};
 		}

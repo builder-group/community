@@ -76,7 +76,7 @@ describe('createLogger function', () => {
 	});
 
 	describe('_baseLog method', () => {
-		it('should compose global and context middlewares from right to left', () => {
+		it('should compose global and context middleware from right to left', () => {
 			// Prepare
 			const calls: string[] = [];
 			const globalMiddleware: TLoggerMiddleware = (next) => {
@@ -92,13 +92,13 @@ describe('createLogger function', () => {
 				};
 			};
 			const invokeConsole = vi.fn();
-			const logger = createLogger({ invokeConsole, middlewares: [globalMiddleware] });
+			const logger = createLogger({ invokeConsole, middleware: [globalMiddleware] });
 
 			// Act
 			logger._baseLog(['message'], {
 				logMethod: 'log',
 				level: ELogLevel.LOG,
-				middlewares: [contextMiddleware]
+				middleware: [contextMiddleware]
 			});
 
 			// Assert

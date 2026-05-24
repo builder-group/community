@@ -6,7 +6,7 @@ export function styleFeature(styles: TLogStyles = {}): TStyleFeature {
 	return defineFeature<TStyleFeature>({
 		key: 'style',
 		install(logger: TLoggerBase) {
-			logger.middlewares.push(styleMiddleware(styles));
+			logger._middleware.push(styleMiddleware(styles));
 
 			return {};
 		}

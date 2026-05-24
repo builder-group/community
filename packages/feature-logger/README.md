@@ -114,10 +114,10 @@ logger.info('visible');
 | --------------- | --------------- | ------------------------------------------------ |
 | `active`        | `true`          | When false, all log calls are skipped.           |
 | `level`         | `ELogLevel.ALL` | Minimum level that should be emitted.            |
-| `middlewares`   | `[]`            | Logger middlewares applied to every log call.    |
+| `middleware`    | `[]`            | Logger middleware applied to every log call.     |
 | `invokeConsole` | `console.*`     | Custom console invoker, useful for tests or I/O. |
 
-Custom invokers and middlewares receive `(data, context)`. `data` is the array passed to the log method, and `context` contains the `logMethod`, `level`, and optional per-call middlewares.
+Custom invokers and middleware receive `(data, context)`. `data` is the array passed to the log method, and `context` contains the `logMethod`, `level`, and optional per-call middleware.
 
 `ELogLevel` uses ordered threshold values: `ALL = 0`, `TRACE = 100`, `DEBUG = 200`, `LOG = 300`, `INFO = 400`, `WARN = 500`, and `ERROR = 600`.
 
@@ -235,7 +235,7 @@ export function labelFeature(label: string): TLabelFeature {
 	return defineFeature<TLabelFeature>({
 		key: 'label',
 		install(logger: TLoggerBase) {
-			logger.middlewares.push((next) => {
+			logger._middleware.push((next) => {
 				return (data, context) => {
 					if (typeof data[0] === 'string') {
 						next([`${label}: ${data[0]}`, ...data.slice(1)], context);
@@ -264,9 +264,9 @@ export type TLabelFeature = TFeature<'label', object>;
 - [pino](https://github.com/pinojs/pino): high-performance JSON logger for Node.js
 - [debug](https://github.com/debug-js/debug): lightweight namespace-based debug logger
 
-### What is the difference between `invokeConsole` and middlewares?
+### What is the difference between `invokeConsole` and middleware?
 
-`invokeConsole` is the final step that writes to the console. It receives the fully processed data after all middlewares have run. Middlewares transform data before it reaches `invokeConsole`. Use middlewares to modify or annotate log output. Use `invokeConsole` to redirect it entirely.
+`invokeConsole` is the final step that writes to the console. It receives the fully processed data after all middleware has run. Middleware transforms data before it reaches `invokeConsole`. Use middleware to modify or annotate log output. Use `invokeConsole` to redirect it entirely.
 
 ### When should I use `active: false` instead of setting a high `level`?
 
@@ -282,7 +282,7 @@ Yes. Call `.with()` once with multiple features or chain multiple `.with()` call
 
 ### How do I test a logger that uses features like `prefixFeature`?
 
-Pass a custom `invokeConsole` to `createLogger`, then apply the same features with `.with()`. The `invokeConsole` receives data after all middlewares run, so the captured output reflects the full formatting pipeline.
+Pass a custom `invokeConsole` to `createLogger`, then apply the same features with `.with()`. The `invokeConsole` receives data after all middleware runs, so the captured output reflects the full formatting pipeline.
 
 ```ts
 const logs: string[] = [];

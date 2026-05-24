@@ -13,12 +13,12 @@ export interface TLoggerBase {
 	_invokeConsole: TInvokeConsole;
 	/** @internal */
 	_baseLog(data: unknown[], context: TLogContext): void;
+	/** @internal */
+	_middleware: TLoggerMiddleware[];
 	/** When `false`, all log calls are silenced without removing the logger. */
 	active: boolean;
 	/** Minimum log level. Calls with a level below this value are suppressed. See `ELogLevel`. */
 	level: number;
-	/** Middleware stack applied to every log call. Push to add formatting or transformation. First-pushed middleware runs first and wraps all later ones. */
-	middlewares: TLoggerMiddleware[];
 	/** Emits at `ELogLevel.TRACE`. */
 	trace(...data: unknown[]): void;
 	/** Emits at `ELogLevel.DEBUG`. */
@@ -42,8 +42,8 @@ export interface TLogContext {
 	logMethod: TLogMethod;
 	/** Numeric log level for this call. Compare against `ELogLevel` values. */
 	level: number;
-	/** Per-call middlewares appended after the logger's own stack for this invocation only. */
-	middlewares?: TLoggerMiddleware[];
+	/** Per-call middleware appended after the logger's own stack for this invocation only. */
+	middleware?: TLoggerMiddleware[];
 }
 
 export type TLogMethod = 'debug' | 'trace' | 'log' | 'info' | 'warn' | 'error';
