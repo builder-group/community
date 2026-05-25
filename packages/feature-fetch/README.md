@@ -19,267 +19,400 @@
 
 > Status: Experimental
 
-`feature-fetch` is a straightforward, typesafe, and feature-based [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) wrapper supporting [OpenAPI](https://www.openapis.org/) types.
+`feature-fetch` is a typed fetch client where every request returns `[isOk, err, value]` instead of throwing. Start with a REST or OpenAPI client, then add retry, cache, GraphQL, or custom behavior with `.with()`.
 
-- **Lightweight & Tree Shakable**: Function-based and modular design (< 6KB minified)
-- **Fast**: Thin wrapper around the native [`fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API), maintaining near-native performance
-- **Modular & Extendable**: Easily extendable with features like `withRetry()`, `withOpenApi()`, ..
-- **Typesafe**: Build with TypeScript for strong type safety and support for [`openapi-typescript`](https://github.com/drwpow/openapi-typescript) types
-- **Standalone**: Only dependent on `fetch`, ensuring ease of use in various environments
+- Every request returns `[isOk, err, value]`: no try/catch, no unhandled rejections
+- Add REST helpers, OpenAPI type safety, GraphQL, retry, cache, or delay with `.with()`
+- Unknown OpenAPI paths, missing params, and wrong bodies fail at compile time
+- Build custom features on the same hook model: push auth, logging, or tracing into the client
 
-### 📚 Examples
+```ts
+import { createApiFetchClient, retryFeature } from 'feature-fetch';
 
-- [Vanilla Open-Meteo](https://github.com/builder-group/community/tree/develop/examples/feature-fetch/vanilla/open-meteo)
+const api = createApiFetchClient({
+	baseUrl: 'https://api.example.com/v1',
+	headers: { Authorization: `Bearer ${token}` }
+}).with(retryFeature({ maxRetries: 3 }));
 
-### 🌟 Motivation
+const [isOk, err, post] = await api.get<{ id: string; title: string }>('/posts/{postId}', {
+	pathParams: { postId: '123' }
+});
 
-Create a typesafe, straightforward, and lightweight `fetch` wrapper that seamlessly integrates with OpenAPI schemas using `openapi-typescript`. It aims to simplify error handling by returning results in a predictable manner with [`ts-results-es`](https://github.com/lune-climate/ts-results-es#readme). Additionally, it is designed to be modular & extendable, enabling the creation of straightforward API wrappers, such as for the Google Web Fonts API (see [`google-webfonts-client`](https://github.com/builder-group/community/tree/develop/packages/google-webfonts-client)). `feature-fetch` only depends on `fetch`, making it usable in most sandboxed environments like Figma plugins.
+if (isOk) {
+	console.log(post.title); // typed as { id: string; title: string }
+} else {
+	console.error(err.message); // NetworkError | HttpError | FetchError
+}
+```
 
-### ⚖️ Alternatives
+## Install
 
-- [wretch](https://github.com/elbywan/wretch)
-- [openapi-fetch](https://github.com/drwpow/openapi-typescript/tree/main/packages/openapi-fetch)
+```bash
+npm install feature-fetch
+```
 
-## 📖 Usage
+## Usage
+
+`createApiFetchClient` is the quickest starting point. It creates a client with REST helpers already installed:
 
 ```ts
 import { createApiFetchClient } from 'feature-fetch';
 
-const fetchClient = createApiFetchClient({
-	prefixUrl: 'https://api.example.com/v1'
+const api = createApiFetchClient({
+	baseUrl: 'https://api.example.com/v1',
+	headers: { Authorization: `Bearer ${token}` }
 });
 
-// Send request
-const response = await fetchClient.get<{ id: string }>('/blogposts/{postId}', {
-	pathParams: {
-		postId: '123'
-	}
+const [isOk, err, post] = await api.get<{ id: string; title: string }>('/posts/{postId}', {
+	pathParams: { postId: '123' }
 });
 
-// Handle response
-if (response.isOk()) {
-	console.log(response.value.data); // Handle successful response
+if (isOk) {
+	console.log(post.title);
 } else {
-	console.error(response.error.message); // Handle error response or network exception
-}
-
-// Or unwrap the response, throwing an exception on error
-try {
-	const data = response.unwrap().data;
-	console.log(data);
-} catch (error) {
-	console.error(error.message);
+	console.error(err.message);
 }
 ```
 
-### `withApi()`
-
-Enhance `feature-fetch` to create a typesafe `fetch` wrapper. This feature provides common HTTP methods (`get`, `post`, `put`, `del`) ensuring requests and responses are typed.
-
-1. **Create an API Fetch Client**:
-   Use `createApiFetchClient` to create a fetch client with a specified base URL.
-
-   ```ts
-   import { createApiFetchClient } from 'feature-fetch';
-
-   const fetchClient = createApiFetchClient({
-   	prefixUrl: 'https://api.example.com/v1'
-   });
-   ```
-
-2. **Send Requests**:
-   Use the fetch client to send requests, specifying the response type for better type safety.
-
-   ```ts
-   // Send request
-   const response = await fetchClient.get<{ id: string }>('/blogposts/{postId}', {
-   	pathParams: {
-   		postId: '123'
-   	}
-   });
-   ```
-
-### `withOpenApi()`
-
-Enhance `feature-fetch` with [OpenAPI](https://www.openapis.org/) support to create a typesafe `fetch` wrapper. This feature provides common HTTP methods (`get`, `post`, `put`, `del`) that are fully typed by leveraging your OpenAPI schema using [`openapi-typescript`](https://github.com/drwpow/openapi-typescript/).
-
-1. **Generate TypeScript Definitions**:
-   Use `openapi-typescript` to generate TypeScript definitions from your OpenAPI schema.
-
-   ```bash
-   npx openapi-typescript ./path/to/my/schema.yaml -o ./path/to/my/schema.d.ts
-   ```
-
-   [More info](https://github.com/drwpow/openapi-typescript/tree/main/packages/openapi-typescript)
-
-2. **Create an OpenAPI Fetch Client**:
-   Import the generated `paths` and use `createOpenApiFetchClient()` to create a fetch client.
-
-   ```ts
-   import { createOpenApiFetchClient } from 'feature-fetch';
-   import { paths } from './openapi-paths';
-
-   const fetchClient = createOpenApiFetchClient<paths>({
-   	prefixUrl: 'https://api.example.com/v1'
-   });
-   ```
-
-3. **Send Requests**:
-   Use the fetch client to send requests, ensuring typesafe parameters and responses.
-
-   ```ts
-   // Send request
-   const response = await fetchClient.get('/blogposts/{postId}', {
-   	pathParams: {
-   		postId: '123'
-   	}
-   });
-   ```
-
-### `withGraphQL()`
-
-Enhance `feature-fetch` to create a typesafe `fetch` wrapper specifically for GraphQL requests. This feature allows you to send GraphQL queries and mutations, ensuring requests and responses are typed.
-
-1. **Create a GraphQL Fetch Client**:
-   Use `withGraphQL` to extend your existing fetch client with GraphQL capabilities.
-
-   ```ts
-   import { gql, withGraphQL } from 'feature-fetch';
-   import createFetchClient from './createFetchClient';
-
-   const baseFetchClient = createFetchClient({
-   	prefixUrl: 'https://api.example.com/v1/graphql'
-   });
-
-   const graphqlClient = withGraphQL(baseFetchClient);
-   ```
-
-2. **Define GraphQL Queries**:
-   Use the `gql` tagged template literal to define your GraphQL queries with syntax highlighting.
-
-   ```ts
-   const GET_USER = gql`
-   	query GetUser($id: ID!) {
-   		user(id: $id) {
-   			id
-   			name
-   			email
-   		}
-   	}
-   `;
-   ```
-
-3. **Send GraphQL Requests**:
-   Use the GraphQL-enabled fetch client to send requests, specifying the response type for better type safety.
-
-   ```ts
-   // Send GraphQL query
-   const response = await graphqlClient.query<
-   	{ id: number },
-   	{ user: { id: string; name: string; email: string } }
-   >(GET_USER, {
-   	variables: {
-   		id: '123'
-   	}
-   });
-   ```
-
-## 🚨 Errors
-
-When handling API error responses (`response.isErr()`), `response` can be one of three [`Error`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error) types, each representing a different kind of failure.
-
-### `NetworkError` (extends `FetchError`)
-
-Indicates a failure in network communication, such as loss of connectivity.
+Compose features with `createFetchClient` when you want control over which features are installed and in what order:
 
 ```ts
-if (response.isErr() && response.error instanceof NetworkError) {
-	console.error('Network error:', response.error.message);
-}
+import { apiFeature, cacheFeature, createFetchClient, retryFeature } from 'feature-fetch';
+
+const api = createFetchClient({
+	baseUrl: 'https://api.example.com/v1'
+}).with(apiFeature(), retryFeature(), cacheFeature({ maxAgeMs: 30_000 }));
 ```
 
-### `RequestError` (extends `FetchError`)
+## Client
 
-Occurs when the server returns a response with a status code indicating an error (e.g., 4xx or 5xx).
+### `createFetchClient(options)`
+
+Creates a base fetch client with a single `request()` method. All built-in features build on top of this method.
 
 ```ts
-if (response.isErr() && response.error instanceof RequestError) {
-	console.error('Request error:', response.error.message, 'Status:', response.error.status);
-}
+const client = createFetchClient({
+	baseUrl: 'https://api.example.com',
+	headers: { Authorization: `Bearer ${token}` }
+});
+
+const [isOk, err, data] = await client.request<{ status: string }>('GET', '/health');
 ```
 
-### `FetchError`
+| Option            | Default                | Description                                                         |
+| ----------------- | ---------------------- | ------------------------------------------------------------------- |
+| `baseUrl`         | `''`                   | Prepended to every request path                                     |
+| `headers`         | `{}`                   | Default headers applied to every request                            |
+| `fetch`           | `globalThis.fetch`     | Custom fetch implementation                                         |
+| `requestInit`     | `{}`                   | Default `RequestInit` values except `body`, `method`, and `headers` |
+| `pathSerializer`  | `serializePathParams`  | Serializes `{path}` parameters                                      |
+| `querySerializer` | `serializeQueryParams` | Serializes query parameters                                         |
+| `bodySerializer`  | `serializeBody`        | Serializes request bodies                                           |
+| `prepareRequest`  | `[]`                   | Hooks called before URL and body are built                          |
+| `prepareResponse` | `[]`                   | Hooks called after a response is received, before parsing           |
+| `middleware`      | `[]`                   | Wrappers around the final fetch call                                |
 
-A general exception type that can encompass other error scenarios not covered by `NetworkError` or `RequestError`, for example when the response couldn't be parsed, ..
+**Request options**
+
+Each call to `request()` and the method helpers from installed features accept these options:
+
+| Option         | Default  | Description                                                                       |
+| -------------- | -------- | --------------------------------------------------------------------------------- |
+| `pathParams`   | `{}`     | Values for `{param}` placeholders in the path                                     |
+| `queryParams`  | `{}`     | Appended to the URL as a query string                                             |
+| `headers`      |          | Per-request headers merged after client defaults. `null` removes a default header |
+| `body`         |          | Request body. Objects are JSON-serialized when no `Content-Type` is set           |
+| `parseAs`      | `'json'` | Response parser: `'json'`, `'text'`, `'blob'`, `'arrayBuffer'`, or `'stream'`     |
+| `withResponse` | `false`  | When `true`, success value is `{ data, response }` instead of `data`              |
+| `signal`       |          | `AbortSignal` for cancellation                                                    |
+| `meta`         | `{}`     | Request-scoped metadata passed to `prepareRequest` and `prepareResponse` hooks    |
+| `middleware`   | `[]`     | Request-scoped middleware appended after client middleware                        |
+| `baseUrl`      |          | Overrides the client base URL for this request                                    |
+| `requestInit`  |          | Overrides native `RequestInit` values except `body`, `method`, and `headers`      |
+
+`FormData` bodies automatically have `Content-Type` removed so the browser can add the required multipart boundary.
+
+## Built-in Features
+
+### `apiFeature()`
+
+Adds typed HTTP method helpers: `get`, `post`, `put`, `patch`, `delete`, `options`, `head`, and `trace`.
 
 ```ts
-if (response.isErr() && response.error instanceof FetchError) {
-	console.error('Service error:', response.error.message);
-}
+import { apiFeature, createFetchClient } from 'feature-fetch';
+
+const api = createFetchClient({ baseUrl: '/api' }).with(apiFeature());
+
+const [isOk, err, post] = await api.post<{ id: string }>('/posts', {
+	body: { title: 'Hello' }
+});
+
+await api.delete('/posts/{postId}', { pathParams: { postId: '123' } });
 ```
 
-### Example
+`createApiFetchClient(options)` is shorthand for `createFetchClient(options).with(apiFeature())`.
+
+### `openApiFeature<paths>()`
+
+Adds HTTP helpers fully typed from an OpenAPI schema. Unknown paths, missing required params, wrong bodies, and unexpected fields are rejected at compile time.
+
+Generate the `paths` type from your schema:
+
+```bash
+npx openapi-typescript ./schema.yaml -o ./schema.d.ts
+```
 
 ```ts
-if (response.isErr()) {
-	const error = response.error;
+import { createOpenApiFetchClient } from 'feature-fetch';
+import type { paths } from './schema';
 
-	if (isStatusCode(error, 404)) {
-		console.error('Not found:', error.data);
+const api = createOpenApiFetchClient<paths>({
+	baseUrl: 'https://api.example.com/v1'
+});
+
+const [isOk, err, pet] = await api.get('/pets/{petId}', {
+	pathParams: { petId: 123 }
+});
+
+const [isCreated, createErr, created] = await api.post('/pets', {
+	body: { name: 'Jeff', photoUrls: [] }
+});
+```
+
+Schema-declared header parameters are typed in `headers`. Extra transport headers such as `Authorization` remain allowed alongside them.
+
+`createOpenApiFetchClient<paths>(options)` is shorthand for `createFetchClient(options).with(openApiFeature<paths>())`.
+
+### `graphqlFeature()`
+
+Adds `query()`, `mutate()`, and raw variants for GraphQL POST requests. Set `baseUrl` to the full GraphQL endpoint.
+
+```ts
+import { createGraphQLFetchClient, gql } from 'feature-fetch';
+
+const graphql = createGraphQLFetchClient({
+	baseUrl: 'https://api.example.com/graphql'
+});
+
+const getUser = gql`
+	query GetUser($id: ID!) {
+		user(id: $id) {
+			id
+			name
+		}
 	}
+`;
 
-	if (error instanceof NetworkError) {
-		console.error('Network error:', error.message);
-	} else if (error instanceof RequestError) {
-		console.error('Request error:', error.message, 'Status:', error.status);
-	} else if (error instanceof FetchError) {
-		console.error('Service error:', error.message);
-	} else {
-		console.error('Unexpected error:', error);
+const [isOk, err, result] = await graphql.query<
+	{ user: { id: string; name: string } },
+	{ id: string }
+>(getUser, { variables: { id: '123' } });
+
+if (isOk) {
+	console.log(result.data.user.name); // result is { data, extensions?, response }
+}
+```
+
+`query()` and `mutate()` unwrap GraphQL `errors` arrays into a `GraphQLError` on the error branch. Use `queryRaw()` and `mutateRaw()` to receive the raw `{ data, errors, extensions }` response without that unwrapping.
+
+`createGraphQLFetchClient(options)` is shorthand for `createFetchClient(options).with(graphqlFeature())`.
+
+### `retryFeature(options)`
+
+Retries failed requests. Network errors use exponential backoff. HTTP responses are retried when `shouldRetryResponse` returns `true`, defaulting to HTTP 429. Respects `Retry-After` and `x-rate-limit-reset` response headers when present.
+
+```ts
+import { createApiFetchClient, retryFeature } from 'feature-fetch';
+
+const api = createApiFetchClient({ baseUrl: '/api' }).with(retryFeature({ maxRetries: 3 }));
+```
+
+| Option                     | Default    | Description                                   |
+| -------------------------- | ---------- | --------------------------------------------- |
+| `maxRetries`               | `3`        | Number of retries after the initial request   |
+| `networkError.baseDelayMs` | `1000`     | Base delay in ms for exponential backoff      |
+| `networkError.maxDelayMs`  | `30000`    | Maximum delay in ms for network-error backoff |
+| `shouldRetryResponse`      | HTTP `429` | Predicate for retryable HTTP responses        |
+
+### `cacheFeature(options)`
+
+Caches successful GET responses in memory. Respects `Cache-Control` response headers. Skips requests with `Authorization` or `Cookie` headers to avoid mixing user-specific responses.
+
+```ts
+import { cacheFeature, createApiFetchClient } from 'feature-fetch';
+
+const api = createApiFetchClient({ baseUrl: '/api' }).with(cacheFeature({ maxAgeMs: 30_000 }));
+
+// Clear all cached responses
+api.cache.clear();
+
+// Invalidate entries matching a predicate
+api.cache.invalidate((key) => key.includes('/posts'));
+```
+
+| Option        | Default                   | Description                                                                               |
+| ------------- | ------------------------- | ----------------------------------------------------------------------------------------- |
+| `maxAgeMs`    | `300000` (5 minutes)      | Maximum age in milliseconds                                                               |
+| `getCacheKey` | GET URL, no auth headers  | Returns the cache key for a request, or `null` to skip caching                            |
+| `shouldCache` | OK, non-private responses | Returns whether a response should be cached. Skips `no-store`, `no-cache`, and `private`. |
+
+### `delayFeature(ms)`
+
+Waits the given number of milliseconds before forwarding each request. Useful in tests and demos.
+
+```ts
+import { createApiFetchClient, delayFeature } from 'feature-fetch';
+
+const api = createApiFetchClient({ baseUrl: '/api' }).with(delayFeature(500));
+```
+
+## Extending with Features
+
+Fetch features are regular `feature-core` features. A feature can add new methods, push hooks or middleware into the client config, or both.
+
+```ts
+import { defineFeature, type TFeature } from 'feature-core';
+import type { TFetchClientBase } from 'feature-fetch';
+
+export function authFeature(getToken: () => string): TAuthFeature {
+	return defineFeature<TAuthFeature>({
+		key: 'auth',
+		install(client: TFetchClientBase) {
+			client._config.prepareRequest.push((cx) => {
+				cx.headers.authorization = `Bearer ${getToken()}`;
+			});
+
+			return {};
+		}
+	});
+}
+
+type TAuthFeature = TFeature<'auth', object>;
+```
+
+Three extension points are available in `_config`:
+
+- `prepareRequest`: hooks that mutate the request context before URL and body are built
+- `middleware`: wrappers around the final `fetch` call (receives the next function and returns a new one)
+- `prepareResponse`: hooks that can inspect or replace the raw response before parsing
+
+Feature order matters because middleware is applied outermost-first. Install `cacheFeature` before `retryFeature` so cache is checked first and the retry logic only runs on cache misses.
+
+## Errors
+
+All request methods return a `tuple-result`. The error branch is one of three types:
+
+| Error          | When it occurs                                                             |
+| -------------- | -------------------------------------------------------------------------- |
+| `NetworkError` | The fetch call threw before any HTTP response was received                 |
+| `HttpError`    | The server returned a non-2xx response                                     |
+| `FetchError`   | Request preparation, serialization, middleware, or response parsing failed |
+
+```ts
+import { FetchError, hasStatusCode, HttpError, NetworkError } from 'feature-fetch';
+
+const [isOk, err, user] = await api.get<User>('/users/123');
+
+if (!isOk) {
+	if (hasStatusCode(err, 404)) {
+		console.error('Not found');
+	} else if (err instanceof NetworkError) {
+		console.error('Network error:', err.message);
+	} else if (err instanceof HttpError) {
+		console.error('HTTP error:', err.status, err.data); // err.data is the parsed error body
+	} else if (err instanceof FetchError) {
+		console.error('Client error:', err.code, err.message); // err.code e.g. '#ERR_SERIALIZE_BODY'
 	}
 }
 ```
 
-## 📙 Features
+`hasStatusCode(error, code)` narrows to `HttpError` and checks the status code.
 
-### `withRetry()`
+## Examples
 
-Retries each request using an exponential backoff strategy if a network exceptions (`NetworkError`) or HTTP `429` (Too Many Requests) response occur.
+- [Vanilla Open-Meteo](https://github.com/builder-group/community/tree/develop/examples/feature-fetch/vanilla/open-meteo)
 
-```ts
-import { createApiFetchClient, withRetry } from 'feature-fetch';
+## FAQ
 
-const fetchClient = withRetry(
-	createApiFetchClient({
-		prefixUrl: 'https://api.example.com/v1'
-	}),
-	{
-		maxRetries: 3
-	}
-);
-```
+### How do I add auth headers to every request?
 
-- **`maxRetries`**: Maximum number of retry attempts
-
-### `withDelay()`
-
-Delays each request by a specified number of milliseconds before sending it.
+Pass static headers in the client options:
 
 ```ts
-import { createApiFetchClient, withDelay } from 'feature-fetch';
-
-const fetchClient = withDelay(
-	createApiFetchClient({
-		prefixUrl: 'https://api.example.com/v1'
-	}),
-	1000
-);
+const api = createApiFetchClient({
+	baseUrl: 'https://api.example.com/v1',
+	headers: { Authorization: `Bearer ${token}` }
+});
 ```
 
-- **`delayInMs`**: Delay duration in milliseconds
+For dynamic tokens that may change between requests, use a `prepareRequest` hook instead. See [Extending with Features](#extending-with-features) for an `authFeature` example that calls `getToken()` on each request.
 
-## ❓ FAQ
+### What is the difference between `middleware` and `prepareRequest`?
 
-### Why is `@0no-co/graphql.web` a dependency if it's not always used?
+Use `prepareRequest` to mutate the structured request context: headers, path, query params, body, and metadata. It runs before the URL is built and before the body is serialized.
 
-`@0no-co/graphql.web` is listed as a dependency because it's dynamically imported in the `getQueryString()` function. If the function isn’t used, Webpack's tree shaking should exclude it from the final bundle. This ensures that only necessary modules are included, keeping your build clean.
+Use `middleware` for transport-level concerns that wrap the fetch call itself: retry, caching, timing, and tracing. Middleware receives `(next) => (url, requestInit) => Promise<Response>` and can call `next` zero or more times.
+
+If you need to read or modify the final URL or `RequestInit`, use middleware. If you need to modify request inputs in a structured way, use `prepareRequest`.
+
+### Can I type the error response body?
+
+Yes. Pass it as the second generic parameter on any request method:
+
+```ts
+interface ApiError {
+	code: string;
+	message: string;
+}
+
+const [isOk, err, user] = await api.get<User, ApiError>('/users/123');
+
+if (!isOk && err instanceof HttpError) {
+	console.error(err.data.code); // typed as ApiError
+}
+```
+
+`err.data` is typed as `ApiError` when the error is an `HttpError`. It remains `unknown` for `NetworkError` and `FetchError`.
+
+### In what order should I install features?
+
+Install features in the order you want them to intercept requests, outermost first. For common combinations:
+
+- `cacheFeature` before `retryFeature`: cache is checked first; retry only runs on cache misses
+- `retryFeature` before a logging middleware: retry attempts are each logged individually
+
+Features that add methods (`apiFeature`, `openApiFeature`, `graphqlFeature`) can go in any position relative to middleware features.
+
+### How do I mock requests in tests?
+
+Pass a custom `fetch` function to `createFetchClient`. Return any `Response` you need:
+
+```ts
+const api = createApiFetchClient({
+	baseUrl: '/api',
+	fetch: async () => new Response(JSON.stringify({ id: '1' }), { status: 200 })
+});
+```
+
+For more control, use `delayFeature` in development or a mock server in integration tests.
+
+### How do I cancel a request?
+
+Pass an `AbortSignal` in the request options:
+
+```ts
+const controller = new AbortController();
+
+const [isOk, err, data] = await api.get('/posts', {
+	signal: controller.signal
+});
+
+// Cancel from anywhere
+controller.abort();
+```
+
+A cancelled request returns `NetworkError` on the error branch.
+
+### Why is `@0no-co/graphql.web` a dependency if GraphQL is opt-in?
+
+`@0no-co/graphql.web` is imported dynamically only when a `DocumentNode` input needs to be printed to a string. If you pass operation strings directly or never install `graphqlFeature()`, modern bundlers tree-shake that path out of the bundle.
