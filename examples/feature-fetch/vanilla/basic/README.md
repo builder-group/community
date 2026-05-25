@@ -1,8 +1,13 @@
-# feature-fetch Vanilla basic
+# feature-fetch Vanilla Basic
 
-Basic Vanilla TypeScript example for `feature-fetch`.
+Vanilla TypeScript example for `feature-fetch`. It shows REST helpers, OpenAPI-generated types, and GraphQL documents using the same tuple-result client model.
 
-Created from the Vite Vanilla TypeScript template with `pnpm create vite -t vanilla-ts`.
+- REST calls with `createApiFetchClient`
+- OpenAPI-typed calls with `createOpenApiFetchClient`
+- GraphQL calls with `createGraphQLFetchClient`
+- tuple-result success and error branches
+- generated OpenAPI and GraphQL types
+- real requests logged to the browser console
 
 ## Run
 
@@ -10,22 +15,9 @@ Created from the Vite Vanilla TypeScript template with `pnpm create vite -t vani
 pnpm dev
 ```
 
-## What It Shows
-
-- `createApiFetchClient`
-- `createOpenApiFetchClient`
-- `createGraphQLFetchClient`
-- generated OpenAPI types from `openapi-typescript`
-- generated GraphQL schema types from `gql.tada`
-- grouped API/OpenAPI/GraphQL example files
-- `queryParams`
-- tuple-result destructuring
-- handling success and error branches
-- logging Open-Meteo weather and Countries GraphQL data in the browser console
-
 ## Refresh Generated Types
 
-Generated OpenAPI and GraphQL types are committed. Refresh them when the upstream schemas change:
+Generated OpenAPI and GraphQL types are committed. Refresh them when upstream schemas change:
 
 ```sh
 pnpm openapi:generate

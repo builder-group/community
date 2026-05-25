@@ -1,20 +1,16 @@
-# feature-form React basic
+# feature-form React Basic
 
-Basic React example for `feature-form` and `feature-react/form`.
+React example for `feature-form` and `feature-react/form`. It shows a typed form where fields are reactive state, validation uses Zod through Standard Schema, and components subscribe to the field or form state they render.
 
-Created from the Vite React TypeScript template with `pnpm create vite -t react-ts`.
+- `createForm<TFormData>` with typed submit data
+- field bindings with `useFormField`
+- Zod validation through Standard Schema
+- form-level validation for the admin age rule
+- dirty tracking with `dirtyFeature()`
+- render counters for per-field subscriptions
 
 ## Run
 
 ```sh
 pnpm dev
 ```
-
-## What It Shows
-
-- `createForm`
-- `useFormField`
-- Standard Schema validation with Zod
-- form-level validation
-- `dirtyFeature`
-- render counts for per-field subscriptions
