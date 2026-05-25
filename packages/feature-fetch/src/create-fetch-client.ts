@@ -28,7 +28,7 @@ import type {
 	TFetchMiddleware,
 	TFetchOptionsWithBody,
 	TFetchRequestInit,
-	TFetchResponse,
+	TFetchRequestResponse,
 	TParseAs,
 	TParseAsResponse,
 	TPathSerializer,
@@ -83,7 +83,7 @@ export function createFetchClient(options: TCreateFetchClientOptions = {}): TFet
 			method: TRequestMethod,
 			path: string,
 			requestOptions: TFetchOptionsWithBody<TUnserializedBody, GParseAs> = {}
-		): Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs, boolean>> {
+		): Promise<TFetchRequestResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>> {
 			const {
 				parseAs = 'json',
 				body,
@@ -96,8 +96,7 @@ export function createFetchClient(options: TCreateFetchClientOptions = {}): TFet
 				baseUrl = this._config.baseUrl,
 				queryParams = {},
 				querySerializer = this._config.querySerializer,
-				middleware: requestMiddleware = [],
-				withResponse = false
+				middleware: requestMiddleware = []
 			} = requestOptions;
 
 			const cx: TPrepareRequestContext = {
@@ -213,7 +212,7 @@ export function createFetchClient(options: TCreateFetchClientOptions = {}): TFet
 						requestMethod,
 						parseAs as GParseAs
 					);
-					return Ok(withResponse ? { data, response } : data);
+					return Ok({ data, response });
 				} catch (error) {
 					return Err(mapErrorToFetchError(error, '#ERR_PARSE_RESPONSE_DATA'));
 				}

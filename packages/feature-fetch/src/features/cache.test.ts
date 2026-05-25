@@ -19,8 +19,8 @@ describe('cacheFeature function', () => {
 			const secondResult = await client.request('GET', '/items');
 
 			// Assert
-			expect(firstResult.unwrap()).toEqual({ requestCount: 1 });
-			expect(secondResult.unwrap()).toEqual({ requestCount: 1 });
+			expect(firstResult.unwrap().data).toEqual({ requestCount: 1 });
+			expect(secondResult.unwrap().data).toEqual({ requestCount: 1 });
 			expect(fetchLike).toHaveBeenCalledTimes(1);
 		});
 
@@ -40,8 +40,8 @@ describe('cacheFeature function', () => {
 			const secondResult = await client.request('GET', '/items');
 
 			// Assert
-			expect(firstResult.unwrap()).toEqual({ ok: true });
-			expect(secondResult.unwrap()).toEqual({ ok: true });
+			expect(firstResult.unwrap().data).toEqual({ ok: true });
+			expect(secondResult.unwrap().data).toEqual({ ok: true });
 			expect(fetchLike).toHaveBeenCalledTimes(1);
 		});
 
@@ -131,8 +131,8 @@ describe('cacheFeature function', () => {
 				const secondResult = await client.request('GET', '/items');
 
 				// Assert
-				expect(firstResult.unwrap()).toEqual({ requestCount: 1 });
-				expect(secondResult.unwrap()).toEqual({ requestCount: 2 });
+				expect(firstResult.unwrap().data).toEqual({ requestCount: 1 });
+				expect(secondResult.unwrap().data).toEqual({ requestCount: 2 });
 				expect(fetchLike).toHaveBeenCalledTimes(2);
 			} finally {
 				vi.useRealTimers();
@@ -167,8 +167,8 @@ describe('cacheFeature function', () => {
 				const secondResult = await client.request('GET', '/items');
 
 				// Assert
-				expect(firstResult.unwrap()).toEqual({ requestCount: 1 });
-				expect(secondResult.unwrap()).toEqual({ requestCount: 2 });
+				expect(firstResult.unwrap().data).toEqual({ requestCount: 1 });
+				expect(secondResult.unwrap().data).toEqual({ requestCount: 2 });
 				expect(fetchLike).toHaveBeenCalledTimes(2);
 			} finally {
 				vi.useRealTimers();
@@ -196,8 +196,8 @@ describe('cacheFeature function', () => {
 			const secondResult = await client.request('GET', '/items');
 
 			// Assert
-			expect(firstResult.unwrap()).toEqual({ requestCount: 1 });
-			expect(secondResult.unwrap()).toEqual({ requestCount: 2 });
+			expect(firstResult.unwrap().data).toEqual({ requestCount: 1 });
+			expect(secondResult.unwrap().data).toEqual({ requestCount: 2 });
 			expect(fetchLike).toHaveBeenCalledTimes(2);
 		});
 
@@ -250,10 +250,10 @@ describe('cacheFeature function', () => {
 			const fourthResult = await client.request('GET', '/items');
 
 			// Assert
-			expect(firstResult.unwrap()).toEqual({ requestCount: 1 });
-			expect(secondResult.unwrap()).toEqual({ requestCount: 1 });
-			expect(thirdResult.unwrap()).toEqual({ requestCount: 2 });
-			expect(fourthResult.unwrap()).toEqual({ requestCount: 3 });
+			expect(firstResult.unwrap().data).toEqual({ requestCount: 1 });
+			expect(secondResult.unwrap().data).toEqual({ requestCount: 1 });
+			expect(thirdResult.unwrap().data).toEqual({ requestCount: 2 });
+			expect(fourthResult.unwrap().data).toEqual({ requestCount: 3 });
 			expect(fetchLike).toHaveBeenCalledTimes(3);
 			expectTypeOf(client.cache.clear).toEqualTypeOf<() => void>();
 			expectTypeOf(client.cache.invalidate).toEqualTypeOf<

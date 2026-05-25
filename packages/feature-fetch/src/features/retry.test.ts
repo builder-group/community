@@ -29,7 +29,7 @@ describe('retryFeature function', () => {
 			const result = await client.request('GET', '/items');
 
 			// Assert
-			expect(result.unwrap()).toEqual({ ok: true });
+			expect(result.unwrap().data).toEqual({ ok: true });
 			expect(fetchLike).toHaveBeenCalledTimes(3);
 		});
 
@@ -76,7 +76,7 @@ describe('retryFeature function', () => {
 			const result = await client.request('GET', '/items');
 
 			// Assert
-			expect(result.unwrap()).toEqual({ ok: true });
+			expect(result.unwrap().data).toEqual({ ok: true });
 			expect(fetchLike).toHaveBeenCalledTimes(3);
 		});
 
@@ -102,7 +102,7 @@ describe('retryFeature function', () => {
 			const result = await client.request('GET', '/items');
 
 			// Assert
-			expect(result.unwrap()).toEqual({ ok: true });
+			expect(result.unwrap().data).toEqual({ ok: true });
 			expect(fetchLike).toHaveBeenCalledTimes(2);
 		});
 
@@ -133,7 +133,7 @@ describe('retryFeature function', () => {
 			const result = await client.request('GET', '/items');
 
 			// Assert
-			expect(result.unwrap()).toEqual({ ok: true });
+			expect(result.unwrap().data).toEqual({ ok: true });
 			expect(cancel).toHaveBeenCalledTimes(1);
 			expect(fetchLike).toHaveBeenCalledTimes(2);
 		});
@@ -191,7 +191,7 @@ describe('retryFeature function', () => {
 				const result = await resultPromise;
 
 				// Assert
-				expect(result.unwrap()).toEqual({ ok: true });
+				expect(result.unwrap().data).toEqual({ ok: true });
 				expect(fetchLike).toHaveBeenCalledTimes(2);
 			} finally {
 				vi.useRealTimers();
@@ -233,7 +233,7 @@ describe('retryFeature function', () => {
 				const result = await resultPromise;
 
 				// Assert
-				expect(result.unwrap()).toEqual({ ok: true });
+				expect(result.unwrap().data).toEqual({ ok: true });
 				expect(fetchLike).toHaveBeenCalledTimes(2);
 			} finally {
 				vi.useRealTimers();
@@ -279,7 +279,7 @@ describe('retryFeature function', () => {
 				const result = await resultPromise;
 
 				// Assert
-				expect(result.unwrap()).toEqual({ ok: true });
+				expect(result.unwrap().data).toEqual({ ok: true });
 				expect(fetchLike).toHaveBeenCalledTimes(2);
 			} finally {
 				vi.useRealTimers();

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { HttpError, hasStatusCode, mapResponseToHttpError } from './HttpError';
+import { hasStatusCode, HttpError, mapResponseToHttpError } from './HttpError';
 
 describe('HttpError module', () => {
 	describe('HttpError class', () => {
@@ -26,7 +26,9 @@ describe('HttpError module', () => {
 			expect(error.data).toEqual({
 				message: 'Item not found'
 			});
-			expect(error.message).toBe('[#ERR_HTTP_STATUS] HTTP request failed with status 404 Not Found');
+			expect(error.message).toBe(
+				'[#ERR_HTTP_STATUS] HTTP request failed with status 404 Not Found'
+			);
 		});
 
 		it('should use the cause message when no message is provided', () => {
@@ -123,9 +125,7 @@ describe('HttpError module', () => {
 			// Assert
 			expect(error).toBeInstanceOf(HttpError);
 			expect(error.code).toBe('#ERR_HTTP_STATUS');
-			expect(error.message).toBe(
-				'[#ERR_HTTP_STATUS] HTTP request failed with status 500'
-			);
+			expect(error.message).toBe('[#ERR_HTTP_STATUS] HTTP request failed with status 500');
 			expect(error.data).toBeUndefined();
 		});
 

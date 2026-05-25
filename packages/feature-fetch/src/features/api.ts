@@ -1,12 +1,15 @@
 import { defineFeature, type TFeature } from 'feature-core';
+import { mapOk, type TResult } from 'tuple-result';
 import { createFetchClient, type TCreateFetchClientOptions } from '../create-fetch-client';
 import type {
 	TFetchClient,
 	TFetchClientBase,
 	TFetchOptions,
 	TFetchOptionsWithBody,
-	TFetchResponse,
+	TFetchResponseError,
+	TFetchResponseSuccess,
 	TParseAs,
+	TParseAsResponse,
 	TRequestMethod,
 	TUnserializedBody
 } from '../types';
@@ -55,14 +58,20 @@ export interface TApiFeatureApi {
 // MARK: - Method
 
 function createApiMethod(method: TRequestMethod) {
-	return function apiMethod(
+	return async function apiMethod(
 		this: TFetchClientBase,
 		path: string,
-		options: TFetchOptionsWithBody = {}
+		options: TApiMethodOptions = {}
 	) {
-		return this.request(method, path, options);
+		const { withResponse = false, ...fetchOptions } = options;
+		const requestResult = await this.request(method, path, fetchOptions);
+		return withResponse ? requestResult : mapOk(requestResult, ({ data }) => data);
 	};
 }
+
+type TApiMethodOptions = TFetchOptionsWithBody & {
+	withResponse?: boolean;
+};
 
 export interface TApiMethod {
 	<
@@ -72,7 +81,7 @@ export interface TApiMethod {
 	>(
 		path: string,
 		options: TFetchOptions<GParseAs> & { withResponse: true }
-	): Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs, true>>;
+	): Promise<TApiResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs, true>>;
 	<
 		GSuccessResponseBody = unknown,
 		GErrorResponseBody = unknown,
@@ -80,7 +89,7 @@ export interface TApiMethod {
 	>(
 		path: string,
 		options?: TFetchOptions<GParseAs> & { withResponse?: false }
-	): Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
+	): Promise<TApiResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 	<
 		GSuccessResponseBody = unknown,
 		GErrorResponseBody = unknown,
@@ -89,7 +98,7 @@ export interface TApiMethod {
 	>(
 		path: string,
 		options?: TFetchOptions<GParseAs> & { withResponse?: GWithResponse }
-	): Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs, GWithResponse>>;
+	): Promise<TApiResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs, GWithResponse>>;
 }
 
 export interface TApiBodyMethod {
@@ -101,7 +110,7 @@ export interface TApiBodyMethod {
 	>(
 		path: string,
 		options: TFetchOptionsWithBody<GRequestBody, GParseAs> & { withResponse: true }
-	): Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs, true>>;
+	): Promise<TApiResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs, true>>;
 	<
 		GSuccessResponseBody = unknown,
 		GErrorResponseBody = unknown,
@@ -110,7 +119,7 @@ export interface TApiBodyMethod {
 	>(
 		path: string,
 		options?: TFetchOptionsWithBody<GRequestBody, GParseAs> & { withResponse?: false }
-	): Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
+	): Promise<TApiResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 	<
 		GSuccessResponseBody = unknown,
 		GErrorResponseBody = unknown,
@@ -122,5 +131,19 @@ export interface TApiBodyMethod {
 		options?: TFetchOptionsWithBody<GRequestBody, GParseAs> & {
 			withResponse?: GWithResponse;
 		}
-	): Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs, GWithResponse>>;
+	): Promise<TApiResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs, GWithResponse>>;
 }
+
+// MARK: - Response
+
+type TApiResponse<
+	GSuccessResponseBody = unknown,
+	GErrorResponseBody = unknown,
+	GParseAs extends TParseAs = 'json',
+	GWithResponse extends boolean = false
+> = TResult<
+	GWithResponse extends true
+		? TFetchResponseSuccess<GSuccessResponseBody, GParseAs>
+		: TParseAsResponse<GParseAs, GSuccessResponseBody>,
+	TFetchResponseError<GErrorResponseBody>
+>;

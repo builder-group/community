@@ -6,9 +6,7 @@ import type { TGraphQLDocumentInput } from './graphql';
 export async function getOperationString<
 	GResult extends object = object,
 	GVariables extends object = Record<string, unknown>
->(
-	document: TGraphQLDocumentInput<GResult, GVariables>
-): Promise<TResult<string, FetchError>> {
+>(document: TGraphQLDocumentInput<GResult, GVariables>): Promise<TResult<string, FetchError>> {
 	if (typeof document === 'string') {
 		return Ok(document);
 	}

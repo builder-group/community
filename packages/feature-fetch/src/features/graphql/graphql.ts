@@ -7,7 +7,7 @@ import type {
 	TFetchClient,
 	TFetchClientBase,
 	TFetchOptions,
-	TFetchResponse,
+	TFetchRequestResponse,
 	TFetchResponseError
 } from '../../types';
 import { getOperationString } from './get-operation-string';
@@ -59,12 +59,21 @@ function createGraphQLOperationMethod(): TGraphQLOperationMethod {
 }
 
 function createGraphQLRawOperationMethod(): TGraphQLRawOperationMethod {
-	return function graphQLRawOperationMethod(
+	return async function graphQLRawOperationMethod(
 		this: TFetchClientBase,
 		document: TGraphQLDocumentInput,
 		options: TGraphQLOperationOptions = {}
 	) {
-		return sendRawGraphQLRequest(this, document, options);
+		const [isGraphQLResponseOk, graphQLResponseErr, graphQLResponse] = await sendGraphQLHttpRequest(
+			this,
+			document,
+			options
+		);
+		if (!isGraphQLResponseOk) {
+			return Err(graphQLResponseErr);
+		}
+
+		return Ok(graphQLResponse.data);
 	} as TGraphQLRawOperationMethod;
 }
 
@@ -84,7 +93,7 @@ export type TGraphQLRawOperationMethod = <
 >(
 	document: TGraphQLDocumentInput<GData, GVariables>,
 	...args: TGraphQLOperationOptionsArgs<GVariables>
-) => Promise<TFetchResponse<TGraphQLResponse<GData>, GErrorResponseBody, 'json'>>;
+) => Promise<TGraphQLRawOperationResponse<GData, GErrorResponseBody>>;
 
 type TGraphQLOperationOptionsArgs<GVariables extends object> =
 	TGraphQLHasRequiredVariables<GVariables> extends true
@@ -93,7 +102,7 @@ type TGraphQLOperationOptionsArgs<GVariables extends object> =
 
 export type TGraphQLOperationOptions<GVariables extends object = Record<string, unknown>> = Omit<
 	TFetchOptions<'json'>,
-	'body' | 'parseAs' | 'withResponse'
+	'body' | 'parseAs'
 > &
 	TGraphQLVariablesOption<GVariables>;
 
@@ -113,6 +122,11 @@ type TGraphQLRequiredVariableKeys<GVariables extends object> = {
 
 export type TGraphQLOperationResponse<GData, GErrorResponseBody = unknown> = TResult<
 	TGraphQLOperationSuccess<GData>,
+	TFetchResponseError<GErrorResponseBody>
+>;
+
+export type TGraphQLRawOperationResponse<GData, GErrorResponseBody = unknown> = TResult<
+	TGraphQLResponse<GData>,
 	TFetchResponseError<GErrorResponseBody>
 >;
 
@@ -176,15 +190,11 @@ async function sendGraphQLRequest<
 	document: TGraphQLDocumentInput<GData, GVariables>,
 	options: TGraphQLOperationOptions<GVariables>
 ): Promise<TGraphQLOperationResponse<GData, GErrorResponseBody>> {
-	const [isGraphQLResponseOk, graphQLResponseErr, graphQLResponse] = await sendRawGraphQLRequest<
+	const [isGraphQLResponseOk, graphQLResponseErr, graphQLResponse] = await sendGraphQLHttpRequest<
 		GData,
 		GVariables,
-		GErrorResponseBody,
-		true
-	>(client, document, {
-		...options,
-		withResponse: true
-	});
+		GErrorResponseBody
+	>(client, document, options);
 	if (!isGraphQLResponseOk) {
 		return Err(graphQLResponseErr);
 	}
@@ -212,16 +222,15 @@ async function sendGraphQLRequest<
 	});
 }
 
-async function sendRawGraphQLRequest<
+async function sendGraphQLHttpRequest<
 	GData extends object,
 	GVariables extends object,
-	GErrorResponseBody,
-	GWithResponse extends boolean = false
+	GErrorResponseBody
 >(
 	client: TFetchClientBase,
 	document: TGraphQLDocumentInput<GData, GVariables>,
-	options: TGraphQLRequestOptions<GVariables, GWithResponse>
-): Promise<TFetchResponse<TGraphQLResponse<GData>, GErrorResponseBody, 'json', GWithResponse>> {
+	options: TGraphQLOperationOptions<GVariables>
+): Promise<TFetchRequestResponse<TGraphQLResponse<GData>, GErrorResponseBody, 'json'>> {
 	const { variables, ...fetchOptions } = options;
 	const [isRequestBodyOk, requestBodyErr, requestBody] = await createGraphQLRequestBody(
 		document,
@@ -231,23 +240,12 @@ async function sendRawGraphQLRequest<
 		return Err(requestBodyErr);
 	}
 
-	return client.request<TGraphQLResponse<GData>, GErrorResponseBody, 'json', GWithResponse>(
-		'POST',
-		'',
-		{
-			...fetchOptions,
-			parseAs: 'json',
-			body: requestBody
-		}
-	);
+	return client.request<TGraphQLResponse<GData>, GErrorResponseBody, 'json'>('POST', '', {
+		...fetchOptions,
+		parseAs: 'json',
+		body: requestBody
+	});
 }
-
-type TGraphQLRequestOptions<
-	GVariables extends object,
-	GWithResponse extends boolean
-> = TGraphQLOperationOptions<GVariables> & {
-	withResponse?: GWithResponse;
-};
 
 async function createGraphQLRequestBody<GData extends object, GVariables extends object>(
 	document: TGraphQLDocumentInput<GData, GVariables>,

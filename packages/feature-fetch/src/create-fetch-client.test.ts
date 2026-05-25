@@ -38,7 +38,7 @@ describe('createFetchClient function', () => {
 			});
 
 			// Assert
-			expect(result.unwrap()).toEqual({ id: 'post-1' });
+			expect(result.unwrap().data).toEqual({ id: 'post-1' });
 			expect(fetchLike).toHaveBeenCalledWith(
 				'https://api.example.com/posts/post-1?preview=true',
 				expect.objectContaining({
@@ -54,7 +54,7 @@ describe('createFetchClient function', () => {
 			);
 		});
 
-		it('should return response details when requested', async () => {
+		it('should return response details', async () => {
 			// Prepare
 			const fetchLike = vi.fn<TFetchLike>(async () => {
 				return Response.json({ id: 'post-1' });
@@ -62,9 +62,7 @@ describe('createFetchClient function', () => {
 			const client = createFetchClient({ fetch: fetchLike });
 
 			// Act
-			const result = await client.request<{ id: string }>('GET', '/posts/post-1', {
-				withResponse: true
-			});
+			const result = await client.request<{ id: string }>('GET', '/posts/post-1');
 
 			// Assert
 			const value = result.unwrap();
@@ -250,7 +248,7 @@ describe('createFetchClient function', () => {
 			});
 
 			// Assert
-			expect(result.unwrap()).toEqual({ status: 'prepared' });
+			expect(result.unwrap().data).toEqual({ status: 'prepared' });
 			expect(prepareResponse).toHaveBeenCalledOnce();
 		});
 
@@ -353,7 +351,7 @@ describe('createFetchClient function', () => {
 			const result = await client.request('head', '/items');
 
 			// Assert
-			expect(result.unwrap()).toBeUndefined();
+			expect(result.unwrap().data).toBeUndefined();
 			expect(fetchLike).toHaveBeenCalledWith(
 				'/items',
 				expect.objectContaining({
@@ -377,7 +375,7 @@ describe('createFetchClient function', () => {
 				});
 
 				// Assert
-				expect(result.unwrap()).toBeUndefined();
+				expect(result.unwrap().data).toBeUndefined();
 			}
 		);
 
@@ -397,7 +395,7 @@ describe('createFetchClient function', () => {
 			const result = await client.request('GET', '/items');
 
 			// Assert
-			expect(result.unwrap()).toBeUndefined();
+			expect(result.unwrap().data).toBeUndefined();
 		});
 
 		it('should parse chunked responses with zero content length', async () => {
@@ -416,7 +414,7 @@ describe('createFetchClient function', () => {
 			const result = await client.request<{ ok: boolean }>('GET', '/items');
 
 			// Assert
-			expect(result.unwrap()).toEqual({ ok: true });
+			expect(result.unwrap().data).toEqual({ ok: true });
 		});
 	});
 

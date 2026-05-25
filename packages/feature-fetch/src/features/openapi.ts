@@ -13,6 +13,7 @@ import type {
 	SuccessResponse,
 	Writable
 } from 'openapi-typescript-helpers';
+import { mapOk, type TResult } from 'tuple-result';
 import { createFetchClient, type TCreateFetchClientOptions } from '../create-fetch-client';
 import type {
 	TBodySerializer,
@@ -22,8 +23,10 @@ import type {
 	TFetchHeadersInitRecord,
 	TFetchOptions,
 	TFetchOptionsWithBody,
-	TFetchResponse,
+	TFetchResponseError,
+	TFetchResponseSuccess,
 	TParseAs,
+	TParseAsResponse,
 	TPathSerializer,
 	TQuerySerializer,
 	TRequestMethod
@@ -78,14 +81,20 @@ export interface TOpenApiFeatureApi<GPaths extends object> {
 function createOpenApiMethod<GPaths extends object, GMethod extends HttpMethod>(
 	method: Uppercase<GMethod> & TRequestMethod
 ): TOpenApiMethod<GPaths, GMethod> {
-	return function openApiMethod(
+	return async function openApiMethod(
 		this: TFetchClientBase,
 		path: string,
-		options: TFetchOptionsWithBody = {}
+		options: TOpenApiMethodOptions = {}
 	) {
-		return this.request(method, path, options);
+		const { withResponse = false, ...fetchOptions } = options;
+		const requestResult = await this.request(method, path, fetchOptions);
+		return withResponse ? requestResult : mapOk(requestResult, ({ data }) => data);
 	} as TOpenApiMethod<GPaths, GMethod>;
 }
+
+type TOpenApiMethodOptions = TFetchOptionsWithBody & {
+	withResponse?: boolean;
+};
 
 export interface TOpenApiMethod<GPaths extends object, GMethod extends HttpMethod> {
 	<GPath extends TOpenApiMethodPath<GPaths, GMethod>, GParseAs extends TParseAs = 'json'>(
@@ -137,13 +146,7 @@ type TOpenApiMethodOptionsArgs<GOptions extends object> =
 
 export type TOpenApiFetchOptions<GOperation, GParseAs extends TParseAs = 'json'> = Omit<
 	TFetchOptions<GParseAs>,
-	| 'bodySerializer'
-	| 'headers'
-	| 'pathParams'
-	| 'pathSerializer'
-	| 'queryParams'
-	| 'querySerializer'
-	| 'withResponse'
+	'bodySerializer' | 'headers' | 'pathParams' | 'pathSerializer' | 'queryParams' | 'querySerializer'
 > & {
 	pathSerializer?: TPathSerializer<TOpenApiPathSerializerParams<GOperation>>;
 	querySerializer?: TQuerySerializer<TOpenApiQuerySerializerParams<GOperation>>;
@@ -159,11 +162,11 @@ export type TOpenApiFetchResponse<
 	GOperation,
 	GParseAs extends TParseAs = 'json',
 	GWithResponse extends boolean = false
-> = TFetchResponse<
-	TOpenApiSuccessResponse<GOperation, GParseAs>,
-	TOpenApiErrorResponse<GOperation, GParseAs>,
-	GParseAs,
-	GWithResponse
+> = TResult<
+	GWithResponse extends true
+		? TFetchResponseSuccess<TOpenApiSuccessResponse<GOperation, GParseAs>, GParseAs>
+		: TParseAsResponse<GParseAs, TOpenApiSuccessResponse<GOperation, GParseAs>>,
+	TFetchResponseError<TOpenApiErrorResponse<GOperation, GParseAs>>
 >;
 
 // Note: Readable removes OpenAPI writeOnly fields from response bodies

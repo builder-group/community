@@ -90,7 +90,7 @@ export type TRequestInitWithResolvedHeaders = Omit<RequestInit, 'headers'> & {
 
 /**
  * Sends one request and returns a `tuple-result`.
- * Success values are parsed data by default; pass `withResponse: true` to include the raw response.
+ * Success values include parsed data plus response details.
  */
 export interface TFetchRequest {
 	<
@@ -100,29 +100,8 @@ export interface TFetchRequest {
 	>(
 		method: TRequestMethod,
 		path: string,
-		options: TFetchOptionsWithBody<TUnserializedBody, GParseAs> & { withResponse: true }
-	): Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs, true>>;
-	<
-		GSuccessResponseBody = unknown,
-		GErrorResponseBody = unknown,
-		GParseAs extends TParseAs = 'json'
-	>(
-		method: TRequestMethod,
-		path: string,
-		options?: TFetchOptionsWithBody<TUnserializedBody, GParseAs> & { withResponse?: false }
-	): Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
-	<
-		GSuccessResponseBody = unknown,
-		GErrorResponseBody = unknown,
-		GParseAs extends TParseAs = 'json',
-		GWithResponse extends boolean = boolean
-	>(
-		method: TRequestMethod,
-		path: string,
-		options?: TFetchOptionsWithBody<TUnserializedBody, GParseAs> & {
-			withResponse?: GWithResponse;
-		}
-	): Promise<TFetchResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs, GWithResponse>>;
+		options?: TFetchOptionsWithBody<TUnserializedBody, GParseAs>
+	): Promise<TFetchRequestResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 }
 
 export type TParseAs = keyof TBodyType;
@@ -143,9 +122,6 @@ export type TUnserializedBody = TSerializedBody | object | number | boolean;
 export interface TFetchOptions<GParseAs extends TParseAs = TParseAs> {
 	/** Response parser. Defaults to `json`. */
 	parseAs?: GParseAs;
-	// Note: Overloads require explicit `true`; a generic here would still make this property optional
-	/** When true, success values include both parsed data and the raw `Response`. */
-	withResponse?: boolean;
 	/** Headers merged after client headers. `null` removes an earlier header and `undefined` is ignored. */
 	headers?: TFetchHeadersInit;
 	/** Base URL override for this request. Absolute request paths ignore the base URL. */
@@ -209,14 +185,13 @@ export type TSerializedBody = RequestInit['body'];
 
 // MARK: - Response
 
-/** Result returned by fetch requests. The success branch is parsed data unless `withResponse` is true. */
-export type TFetchResponse<
+/** Result returned by the low-level request method. */
+export type TFetchRequestResponse<
 	GSuccessResponseBody = unknown,
 	GErrorResponseBody = unknown,
-	GParseAs extends TParseAs = 'json',
-	GWithResponse extends boolean = false
+	GParseAs extends TParseAs = 'json'
 > = TResult<
-	TFetchResponseSuccess<GSuccessResponseBody, GParseAs, GWithResponse>,
+	TFetchResponseSuccess<GSuccessResponseBody, GParseAs>,
 	TFetchResponseError<GErrorResponseBody>
 >;
 
@@ -225,16 +200,14 @@ export type TFetchResponseError<GErrorResponseBody = unknown> =
 	| HttpError<GErrorResponseBody>
 	| FetchError;
 
-export type TFetchResponseSuccess<
+export interface TFetchResponseSuccess<
 	GSuccessResponseBody = unknown,
-	GParseAs extends TParseAs = 'json',
-	GWithResponse extends boolean = false
-> = GWithResponse extends true
-	? {
-			data: TParseAsResponse<GParseAs, GSuccessResponseBody>;
-			response: Response;
-		}
-	: TParseAsResponse<GParseAs, GSuccessResponseBody>;
+	GParseAs extends TParseAs = 'json'
+> {
+	data: TParseAsResponse<GParseAs, GSuccessResponseBody>;
+	/** Response used to produce `data`. Its body is already consumed unless `parseAs` is `stream`. */
+	response: Response;
+}
 
 export type TParseAsResponse<
 	GParseAs extends TParseAs,

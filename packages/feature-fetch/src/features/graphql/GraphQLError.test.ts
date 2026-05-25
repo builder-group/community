@@ -50,18 +50,15 @@ describe('GraphQLError class', () => {
 		];
 
 		// Act
-		const error = new GraphQLError(
-			errors,
-			{
-				data: {
-					user: null
-				},
-				extensions: {
-					requestId: 'request-1'
-				},
-				response
-			}
-		);
+		const error = new GraphQLError(errors, {
+			data: {
+				user: null
+			},
+			extensions: {
+				requestId: 'request-1'
+			},
+			response
+		});
 
 		// Assert
 		expect(error.errors).toBe(errors);
