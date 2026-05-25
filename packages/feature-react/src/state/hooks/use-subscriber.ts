@@ -8,9 +8,6 @@ import { useEventCallback } from './use-event-callback';
  * matching `state.subscribe()`. The callback may return a cleanup function that runs before
  * the next call and on unmount. Pass `null` or `undefined` as `state` to opt out without
  * conditionally calling the hook.
- *
- * @param state - The state to subscribe to, or `null`/`undefined` to skip.
- * @param callback - Receives the listener context on every call. May return a cleanup function.
  */
 export function useSubscriber<GValue, GFeatures extends TAnyFeature[]>(
 	state: TState<GValue, GFeatures> | null | undefined,
@@ -34,6 +31,7 @@ export function useSubscriber<GValue, GFeatures extends TAnyFeature[]>(
 	}, [state, stableCallback]);
 }
 
+/** Receives the current listener context immediately, then on each future change. */
 export type TUseSubscriberCallback<GValue> = (
 	context: TListenerContext<GValue>
 	// eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- callbacks may return nothing, async work, or a cleanup

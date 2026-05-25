@@ -67,5 +67,6 @@ export interface TAdditionalListenerContext {
 	background?: boolean;
 }
 
+/** Extracts the value type from a state. */
 export type TStateValue<GState> =
 	GState extends TState<infer GValue, TAnyFeature[]> ? GValue : never;

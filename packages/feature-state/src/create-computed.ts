@@ -8,10 +8,6 @@ import type { TState, TStateBase, TStateValue } from './types';
  * Recomputes and notifies listeners whenever a source changes. Calling `set()` or
  * assigning `value` throws: update the source states instead. Call `destroy()` when
  * the computed state is no longer needed to unsubscribe from its sources.
- *
- * @param source - A single source state, or a tuple of source states.
- * @param compute - Derives the computed value from the current source value(s).
- * @param options - Pass `isEqual` to suppress notifications on structurally equivalent results.
  */
 export function createComputed<GState extends TAnyComputedSourceState, GValue>(
 	source: GState,
@@ -117,6 +113,7 @@ export interface TCreateComputedOptions<GValue> {
 	isEqual?: TComputedIsEqual<GValue>;
 }
 
+/** Compares computed values, or disables equality checks when set to `false`. */
 export type TComputedIsEqual<GValue> = ((prevValue: GValue, nextValue: GValue) => boolean) | false;
 
 /** Read-only state derived from one or more source states. Created by `createComputed()`. */

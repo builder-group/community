@@ -3,9 +3,12 @@ import type { TGraphQLError } from './graphql';
 
 /** Represents a GraphQL response whose `errors` array is not empty. */
 export class GraphQLError<GData = unknown> extends FetchError {
+	/** GraphQL errors returned by the server. */
 	public readonly errors: TGraphQLError[];
 	public readonly response: Response;
+	/** Partial GraphQL data returned with the errors, when provided. */
 	public readonly data?: GData | null;
+	/** GraphQL response extensions returned with the errors, when provided. */
 	public readonly extensions?: Record<string, unknown>;
 
 	constructor(errors: TGraphQLError[], options: TGraphQLErrorOptions<GData>) {
@@ -21,9 +24,12 @@ export class GraphQLError<GData = unknown> extends FetchError {
 }
 
 export interface TGraphQLErrorOptions<GData = unknown> {
+	/** Stable feature-fetch error code. Defaults to `#ERR_GRAPHQL_OPERATION`. */
 	code?: TFetchErrorCode;
 	response: Response;
+	/** Partial GraphQL data returned with the errors, when provided. */
 	data?: GData | null;
+	/** GraphQL response extensions returned with the errors, when provided. */
 	extensions?: Record<string, unknown>;
 }
 

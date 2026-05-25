@@ -2,7 +2,10 @@ import { defineFeature, type TFeature } from 'feature-core';
 import { getAbortReason, sleep } from '../lib';
 import type { TFetchClientBase, TFetchLike, TFetchMiddleware } from '../types';
 
-/** Adds retry behavior for network errors and retryable HTTP responses. */
+/**
+ * Adds retry middleware for network errors and retryable HTTP responses.
+ * Network errors use exponential backoff. HTTP responses retry only when `shouldRetryResponse` returns true.
+ */
 export function retryFeature(options: TRetryFeatureOptions = {}): TRetryFeature {
 	return defineFeature<TRetryFeature>({
 		key: 'retry',
@@ -16,6 +19,7 @@ export function retryFeature(options: TRetryFeatureOptions = {}): TRetryFeature 
 
 export type TRetryFeature = TFeature<'retry', object>;
 
+/** Creates a standalone retry middleware for custom client composition. */
 export function createRetryMiddleware(options: TRetryFeatureOptions = {}): TFetchMiddleware {
 	const {
 		maxRetries = 3,
@@ -46,9 +50,9 @@ export interface TRetryFeatureOptions {
 }
 
 export interface TRetryNetworkErrorOptions {
-	/** Base delay in milliseconds. Defaults to `1000`. */
+	/** Base exponential-backoff delay in milliseconds. Defaults to `1000`. */
 	baseDelayMs?: number;
-	/** Maximum delay in milliseconds. Defaults to `30000`. */
+	/** Maximum exponential-backoff delay in milliseconds. Defaults to `30000`. */
 	maxDelayMs?: number;
 }
 

@@ -7,9 +7,6 @@ import type { TState } from '../types';
  * `persist()` tries to load a previously saved value first; if none exists it
  * saves the current state instead. After that, every `set()` call saves the new
  * value automatically. Saves triggered by loading are skipped to prevent loops.
- *
- * @param storage - The storage adapter implementing `TStorageInterface`.
- * @param key - The key used to identify this state's value in storage.
  */
 export function storageFeature<GValue, GStorageValue extends GValue = GValue>(
 	storage: TStorageInterface<GStorageValue>,

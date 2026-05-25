@@ -10,11 +10,6 @@ import React from 'react';
  * Pass a custom `isEqual` to use structural comparison, or `false` to re-render on every
  * source change regardless of the computed value. Keep `compute` and `isEqual` pure:
  * React may call them outside a render.
- *
- * @param state - A single state or a tuple of states to subscribe to.
- * @param compute - Derives the result from the current state value(s).
- * @param deps - External values read by `compute`. Triggers recomputation when changed.
- * @param isEqual - Compares previous and next computed values. Defaults to `Object.is`.
  */
 export function useCompute<GState extends TAnyComputeState, GComputed>(
 	state: GState,
@@ -117,6 +112,7 @@ export function useCompute<GComputed>(
 	return React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot).value;
 }
 
+/** Compares next and current computed values, or disables equality checks when set to `false`. */
 export type TComputeIsEqual<GComputed> = ((next: GComputed, current: GComputed) => boolean) | false;
 
 type TComputeValues<GStates extends readonly TAnyComputeState[]> = {

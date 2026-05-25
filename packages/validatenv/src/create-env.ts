@@ -66,11 +66,17 @@ export interface TCreateEnvOptions<
 	GClientSpecs extends Record<string, unknown> = TEmptyEnvSpecs,
 	GSharedSpecs extends Record<string, unknown> = TEmptyEnvSpecs
 > {
+	/** Environment source, such as `process.env`, `import.meta.env`, or a test object. */
 	env: TEnv;
+	/** Server-only specs. Client access throws unless `onInvalidAccess` overrides it. */
 	server?: TEnvSpecs<GServerSpecs>;
+	/** Client-exposed specs validated on both server and client. */
 	client?: TEnvSpecs<GClientSpecs>;
+	/** Runtime-neutral specs shared by server and client code. */
 	shared?: TEnvSpecs<GSharedSpecs>;
+	/** Runtime side. Defaults to a global runtime check. */
 	isServer?: boolean;
+	/** Handles client-side reads of server-only keys. Must not return. */
 	onInvalidAccess?: (key: string) => never;
 }
 

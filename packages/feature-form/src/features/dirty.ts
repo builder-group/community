@@ -10,8 +10,6 @@ import { type TForm, type TFormData, type TFormFieldKey, type TFormFields } from
  * `isDirty` and `dirtyFields` are reactive states. `resetDirty()` makes the current values
  * the new baseline without clearing them. Dirty state clears automatically when
  * `submit({ updateDefaultValues: true })` succeeds.
- *
- * @param config - Optional. Pass `isEqual` to override the default deep equality check.
  */
 export function dirtyFeature<GFormData extends TFormData = TFormData>(
 	config: TDirtyFeatureConfig = {}
@@ -63,20 +61,26 @@ export interface TDirtyFeatureConfig {
 	isEqual?: TDirtyFieldComparator;
 }
 
+/** Returns `true` when a current field value matches its default value. */
 export type TDirtyFieldComparator = (value: unknown, defaultValue: unknown) => boolean;
 
 export type TDirtyFeature<GFormData extends TFormData = TFormData> = TFeature<
 	'dirty',
 	{
+		/** True when at least one field differs from its default value. */
 		isDirty: TState<boolean, []>;
+		/** Field-keyed reactive map where `true` means the field differs from its default value. */
 		dirtyFields: TState<TDirtyFields<GFormData>, []>;
+		/** Makes the current field values the new default values without clearing the form. */
 		resetDirty(): void;
+		/** Updates dirty state after the original submit flow completes. */
 		submit: TForm<GFormData, []>['submit'];
 	},
 	[],
 	'submit'
 >;
 
+/** Field-keyed dirty map where `true` means the field differs from its default value. */
 export type TDirtyFields<GFormData extends TFormData> = {
 	[Key in TFormFieldKey<GFormData>]: boolean;
 };

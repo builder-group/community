@@ -4,6 +4,7 @@ import type { FetchError, HttpError, NetworkError } from './errors';
 
 // MARK: - Client
 
+/** Represents a fetch client returned by `createFetchClient()` and extended through `.with()`. */
 export type TFetchClient<GFeatures extends TAnyFeature[] = []> = TFeatureHost<
 	TFetchClientBase,
 	GFeatures
@@ -18,7 +19,7 @@ export interface TFetchClientBase {
 	_config: TFetchClientConfig;
 	/** @internal */
 	_fetchLike: TFetchLike;
-	/** Low-level request method used by higher-level features. */
+	/** Sends one request and returns parsed data plus the raw response on the success branch. */
 	request: TFetchRequest;
 }
 
@@ -36,6 +37,10 @@ export interface TFetchClientConfig {
 	prepareResponse: TPrepareResponseHook[];
 }
 
+/**
+ * Hook that can mutate structured request inputs before URL and body serialization.
+ * Throwing from this hook returns a `FetchError` on the tuple-result error branch.
+ */
 export type TPrepareRequestHook = (cx: TPrepareRequestContext) => void | Promise<void>;
 
 /** Mutable request context passed to `prepareRequest` hooks before URL/body creation. */
@@ -65,6 +70,10 @@ export interface TFetchRequestMeta {
 	[key: string]: unknown;
 }
 
+/**
+ * Hook that can inspect or replace the raw response before the client parses it.
+ * Replace `cx.response` after reading a body so later parsing still has a readable response.
+ */
 export type TPrepareResponseHook = (cx: TPrepareResponseContext) => void | Promise<void>;
 
 /**
@@ -76,12 +85,15 @@ export interface TPrepareResponseContext {
 	request: TPreparedRequest;
 }
 
-/** Finalized request snapshot passed to `prepareResponse` hooks. Headers and `requestInit` are fully resolved. */
+/** Final request snapshot passed to `prepareResponse` hooks. */
 export type TPreparedRequest = Omit<TPrepareRequestContext, 'requestInit'> & {
+	/** Fully built URL after base URL, path params, and query params are applied. */
 	url: string;
+	/** Native fetch init with resolved headers, method, body, and signal. */
 	requestInit: TRequestInitWithResolvedHeaders;
 };
 
+/** Native fetch init with feature-fetch's normalized header record. */
 export type TRequestInitWithResolvedHeaders = Omit<RequestInit, 'headers'> & {
 	headers: TResolvedFetchHeaders;
 };
@@ -89,8 +101,10 @@ export type TRequestInitWithResolvedHeaders = Omit<RequestInit, 'headers'> & {
 // MARK: - Request
 
 /**
- * Sends one request and returns a `tuple-result`.
- * Success values include parsed data plus response details.
+ * Sends one HTTP request and returns a tuple result.
+ *
+ * The success branch is `{ data, response }`. The error branch is `NetworkError`,
+ * `HttpError<GErrorResponseBody>`, or `FetchError`.
  */
 export interface TFetchRequest {
 	<
@@ -104,10 +118,12 @@ export interface TFetchRequest {
 	): Promise<TFetchRequestResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 }
 
+/** Response parser names supported by `parseAs`. */
 export type TParseAs = keyof TBodyType;
 
 export type TRequestMethod = NonNullable<RequestInit['method']>;
 
+/** Request options for methods that can send a request body. */
 export type TFetchOptionsWithBody<
 	GBody extends TUnserializedBody = TUnserializedBody,
 	GParseAs extends TParseAs = TParseAs
@@ -116,9 +132,10 @@ export type TFetchOptionsWithBody<
 	body?: GBody;
 } & TFetchOptions<GParseAs>;
 
-/** Request body input accepted before the active body serializer runs. */
+/** Defines request body input accepted before the active body serializer runs. */
 export type TUnserializedBody = TSerializedBody | object | number | boolean;
 
+/** Request-scoped options accepted by `request()` and installed method features. */
 export interface TFetchOptions<GParseAs extends TParseAs = TParseAs> {
 	/** Response parser. Defaults to `json`. */
 	parseAs?: GParseAs;
@@ -148,14 +165,22 @@ export interface TFetchOptions<GParseAs extends TParseAs = TParseAs> {
 
 export type TFetchRequestInit = Omit<RequestInit, 'body' | 'method' | 'headers'>;
 
+/** Values used to replace `{param}` placeholders in a request path. */
 export type TPathParams = Record<string, unknown>;
+/** Values serialized into the request query string. */
 export type TQueryParams = Record<string, unknown>;
 
+/**
+ * Middleware wrapper around the final fetch call.
+ * Use middleware for transport behavior such as retry, cache, tracing, or timing.
+ */
 export type TFetchMiddleware = (next: TFetchLike) => TFetchLike;
 
 // MARK: - Headers
 
+/** Defines header input accepted by client and request options. */
 export type TFetchHeadersInit = NonNullable<RequestInit['headers']> | TFetchHeadersInitRecord;
+/** Header record that also supports primitive arrays, `null` deletes, and ignored `undefined` values. */
 export type TFetchHeadersInitRecord = Record<string, TFetchHeaderInitValue>;
 export type TFetchHeaderInitValue =
 	| TFetchHeaderPrimitive
@@ -169,13 +194,16 @@ export type TResolvedFetchHeaders = Record<string, string>;
 
 // MARK: - Serializers
 
+/** Serializes request path params into a path string. */
 export type TPathSerializer<GPathParams extends Record<string, unknown> = Record<string, unknown>> =
 	(path: string, pathParams: GPathParams) => string;
 
+/** Serializes request query params without a leading question mark. */
 export type TQuerySerializer<
 	GQueryParams extends Record<string, unknown> = Record<string, unknown>
 > = (queryParams: GQueryParams) => string;
 
+/** Serializes a request body before it is passed to fetch. */
 export type TBodySerializer<GBody = unknown, GResult extends TSerializedBody = TSerializedBody> = (
 	body: GBody,
 	contentType?: string
@@ -185,7 +213,7 @@ export type TSerializedBody = RequestInit['body'];
 
 // MARK: - Response
 
-/** Result returned by the low-level request method. */
+/** Represents the tuple result returned by the low-level request method. */
 export type TFetchRequestResponse<
 	GSuccessResponseBody = unknown,
 	GErrorResponseBody = unknown,
@@ -195,25 +223,30 @@ export type TFetchRequestResponse<
 	TFetchResponseError<GErrorResponseBody>
 >;
 
+/** Error union returned by feature-fetch request methods. */
 export type TFetchResponseError<GErrorResponseBody = unknown> =
 	| NetworkError
 	| HttpError<GErrorResponseBody>
 	| FetchError;
 
+/** Success value returned by the low-level `request()` method. */
 export interface TFetchResponseSuccess<
 	GSuccessResponseBody = unknown,
 	GParseAs extends TParseAs = 'json'
 > {
+	/** Parsed response body. */
 	data: TParseAsResponse<GParseAs, GSuccessResponseBody>;
 	/** Response used to produce `data`. Its body is already consumed unless `parseAs` is `stream`. */
 	response: Response;
 }
 
+/** Maps a parser name to the corresponding success data type. */
 export type TParseAsResponse<
 	GParseAs extends TParseAs,
 	GJson = unknown
 > = TBodyType<GJson>[GParseAs];
 
+/** Response body types returned by each parser mode. */
 export interface TBodyType<GJson = unknown> {
 	json: GJson;
 	text: Awaited<ReturnType<Response['text']>>;

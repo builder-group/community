@@ -2,7 +2,10 @@ import { defineFeature, type TFeature } from 'feature-core';
 import { hasHeader, normalizeHeaders } from '../lib';
 import type { TFetchClientBase, TFetchLike, TFetchMiddleware } from '../types';
 
-/** Adds an in-memory response cache middleware. Defaults to cacheable GET requests. */
+/**
+ * Adds an in-memory response cache middleware.
+ * Defaults to cacheable GET requests and skips requests with auth or cookie headers.
+ */
 export function cacheFeature(options: TCacheFeatureOptions = {}): TCacheFeature {
 	return defineFeature<TCacheFeature>({
 		key: 'cache',
@@ -27,14 +30,13 @@ export function cacheFeature(options: TCacheFeatureOptions = {}): TCacheFeature 
 export type TCacheFeature = TFeature<'cache', TCacheFeatureApi>;
 
 export interface TCacheFeatureApi {
-	/** Cache control methods for this installed feature. */
 	cache: TCacheApi;
 }
 
 export interface TCacheApi {
 	/** Clears all cached responses. */
 	clear(): void;
-	/** Deletes cached responses whose cache key matches `predicate`. */
+	/** Deletes cached responses whose cache key matches the predicate. */
 	invalidate(predicate: TCacheInvalidationPredicate): void;
 }
 
@@ -42,6 +44,7 @@ export type TCacheInvalidationPredicate = (key: string) => boolean;
 
 // MARK: - Middleware
 
+/** Creates a standalone cache middleware for custom client composition. */
 export function createCacheMiddleware(options: TCacheFeatureOptions = {}): TFetchMiddleware {
 	return createResponseCacheMiddleware(new ResponseCache(), options);
 }
@@ -87,8 +90,10 @@ export interface TCacheFeatureOptions {
 	shouldCache?: TShouldCache;
 }
 
+/** Returns a cache key for a request, or `null` to skip caching. */
 export type TGetCacheKey = (url: URL | string, init?: RequestInit) => string | null;
 
+/** Returns whether a response should be cached. */
 export type TShouldCache = (response: Response) => boolean;
 
 const defaultGetCacheKey: TGetCacheKey = (url, init) => {

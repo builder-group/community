@@ -23,10 +23,6 @@ import { type TIsWideString } from '../types';
  * Returns `field` (the `TFormField` instance), `status()` (the current validation status),
  * and `input()` (ready-to-spread input props). All options (`controlled`, `format`, `parse`)
  * go to this hook; the returned `input()` takes no arguments.
- *
- * @param form - The form that owns the field.
- * @param key - The field key within the form's data shape.
- * @param options - Optional for string fields. Non-string fields require `format` and `parse`.
  */
 export function useFormField<
 	GFormData extends TFormData,
@@ -89,6 +85,7 @@ export interface TUseFormFieldResponse<
 	input: (...options: TUseFormFieldInputOptionsArgs<GFormData[GKey]>) => TFieldInputProps<GKey>;
 }
 
+/** Requires `format` and `parse` for non-string field values. */
 export type TUseFormFieldInputOptionsArgs<GValue> =
 	TIsWideString<GValue> extends true
 		? [options?: TUseFormFieldInputOptions<GValue>]

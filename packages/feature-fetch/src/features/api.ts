@@ -14,7 +14,7 @@ import type {
 	TUnserializedBody
 } from '../types';
 
-/** Creates a fetch client with `apiFeature()` installed. */
+/** Creates a fetch client with REST method helpers already installed. */
 export function createApiFetchClient(
 	options: TCreateFetchClientOptions = {}
 ): TFetchClient<[TApiFeature]> {
@@ -23,7 +23,10 @@ export function createApiFetchClient(
 
 // MARK: - Feature
 
-/** Adds HTTP method helpers around `request()`. */
+/**
+ * Adds REST method helpers around `request()`.
+ * Helpers unwrap the low-level success value to `data` unless `withResponse: true` is passed.
+ */
 export function apiFeature(): TApiFeature {
 	return defineFeature<TApiFeature>({
 		key: 'api',
@@ -73,6 +76,12 @@ type TApiMethodOptions = TFetchOptionsWithBody & {
 	withResponse?: boolean;
 };
 
+/**
+ * Sends a REST request without a request body.
+ *
+ * By default the success branch is parsed data. Pass `withResponse: true` to receive
+ * `{ data, response }` instead.
+ */
 export interface TApiMethod {
 	<
 		GSuccessResponseBody = unknown,
@@ -101,6 +110,12 @@ export interface TApiMethod {
 	): Promise<TApiResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs, GWithResponse>>;
 }
 
+/**
+ * Sends a REST request that can include a request body.
+ *
+ * By default the success branch is parsed data. Pass `withResponse: true` to receive
+ * `{ data, response }` instead.
+ */
 export interface TApiBodyMethod {
 	<
 		GSuccessResponseBody = unknown,

@@ -1,7 +1,10 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
 import { formatThrownError } from './format-thrown-error';
 
-/** Runs a Standard Schema validator synchronously and returns a success or failure result. Async validators are rejected immediately with an error. */
+/**
+ * Runs a Standard Schema validator synchronously and returns a success or failure result.
+ * Async validators are rejected immediately with an error.
+ */
 export function validateStandardSchema<GOutput>(
 	validator: StandardSchemaV1<unknown, GOutput>,
 	value: unknown,

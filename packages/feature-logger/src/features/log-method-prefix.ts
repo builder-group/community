@@ -19,9 +19,11 @@ export function logMethodPrefixFeature(
 export type TLogMethodPrefixFeature = TFeature<'log-method-prefix', object>;
 
 export interface TLogMethodPrefixFeatureOptions {
+	/** Formats the console method before it is used as a prefix. */
 	formatLogMethod?: (logMethod: TLogMethod) => string;
 }
 
+/** Middleware that prefixes each log call with its console method name. */
 export function logMethodPrefixMiddleware(
 	options: TLogMethodPrefixFeatureOptions = {}
 ): TLoggerMiddleware {

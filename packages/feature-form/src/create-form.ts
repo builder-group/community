@@ -29,8 +29,6 @@ import {
  * Field configs in `fields` are upgraded to reactive form fields automatically.
  * Validators must implement the Standard Schema interface (Zod, Valibot, or custom).
  * Extend the form with features using `.with(feature())`.
- *
- * @param config - Form configuration: fields, optional validators, triggers, and submit callbacks.
  */
 export function createForm<GFields extends TCreateFormFieldsInput>(
 	config: TCreateFormConfig<TCreateFormDataFromFields<GFields>> & { fields: GFields }
@@ -249,6 +247,7 @@ export type TCreateFormConfigFormFields<GFormData extends TFormData> = {
 		| TFormField<GFormData[Key]>;
 };
 
+/** Infers form data from field configs and existing form fields passed to `createForm()`. */
 export type TCreateFormDataFromFields<GFields extends TCreateFormFieldsInput> = {
 	[Key in Extract<keyof GFields, string>]: GFields[Key] extends TFormField<infer GValue>
 		? GValue
@@ -264,10 +263,15 @@ export type TCreateFormFieldsInput = Record<
 
 /** Configures one form field when `createForm()` should create the field. */
 export interface TCreateFormConfigFormField<GValue> {
+	/** Initial value for the created field. Also restored by `reset()`. */
 	defaultValue: GValue;
+	/** Optional field-level Standard Schema validator. */
 	validator?: TFormFieldValidator<NoInfer<GValue>>;
+	/** Overrides the form default for this field. */
 	collectErrorMode?: TFormFieldValidationConfig['collectErrorMode'];
+	/** Overrides the form default for this field after first submit. */
 	revalidateOn?: TFormFieldValidationConfig['revalidateOn'];
+	/** Overrides the form default for this field before first submit. */
 	validateOn?: TFormFieldValidationConfig['validateOn'];
 }
 

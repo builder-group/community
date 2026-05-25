@@ -56,6 +56,7 @@ export type TFormData = object;
 
 export type TFormFieldKey<GFormData extends TFormData> = Extract<keyof GFormData, string>;
 
+/** Maps each form data property to its reactive field. */
 export type TFormFields<GFormData extends TFormData> = {
 	[Key in TFormFieldKey<GFormData>]: TFormField<GFormData[Key]>;
 };
@@ -79,16 +80,19 @@ export interface TFormSubmitOptions<GFormData extends TFormData> {
 	updateDefaultValues?: boolean;
 }
 
+/** Receives typed form data after a successful submit. */
 export type TFormValidSubmitCallback<GFormData extends TFormData> = (
 	formData: Readonly<GFormData>,
 	context?: TFormSubmitContext
 ) => Promise<void> | void;
 
+/** Receives collected form and field errors after an invalid submit. */
 export type TFormInvalidSubmitCallback<GFormData extends TFormData> = (
 	errors: TFormErrors<GFormData>,
 	context?: TFormSubmitContext
 ) => Promise<void> | void;
 
+/** Metadata forwarded to submit callbacks. */
 export interface TFormSubmitContext {
 	[key: string]: unknown;
 	/** The HTML submit event, if the form was submitted via a DOM form element. */
@@ -100,6 +104,7 @@ export interface TFormValidation<GFormData extends TFormData> {
 	config: TFormValidationConfig;
 }
 
+/** Controls form-level validation timing and error collection. */
 export interface TFormValidationConfig {
 	/** Validation triggers used before the first submit. */
 	validateOn: readonly TValidateTrigger[];
@@ -172,11 +177,13 @@ export type TFormFieldFeature<GValue> = TFeature<
 
 export type TFormFieldStatus = TValidationStatus;
 
+/** Stores a field-level validator with its timing and error collection config. */
 export interface TFormFieldValidation<GValue> {
 	validator: TFormFieldValidator<GValue>;
 	config: TFormFieldValidationConfig;
 }
 
+/** Controls field-level validation timing and error collection. */
 export interface TFormFieldValidationConfig {
 	/** Validation triggers used before the field is submitted. */
 	validateOn: readonly TValidateTrigger[];
@@ -186,6 +193,7 @@ export interface TFormFieldValidationConfig {
 	collectErrorMode: TCollectErrorMode;
 }
 
+/** Validates one field value with Standard Schema. */
 export type TFormFieldValidator<GValue> = StandardSchemaV1<GValue, unknown>;
 
 export interface TFormFieldCallbacks {
@@ -201,10 +209,13 @@ export interface TFormFieldBlurContext {
 
 // MARK: - Validation
 
+/** Controls whether validation keeps the first issue or all issues returned by Standard Schema. */
 export type TCollectErrorMode = 'firstError' | 'all';
 
+/** Validation event names. `touched` runs after the first blur and then on later changes. */
 export type TValidateTrigger = 'blur' | 'change' | 'submit' | 'touched';
 
+/** Revalidation runs after submit, where `touched` no longer applies. */
 export type TRevalidateTrigger = Exclude<TValidateTrigger, 'touched'>;
 
 /** Validation status state used by forms and fields. */
@@ -218,6 +229,7 @@ export type TValidationStatusValue =
 	| TValidValidationStatus
 	| TUnvalidatedValidationStatus;
 
+/** Validation failed with one or more errors. */
 export interface TInvalidValidationStatus {
 	type: 'invalid';
 	errors: readonly TValidationError[];
@@ -237,6 +249,7 @@ export interface TValidValidationStatus {
 	type: 'valid';
 }
 
+/** Validation has not run yet. */
 export interface TUnvalidatedValidationStatus {
 	type: 'unvalidated';
 }

@@ -46,7 +46,10 @@ import type {
 } from './types';
 
 /**
- * Creates a feature host around fetch.
+ * Creates a typed fetch client with the low-level `request()` method.
+ *
+ * Use `.with()` to install REST, OpenAPI, GraphQL, retry, cache, or custom features.
+ * `request()` returns a tuple result whose success branch contains `{ data, response }`.
  */
 export function createFetchClient(options: TCreateFetchClientOptions = {}): TFetchClient<[]> {
 	const {
@@ -225,19 +228,19 @@ export function createFetchClient(options: TCreateFetchClientOptions = {}): TFet
 }
 
 export interface TCreateFetchClientOptions {
-	/** Base URL prepended to relative request paths. */
+	/** Base URL prepended to relative request paths. Absolute request paths ignore it. */
 	baseUrl?: string;
 	/** Native fetch init defaults except `body`, `method`, and `headers`. */
 	requestInit?: TFetchRequestInit;
-	/** Headers applied to every request. */
+	/** Headers applied to every request. Per-request headers can override or remove them. */
 	headers?: TFetchHeadersInit;
-	/** Default body serializer. */
+	/** Default body serializer used before the request is sent. */
 	bodySerializer?: TBodySerializer;
-	/** Default path param serializer. */
+	/** Default serializer for `{param}` placeholders in request paths. */
 	pathSerializer?: TPathSerializer;
-	/** Default query param serializer. */
+	/** Default serializer for request query params. */
 	querySerializer?: TQuerySerializer;
-	/** Hooks for structured request changes before URL/body creation, such as auth, params, body, or metadata. */
+	/** Hooks that can mutate request inputs before URL and body serialization. */
 	prepareRequest?: TPrepareRequestHook[];
 	/** Fetch wrappers for transport concerns such as retries, caching, tracing, or timing. */
 	middleware?: TFetchMiddleware[];

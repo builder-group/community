@@ -25,15 +25,18 @@ export function mergeHeaders(
 	return headers;
 }
 
+/** Returns a normalized header value, or null when the header is absent. */
 export function getHeader(headers: TResolvedFetchHeaders, name: string): string | null {
 	const key = normalizeHeaderName(name);
 	return Object.hasOwn(headers, key) ? (headers[key] ?? null) : null;
 }
 
+/** Returns whether a normalized header record contains the given header name. */
 export function hasHeader(headers: TResolvedFetchHeaders, name: string): boolean {
 	return Object.hasOwn(headers, normalizeHeaderName(name));
 }
 
+/** Sets a header value after normalizing its name and value. */
 export function setHeader(
 	headers: TResolvedFetchHeaders,
 	name: string,
@@ -42,6 +45,7 @@ export function setHeader(
 	headers[normalizeHeaderName(name)] = normalizeHeaderValue(value);
 }
 
+/** Removes a header after normalizing its name. */
 export function deleteHeader(headers: TResolvedFetchHeaders, name: string): void {
 	// eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- Header names are normalized dynamic keys
 	delete headers[normalizeHeaderName(name)];

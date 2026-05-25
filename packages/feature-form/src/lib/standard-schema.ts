@@ -5,6 +5,7 @@ import {
 	type TValidationStatusValue
 } from '../types';
 
+/** Runs a Standard Schema validator and converts its issues into a validation status. */
 export async function validateStandardSchema<GValue>(
 	schema: StandardSchemaV1<GValue, unknown>,
 	value: GValue,

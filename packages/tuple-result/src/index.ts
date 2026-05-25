@@ -25,12 +25,10 @@ export class OkResult<GValue, GError> extends Array<true | undefined | GValue> {
 		return this[1];
 	}
 
-	/** Returns `true`. */
 	public isOk(): this is OkResult<GValue, GError> {
 		return true;
 	}
 
-	/** Returns `false`. */
 	public isErr(): this is ErrResult<GValue, GError> {
 		return false;
 	}
@@ -73,12 +71,10 @@ export class ErrResult<GValue, GError> extends Array<false | GError | undefined>
 		return this[1];
 	}
 
-	/** Returns `false`. */
 	public isOk(): this is OkResult<GValue, GError> {
 		return false;
 	}
 
-	/** Returns `true`. */
 	public isErr(): this is ErrResult<GValue, GError> {
 		return true;
 	}
@@ -148,7 +144,7 @@ export function unwrap<GValue, GError>(result: TResultLike<GValue, GError>): GVa
 	throw result[1];
 }
 
-/** Extracts the success value. Throws if the result is not Ok. */
+/** Extracts the success value. Throws a generic `Error` if the result is not Ok. */
 export function unwrapOk<GValue, GError>(result: TResultLike<GValue, GError>): GValue {
 	if (result[0]) {
 		return result[2];
@@ -157,7 +153,7 @@ export function unwrapOk<GValue, GError>(result: TResultLike<GValue, GError>): G
 	throw new Error('Expected an Ok result');
 }
 
-/** Extracts the error value. Throws if the result is not Err. */
+/** Extracts the error value. Throws a generic `Error` if the result is not Err. */
 export function unwrapErr<GValue, GError>(result: TResultLike<GValue, GError>): GError {
 	if (!result[0]) {
 		return result[1];

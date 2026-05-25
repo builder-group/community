@@ -49,6 +49,7 @@ export function logIdFeature(options: TLogIdFeatureOptions = {}): TLogIdFeature 
 
 export type TLogIdFeature = TFeature<'log-id', TLogIdFeatureApi, [], TLogMethod>;
 
+/** Logger API after `logIdFeature()` makes each log method return the generated id. */
 export interface TLogIdFeatureApi {
 	/** @internal */
 	_baseLogWithId(data: unknown[], context: TLogContext): string;

@@ -1,5 +1,6 @@
 import { type TValidationError, type TValidationPath, type TValidationStatusValue } from '../types';
 
+/** Compares validation statuses so reactive status state can skip equivalent updates. */
 export function areValidationStatusesEqual(
 	current: TValidationStatusValue,
 	next: TValidationStatusValue

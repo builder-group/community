@@ -16,6 +16,7 @@ export function delayFeature(delayMs: number): TDelayFeature {
 
 export type TDelayFeature = TFeature<'delay', object>;
 
+/** Creates a standalone delay middleware for custom client composition. */
 export function createDelayMiddleware(delayMs: number): TFetchMiddleware {
 	return (next: TFetchLike) =>
 		async (url, requestInit): Promise<Response> => {

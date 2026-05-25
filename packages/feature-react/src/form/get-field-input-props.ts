@@ -9,9 +9,6 @@ import { type TIsWideString } from './types';
  * Uncontrolled by default: `onChange` sets the field value with `background: true` so React
  * does not re-render on every keystroke. Set `controlled: true` for a controlled input.
  * Non-string fields require `format` (field value to display string) and `parse` (string to field value).
- *
- * @param formField - The form field to bind.
- * @param options - Optional for string fields. Non-string fields require `format` and `parse`.
  */
 export function getFieldInputProps<GKey extends string = string, GValue = string>(
 	formField: TFormField<GValue>,
@@ -47,6 +44,7 @@ export interface TFieldInputProps<GKey extends string> {
 	onBlur: FocusEventHandler<TFieldInputElement>;
 }
 
+/** Requires `format` and `parse` for non-string field values. */
 export type TFieldInputOptionsArgs<GValue> =
 	TIsWideString<GValue> extends true
 		? [options?: TFieldInputOptions<GValue>]

@@ -8,7 +8,10 @@ import type {
 } from '../../types';
 import { FlatQueue } from './FlatQueue';
 
-/** Adds priority-based listener scheduling to a state. */
+/**
+ * Adds priority-based listener scheduling to a state.
+ * Lower priority numbers run first. Same-priority listeners keep insertion order.
+ */
 export function priorityQueueFeature<GValue>(): TPriorityQueueFeature<GValue> {
 	return defineFeature<TPriorityQueueFeature<GValue>>({
 		key: 'priority-queue',
@@ -72,8 +75,11 @@ export type TPriorityQueueFeature<GValue> = TFeature<
 >;
 
 export interface TPriorityQueueFeatureApi<GValue> {
+	/** Registers a listener with an optional priority and returns an unsubscribe function. */
 	listen(callback: TListenerCallback<GValue>, options?: TPriorityListenerOptions): () => void;
+	/** Notifies listeners in priority order. */
 	notify(options?: TStateNotifyOptions<GValue>): void;
+	/** Registers a listener with an optional priority and calls it immediately with the current value. */
 	subscribe(callback: TListenerCallback<GValue>, options?: TPriorityListenerOptions): () => void;
 }
 

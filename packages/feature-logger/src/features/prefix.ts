@@ -31,6 +31,7 @@ export interface TPrefixFeatureOptions {
 	newLineBehavior?: 'indent' | 'prefix' | 'ignore';
 }
 
+/** Middleware that prepends a static or context-derived prefix to log data. */
 export function prefixMiddleware(
 	prefix: string | TLogPrefixResolver,
 	options: TPrefixFeatureOptions = {}
@@ -64,6 +65,7 @@ export function prefixMiddleware(
 	};
 }
 
+/** Resolves a prefix for the current log call. */
 export type TLogPrefixResolver = (context: TLogContext) => string;
 
 function formatIndentedPrefixMessage(prefix: string, message: string): string {

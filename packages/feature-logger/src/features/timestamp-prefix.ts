@@ -19,9 +19,11 @@ export function timestampPrefixFeature(
 export type TTimestampPrefixFeature = TFeature<'timestamp-prefix', object>;
 
 export interface TTimestampPrefixFeatureOptions {
+	/** Formats the current date before it is used as a prefix. */
 	formatTimestamp?: (date: Date) => string;
 }
 
+/** Middleware that prefixes each log call with the current local timestamp. */
 export function timestampPrefixMiddleware(
 	options: TTimestampPrefixFeatureOptions = {}
 ): TLoggerMiddleware {

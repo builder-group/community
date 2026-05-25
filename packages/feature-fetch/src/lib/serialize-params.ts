@@ -117,8 +117,11 @@ export function serializeQueryParams(
 }
 
 export interface TSerializeQueryParamsOptions {
+	/** Array serialization options. Defaults to form style with explode enabled. */
 	array?: TSerializeQueryArrayOptions;
+	/** Object serialization options. Defaults to deepObject style with explode enabled. */
 	object?: TSerializeQueryObjectOptions;
+	/** Preserves reserved URL characters when true. */
 	allowReserved?: boolean;
 }
 

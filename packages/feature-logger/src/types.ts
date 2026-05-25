@@ -33,10 +33,13 @@ export interface TLoggerBase {
 	error(...data: unknown[]): void;
 }
 
+/** Final output sink called after logger middleware has transformed the log data. */
 export type TInvokeConsole = (data: unknown[], context: TLogContext) => void;
 
+/** Wraps a console invoker to transform, filter, or redirect a log call. */
 export type TLoggerMiddleware = (next: TInvokeConsole) => TInvokeConsole;
 
+/** Metadata passed through the logger middleware chain for one log call. */
 export interface TLogContext {
 	/** The console method this call maps to. */
 	logMethod: TLogMethod;

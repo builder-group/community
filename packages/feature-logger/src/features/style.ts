@@ -15,8 +15,10 @@ export function styleFeature(styles: TLogStyles = {}): TStyleFeature {
 
 export type TStyleFeature = TFeature<'style', object>;
 
+/** Browser console CSS strings keyed by log method. */
 export type TLogStyles = Partial<Record<TLogMethod, string>>;
 
+/** Middleware that inserts `%c` CSS arguments for string messages. */
 export function styleMiddleware(styles: TLogStyles = {}): TLoggerMiddleware {
 	const allStyles = { ...defaultLogStyles, ...styles };
 
@@ -35,6 +37,7 @@ export function styleMiddleware(styles: TLogStyles = {}): TLoggerMiddleware {
 	};
 }
 
+/** Default browser console CSS styles used by `styleFeature()`. */
 export const defaultLogStyles: TLogStyles = {
 	trace: 'color: #aaa',
 	debug: 'color: #888',

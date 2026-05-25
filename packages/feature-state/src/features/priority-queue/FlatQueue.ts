@@ -1,3 +1,4 @@
+/** Priority queue where lower priority values are popped first and ties keep insertion order. */
 // Based on: https://github.com/mourner/flatqueue/blob/main/index.js
 // Note: Kept local because the original package does not support CommonJS output
 export class FlatQueue<GItem> {

@@ -16,9 +16,6 @@ import {
  * Use this when a field should exist independently of a specific form, for example a shared
  * search input or a field composed into different forms. Pass the result directly into
  * `createForm`'s `fields` config.
- *
- * @param defaultValue - The initial value, also restored by `reset()`.
- * @param config - Field configuration: stable key, optional validator, and trigger settings.
  */
 export function createFormField<GValue>(
 	defaultValue: GValue,
@@ -56,6 +53,7 @@ export function createFormField<GValue>(
 export interface TCreateFormFieldConfig<GValue> extends Partial<TFormFieldValidationConfig> {
 	/** Stable field key used in validation contexts and form error paths. */
 	key: string;
+	/** Optional field-level Standard Schema validator. */
 	validator?: TFormFieldValidator<GValue>;
 }
 

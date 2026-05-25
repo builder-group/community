@@ -1,3 +1,4 @@
+/** Resolves after the given delay, or rejects with the abort reason when the signal aborts. */
 export function sleep(ms: number, signal?: AbortSignal | null): Promise<void> {
 	if (ms <= 0) {
 		return Promise.resolve();
@@ -30,6 +31,7 @@ export function sleep(ms: number, signal?: AbortSignal | null): Promise<void> {
 	});
 }
 
+/** Returns the abort reason, or a default abort error when the runtime did not provide one. */
 export function getAbortReason(signal: AbortSignal): unknown {
 	return signal.reason ?? new Error('The operation was aborted');
 }

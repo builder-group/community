@@ -7,6 +7,7 @@ export class HttpError<GData = unknown> extends FetchError {
 	public readonly status: number;
 	public readonly statusText: string;
 	public readonly response: Response;
+	/** Parsed error response body, when one could be read. */
 	public readonly data?: GData;
 
 	constructor(response: Response, options: THttpErrorOptions<GData> = {}) {
@@ -23,9 +24,11 @@ export class HttpError<GData = unknown> extends FetchError {
 }
 
 export interface THttpErrorOptions<GData = unknown> {
+	/** Stable feature-fetch error code. Defaults to `#ERR_HTTP_STATUS`. */
 	code?: TFetchErrorCode;
 	message?: string;
 	cause?: unknown;
+	/** Parsed error response body. */
 	data?: GData;
 }
 
@@ -43,6 +46,7 @@ function formatHttpErrorMessage(
 	return detail != null ? `${baseMessage}: ${detail}` : baseMessage;
 }
 
+/** Checks `HttpError` instances and error-like objects with a numeric `status`. */
 export function hasStatusCode(error: unknown, statusCode: number): boolean {
 	if (error instanceof HttpError) {
 		return error.status === statusCode;
@@ -53,6 +57,7 @@ export function hasStatusCode(error: unknown, statusCode: number): boolean {
 	return false;
 }
 
+/** Maps a non-OK `Response` to an `HttpError` with parsed error data when possible. */
 export async function mapResponseToHttpError(
 	response: Response,
 	code: TFetchErrorCode = '#ERR_HTTP_STATUS'

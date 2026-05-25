@@ -59,6 +59,7 @@ export interface TCreateLoggerOptions {
 	invokeConsole?: TInvokeConsole;
 }
 
+/** Numeric severity values used by logger level filtering. Higher values are more severe. */
 export enum ELogLevel {
 	ALL = 0,
 	TRACE = 100,

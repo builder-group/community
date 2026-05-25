@@ -33,7 +33,7 @@ export type TEnvPreprocess<GValue = unknown> = (value: unknown) => GValue | unde
 /** Computes a default value from the full env source. */
 export type TEnvDefaultFn<GValue> = (env: TEnv) => GValue | undefined;
 
-/** Env spec object accepted by `validateEnv()` and `createViteEnvDefine()`. */
+/** Env spec object accepted by `validateEnv()`, `createEnv()`, and `createViteEnvDefine()`. */
 export type TEnvSpecs<GSpecs extends Record<string, unknown>> = GSpecs &
 	TEnvSpecEntriesConstraint<GSpecs>;
 

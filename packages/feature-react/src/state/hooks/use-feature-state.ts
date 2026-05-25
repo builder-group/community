@@ -7,8 +7,6 @@ import React from 'react';
  *
  * Pass `null` or `undefined` to opt out: the hook returns `null` and registers no listener.
  * Background updates mark the change for the next render without forcing an immediate re-render.
- *
- * @param state - The state to subscribe to, or `null`/`undefined` to skip subscription.
  */
 export function useFeatureState<GState extends TAnyFeatureState>(
 	state: GState

@@ -1,7 +1,7 @@
 // Note: Import directly to avoid circular dependencies
 import { getCauseMessage } from '../lib/get-cause-message';
 
-/** Base error for feature-fetch failures. */
+/** Base error for feature-fetch client, middleware, parsing, and serialization failures. */
 export class FetchError extends Error {
 	public readonly code: TFetchErrorCode;
 
@@ -25,6 +25,7 @@ export interface TFetchErrorOptions {
 	cause?: unknown;
 }
 
+/** Feature-fetch error code format. */
 export type TFetchErrorCode = `#ERR_${string}`;
 
 function formatFetchErrorMessage(
@@ -37,6 +38,7 @@ function formatFetchErrorMessage(
 	return `[${code}] ${detail}`;
 }
 
+/** Maps an unknown thrown value to `FetchError` unless it already is one. */
 export function mapErrorToFetchError(
 	error: unknown,
 	code: TFetchErrorCode,

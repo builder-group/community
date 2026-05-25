@@ -7,8 +7,6 @@ import type { TListener, TListenerCallback, TListenerContext, TState, TStateBase
  * The state exposes `value`, `get()`, `set()`, `notify()`, `listen()`, and `subscribe()`.
  * `set()` skips notification when the new value equals the current one (`Object.is`).
  * Extend the state with features by calling `.with(feature())`.
- *
- * @param initialValue - The initial state value.
  */
 export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 	return createFeatureHost<TStateBase<GValue>>({

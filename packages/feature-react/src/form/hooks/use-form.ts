@@ -21,8 +21,6 @@ import {
  * event, `field(key)` to access the raw `TFormField`, and `status(key)` to get a field's
  * status state for a targeted subscription via `useFeatureState`. Use `useFormField` instead
  * for isolated field components or large forms where per-keystroke re-renders are expensive.
- *
- * @param form - The form instance returned by `createForm`.
  */
 export function useForm<GFormData extends TFormData, GFeatures extends TAnyFeature[]>(
 	form: TForm<GFormData, GFeatures>

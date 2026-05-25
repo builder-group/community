@@ -14,6 +14,7 @@ export class NetworkError extends FetchError {
 }
 
 export interface TNetworkErrorOptions {
+	/** Stable feature-fetch error code. Defaults to `#ERR_NETWORK`. */
 	code?: TFetchErrorCode;
 	message?: string;
 	cause?: unknown;
@@ -25,6 +26,7 @@ function formatNetworkErrorMessage(message: string | undefined, cause: unknown):
 	return detail != null ? `${baseMessage}: ${detail}` : baseMessage;
 }
 
+/** Maps an unknown thrown value to `NetworkError` unless it already is one. */
 export function mapErrorToNetworkError(
 	error: unknown,
 	code: TFetchErrorCode = '#ERR_NETWORK'

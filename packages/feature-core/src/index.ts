@@ -1,7 +1,8 @@
 /**
  * Adds feature metadata and `.with()` to a plain object.
  *
- * Mutates and returns the provided object.
+ * Mutates and returns the provided object. The base object must not already define
+ * reserved host keys such as `_features` or `with`.
  */
 export function createFeatureHost<GBase extends object>(base: GBase): TFeatureHost<GBase, []> {
 	// Reserved host properties must not already exist on base
@@ -118,9 +119,7 @@ export function installFeature<
 	return host as unknown as TFeatureHost<GBase, [...GInstalledFeatures, GFeatureToInstall]>;
 }
 
-/**
- * Checks whether a value is a feature host with a specific installed feature.
- */
+/** Checks for an installed feature and narrows matching values to a feature host. */
 export function hasFeature<GFeature extends TAnyFeature>(
 	host: unknown,
 	key: GFeature['key']
@@ -208,6 +207,7 @@ type TFeatureOverrideKey = string | symbol;
 
 /**
  * A base object extended with installed feature APIs and the `.with()` method.
+ * Each `.with()` call returns the same host object with a wider static type.
  */
 export type TFeatureHost<GBase extends object, GInstalledFeatures extends TAnyFeature[]> = Omit<
 	TApplyFeatureApis<Omit<GBase, keyof TFeatureHostApi<object, []>>, GInstalledFeatures>,

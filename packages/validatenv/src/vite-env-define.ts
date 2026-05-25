@@ -16,6 +16,7 @@ export function createViteEnvDefine<GSpecs extends Record<string, unknown>>(
 	return define as TViteEnvDefine<TEnvData<GSpecs>>;
 }
 
+/** Vite define object keyed as `import.meta.env.KEY`, with JSON-serialized values. */
 export type TViteEnvDefine<GEnvData extends Record<string, unknown> = Record<string, unknown>> = {
 	[Key in keyof GEnvData & string as `import.meta.env.${Key}`]: string;
 };

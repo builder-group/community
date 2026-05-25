@@ -7,8 +7,6 @@ import type { TStateBase, TStateSetOptions } from '../types';
  * Useful for value types that are structurally equal but not referentially equal, such as
  * arrays or objects where re-notifying listeners on the same logical value is wasteful.
  * `set()` calls `isEqual(prevValue, newValue)` and skips notification when it returns `true`.
- *
- * @param isEqual - Returns `true` when the previous and next values are considered equal.
  */
 export function isEqualFeature<GValue>(isEqual: TStateEquality<GValue>): TIsEqualFeature<GValue> {
 	return defineFeature<TIsEqualFeature<GValue>>({
@@ -52,10 +50,12 @@ export type TIsEqualFeature<GValue> = TFeature<'is-equal', TIsEqualFeatureApi<GV
 export interface TIsEqualFeatureApi<GValue> {
 	/** @internal */
 	_isEqual: TStateEquality<GValue>;
+	/** Sets the value and skips notification when the installed equality function returns `true`. */
 	set(
 		newValueOrUpdater: GValue | ((value: GValue) => GValue),
 		options?: TStateSetOptions<GValue>
 	): void;
 }
 
+/** Returns `true` when two state values should be treated as equal. */
 export type TStateEquality<GValue> = (prevValue: GValue, nextValue: GValue) => boolean;
