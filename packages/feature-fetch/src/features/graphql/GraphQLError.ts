@@ -1,4 +1,4 @@
-import { FetchError, type TFetchErrorCode } from '../../errors/FetchError';
+import { FetchError, type TFetchErrorCode } from '../../errors';
 import type { TGraphQLError } from './graphql';
 
 /** Represents a GraphQL response whose `errors` array is not empty. */

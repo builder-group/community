@@ -11,6 +11,8 @@ import {
 	deleteHeader,
 	getHeader,
 	hasHeader,
+	isFormData,
+	isNativeBody,
 	mergeHeaders,
 	normalizeHeaders,
 	serializeBody,
@@ -18,7 +20,6 @@ import {
 	serializeQueryParams,
 	setHeader
 } from './lib';
-import { isFormData, isNativeBody } from './lib/native-body';
 import type {
 	TBodySerializer,
 	TFetchClient,

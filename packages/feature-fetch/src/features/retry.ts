@@ -1,5 +1,5 @@
 import { defineFeature, type TFeature } from 'feature-core';
-import { getAbortReason, sleep } from '../lib/sleep';
+import { getAbortReason, sleep } from '../lib';
 import type { TFetchClientBase, TFetchLike, TFetchMiddleware } from '../types';
 
 /** Adds retry behavior for network errors and retryable HTTP responses. */

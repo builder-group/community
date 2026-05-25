@@ -1,5 +1,5 @@
 import { defineFeature, type TFeature } from 'feature-core';
-import { sleep } from '../lib/sleep';
+import { sleep } from '../lib';
 import type { TFetchClientBase, TFetchLike, TFetchMiddleware } from '../types';
 
 /** Adds a request middleware that waits before forwarding each request. */
