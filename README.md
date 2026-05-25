@@ -65,7 +65,7 @@ Open source packages from [builder.group](https://builder.group) projects, share
 
 ### `feature-fetch`
 
-- [`feature-fetch/vanilla/open-meteo`](https://github.com/builder-group/community/tree/develop/examples/feature-fetch/vanilla/open-meteo)
+- [`feature-fetch/vanilla/basic`](https://github.com/builder-group/community/tree/develop/examples/feature-fetch/vanilla/basic)
 
 ### `feature-form`
 

@@ -328,7 +328,7 @@ if (!isOk) {
 
 ## Examples
 
-- [Vanilla Open-Meteo](https://github.com/builder-group/community/tree/develop/examples/feature-fetch/vanilla/open-meteo)
+- [Vanilla basic](https://github.com/builder-group/community/tree/develop/examples/feature-fetch/vanilla/basic)
 
 ## FAQ
 

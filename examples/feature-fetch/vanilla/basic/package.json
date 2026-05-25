@@ -6,11 +6,14 @@
 	"scripts": {
 		"build": "tsc && vite build",
 		"dev": "vite",
+		"graphql:generate": "gql.tada generate-output -c ./tsconfig.json -o ./src/graphql/gen/countries-env.d.ts",
+		"graphql:schema": "gql.tada generate-schema https://countries.trevorblades.com/graphql -o ./resources/graphql/countries.graphql",
 		"openapi:generate": "openapi-typescript ./resources/openapi/open-meteo-v1.yaml -o ./src/openapi/gen/open-meteo-v1.ts",
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"feature-fetch": "workspace:*"
+		"feature-fetch": "workspace:*",
+		"gql.tada": "^1.9.2"
 	},
 	"devDependencies": {
 		"openapi-typescript": "^7.10.1",
