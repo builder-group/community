@@ -18,7 +18,7 @@ const COUNTRY_QUERY = gql(`
 `);
 
 export async function fetchCountryWithGraphQLFetchClient(code: string): Promise<void> {
-	const [isOk, error, countryResponse] = await countriesFetchClient.query(COUNTRY_QUERY, {
+	const [isOk, error, countryData] = await countriesFetchClient.query(COUNTRY_QUERY, {
 		variables: {
 			code
 		}
@@ -29,5 +29,5 @@ export async function fetchCountryWithGraphQLFetchClient(code: string): Promise<
 		return;
 	}
 
-	console.log('[graphql] Ok Result', { country: countryResponse.data.country });
+	console.log('[graphql] Ok Result', { country: countryData.country });
 }

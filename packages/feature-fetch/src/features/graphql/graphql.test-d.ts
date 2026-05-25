@@ -107,11 +107,31 @@ describe('graphqlFeature function', () => {
 				}
 			});
 			if (result.isOk()) {
+				expectTypeOf(result.value).toEqualTypeOf<{
+					user: {
+						id: string;
+					};
+				}>();
+			}
+		});
+
+		it('should infer response details when requested', async () => {
+			const client = createGraphQLFetchClient();
+
+			const result = await client.query(documentWithRequiredVariables, {
+				variables: {
+					id: 'user-1'
+				},
+				withResponse: true
+			});
+			if (result.isOk()) {
 				expectTypeOf(result.value.data).toEqualTypeOf<{
 					user: {
 						id: string;
 					};
 				}>();
+				expectTypeOf(result.value.extensions).toEqualTypeOf<Record<string, unknown> | undefined>();
+				expectTypeOf(result.value.response).toEqualTypeOf<Response>();
 			}
 		});
 

@@ -97,6 +97,30 @@ describe('openApiFeature function', () => {
 			);
 		});
 
+		it('should include response details when requested', async () => {
+			// Prepare
+			const responseBody = { id: 10, name: 'Jeff', photoUrls: [] };
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return Response.json(responseBody);
+			});
+			const client = createOpenApiFetchClient<paths>({
+				fetch: fetchLike
+			});
+
+			// Act
+			const result = await client.get('/pet/{petId}', {
+				pathParams: {
+					petId: 10
+				},
+				withResponse: true
+			});
+			const value = result.unwrap();
+
+			// Assert
+			expect(value.data).toEqual(responseBody);
+			expect(value.response).toBeInstanceOf(Response);
+		});
+
 		it('should merge OpenAPI header params with transport headers', async () => {
 			// Prepare
 			const fetchLike = vi.fn<TFetchLike>(async () => {

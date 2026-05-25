@@ -28,7 +28,7 @@ describe('graphqlFeature function', () => {
 			);
 
 			// Assert
-			expect(result.unwrap().data).toEqual({
+			expect(result.unwrap()).toEqual({
 				user: {
 					id: 'user-1'
 				}
@@ -70,10 +70,9 @@ describe('graphqlFeature function', () => {
 					id: 'user-1'
 				}
 			});
-			const value = result.unwrap();
 
 			// Assert
-			expect(value.data).toEqual({
+			expect(result.unwrap()).toEqual({
 				user: {
 					id: 'user-1'
 				}
@@ -120,6 +119,37 @@ describe('graphqlFeature function', () => {
 				query: 'query Viewer { viewer { id } }'
 			});
 		});
+
+		it('should include extensions and response when requested', async () => {
+			// Prepare
+			const { client } = createTestGraphQLClient({
+				data: {
+					user: {
+						id: 'user-1'
+					}
+				},
+				extensions: {
+					traceId: 'trace-1'
+				}
+			});
+
+			// Act
+			const result = await client.query<{ user: { id: string } }>('query GetUser { user { id } }', {
+				withResponse: true
+			});
+			const value = result.unwrap();
+
+			// Assert
+			expect(value.data).toEqual({
+				user: {
+					id: 'user-1'
+				}
+			});
+			expect(value.extensions).toEqual({
+				traceId: 'trace-1'
+			});
+			expect(value.response).toBeInstanceOf(Response);
+		});
 	});
 
 	describe('mutate method', () => {
@@ -144,7 +174,7 @@ describe('graphqlFeature function', () => {
 			);
 
 			// Assert
-			expect(result.unwrap().data).toEqual({
+			expect(result.unwrap()).toEqual({
 				updateUser: {
 					id: 'user-1'
 				}
