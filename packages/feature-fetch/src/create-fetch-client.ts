@@ -88,8 +88,9 @@ export function createFetchClient(options: TCreateFetchClientOptions = {}): TFet
 				parseAs = 'json',
 				body,
 				bodySerializer = this._config.bodySerializer,
-				meta,
+				meta = {},
 				requestInit: requestInitOverrides = {},
+				signal,
 				pathParams = {},
 				pathSerializer = this._config.pathSerializer,
 				baseUrl = this._config.baseUrl,
@@ -110,7 +111,8 @@ export function createFetchClient(options: TCreateFetchClientOptions = {}): TFet
 				queryParams: { ...queryParams },
 				requestInit: {
 					...this._config.requestInit,
-					...requestInitOverrides
+					...requestInitOverrides,
+					...(signal !== undefined ? { signal } : {})
 				}
 			};
 
@@ -235,12 +237,12 @@ export interface TCreateFetchClientOptions {
 	pathSerializer?: TPathSerializer;
 	/** Default query param serializer. */
 	querySerializer?: TQuerySerializer;
-	/** Hooks that can mutate request data before URL/body creation. */
+	/** Hooks for structured request changes before URL/body creation, such as auth, params, body, or metadata. */
 	prepareRequest?: TPrepareRequestHook[];
-	/** Hooks that can inspect or replace the response before parsing/error mapping. */
-	prepareResponse?: TPrepareResponseHook[];
-	/** Middleware applied around fetch for every request. */
+	/** Fetch wrappers for transport concerns such as retries, caching, tracing, or timing. */
 	middleware?: TFetchMiddleware[];
+	/** Hooks that can inspect or replace the raw response before parsing and HTTP error mapping. */
+	prepareResponse?: TPrepareResponseHook[];
 	/** Fetch implementation. Defaults to `globalThis.fetch`. */
 	fetch?: TFetchLike;
 }

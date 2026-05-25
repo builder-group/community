@@ -130,6 +130,54 @@ describe('createFetchClient function', () => {
 				})
 			);
 		});
+
+		it('should omit body headers when no body is provided', async () => {
+			// Prepare
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return Response.json({ ok: true });
+			});
+			const client = createFetchClient({ fetch: fetchLike });
+
+			// Act
+			await client.request('GET', '/items');
+
+			// Assert
+			expect(fetchLike).toHaveBeenCalledWith(
+				'/items',
+				expect.objectContaining({
+					body: undefined,
+					headers: {}
+				})
+			);
+		});
+
+		it('should use top-level abort signal over request init signal', async () => {
+			// Prepare
+			const defaultController = new AbortController();
+			const requestController = new AbortController();
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return Response.json({ ok: true });
+			});
+			const client = createFetchClient({
+				fetch: fetchLike,
+				requestInit: {
+					signal: defaultController.signal
+				}
+			});
+
+			// Act
+			await client.request('GET', '/items', {
+				signal: requestController.signal
+			});
+
+			// Assert
+			expect(fetchLike).toHaveBeenCalledWith(
+				'/items',
+				expect.objectContaining({
+					signal: requestController.signal
+				})
+			);
+		});
 	});
 
 	describe('lifecycle hooks', () => {
@@ -204,6 +252,42 @@ describe('createFetchClient function', () => {
 			// Assert
 			expect(result.unwrap()).toEqual({ status: 'prepared' });
 			expect(prepareResponse).toHaveBeenCalledOnce();
+		});
+
+		it('should keep mutable metadata scoped to prepare hooks', async () => {
+			// Prepare
+			const fetchLike = vi.fn<TFetchLike>(async () => {
+				return Response.json({ ok: true });
+			});
+			const prepareRequest = vi.fn((cx) => {
+				cx.meta.requestId = 'request-1';
+				cx.meta.stage = 'prepared';
+			});
+			const prepareResponse = vi.fn((cx) => {
+				expect(cx.request.meta).toEqual({
+					requestId: 'request-1',
+					stage: 'prepared'
+				});
+			});
+			const client = createFetchClient({
+				fetch: fetchLike,
+				prepareRequest: [prepareRequest],
+				prepareResponse: [prepareResponse]
+			});
+
+			// Act
+			const result = await client.request('GET', '/items');
+
+			// Assert
+			expect(result.isOk()).toBe(true);
+			expect(prepareRequest).toHaveBeenCalledOnce();
+			expect(prepareResponse).toHaveBeenCalledOnce();
+			expect(fetchLike).toHaveBeenCalledWith(
+				'/items',
+				expect.not.objectContaining({
+					meta: expect.anything()
+				})
+			);
 		});
 	});
 

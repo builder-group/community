@@ -32,8 +32,8 @@ export interface TFetchClientConfig {
 	requestInit: TFetchRequestInit;
 	headers: TResolvedFetchHeaders;
 	prepareRequest: TPrepareRequestHook[];
-	prepareResponse: TPrepareResponseHook[];
 	middleware: TFetchMiddleware[];
+	prepareResponse: TPrepareResponseHook[];
 }
 
 export type TPrepareRequestHook = (cx: TPrepareRequestContext) => void | Promise<void>;
@@ -44,8 +44,8 @@ export interface TPrepareRequestContext {
 	method: TRequestMethod;
 	/** Base URL used by `buildUrl()`. */
 	baseUrl: string;
-	/** Request metadata forwarded from options. */
-	meta: unknown;
+	/** Request-scoped metadata available to prepare hooks and feature wrappers. */
+	meta: TFetchRequestMeta;
 	/** Normalized mutable headers. Header names are lowercased. */
 	headers: TResolvedFetchHeaders;
 	/** Request body before serialization. */
@@ -60,6 +60,11 @@ export interface TPrepareRequestContext {
 	requestInit: TFetchRequestInit;
 }
 
+/** Open request metadata bag used by hooks and features. Extend this interface for app-specific hints. */
+export interface TFetchRequestMeta {
+	[key: string]: unknown;
+}
+
 export type TPrepareResponseHook = (cx: TPrepareResponseContext) => void | Promise<void>;
 
 /**
@@ -68,11 +73,14 @@ export type TPrepareResponseHook = (cx: TPrepareResponseContext) => void | Promi
  */
 export interface TPrepareResponseContext {
 	response: Response;
-	request: Omit<TPrepareRequestContext, 'requestInit'> & {
-		url: string;
-		requestInit: TRequestInitWithResolvedHeaders;
-	};
+	request: TPreparedRequest;
 }
+
+/** Finalized request snapshot passed to `prepareResponse` hooks. Headers and `requestInit` are fully resolved. */
+export type TPreparedRequest = Omit<TPrepareRequestContext, 'requestInit'> & {
+	url: string;
+	requestInit: TRequestInitWithResolvedHeaders;
+};
 
 export type TRequestInitWithResolvedHeaders = Omit<RequestInit, 'headers'> & {
 	headers: TResolvedFetchHeaders;
@@ -142,10 +150,12 @@ export interface TFetchOptions<GParseAs extends TParseAs = TParseAs> {
 	headers?: TFetchHeadersInit;
 	/** Base URL override for this request. Absolute request paths ignore the base URL. */
 	baseUrl?: string;
-	/** Native fetch init options except `body`, `method`, and `headers`, which are owned by this client. */
+	/** Native fetch init options except `body`, `method`, and `headers`. Use top-level `signal` for cancellation. */
 	requestInit?: TFetchRequestInit;
-	/** Arbitrary data forwarded to prepare hooks. */
-	meta?: unknown;
+	/** Abort signal for this request. Overrides `requestInit.signal` when not `undefined`; use `null` to clear it. */
+	signal?: AbortSignal | null;
+	/** Request-scoped metadata available to prepare hooks and feature wrappers. */
+	meta?: TFetchRequestMeta;
 	/** Request-scoped middleware appended after client middleware. */
 	middleware?: TFetchMiddleware[];
 	/** Values used by the active path serializer. */
