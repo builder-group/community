@@ -17,8 +17,6 @@
     </a>
 </p>
 
-> Status: Experimental
-
 `feature-fetch` is a typed fetch client where every request returns `[isOk, err, value]` instead of throwing. Start with a REST or OpenAPI client, then add retry, cache, GraphQL, or custom behavior with `.with()`.
 
 - Every request returns `[isOk, err, value]`: no try/catch, no unhandled rejections

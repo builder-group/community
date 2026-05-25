@@ -1,0 +1,20 @@
+{
+	"name": "feature-fetch-vanilla-basic",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "tsc && vite build",
+		"dev": "vite",
+		"openapi:generate": "openapi-typescript ./resources/openapi/open-meteo-v1.yaml -o ./src/openapi/gen/open-meteo-v1.ts",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"feature-fetch": "workspace:*"
+	},
+	"devDependencies": {
+		"openapi-typescript": "^7.10.1",
+		"typescript": "~6.0.2",
+		"vite": "^8.0.12"
+	}
+}
