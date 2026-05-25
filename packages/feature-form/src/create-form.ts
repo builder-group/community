@@ -1,8 +1,7 @@
 import { createFeatureHost } from 'feature-core';
 import { createState, isEqualFeature } from 'feature-state';
-import { createFormField, formFieldResetSourceKey, isFormField } from './form-field';
-import { deepCopy } from './lib';
-import { validateStandardSchema } from './standard-schema';
+import { createFormField, formFieldResetSourceKey, isFormField } from './create-form-field';
+import { areValidationStatusesEqual, deepCopy, validateStandardSchema } from './lib';
 import {
 	type TForm,
 	type TFormBase,
@@ -22,7 +21,6 @@ import {
 	type TValidationError,
 	type TValidationStatusValue
 } from './types';
-import { areValidationStatusesEqual } from './validation-status';
 
 /**
  * Creates a reactive form.

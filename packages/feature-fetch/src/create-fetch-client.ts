@@ -1,155 +1,338 @@
+import { createFeatureHost } from 'feature-core';
 import { Err, Ok } from 'tuple-result';
-import { FetchError } from './exceptions';
 import {
-	buildUrl,
-	FetchHeaders,
+	FetchError,
 	mapErrorToFetchError,
 	mapErrorToNetworkError,
-	mapResponseToRequestError,
+	mapResponseToHttpError
+} from './errors';
+import {
+	buildUrl,
+	deleteHeader,
+	getHeader,
+	hasHeader,
+	mergeHeaders,
+	normalizeHeaders,
 	serializeBody,
 	serializePathParams,
-	serializeQueryParams
-} from './helper';
+	serializeQueryParams,
+	setHeader
+} from './lib';
+import { isFormData, isNativeBody } from './lib/native-body';
 import type {
+	TBodySerializer,
 	TFetchClient,
-	TFetchClientConfig,
-	TFetchClientOptions,
+	TFetchClientBase,
+	TFetchHeadersInit,
 	TFetchLike,
-	TSerializedBody
+	TFetchMiddleware,
+	TFetchOptionsWithBody,
+	TFetchRequestInit,
+	TFetchRequestResponse,
+	TParseAs,
+	TParseAsResponse,
+	TPathSerializer,
+	TPrepareRequestContext,
+	TPrepareRequestHook,
+	TPrepareResponseContext,
+	TPrepareResponseHook,
+	TQuerySerializer,
+	TRequestInitWithResolvedHeaders,
+	TRequestMethod,
+	TResolvedFetchHeaders,
+	TSerializedBody,
+	TUnserializedBody
 } from './types';
-import { type TRequestInitWithHeadersObject } from './types/fetch';
 
-export function createFetchClient(options: TFetchClientOptions = {}): TFetchClient<[]> {
-	const config: TFetchClientConfig = {
-		prefixUrl: options.prefixUrl ?? '',
-		fetchProps: options.fetchProps ?? {},
-		headers: options.headers != null ? new FetchHeaders(options.headers) : new FetchHeaders(),
-		bodySerializer: options.bodySerializer ?? serializeBody,
-		pathSerializer: options.pathSerializer ?? serializePathParams,
-		querySerializer:
-			options.querySerializer ?? ((queryParams) => serializeQueryParams(queryParams)),
-		beforeRequestMiddlewares: options.beforeRequestMiddlewares ?? [],
-		requestMiddlewares: options.requestMiddlewares ?? []
-	};
-	let fetchLike: TFetchLike;
-	if (typeof options.fetch === 'function') {
-		fetchLike = options.fetch;
-	} else if (typeof fetch === 'function') {
-		fetchLike = fetch;
-	} else {
-		throw new FetchError('#ERR_MISSING_FETCH', {
-			description: "Failed to find valid 'fetch' function to wrap around!"
-		});
-	}
+/**
+ * Creates a feature host around fetch.
+ */
+export function createFetchClient(options: TCreateFetchClientOptions = {}): TFetchClient<[]> {
+	const {
+		baseUrl = '',
+		requestInit = {},
+		headers,
+		bodySerializer = serializeBody,
+		pathSerializer = serializePathParams,
+		querySerializer = serializeQueryParams,
+		prepareRequest = [],
+		prepareResponse = [],
+		middleware = [],
+		fetch
+	} = options;
 
-	// Apply default headers
-	if (!config.headers.has('Content-Type')) {
-		config.headers.set('Content-Type', 'application/json; charset=utf-8');
-	}
-
-	return {
-		_features: [],
-		_fetchLike: fetchLike,
-		_config: config,
-		async _baseFetch(this: TFetchClient<[]>, path, method, baseFetchOptions = {}) {
+	return createFeatureHost<TFetchClientBase>({
+		_config: {
+			baseUrl,
+			requestInit,
+			headers: normalizeHeaders(headers),
+			bodySerializer,
+			pathSerializer,
+			querySerializer,
+			prepareRequest,
+			middleware,
+			prepareResponse
+		},
+		_fetchLike: resolveFetchLike(fetch),
+		async request<
+			GSuccessResponseBody = unknown,
+			GErrorResponseBody = unknown,
+			GParseAs extends TParseAs = 'json'
+		>(
+			this: TFetchClientBase,
+			method: TRequestMethod,
+			path: string,
+			requestOptions: TFetchOptionsWithBody<TUnserializedBody, GParseAs> = {}
+		): Promise<TFetchRequestResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>> {
 			const {
 				parseAs = 'json',
-				pathSerializer = this._config.pathSerializer,
-				querySerializer = this._config.querySerializer,
+				body,
 				bodySerializer = this._config.bodySerializer,
-				body = undefined,
-				prefixUrl = this._config.prefixUrl,
-				fetchProps = {},
-				middlewareProps,
-				requestMiddlewares = [],
+				meta = {},
+				requestInit: requestInitOverrides = {},
+				signal,
 				pathParams = {},
-				queryParams = {}
-			} = baseFetchOptions;
-			const headers = new FetchHeaders(baseFetchOptions.headers);
-			const mergedHeaders = FetchHeaders.merge(headers, this._config.headers);
+				pathSerializer = this._config.pathSerializer,
+				baseUrl = this._config.baseUrl,
+				queryParams = {},
+				querySerializer = this._config.querySerializer,
+				middleware: requestMiddleware = []
+			} = requestOptions;
 
-			// Serialize body
-			let serializedBody: TSerializedBody;
-			if (body != null) {
-				try {
-					serializedBody = bodySerializer(body, mergedHeaders.get('Content-Type') ?? undefined);
-				} catch (error) {
-					return Err(mapErrorToFetchError(error, '#ERR_SERIALIZE_BODY'));
-				}
-			}
-
-			// Remove `Content-Type` if body is FormData.
-			// Browser will correctly set Content-Type & boundary expression.
-			if (typeof FormData !== 'undefined' && serializedBody instanceof FormData) {
-				mergedHeaders.delete('Content-Type');
-			}
-
-			// Build request init object
-			const requestInit: TRequestInitWithHeadersObject = {
-				redirect: 'follow',
-				...this._config.fetchProps,
-				...fetchProps,
+			const cx: TPrepareRequestContext = {
+				baseUrl,
+				body,
+				meta,
+				headers: mergeHeaders(this._config.headers, requestOptions.headers),
 				method,
-				headers: mergedHeaders.toHeadersInit(),
+				path,
+				pathParams: { ...pathParams },
+				queryParams: { ...queryParams },
+				requestInit: {
+					...this._config.requestInit,
+					...requestInitOverrides,
+					...(signal !== undefined ? { signal } : {})
+				}
+			};
+
+			try {
+				for (const prepareRequest of this._config.prepareRequest) {
+					await prepareRequest(cx);
+				}
+			} catch (error) {
+				return Err(
+					mapErrorToFetchError(error, '#ERR_PREPARE_REQUEST', 'Failed to prepare request')
+				);
+			}
+
+			let serializedBody: TSerializedBody;
+			try {
+				serializedBody = prepareRequestBody(cx.body, bodySerializer, cx.headers);
+			} catch (error) {
+				return Err(
+					mapErrorToFetchError(error, '#ERR_SERIALIZE_BODY', 'Failed to serialize request body')
+				);
+			}
+
+			let url: string;
+			try {
+				url = buildUrl(cx.baseUrl, {
+					path: cx.path,
+					pathParams: cx.pathParams,
+					pathSerializer,
+					queryParams: cx.queryParams,
+					querySerializer
+				});
+			} catch (error) {
+				return Err(mapErrorToFetchError(error, '#ERR_BUILD_URL', 'Failed to build request URL'));
+			}
+
+			const requestMethod = cx.method.toUpperCase();
+			const requestInit: TRequestInitWithResolvedHeaders = {
+				redirect: 'follow',
+				...cx.requestInit,
+				method: requestMethod,
+				headers: cx.headers,
 				body: serializedBody
 			};
 
-			// Process before request middlewares
+			let fetchLike: TFetchLike;
 			try {
-				for (const middleware of this._config.beforeRequestMiddlewares) {
-					await middleware({
-						path,
-						props: middlewareProps,
-						requestInit,
-						queryParams,
-						pathParams
-					});
+				const hasMiddleware = this._config.middleware.length > 0 || requestMiddleware.length > 0;
+				if (hasMiddleware) {
+					fetchLike = this._config.middleware
+						.concat(requestMiddleware)
+						.reduceRight((next, fetchMiddleware) => fetchMiddleware(next), this._fetchLike);
+				} else {
+					fetchLike = this._fetchLike;
 				}
 			} catch (error) {
-				return Err(mapErrorToFetchError(error, '#ERR_MIDDLEWARE'));
+				return Err(
+					mapErrorToFetchError(error, '#ERR_FETCH_MIDDLEWARE', 'Failed to compose fetch middleware')
+				);
 			}
 
-			// Build final Url
-			const finalUrl = buildUrl(prefixUrl, {
-				path,
-				pathParams,
-				queryParams,
-				pathSerializer,
-				querySerializer
-			});
-
-			// Process request middlewares
-			const baseFetch = this._config.requestMiddlewares
-				.concat(requestMiddlewares)
-				.reduceRight((acc, middleware) => middleware(acc), this._fetchLike);
-
-			// Send request
 			let response: Response;
 			try {
-				response = await baseFetch(finalUrl, requestInit as unknown as RequestInit);
+				response = await fetchLike(url, requestInit);
 			} catch (error) {
+				if (error instanceof FetchError) {
+					return Err(error);
+				}
 				return Err(mapErrorToNetworkError(error));
 			}
 
-			// Handle ok response (parse as "parseAs" and falling back to .text() when necessary)
-			if (response.ok) {
-				let data: any = response.body;
-				if (parseAs !== 'stream') {
-					try {
-						data = await response[parseAs]();
-					} catch (error) {
-						return Err(
-							new FetchError('#ERR_PARSE_RESPONSE_DATA', {
-								description: `Failed to parse response as '${parseAs}'`
-							})
-						);
+			if (this._config.prepareResponse.length > 0) {
+				const responseCx: TPrepareResponseContext = {
+					request: {
+						...cx,
+						method: requestMethod,
+						requestInit,
+						url
+					},
+					response
+				};
+
+				try {
+					for (const prepareResponse of this._config.prepareResponse) {
+						await prepareResponse(responseCx);
 					}
+					response = responseCx.response;
+				} catch (error) {
+					return Err(
+						mapErrorToFetchError(error, '#ERR_PREPARE_RESPONSE', 'Failed to prepare response')
+					);
 				}
-				return Ok({ data, response });
 			}
 
-			// Handle errors (always parse as .json() or .text())
-			return Err(await mapResponseToRequestError(response));
+			if (response.ok) {
+				try {
+					const data = await parseResponseData<GSuccessResponseBody, GParseAs>(
+						response,
+						requestMethod,
+						parseAs as GParseAs
+					);
+					return Ok({ data, response });
+				} catch (error) {
+					return Err(mapErrorToFetchError(error, '#ERR_PARSE_RESPONSE_DATA'));
+				}
+			}
+
+			return Err(await mapResponseToHttpError(response));
 		}
+	});
+}
+
+export interface TCreateFetchClientOptions {
+	/** Base URL prepended to relative request paths. */
+	baseUrl?: string;
+	/** Native fetch init defaults except `body`, `method`, and `headers`. */
+	requestInit?: TFetchRequestInit;
+	/** Headers applied to every request. */
+	headers?: TFetchHeadersInit;
+	/** Default body serializer. */
+	bodySerializer?: TBodySerializer;
+	/** Default path param serializer. */
+	pathSerializer?: TPathSerializer;
+	/** Default query param serializer. */
+	querySerializer?: TQuerySerializer;
+	/** Hooks for structured request changes before URL/body creation, such as auth, params, body, or metadata. */
+	prepareRequest?: TPrepareRequestHook[];
+	/** Fetch wrappers for transport concerns such as retries, caching, tracing, or timing. */
+	middleware?: TFetchMiddleware[];
+	/** Hooks that can inspect or replace the raw response before parsing and HTTP error mapping. */
+	prepareResponse?: TPrepareResponseHook[];
+	/** Fetch implementation. Defaults to `globalThis.fetch`. */
+	fetch?: TFetchLike;
+}
+
+function resolveFetchLike(fetchLike?: TFetchLike): TFetchLike {
+	if (typeof fetchLike === 'function') {
+		return fetchLike;
+	}
+	if (typeof globalThis.fetch === 'function') {
+		return globalThis.fetch.bind(globalThis) as TFetchLike;
+	}
+
+	return async () => {
+		throw new FetchError('#ERR_MISSING_FETCH', {
+			message: "Failed to find a valid 'fetch' function"
+		});
 	};
+}
+
+function prepareRequestBody(
+	body: TUnserializedBody | undefined,
+	bodySerializer: TBodySerializer,
+	headers: TResolvedFetchHeaders
+): TSerializedBody | undefined {
+	if (body === undefined) {
+		return undefined;
+	}
+
+	if (!isNativeBody(body) && !hasHeader(headers, 'Content-Type')) {
+		setHeader(headers, 'Content-Type', 'application/json; charset=utf-8');
+	}
+
+	const serializedBody = bodySerializer(body, getHeader(headers, 'Content-Type') ?? undefined);
+	// Note: Delete Content-Type so fetch can add the required multipart boundary for FormData
+	if (isFormData(serializedBody)) {
+		deleteHeader(headers, 'Content-Type');
+	}
+
+	return serializedBody;
+}
+
+async function parseResponseData<GSuccessResponseBody, GParseAs extends TParseAs>(
+	response: Response,
+	method: TRequestMethod,
+	parseAs: GParseAs
+): Promise<TParseAsResponse<GParseAs, GSuccessResponseBody>> {
+	if (isEmptyResponse(response, method)) {
+		return undefined as TParseAsResponse<GParseAs, GSuccessResponseBody>;
+	}
+	if (parseAs === 'stream') {
+		return response.body as TParseAsResponse<GParseAs, GSuccessResponseBody>;
+	}
+
+	try {
+		switch (parseAs) {
+			case 'arrayBuffer':
+				return (await response.arrayBuffer()) as TParseAsResponse<GParseAs, GSuccessResponseBody>;
+			case 'blob':
+				return (await response.blob()) as TParseAsResponse<GParseAs, GSuccessResponseBody>;
+			case 'json': {
+				// Note: response.json() throws on empty bodies, so parse text only when present
+				const text = await response.text();
+				return (text.length ? JSON.parse(text) : undefined) as TParseAsResponse<
+					GParseAs,
+					GSuccessResponseBody
+				>;
+			}
+			case 'text':
+				return (await response.text()) as TParseAsResponse<GParseAs, GSuccessResponseBody>;
+			default:
+				throw new FetchError('#ERR_PARSE_RESPONSE_DATA', {
+					message: `Unsupported response parser '${parseAs}'`
+				});
+		}
+	} catch (error) {
+		if (error instanceof FetchError) {
+			throw error;
+		}
+		throw new FetchError('#ERR_PARSE_RESPONSE_DATA', {
+			message: `Failed to parse response as '${parseAs}'`,
+			cause: error
+		});
+	}
+}
+
+function isEmptyResponse(response: Response, method: TRequestMethod): boolean {
+	const contentLength = response.headers.get('Content-Length')?.trim();
+	const transferEncoding = response.headers.get('Transfer-Encoding')?.toLowerCase();
+
+	const hasNoContentStatus = response.status === 204 || response.status === 205;
+	const hasNoBodyMethod = method === 'HEAD';
+	const hasExplicitEmptyBody = contentLength === '0' && !transferEncoding?.includes('chunked');
+	return hasNoContentStatus || hasNoBodyMethod || hasExplicitEmptyBody;
 }

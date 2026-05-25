@@ -9,7 +9,7 @@ export function timestampPrefixFeature(
 	return defineFeature<TTimestampPrefixFeature>({
 		key: 'timestamp-prefix',
 		install(logger: TLoggerBase) {
-			logger.middlewares.push(timestampPrefixMiddleware(options));
+			logger._middleware.push(timestampPrefixMiddleware(options));
 
 			return {};
 		}

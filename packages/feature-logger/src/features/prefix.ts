@@ -12,7 +12,7 @@ export function prefixFeature(prefix: string, options: TPrefixFeatureOptions = {
 	return defineFeature<TPrefixFeature>({
 		key: 'prefix',
 		install(logger: TLoggerBase) {
-			logger.middlewares.push(prefixMiddleware(prefix, options));
+			logger._middleware.push(prefixMiddleware(prefix, options));
 
 			return {};
 		}
