@@ -70,8 +70,8 @@ export function createFetchClient(options: TCreateFetchClientOptions = {}): TFet
 			pathSerializer,
 			querySerializer,
 			prepareRequest,
-			prepareResponse,
-			middleware
+			middleware,
+			prepareResponse
 		},
 		_fetchLike: resolveFetchLike(fetch),
 		async request<
