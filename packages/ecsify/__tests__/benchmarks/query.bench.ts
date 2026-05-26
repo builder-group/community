@@ -1,6 +1,6 @@
-import { createSeededRandom } from '@blgc/utils';
 import { bench, describe, expect } from 'vitest';
 import { And, createApp, With, Without } from '../../src';
+import { createSeededRandom } from '../create-seeded-random';
 
 describe('Query Performance', () => {
 	const seed = Math.random() * 1000000;

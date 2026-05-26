@@ -1,4 +1,3 @@
-import { withNew } from '@blgc/utils';
 import { TComponentRef } from '../../component';
 import { TEntityId } from '../../entity';
 import { categorizeEvaluationStrategy } from '../categorize-evaluation-strategy';
@@ -46,171 +45,166 @@ export function createRetainedQuery(
 		resetBehavior = 'reset'
 	} = options;
 
-	const query: TRetainedQuery = withNew<TRetainedQuery, [TQueryData['filter']]>(
-		{
-			...createQuery(queryRegistry, filter, { evaluationStrategy, key, register: false }),
-			_addedMasks: [[]],
-			_changedMasks: [[]],
-			_removedMasks: [[]],
-			_resetBehavior: resetBehavior,
-			_trackedComponents: [],
+	const query: TRetainedQuery = {
+		...createQuery(queryRegistry, filter, { evaluationStrategy, key, register: false }),
+		_addedMasks: [[]],
+		_changedMasks: [[]],
+		_removedMasks: [[]],
+		_resetBehavior: resetBehavior,
+		_trackedComponents: [],
 
-			_new(filter) {
-				this._registerComponentFilters(filter);
-				this._syncFromRegistry();
-			},
+		// TODO: Improve swapping component registry masks feels dirty
+		execute() {
+			// Temporarily swap component registry masks with our retained masks
+			const originalAdded = this._componentRegistry._addedMasks;
+			const originalChanged = this._componentRegistry._changedMasks;
+			const originalRemoved = this._componentRegistry._removedMasks;
 
-			// TODO: Improve swapping component registry masks feels dirty
-			execute() {
-				// Temporarily swap component registry masks with our retained masks
-				const originalAdded = this._componentRegistry._addedMasks;
-				const originalChanged = this._componentRegistry._changedMasks;
-				const originalRemoved = this._componentRegistry._removedMasks;
+			this._componentRegistry._addedMasks = this._addedMasks;
+			this._componentRegistry._changedMasks = this._changedMasks;
+			this._componentRegistry._removedMasks = this._removedMasks;
 
-				this._componentRegistry._addedMasks = this._addedMasks;
-				this._componentRegistry._changedMasks = this._changedMasks;
-				this._componentRegistry._removedMasks = this._removedMasks;
+			// Find matching entities
+			const matchingEntities: TEntityId[] = [];
+			for (let i = 0; i < this._entityIndex._aliveCount; i++) {
+				const eid = this._entityIndex._dense[i];
+				if (eid != null && this.filter.evaluate(this, eid)) {
+					matchingEntities.push(eid);
+				}
+			}
 
-				// Find matching entities
-				const matchingEntities: TEntityId[] = [];
-				for (let i = 0; i < this._entityIndex._aliveCount; i++) {
-					const eid = this._entityIndex._dense[i];
-					if (eid != null && this.filter.evaluate(this, eid)) {
-						matchingEntities.push(eid);
-					}
+			// Restore original masks
+			this._componentRegistry._addedMasks = originalAdded;
+			this._componentRegistry._changedMasks = originalChanged;
+			this._componentRegistry._removedMasks = originalRemoved;
+
+			// Reset state
+			switch (this._resetBehavior) {
+				case 'reset':
+					this.reset();
+					break;
+				case 'sync':
+					this.resetAndSync();
+					break;
+			}
+
+			return matchingEntities;
+		},
+
+		_registerComponentFilters(filter) {
+			switch (filter.type) {
+				case 'Added': {
+					this._trackedComponents.push({ component: filter.component, changeType: 'added' });
+					this._componentRegistry.onAdd(filter.component, (eid) => {
+						this._accumulateChange(eid, filter.component, 'added');
+					});
+					break;
 				}
 
-				// Restore original masks
-				this._componentRegistry._addedMasks = originalAdded;
-				this._componentRegistry._changedMasks = originalChanged;
-				this._componentRegistry._removedMasks = originalRemoved;
-
-				// Reset state
-				switch (this._resetBehavior) {
-					case 'reset':
-						this.reset();
-						break;
-					case 'sync':
-						this.resetAndSync();
-						break;
+				case 'Changed': {
+					this._trackedComponents.push({ component: filter.component, changeType: 'changed' });
+					this._componentRegistry.onChange(filter.component, (eid) => {
+						this._accumulateChange(eid, filter.component, 'changed');
+					});
+					break;
 				}
 
-				return matchingEntities;
-			},
-
-			_registerComponentFilters(filter) {
-				switch (filter.type) {
-					case 'Added': {
-						this._trackedComponents.push({ component: filter.component, changeType: 'added' });
-						this._componentRegistry.onAdd(filter.component, (eid) => {
-							this._accumulateChange(eid, filter.component, 'added');
-						});
-						break;
-					}
-
-					case 'Changed': {
-						this._trackedComponents.push({ component: filter.component, changeType: 'changed' });
-						this._componentRegistry.onChange(filter.component, (eid) => {
-							this._accumulateChange(eid, filter.component, 'changed');
-						});
-						break;
-					}
-
-					case 'Removed': {
-						this._trackedComponents.push({ component: filter.component, changeType: 'removed' });
-						this._componentRegistry.onRemove(filter.component, (eid) => {
-							this._accumulateChange(eid, filter.component, 'removed');
-						});
-						break;
-					}
-
-					case 'And':
-					case 'Or': {
-						for (const childFilter of filter.filters) {
-							this._registerComponentFilters(childFilter);
-						}
-						break;
-					}
-
-					default:
-					// do nothing
+				case 'Removed': {
+					this._trackedComponents.push({ component: filter.component, changeType: 'removed' });
+					this._componentRegistry.onRemove(filter.component, (eid) => {
+						this._accumulateChange(eid, filter.component, 'removed');
+					});
+					break;
 				}
-			},
 
-			_accumulateChange(eid, component, changeType) {
+				case 'And':
+				case 'Or': {
+					for (const childFilter of filter.filters) {
+						this._registerComponentFilters(childFilter);
+					}
+					break;
+				}
+
+				default:
+				// do nothing
+			}
+		},
+
+		_accumulateChange(eid, component, changeType) {
+			const componentData = this._componentRegistry._componentMap.get(component);
+			if (componentData == null) {
+				return;
+			}
+
+			const { generationId, bitflag } = componentData;
+
+			const targetMasks =
+				changeType === 'added'
+					? this._addedMasks
+					: changeType === 'changed'
+						? this._changedMasks
+						: this._removedMasks;
+
+			// Ensure mask arrays exist for this generation
+			while (targetMasks.length <= generationId) {
+				targetMasks.push([]);
+			}
+
+			// Accumulate the bit for this entity/component
+			const currentMask = targetMasks[generationId]?.[eid] ?? 0;
+			const targetGenMask = targetMasks[generationId];
+			if (targetGenMask != null) {
+				targetGenMask[eid] = currentMask | bitflag;
+			}
+		},
+
+		_syncFromRegistry() {
+			for (const { component, changeType } of this._trackedComponents) {
 				const componentData = this._componentRegistry._componentMap.get(component);
 				if (componentData == null) {
-					return;
+					continue;
 				}
 
 				const { generationId, bitflag } = componentData;
-
-				const targetMasks =
+				const sourceMasks =
 					changeType === 'added'
-						? this._addedMasks
+						? this._componentRegistry._addedMasks
 						: changeType === 'changed'
-							? this._changedMasks
-							: this._removedMasks;
+							? this._componentRegistry._changedMasks
+							: this._componentRegistry._removedMasks;
 
-				// Ensure mask arrays exist for this generation
-				while (targetMasks.length <= generationId) {
-					targetMasks.push([]);
+				const sourceGenMasks = sourceMasks[generationId];
+				if (sourceGenMasks == null) {
+					continue;
 				}
 
-				// Accumulate the bit for this entity/component
-				const currentMask = targetMasks[generationId]?.[eid] ?? 0;
-				const targetGenMask = targetMasks[generationId];
-				if (targetGenMask != null) {
-					targetGenMask[eid] = currentMask | bitflag;
-				}
-			},
-
-			_syncFromRegistry() {
-				for (const { component, changeType } of this._trackedComponents) {
-					const componentData = this._componentRegistry._componentMap.get(component);
-					if (componentData == null) {
-						continue;
-					}
-
-					const { generationId, bitflag } = componentData;
-					const sourceMasks =
-						changeType === 'added'
-							? this._componentRegistry._addedMasks
-							: changeType === 'changed'
-								? this._componentRegistry._changedMasks
-								: this._componentRegistry._removedMasks;
-
-					const sourceGenMasks = sourceMasks[generationId];
-					if (sourceGenMasks == null) {
-						continue;
-					}
-
-					// Copy existing state for this component
-					for (let eid = 0; eid < sourceGenMasks.length; eid++) {
-						const mask = sourceGenMasks[eid];
-						if (mask != null && (mask & bitflag) !== 0) {
-							this._accumulateChange(eid, component, changeType);
-						}
+				// Copy existing state for this component
+				for (let eid = 0; eid < sourceGenMasks.length; eid++) {
+					const mask = sourceGenMasks[eid];
+					if (mask != null && (mask & bitflag) !== 0) {
+						this._accumulateChange(eid, component, changeType);
 					}
 				}
-			},
-
-			reset() {
-				this._addedMasks.length = 0;
-				this._addedMasks.push([]);
-				this._changedMasks.length = 0;
-				this._changedMasks.push([]);
-				this._removedMasks.length = 0;
-				this._removedMasks.push([]);
-			},
-
-			resetAndSync() {
-				this.reset();
-				this._syncFromRegistry();
 			}
 		},
-		filter
-	);
+
+		reset() {
+			this._addedMasks.length = 0;
+			this._addedMasks.push([]);
+			this._changedMasks.length = 0;
+			this._changedMasks.push([]);
+			this._removedMasks.length = 0;
+			this._removedMasks.push([]);
+		},
+
+		resetAndSync() {
+			this.reset();
+			this._syncFromRegistry();
+		}
+	};
+
+	query._registerComponentFilters(filter);
+	query._syncFromRegistry();
 
 	// Register query if requested
 	if (register) {

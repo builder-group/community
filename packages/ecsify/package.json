@@ -34,9 +34,6 @@
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest"
 	},
-	"dependencies": {
-		"@blgc/utils": "workspace:*"
-	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@lastolivegames/becsy": "^0.15.5",

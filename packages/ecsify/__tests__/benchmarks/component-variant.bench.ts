@@ -1,6 +1,6 @@
-import { createSeededRandom } from '@blgc/utils';
 import { bench, describe, expect } from 'vitest';
 import { createApp, With } from '../../src';
+import { createSeededRandom } from '../create-seeded-random';
 
 describe('Component Variants Performance', () => {
 	const seed = Math.random() * 1000000;

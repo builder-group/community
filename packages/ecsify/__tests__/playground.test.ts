@@ -1,6 +1,6 @@
-import { createSeededRandom } from '@blgc/utils';
 import { describe, expect, it } from 'vitest';
 import { createApp, With } from '../src';
+import { createSeededRandom } from './create-seeded-random';
 
 describe('playground', () => {
 	it('should pass', () => {
