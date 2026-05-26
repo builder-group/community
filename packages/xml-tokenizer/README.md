@@ -17,10 +17,10 @@
     </a>
 </p>
 
-`xml-tokenizer` is a streaming XML, HTML, and SVG tokenizer for TypeScript. It emits typed tokens through a callback, supports early exit when you have the data you need, and includes small helpers for path selection and object conversion when a full DOM would be unnecessary.
+`xml-tokenizer` is a callback-based XML, HTML, and SVG tokenizer for TypeScript. It emits typed tokens, supports early exit when you have the data you need, and includes small helpers for path selection and object conversion when a full DOM would be unnecessary.
 
-- Stream `ElementStart`, `Attribute`, `Text`, `Cdata`, and other tokens without building a tree first
-- Pick strict XML, HTML, or SVG parsing behavior with `xmlConfig`, `htmlConfig`, and `svgConfig`
+- Emit `ElementStart`, `Attribute`, `Text`, `Cdata`, and other tokens without building a tree first
+- Pick XML document mode, HTML, or SVG parsing behavior with `xmlConfig`, `htmlConfig`, and `svgConfig`
 - Stop parsing from inside the callback with `stream.goToEnd()`
 - Select matching token ranges with object-based path selectors
 - Convert markup into nested or simplified objects when a tree shape is more convenient
@@ -39,8 +39,11 @@ tokenize(
     }
 
     if (insideTitle && token.type === 'Text') {
-      title = token.text.trim();
-      stream.goToEnd();
+      const text = token.text.trim();
+      if (text !== '') {
+        title = text;
+        stream.goToEnd();
+      }
     }
   },
   htmlConfig
@@ -113,10 +116,33 @@ select(
 Use the object helpers when you want a small tree representation:
 
 ```ts
-import { xmlToObject, xmlToSimplifiedObject } from 'xml-tokenizer';
+import { htmlToMarkdown, xmlToObject, xmlToSimplifiedObject } from 'xml-tokenizer';
 
 const tree = xmlToObject('<book id="1"><title>Dune</title></book>');
 const simplified = xmlToSimplifiedObject('<book id="1"><title>Dune</title></book>');
+```
+
+`tree` contains nested nodes:
+
+```ts
+const tree = {
+  local: 'book',
+  attributes: [{ local: 'id', value: '1' }],
+  content: [{ local: 'title', attributes: [], content: ['Dune'] }]
+};
+```
+
+`simplified` stores element names under underscored keys:
+
+```ts
+const simplified = {
+  _book: [
+    {
+      attributes: { id: '1' },
+      _title: [{ text: 'Dune' }]
+    }
+  ]
+};
 ```
 
 ## Configs
@@ -125,7 +151,7 @@ Choose the config that matches the input:
 
 | Config       | Use for                              |
 | ------------ | ------------------------------------ |
-| `xmlConfig`  | Strict XML documents                 |
+| `xmlConfig`  | XML document mode                    |
 | `htmlConfig` | HTML with raw text and void elements |
 | `svgConfig`  | SVG fragments and documents          |
 
@@ -155,6 +181,8 @@ tokenize(markup, onToken, {
 
 Structure-sensitive code should handle `ElementStart`, `ElementEnd`, and `Attribute` deliberately. Keep parser state outside the callback, and call `stream.goToEnd()` once the target data has been found.
 
+`Text` tokens preserve the source slice. They can contain whitespace-only formatting, and encoded references stay encoded.
+
 ## Selectors
 
 Selectors use object paths instead of XPath strings:
@@ -166,7 +194,9 @@ const cookingBooks = [
 ] as const;
 ```
 
-Each segment can match by `local`, `prefix`, attributes, and text. Use `axis: 'child'` for direct children and `axis: 'self-or-descendant'` for descendants.
+Segments match by name, attributes, or plain text at a path depth. Use `axis: 'child'` for direct children and `axis: 'self-or-descendant'` for descendants.
+
+Attribute and text segments currently do not combine with `local` or `prefix` on the same segment. Add a callback guard when that distinction matters.
 
 ## Object Helpers
 
@@ -175,6 +205,14 @@ Each segment can match by `local`, `prefix`, attributes, and text. Use `axis: 'c
 `xmlToSimplifiedObject` returns a more compact object shape where element names are stored under underscored keys such as `_book`.
 
 `tokensToXml`, `tokenToXml`, and `xmlToString` help rebuild markup from token or object data when you need a serialization step.
+
+`htmlToMarkdown` converts simple HTML to Markdown and returns the string on `.string`:
+
+```ts
+const { string } = htmlToMarkdown('<h1>Title</h1><p>Hello <strong>world</strong>.</p>');
+```
+
+Object conversion omits whitespace-only text, comments, processing instructions, and entity declarations.
 
 ## Examples
 
@@ -190,10 +228,14 @@ No. `xml-tokenizer` is built for streaming extraction and lightweight conversion
 
 Use `htmlConfig`. It enables HTML-oriented behavior such as raw text elements and implicit self-closing elements.
 
+### Is `xmlConfig` full XML validation?
+
+No. `xmlConfig` enforces document-level rules such as one root element and quoted attributes, but it does not validate schemas, process DTDs, or resolve entities. Use `{ ...xmlConfig, allowDtd: false }` to reject DTDs.
+
 ### Why does the tokenizer use callbacks instead of generators?
 
-Callbacks avoid generator overhead in hot parsing loops and let the stream expose controls such as `goToEnd()`. This keeps the main tokenizer path direct while selectors and object helpers provide higher-level APIs when you need them.
+Callbacks keep the tokenizer loop direct and let the stream expose controls such as `goToEnd()`. Selectors and object helpers provide higher-level APIs when you need them.
 
 ### How does it compare to fast-xml-parser, txml, sax, and saxen?
 
-`xml-tokenizer` focuses on typed streaming tokens plus small selector and object helpers. Use it when you want callback-based extraction with explicit parser state in TypeScript. Use a full XML object parser when you mainly need whole-document conversion.
+`xml-tokenizer` focuses on typed tokens plus small selector and object helpers. Use it when you want callback-based extraction with explicit parser state in TypeScript. Use a full XML object parser when you mainly need whole-document conversion.

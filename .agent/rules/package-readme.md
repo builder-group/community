@@ -10,7 +10,8 @@ Apply this together with `.agent/rules/writing.md`.
 - Keep the above-the-fold section strong: one clear description, concrete bullets, and one compact example that shows the core workflow
 - Make bullets outcome-driven: focus on what users can build, avoid, catch, or simplify
 - Make the above-the-fold example a small proof of value: simple enough to scan, but specific enough to show the package differentiator
-- Show real usage early with imports, setup, and the first successful call, handler, or result
+- Show real usage early with enough imports, setup, and result context for the reader to understand the workflow
+- Keep examples practical rather than exhaustive: the main path should be easy to adapt, while later snippets may elide obvious context to keep the point clear
 - Put installation after the value section unless the package cannot be understood without setup context
 - Structure larger READMEs around user goals before API reference: `Install`, `Usage`, concept sections, API details, examples, FAQ
 - Treat `Usage` as the fast path to get started, not as the full reference
@@ -30,6 +31,7 @@ Apply this together with `.agent/rules/writing.md`.
 - Do not overpromise runtime guarantees when TypeScript only checks compile-time shape
 - Do not blur compile-time checks, runtime validation, and runtime behavior in the same claim
 - Do not duplicate full API docs in the quick-start section
+- Do not leave readers guessing about non-obvious setup; add local context when missing details would block understanding
 - Do not force every package README into the same length or exact section order
 - Do not add long example walkthroughs to small example READMEs unless setup is genuinely non-obvious
 - Do not keep generic maturity notices in README prose when the package version already communicates maturity. Keep warnings only when they change user behavior or setup

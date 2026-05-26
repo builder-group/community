@@ -22,10 +22,10 @@
 - Return typed errors as values for expected failure paths
 - Let TypeScript narrow `error` and `value` after the `isOk` check
 - Use helpers like `mapOk`, `mapErr`, and `match` only when they reduce noise
-- Send results through loaders, workers, APIs, or storage as plain arrays
+- Send JSON-safe result payloads through loaders, workers, APIs, or storage as plain arrays
 
 ```ts
-import { Err, fromArray, Ok, tAsync } from 'tuple-result';
+import { Err, tAsync } from 'tuple-result';
 
 async function loadUser(id: string) {
   const [isFetchOk, fetchErr, response] = await tAsync(fetch(`/api/users/${id}`));
@@ -41,11 +41,6 @@ if (isUserOk) {
 } else {
   console.error(userErr); // TypeScript knows userErr is defined here
 }
-
-// Results are arrays, so JSON round-trips without a custom serializer
-const serialized = JSON.stringify(Ok(42)); // '[true,null,42]'
-const result = fromArray<number, Error>(JSON.parse(serialized));
-result.unwrap(); // 42
 ```
 
 ## Install
@@ -55,6 +50,12 @@ npm install tuple-result
 ```
 
 ## Usage
+
+Pick the style that fits the call site:
+
+- Use destructuring for normal `if/else` branching
+- Use instance methods when you already have an `OkResult` or `ErrResult`
+- Use standalone helpers when transforming results or accepting both instances and plain arrays
 
 Create a result with `Ok` or `Err`, then read it with array destructuring. TypeScript narrows the type automatically after the `isOk` check:
 
@@ -96,6 +97,8 @@ const userResult = await tAsync(
   })
 );
 ```
+
+`t` catches synchronous throws from the callback you pass. `tAsync` awaits an already-created promise-like value and catches rejections. Both return `unknown` errors, so map errors before exposing them as domain errors.
 
 Transform the success or error value without unpacking the result first:
 
@@ -219,6 +222,8 @@ Most standalone helpers accept both types, so no conversion is needed in normal 
 In memory, `Ok(value).toArray()` returns `[true, undefined, value]` and `Err(error).toArray()` returns `[false, error, undefined]`.
 
 JSON cannot preserve `undefined`, so `JSON.stringify()` turns the inactive slot into `null`. `TResultArray<T, E>` accepts both `undefined` and `null` in inactive slots so roundtrips keep working without an extra conversion step.
+
+JSON preserves only the tuple shape. Use plain error objects or error codes when results cross APIs, workers, or storage. `fromArray()` reconstructs a result instance, but it does not validate untrusted input.
 
 ### Why array destructuring instead of chaining or `.match()`?
 

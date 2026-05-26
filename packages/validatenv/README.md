@@ -47,7 +47,7 @@ const env = validateEnv(process.env, {
 npm install validatenv
 ```
 
-The examples below use Zod, but any Standard Schema validator works:
+Examples use Zod, but any Standard Schema validator works:
 
 ```bash
 npm install zod
@@ -160,20 +160,22 @@ This helper is useful when you want one typed env object with a runtime access g
 
 Access is guarded by the returned output key. For example, `{ dbUrl: { envKey: 'DATABASE_URL', validator } }` blocks `env.dbUrl` in client mode.
 
+Server, client, and shared output keys must be unique. Pass `onInvalidAccess` to customize the error thrown when client code reads a server-only key.
+
 ## Validators
 
 Built-in validators implement the Standard Schema interface and require no schema library:
 
-| Validator          | Output    | Description                                      |
-| ------------------ | --------- | ------------------------------------------------ |
-| `stringValidator`  | `string`  | Requires a string value                          |
-| `booleanValidator` | `boolean` | Parses `true`, `false`, `yes`, `no`, `1`, `0`    |
-| `numberValidator`  | `number`  | Parses finite numbers                            |
-| `portValidator`    | `number`  | Parses integer ports from `1` to `65535`         |
-| `emailValidator`   | `string`  | Checks a practical email shape                   |
-| `hostValidator`    | `string`  | Accepts fully qualified domains or IP addresses  |
-| `urlValidator`     | `string`  | Requires a valid URL                             |
-| `jsonValidator`    | `unknown` | Parses JSON strings and returns the parsed value |
+| Validator          | Output    | Description                                                              |
+| ------------------ | --------- | ------------------------------------------------------------------------ |
+| `stringValidator`  | `string`  | Requires a string value                                                  |
+| `booleanValidator` | `boolean` | Parses `true`, `t`, `yes`, `on`, `1`, and `false`, `f`, `no`, `off`, `0` |
+| `numberValidator`  | `number`  | Parses finite numbers                                                    |
+| `portValidator`    | `number`  | Parses integer ports from `1` to `65535`                                 |
+| `emailValidator`   | `string`  | Checks a practical email shape                                           |
+| `hostValidator`    | `string`  | Accepts fully qualified domains or IP addresses                          |
+| `urlValidator`     | `string`  | Requires a valid URL                                                     |
+| `jsonValidator`    | `unknown` | Parses JSON strings and returns the parsed value                         |
 
 Schema transforms are supported. The inferred type follows the output of the transform:
 
@@ -273,7 +275,7 @@ Available helpers:
 | `devDefault`   | `NODE_ENV` is `development`                                    |
 | `localDefault` | `NODE_ENV` is `local` or `development`                         |
 | `testDefault`  | `NODE_ENV` is `test`                                           |
-| `ciDefault`    | `CI` is set                                                    |
+| `ciDefault`    | `CI` is truthy                                                 |
 | `envDefault`   | `NODE_ENV` matches values you provide                          |
 | `pipeDefaults` | tries each helper in order, returns first non-undefined result |
 
@@ -316,6 +318,8 @@ The helper returns Vite-compatible replacement expressions:
   'import.meta.env.VITE_API_URL': '"https://api.example.com"'
 }
 ```
+
+Values are emitted as JavaScript replacement expressions: strings are quoted, numbers and booleans are literals, `undefined` is emitted as `undefined`, and non-serializable values throw.
 
 Only keys listed in the spec are injected. Keep server-only values out of this spec.
 
@@ -395,13 +399,15 @@ const env = validateEnv(process.env, {
 // env.SENTRY_DSN is string | undefined
 ```
 
+If your runtime leaves missing values as empty strings, use `preprocess: emptyStringAsUndefined` before an optional validator or default.
+
 ### Can I use it without Zod or Valibot?
 
 Yes. The built-in validators cover the most common patterns: string, boolean, number, port, URL, email, host, and JSON. No schema library is required.
 
 ### What happens when validation fails?
 
-`validateEnv` throws synchronously with a single error message that lists every failed variable and its issue. The process does not continue.
+`validateEnv` throws synchronously with a single error message that lists every failed variable and its issue. If uncaught during startup, the process stops before the app starts serving traffic.
 
 ```
 Environment validation failed:

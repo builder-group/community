@@ -71,14 +71,27 @@ openApiRouter.get('/pet/{petId}', {
 
 ## Install
 
-Install the router package, one Standard Schema validator, and the framework peer you use:
+Install the router package and the OpenAPI type generator:
 
 ```sh
-npm install openapi-ts-router zod
-npm install express @types/express
-# or
-npm install openapi-ts-router valibot
+npm install openapi-ts-router
+npm install -D openapi-typescript
+```
+
+Install the framework and validator you use:
+
+```sh
+# Express
+npm install express
+npm install -D @types/express
+
+# Hono
 npm install hono
+
+# Standard Schema validator
+npm install zod
+# or
+npm install valibot
 ```
 
 Generate TypeScript types from your OpenAPI document:
@@ -92,6 +105,8 @@ The generated file must export the `paths` type from `openapi-typescript`.
 ## Usage
 
 Create a router wrapper with your generated `paths` type. The wrapper keeps your framework router, but narrows each route method to paths that exist in your OpenAPI schema.
+
+Pass OpenAPI path strings such as `/pet/{petId}` to `openApiRouter`. The wrapper registers the framework route as `/pet/:petId` for Express and Hono. Do not use framework `:param` syntax in `openApiRouter` calls.
 
 ### Express
 
@@ -219,7 +234,7 @@ Required OpenAPI request parts require matching schemas at compile time. Optiona
 
 ## Validated Data
 
-Parsed and validated values are stored separately from the raw framework request data:
+Parsed values, and validated values when a schema runs, are stored separately from the raw framework request data:
 
 | Request part | Express           | Hono                   |
 | ------------ | ----------------- | ---------------------- |
@@ -227,7 +242,7 @@ Parsed and validated values are stored separately from the raw framework request
 | Query params | `req.valid.query` | `c.req.valid('query')` |
 | JSON body    | `req.valid.body`  | `c.req.valid('json')`  |
 
-This keeps handlers honest: `req.params`, `req.query`, and `req.body` may still contain raw framework values, while the `valid` slots contain parser and validator output.
+This keeps handlers honest: `req.params`, `req.query`, and `req.body` may still contain raw framework values, while the `valid` slots contain parser output and schema output for the request parts you validated.
 
 ## Param Parsing
 
@@ -345,6 +360,10 @@ No. Your OpenAPI document stays the source of truth. Generate TypeScript with `o
 
 No. JSON success responses are checked by TypeScript in handlers, but the package does not run response validators at runtime. Keep response runtime checks in tests or framework middleware if your app needs them.
 
+### What happens when I omit an optional schema?
+
+TypeScript still infers the OpenAPI request shape, but runtime validation does not run for that request part. Use a schema when handlers need trusted parsed and validated values.
+
 ### Why are error responses not typed on handlers?
 
 Error responses usually come from shared error handling, not the happy-path route handler. Throw domain errors or `OpenApiRouterError` values from routes, then map them to your API error shape in Express error middleware or Hono `app.onError()`.
@@ -352,6 +371,14 @@ Error responses usually come from shared error handling, not the happy-path rout
 ### What request parts are supported?
 
 The router validates path params, query params, and JSON request bodies. Keep auth, headers, cookies, multipart uploads, and framework-specific request concerns in native Express or Hono middleware.
+
+### Which HTTP methods are supported?
+
+`get`, `post`, `put`, `patch`, and `delete` are supported.
+
+### Which framework versions are supported?
+
+The package targets Express 5 and Hono 4 through peer dependencies.
 
 ### Can I migrate one route at a time?
 

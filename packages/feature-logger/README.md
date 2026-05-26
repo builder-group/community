@@ -17,7 +17,7 @@
     </a>
 </p>
 
-`feature-logger` is a console logger you compose per instance. Keep the familiar `trace`, `debug`, `info`, `warn`, and `error` methods while each logger owns its level, formatting pipeline, and output sink.
+`feature-logger` is a console logger you compose per instance. Keep the familiar `trace`, `debug`, `log`, `info`, `warn`, and `error` methods while each logger owns its level, formatting pipeline, and output sink.
 
 - Set a level once and keep call sites clean
 - Add prefixes, timestamps, ids, and browser styles with `.with()` features
@@ -110,20 +110,20 @@ logger.debug('hidden');
 logger.info('visible');
 ```
 
-| Option          | Default         | Description                                      |
-| --------------- | --------------- | ------------------------------------------------ |
-| `active`        | `true`          | When false, all log calls are skipped.           |
-| `level`         | `ELogLevel.ALL` | Minimum level that should be emitted.            |
-| `middleware`    | `[]`            | Logger middleware applied to every log call.     |
-| `invokeConsole` | `console.*`     | Custom console invoker, useful for tests or I/O. |
+| Option          | Default                   | Description                                  |
+| --------------- | ------------------------- | -------------------------------------------- |
+| `active`        | `true`                    | When false, all log calls are skipped.       |
+| `level`         | `ELogLevel.ALL`           | Minimum level that should be emitted.        |
+| `middleware`    | `[]`                      | Logger middleware applied to every log call. |
+| `invokeConsole` | matching `console.*` call | Final output sink, useful for tests or I/O.  |
 
-Custom invokers and middleware receive `(data, context)`. `data` is the array passed to the log method, and `context` contains the `logMethod`, `level`, and optional per-call middleware.
+Custom invokers and middleware receive `(data, context)`. `data` is the processed argument array, and `context` contains the `logMethod`, `level`, and optional per-call middleware.
 
 `ELogLevel` uses ordered threshold values: `ALL = 0`, `TRACE = 100`, `DEBUG = 200`, `LOG = 300`, `INFO = 400`, `WARN = 500`, and `ERROR = 600`.
 
 ### Log Methods
 
-Each method maps to its matching `console.*` call and accepts the same arguments.
+The logger implements `trace`, `debug`, `log`, `info`, `warn`, and `error`. Each method accepts console-style arguments and forwards them to the matching `console.*` method unless level filtering, `active: false`, or middleware changes the call.
 
 ```ts
 logger.trace('trace');
@@ -218,6 +218,8 @@ const id = logger.log('created');
 
 The existing `trace`, `debug`, `log`, `info`, `warn`, and `error` methods keep their console-like arguments, but return the generated id.
 
+IDs are generated before level filtering, so suppressed log calls still return an id.
+
 | Option       | Default        | Description                               |
 | ------------ | -------------- | ----------------------------------------- |
 | `generateId` | 16-char hex id | Creates the id returned by each log call. |
@@ -266,7 +268,7 @@ export type TLabelFeature = TFeature<'label', object>;
 
 ### What is the difference between `invokeConsole` and middleware?
 
-`invokeConsole` is the final step that writes to the console. It receives the fully processed data after all middleware has run. Middleware transforms data before it reaches `invokeConsole`. Use middleware to modify or annotate log output. Use `invokeConsole` to redirect it entirely.
+By default, `invokeConsole` writes to the matching `console.*` method. A custom `invokeConsole` is the final output sink and receives the fully processed data after all middleware has run. Middleware transforms data before it reaches `invokeConsole`. Use middleware to modify or annotate log output. Use `invokeConsole` to redirect it entirely.
 
 ### When should I use `active: false` instead of setting a high `level`?
 
@@ -274,7 +276,7 @@ Use `active: false` to silence everything without changing the level threshold. 
 
 ### Can I use this in Node.js?
 
-Yes. The logger calls `console.*` methods directly and works in any environment that provides a standard `console` object. `styleFeature` uses `%c` CSS directives, which Node ignores silently, so it is safe to install in shared code.
+Yes. The logger calls `console.*` methods directly and works in any environment that provides a standard `console` object. In Node.js, `%c` is ignored and the CSS argument is consumed by formatting, so `styleFeature` output is unstyled.
 
 ### Can I compose multiple features?
 

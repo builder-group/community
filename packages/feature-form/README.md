@@ -55,7 +55,7 @@ const unbind = $form.fields.email.status.listen(({ value }) => {
 $form.fields.email.set('not-an-email');
 $form.fields.email.blur(); // validates email and notifies the status listener
 
-await $form.submit(); // runs every validator and calls onValidSubmit when valid
+await $form.submit(); // runs submit-triggered validators and calls onValidSubmit when valid
 $form.isDirty.get(); // true if any field differs from its default value
 unbind();
 ```
@@ -66,7 +66,7 @@ unbind();
 npm install feature-form
 ```
 
-The examples below use Zod, but any Standard Schema validator works:
+Examples use Zod, but any Standard Schema validator works:
 
 ```bash
 npm install zod
@@ -172,11 +172,11 @@ const isValid = await $form.validate(); // runs all validators without submittin
 $form.reset(); // resets values, validation status, isTouched, and isSubmitted
 ```
 
-`submit()` runs validators configured for the submit trigger. All matching field validators and the form validator run together. No failing validator prevents the others from completing, so submit gives you a complete error picture. Returns `true` if the form was valid, `false` otherwise. Persistent callbacks registered via `onValidSubmit()` / `onInvalidSubmit()` and per-call options passed to `submit()` both run in parallel.
+`submit()` runs validators configured for the submit trigger. All matching field validators and the form validator run together. No failing validator prevents the others from completing, so submit gives you a complete error picture for validators that ran. Returns `true` if the form was valid, `false` otherwise. Persistent callbacks registered via `onValidSubmit()` / `onInvalidSubmit()` and per-call options passed to `submit()` both run in parallel.
 
 `validate()` runs all validators the same way but has no submit side effects: it updates validation state, but does not set `isSubmitted`, does not fire `onValidSubmit` or `onInvalidSubmit`, and does not update default values.
 
-`reset()` restores all fields to their `defaultValue` and clears `status`, `isTouched`, and `isSubmitted` on both the form and every field. Any in-flight async validation is cancelled so stale results cannot update field status.
+`reset()` restores all fields to their `defaultValue` and clears `status`, `isTouched`, and `isSubmitted` on both the form and every field. Any in-flight async validation is invalidated so stale results cannot update field status.
 
 ### `getData()` / `getValidData()` / `getErrors()`
 
@@ -289,15 +289,15 @@ const valibotValidator = v.pipe(v.string(), v.minLength(2), v.maxLength(50));
 
 For custom validators, implement the `StandardSchemaV1` interface from [`@standard-schema/spec`](https://github.com/standard-schema/standard-schema).
 
-Validators run for validation only. If a schema transforms or coerces output values, the parsed output does not write back into the field state.
+Validators run for validation only. If a schema transforms or coerces output values, the parsed output does not write back into the field state. `getValidData()` and submit callbacks keep returning the current field values.
 
 ## Field
 
 Each entry in `form.fields` is a `TFormField<GValue>`: a full `feature-state` state with form-specific methods added.
 
-### `createFormField(defaultValue, options?)`
+### `createFormField(defaultValue, config)`
 
-Creates a field independently of any form. Use this for a shared search input or a field conditionally composed into different forms. Pass the resulting `TFormField` directly into the `createForm` fields config.
+Creates a field independently of any form. Use this for a shared search input or a field conditionally composed into different forms. `config.key` is required because validation errors use it for path routing. Pass the resulting `TFormField` directly into the `createForm` fields config.
 
 ```ts
 import { createFormField } from 'feature-form';
@@ -364,7 +364,7 @@ Features are installed via `.with()` and extend the form with new methods.
 
 ### `dirtyFeature()`
 
-Adds `isDirty`, `dirtyFields`, and `resetDirty()`. Tracks whether any field value has changed from its default value using deep structural equality, not reference equality.
+Adds `isDirty`, `dirtyFields`, and `resetDirty()`. Tracks whether each field differs from its default value. By default it compares primitives, arrays, and plain objects structurally. Pass `dirtyFeature({ isEqual })` for other value types.
 
 ```ts
 import { dirtyFeature } from 'feature-form';
@@ -415,11 +415,11 @@ Before the first submit, aggressive validation (e.g. `'change'`) can feel intrus
 
 ### Does it support async validators?
 
-Yes. Any Standard Schema validator can be async. `submit()` and `validate()` are both async and await all validators. The `isValidating` state on both the form and each field reflects whether a run is in progress. In-flight async runs are cancelled (by run ID) when `reset()` is called, so stale results never overwrite reset state.
+Yes. Any Standard Schema validator can be async. `submit()` and `validate()` are both async and await all validators. The `isValidating` state on both the form and each field reflects whether a run is in progress. In-flight async runs are invalidated by run ID when `reset()` is called, so stale results never overwrite reset state.
 
 ### Do all field validators run on submit, or does it stop at the first error?
 
-All validators configured for the submit trigger run together. No failing validator skips the others, so submit always gives a complete picture of every validation error.
+All validators configured for the submit trigger run together. No failing submit-triggered validator skips the others, so submit gives a complete picture of every submit-triggered validation error.
 
 ### What does `getErrors()` return before any validation has run?
 

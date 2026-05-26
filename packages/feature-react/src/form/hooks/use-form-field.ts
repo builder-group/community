@@ -20,9 +20,9 @@ import { type TIsWideString } from '../types';
  * default: only re-renders on status changes, not on every keystroke. Pass
  * `{ controlled: true }` to also subscribe to the field value and re-render on change.
  *
- * Returns `field` (the `TFormField` instance), `status()` (the current validation status),
- * and `input()` (ready-to-spread input props). All options (`controlled`, `format`, `parse`)
- * go to this hook; the returned `input()` takes no arguments.
+ * Returns `field` (the `TFormField` instance), `status` (the current validation status),
+ * and `input()` (ready-to-spread input props). Pass `controlled` to this hook, and pass
+ * `format` and `parse` to the returned `input()` helper.
  */
 export function useFormField<
 	GFormData extends TFormData,
@@ -81,7 +81,7 @@ export interface TUseFormFieldResponse<
 	field: TFormField<GFormData[GKey]>;
 	/** Current validation status value. */
 	status: TValidationStatusValue;
-	/** Returns ready-to-spread input props. Takes no arguments; pass `format` and `parse` to `useFormField` instead. */
+	/** Returns ready-to-spread input props. Pass `format` and `parse` here for non-string fields. */
 	input: (...options: TUseFormFieldInputOptionsArgs<GFormData[GKey]>) => TFieldInputProps<GKey>;
 }
 

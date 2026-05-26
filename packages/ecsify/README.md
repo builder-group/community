@@ -19,14 +19,14 @@
 
 `ecsify` is a TypeScript Entity Component System for games, simulations, and data-heavy runtimes. It keeps entity data in component stores, lets plugins add typed components, resources, events, and app methods, and gives systems fast queries with change tracking when frame-to-frame behavior matters.
 
-- Model runtime data as entities, components, resources, systems, and events
-- Keep component storage flexible: arrays, structure-of-arrays, objects, and markers
-- Query with `With`, `Without`, `Added`, `Changed`, `Removed`, `And`, and `Or`
-- Let TypeScript track plugin contributions on `app.c`, `app.r`, and app extensions
-- Drop down to raw registries when a hot path needs direct control
+- Build frame loops around numeric entities and typed component stores
+- Choose structure-of-arrays for hot paths, object arrays for convenience, or marker components for tags
+- React to added, changed, and removed components without maintaining side lists
+- Compose plugins that add typed `app.c`, `app.r`, events, and app methods
+- Use raw registries when a hot path needs tighter control
 
 ```ts
-import { createApp, createDefaultPlugin, definePlugin, Entity, With } from 'ecsify';
+import { createApp, createDefaultPlugin, definePlugin, Entity } from 'ecsify';
 
 const movementPlugin = definePlugin({
   name: 'Movement',
@@ -48,10 +48,11 @@ app.addComponent(player, app.c.Velocity, { dx: 4, dy: 2 });
 
 app.addSystem(
   (currentApp, delta = 1) => {
-    for (const [eid, pos, vel] of currentApp.queryComponents(
-      [Entity, currentApp.c.Position, currentApp.c.Velocity] as const,
-      With(currentApp.c.Velocity)
-    )) {
+    for (const [eid, pos, vel] of currentApp.queryComponents([
+      Entity,
+      currentApp.c.Position,
+      currentApp.c.Velocity
+    ] as const)) {
       currentApp.updateComponent(eid, currentApp.c.Position, {
         x: pos.x + vel.dx * delta,
         y: pos.y + vel.dy * delta
@@ -62,6 +63,7 @@ app.addSystem(
 );
 
 app.update(1 / 60);
+console.log(app.c.Position.x[player]); // 0.0666...
 ```
 
 ## Install
@@ -136,7 +138,7 @@ const app = createApp({
 | `plugins`    | Plugins installed before the app is returned     |
 | `systemSets` | Ordered system groups run by `app.update(delta)` |
 
-The default plugin adds a `Removed` marker, `markEntityForRemoval(eid)`, and a `Flush` system that clears frame-based tracking.
+The default plugin adds `app.c.Removed`, `markEntityForRemoval(eid)`, and a `Flush` system. That system destroys entities marked with `app.c.Removed`, then calls `app.flush()` to clear frame-based tracking.
 
 ### `definePlugin(config)`
 
@@ -199,6 +201,8 @@ for (const [eid, health] of app.queryComponents([Entity, app.c.Health] as const)
 
 `queryComponents` returns typed tuples in the same order as the component list. Include `Entity` when the system needs the entity ID.
 
+For structure-of-arrays storage, `queryComponents` returns row value objects such as `{ x, y }`, not live references to the backing arrays. Update through `updateComponent`, or write to arrays directly and call `markComponentChanged(eid, component)` when `Changed(component)` queries should react.
+
 ## Resources And Events
 
 Resources hold global state such as input, config, clocks, and score:
@@ -249,7 +253,7 @@ for (const event of app.consumeEvent('damage')) {
 }
 ```
 
-Frame-based component, resource, and event tracking is cleared by `app.flush()`. The default plugin runs that during the `Flush` system set.
+`app.flush()` clears component and resource add/change/remove tracking, plus unread event queues. If you install `createDefaultPlugin()`, include `Flush` in `systemSets` so the default flush system runs every frame.
 
 ## Examples
 
@@ -268,6 +272,14 @@ No. Structure-of-arrays storage is useful for tight loops, but `ecsify` also wor
 ### How does change tracking work?
 
 `addComponent`, `updateComponent`, and `removeComponent` update the frame-tracking state automatically. Direct mutations are allowed, but you need to call `markComponentChanged` when `Changed(component)` queries should react to them.
+
+### What is the difference between `Removed(component)` and `app.c.Removed`?
+
+`Removed(component)` is a query filter for components removed earlier in the current frame. `app.c.Removed` is the marker component added by the default plugin for whole-entity removal. Call `markEntityForRemoval(eid)` to add that marker, then the default `Flush` system destroys the entity.
+
+### Are entity IDs recycled?
+
+Yes. The app uses `createEntityIndex()` with recycled numeric IDs by default. Use the raw `createEntityIndex({ versioning: true })` API when stale entity references need versioned IDs.
 
 ### How does it compare to bitecs, koota, becsy, and elics?
 

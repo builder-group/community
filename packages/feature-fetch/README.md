@@ -134,7 +134,7 @@ import { apiFeature, cacheFeature, createFetchClient, retryFeature } from 'featu
 
 const api = createFetchClient({
   baseUrl: 'https://api.example.com/v1'
-}).with(apiFeature(), retryFeature(), cacheFeature({ maxAgeMs: 30_000 }));
+}).with(apiFeature(), cacheFeature({ maxAgeMs: 30_000 }), retryFeature());
 ```
 
 ## Client
@@ -297,7 +297,7 @@ console.log(userResult.user.name);
 
 ### `retryFeature(options)`
 
-Retries failed requests. Network errors use exponential backoff. HTTP responses are retried when `shouldRetryResponse` returns `true`, defaulting to HTTP 429. Respects `Retry-After` and `x-rate-limit-reset` response headers when present.
+Retries failed requests. Network errors use exponential backoff. HTTP responses are retried when `shouldRetryResponse` returns `true`, defaulting to HTTP 429. Respects `Retry-After`, and uses `x-rate-limit-reset` when `x-rate-limit-remaining` is `0`.
 
 ```ts
 import { createApiFetchClient, retryFeature } from 'feature-fetch';
@@ -333,6 +333,8 @@ api.cache.invalidate((key) => key.includes('/posts'));
 | `maxAgeMs`    | `300000` (5 minutes)      | Maximum age in milliseconds                                                               |
 | `getCacheKey` | GET URL, no auth headers  | Returns the cache key for a request, or `null` to skip caching                            |
 | `shouldCache` | OK, non-private responses | Returns whether a response should be cached. Skips `no-store`, `no-cache`, and `private`. |
+
+The default cache also skips `requestInit.cache: 'no-store' | 'reload'` and responses with `Set-Cookie`.
 
 ### `delayFeature(ms)`
 
@@ -386,6 +388,8 @@ All request methods return a `tuple-result`. The error branch is one of three ty
 | `HttpError`    | The server returned a non-2xx response                                     |
 | `FetchError`   | Request preparation, serialization, middleware, or response parsing failed |
 
+GraphQL `errors` arrays return `GraphQLError`, which extends `FetchError`.
+
 ```ts
 import { FetchError, hasStatusCode, HttpError, NetworkError } from 'feature-fetch';
 
@@ -404,7 +408,7 @@ if (!isUserOk) {
 }
 ```
 
-`hasStatusCode(error, code)` narrows to `HttpError` and checks the status code.
+`hasStatusCode(error, code)` checks `HttpError` instances and error-like objects with a numeric `status`. Use `error instanceof HttpError` when you need narrowing.
 
 ## Examples
 

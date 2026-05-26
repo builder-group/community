@@ -29,7 +29,7 @@ export type TGamePlugin = TPlugin<
 			Rectangle: TCRectangle;
 			Color: TCColor;
 		};
-		systemSets: 'First' | 'Update' | 'Last';
+		systemSets: 'First' | 'Update' | 'Last' | 'Flush';
 	},
 	[TDefaultPlugin]
 >;
@@ -46,7 +46,7 @@ export function runAppExample(): void {
 	// Create app with GamePlugin
 	const app = createApp({
 		plugins: [createDefaultPlugin(), createGamePlugin()] as const,
-		systemSets: ['First', 'Update', 'Last']
+		systemSets: ['First', 'Update', 'Last', 'Flush']
 	});
 
 	// Game loop

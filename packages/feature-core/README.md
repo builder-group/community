@@ -25,6 +25,8 @@
 - Reuse feature logic across any host that provides the API the feature needs
 - Keep runtime guards for duplicate features, missing dependencies, and accidental property collisions
 
+Read `.with(a, b)` as left-to-right installation on the same object: each feature can use APIs installed before it.
+
 ```ts
 import { createFeatureHost, defineFeature, type TFeature } from 'feature-core';
 
@@ -47,10 +49,12 @@ function createCounter(initialValue: number) {
   });
 }
 
-function resetFeature(initialValue: number): TResetFeature {
+function resetFeature(): TResetFeature {
   return defineFeature<TResetFeature>({
     key: 'reset',
     install(counter: TCounterBase) {
+      const initialValue = counter.get();
+
       return {
         reset: () => counter.set(initialValue)
       };
@@ -73,7 +77,7 @@ function resetTwiceFeature(): TResetTwiceFeature {
   });
 }
 
-const counter = createCounter(0).with(resetFeature(0), resetTwiceFeature());
+const counter = createCounter(0).with(resetFeature(), resetTwiceFeature());
 
 counter.set(5);
 counter.resetTwice(); // typed because resetFeature was installed first
@@ -180,7 +184,7 @@ Use `TInstalledFeaturesOf<THost>` when a generic utility needs to recover the in
 
 ## Feature Author
 
-Use `defineFeature()`. Pass the feature type explicitly to get a typed install host and validated `requires`:
+Use `defineFeature()`. Pass the feature type explicitly so TypeScript checks the key, returned API shape, `requires`, and `overrides`:
 
 ```ts
 import { defineFeature, type TFeature } from 'feature-core';
@@ -203,7 +207,7 @@ export function resetFeature(): TResetFeature {
 }
 ```
 
-Annotate the `install()` parameter with the base host type when the feature needs base APIs. The parameter is `never` by default. There is no implicit host type because features are designed to work across different host shapes.
+Required features type the dependency APIs available in `install()`. Annotate the `install()` parameter with the base host type when the feature needs base APIs. The parameter is `never` by default. There is no implicit base host type because features are designed to work across different host shapes.
 
 For local or one-off features, the generic can be omitted and the type is inferred:
 
@@ -304,7 +308,7 @@ Capture the previous method before returning the override when you want `super`-
 
 ### Why does the host get mutated instead of copied?
 
-Feature installation happens at construction time, not at runtime. Mutation keeps the model simple: there is one object, its identity never changes, and installed feature APIs are just properties on it. Copying would require re-typing the result on every `.with()` call anyway, so there is no practical benefit.
+`.with()` mutates the host when you call it. The intended pattern is to compose features during construction, then pass around the fully composed host. Mutation keeps the model simple: there is one object, its identity never changes, and installed feature APIs are just properties on it. Copying would require re-typing the result on every `.with()` call anyway, so there is no practical benefit.
 
 ### Why does `requires` order have to mirror the dependency tuple?
 
@@ -325,6 +329,12 @@ install() { ... }                                // does not use the host
 No. `feature-core` validates feature dependencies and the APIs added by installed features, but it does not carry a global base-host constraint per feature. If a feature needs base APIs, annotate the `install()` parameter with the host shape it actually uses.
 
 This keeps features reusable across libraries and avoids making every feature carry extra generic state. Package-specific tests should cover whether a feature is valid for that package's base host.
+
+### Which guarantees are TypeScript-only and which are runtime checks?
+
+TypeScript rejects missing dependencies and duplicate feature keys when host and feature types stay literal. Runtime `.with()` still checks missing dependencies, duplicate installs, invalid overrides, and accidental property collisions.
+
+Runtime checks do not validate the base host shape or method signatures. If a feature depends on base APIs, type the `install()` parameter and cover that package-specific contract in tests.
 
 ### When should I use explicit `defineFeature<TMyFeature>()` vs inferred?
 

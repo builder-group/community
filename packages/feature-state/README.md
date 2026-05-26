@@ -17,10 +17,10 @@
     </a>
 </p>
 
-`feature-state` is reactive state that grows by installing features. Start with one observable value, then add undo, storage, computed values, custom equality, queues, or custom capabilities with `.with()` only where you need them.
+`feature-state` is reactive state that grows by installing features. Start with one observable value, derive read-only values with `createComputed()`, then add undo, storage, custom equality, queues, or custom capabilities with `.with()` only where you need them.
 
 - Install capabilities per state: undo, storage, queues, and equality stay opt-in
-- Use one `createState()` API in vanilla JS, React, Vue, Svelte, Node.js, and tests
+- Share the same framework-free state object across vanilla JS, Node.js, tests, and UI frameworks
 - Let TypeScript track installed capabilities: `undo()` exists only after `undoFeature()`
 - Build custom feature packs on the same typed host model as the built-ins
 
@@ -69,7 +69,7 @@ $count.set((v) => v + 1); // updater form, value is now 6
 Extend a state with features using `.with()`. Each installed feature adds typed methods:
 
 ```ts
-import { multiUndoFeature, undoFeature } from 'feature-state';
+import { createState, multiUndoFeature, undoFeature } from 'feature-state';
 
 const $count = createState(0).with(undoFeature(), multiUndoFeature());
 
@@ -146,12 +146,17 @@ $count.value = 10; // same as set(10)
 
 ### `notify()`
 
-Triggers all listeners without changing the value. Use this after mutating a value in place via `_v`, or when a feature updates internal state by other means.
+Triggers all listeners without replacing the value. Use this after mutating an object value in place, or when a feature updates internal state by other means.
 
 ```ts
-$count._v = 42; // mutate directly, no notification
-$count.notify(); // notify listeners manually
+const $settings = createState({ theme: 'light', sidebarOpen: true });
+
+const prevValue = { ...$settings.value };
+$settings.value.theme = 'dark'; // mutate in place, no notification yet
+$settings.notify({ prevValue }); // notify listeners manually
 ```
+
+Use `_v` only inside features or low-level integrations. App code should prefer `set()`, `value`, `get()`, and `notify()`.
 
 Pass custom metadata to every listener in the same notification:
 
@@ -182,7 +187,7 @@ Calling `unlisten()` inside the listener itself is safe. Any pending call to tha
 | `source`     | What triggered the change. `'stateSet'` for `set()`. Features set their own source keys. |
 | `background` | When `true`, signals that the change is a background sync and UI updates can be skipped. |
 
-Listeners run synchronously in registration order. Nested `set()` calls inside a listener are batched: their listeners join the current queue and run after the outermost notification finishes.
+Listeners run synchronously in registration order. A nested `set()` inside a listener appends its listeners to the active queue. They run after already queued listeners, before the outermost `set()` or `notify()` returns. Queue features replace this behavior.
 
 ### `createComputed(source, compute, options?)`
 
@@ -206,7 +211,7 @@ const $filteredTasks = createComputed([$tasks, $filter] as const, ([tasks, filte
 );
 ```
 
-Computed states expose the normal read and subscription API (`value`, `get()`, `listen()`, and `subscribe()`), but `set()` and assigning `value` throw because source states own the data. Call `destroy()` when the containing object is torn down to unsubscribe from source states.
+Computed states expose the normal read and subscription API (`value`, `get()`, `listen()`, and `subscribe()`), but `set()` and assigning `value` throw because source states own the data. Computed states are still feature hosts. Use queue-oriented features when the computed state needs custom scheduling, but keep write-oriented features such as `undoFeature`, `storageFeature`, and `isEqualFeature` on source states because they call or replace `set()`. Call `destroy()` when the containing object is torn down to unsubscribe from source states.
 
 `isEqual` defaults to `Object.is`. Pass a custom comparator to suppress notifications when the computed structure is equivalent but not referentially identical. Pass `false` to notify on every source update.
 
@@ -219,6 +224,8 @@ Features are installed via `.with()` and extend the state with new methods.
 Adds `undo()`. Keeps the last 50 values by default. History is seeded with the initial value at install time.
 
 ```ts
+import { createState, undoFeature } from 'feature-state';
+
 const $count = createState(0).with(undoFeature());
 
 $count.set(1);
@@ -233,6 +240,8 @@ $count.undo(); // no-op, already at oldest
 Adds `multiUndo(count)`. Requires `undoFeature` to be installed first.
 
 ```ts
+import { createState, multiUndoFeature, undoFeature } from 'feature-state';
+
 const $count = createState(0).with(undoFeature(), multiUndoFeature());
 
 $count.set(1);
@@ -310,7 +319,7 @@ await $count.notify(); // resolves when all listeners have completed
 Replaces the default sync listener queue with a priority-based sync queue. Lower priority values run first. Listeners with the same priority keep registration order.
 
 ```ts
-import { EListenerPriority, priorityQueueFeature } from 'feature-state';
+import { createState, EListenerPriority, priorityQueueFeature } from 'feature-state';
 
 const $count = createState(0).with(priorityQueueFeature<number>());
 
@@ -356,8 +365,18 @@ No. Both features override the same internal queue (`listen`, `subscribe`, and `
 
 ### When should I use `_v` directly instead of `set()`?
 
-Use `_v` when you need to mutate a value in place, for example pushing to an array, without going through `set()`'s reference equality check. Mutate via `_v`, then call `notify()` manually to trigger listeners. This is an escape hatch; prefer replacing the value with `set()` when possible.
+Use `_v` only inside features or low-level integrations that need raw backing-value access. For app code that mutates an object in place, use `value` or `get()` to reach the object, keep your own `prevValue` when listeners need it, then call `notify()`. This is an escape hatch; prefer replacing the value with `set()` when possible.
 
 ### How does `storageFeature` prevent save loops?
 
 When `loadFromStorage()` calls `set()` internally it passes `source: 'loadFromStorage'` in the listener context. The auto-save listener ignores changes with that source, so loading a value does not immediately write it back to storage.
+
+### What happens if a listener throws?
+
+With the default queue and `priorityQueueFeature`, synchronous listener errors propagate from `set()` or `notify()` and stop the current flush. Async rejections are not awaited unless you use `asyncQueueFeature()`.
+
+With `asyncQueueFeature()`, `notify()` returns a promise that rejects when a listener rejects. `set()` still returns `void`, so catch errors inside listeners triggered by `set()`.
+
+### Does `.with()` create a new state?
+
+No. `.with()` installs features on the same state object and returns that object with a wider TypeScript type. Install features before sharing references that expect the added methods.

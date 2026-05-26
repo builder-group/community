@@ -25,11 +25,11 @@
 - Resolve `tsconfig` paths before transform plugins run
 - Add custom plugins in predictable `pre`, `transform`, and `post` stages
 
-```ts
+```js
 // rollup.config.js
-import { libraryPreset } from 'rollup-presets';
+const { libraryPreset } = require('rollup-presets');
 
-export default libraryPreset({
+module.exports = libraryPreset({
   formats: ['esm', 'cjs', 'types'],
   preserveModules: true
 });
@@ -38,8 +38,10 @@ export default libraryPreset({
 ## Install
 
 ```bash
-npm install -D rollup rollup-presets
+npm install -D rollup typescript rollup-presets
 ```
+
+`libraryPreset` expects a `tsconfig.json` in the package unless you pass custom compiler options.
 
 ## Usage
 
@@ -57,13 +59,15 @@ Add bundle paths to `package.json`:
 
 Then create `rollup.config.js`:
 
-```ts
-import { libraryPreset } from 'rollup-presets';
+```js
+const { libraryPreset } = require('rollup-presets');
 
-export default libraryPreset();
+module.exports = libraryPreset();
 ```
 
 The preset returns Rollup configs for the requested formats. By default it builds ESM, CJS, and declaration output.
+
+With the default `useTsc: true`, declarations are emitted by `tsc --emitDeclarationOnly`. Set `declarationDir` or `outDir` in `tsconfig.json` so declaration output matches your `types` and `exports` metadata. Set `useTsc: false` to generate declaration Rollup configs from package metadata instead.
 
 ## Package Exports
 
@@ -103,7 +107,9 @@ For packages with multiple entry points, add one export per entry:
 }
 ```
 
-When `preserveModules` is enabled, output paths are treated as directories and module structure is preserved under those directories.
+Direct `source`, `import`, `require`, and `types` string fields are supported. Nested `import` and `require` export objects use their `default` field for JavaScript output and `types` for declarations. `crossModuleImports` requires direct string subpath exports.
+
+When `preserveModules` is enabled, ESM and CJS output paths become Rollup `dir` values. For example, `./dist/esm/index.js` becomes `./dist/esm`, and `entryFileNames` keeps the file extension. When `preserveModules` is disabled, output paths are used as single output files.
 
 ## Library Preset
 
@@ -111,10 +117,10 @@ When `preserveModules` is enabled, output paths are treated as directories and m
 
 Creates Rollup configs for TypeScript libraries.
 
-```ts
-import { libraryPreset } from 'rollup-presets';
+```js
+const { libraryPreset } = require('rollup-presets');
 
-export default libraryPreset({
+module.exports = libraryPreset({
   environment: 'production',
   formats: ['esm', 'cjs', 'types'],
   preserveModules: true,
@@ -143,11 +149,11 @@ export default libraryPreset({
 
 Use plugin stages to place custom behavior around the preset defaults:
 
-```ts
-import replace from '@rollup/plugin-replace';
-import { libraryPreset } from 'rollup-presets';
+```js
+const replace = require('@rollup/plugin-replace');
+const { libraryPreset } = require('rollup-presets');
 
-export default libraryPreset({
+module.exports = libraryPreset({
   plugins: {
     pre: [
       replace({
@@ -161,11 +167,11 @@ export default libraryPreset({
 });
 ```
 
-| Stage       | Runs before or after                          | Good for                             |
-| ----------- | --------------------------------------------- | ------------------------------------ |
-| `pre`       | Before externals, CommonJS, TS paths, esbuild | replacements, virtual modules, setup |
-| `transform` | After TS path resolution, before esbuild      | CSS, assets, path-aware transforms   |
-| `post`      | After esbuild                                 | analysis, compression, reporting     |
+| Stage       | Runs before or after                                                             | Good for                             |
+| ----------- | -------------------------------------------------------------------------------- | ------------------------------------ |
+| `pre`       | Before cross-module import rewriting, externals, CommonJS, TS paths, and esbuild | replacements, virtual modules, setup |
+| `transform` | After TS path resolution, before esbuild                                         | CSS, assets, path-aware transforms   |
+| `post`      | After esbuild                                                                    | analysis, compression, reporting     |
 
 ## Built-in Plugins
 
@@ -173,8 +179,8 @@ export default libraryPreset({
 
 Resolves TypeScript `paths` and optional `baseUrl` imports through TypeScript's resolver.
 
-```ts
-import { tsPathsPlugin } from 'rollup-presets';
+```js
+const { tsPathsPlugin } = require('rollup-presets');
 
 tsPathsPlugin({
   tsConfigPath: './tsconfig.json',
@@ -186,8 +192,8 @@ tsPathsPlugin({
 
 Emits declaration files through the TypeScript compiler API. The library preset defaults to `useTsc: true`, which is usually more reliable for preserved module builds.
 
-```ts
-import { tsDeclarationsPlugin } from 'rollup-presets';
+```js
+const { tsDeclarationsPlugin } = require('rollup-presets');
 
 tsDeclarationsPlugin({
   tsConfigPath: './tsconfig.json',

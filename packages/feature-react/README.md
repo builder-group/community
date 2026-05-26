@@ -60,16 +60,22 @@ const EmailField = () => {
 ## Install
 
 ```bash
-npm install feature-react
+npm install feature-react react
 ```
 
-Install the source package for the hooks you use. The examples below use both state and form hooks:
+Install the matching state or form package for the hooks you use:
 
 ```bash
-npm install feature-state feature-form zod
+# State hooks
+npm install feature-state
+
+# Form hooks
+npm install feature-form
 ```
 
-`zod` is only used by the form examples. Any Standard Schema validator works with `feature-form`.
+Install `zod` only for examples or any form that uses Zod validators. Any Standard Schema validator works with `feature-form`.
+
+The React peer dependency supports React 18 and React 19.
 
 ## Usage
 
@@ -187,7 +193,7 @@ Calls `callback` whenever the state changes without subscribing the component to
 import { useListener } from 'feature-react/state';
 
 export const Analytics = () => {
-  useListener($tasks, (tasks) => {
+  useListener($tasks, ({ value: tasks }) => {
     analytics.track('tasks_changed', { count: tasks.length });
   });
 
@@ -195,7 +201,7 @@ export const Analytics = () => {
 };
 ```
 
-The callback must be synchronous. It runs after every state change, including background updates.
+The callback runs after every state change, including background updates. It may return a cleanup function that runs before the next callback and on unmount. Async callbacks are accepted but not awaited.
 
 ### `useSubscriber(state, callback)`
 
@@ -204,7 +210,7 @@ Like `useListener`, but runs the callback immediately on mount with the current 
 ```ts
 import { useSubscriber } from 'feature-react/state';
 
-useSubscriber($theme, (theme) => {
+useSubscriber($theme, ({ value: theme }) => {
   document.documentElement.setAttribute('data-theme', theme);
 });
 ```
@@ -292,7 +298,7 @@ Builds input props from a `TFormField` directly, without a hook. Use this outsid
 
 #### Input options
 
-`useForm().input()` and `getFieldInputProps()` accept options per call. `useFormField()` accepts options at the hook level; the returned `input()` helper takes no arguments.
+`useForm().input()` and `getFieldInputProps()` accept options per call. `useFormField()` accepts `controlled` at the hook level, and its returned `input()` helper accepts `format` and `parse`.
 
 For string-valued fields, all options are optional:
 
@@ -309,13 +315,11 @@ For non-string fields, `format` and `parse` are required.
 input('name');
 input('age', { format: (v) => String(v), parse: (s) => Number(s), controlled: true });
 
-// useFormField: all options go to the hook; input() takes no args
+// useFormField: controlled goes to the hook; format and parse go to input()
 const { input: ageInput } = useFormField($form, 'age', {
-  controlled: true,
-  format: (v) => String(v),
-  parse: (s) => Number(s)
+  controlled: true
 });
-ageInput();
+ageInput({ format: (v) => String(v), parse: (s) => Number(s) });
 ```
 
 ## Built-in Features
@@ -358,6 +362,7 @@ const $tasks = createState<string[]>([]).with(globalBindFeature('_tasks'));
 ## Examples
 
 - [React Basic](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/basic)
+- [React Form Basic](https://github.com/builder-group/community/tree/develop/examples/feature-form/react/basic)
 
 ## FAQ
 
@@ -387,11 +392,11 @@ Use `useListener` when you need to react to state changes as a side effect but t
 
 ### Can I reference the latest values in a `useListener` or `useSubscriber` callback?
 
-Yes. Both hooks use a stable callback ref internally, so you can close over other state or props without stale value issues. The callback itself must be synchronous.
+Yes. Both hooks use a stable callback ref internally, so you can close over other state or props without stale value issues. Async callbacks are accepted but not awaited.
 
 ### Can I pass `null` or `undefined` as the state argument?
 
-Yes. All hooks accept `null` and `undefined` without subscribing. `useFeatureState` returns `null` in that case. This makes conditional subscription safe without violating the rules of hooks.
+Yes. State hooks such as `useFeatureState`, `useCompute`, `useListener`, and `useSubscriber` accept `null` and `undefined` without subscribing. `useFeatureState` returns `null` in that case. This makes conditional subscription safe without violating the rules of hooks.
 
 ### Why do background updates not trigger an immediate re-render?
 
@@ -399,7 +404,7 @@ States can emit updates marked as background, meaning the change should be picke
 
 ### What does passing `isEqual = false` to `useCompute` do?
 
-It disables the equality check entirely. The component re-renders every time any subscribed state emits a change, regardless of whether the computed value actually changed. Useful when the compute function has deliberate side effects or when you always want the freshest object reference.
+It disables the equality check entirely. The component re-renders every time any subscribed state emits a change, regardless of whether the computed value actually changed. This is useful when every source notification should produce a fresh rendered value. Keep `compute` pure. Use `useListener` for side effects.
 
 ### Does `useFeatureState` re-render when I call `notify()` without replacing the value?
 

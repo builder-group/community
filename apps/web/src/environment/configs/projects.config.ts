@@ -350,7 +350,7 @@ export const projectsConfig: {
 			id: 'feature-state',
 			name: 'feature-state',
 			description:
-				'Reactive state with opt-in features for undo, storage, computed values, equality, queues',
+				'Reactive state with computed values and opt-in undo, storage, equality, and queues',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -444,7 +444,7 @@ export const projectsConfig: {
 			id: 'head-metadata',
 			name: 'head-metadata',
 			description:
-				'Typed HTML head metadata extraction with title, meta, link, and custom extractors',
+				'Typed HTML head metadata extraction for title, meta, link, and custom extractors',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',

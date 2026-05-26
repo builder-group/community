@@ -17,7 +17,7 @@
     </a>
 </p>
 
-`head-metadata` extracts structured metadata from the `<head>` of an HTML document. It streams through the first head element with `xml-tokenizer`, ships extractors for `title`, `meta`, and `link`, and lets you add focused extractors for project-specific tags.
+`head-metadata` extracts structured metadata from the `<head>` of an HTML document. It tokenizes the first head element with `xml-tokenizer`, ships extractors for `title`, `meta`, and `link`, and lets you add focused extractors for project-specific tags.
 
 - Read page title, meta tags, Open Graph tags, charset, and canonical links into typed output
 - Stop after the first `<head>` so full-page HTML does not need a DOM parse
@@ -85,7 +85,7 @@ metadata.meta['og:title']; // Example OG title
 metadata.link.canonical; // https://example.com
 ```
 
-The output shape follows the extractor config. Collection extractors return records, and single extractors return one value.
+The output shape follows the extractor config. Config object keys choose the element names each extractor receives. `key` and `parent` choose metadata fields. Collection extractors write records under `parent`, while single extractors set a string under `key` when the callback returns a value.
 
 ## Built-in Extractors
 
@@ -148,6 +148,8 @@ const metadata = extractHeadMetadata(html, {
 metadata.viewport;
 ```
 
+In this example, `meta` means the extractor receives `<meta>` elements. `key: 'viewport'` controls the output field.
+
 Use a `collection` extractor when many tags should contribute to one record:
 
 ```ts
@@ -181,7 +183,7 @@ const metadata = extractHeadMetadata(html, {
 
 ### `extractHeadMetadata(html, extractors)`
 
-Streams through the first `<head>` element and returns metadata collected by the provided extractors.
+Tokenizes the first `<head>` element and returns metadata collected by the provided extractors.
 
 ```ts
 const metadata = extractHeadMetadata(html, {
@@ -212,3 +214,15 @@ Extractors keep the output shape explicit and typed. You choose which tags matte
 ### Can I extract Open Graph and Twitter metadata?
 
 Yes. `metaExtractor` stores both `name` and `property` attributes as keys, so tags such as `og:title` and `twitter:card` are included in `metadata.meta`.
+
+### What happens with multiple `<head>` elements?
+
+Only the first matched `<head>` is read. Later `<head>` elements are ignored.
+
+### What happens when two tags produce the same key?
+
+Collection output is a record. The later value replaces the earlier value for the same key.
+
+### Does it validate SEO metadata?
+
+No. It extracts selected values only. It does not validate SEO rules, normalize metadata, or resolve relative URLs.

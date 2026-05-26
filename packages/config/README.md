@@ -33,6 +33,20 @@ module.exports = [
 ];
 ```
 
+```js
+// eslint.config.mjs
+import libraryConfig from '@blgc/config/eslint/library';
+
+export default [
+  ...libraryConfig,
+  {
+    rules: {
+      // project-specific overrides
+    }
+  }
+];
+```
+
 ```json
 {
   "prettier": "@blgc/config/prettier"
@@ -45,13 +59,14 @@ module.exports = [
 npm install -D @blgc/config eslint prettier typescript
 ```
 
-Install the tools you use in the project. For example, add `vitest` when you use the shared Vitest config.
+Install the tools you use in the project. Add `vitest` directly when you use the shared Vitest config because it imports `vitest/config` and your scripts still run the Vitest CLI.
 
 ## Usage
 
 Use the config entry that matches the tool you are setting up:
 
 - `@blgc/config/prettier`: shared Prettier rules and sorting plugins
+- `@blgc/config/eslint/base`: shared ESLint foundation for custom presets
 - `@blgc/config/eslint/library`: flat ESLint config for TypeScript libraries
 - `@blgc/config/eslint/react-internal`: flat ESLint config for internal React packages
 - `@blgc/config/eslint/next`: flat ESLint config for Next.js apps
@@ -87,8 +102,23 @@ The Prettier config includes:
 Use flat config from `eslint.config.js`:
 
 ```js
+// CommonJS
 module.exports = [
   ...require('@blgc/config/eslint/library'),
+  {
+    rules: {
+      // local overrides
+    }
+  }
+];
+```
+
+```js
+// ESM
+import libraryConfig from '@blgc/config/eslint/library';
+
+export default [
+  ...libraryConfig,
   {
     rules: {
       // local overrides
@@ -107,6 +137,8 @@ Choose the preset by project type:
 | `@blgc/config/eslint/tanstack`       | TanStack Router or Start apps |
 
 The base config includes recommended JavaScript rules, TypeScript strict rules, Prettier compatibility, Turbo env-var warnings, `only-warn`, and generated-file ignores.
+
+`only-warn` makes ESLint report rule failures as warnings. Use `eslint --max-warnings=0` in CI when warnings should fail the build.
 
 ## TypeScript
 
@@ -135,6 +167,8 @@ Available configs:
 | `@blgc/config/typescript/react-internal` | React packages and Vite apps          |
 | `@blgc/config/typescript/next`           | Next.js apps                          |
 | `@blgc/config/typescript/tanstack`       | TanStack apps                         |
+
+Defaults to know: the base configs enable declarations and declaration maps, use `skipLibCheck`, and leave TypeScript unused checks off. The library presets allow JavaScript files. `@blgc/config/typescript/library` uses CommonJS output, so override `compilerOptions.module` when a project needs TypeScript to emit ESM directly.
 
 ## Vitest
 

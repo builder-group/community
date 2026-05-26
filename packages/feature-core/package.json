@@ -14,7 +14,7 @@
 		"library-authoring",
 		"type-safe",
 		"with",
-		"plugin-system"
+		"feature-system"
 	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
