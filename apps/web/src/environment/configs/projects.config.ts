@@ -409,11 +409,12 @@ export const projectsConfig: {
 			name: 'validation-adapter',
 			description: 'Universal validation abstraction for validators like Zod, Valibot, and Yup',
 			startedAt: { year: 2024 },
+			endedAt: { year: 2026, month: 5 },
 			status: 'discontinued',
 			category: 'package',
 			tags: [
 				{ type: 'npm', url: 'https://www.npmjs.com/package/validation-adapter' },
-				{ type: 'github', url: `${appConfig.social.githubPackages}/validation-adapter` }
+				{ type: 'github', url: `${appConfig.social.githubPackages}/_deprecated/validation-adapter` }
 			]
 		},
 		{
@@ -422,11 +423,15 @@ export const projectsConfig: {
 			description:
 				'Ready-made validation-adapter implementations for Zod, Valibot, Yup, and Standard Schema',
 			startedAt: { year: 2024 },
+			endedAt: { year: 2026, month: 5 },
 			status: 'discontinued',
 			category: 'package',
 			tags: [
 				{ type: 'npm', url: 'https://www.npmjs.com/package/validation-adapters' },
-				{ type: 'github', url: `${appConfig.social.githubPackages}/validation-adapters` }
+				{
+					type: 'github',
+					url: `${appConfig.social.githubPackages}/_deprecated/validation-adapters`
+				}
 			]
 		},
 		{
@@ -461,11 +466,12 @@ export const projectsConfig: {
 			name: '@blgc/utils',
 			description: 'Tree-shakable TypeScript utilities for colors, IDs, objects, URLs, and math',
 			startedAt: { year: 2024 },
-			status: 'maintenance',
+			endedAt: { year: 2026, month: 5 },
+			status: 'discontinued',
 			category: 'package',
 			tags: [
 				{ type: 'npm', url: 'https://www.npmjs.com/package/@blgc/utils' },
-				{ type: 'github', url: `${appConfig.social.githubPackages}/utils` }
+				{ type: 'github', url: `${appConfig.social.githubPackages}/_deprecated/utils` }
 			]
 		},
 		{
@@ -473,11 +479,12 @@ export const projectsConfig: {
 			name: '@blgc/types',
 			description: 'Shared utility, API, and OpenAPI TypeScript types for builder.group packages',
 			startedAt: { year: 2024 },
-			status: 'maintenance',
+			endedAt: { year: 2026, month: 5 },
+			status: 'discontinued',
 			category: 'package',
 			tags: [
 				{ type: 'npm', url: 'https://www.npmjs.com/package/@blgc/types' },
-				{ type: 'github', url: `${appConfig.social.githubPackages}/types` }
+				{ type: 'github', url: `${appConfig.social.githubPackages}/_deprecated/types` }
 			]
 		},
 		{
