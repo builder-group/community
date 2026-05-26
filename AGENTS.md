@@ -20,6 +20,7 @@ This is the shared source of truth for agent guidance in this repository.
 - General code style: `.agent/rules/style-guide.md`
 - Comments: `.agent/rules/comments.md`
 - Writing style (prose, READMEs, commit messages): `.agent/rules/writing.md`
+- Package READMEs: `.agent/rules/package-readme.md`
 - `tuple-result`: `.agent/rules/tuple-result.md`
 - Vitest tests: `.agent/rules/vitest.md`
 - `feature-fetch`: `.agent/rules/feature-fetch.md`
