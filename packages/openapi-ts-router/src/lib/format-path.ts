@@ -1,4 +1,4 @@
-// "/users/{userId}/books/{bookId}" -> "/users/:userId/books/:bookId"
-export function formatPath(path: string): string {
-	return path.replace(/\{(\w+)\}/g, ':$1');
+/** Converts an OpenAPI path (`/pets/{id}`) to router path syntax (`/pets/:id`). */
+export function formatOpenApiPath(path: string): string {
+	return path.replace(/\{([^{}]+)\}/g, ':$1');
 }

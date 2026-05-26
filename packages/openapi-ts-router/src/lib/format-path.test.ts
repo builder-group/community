@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { formatPath } from './format-path';
+import { formatOpenApiPath } from './format-path';
 
-describe('formatPath function', () => {
-	it('should replace single curly braces with colons', () => {
+describe('formatOpenApiPath function', () => {
+	it('should convert OpenAPI placeholders to router params', () => {
 		const path = '/users/{userId}/books/{bookId}';
-		const formatted = formatPath(path);
+		const formatted = formatOpenApiPath(path);
 		expect(formatted).toBe('/users/:userId/books/:bookId');
 	});
 
-	it('should handle paths without placeholders correctly', () => {
+	it('should leave paths without placeholders unchanged', () => {
 		const path = '/users/all';
-		const formatted = formatPath(path);
+		const formatted = formatOpenApiPath(path);
 		expect(formatted).toBe('/users/all');
 	});
 });

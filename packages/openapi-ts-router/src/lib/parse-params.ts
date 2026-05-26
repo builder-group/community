@@ -1,10 +1,14 @@
-import { type TParams } from '../types';
+import { type TParseParamsInput } from '../types';
 
-export function parseParams(params: TParams, blacklist?: string[]): Record<string, unknown> {
+/**
+ * Parses route and query params before schema validation.
+ * Converts finite numbers, booleans, and `null` recursively.
+ */
+export function parseParams(params: TParseParamsInput): Record<string, unknown> {
 	const parsedParams: Record<string, unknown> = {};
 
 	for (const [key, value] of Object.entries(params)) {
-		parsedParams[key] = blacklist?.includes(key) ? value : parseValue(value);
+		parsedParams[key] = parseValue(value);
 	}
 
 	return parsedParams;
@@ -24,14 +28,23 @@ function parseValue(value: unknown): unknown {
 }
 
 function parseStringValue(value: string): string | number | boolean | null | undefined {
-	if (value === '') return '';
-	if (value === 'null') return null;
-	if (value === 'undefined') return undefined;
-	if (value === 'true') return true;
-	if (value === 'false') return false;
+	if (value === '') {
+		return '';
+	}
+	if (value === 'null') {
+		return null;
+	}
+	if (value === 'true') {
+		return true;
+	}
+	if (value === 'false') {
+		return false;
+	}
 
 	const numberValue = Number(value);
-	if (!isNaN(numberValue)) return numberValue;
+	if (value.trim().length > 0 && Number.isFinite(numberValue)) {
+		return numberValue;
+	}
 
 	return value;
 }
