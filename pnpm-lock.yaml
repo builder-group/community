@@ -629,24 +629,6 @@ importers:
         specifier: workspace:*
         version: link:../rollup-presets
 
-  packages/types:
-    devDependencies:
-      '@blgc/config':
-        specifier: workspace:*
-        version: link:../config
-      rollup-presets:
-        specifier: workspace:*
-        version: link:../rollup-presets
-
-  packages/utils:
-    devDependencies:
-      '@blgc/config':
-        specifier: workspace:*
-        version: link:../config
-      rollup-presets:
-        specifier: workspace:*
-        version: link:../rollup-presets
-
   packages/validatenv:
     dependencies:
       '@standard-schema/spec':
@@ -662,44 +644,6 @@ importers:
       rollup-presets:
         specifier: workspace:*
         version: link:../rollup-presets
-
-  packages/validation-adapter:
-    dependencies:
-      '@blgc/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      '@blgc/config':
-        specifier: workspace:*
-        version: link:../config
-      rollup-presets:
-        specifier: workspace:*
-        version: link:../rollup-presets
-
-  packages/validation-adapters:
-    dependencies:
-      validation-adapter:
-        specifier: workspace:*
-        version: link:../validation-adapter
-    devDependencies:
-      '@blgc/config':
-        specifier: workspace:*
-        version: link:../config
-      '@standard-schema/spec':
-        specifier: ^1.1.0
-        version: 1.1.0
-      rollup-presets:
-        specifier: workspace:*
-        version: link:../rollup-presets
-      valibot:
-        specifier: 1.4.0
-        version: 1.4.0(typescript@6.0.3)
-      yup:
-        specifier: ^1.7.1
-        version: 1.7.1
-      zod:
-        specifier: ^4.4.3
-        version: 4.4.3
 
   packages/xml-tokenizer:
     devDependencies:
@@ -4728,9 +4672,6 @@ packages:
   prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
 
-  property-expr@2.0.6:
-    resolution: {integrity: sha512-SVtmxhRE/CGkn3eZY1T6pC8Nln6Fr/lu1mKSgRud0eC73whjGfoAogbn78LkD8aFL0zz3bAFerKSnOl7NlErBA==}
-
   property-information@7.1.0:
     resolution: {integrity: sha512-TwEZ+X+yCJmYfL7TPUOcvBZ4QfoT5YenQiJuX//0th53DE6w0xxLEtfK3iyryQFddXuvkIk51EEgrJQ0WJkOmQ==}
 
@@ -5209,9 +5150,6 @@ packages:
   through2@3.0.2:
     resolution: {integrity: sha512-enaDQ4MUyP2W6ZyT6EsMzqBPZaM/avg8iuo+l2d3QCs0J+6RaqkHV/2/lOwDTueBHeJ/2LG9lrLW3d5rWPucuQ==}
 
-  tiny-case@1.0.3:
-    resolution: {integrity: sha512-Eet/eeMhkO6TX8mnUteS9zgPbUMQa4I6Kkp5ORiBD5476/m+PIRiumP5tmh5ioJpH7k51Kehawy2UDfsnxxY8Q==}
-
   tinybench@2.9.0:
     resolution: {integrity: sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==}
 
@@ -5249,9 +5187,6 @@ packages:
   toidentifier@1.0.1:
     resolution: {integrity: sha512-o5sSPKEkg/DIQNmH43V0/uerLrpzVedkUh8tGNvaeXpfpuwjKenlSox/2O/BTlZUtEe+JG7s5YhEz608PlAHRA==}
     engines: {node: '>=0.6'}
-
-  toposort@2.0.2:
-    resolution: {integrity: sha512-0a5EOkAUp8D4moMi2W8ZF8jcga7BgZd91O/yabJCFY8az+XSzeGyTKs0Aoo897iV1Nj6guFq8orWDS96z91oGg==}
 
   tough-cookie@6.0.1:
     resolution: {integrity: sha512-LktZQb3IeoUWB9lqR5EWTHgW/VTITCXg4D21M+lvybRVdylLrRMnqaIONLVb5mav8vM19m44HIcGq4qASeu2Qw==}
@@ -5294,10 +5229,6 @@ packages:
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
-
-  type-fest@2.19.0:
-    resolution: {integrity: sha512-RAH822pAdBgcNMAfWnCBU3CFZcfZ/i1eZjwFU/dsLKumyuuP3niueg2UAukXYF0E2AAoc82ZSSf9J0WQBinzHA==}
-    engines: {node: '>=12.20'}
 
   type-fest@4.41.0:
     resolution: {integrity: sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA==}
@@ -5768,9 +5699,6 @@ packages:
   yoctocolors@2.1.2:
     resolution: {integrity: sha512-CzhO+pFNo8ajLM2d2IW/R93ipy99LWjtwblvC1RsoSUMZgyLbYFr221TnSNT7GjGdYui6P459mw9JH/g/zW2ug==}
     engines: {node: '>=18'}
-
-  yup@1.7.1:
-    resolution: {integrity: sha512-GKHFX2nXul2/4Dtfxhozv701jLQHdf6J34YDh2cEkpqoo8le5Mg6/LrdseVLrFarmFygZTlfIhHx/QKfb/QWXw==}
 
   zod-validation-error@4.0.2:
     resolution: {integrity: sha512-Q6/nZLe6jxuU80qb/4uJ4t5v2VEZ44lzQjPDhYJNztRQ4wyWc6VF3D3Kb/fAuPetZQnhS3hnajCf9CsWesghLQ==}
@@ -9941,8 +9869,6 @@ snapshots:
       object-assign: 4.1.1
       react-is: 16.13.1
 
-  property-expr@2.0.6: {}
-
   property-information@7.1.0: {}
 
   proxy-addr@2.0.7:
@@ -10545,8 +10471,6 @@ snapshots:
       inherits: 2.0.4
       readable-stream: 3.6.2
 
-  tiny-case@1.0.3: {}
-
   tinybench@2.9.0: {}
 
   tinybench@6.0.0: {}
@@ -10576,8 +10500,6 @@ snapshots:
       is-number: 7.0.0
 
   toidentifier@1.0.1: {}
-
-  toposort@2.0.2: {}
 
   tough-cookie@6.0.1:
     dependencies:
@@ -10620,8 +10542,6 @@ snapshots:
   type-check@0.4.0:
     dependencies:
       prelude-ls: 1.2.1
-
-  type-fest@2.19.0: {}
 
   type-fest@4.41.0: {}
 
@@ -10992,13 +10912,6 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   yoctocolors@2.1.2: {}
-
-  yup@1.7.1:
-    dependencies:
-      property-expr: 2.0.6
-      tiny-case: 1.0.3
-      toposort: 2.0.2
-      type-fest: 2.19.0
 
   zod-validation-error@4.0.2(zod@4.4.3):
     dependencies:

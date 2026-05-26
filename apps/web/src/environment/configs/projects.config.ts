@@ -609,7 +609,13 @@ export const projectsConfig: {
 			startedAt: { year: 2024 },
 			status: 'discontinued',
 			category: 'package',
-			tags: [{ type: 'npm', url: 'https://www.npmjs.com/package/widget-grid' }]
+			tags: [
+				{ type: 'npm', url: 'https://www.npmjs.com/package/widget-grid' },
+				{
+					type: 'github',
+					url: 'https://github.com/builder-group/saku-v1/tree/develop/apps/web/src/features/editor'
+				}
+			]
 		},
 		{
 			id: 'openapi-express',
