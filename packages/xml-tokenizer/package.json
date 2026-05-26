@@ -2,8 +2,22 @@
 	"name": "xml-tokenizer",
 	"version": "0.0.45",
 	"private": false,
-	"description": "Straightforward and typesafe XML tokenizer that streams tokens through a callback mechanism",
-	"keywords": [],
+	"description": "Streaming XML, HTML, and SVG tokenizer with typed tokens, selectors, and object helpers",
+	"keywords": [
+		"xml",
+		"html",
+		"svg",
+		"tokenizer",
+		"parser",
+		"xml-parser",
+		"html-parser",
+		"streaming-parser",
+		"sax",
+		"typescript",
+		"selector",
+		"object-parser",
+		"markup"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"

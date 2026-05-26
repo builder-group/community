@@ -35,15 +35,15 @@ Add comments when they make the code easier to understand or maintain. Omit them
 // Sort once so the UI stays stable across refreshes
 const sortedItems = items.slice().sort(compareItems);
 for (const item of sortedItems) {
-	renderItem(item);
+  renderItem(item);
 }
 ```
 
 ```ts
 // Retry with exponential backoff; the upstream service rate-limits on burst
 for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-	const result = await fetchWithDelay(attempt);
-	if (result.ok) return result;
+  const result = await fetchWithDelay(attempt);
+  if (result.ok) return result;
 }
 ```
 

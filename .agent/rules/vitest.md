@@ -32,28 +32,28 @@ Write tests so they read like small specifications.
 
 ```ts
 describe('createStore function', () => {
-	describe('types', () => {
-		it('should infer value types', () => {
-			const store = createStore('value');
+  describe('types', () => {
+    it('should infer value types', () => {
+      const store = createStore('value');
 
-			expectTypeOf(store.get()).toEqualTypeOf<string>();
-		});
-	});
+      expectTypeOf(store.get()).toEqualTypeOf<string>();
+    });
+  });
 
-	describe('set method', () => {
-		it('should notify listeners when the value changes', () => {
-			// Prepare
-			const store = createStore(0);
-			const listener = vi.fn();
-			store.listen(listener);
+  describe('set method', () => {
+    it('should notify listeners when the value changes', () => {
+      // Prepare
+      const store = createStore(0);
+      const listener = vi.fn();
+      store.listen(listener);
 
-			// Act
-			store.set(1);
+      // Act
+      store.set(1);
 
-			// Assert
-			expect(listener).toHaveBeenCalledWith({ value: 1 });
-		});
-	});
+      // Assert
+      expect(listener).toHaveBeenCalledWith({ value: 1 });
+    });
+  });
 });
 ```
 
@@ -61,16 +61,16 @@ describe('createStore function', () => {
 
 ```ts
 describe('store', () => {
-	describe('set method edge cases and notification behavior', () => {
-		it('works', () => {
-			const store = createStore(0);
-			const listener = vi.fn();
-			store.listen(listener);
-			store.set(1);
-			store.set(1);
-			expect(store.get()).toBe(1);
-			expect(listener).toHaveBeenCalledTimes(1);
-		});
-	});
+  describe('set method edge cases and notification behavior', () => {
+    it('works', () => {
+      const store = createStore(0);
+      const listener = vi.fn();
+      store.listen(listener);
+      store.set(1);
+      store.set(1);
+      expect(store.get()).toBe(1);
+      expect(listener).toHaveBeenCalledTimes(1);
+    });
+  });
 });
 ```

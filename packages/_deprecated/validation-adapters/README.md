@@ -31,29 +31,29 @@ import { zValidator } from 'validation-adapters/zod';
 import * as z from 'zod';
 
 const zodNameValidator = zValidator(
-	z
-		.string()
-		.min(2)
-		.max(10)
-		.regex(/^([^0-9]*)$/)
+  z
+    .string()
+    .min(2)
+    .max(10)
+    .regex(/^([^0-9]*)$/)
 );
 
 const valibotNameValidator = vValidator(
-	v.pipe(v.string(), v.minLength(2), v.maxLength(10), v.regex(/^([^0-9]*)$/))
+  v.pipe(v.string(), v.minLength(2), v.maxLength(10), v.regex(/^([^0-9]*)$/))
 );
 
 const customValidator = createValidator([
-	{
-		key: 'custom',
-		validate: (cx) => {
-			if (cx.value !== 'CustomValue') {
-				cx.registerError({
-					code: 'custom-error',
-					message: 'Value must be CustomValue.'
-				});
-			}
-		}
-	}
+  {
+    key: 'custom',
+    validate: (cx) => {
+      if (cx.value !== 'CustomValue') {
+        cx.registerError({
+          code: 'custom-error',
+          message: 'Value must be CustomValue.'
+        });
+      }
+    }
+  }
 ]);
 
 const combinedValidator = valibotNameValidator.clone().append(customValidator);
@@ -66,11 +66,11 @@ import { zValidator } from 'validation-adapters/zod';
 import * as z from 'zod';
 
 const zodNameValidator = zValidator(
-	z
-		.string()
-		.min(2)
-		.max(10)
-		.regex(/^([^0-9]*)$/)
+  z
+    .string()
+    .min(2)
+    .max(10)
+    .regex(/^([^0-9]*)$/)
 );
 ```
 
@@ -81,6 +81,6 @@ import * as v from 'valibot';
 import { vValidator } from 'validation-adapters/valibot';
 
 const valibotNameValidator = vValidator(
-	v.pipe(v.string(), v.minLength(2), v.maxLength(10), v.regex(/^([^0-9]*)$/))
+  v.pipe(v.string(), v.minLength(2), v.maxLength(10), v.regex(/^([^0-9]*)$/))
 );
 ```

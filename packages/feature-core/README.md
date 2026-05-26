@@ -17,25 +17,66 @@
     </a>
 </p>
 
-> Status: Experimental
+`feature-core` is the `.with(feature())` engine for extensible TypeScript libraries. Wrap a plain object once, define opt-in features, and let TypeScript track installed capabilities, dependencies, and intentional overrides.
 
-The `.with(feature())` composition layer for extensible TypeScript libraries. Write the feature logic; `feature-core` handles type tracking, dependency validation, and API merging.
-
-- TypeScript enforces feature dependencies at the call site: a missing required feature is a compile error, not a runtime crash
-- No registries, no lifecycles, no decorators: features install directly onto a plain object via `.with()`
-- No custom type gymnastics: the `.with()` signature, dependency checking, and API merging come built in
-- Features are host-agnostic: the same feature installs on any object that provides the base API it needs
+- Add typed capabilities to a host object without registries, decorators, or framework lifecycle hooks
+- Catch missing feature dependencies at the `.with()` call site
+- Compose one feature at a time or install a validated feature list in order
+- Reuse feature logic across any host that provides the API the feature needs
+- Keep runtime guards for duplicate features, missing dependencies, and accidental property collisions
 
 ```ts
-const counter = createCounter(0).with(resetFeature(), resetTwiceFeature());
+import { createFeatureHost, defineFeature, type TFeature } from 'feature-core';
 
-counter.reset(); // typed
-counter.resetTwice(); // typed: type error if resetFeature() was not passed first
-counter.missing(); // type error: property does not exist on this type
-
-if (hasFeature<TResetFeature>(counter, 'reset')) {
-	counter.reset(); // narrowed
+interface TCounterBase {
+  get(): number;
+  set(nextValue: number): void;
 }
+
+type TResetFeature = TFeature<'reset', { reset(): void }>;
+type TResetTwiceFeature = TFeature<'resetTwice', { resetTwice(): void }, [TResetFeature]>;
+
+function createCounter(initialValue: number) {
+  let value = initialValue;
+
+  return createFeatureHost({
+    get: () => value,
+    set: (nextValue: number) => {
+      value = nextValue;
+    }
+  });
+}
+
+function resetFeature(initialValue: number): TResetFeature {
+  return defineFeature<TResetFeature>({
+    key: 'reset',
+    install(counter: TCounterBase) {
+      return {
+        reset: () => counter.set(initialValue)
+      };
+    }
+  });
+}
+
+function resetTwiceFeature(): TResetTwiceFeature {
+  return defineFeature<TResetTwiceFeature>({
+    key: 'resetTwice',
+    requires: ['reset'],
+    install(counter) {
+      return {
+        resetTwice: () => {
+          counter.reset();
+          counter.reset();
+        }
+      };
+    }
+  });
+}
+
+const counter = createCounter(0).with(resetFeature(0), resetTwiceFeature());
+
+counter.set(5);
+counter.resetTwice(); // typed because resetFeature was installed first
 ```
 
 ## Install
@@ -44,9 +85,9 @@ if (hasFeature<TResetFeature>(counter, 'reset')) {
 npm install feature-core
 ```
 
-## Three Roles
+## Usage
 
-There are three roles in the feature model:
+Most package code falls into one of three roles:
 
 | Role               | Responsibility                                 |
 | ------------------ | ---------------------------------------------- |
@@ -80,7 +121,7 @@ Use `hasFeature()` for runtime checks:
 
 ```ts
 if (hasFeature<TResetFeature>(value, 'reset')) {
-	value.reset(); // narrowed
+  value.reset(); // narrowed
 }
 ```
 
@@ -92,8 +133,8 @@ Wrap the base object with `createFeatureHost()` and export a typed host alias:
 import { createFeatureHost, type TFeature, type TFeatureHost } from 'feature-core';
 
 interface TCounterBase {
-	get: () => number;
-	set: (nextValue: number) => void;
+  get: () => number;
+  set: (nextValue: number) => void;
 }
 
 type TResetFeature = TFeature<'reset', { reset(): void }>;
@@ -103,16 +144,16 @@ type TCounterFeature = TResetFeature | TResetTwiceFeature;
 export type TCounter<GFeatures extends TCounterFeature[]> = TFeatureHost<TCounterBase, GFeatures>;
 
 export function createCounter(initialValue: number): TCounter<[]> {
-	let value = initialValue;
+  let value = initialValue;
 
-	return createFeatureHost({
-		get() {
-			return value;
-		},
-		set(nextValue) {
-			value = nextValue;
-		}
-	});
+  return createFeatureHost({
+    get() {
+      return value;
+    },
+    set(nextValue) {
+      value = nextValue;
+    }
+  });
 }
 ```
 
@@ -147,18 +188,18 @@ import { defineFeature, type TFeature } from 'feature-core';
 type TResetFeature = TFeature<'reset', { reset(): void }>;
 
 export function resetFeature(): TResetFeature {
-	return defineFeature<TResetFeature>({
-		key: 'reset',
-		install(counter: TCounterBase) {
-			const initialValue = counter.get();
+  return defineFeature<TResetFeature>({
+    key: 'reset',
+    install(counter: TCounterBase) {
+      const initialValue = counter.get();
 
-			return {
-				reset() {
-					counter.set(initialValue);
-				}
-			};
-		}
-	});
+      return {
+        reset() {
+          counter.set(initialValue);
+        }
+      };
+    }
+  });
 }
 ```
 
@@ -168,16 +209,16 @@ For local or one-off features, the generic can be omitted and the type is inferr
 
 ```ts
 const debugFeature = () =>
-	defineFeature({
-		key: 'debug',
-		install() {
-			return {
-				debug() {
-					return true;
-				}
-			};
-		}
-	});
+  defineFeature({
+    key: 'debug',
+    install() {
+      return {
+        debug() {
+          return true;
+        }
+      };
+    }
+  });
 ```
 
 ### Dependent Features
@@ -188,18 +229,18 @@ List required feature types in the third `TFeature` generic and mirror those key
 type TResetTwiceFeature = TFeature<'resetTwice', { resetTwice(): void }, [TResetFeature]>;
 
 export function resetTwiceFeature(): TResetTwiceFeature {
-	return defineFeature<TResetTwiceFeature>({
-		key: 'resetTwice',
-		requires: ['reset'],
-		install(counter) {
-			return {
-				resetTwice() {
-					counter.reset();
-					counter.reset();
-				}
-			};
-		}
-	});
+  return defineFeature<TResetTwiceFeature>({
+    key: 'resetTwice',
+    requires: ['reset'],
+    install(counter) {
+      return {
+        resetTwice() {
+          counter.reset();
+          counter.reset();
+        }
+      };
+    }
+  });
 }
 ```
 
@@ -217,13 +258,13 @@ Features that only mutate internal configuration return an empty object:
 type TCacheFeature = TFeature<'cache', Record<never, never>>;
 
 export function cacheFeature(): TCacheFeature {
-	return defineFeature<TCacheFeature>({
-		key: 'cache',
-		install(client: TFetchClientBase) {
-			client._config.requestMiddlewares.push(cacheMiddleware());
-			return {};
-		}
-	});
+  return defineFeature<TCacheFeature>({
+    key: 'cache',
+    install(client: TFetchClientBase) {
+      client._config.requestMiddlewares.push(cacheMiddleware());
+      return {};
+    }
+  });
 }
 ```
 
@@ -235,21 +276,21 @@ Most features add new methods. When a feature intentionally replaces an existing
 type TLoggedSetFeature = TFeature<'logged-set', { set(nextValue: number): void }, [], 'set'>;
 
 export function loggedSetFeature(): TLoggedSetFeature {
-	return defineFeature<TLoggedSetFeature>({
-		key: 'logged-set',
-		overrides: ['set'],
-		install(counter: TCounterBase) {
-			// Capture the original before Object.assign replaces it with this override
-			const originalSet = counter.set.bind(counter);
+  return defineFeature<TLoggedSetFeature>({
+    key: 'logged-set',
+    overrides: ['set'],
+    install(counter: TCounterBase) {
+      // Capture the original before Object.assign replaces it with this override
+      const originalSet = counter.set.bind(counter);
 
-			return {
-				set(nextValue) {
-					console.log('set', nextValue);
-					originalSet(nextValue);
-				}
-			};
-		}
-	});
+      return {
+        set(nextValue) {
+          console.log('set', nextValue);
+          originalSet(nextValue);
+        }
+      };
+    }
+  });
 }
 ```
 

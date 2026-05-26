@@ -44,31 +44,31 @@ import { type TFromPluginMessageEvent } from 'figma-connect/plugin';
 
 // Plugin Events (Plugin -> App)
 interface TOnSelectNodeEvent extends TFromPluginMessageEvent {
-	key: 'on-select-node';
-	args: { selected: Pick<SceneNode, 'name' | 'id'>[] };
+  key: 'on-select-node';
+  args: { selected: Pick<SceneNode, 'name' | 'id'>[] };
 }
 
 interface TOnDeselectNodeEvent extends TFromPluginMessageEvent {
-	key: 'on-deselect-node';
-	args: { deselected: Pick<SceneNode, 'name' | 'id'>[] };
+  key: 'on-deselect-node';
+  args: { deselected: Pick<SceneNode, 'name' | 'id'>[] };
 }
 
 type TFromPluginMessageEvents = TOnSelectNodeEvent | TOnDeselectNodeEvent;
 
 // App Events (App -> Plugin)
 interface TOnUIRouteChangeEvent extends TFromAppMessageEvent {
-	key: 'on-ui-route-change';
-	args: {
-		activeRoute: 'a' | 'b' | 'c';
-	};
+  key: 'on-ui-route-change';
+  args: {
+    activeRoute: 'a' | 'b' | 'c';
+  };
 }
 
 interface TOnUserLoginEvent extends TFromAppMessageEvent {
-	key: 'on-user-login';
-	args: {
-		userId: string;
-		timestamp: number;
-	};
+  key: 'on-user-login';
+  args: {
+    userId: string;
+    timestamp: number;
+  };
 }
 
 type TFromAppMessageEvents = TOnUIRouteChangeEvent | TOnUserLoginEvent;
@@ -93,18 +93,18 @@ appHandler.post('on-user-login', { userId: 'user123', timestamp: Date.now() });
 
 // Register callbacks to receive Events from the 'plugin' part
 appHandler.register({
-	key: 'on-select-node',
-	type: 'plugin.message',
-	callback: async (_, args) => {
-		console.log('Selected Nodes:', args.selected);
-	}
+  key: 'on-select-node',
+  type: 'plugin.message',
+  callback: async (_, args) => {
+    console.log('Selected Nodes:', args.selected);
+  }
 });
 appHandler.register({
-	key: 'on-deselect-node',
-	type: 'plugin.message',
-	callback: async (_, args) => {
-		console.log('Deselected Nodes:', args.deselected);
-	}
+  key: 'on-deselect-node',
+  type: 'plugin.message',
+  callback: async (_, args) => {
+    console.log('Deselected Nodes:', args.deselected);
+  }
 });
 ```
 
@@ -120,7 +120,7 @@ import { TFromAppMessageEvents, TFromPluginMessageEvents } from './shared';
 
 // Create Plugin Handler and pass global 'figma' instance as first argument
 const pluginHandler = new FigmaPluginHandler<TFromAppMessageEvents, TFromPluginMessageEvents>(
-	figma
+  figma
 );
 
 // Send Events to the 'app/ui' part
@@ -129,18 +129,18 @@ pluginHandler.post('on-deselect-node', { deselected: [{ id: '1v1', name: 'Frame1
 
 // Register callbacks to receive Events from the 'app/ui' part
 pluginHandler.register({
-	key: 'on-ui-route-change',
-	type: 'app.message',
-	callback: async (_, args) => {
-		console.log('UI Route Changed:', args.activeRoute);
-	}
+  key: 'on-ui-route-change',
+  type: 'app.message',
+  callback: async (_, args) => {
+    console.log('UI Route Changed:', args.activeRoute);
+  }
 });
 pluginHandler.register({
-	key: 'on-user-login',
-	type: 'app.message',
-	callback: async (_, args) => {
-		console.log('User Logged In:', args.userId, 'at', args.timestamp);
-	}
+  key: 'on-user-login',
+  type: 'app.message',
+  callback: async (_, args) => {
+    console.log('User Logged In:', args.userId, 'at', args.timestamp);
+  }
 });
 ```
 
@@ -155,31 +155,31 @@ import { useAppCallback } from './hooks';
 import { TFromAppMessageEvents, TFromPluginMessageEvents } from './shared';
 
 export const MyComponent: React.FC = () => {
-	const [selectedNodes, setSelectedNodes] = useState([]);
+  const [selectedNodes, setSelectedNodes] = useState([]);
 
-	useAppCallback(
-		appHandler,
-		{
-			type: 'plugin.message',
-			key: 'on-select-node',
-			callback: async (_, args) => {
-				console.log('Selected Nodes:', args.selected);
-				setSelectedNodes(args.selected);
-			}
-		},
-		[]
-	);
+  useAppCallback(
+    appHandler,
+    {
+      type: 'plugin.message',
+      key: 'on-select-node',
+      callback: async (_, args) => {
+        console.log('Selected Nodes:', args.selected);
+        setSelectedNodes(args.selected);
+      }
+    },
+    []
+  );
 
-	return (
-		<div>
-			<h1>Selected Nodes</h1>
-			<ul>
-				{selectedNodes.map((node, index) => (
-					<li key={index}>{node.name}</li>
-				))}
-			</ul>
-		</div>
-	);
+  return (
+    <div>
+      <h1>Selected Nodes</h1>
+      <ul>
+        {selectedNodes.map((node, index) => (
+          <li key={index}>{node.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
 };
 ```
 

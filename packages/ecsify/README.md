@@ -10,739 +10,265 @@
         <img src="https://img.shields.io/bundlephobia/minzip/ecsify.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
     </a>
     <a href="https://www.npmjs.com/package/ecsify">
-        <img src="https://img.shields.io/npm/dt/featuer-state.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>
+        <img src="https://img.shields.io/npm/dt/ecsify.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>
     </a>
     <a href="https://discord.gg/w4xE3bSjhQ">
         <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=FDE200" alt="Join Discord"/>
     </a>
 </p>
 
-`ecsify` is a flexible, typesafe, and performance-focused [Entity Component System (ECS)](https://en.wikipedia.org/wiki/Entity_component_system) library for TypeScript.
+`ecsify` is a TypeScript Entity Component System for games, simulations, and data-heavy runtimes. It keeps entity data in component stores, lets plugins add typed components, resources, events, and app methods, and gives systems fast queries with change tracking when frame-to-frame behavior matters.
 
-- **🔮 Simple, declarative API**: Intuitive component patterns with full type safety
-- **🍃 Lightweight & Tree Shakable**: Function-based and modular design
-- **⚡ High Performance**: O(1) component checks using bitflags, cache-friendly sparse arrays
-- **🔍 Powerful Querying**: Query entities with complex filters and get component data efficiently
-- **📦 Zero Dependencies**: Standalone library ensuring ease of use in various environments
-- **🔧 Flexible Storage**: Supports AoS, SoA, and marker component patterns
-- **🧵 Change Tracking**: Built-in tracking for added, changed, and removed components
-
-### 📚 Examples
-
-- [Basic](https://github.com/builder-group/community/tree/develop/examples/ecsify/vanilla/basic) ([CodeSandbox](https://codesandbox.io/p/sandbox/822vss))
-
-### 🌟 Motivation
-
-Build a modern, type-safe ECS library that fully leverages TypeScript's type system without compromising performance. While libraries like [bitECS](https://github.com/NateTheGreatt/bitECS) offer good speed, they often lack robust TypeScript support and more advanced queries like `Added()`, `Removed()`, or `Changed()`. `ecsify` bridges this gap - combining high performance, full TypeScript integration, and powerful query capabilities - all while adhering to the KISS principle for a clean, intuitive API.
-
-### ⚖️ Alternatives
-
-- [bitecs](https://github.com/NateTheGreatt/bitECS)
-- [koota](https://github.com/pmndrs/koota)
-- [becsy](https://github.com/lastolivegames/becsy)
-- [elics](https://github.com/elixr-games/elics)
-- [ecsy](https://github.com/ecsyjs/ecsy)
-
-## 📖 Usage
-
-`ecsify` offers two approaches:
-
-- [**App**](#app-approach-recommended): Better DX, type safety, unified API
-- [**Raw**](#raw-approach-advanced): Maximum performance, direct memory access
-
-Both approaches can be mixed in the same codebase. Most users start with [App](#app-approach-recommended). Use [Raw](#raw-approach-advanced) only for performance-critical code.
-
-### App Approach (Recommended)
-
-Better DX with plugins, systems, and unified API (slower than [Raw](#raw-approach-advanced) because of added abstractions):
+- Model runtime data as entities, components, resources, systems, and events
+- Keep component storage flexible: arrays, structure-of-arrays, objects, and markers
+- Query with `With`, `Without`, `Added`, `Changed`, `Removed`, `And`, and `Or`
+- Let TypeScript track plugin contributions on `app.c`, `app.r`, and app extensions
+- Drop down to raw registries when a hot path needs direct control
 
 ```ts
-import { createApp, createDefaultPlugin, Entity, TPlugin } from 'ecsify';
+import { createApp, createDefaultPlugin, definePlugin, Entity, With } from 'ecsify';
 
-// Define plugin
-type TGamePlugin = TPlugin<
-	{
-		name: 'Game';
-		components: {
-			Position: { x: number[]; y: number[] };
-			Velocity: { dx: number[]; dy: number[] };
-		};
-	},
-	[TDefaultPlugin]
->;
-
-function createGamePlugin(): TGamePlugin {
-	return {
-		name: 'Game',
-		deps: ['Default'],
-		components: {
-			Position: { x: [], y: [] },
-			Velocity: { dx: [], dy: [] }
-		},
-		setup(app) {
-			// Create entity
-			const player = app.createEntity();
-			app.addComponent(player, app.c.Position, { x: 0, y: 0 });
-			app.addComponent(player, app.c.Velocity, { dx: 1, dy: 1 });
-
-			// Register system
-			app.addSystem(movementSystem, { set: 'Update' });
-		}
-	};
-}
-
-function movementSystem(app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>) {
-	for (const [eid, pos, vel] of app.queryComponents([
-		Entity,
-		app.c.Position,
-		app.c.Velocity
-	] as const)) {
-		// 'as const' for type inference
-		app.updateComponent(eid, app.c.Position, {
-			x: pos.x + vel.dx,
-			y: pos.y + vel.dy
-		});
-	}
-}
-
-// Create app
-const app = createApp({
-	plugins: [createDefaultPlugin(), createGamePlugin()] as const, // 'as const' for type inference
-	systemSets: ['First', 'Update', 'Last', 'Flush'] // Execution order
+const movementPlugin = definePlugin({
+  name: 'Movement',
+  deps: ['Default'],
+  components: {
+    Position: { x: [] as number[], y: [] as number[] },
+    Velocity: { dx: [] as number[], dy: [] as number[] }
+  }
 });
 
-// Game loop
-function gameLoop() {
-	app.update();
-	requestAnimationFrame(gameLoop);
-}
-```
+const app = createApp({
+  plugins: [createDefaultPlugin(), movementPlugin] as const,
+  systemSets: ['First', 'Update', 'Last', 'Flush']
+});
 
-### Key Concepts
-
-#### Entities
-
-Numerical IDs representing game objects:
-
-```ts
 const player = app.createEntity();
-const enemy = app.createEntity();
-```
+app.addComponent(player, app.c.Position, { x: 0, y: 0 });
+app.addComponent(player, app.c.Velocity, { dx: 4, dy: 2 });
 
-#### Components
-
-Data containers:
-
-```ts
-// Array of Structures (AoS) - simpler
-const Position: { x: number; y: number }[] = [];
-
-// Structure of Arrays (SoA) - cache-friendly
-const Position: { x: number[]; y: number[] } = { x: [], y: [] };
-
-// Single arrays
-const Health: number[] = [];
-
-// Markers
-const Player = {};
-```
-
-#### Systems
-
-Functions that process entities:
-
-```ts
-function movementSystem(app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>) {
-	for (const [eid, pos, vel] of app.queryComponents([
-		Entity,
-		app.c.Position,
-		app.c.Velocity
-	] as const)) {
-		pos.x += vel.dx;
-		pos.y += vel.dy;
-	}
-}
-
-app.addSystem(movementSystem, { set: 'Update' });
-```
-
-#### Queries
-
-Filter entities:
-
-```ts
-import { Added, And, Changed, Or, Removed, With, Without } from 'ecsify';
-
-// Filters
-app.queryEntities(With(app.c.Player)); // Has component
-app.queryEntities(Without(app.c.Dead)); // Lacks component
-app.queryEntities(And(With(app.c.Position), With(app.c.Velocity))); // Has all components
-app.queryEntities(Or(With(app.c.Player), With(app.c.Enemy))); // Has either component
-
-// Change tracking
-app.queryEntities(Added(app.c.Player)); // Component added this frame
-app.queryEntities(Removed(app.c.Velocity)); // Component removed this frame
-app.queryEntities(Changed(app.c.Health)); // Component changed this frame
-
-// Query entities with components
-for (const [eid, pos, vel] of app.queryComponents(
-	[Entity, app.c.Position, app.c.Velocity] as const, // 'as const' for type inference
-	With(app.c.Player)
-)) {
-	console.log(`Player ${eid} at (${pos.x}, ${pos.y})`);
-}
-
-// Query just entities
-for (const eid of app.queryEntities(With(app.c.Enemy))) {
-	console.log(`Enemy ${eid} at (${Position.x[eid]}, ${Position.y[eid]})`);
-}
-
-// For reactive queries with direct updates, mark changes manually
-Position.x[entity] = 110;
-app.markComponentChanged(entity, Position); // Required for Changed() queries
-```
-
-#### Resources
-
-Global state (config, input, score):
-
-```ts
-type TGamePlugin = TPlugin<
-	{
-		name: 'Game';
-		components: { Position: { x: number; y: number }[] };
-		resources: {
-			inputState: { jump: boolean };
-			gameConfig: { gravity: number };
-		};
-	},
-	[TDefaultPlugin]
->;
-
-function createGamePlugin(): TGamePlugin {
-	return {
-		name: 'Game',
-		deps: ['Default'],
-		components: { Position: [] },
-		resources: {
-			inputState: { jump: false },
-			gameConfig: { gravity: 9.8 }
-		},
-		setup(app) {
-			app.addSystem(physicsSystem, { set: 'Update' });
-		}
-	};
-}
-
-function physicsSystem(app: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>) {
-	const { inputState, gameConfig } = app.r;
-
-	for (const [eid, pos] of app.queryComponents([Entity, app.c.Position] as const)) {
-		if (inputState.jump) pos.y -= 100;
-		pos.y += gameConfig.gravity;
-	}
-}
-
-// Modify anywhere
-app.r.inputState.jump = true;
-```
-
-Resources declared by plugins are registered automatically and can be tracked explicitly for
-frame-based change detection:
-
-```ts
-app.hasResource('inputState'); // true
-
-// Top-level replacement marks the resource as changed
-app.updateResource('inputState', { jump: true });
-
-if (app.wasResourceChanged('inputState')) {
-	console.log('Input state changed this frame');
-}
-
-// Direct nested mutation requires manual marking
-app.r.inputState.jump = false;
-app.markResourceChanged('inputState');
-
-if (app.wasResourceAdded('inputState')) {
-	console.log('Resource was added this frame');
-}
-```
-
-Like component change tracking, resource tracking is cleared on `app.flush()`. Direct nested writes on
-`app.r` are not observed automatically, so call `app.markResourceChanged(...)` when mutating in place.
-`app.reset()` preserves loaded resources and their current values, while clearing resource tracking state.
-
-#### Bundles
-
-Reusable groups of components for entity setup:
-
-```ts
-import { bundleEntry, defineBundle } from 'ecsify';
-
-const ActorBundle = defineBundle(
-	bundleEntry(app.c.Position, { x: 0, y: 0 }),
-	bundleEntry(app.c.Health, 100)
+app.addSystem(
+  (currentApp, delta = 1) => {
+    for (const [eid, pos, vel] of currentApp.queryComponents(
+      [Entity, currentApp.c.Position, currentApp.c.Velocity] as const,
+      With(currentApp.c.Velocity)
+    )) {
+      currentApp.updateComponent(eid, currentApp.c.Position, {
+        x: pos.x + vel.dx * delta,
+        y: pos.y + vel.dy * delta
+      });
+    }
+  },
+  { set: 'Update' }
 );
 
-const PlayerBundle = defineBundle(ActorBundle, bundleEntry(app.c.Player));
-
-const player = app.createEntity();
-app.addBundle(player, PlayerBundle);
+app.update(1 / 60);
 ```
 
-Bundles are insertion helpers only. They are flattened when defined and can be composed from other
-bundles, but they are not queryable as a separate ECS concept.
+## Install
 
-#### App Extensions
-
-Custom methods on app:
-
-```ts
-type TGamePlugin = TPlugin<
-	{
-		name: 'Game';
-		components: {
-			Position: { x: number; y: number }[];
-			Health: number[];
-			Dead: Record<string, never>;
-		};
-		resources: { inputState: { w: boolean; s: boolean } };
-		appExtensions: {
-			handleKeyDown: (key: string) => void;
-			damageEntity: (eid: TEntityId, amount: number) => void;
-			spawnEnemy: (x: number, y: number) => TEntityId;
-		};
-	},
-	[TDefaultPlugin]
->;
-
-function createGamePlugin(): TGamePlugin {
-	return {
-		name: 'Game',
-		deps: ['Default'],
-		components: { Position: [], Health: [], Dead: {} },
-		resources: { inputState: { w: false, s: false } },
-		appExtensions: {
-			handleKeyDown(this: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>, key: string) {
-				if (key === 'w') this.r.inputState.w = true;
-				if (key === 's') this.r.inputState.s = true;
-			},
-
-			damageEntity(
-				this: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>,
-				eid: TEntityId,
-				amount: number
-			) {
-				const health = this.c.Health[eid];
-				if (health == null) return;
-
-				this.updateComponent(eid, this.c.Health, health - amount);
-				if (health - amount <= 0) this.addComponent(eid, this.c.Dead);
-			},
-
-			spawnEnemy(
-				this: TApp<TAppContext<[TDefaultPlugin, TGamePlugin]>>,
-				x: number,
-				y: number
-			): TEntityId {
-				const enemy = this.createEntity();
-				this.addComponent(enemy, this.c.Position, { x, y });
-				this.addComponent(enemy, this.c.Health, 100);
-				return enemy;
-			}
-		},
-		setup(app) {
-			const enemy = app.spawnEnemy(100, 200);
-		}
-	};
-}
-
-// Use anywhere
-app.handleKeyDown('w');
-app.damageEntity(enemy, 25);
+```bash
+npm install ecsify
 ```
 
-### Component Operations
+## Usage
+
+Start with an app when you want plugins, systems, resources, events, and typed access to components:
 
 ```ts
-const player = app.createEntity();
+import { createApp, createDefaultPlugin, definePlugin } from 'ecsify';
 
-// Add
-app.addComponent(player, app.c.Position, { x: 100, y: 50 });
+const gamePlugin = definePlugin({
+  name: 'Game',
+  deps: ['Default'],
+  components: {
+    Health: [] as number[],
+    Player: {}
+  },
+  resources: {
+    score: 0
+  }
+});
+
+const app = createApp({
+  plugins: [createDefaultPlugin(), gamePlugin] as const,
+  systemSets: ['First', 'Update', 'Last', 'Flush']
+});
+
+const player = app.createEntity();
+app.addComponent(player, app.c.Player);
 app.addComponent(player, app.c.Health, 100);
-app.addComponent(player, app.c.Player); // Marker
 
-// Update
-app.updateComponent(player, app.c.Position, { x: 110 }); // Partial updates (only possible for SoA)
-app.updateComponent(player, app.c.Health, 95);
-
-// Direct access (faster)
-app.c.Position.x[player] = 110;
-app.markComponentChanged(player, app.c.Position); // Required for Changed() queries
-
-// Remove
-app.removeComponent(player, app.c.Velocity);
-
-// Check
-if (app.hasComponent(player, app.c.Player)) {
-	// Is player
-}
+app.updateResource('score', 10);
 ```
 
-### Game Loop
+Use raw registries when you want only the ECS primitives and no app abstraction:
 
 ```ts
-function gameLoop() {
-	app.update(); // Runs all registered systems
-	requestAnimationFrame(gameLoop);
-}
-```
+import { createComponentRegistry, createEntityIndex, createQueryRegistry, With } from 'ecsify';
 
-### Raw Approach (Advanced)
-
-Direct memory access for maximum performance. You manage everything manually:
-
-```ts
-import { And, createComponentRegistry, createEntityIndex, createQueryRegistry, With } from 'ecsify';
-
-// Create registries
 const entityIndex = createEntityIndex();
 const componentRegistry = createComponentRegistry();
 const queryRegistry = createQueryRegistry(entityIndex, componentRegistry);
 
-// Define components
-const Position: { x: number[]; y: number[] } = { x: [], y: [] };
-const Velocity: { dx: number[]; dy: number[] } = { dx: [], dy: [] };
+const Position = { x: [] as number[], y: [] as number[] };
+const eid = entityIndex.createEntity();
 
-// Create entity
-const player = entityIndex.createEntity();
-componentRegistry.add(player, Position);
-Position.x[player] = 0;
-Position.y[player] = 0;
-componentRegistry.add(player, Velocity);
-Velocity.dx[player] = 1;
-Velocity.dy[player] = 1;
+componentRegistry.add(eid, Position, { x: 10, y: 20 });
 
-// Systems are just functions
-function movementSystem() {
-	for (const eid of queryRegistry.queryEntities(And(With(Position), With(Velocity)))) {
-		Position.x[eid] += Velocity.dx[eid];
-		Position.y[eid] += Velocity.dy[eid];
-	}
-}
-
-// Game loop
-function gameLoop() {
-	movementSystem();
-	componentRegistry.flush(); // Clear change tracking
-	requestAnimationFrame(gameLoop);
-}
+const moving = queryRegistry.queryEntities(With(Position));
 ```
 
-## 📐 Architecture
+## App
 
-### Entity Index (`create-entity-index.ts`)
+### `createApp(config)`
 
-Efficient entity ID management using sparse-dense array pattern with optional versioning. Provides O(1) operations while maintaining cache-friendly iteration.
-
-#### Sparse-Dense Pattern
-
-```
-Sparse Array:  [_, 0, _, 2, 1, _, _]  ← Maps entity ID → dense index
-                 1  2  3  4  5  6  7   ← Entity IDs
-
-Dense Array:   [2, 5, 4, 7, 3]        ← Alive entities (cache-friendly)
-               [0, 1, 2, 3, 4]        ← Indices
-               └─alive─┘ └dead┘
-
-aliveCount: 3  ← First 3 elements are alive
-```
-
-**Core Data:**
-
-- **Sparse Array**: Maps base entity IDs to dense array positions
-- **Dense Array**: Contiguous alive entities, with dead entities at end
-- **Alive Count**: Boundary between alive/dead entities
-
-#### Entity ID Format
-
-```
-32-bit Entity ID = [Version Bits | Entity ID Bits]
-
-Example with 8 version bits:
-┌─ Version (8 bits) ─┐┌─── Entity ID (24 bits) ───┐
-00000001              000000000000000000000001
-│                     │
-└─ Version 1          └─ Base Entity ID 1
-```
-
-#### Why This Design?
-
-**Problem: Stale References**
-
-```typescript
-const entity = addEntity(); // Returns ID 5
-removeEntity(entity); // Removes ID 5
-const newEntity = addEntity(); // Might reuse ID 5!
-// Bug: old reference to ID 5 now points to wrong entity
-```
-
-**Solution: Versioning**
-
-```typescript
-const entity = addEntity(); // Returns 5v0 (ID 5, version 0)
-removeEntity(entity); // Increments to 5v1
-const newEntity = addEntity(); // Reuses base ID 5 but as 5v1
-// Safe: old reference (5v0) won't match new entity (5v1)
-```
-
-**Swap-and-Pop for O(1) Removal**
-
-```typescript
-// Remove entity at index 1:
-dense = [1, 2, 3, 4, 5];
-// 1. Swap with last: [1, 5, 3, 4, 2]
-// 2. Decrease alive count
-// Result: [1, 5, 3, 4 | 2] - only alive section matters
-```
-
-**Performance:** O(1) all operations, ~8 bytes per entity, cache-friendly iteration.
-
-### Query Registry (`create-query-registry.ts`)
-
-Entity filtering with two strategies: bitmask optimization for simple queries, individual evaluation for complex queries.
-
-#### Query Filters
-
-```typescript
-// Component filters
-With(Position); // Entity must have component
-Without(Dead); // Entity must not have component
-
-// Change detection
-Added(Position); // Component added this frame
-Changed(Health); // Component modified this frame
-Removed(Velocity); // Component removed this frame
-
-// Logical operators
-And(With(Position), With(Velocity)); // All must match
-Or(With(Player), With(Enemy)); // Any must match
-```
-
-#### Evaluation Strategies
-
-**Bitmask Strategy** - Fast bitwise operations:
-
-```typescript
-// Components get bit positions
-Position: bitflag=0b001, Velocity: bitflag=0b010, Health: bitflag=0b100
-
-// Entity masks show what components each entity has
-entity1: 0b011  // Has Position + Velocity
-entity2: 0b101  // Has Position + Health
-
-// Query: And(With(Position), With(Velocity)) → andMasks.with = 0b011
-// Check: (entityMask & 0b011) === 0b011
-entity1: (0b011 & 0b011) === 0b011  ✓ true
-entity2: (0b101 & 0b011) === 0b011  ✗ false
-```
-
-**Individual Strategy** - Per-filter evaluation for complex queries:
-
-```typescript
-// Complex queries like Or(With(Position), Changed(Health))
-// Fall back to: filters.some(filter => filter.evaluate(app, eid))
-```
-
-#### Performance (10,000 entities)
-
-```
-  individual + cached - __tests__/query.bench.ts > Query Performance > With(Position)
-    1.04x faster than bitmask + cached
-    7.50x faster than bitmask + no cache
-    7.83x faster than individual + no cache
-
-  bitmask + cached - __tests__/query.bench.ts > Query Performance > And(With(Position), With(Velocity))
-    1.01x faster than individual + cached
-    13.58x faster than bitmask + no cache
-    13.72x faster than individual + no cache
-```
-
-**Key Insight:** Caching matters most (7-14x faster than no cache). Bitmask vs individual evaluation shows minimal difference.
-
-### Resource Registry (`create-resource-registry.ts`)
-
-Tracks top-level app resources independently from the entity/component query system.
-
-#### Why Separate from Queries?
-
-Resources are singleton values on `app.r`, not collections of ECS data. They do not benefit from
-bitmask matching, cached entity scans, or query compilation.
-
-Instead, `ecsify` tracks resources by key using three small `Set`s:
-
-```typescript
-_registered = new Set(); // Known resource keys
-_added = new Set(); // Added since last flush
-_changed = new Set(); // Changed since last flush
-```
-
-This keeps resource tracking:
-
-- **O(1) for lookups and writes**
-- **Cheap to maintain** because apps typically have very few resources
-- **Explicit** without proxy magic or deep object observation
-
-#### Update Model
-
-```typescript
-// Top-level replacement
-app.updateResource('score', 10);
-
-// Direct nested mutation
-app.r.inputState.jump = true;
-app.markResourceChanged('inputState');
-```
-
-Top-level updates can be tracked automatically because the app owns the assignment. Direct nested
-mutations are not intercepted, so they must be marked explicitly.
-
-### Bundles (`define-bundle.ts`)
-
-Bundles provide a lightweight way to group components for insertion without introducing a new runtime
-storage model.
-
-#### Design
-
-Bundles are flattened when defined:
-
-```typescript
-const ActorBundle = defineBundle(bundleEntry(Position, { x: 0, y: 0 }), bundleEntry(Health, 100));
-
-const PlayerBundle = defineBundle(ActorBundle, bundleEntry(Player));
-```
-
-This keeps application fast and simple:
-
-- `app.addBundle(...)` only iterates flat bundle entries
-- Nested bundle composition is resolved once up front
-- Duplicate component references are rejected early
-
-Bundles are intentionally just insertion convenience. Like Bevy bundles, they are not used for
-queries or runtime grouping.
-
-### Component Registry (`create-component-registry.ts`)
-
-Component management with direct array access, unlimited components via generations, and flexible storage patterns.
-
-#### Component Patterns
-
-```typescript
-// Array of Structures (AoS) - good for complete entity data
-const Transform = [];
-Transform[eid] = { x: 10, y: 20 };
-
-// Structure of Arrays (SoA) - cache-friendly for bulk operations
-const Position = { x: [], y: [] };
-Position.x[eid] = 10;
-Position.y[eid] = 20;
-
-// Single arrays and marker components
-const Health = []; // Health[eid] = 100
-const Player = {}; // Just presence/absence
-```
-
-#### Generation System
-
-Unlimited components beyond 31-bit limit:
-
-**Why Generations?** Bitmasks need one bit per component for fast O(1) checks. JavaScript integers are 32-bit, giving us only 31 usable bits (0 - 30, bit 31 is sign). So we can only track 31 components per bitmask.
-
-```typescript
-// Problem: Only 31 components fit in one integer bitmask
-// Bits:  31 30 29 28 ... 3  2  1  0
-// Components: ❌ ✓  ✓  ✓ ... ✓  ✓  ✓  ✓  (31 components max)
-
-// Solution: Multiple generations, each with 31 components
-// Generation 0: Components 0-30 (bitflags 1, 2, 4, ..., 2^30)
-Position: { generationId: 0, bitflag: 0b001 }
-Velocity: { generationId: 0, bitflag: 0b010 }
-
-// Generation 1: Components 31+ (bitflags restart)
-Armor:    { generationId: 1, bitflag: 0b001 }
-Weapon:   { generationId: 1, bitflag: 0b010 }
-
-// Entity masks stored per generation
-_entityMasks[0][eid] = 0b011;  // Has Position + Velocity
-_entityMasks[1][eid] = 0b001;  // Has Armor
-```
-
-#### Bitmask Operations
-
-```typescript
-// Adding component: OR with bitflag
-entityMask |= 0b010; // Add Velocity
-
-// Removing component: AND with inverted bitflag
-entityMask &= ~0b010; // Remove Velocity
-
-// Checking component: AND with bitflag
-const hasVelocity = (entityMask & 0b010) !== 0;
-```
-
-#### Change Tracking
-
-```typescript
-// Separate masks track changes per frame
-_addedMasks[0][eid] |= bitflag;    // Component added
-_changedMasks[0][eid] |= bitflag;  // Component changed
-_removedMasks[0][eid] |= bitflag;  // Component removed
-
-// Clear at frame end
-flush() { /* clear all change masks */ }
-```
-
-#### Flush-Based Semantics
-
-`ecsify` uses flush-based change detection, not per-system tick tracking.
-
-That means:
-
-- `Changed(...)` means changed since the last `flush()`
-- `wasResourceChanged(...)` means changed since the last `flush()`
-- By default, the app flushes in the `Last` system set via the default plugin
-
-This model is simpler than Bevy-style per-system ticks and matches the current scheduler design.
-If you need a different tracking boundary, you can control when `flush()` is called.
-
-## 📚 Good to Know
-
-### Sparse vs Dense Arrays
-
-JavaScript sparse arrays store only assigned indices, making them memory-efficient:
+Creates an ECS app from plugins and ordered system sets.
 
 ```ts
-const sparse = [];
-sparse[1000] = 5; // [<1000 empty items>, 5]
-
-console.log(sparse.length); // 1001
-console.log(sparse[500]); // undefined (no memory used)
+const app = createApp({
+  plugins: [createDefaultPlugin(), gamePlugin] as const,
+  systemSets: ['First', 'Update', 'Last', 'Flush']
+});
 ```
 
-In contrast, dense arrays allocate memory for every element, even if unused:
+| Option       | Description                                      |
+| ------------ | ------------------------------------------------ |
+| `plugins`    | Plugins installed before the app is returned     |
+| `systemSets` | Ordered system groups run by `app.update(delta)` |
+
+The default plugin adds a `Removed` marker, `markEntityForRemoval(eid)`, and a `Flush` system that clears frame-based tracking.
+
+### `definePlugin(config)`
+
+Defines a typed plugin. Plugins can contribute components, resources, events, app extension methods, and setup logic.
 
 ```ts
-const dense = new Array(1001).fill(0); // Allocates 1001 × 4 bytes = ~4KB
-
-console.log(dense.length); // 1001
-console.log(dense[500]); // 0
+const inputPlugin = definePlugin({
+  name: 'Input',
+  deps: ['Default'],
+  resources: {
+    input: { jump: false }
+  }
+});
 ```
 
-Use sparse arrays for large, mostly empty datasets. Use dense arrays when you need consistent iteration and performance.
+Install plugins in dependency order. A plugin with `deps: ['Input']` must be installed after the `Input` plugin.
 
-## 💡 Resources / References
+## Components
 
-- [BitECS](https://github.com/NateTheGreatt/bitECS) - High-performance ECS library that inspired our implementation
-- [Bevy](https://github.com/bevyengine/bevy) - Data-driven game engine built in Rust that inspired our API
-- [Data Oriented Design and Entity Component System Explained](https://www.youtube.com/watch?v=xm4AQj5PHT4)
+Components are storage references. `ecsify` supports common ECS storage shapes:
+
+```ts
+const Position = { x: [] as number[], y: [] as number[] }; // structure of arrays
+const Health = [] as number[]; // single array
+const Renderable = {} as {}; // marker
+const Sprite = [] as { src: string; frame: number }[]; // array of objects
+```
+
+Use app helpers to add, update, remove, and check components:
+
+```ts
+const eid = app.createEntity();
+
+app.addComponent(eid, app.c.Position, { x: 0, y: 0 });
+app.updateComponent(eid, app.c.Position, { x: 12 });
+app.hasComponent(eid, app.c.Position);
+app.removeComponent(eid, app.c.Position);
+```
+
+`updateComponent` marks the component as changed by default. If you mutate component storage directly, call `markComponentChanged(eid, component)` when `Changed(component)` queries should see the update.
+
+## Queries
+
+Use filters to select entities and components:
+
+```ts
+import { Added, And, Changed, Entity, Or, Removed, With, Without } from 'ecsify';
+
+app.queryEntities(With(app.c.Player));
+app.queryEntities(And(With(app.c.Position), Without(app.c.Removed)));
+app.queryEntities(Or(With(app.c.Player), With(app.c.Enemy)));
+app.queryEntities(Added(app.c.Player));
+app.queryEntities(Changed(app.c.Health));
+app.queryEntities(Removed(app.c.Velocity));
+
+for (const [eid, health] of app.queryComponents([Entity, app.c.Health] as const)) {
+  console.log(eid, health);
+}
+```
+
+`queryComponents` returns typed tuples in the same order as the component list. Include `Entity` when the system needs the entity ID.
+
+## Resources And Events
+
+Resources hold global state such as input, config, clocks, and score:
+
+```ts
+const inputPlugin = definePlugin({
+  name: 'Input',
+  deps: ['Default'],
+  resources: {
+    input: { jump: false }
+  }
+});
+
+const app = createApp({
+  plugins: [createDefaultPlugin(), inputPlugin] as const,
+  systemSets: ['First', 'Update', 'Last', 'Flush']
+});
+
+app.r.input.jump = true;
+app.markResourceChanged('input');
+
+if (app.wasResourceChanged('input')) {
+  console.log('input changed this frame');
+}
+```
+
+Events are queued by type and can be read or consumed:
+
+```ts
+const combatPlugin = definePlugin({
+  name: 'Combat',
+  deps: ['Default'],
+  events: {
+    damage: {} as { entity: number; amount: number }
+  }
+});
+
+const app = createApp({
+  plugins: [createDefaultPlugin(), combatPlugin] as const,
+  systemSets: ['First', 'Update', 'Last', 'Flush']
+});
+
+const player = app.createEntity();
+app.pushEvent('damage', { entity: player, amount: 10 });
+
+for (const event of app.consumeEvent('damage')) {
+  console.log(event.data.amount);
+}
+```
+
+Frame-based component, resource, and event tracking is cleared by `app.flush()`. The default plugin runs that during the `Flush` system set.
+
+## Examples
+
+- [Vanilla basic](https://github.com/builder-group/community/tree/develop/examples/ecsify/vanilla/basic)
+
+## FAQ
+
+### When should I use the app API instead of raw registries?
+
+Use the app API for most projects. It gives you plugin composition, typed component access, resources, events, and ordered systems. Use raw registries for isolated hot paths, tests, or experiments where you want direct control over every ECS primitive.
+
+### Do components have to use structure-of-arrays storage?
+
+No. Structure-of-arrays storage is useful for tight loops, but `ecsify` also works with arrays of objects, single arrays, and marker components. Pick the shape that fits the data and update pattern.
+
+### How does change tracking work?
+
+`addComponent`, `updateComponent`, and `removeComponent` update the frame-tracking state automatically. Direct mutations are allowed, but you need to call `markComponentChanged` when `Changed(component)` queries should react to them.
+
+### How does it compare to bitecs, koota, becsy, and elics?
+
+`ecsify` focuses on a TypeScript-first app model with plugins, typed app contributions, flexible component storage, and query filters. Use it when you want ECS primitives that can stay low-level, but still compose into a typed application API.

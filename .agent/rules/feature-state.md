@@ -27,20 +27,20 @@ Use `feature-state` and `feature-react/state` as the default state pattern in pr
 ```tsx
 const label = useCompute($seconds, (seconds = 0) => formatSeconds(seconds));
 const isDisabled = useCompute(
-	[$status, $selectedId] as const,
-	([status = 'idle', selectedId = null]) => {
-		return status === 'loading' || selectedId == null;
-	}
+  [$status, $selectedId] as const,
+  ([status = 'idle', selectedId = null]) => {
+    return status === 'loading' || selectedId == null;
+  }
 );
 
 useListener(
-	$status,
-	({ value }) => {
-		if (value === 'error') {
-			showToast('Something went wrong');
-		}
-	},
-	[showToast]
+  $status,
+  ({ value }) => {
+    if (value === 'error') {
+      showToast('Something went wrong');
+    }
+  },
+  [showToast]
 );
 ```
 
@@ -52,8 +52,8 @@ const selectedId = useFeatureState($selectedId);
 const isDisabled = status === 'loading' || selectedId == null;
 
 React.useEffect(() => {
-	if (status === 'error') {
-		showToast('Something went wrong');
-	}
+  if (status === 'error') {
+    showToast('Something went wrong');
+  }
 }, [status, showToast]);
 ```

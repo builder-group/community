@@ -17,6 +17,16 @@ module.exports = {
 	semi: true,
 	quoteProps: 'consistent',
 	bracketSameLine: false,
+	// Markdown is published documentation. Spaces keep code fences readable on npm and GitHub.
+	overrides: [
+		{
+			files: ['*.md', '*.mdx'],
+			options: {
+				useTabs: false,
+				tabWidth: 2
+			}
+		}
+	],
 
 	// Plugins
 	// Note: Use require.resolve() to ensure plugins are found from this package's node_modules.

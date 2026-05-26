@@ -49,7 +49,7 @@ pnpm add split-flap-board
 
 ```html
 <script type="module">
-	import 'split-flap-board';
+  import 'split-flap-board';
 </script>
 
 <split-flap-board></split-flap-board>
@@ -74,7 +74,7 @@ For most apps, this is the easiest way to start:
 
 ```html
 <script type="module">
-	import 'split-flap-board';
+  import 'split-flap-board';
 </script>
 
 <split-flap-spool value="A"></split-flap-spool>
@@ -143,7 +143,7 @@ Char flaps can be styled per flap when needed:
 
 ```ts
 const styledSpool = charSpool.map((flap) =>
-	flap.type === 'char' ? { ...flap, fontSize: '3rem', color: '#fff', bg: '#2563eb' } : flap
+  flap.type === 'char' ? { ...flap, fontSize: '3rem', color: '#fff', bg: '#2563eb' } : flap
 );
 
 spool.flaps = styledSpool;
@@ -171,10 +171,10 @@ Custom spools are just arrays:
 
 ```ts
 const statusSpool: TSpool = [
-	{ type: 'color', value: '#111', key: 'off' },
-	{ type: 'color', value: '#16a34a', key: 'green' },
-	{ type: 'color', value: '#dc2626', key: 'red' },
-	{ type: 'color', value: '#f59e0b', key: 'yellow' }
+  { type: 'color', value: '#111', key: 'off' },
+  { type: 'color', value: '#16a34a', key: 'green' },
+  { type: 'color', value: '#dc2626', key: 'red' },
+  { type: 'color', value: '#f59e0b', key: 'yellow' }
 ];
 ```
 
@@ -182,10 +182,10 @@ You can also mix flap types within a single spool:
 
 ```ts
 const mixedSpool: TSpool = [
-	{ type: 'char', value: ' ' },
-	{ type: 'image', src: '/icons/check.svg', key: 'check' },
-	{ type: 'color', value: '#16a34a', key: 'green' },
-	{ type: 'char', value: '!' }
+  { type: 'char', value: ' ' },
+  { type: 'image', src: '/icons/check.svg', key: 'check' },
+  { type: 'color', value: '#16a34a', key: 'green' },
+  { type: 'char', value: '!' }
 ];
 ```
 
@@ -212,14 +212,14 @@ board.spools = spoolGrid([charSpool, charSpool, statusSpool], 3, 2);
 
 // Fully custom: build the 2D array directly.
 board.spools = [
-	[charSpool, charSpool, statusSpool],
-	[charSpool, charSpool, statusSpool]
+  [charSpool, charSpool, statusSpool],
+  [charSpool, charSpool, statusSpool]
 ];
 
 // grid: target keys, updated freely at runtime
 board.grid = [
-	['H', 'E', 'green'],
-	['L', 'O', 'red']
+  ['H', 'E', 'green'],
+  ['L', 'O', 'red']
 ];
 ```
 
@@ -242,8 +242,8 @@ board.grid = [['G', 'O', 'O', 'D', 'B', 'Y', 'E', ' ', ' ', ' ', ' ']];
 import { fromLines } from 'split-flap-board';
 
 const { spools, grid } = fromLines(
-	['BA123  LHR  18:30  BOARDING', 'LH456  FRA  19:15  ON TIME ', 'AF789  CDG  19:45  DELAYED '],
-	26
+  ['BA123  LHR  18:30  BOARDING', 'LH456  FRA  19:15  ON TIME ', 'AF789  CDG  19:45  DELAYED '],
+  26
 );
 
 board.spools = spools;
@@ -254,9 +254,9 @@ board.grid = grid;
 
 ```js
 const statusSpool = [
-	{ type: 'color', value: '#111', key: 'off' },
-	{ type: 'color', value: '#16a34a', key: 'green' },
-	{ type: 'color', value: '#dc2626', key: 'red' }
+  { type: 'color', value: '#111', key: 'off' },
+  { type: 'color', value: '#16a34a', key: 'green' },
+  { type: 'color', value: '#dc2626', key: 'red' }
 ];
 
 spool.flaps = statusSpool;
@@ -269,16 +269,16 @@ spool.value = 'green';
 import { charSpool, spoolGrid } from 'split-flap-board';
 
 const statusSpool = [
-	{ type: 'color', value: '#111', key: 'off' },
-	{ type: 'color', value: '#16a34a', key: 'green' },
-	{ type: 'color', value: '#dc2626', key: 'red' }
+  { type: 'color', value: '#111', key: 'off' },
+  { type: 'color', value: '#16a34a', key: 'green' },
+  { type: 'color', value: '#dc2626', key: 'red' }
 ];
 
 board.spools = spoolGrid([charSpool, charSpool, charSpool, charSpool, statusSpool], 5, 2);
 
 board.grid = [
-	['G', 'A', 'T', 'E', 'green'],
-	['B', '1', '2', '3', 'red']
+  ['G', 'A', 'T', 'E', 'green'],
+  ['B', '1', '2', '3', 'red']
 ];
 ```
 
@@ -288,12 +288,12 @@ board.grid = [
 import { fromLines } from 'split-flap-board';
 
 const { spools, grid } = fromLines(
-	[
-		{ text: 'BA123  LHR  BOARDING', bg: '#16a34a', color: '#fff' },
-		{ text: 'LH456  FRA  ON TIME ' },
-		{ text: 'AF789  CDG  DELAYED ', bg: '#dc2626', color: '#fff' }
-	],
-	26
+  [
+    { text: 'BA123  LHR  BOARDING', bg: '#16a34a', color: '#fff' },
+    { text: 'LH456  FRA  ON TIME ' },
+    { text: 'AF789  CDG  DELAYED ', bg: '#dc2626', color: '#fff' }
+  ],
+  26
 );
 
 board.spools = spools;
@@ -309,26 +309,26 @@ import { useEffect, useRef } from 'react';
 import { fromLines } from 'split-flap-board';
 
 declare global {
-	namespace JSX {
-		interface IntrinsicElements {
-			'split-flap-spool': React.HTMLAttributes<HTMLElement> & { value?: string; variant?: string };
-			'split-flap-board': React.HTMLAttributes<HTMLElement>;
-		}
-	}
+  namespace JSX {
+    interface IntrinsicElements {
+      'split-flap-spool': React.HTMLAttributes<HTMLElement> & { value?: string; variant?: string };
+      'split-flap-board': React.HTMLAttributes<HTMLElement>;
+    }
+  }
 }
 
 export function DeparturesBoard() {
-	const ref = useRef<HTMLElement>(null);
+  const ref = useRef<HTMLElement>(null);
 
-	useEffect(() => {
-		if (ref.current == null) return;
+  useEffect(() => {
+    if (ref.current == null) return;
 
-		const { spools, grid } = fromLines(['DEPARTURES'], 10);
-		(ref.current as any).spools = spools;
-		(ref.current as any).grid = grid;
-	}, []);
+    const { spools, grid } = fromLines(['DEPARTURES'], 10);
+    (ref.current as any).spools = spools;
+    (ref.current as any).grid = grid;
+  }, []);
 
-	return <split-flap-board ref={ref} />;
+  return <split-flap-board ref={ref} />;
 }
 ```
 
@@ -405,8 +405,8 @@ spoolGrid([charSpool, charSpool, statusSpool], 3, 2);
 
 ```ts
 function fromLines(
-	lines: (string | { text: string; bg?: string; color?: string })[],
-	cols: number
+  lines: (string | { text: string; bg?: string; color?: string })[],
+  cols: number
 ): { spools: TSpool[][]; grid: string[][] };
 ```
 
@@ -414,8 +414,8 @@ Creates a char `spools` grid and a `grid` of target keys from an array of lines.
 
 ```ts
 const { spools, grid } = fromLines(
-	['HELLO WORLD', { text: 'BOARDING', bg: '#16a34a', color: '#fff' }],
-	11
+  ['HELLO WORLD', { text: 'BOARDING', bg: '#16a34a', color: '#fff' }],
+  11
 );
 
 board.spools = spools;
@@ -429,42 +429,42 @@ Set these on the board to theme all spools at once, or override them on individu
 ```css
 /* Board panel */
 split-flap-board {
-	--sfb-board-bg: #1c1c1c; /* panel and frame background */
-	--sfb-board-padding: 10px; /* inset spacing around the cell grid */
-	--sfb-board-radius: 8px; /* corner radius of the panel itself */
-	--sfb-gap: 3px; /* gap between spool cells */
+  --sfb-board-bg: #1c1c1c; /* panel and frame background */
+  --sfb-board-padding: 10px; /* inset spacing around the cell grid */
+  --sfb-board-radius: 8px; /* corner radius of the panel itself */
+  --sfb-gap: 3px; /* gap between spool cells */
 }
 
 /* Shared flap styles */
 split-flap-board {
-	--sfb-flap-bg: #111; /* flap background */
-	--sfb-flap-color: #f5f0e0; /* flap text color */
-	--sfb-flap-radius: 4px; /* corner radius on each flap */
+  --sfb-flap-bg: #111; /* flap background */
+  --sfb-flap-color: #f5f0e0; /* flap text color */
+  --sfb-flap-radius: 4px; /* corner radius on each flap */
 }
 
 /* Minimal variant */
 split-flap-board {
-	--sfb-spool-width: 1.2em; /* explicit cell width */
-	--sfb-spool-height: 2em; /* explicit cell height */
-	--sfb-fold-color: #0a0a0a; /* center crease color */
+  --sfb-spool-width: 1.2em; /* explicit cell width */
+  --sfb-spool-height: 2em; /* explicit cell height */
+  --sfb-fold-color: #0a0a0a; /* center crease color */
 }
 
 /* Realistic variant */
 split-flap-board {
-	--sfb-spool-width: 1em; /* flap width, defaults to 1x font-size */
-	--sfb-spool-height: 2em; /* flap height, defaults to 2x font-size */
-	--sfb-drum-radius: 0px; /* cylinder radius, 0 keeps the flip flat */
-	--sfb-crease: 1px; /* gap between the two flap halves */
-	--sfb-perspective: 400px; /* CSS perspective depth */
-	--sfb-view-transform: none; /* e.g. rotateY(-30deg) */
-	--sfb-max-step-angle: 1turn; /* per-step angle cap, 8deg tightens small spools */
-	--sfb-flap-border: #2a2a2a; /* border on each flap card */
+  --sfb-spool-width: 1em; /* flap width, defaults to 1x font-size */
+  --sfb-spool-height: 2em; /* flap height, defaults to 2x font-size */
+  --sfb-drum-radius: 0px; /* cylinder radius, 0 keeps the flip flat */
+  --sfb-crease: 1px; /* gap between the two flap halves */
+  --sfb-perspective: 400px; /* CSS perspective depth */
+  --sfb-view-transform: none; /* e.g. rotateY(-30deg) */
+  --sfb-max-step-angle: 1turn; /* per-step angle cap, 8deg tightens small spools */
+  --sfb-flap-border: #2a2a2a; /* border on each flap card */
 }
 
 /* Per-spool override */
 split-flap-spool.highlight {
-	--sfb-flap-bg: #16a34a;
-	--sfb-flap-color: #fff;
+  --sfb-flap-bg: #16a34a;
+  --sfb-flap-color: #fff;
 }
 ```
 

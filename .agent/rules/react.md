@@ -32,59 +32,59 @@ Follow the established project React pattern unless the local code clearly does 
 
 ```tsx
 export const ItemList: React.FC<TItemListProps> = (props) => {
-	const { items, selectedId, onSelect } = props;
-	const [focusedId, setFocusedId] = React.useState<string | null>(null);
+  const { items, selectedId, onSelect } = props;
+  const [focusedId, setFocusedId] = React.useState<string | null>(null);
 
-	const visibleLabels = React.useMemo(() => {
-		const result: { id: string; label: string }[] = [];
-		for (const item of items) {
-			if (!item.hidden) {
-				result.push({ id: item.id, label: item.label });
-			}
-		}
-		return result;
-	}, [items]);
+  const visibleLabels = React.useMemo(() => {
+    const result: { id: string; label: string }[] = [];
+    for (const item of items) {
+      if (!item.hidden) {
+        result.push({ id: item.id, label: item.label });
+      }
+    }
+    return result;
+  }, [items]);
 
-	// MARK: - Actions
+  // MARK: - Actions
 
-	const handleSelect = React.useCallback(
-		(id: string) => {
-			setFocusedId(id);
-			onSelect(id);
-		},
-		[onSelect]
-	);
+  const handleSelect = React.useCallback(
+    (id: string) => {
+      setFocusedId(id);
+      onSelect(id);
+    },
+    [onSelect]
+  );
 
-	// MARK: - Effects
+  // MARK: - Effects
 
-	React.useEffect(() => {
-		setFocusedId(selectedId);
-	}, [selectedId]);
+  React.useEffect(() => {
+    setFocusedId(selectedId);
+  }, [selectedId]);
 
-	// MARK: - UI
+  // MARK: - UI
 
-	return (
-		<ul>
-			{visibleLabels.map((item) => (
-				<li key={item.id}>
-					<button onClick={() => handleSelect(item.id)}>
-						{item.label}
-						{item.id === focusedId ? ' selected' : ''}
-					</button>
-				</li>
-			))}
-		</ul>
-	);
+  return (
+    <ul>
+      {visibleLabels.map((item) => (
+        <li key={item.id}>
+          <button onClick={() => handleSelect(item.id)}>
+            {item.label}
+            {item.id === focusedId ? ' selected' : ''}
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
 };
 
 interface TItemListProps {
-	items: {
-		id: string;
-		label: string;
-		hidden: boolean;
-	}[];
-	selectedId: string | null;
-	onSelect: (id: string) => void;
+  items: {
+    id: string;
+    label: string;
+    hidden: boolean;
+  }[];
+  selectedId: string | null;
+  onSelect: (id: string) => void;
 }
 ```
 
@@ -92,22 +92,22 @@ interface TItemListProps {
 
 ```tsx
 function ItemList({ items, selectedId, onSelect }: TItemListProps) {
-	return (
-		<ul>
-			{items.map((index) => (
-				<li
-					key={index.id}
-					onClick={() => {
-						if (!index.hidden) {
-							onSelect(index.id);
-						}
-					}}
-				>
-					{index.label}
-					{index.id === selectedId ? ' selected' : ''}
-				</li>
-			))}
-		</ul>
-	);
+  return (
+    <ul>
+      {items.map((index) => (
+        <li
+          key={index.id}
+          onClick={() => {
+            if (!index.hidden) {
+              onSelect(index.id);
+            }
+          }}
+        >
+          {index.label}
+          {index.id === selectedId ? ' selected' : ''}
+        </li>
+      ))}
+    </ul>
+  );
 }
 ```

@@ -23,15 +23,15 @@ Use `feature-fetch` as the typed API layer. Prefer consistent client setup and e
 
 ```ts
 const [isItemOk, itemErr, item] = await api.get<Item>('/items/{itemId}', {
-	pathParams: { itemId }
+  pathParams: { itemId }
 });
 
 if (!isItemOk) {
-	if (itemErr instanceof NetworkError) {
-		throw new AppError('Failed to connect', { cause: itemErr });
-	}
+  if (itemErr instanceof NetworkError) {
+    throw new AppError('Failed to connect', { cause: itemErr });
+  }
 
-	throw itemErr;
+  throw itemErr;
 }
 
 return item;

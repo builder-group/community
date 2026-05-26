@@ -29,26 +29,27 @@ import { createForm, dirtyFeature } from 'feature-form';
 import * as z from 'zod';
 
 const $form = createForm({
-	fields: {
-		email: {
-			defaultValue: '',
-			validator: z.string().email(),
-			validateOn: ['blur', 'submit'], // no errors while typing
-			revalidateOn: ['change', 'submit'] // revalidate after first submit
-		},
-		password: {
-			defaultValue: '',
-			validator: z.string().min(8),
-			validateOn: ['touched', 'submit'], // first blur, subsequent changes, and submit
-			revalidateOn: ['change', 'submit']
-		}
-	},
-	onValidSubmit: (data) => saveAccount(data)
+  fields: {
+    email: {
+      defaultValue: '',
+      validator: z.string().email(),
+      validateOn: ['blur', 'submit'], // no errors while typing
+      revalidateOn: ['change', 'submit'] // revalidate after first submit
+    },
+    password: {
+      defaultValue: '',
+      validator: z.string().min(8),
+      validateOn: ['touched', 'submit'], // first blur, subsequent changes, and submit
+      revalidateOn: ['change', 'submit']
+    }
+  },
+  onValidSubmit: (data) => console.log(data)
 }).with(dirtyFeature());
 
 const unbind = $form.fields.email.status.listen(({ value }) => {
-	if (value.type === 'invalid') showError(value.errors[0].message);
-	if (value.type === 'valid') clearError();
+  if (value.type === 'invalid') {
+    console.log(value.errors[0].message);
+  }
 });
 
 $form.fields.email.set('not-an-email');
@@ -65,6 +66,12 @@ unbind();
 npm install feature-form
 ```
 
+The examples below use Zod, but any Standard Schema validator works:
+
+```bash
+npm install zod
+```
+
 ## Usage
 
 Fields are reactive states. Subscribe to status changes to wire validation feedback directly into your UI:
@@ -74,16 +81,16 @@ import { createForm } from 'feature-form';
 import * as z from 'zod';
 
 const $form = createForm({
-	fields: {
-		email: { defaultValue: '', validator: z.string().email() }
-	},
-	onValidSubmit: (data) => save(data)
+  fields: {
+    email: { defaultValue: '', validator: z.string().email() }
+  },
+  onValidSubmit: (data) => console.log(data)
 });
 
 $form.fields.email.status.listen(({ value }) => {
-	if (value.type === 'invalid') {
-		console.log(value.errors[0].message);
-	}
+  if (value.type === 'invalid') {
+    console.log(value.errors[0].message);
+  }
 });
 
 $form.fields.email.set('not-an-email'); // set() alone does not validate (validateOn defaults to ['submit'])
@@ -94,14 +101,14 @@ Control when validation fires with per-field triggers. Keep errors quiet before 
 
 ```ts
 const $form = createForm({
-	fields: {
-		email: {
-			defaultValue: '',
-			validator: z.string().email(),
-			validateOn: ['blur', 'submit'], // quiet while typing, fires on blur
-			revalidateOn: ['change', 'submit'] // immediate feedback after first submit
-		}
-	}
+  fields: {
+    email: {
+      defaultValue: '',
+      validator: z.string().email(),
+      validateOn: ['blur', 'submit'], // quiet while typing, fires on blur
+      revalidateOn: ['change', 'submit'] // immediate feedback after first submit
+    }
+  }
 });
 ```
 
@@ -113,15 +120,15 @@ Creates a form and returns it as a feature host. Each key in `fields` becomes a 
 
 ```ts
 const $form = createForm({
-	fields: {
-		age: { defaultValue: 0 },
-		username: {
-			defaultValue: '',
-			validator: z.string().min(3),
-			validateOn: ['submit', 'blur'],
-			revalidateOn: ['submit', 'change', 'blur']
-		}
-	}
+  fields: {
+    age: { defaultValue: 0 },
+    username: {
+      defaultValue: '',
+      validator: z.string().min(3),
+      validateOn: ['submit', 'blur'],
+      revalidateOn: ['submit', 'change', 'blur']
+    }
+  }
 });
 ```
 
@@ -151,13 +158,13 @@ const $form = createForm({
 const isValid = await $form.submit();
 
 await $form.submit({
-	onValidSubmit: (data) => save(data),
-	onInvalidSubmit: (errors) => showErrors(errors),
-	updateDefaultValues: true, // treat submitted values as new reset baseline
-	context: { event } // passed through to onValidSubmit / onInvalidSubmit callbacks
+  onValidSubmit: (data) => console.log(data),
+  onInvalidSubmit: (errors) => console.error(errors),
+  updateDefaultValues: true, // treat submitted values as new reset baseline
+  context: { source: 'settings-form' } // passed through to submit callbacks
 });
 
-const unbind = $form.onValidSubmit((data) => save(data));
+const unbind = $form.onValidSubmit((data) => console.log(data));
 unbind();
 
 const isValid = await $form.validate(); // runs all validators without submitting
@@ -214,14 +221,14 @@ The `'touched'` trigger covers the "validate once the user has interacted" patte
 ```ts
 // validate on blur before submit, revalidate on every change after
 const $form = createForm({
-	fields: {
-		email: {
-			defaultValue: '',
-			validator: z.string().email(),
-			validateOn: ['blur', 'submit'],
-			revalidateOn: ['change', 'submit']
-		}
-	}
+  fields: {
+    email: {
+      defaultValue: '',
+      validator: z.string().email(),
+      validateOn: ['blur', 'submit'],
+      revalidateOn: ['change', 'submit']
+    }
+  }
 });
 ```
 
@@ -233,18 +240,18 @@ The library routes form-level validator errors by path. An issue that points at 
 
 ```ts
 const $form = createForm({
-	fields: {
-		password: { defaultValue: '' },
-		confirm: { defaultValue: '' }
-	},
-	validator: z
-		.object({ password: z.string(), confirm: z.string() })
-		.refine((d) => d.password === d.confirm, {
-			message: 'Passwords do not match',
-			path: ['confirm']
-		}),
-	validateOn: ['submit'],
-	revalidateOn: ['change', 'submit']
+  fields: {
+    password: { defaultValue: '' },
+    confirm: { defaultValue: '' }
+  },
+  validator: z
+    .object({ password: z.string(), confirm: z.string() })
+    .refine((d) => d.password === d.confirm, {
+      message: 'Passwords do not match',
+      path: ['confirm']
+    }),
+  validateOn: ['submit'],
+  revalidateOn: ['change', 'submit']
 });
 ```
 
@@ -256,9 +263,9 @@ Both `form.status` and `field.status` are discriminated unions:
 const status = $form.fields.email.status.get();
 
 if (status.type === 'invalid') {
-	status.errors; // readonly TValidationError[]
-	status.errors[0].message; // string
-	status.errors[0].path; // validator path, e.g. ['address', 'city']
+  status.errors; // readonly TValidationError[]
+  status.errors[0].message; // string
+  status.errors[0].path; // validator path, e.g. ['address', 'city']
 }
 ```
 
@@ -296,10 +303,10 @@ Creates a field independently of any form. Use this for a shared search input or
 import { createFormField } from 'feature-form';
 
 const $name = createFormField('', {
-	key: 'name',
-	validator: z.string().min(2),
-	validateOn: ['blur'],
-	revalidateOn: ['change']
+  key: 'name',
+  validator: z.string().min(2),
+  validateOn: ['blur'],
+  revalidateOn: ['change']
 });
 
 $name.set('Alice');
@@ -327,9 +334,9 @@ $form.fields.name.reset(); // resets value, touched, submitted, and status
 
 ```ts
 const unbind = $form.fields.name.onBlur(({ wasTouched }) => {
-	if (!wasTouched) {
-		// first time this field was blurred
-	}
+  if (!wasTouched) {
+    // first time this field was blurred
+  }
 });
 
 unbind();
@@ -363,10 +370,10 @@ Adds `isDirty`, `dirtyFields`, and `resetDirty()`. Tracks whether any field valu
 import { dirtyFeature } from 'feature-form';
 
 const $form = createForm({
-	fields: {
-		name: { defaultValue: 'Alice' },
-		email: { defaultValue: 'alice@example.com' }
-	}
+  fields: {
+    name: { defaultValue: 'Alice' },
+    email: { defaultValue: 'alice@example.com' }
+  }
 }).with(dirtyFeature());
 
 $form.fields.name.set('Bob');

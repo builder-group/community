@@ -2,23 +2,21 @@
 	"name": "feature-logger",
 	"version": "0.1.0-beta.1",
 	"private": false,
-	"description": "Composable console logger with per-instance formatting, levels, and testable output sinks.",
+	"description": "Composable console logger with per-instance levels, formatting, middleware, and testable output",
 	"keywords": [
 		"logger",
 		"logging",
 		"console",
 		"console-logger",
 		"typescript",
+		"feature-composition",
 		"composable",
-		"extensible",
-		"prefix",
-		"timestamp",
 		"middleware",
 		"log-level",
+		"prefix",
+		"timestamp",
 		"testable",
-		"browser",
-		"debug",
-		"node"
+		"browser"
 	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {

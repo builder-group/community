@@ -27,25 +27,25 @@ This file covers high-level repo-wide coding preferences. Language-specific deta
 
 ```ts
 export function buildSummary(input: TSummaryInput): string {
-	const value = normalizeValue(input.value);
-	if (value == null) {
-		return '';
-	}
+  const value = normalizeValue(input.value);
+  if (value == null) {
+    return '';
+  }
 
-	return formatSummary(value, input.label);
+  return formatSummary(value, input.label);
 }
 
 interface TSummaryInput {
-	value: string | null;
-	label: string;
+  value: string | null;
+  label: string;
 }
 
 function normalizeValue(value: string | null): string | null {
-	return value == null ? null : value.trim();
+  return value == null ? null : value.trim();
 }
 
 function formatSummary(value: string, label: string): string {
-	return `${label}: ${value}`;
+  return `${label}: ${value}`;
 }
 ```
 
@@ -53,21 +53,21 @@ function formatSummary(value: string, label: string): string {
 
 ```ts
 interface TSummaryInput {
-	value: string | null;
-	label: string;
+  value: string | null;
+  label: string;
 }
 
 const SUMMARY_SEPARATOR = ': ';
 
 function normalizeValue(value: string | null): string | null {
-	return value == null ? null : value.trim();
+  return value == null ? null : value.trim();
 }
 
 export function buildSummary(input: TSummaryInput): string {
-	if (input.value == null) {
-		return '';
-	}
+  if (input.value == null) {
+    return '';
+  }
 
-	return `${input.label}${SUMMARY_SEPARATOR}${normalizeValue(input.value)}`;
+  return `${input.label}${SUMMARY_SEPARATOR}${normalizeValue(input.value)}`;
 }
 ```

@@ -2,21 +2,20 @@
 	"name": "tuple-result",
 	"version": "0.1.0-beta.1",
 	"private": false,
-	"description": "TypeScript Result as [isOk, error, value] tuples with typed errors and JSON serialization.",
+	"description": "Plain TypeScript Result tuples with typed errors, narrowing, helpers, and JSON-friendly arrays",
 	"keywords": [
 		"result",
 		"result-type",
 		"error-handling",
-		"typed-errors",
 		"error-as-value",
+		"typed-errors",
 		"typescript",
 		"tuple",
+		"tuple-result",
 		"json",
 		"serializable",
 		"destructuring",
-		"either",
-		"functional",
-		"fp"
+		"either"
 	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {

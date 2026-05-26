@@ -2,8 +2,21 @@
 	"name": "@blgc/config",
 	"version": "0.0.42",
 	"private": false,
-	"description": "Builder.Group's engineering style guide",
-	"keywords": [],
+	"description": "Shared TypeScript, ESLint, Prettier, and Vitest configs for Builder Group projects",
+	"keywords": [
+		"config",
+		"shared-config",
+		"eslint",
+		"eslint-config",
+		"prettier",
+		"prettier-config",
+		"typescript",
+		"tsconfig",
+		"vitest",
+		"vitest-config",
+		"vite-config",
+		"style-guide"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"

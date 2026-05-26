@@ -28,18 +28,18 @@
 import { Err, fromArray, Ok, tAsync } from 'tuple-result';
 
 async function loadUser(id: string) {
-	const [isFetchOk, fetchErr, response] = await tAsync(fetch(`/api/users/${id}`));
-	if (!isFetchOk) return Err(fetchErr);
-	if (!response.ok) return Err(new Error(`HTTP ${response.status}`));
-	return tAsync(response.json() as Promise<{ name: string }>);
+  const [isFetchOk, fetchErr, response] = await tAsync(fetch(`/api/users/${id}`));
+  if (!isFetchOk) return Err(fetchErr);
+  if (!response.ok) return Err(new Error(`HTTP ${response.status}`));
+  return tAsync(response.json() as Promise<{ name: string }>);
 }
 
-const [isOk, userErr, user] = await loadUser('42');
+const [isUserOk, userErr, user] = await loadUser('42');
 
-if (isOk) {
-	console.log(user.name); // TypeScript knows user is defined here
+if (isUserOk) {
+  console.log(user.name); // TypeScript knows user is defined here
 } else {
-	console.error(userErr); // TypeScript knows userErr is defined here
+  console.error(userErr); // TypeScript knows userErr is defined here
 }
 
 // Results are arrays, so JSON round-trips without a custom serializer
@@ -67,14 +67,14 @@ const configResult = Err('Missing config');
 // Array destructuring: readable without knowing the library
 const [isCountOk, countErr, count] = countResult;
 if (isCountOk) {
-	console.log(count); // 42
+  console.log(count); // 42
 } else {
-	console.error(countErr);
+  console.error(countErr);
 }
 
 // Method-based access is also available
 if (countResult.isOk()) {
-	console.log(countResult.value); // 42
+  console.log(countResult.value); // 42
 }
 ```
 
@@ -88,12 +88,12 @@ const result = t(() => JSON.parse('invalid')); // Err(SyntaxError)
 
 // Wrap a promise that may reject
 const userResult = await tAsync(
-	fetch('/api/user').then(async (response) => {
-		if (!response.ok) {
-			throw new Error(`HTTP ${response.status}`);
-		}
-		return (await response.json()) as { name: string };
-	})
+  fetch('/api/user').then(async (response) => {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return (await response.json()) as { name: string };
+  })
 );
 ```
 
@@ -106,8 +106,8 @@ const doubled = mapOk(Ok(21), (x) => x * 2); // Ok(42)
 const wrapped = mapErr(Err(404), (c) => `HTTP ${c}`); // Err('HTTP 404')
 
 const message = match(Err('Missing config'), {
-	ok: (config) => `Config: ${config}`,
-	err: (configErr) => `Error: ${configErr}`
+  ok: (config) => `Config: ${config}`,
+  err: (configErr) => `Error: ${configErr}`
 });
 
 const count = unwrapOr(Err('Missing count'), 0); // 0

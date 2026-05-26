@@ -29,56 +29,56 @@ Use `*Cx.ts` and `*Cx.tsx` files for feature context objects that group related 
 
 ```ts
 export class EditorCx {
-	public readonly $text = createState('');
-	public readonly $isSaving = createState(false);
+  public readonly $text = createState('');
+  public readonly $isSaving = createState(false);
 
-	public async save(): Promise<void> {
-		this.$isSaving.set(true);
-		try {
-			await persistText(this.$text.get());
-		} finally {
-			this.$isSaving.set(false);
-		}
-	}
+  public async save(): Promise<void> {
+    this.$isSaving.set(true);
+    try {
+      await persistText(this.$text.get());
+    } finally {
+      this.$isSaving.set(false);
+    }
+  }
 
-	public reset(): void {
-		this.$text.set('');
-	}
+  public reset(): void {
+    this.$text.set('');
+  }
 }
 ```
 
 ```tsx
 export const EditorPane: React.FC = () => {
-	const cx = React.useMemo(() => new EditorCx(), []);
+  const cx = React.useMemo(() => new EditorCx(), []);
 
-	return <EditorView cx={cx} />;
+  return <EditorView cx={cx} />;
 };
 ```
 
 ```tsx
 export interface TEditorCx {
-	readonly $text: TState<string, []>;
-	save(): Promise<void>;
+  readonly $text: TState<string, []>;
+  save(): Promise<void>;
 }
 
 const ReactEditorCx = React.createContext<TEditorCx | null>(null);
 
 export const EditorCxProvider: React.FC<TEditorCxProviderProps> = (props) => {
-	const { value, children } = props;
-	return <ReactEditorCx.Provider value={value}>{children}</ReactEditorCx.Provider>;
+  const { value, children } = props;
+  return <ReactEditorCx.Provider value={value}>{children}</ReactEditorCx.Provider>;
 };
 
 export function useEditorCx<GCx extends TEditorCx>(): GCx {
-	const cx = React.useContext(ReactEditorCx) as GCx | null;
-	if (cx == null) {
-		throw new Error('useEditorCx must be used within an EditorCxProvider');
-	}
-	return cx as GCx;
+  const cx = React.useContext(ReactEditorCx) as GCx | null;
+  if (cx == null) {
+    throw new Error('useEditorCx must be used within an EditorCxProvider');
+  }
+  return cx as GCx;
 }
 
 interface TEditorCxProviderProps {
-	value: TEditorCx;
-	children: React.ReactNode;
+  value: TEditorCx;
+  children: React.ReactNode;
 }
 ```
 
@@ -86,14 +86,14 @@ interface TEditorCxProviderProps {
 
 ```ts
 export class AppCx {
-	public readonly $text = createState('');
-	public readonly $theme = createState('light');
-	public readonly $search = createState('');
-	public readonly $user = createState<TUser | null>(null);
+  public readonly $text = createState('');
+  public readonly $theme = createState('light');
+  public readonly $search = createState('');
+  public readonly $user = createState<TUser | null>(null);
 
-	public async save(): Promise<void> {}
-	public async logout(): Promise<void> {}
-	public async search(): Promise<void> {}
-	public toggleTheme(): void {}
+  public async save(): Promise<void> {}
+  public async logout(): Promise<void> {}
+  public async search(): Promise<void> {}
+  public toggleTheme(): void {}
 }
 ```

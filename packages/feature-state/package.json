@@ -2,7 +2,7 @@
 	"name": "feature-state",
 	"version": "0.1.0-beta.1",
 	"private": false,
-	"description": "Reactive state with opt-in .with() features for undo, storage, computed values, and queues.",
+	"description": "Reactive state with opt-in features for undo, storage, computed values, equality, and queues",
 	"keywords": [
 		"state",
 		"state-management",
@@ -11,13 +11,12 @@
 		"observable",
 		"computed",
 		"typescript",
+		"type-safe",
 		"framework-agnostic",
 		"feature-composition",
-		"undo-redo",
 		"undo",
 		"storage",
-		"persistence",
-		"store"
+		"persistence"
 	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {

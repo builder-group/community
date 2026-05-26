@@ -27,11 +27,13 @@
 ```ts
 import { createComputed, createState, undoFeature } from 'feature-state';
 
-const $tasks = createState<Task[]>([]).with(undoFeature());
+type TTask = { id: number; title: string; done: boolean };
+
+const $tasks = createState<TTask[]>([]).with(undoFeature());
 const $openTasks = createComputed($tasks, (tasks) => tasks.filter((task) => !task.done));
 
 const unlisten = $openTasks.listen(({ value }) => {
-	renderOpenTasks(value);
+  console.log(value);
 });
 
 $tasks.set([{ id: 1, title: 'Buy milk', done: false }]);
@@ -57,7 +59,7 @@ import { createState } from 'feature-state';
 const $count = createState(0);
 
 $count.listen(({ value, prevValue }) => {
-	console.log(value, prevValue);
+  console.log(value, prevValue);
 });
 
 $count.set(5);
@@ -83,7 +85,9 @@ Derive a read-only value from one or more states with `createComputed`. It recom
 ```ts
 import { createComputed, createState } from 'feature-state';
 
-const $tasks = createState<Task[]>([]);
+type TTask = { id: number; title: string; done: boolean };
+
+const $tasks = createState<TTask[]>([]);
 const $done = createComputed($tasks, (tasks) => tasks.filter((t) => t.done));
 
 $tasks.set([{ id: 1, title: 'Buy milk', done: true }]);
@@ -96,21 +100,21 @@ Persist state across sessions with `storageFeature`. Pass any storage adapter th
 import { createState, missingStorageValue, storageFeature } from 'feature-state';
 
 const localAdapter = {
-	save: (key: string, value: unknown) => {
-		localStorage.setItem(key, JSON.stringify(value));
-		return true;
-	},
-	load: (key: string) => {
-		const raw = localStorage.getItem(key);
-		return raw != null ? JSON.parse(raw) : missingStorageValue;
-	},
-	delete: (key: string) => {
-		localStorage.removeItem(key);
-		return true;
-	}
+  save: (key: string, value: unknown) => {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  },
+  load: (key: string) => {
+    const raw = localStorage.getItem(key);
+    return raw != null ? JSON.parse(raw) : missingStorageValue;
+  },
+  delete: (key: string) => {
+    localStorage.removeItem(key);
+    return true;
+  }
 };
 
-const $tasks = createState<Task[]>([]).with(storageFeature(localAdapter, 'tasks'));
+const $tasks = createState<string[]>([]).with(storageFeature(localAdapter, 'tasks'));
 
 await $tasks.persist(); // loads saved value on first call; auto-saves on every set()
 ```
@@ -161,7 +165,7 @@ $count.notify({ listenerContext: { source: 'mySync', background: true } });
 
 ```ts
 const unlisten = $count.listen(({ value, prevValue, source }) => {
-	console.log(value, prevValue, source);
+  console.log(value, prevValue, source);
 });
 
 unlisten(); // remove listener
@@ -187,15 +191,18 @@ Creates a read-only state derived from one source state:
 ```ts
 import { createComputed, createState } from 'feature-state';
 
-const $tasks = createState<Task[]>([]);
+type TTask = { done: boolean; category: string };
+
+const $tasks = createState<TTask[]>([]);
 const $completedCount = createComputed($tasks, (tasks) => tasks.filter((task) => task.done).length);
 ```
 
 Pass a tuple when the value depends on multiple states:
 
 ```ts
+const $filter = createState('work');
 const $filteredTasks = createComputed([$tasks, $filter] as const, ([tasks, filter]) =>
-	tasks.filter((task) => task.category === filter)
+  tasks.filter((task) => task.category === filter)
 );
 ```
 
@@ -239,24 +246,24 @@ $count.multiUndo(2); // back to 1
 Adds `persist()`, `loadFromStorage()`, and `deleteFromStorage()`. The storage adapter is a plain object with `save`, `load`, and `delete` methods.
 
 ```ts
-import { missingStorageValue } from 'feature-state';
+import { createState, missingStorageValue, storageFeature } from 'feature-state';
 
 const storage = {
-	save(key, value) {
-		localStorage.setItem(key, JSON.stringify(value));
-		return true;
-	},
-	load(key) {
-		const raw = localStorage.getItem(key);
-		return raw != null ? JSON.parse(raw) : missingStorageValue;
-	},
-	delete(key) {
-		localStorage.removeItem(key);
-		return true;
-	}
+  save(key: string, value: unknown) {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  },
+  load(key: string) {
+    const raw = localStorage.getItem(key);
+    return raw != null ? JSON.parse(raw) : missingStorageValue;
+  },
+  delete(key: string) {
+    localStorage.removeItem(key);
+    return true;
+  }
 };
 
-const $tasks = createState<Task[]>([]).with(storageFeature(storage, 'tasks'));
+const $tasks = createState<string[]>([]).with(storageFeature(storage, 'tasks'));
 
 await $tasks.persist();
 ```
@@ -273,7 +280,7 @@ Overrides `set()` with a domain-specific equality check. Use it when reference e
 import { createState, isEqualFeature } from 'feature-state';
 
 const $status = createState({ type: 'valid' }).with(
-	isEqualFeature((prevValue, nextValue) => prevValue.type === nextValue.type)
+  isEqualFeature((prevValue, nextValue) => prevValue.type === nextValue.type)
 );
 ```
 
@@ -282,12 +289,15 @@ const $status = createState({ type: 'valid' }).with(
 Replaces the default sync listener queue with a microtask-based FIFO queue. Listeners still run in registration order, but after the current call stack resolves. Async listeners are awaited one by one.
 
 ```ts
-import { asyncQueueFeature } from 'feature-state';
+import { asyncQueueFeature, createState } from 'feature-state';
 
 const $count = createState(0).with(asyncQueueFeature<number>());
 
 $count.listen(async ({ value }) => {
-	await save(value);
+  await fetch('/api/count', {
+    method: 'POST',
+    body: JSON.stringify({ value })
+  });
 });
 
 await $count.notify(); // resolves when all listeners have completed

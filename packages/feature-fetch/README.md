@@ -17,7 +17,7 @@
     </a>
 </p>
 
-`feature-fetch` turns `fetch` into a typed API client with explicit success and error branches. Requests return tuple results instead of throwing, TypeScript checks request shapes, and `.with()` features add REST helpers, OpenAPI, GraphQL, retry, cache, auth, or tracing without changing the client model.
+`feature-fetch` turns `fetch` into a typed API client with explicit success and error branches. Requests return tuple results instead of throwing, TypeScript checks request shapes, and built-in or custom `.with()` features add REST helpers, OpenAPI, GraphQL, retry, cache, auth, or tracing without changing the client model.
 
 - Handle network errors, HTTP errors, and client errors without `try/catch`
 - Add REST helpers, OpenAPI types, GraphQL, retry, cache, or delay only when needed
@@ -28,18 +28,17 @@
 import { createApiFetchClient, retryFeature } from 'feature-fetch';
 
 const api = createApiFetchClient({
-	baseUrl: 'https://api.example.com/v1',
-	headers: { Authorization: `Bearer ${token}` }
+  baseUrl: 'https://api.example.com/v1'
 }).with(retryFeature({ maxRetries: 3 }));
 
 const [isPostOk, postErr, post] = await api.get<{ id: string; title: string }>('/posts/{postId}', {
-	pathParams: { postId: '123' }
+  pathParams: { postId: '123' }
 });
 
 if (!isPostOk) {
-	console.error(postErr.message); // NetworkError | HttpError | FetchError
+  console.error(postErr.message); // NetworkError | HttpError | FetchError
 } else {
-	console.log(post.title); // typed as { id: string; title: string }
+  console.log(post.title); // typed as { id: string; title: string }
 }
 ```
 
@@ -63,18 +62,17 @@ For REST endpoints, start with `createApiFetchClient`:
 import { createApiFetchClient } from 'feature-fetch';
 
 const api = createApiFetchClient({
-	baseUrl: 'https://api.example.com/v1',
-	headers: { Authorization: `Bearer ${token}` }
+  baseUrl: 'https://api.example.com/v1'
 });
 
 const [isPostOk, postErr, post] = await api.get<{ id: string; title: string }>('/posts/{postId}', {
-	pathParams: { postId: '123' }
+  pathParams: { postId: '123' }
 });
 
 if (!isPostOk) {
-	console.error(postErr.message);
+  console.error(postErr.message);
 } else {
-	console.log(post.title);
+  console.log(post.title);
 }
 ```
 
@@ -85,15 +83,15 @@ import { createOpenApiFetchClient } from 'feature-fetch';
 import type { paths } from './schema';
 
 const api = createOpenApiFetchClient<paths>({
-	baseUrl: 'https://api.example.com/v1'
+  baseUrl: 'https://api.example.com/v1'
 });
 
 const [isPetOk, petErr, pet] = await api.get('/pets/{petId}', {
-	pathParams: { petId: 123 }
+  pathParams: { petId: 123 }
 });
 
 if (!isPetOk) {
-	throw petErr;
+  throw petErr;
 }
 
 console.log(pet);
@@ -105,25 +103,25 @@ For GraphQL endpoints, use `createGraphQLFetchClient`:
 import { createGraphQLFetchClient, gql } from 'feature-fetch';
 
 const graphql = createGraphQLFetchClient({
-	baseUrl: 'https://api.example.com/graphql'
+  baseUrl: 'https://api.example.com/graphql'
 });
 
 const getUser = gql`
-	query GetUser($id: ID!) {
-		user(id: $id) {
-			id
-			name
-		}
-	}
+  query GetUser($id: ID!) {
+    user(id: $id) {
+      id
+      name
+    }
+  }
 `;
 
 const [isUserOk, userErr, userResult] = await graphql.query<
-	{ user: { id: string; name: string } },
-	{ id: string }
+  { user: { id: string; name: string } },
+  { id: string }
 >(getUser, { variables: { id: '123' } });
 
 if (!isUserOk) {
-	throw userErr;
+  throw userErr;
 }
 
 console.log(userResult.user.name);
@@ -135,7 +133,7 @@ Compose features with `createFetchClient` when you want control over which featu
 import { apiFeature, cacheFeature, createFetchClient, retryFeature } from 'feature-fetch';
 
 const api = createFetchClient({
-	baseUrl: 'https://api.example.com/v1'
+  baseUrl: 'https://api.example.com/v1'
 }).with(apiFeature(), retryFeature(), cacheFeature({ maxAgeMs: 30_000 }));
 ```
 
@@ -147,14 +145,13 @@ Creates a base fetch client with a single `request()` method. All built-in featu
 
 ```ts
 const client = createFetchClient({
-	baseUrl: 'https://api.example.com',
-	headers: { Authorization: `Bearer ${token}` }
+  baseUrl: 'https://api.example.com'
 });
 
 const [isHealthOk, healthErr, health] = await client.request<{ status: string }>('GET', '/health');
 
 if (!isHealthOk) {
-	throw healthErr;
+  throw healthErr;
 }
 
 console.log(health.data.status);
@@ -207,11 +204,11 @@ import { apiFeature, createFetchClient } from 'feature-fetch';
 const api = createFetchClient({ baseUrl: '/api' }).with(apiFeature());
 
 const [isPostOk, postErr, post] = await api.post<{ id: string }>('/posts', {
-	body: { title: 'Hello' }
+  body: { title: 'Hello' }
 });
 
 if (!isPostOk) {
-	throw postErr;
+  throw postErr;
 }
 
 console.log(post.id);
@@ -236,23 +233,23 @@ import { createOpenApiFetchClient } from 'feature-fetch';
 import type { paths } from './schema';
 
 const api = createOpenApiFetchClient<paths>({
-	baseUrl: 'https://api.example.com/v1'
+  baseUrl: 'https://api.example.com/v1'
 });
 
 const [isPetOk, petErr, pet] = await api.get('/pets/{petId}', {
-	pathParams: { petId: 123 }
+  pathParams: { petId: 123 }
 });
 
 if (!isPetOk) {
-	throw petErr;
+  throw petErr;
 }
 
 const [isCreated, createErr, created] = await api.post('/pets', {
-	body: { name: 'Jeff', photoUrls: [] }
+  body: { name: 'Jeff', photoUrls: [] }
 });
 
 if (!isCreated) {
-	throw createErr;
+  throw createErr;
 }
 
 console.log(pet, created);
@@ -270,25 +267,25 @@ Adds `query()`, `mutate()`, and raw variants for GraphQL POST requests. Set `bas
 import { createGraphQLFetchClient, gql } from 'feature-fetch';
 
 const graphql = createGraphQLFetchClient({
-	baseUrl: 'https://api.example.com/graphql'
+  baseUrl: 'https://api.example.com/graphql'
 });
 
 const getUser = gql`
-	query GetUser($id: ID!) {
-		user(id: $id) {
-			id
-			name
-		}
-	}
+  query GetUser($id: ID!) {
+    user(id: $id) {
+      id
+      name
+    }
+  }
 `;
 
 const [isUserOk, userErr, userResult] = await graphql.query<
-	{ user: { id: string; name: string } },
-	{ id: string }
+  { user: { id: string; name: string } },
+  { id: string }
 >(getUser, { variables: { id: '123' } });
 
 if (!isUserOk) {
-	throw userErr;
+  throw userErr;
 }
 
 console.log(userResult.user.name);
@@ -356,16 +353,16 @@ import { defineFeature, type TFeature } from 'feature-core';
 import type { TFetchClientBase } from 'feature-fetch';
 
 export function authFeature(getToken: () => string): TAuthFeature {
-	return defineFeature<TAuthFeature>({
-		key: 'auth',
-		install(client: TFetchClientBase) {
-			client._config.prepareRequest.push((cx) => {
-				cx.headers.authorization = `Bearer ${getToken()}`;
-			});
+  return defineFeature<TAuthFeature>({
+    key: 'auth',
+    install(client: TFetchClientBase) {
+      client._config.prepareRequest.push((cx) => {
+        cx.headers.authorization = `Bearer ${getToken()}`;
+      });
 
-			return {};
-		}
-	});
+      return {};
+    }
+  });
 }
 
 type TAuthFeature = TFeature<'auth', object>;
@@ -395,15 +392,15 @@ import { FetchError, hasStatusCode, HttpError, NetworkError } from 'feature-fetc
 const [isUserOk, userErr, user] = await api.get<User>('/users/123');
 
 if (!isUserOk) {
-	if (hasStatusCode(userErr, 404)) {
-		console.error('Not found');
-	} else if (userErr instanceof NetworkError) {
-		console.error('Network error:', userErr.message);
-	} else if (userErr instanceof HttpError) {
-		console.error('HTTP error:', userErr.status, userErr.data); // userErr.data is the parsed error body
-	} else if (userErr instanceof FetchError) {
-		console.error('Client error:', userErr.code, userErr.message); // userErr.code e.g. '#ERR_SERIALIZE_BODY'
-	}
+  if (hasStatusCode(userErr, 404)) {
+    console.error('Not found');
+  } else if (userErr instanceof NetworkError) {
+    console.error('Network error:', userErr.message);
+  } else if (userErr instanceof HttpError) {
+    console.error('HTTP error:', userErr.status, userErr.data); // userErr.data is the parsed error body
+  } else if (userErr instanceof FetchError) {
+    console.error('Client error:', userErr.code, userErr.message); // userErr.code e.g. '#ERR_SERIALIZE_BODY'
+  }
 }
 ```
 
@@ -429,8 +426,8 @@ Pass static headers in the client options:
 
 ```ts
 const api = createApiFetchClient({
-	baseUrl: 'https://api.example.com/v1',
-	headers: { Authorization: `Bearer ${token}` }
+  baseUrl: 'https://api.example.com/v1',
+  headers: { Authorization: 'Bearer <token>' }
 });
 ```
 
@@ -450,14 +447,14 @@ Yes. Pass it as the second generic parameter on any request method:
 
 ```ts
 interface ApiError {
-	code: string;
-	message: string;
+  code: string;
+  message: string;
 }
 
 const [isUserOk, userErr, user] = await api.get<User, ApiError>('/users/123');
 
 if (!isUserOk && userErr instanceof HttpError) {
-	console.error(userErr.data.code); // typed as ApiError
+  console.error(userErr.data.code); // typed as ApiError
 }
 ```
 
@@ -478,8 +475,8 @@ Pass a custom `fetch` function to `createFetchClient`. Return any `Response` you
 
 ```ts
 const api = createApiFetchClient({
-	baseUrl: '/api',
-	fetch: async () => new Response(JSON.stringify({ id: '1' }), { status: 200 })
+  baseUrl: '/api',
+  fetch: async () => new Response(JSON.stringify({ id: '1' }), { status: 200 })
 });
 ```
 
@@ -493,7 +490,7 @@ Pass an `AbortSignal` in the request options:
 const controller = new AbortController();
 
 const postsRequest = api.get('/posts', {
-	signal: controller.signal
+  signal: controller.signal
 });
 
 // Cancel from anywhere
@@ -502,9 +499,9 @@ controller.abort();
 const [isPostsOk, postsErr, posts] = await postsRequest;
 
 if (!isPostsOk) {
-	console.error(postsErr.message);
+  console.error(postsErr.message);
 } else {
-	console.log(posts);
+  console.log(posts);
 }
 ```
 

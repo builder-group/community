@@ -27,19 +27,19 @@ Use `xml-tokenizer` as a streaming parser, not as a DOM replacement.
 
 ```ts
 function findAttributeValue(html: string): string | null {
-	let result: string | null = null;
+  let result: string | null = null;
 
-	tokenize(
-		html,
-		(token: TXmlToken, stream) => {
-			if (token.type === 'Attribute' && token.local === 'data-id') {
-				result = token.value;
-				stream.goToEnd();
-			}
-		},
-		htmlConfig
-	);
+  tokenize(
+    html,
+    (token: TXmlToken, stream) => {
+      if (token.type === 'Attribute' && token.local === 'data-id') {
+        result = token.value;
+        stream.goToEnd();
+      }
+    },
+    htmlConfig
+  );
 
-	return result;
+  return result;
 }
 ```

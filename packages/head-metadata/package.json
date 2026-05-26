@@ -2,8 +2,22 @@
 	"name": "head-metadata",
 	"version": "0.0.12",
 	"private": false,
-	"description": "Typesafe and straightforward utility for extracting structured metadata (like `<meta>`, `<title>`, and `<link>`) from the `<head>` of an HTML document",
-	"keywords": [],
+	"description": "Typed HTML head metadata extraction with streaming title, meta, link, and custom extractors",
+	"keywords": [
+		"html",
+		"metadata",
+		"head-metadata",
+		"head",
+		"meta-tags",
+		"open-graph",
+		"twitter-card",
+		"seo",
+		"title",
+		"link-tags",
+		"typescript",
+		"extractor",
+		"xml-tokenizer"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"

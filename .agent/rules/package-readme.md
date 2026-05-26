@@ -47,10 +47,10 @@ Apply this together with `.agent/rules/writing.md`.
 
 ```ts
 router.get('/users/{userId}', {
-	pathSchema: z.object({ userId: z.number() }),
-	handler: (req, res) => {
-		res.json({ id: req.valid.path.userId });
-	}
+  pathSchema: z.object({ userId: z.number() }),
+  handler: (req, res) => {
+    res.json({ id: req.valid.path.userId });
+  }
 });
 ```
 ````

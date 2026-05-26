@@ -14,94 +14,163 @@
     </a>
 </p>
 
-`@blgc/config` is a collection of configurations for popular linting and styling tools.
+`@blgc/config` packages Builder Group's shared TypeScript, ESLint, Prettier, and Vitest config. It gives packages the same strict defaults, import ordering, generated-file ignores, and test setup without copying config files between repos.
 
-The following configs are available, and are designed to be used together.
-
-- [Prettier](#prettier)
-- [ESLint](#eslint)
-- [TypeScript](#typescript)
-- [Vitest](#vitest)
-
-## 📖 Usage
-
-### [Prettier](https://prettier.io/)
-
-> Note: Prettier is a peer-dependency of this package, and should be installed
-> at the root of your project.
->
-> See: https://prettier.io/docs/en/install.html
-
-To use the shared Prettier config, set the following in `package.json`:
-
-```json
-{
-	"prettier": "@blgc/config/prettier"
-}
-```
-
-### [Typescript](https://www.typescriptlang.org/)
-
-> Note: Typescript is a peer-dependency of this package, and should be installed
-> at the root of your project.
-
-To use the shared Typescript config, set the following in `tsconfig.json`:
-
-```json
-{
-	"extends": "@blgc/config/typescript/library",
-	"compilerOptions": {
-		"outDir": "./dist",
-		"rootDir": "./src",
-		"declarationDir": "./dist/types"
-	},
-	"include": ["src"]
-}
-```
-
-### [ESLint](https://eslint.org/)
-
-> Note: ESLint is a peer-dependency of this package, and should be installed
-> at the root of your project.
->
-> See: https://eslint.org/docs/user-guide/getting-started#installation-and-usage
-
-To use the shared ESLint config, set the following in `eslint.config.js`:
+- Share one Prettier config with import sorting, Tailwind class sorting, CSS ordering, and package.json sorting
+- Use flat ESLint configs for libraries, React, Next.js, and TanStack projects
+- Extend TypeScript configs for libraries, DOM libraries, Node 20, React, Next.js, and TanStack
+- Reuse a Vitest node config with TypeScript path resolution and coverage defaults
 
 ```js
-/**
- * @type {import('eslint').Linter.Config}
- */
+// eslint.config.js
 module.exports = [
-	...require('@blgc/config/eslint/library'),
-	{
-		// Any additional custom rules
-	}
+  ...require('@blgc/config/eslint/library'),
+  {
+    rules: {
+      // project-specific overrides
+    }
+  }
 ];
 ```
 
-### [Vitest](https://vitest.dev/)
-
-To use the shared Vitest config, set the following in `vitest.config.js`:
-
-```js
-const { defineConfig, mergeConfig } = require('vitest/config');
-const { nodeConfig } = require('@blgc/config/vite/node');
-
-module.exports = mergeConfig(nodeConfig, defineConfig({}));
+```json
+{
+  "prettier": "@blgc/config/prettier"
+}
 ```
 
-## 🙏 Contribution
-
-### Debugging ESLint Configuration
-
-If you are encountering issues or unexpected behavior with ESLint, you can use the following command to output the final configuration.
+## Install
 
 ```bash
-npx eslint --print-config ./some/file/to/test/on.ts
+npm install -D @blgc/config eslint prettier typescript
 ```
 
-## 🌟 Credits
+Install the tools you use in the project. For example, add `vitest` when you use the shared Vitest config.
 
-- [`turbo-basic`](https://github.com/vercel/turbo/tree/main/examples/basic) - Base configuration from Vercel's official starter template for optimal Next.js settings
-- [`tsconfig/bases`](https://github.com/tsconfig/bases) - TypeScript configuration best practices and recommendations
+## Usage
+
+Use the config entry that matches the tool you are setting up:
+
+- `@blgc/config/prettier`: shared Prettier rules and sorting plugins
+- `@blgc/config/eslint/library`: flat ESLint config for TypeScript libraries
+- `@blgc/config/eslint/react-internal`: flat ESLint config for internal React packages
+- `@blgc/config/eslint/next`: flat ESLint config for Next.js apps
+- `@blgc/config/eslint/tanstack`: flat ESLint config for TanStack apps
+- `@blgc/config/typescript/library`: TypeScript config for Node-targeted libraries
+- `@blgc/config/typescript/library-dom`: TypeScript config for DOM-capable libraries
+- `@blgc/config/typescript/node20`: TypeScript config for Node 20 projects
+- `@blgc/config/typescript/react-internal`: TypeScript config for internal React packages
+- `@blgc/config/typescript/next`: TypeScript config for Next.js apps
+- `@blgc/config/typescript/tanstack`: TypeScript config for TanStack apps
+- `@blgc/config/vite/node`: Vitest config for Node test environments
+
+## Prettier
+
+Reference the shared config from `package.json`:
+
+```json
+{
+  "prettier": "@blgc/config/prettier"
+}
+```
+
+The Prettier config includes:
+
+- tabs for code files, two-space indentation for Markdown, single quotes, semicolons, and `printWidth: 100`
+- sorted imports through `@ianvs/prettier-plugin-sort-imports`
+- Tailwind class sorting through `prettier-plugin-tailwindcss`
+- CSS declaration ordering through `prettier-plugin-css-order`
+- package.json ordering through `prettier-plugin-packagejson`
+
+## ESLint
+
+Use flat config from `eslint.config.js`:
+
+```js
+module.exports = [
+  ...require('@blgc/config/eslint/library'),
+  {
+    rules: {
+      // local overrides
+    }
+  }
+];
+```
+
+Choose the preset by project type:
+
+| Preset                               | Use for                       |
+| ------------------------------------ | ----------------------------- |
+| `@blgc/config/eslint/library`        | TypeScript packages           |
+| `@blgc/config/eslint/react-internal` | React packages and Vite apps  |
+| `@blgc/config/eslint/next`           | Next.js apps                  |
+| `@blgc/config/eslint/tanstack`       | TanStack Router or Start apps |
+
+The base config includes recommended JavaScript rules, TypeScript strict rules, Prettier compatibility, Turbo env-var warnings, `only-warn`, and generated-file ignores.
+
+## TypeScript
+
+Extend the closest TypeScript config:
+
+```json
+{
+  "extends": "@blgc/config/typescript/library",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declarationDir": "./dist/types"
+  },
+  "include": ["src"]
+}
+```
+
+Available configs:
+
+| Config                                   | Use for                               |
+| ---------------------------------------- | ------------------------------------- |
+| `@blgc/config/typescript/base`           | Shared strict base settings           |
+| `@blgc/config/typescript/library`        | TypeScript libraries without DOM APIs |
+| `@blgc/config/typescript/library-dom`    | Libraries that use DOM globals        |
+| `@blgc/config/typescript/node20`         | Node 20 packages and tools            |
+| `@blgc/config/typescript/react-internal` | React packages and Vite apps          |
+| `@blgc/config/typescript/next`           | Next.js apps                          |
+| `@blgc/config/typescript/tanstack`       | TanStack apps                         |
+
+## Vitest
+
+Merge the shared Vite/Vitest node config when you want the default test setup:
+
+```js
+import { nodeConfig } from '@blgc/config/vite/node';
+import { defineConfig, mergeConfig } from 'vitest/config';
+
+export default mergeConfig(
+  nodeConfig,
+  defineConfig({
+    test: {
+      // project-specific test options
+    }
+  })
+);
+```
+
+The node config enables TypeScript path resolution and coverage reporters for text, JSON, and HTML.
+
+## FAQ
+
+### Do I need every peer tool installed?
+
+No. Install the tools that your project runs. For example, a package that only extends TypeScript config does not need to run ESLint or Prettier.
+
+### Can I override rules?
+
+Yes. Add another config object after the shared config in `eslint.config.js`, add `compilerOptions` in `tsconfig.json`, or pass project-specific options to `mergeConfig` for Vitest.
+
+### Why keep these configs in a package?
+
+A package keeps defaults versioned, reviewable, and reusable. Projects can update one dependency instead of copying config changes by hand.
+
+## Credits
+
+- [`turbo-basic`](https://github.com/vercel/turbo/tree/main/examples/basic): base configuration patterns from Vercel's starter template
+- [`tsconfig/bases`](https://github.com/tsconfig/bases): TypeScript configuration references

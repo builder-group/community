@@ -2,20 +2,19 @@
 	"name": "feature-core",
 	"version": "0.0.1",
 	"private": false,
-	"description": "Typed .with() feature composition for extensible TypeScript objects.",
+	"description": "Typed .with() feature composition with dependency checks for TypeScript objects",
 	"keywords": [
 		"typescript",
-		"composition",
 		"feature-composition",
+		"composition",
+		"feature-host",
+		"dependency-validation",
 		"extensible",
 		"composable",
 		"library-authoring",
-		"feature",
-		"typesafe",
+		"type-safe",
 		"with",
-		"mixin",
-		"plugin",
-		"dependency-validation"
+		"plugin-system"
 	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {

@@ -33,7 +33,7 @@ Use `createEPRELClient()` to create a client with your API key.
 import { createEPRELClient } from 'eprel-client';
 
 const client = createEPRELClient({
-	apiKey: 'YOUR_API_KEY'
+  apiKey: 'YOUR_API_KEY'
 });
 ```
 
@@ -59,30 +59,30 @@ const productGroupsResult = await client.getProductGroups();
 
 // First Approach: Handle error using `isErr()`
 if (productGroupsResult.isErr()) {
-	const { error } = productGroupsResult;
-	if (error instanceof NetworkError) {
-		console.error('Network error:', error.message);
-	} else if (error instanceof RequestError) {
-		console.error('Request error:', error.message, 'Status:', error.status);
-	} else if (error instanceof FetchError) {
-		console.error('Service error:', error.message, 'Code:', error.code);
-	} else {
-		console.error('Unexpected error:', error);
-	}
+  const { error } = productGroupsResult;
+  if (error instanceof NetworkError) {
+    console.error('Network error:', error.message);
+  } else if (error instanceof RequestError) {
+    console.error('Request error:', error.message, 'Status:', error.status);
+  } else if (error instanceof FetchError) {
+    console.error('Service error:', error.message, 'Code:', error.code);
+  } else {
+    console.error('Unexpected error:', error);
+  }
 }
 
 // Second Approach: Unwrap response with `try-catch`
 try {
-	const productGroups = productGroupsResult.unwrap();
+  const productGroups = productGroupsResult.unwrap();
 } catch (error) {
-	if (error instanceof NetworkError) {
-		console.error('Network error:', error.message);
-	} else if (error instanceof RequestError) {
-		console.error('Request error:', error.message, 'Status:', error.status);
-	} else if (error instanceof FetchError) {
-		console.error('Service error:', error.message, 'Code:', error.code);
-	} else {
-		console.error('Unexpected error:', error);
-	}
+  if (error instanceof NetworkError) {
+    console.error('Network error:', error.message);
+  } else if (error instanceof RequestError) {
+    console.error('Request error:', error.message, 'Status:', error.status);
+  } else if (error instanceof FetchError) {
+    console.error('Service error:', error.message, 'Code:', error.code);
+  } else {
+    console.error('Unexpected error:', error);
+  }
 }
 ```

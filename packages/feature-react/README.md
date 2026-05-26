@@ -31,27 +31,29 @@ import { useCompute } from 'feature-react/state';
 import { createState } from 'feature-state';
 import * as z from 'zod';
 
-const $tasks = createState<Task[]>([]);
+type TTask = { id: string; title: string; done: boolean };
+
+const $tasks = createState<TTask[]>([]);
 const $profileForm = createForm({
-	fields: {
-		email: { defaultValue: '', validator: z.string().email(), validateOn: ['blur'] }
-	}
+  fields: {
+    email: { defaultValue: '', validator: z.string().email(), validateOn: ['blur'] }
+  }
 });
 
 const CompletedCount = () => {
-	const count = useCompute($tasks, (tasks) => tasks.filter((t) => t.done).length);
-	return <span>{count} completed</span>;
+  const count = useCompute($tasks, (tasks) => tasks.filter((t) => t.done).length);
+  return <span>{count} completed</span>;
 };
 
 const EmailField = () => {
-	const { input, status } = useFormField($profileForm, 'email');
-	return (
-		<label>
-			Email
-			<input {...input()} />
-			{status.type === 'invalid' && <span>{status.errors[0].message}</span>}
-		</label>
-	);
+  const { input, status } = useFormField($profileForm, 'email');
+  return (
+    <label>
+      Email
+      <input {...input()} />
+      {status.type === 'invalid' && <span>{status.errors[0].message}</span>}
+    </label>
+  );
 };
 ```
 
@@ -61,52 +63,68 @@ const EmailField = () => {
 npm install feature-react
 ```
 
+Install the source package for the hooks you use. The examples below use both state and form hooks:
+
+```bash
+npm install feature-state feature-form zod
+```
+
+`zod` is only used by the form examples. Any Standard Schema validator works with `feature-form`.
+
 ## Usage
+
+Pick the hook surface that matches the source of truth:
+
+- `feature-react/state`: subscribe to `feature-state` values, derived values, listeners, and subscribers
+- `feature-react/form`: bind `feature-form` forms and fields to React inputs
+- State features: add browser storage or global bindings for state objects
 
 Use `useFeatureState` to subscribe a component to a state value and re-render when it changes. Use `useCompute` when you only care about a derived slice: the component skips re-renders unless the computed result itself changes.
 
-```ts
+```tsx
+import { useCompute, useFeatureState } from 'feature-react/state';
 import { createState } from 'feature-state';
-import { useFeatureState, useCompute } from 'feature-react/state';
 
-const $tasks = createState<Task[]>([]);
+type TTask = { id: string; title: string };
+
+const $tasks = createState<TTask[]>([]);
 
 export const Tasks = () => {
-	const tasks = useFeatureState($tasks);
+  const tasks = useFeatureState($tasks);
 
-	return (
-		<ul>
-			{tasks.map((task) => (
-				<li key={task.id}>{task.title}</li>
-			))}
-		</ul>
-	);
+  return (
+    <ul>
+      {tasks.map((task) => (
+        <li key={task.id}>{task.title}</li>
+      ))}
+    </ul>
+  );
 };
 ```
 
 Bind a form with `useForm` to get input helpers and a submit handler in one call:
 
-```ts
+```tsx
 import { createForm } from 'feature-form';
 import { useForm } from 'feature-react/form';
 
 const $form = createForm<{ name: string; email: string }>({
-	fields: {
-		name: { defaultValue: '' },
-		email: { defaultValue: '' }
-	}
+  fields: {
+    name: { defaultValue: '' },
+    email: { defaultValue: '' }
+  }
 });
 
 export const ContactForm = () => {
-	const { input, handleSubmit } = useForm($form);
+  const { input, handleSubmit } = useForm($form);
 
-	return (
-		<form onSubmit={handleSubmit({ onValidSubmit: console.log })}>
-			<input {...input('name')} />
-			<input {...input('email')} />
-			<button type="submit">Submit</button>
-		</form>
-	);
+  return (
+    <form onSubmit={handleSubmit({ onValidSubmit: console.log })}>
+      <input {...input('name')} />
+      <input {...input('email')} />
+      <button type="submit">Submit</button>
+    </form>
+  );
 };
 ```
 
@@ -116,22 +134,24 @@ export const ContactForm = () => {
 
 Returns the current state value and re-renders the component when the state changes.
 
-```ts
-import { createState } from 'feature-state';
+```tsx
 import { useFeatureState } from 'feature-react/state';
+import { createState } from 'feature-state';
 
-const $tasks = createState<Task[]>([]);
+type TTask = { id: string; title: string };
+
+const $tasks = createState<TTask[]>([]);
 
 export const Tasks = () => {
-	const tasks = useFeatureState($tasks);
+  const tasks = useFeatureState($tasks);
 
-	return (
-		<ul>
-			{tasks.map((task) => (
-				<li key={task.id}>{task.title}</li>
-			))}
-		</ul>
-	);
+  return (
+    <ul>
+      {tasks.map((task) => (
+        <li key={task.id}>{task.title}</li>
+      ))}
+    </ul>
+  );
 };
 ```
 
@@ -149,7 +169,7 @@ const completedCount = useCompute($tasks, (tasks) => tasks.filter((t) => t.done)
 
 // Multiple states
 const filtered = useCompute([$tasks, $filter], ([tasks, filter]) =>
-	tasks.filter((t) => t.category === filter)
+  tasks.filter((t) => t.category === filter)
 );
 ```
 
@@ -167,11 +187,11 @@ Calls `callback` whenever the state changes without subscribing the component to
 import { useListener } from 'feature-react/state';
 
 export const Analytics = () => {
-	useListener($tasks, (tasks) => {
-		analytics.track('tasks_changed', { count: tasks.length });
-	});
+  useListener($tasks, (tasks) => {
+    analytics.track('tasks_changed', { count: tasks.length });
+  });
 
-	return null;
+  return null;
 };
 ```
 
@@ -185,7 +205,7 @@ Like `useListener`, but runs the callback immediately on mount with the current 
 import { useSubscriber } from 'feature-react/state';
 
 useSubscriber($theme, (theme) => {
-	document.documentElement.setAttribute('data-theme', theme);
+  document.documentElement.setAttribute('data-theme', theme);
 });
 ```
 
@@ -193,32 +213,32 @@ useSubscriber($theme, (theme) => {
 
 Subscribes a component to a form and re-renders when any field changes. Use this when a single component owns the whole form.
 
-```ts
+```tsx
 import { createForm } from 'feature-form';
 import { useForm } from 'feature-react/form';
 
 interface TFormData {
-	name: string;
-	email: string;
+  name: string;
+  email: string;
 }
 
 const $form = createForm<TFormData>({
-	fields: {
-		name: { defaultValue: '' },
-		email: { defaultValue: '' }
-	}
+  fields: {
+    name: { defaultValue: '' },
+    email: { defaultValue: '' }
+  }
 });
 
 export const ContactForm = () => {
-	const { input, handleSubmit } = useForm($form);
+  const { input, handleSubmit } = useForm($form);
 
-	return (
-		<form onSubmit={handleSubmit({ onValidSubmit: console.log })}>
-			<input {...input('name')} />
-			<input {...input('email')} />
-			<button type="submit">Submit</button>
-		</form>
-	);
+  return (
+    <form onSubmit={handleSubmit({ onValidSubmit: console.log })}>
+      <input {...input('name')} />
+      <input {...input('email')} />
+      <button type="submit">Submit</button>
+    </form>
+  );
 };
 ```
 
@@ -236,18 +256,18 @@ export const ContactForm = () => {
 
 Subscribes to a single field's status and returns input props for uncontrolled fields by default. Use this for isolated field components or large forms where re-rendering on every keystroke is expensive.
 
-```ts
+```tsx
 import { useFormField } from 'feature-react/form';
 
 export const NameField = () => {
-	const { status, input } = useFormField($form, 'name');
+  const { status, input } = useFormField($form, 'name');
 
-	return (
-		<div>
-			<input {...input()} />
-			{status.type === 'invalid' && <span>{status.errors[0]?.message}</span>}
-		</div>
-	);
+  return (
+    <div>
+      <input {...input()} />
+      {status.type === 'invalid' && <span>{status.errors[0]?.message}</span>}
+    </div>
+  );
 };
 ```
 
@@ -291,9 +311,9 @@ input('age', { format: (v) => String(v), parse: (s) => Number(s), controlled: tr
 
 // useFormField: all options go to the hook; input() takes no args
 const { input: ageInput } = useFormField($form, 'age', {
-	controlled: true,
-	format: (v) => String(v),
-	parse: (s) => Number(s)
+  controlled: true,
+  format: (v) => String(v),
+  parse: (s) => Number(s)
 });
 ageInput();
 ```
@@ -306,16 +326,16 @@ Features are installed via `.with()` and extend a state with new capabilities.
 
 Persists state in `localStorage`. Built on top of `storageFeature` from `feature-state`.
 
-```ts
-import { createState } from 'feature-state';
+```tsx
 import { localStorageFeature, useFeatureState } from 'feature-react/state';
+import { createState } from 'feature-state';
 
 const $theme = createState<'light' | 'dark'>('light').with(localStorageFeature('theme'));
 await $theme.persist();
 
 export const ThemeToggle = () => {
-	const theme = useFeatureState($theme);
-	return <button onClick={() => $theme.set(theme === 'light' ? 'dark' : 'light')}>{theme}</button>;
+  const theme = useFeatureState($theme);
+  return <button onClick={() => $theme.set(theme === 'light' ? 'dark' : 'light')}>{theme}</button>;
 };
 ```
 
@@ -329,7 +349,7 @@ Exposes the state on `globalThis[key]` for debugging in the browser console.
 import { globalBindFeature } from 'feature-react/state';
 import { createState } from 'feature-state';
 
-const $tasks = createState<Task[]>([]).with(globalBindFeature('_tasks'));
+const $tasks = createState<string[]>([]).with(globalBindFeature('_tasks'));
 
 // In the browser console:
 // globalThis._tasks.get()

@@ -2,15 +2,21 @@
 	"name": "openapi-ts-router",
 	"version": "0.1.0-beta.1",
 	"private": false,
-	"description": "OpenAPI-typed Express and Hono router helpers with Standard Schema request validation.",
+	"description": "Typed Express and Hono route helpers backed by OpenAPI paths and Standard Schema validation",
 	"keywords": [
 		"openapi",
+		"openapi-typescript",
 		"router",
+		"typed-router",
 		"express",
 		"hono",
 		"standard-schema",
+		"request-validation",
+		"api-validation",
 		"typescript",
-		"type-safe"
+		"type-safe",
+		"zod",
+		"valibot"
 	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {

@@ -28,8 +28,8 @@
 import { createLogger, ELogLevel, prefixFeature, timestampPrefixFeature } from 'feature-logger';
 
 const logger = createLogger({ level: ELogLevel.INFO }).with(
-	prefixFeature('[App]'),
-	timestampPrefixFeature()
+  prefixFeature('[App]'),
+  timestampPrefixFeature()
 );
 
 logger.debug('hidden'); // below INFO, not emitted
@@ -38,9 +38,9 @@ logger.info('server ready'); // emits with the app prefix and a timestamp
 // Test: capture output without patching console or using spies
 const logs: Array<[string, unknown[]]> = [];
 const testLogger = createLogger({
-	invokeConsole: (data, context) => {
-		logs.push([context.logMethod, data]);
-	}
+  invokeConsole: (data, context) => {
+    logs.push([context.logMethod, data]);
+  }
 }).with(prefixFeature('[App]'));
 
 testLogger.warn('something happened');
@@ -83,9 +83,9 @@ Swap the console invoker to capture output in tests without patching `console`:
 ```ts
 const logs: Array<[string, unknown[]]> = [];
 const logger = createLogger({
-	invokeConsole: (data, context) => {
-		logs.push([context.logMethod, data]);
-	}
+  invokeConsole: (data, context) => {
+    logs.push([context.logMethod, data]);
+  }
 });
 
 logger.warn('something happened');
@@ -102,8 +102,8 @@ Creates a logger instance and returns it as a feature host.
 import { createLogger, ELogLevel } from 'feature-logger';
 
 const logger = createLogger({
-	active: true,
-	level: ELogLevel.INFO
+  active: true,
+  level: ELogLevel.INFO
 });
 
 logger.debug('hidden');
@@ -162,9 +162,9 @@ Adds the current local timestamp to each log call.
 
 ```ts
 const logger = createLogger().with(
-	timestampPrefixFeature({
-		formatTimestamp: (date) => `[${date.toISOString()}]`
-	})
+  timestampPrefixFeature({
+    formatTimestamp: (date) => `[${date.toISOString()}]`
+  })
 );
 
 logger.info('ready');
@@ -180,9 +180,9 @@ Adds the console method name to each log call.
 
 ```ts
 const logger = createLogger().with(
-	logMethodPrefixFeature({
-		formatLogMethod: (method) => `[${method.toUpperCase()}]`
-	})
+  logMethodPrefixFeature({
+    formatLogMethod: (method) => `[${method.toUpperCase()}]`
+  })
 );
 
 logger.error('failed'); // "[ERROR] failed"
@@ -198,9 +198,9 @@ Applies browser console CSS styles to string messages. Custom styles override th
 
 ```ts
 const logger = createLogger().with(
-	styleFeature({
-		info: 'color: dodgerblue; font-weight: bold'
-	})
+  styleFeature({
+    info: 'color: dodgerblue; font-weight: bold'
+  })
 );
 
 logger.info('styled');
@@ -232,23 +232,23 @@ import { defineFeature, type TFeature } from 'feature-core';
 import type { TLoggerBase } from 'feature-logger';
 
 export function labelFeature(label: string): TLabelFeature {
-	return defineFeature<TLabelFeature>({
-		key: 'label',
-		install(logger: TLoggerBase) {
-			logger._middleware.push((next) => {
-				return (data, context) => {
-					if (typeof data[0] === 'string') {
-						next([`${label}: ${data[0]}`, ...data.slice(1)], context);
-						return;
-					}
+  return defineFeature<TLabelFeature>({
+    key: 'label',
+    install(logger: TLoggerBase) {
+      logger._middleware.push((next) => {
+        return (data, context) => {
+          if (typeof data[0] === 'string') {
+            next([`${label}: ${data[0]}`, ...data.slice(1)], context);
+            return;
+          }
 
-					next([label, ...data], context);
-				};
-			});
+          next([label, ...data], context);
+        };
+      });
 
-			return {};
-		}
-	});
+      return {};
+    }
+  });
 }
 
 export type TLabelFeature = TFeature<'label', object>;
@@ -287,7 +287,7 @@ Pass a custom `invokeConsole` to `createLogger`, then apply the same features wi
 ```ts
 const logs: string[] = [];
 const logger = createLogger({
-	invokeConsole: (data) => logs.push(data.join(' '))
+  invokeConsole: (data) => logs.push(data.join(' '))
 }).with(prefixFeature('[Auth]'));
 
 logger.info('token verified');

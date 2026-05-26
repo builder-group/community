@@ -29,18 +29,18 @@ The plugin transforms cross-module imports based on package.json exports configu
 
    ```json
    {
-   	"exports": {
-   		"./module1": {
-   			"source": "./src/module1/index.ts",
-   			"import": "./dist/module1/esm/index.js",
-   			"require": "./dist/module1/cjs/index.js"
-   		},
-   		"./module2": {
-   			"source": "./src/module2/index.ts",
-   			"import": "./dist/module2/esm/index.js",
-   			"require": "./dist/module2/cjs/index.js"
-   		}
-   	}
+     "exports": {
+       "./module1": {
+         "source": "./src/module1/index.ts",
+         "import": "./dist/module1/esm/index.js",
+         "require": "./dist/module1/cjs/index.js"
+       },
+       "./module2": {
+         "source": "./src/module2/index.ts",
+         "import": "./dist/module2/esm/index.js",
+         "require": "./dist/module2/cjs/index.js"
+       }
+     }
    }
    ```
 

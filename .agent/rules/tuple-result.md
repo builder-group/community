@@ -27,7 +27,7 @@ Use `tuple-result` as the default Result pattern when working with repo code tha
 const configResult = await loadConfig();
 const [isConfigOk, configErr, config] = configResult;
 if (!isConfigOk) {
-	throw new AppError('Failed to load config', { cause: configErr });
+  throw new AppError('Failed to load config', { cause: configErr });
 }
 
 return config;

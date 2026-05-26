@@ -30,10 +30,10 @@ import { booleanValidator, portValidator, validateEnv } from 'validatenv';
 import * as z from 'zod';
 
 const env = validateEnv(process.env, {
-	NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-	DATABASE_URL: z.string().url(),
-	PORT: portValidator, // number, validated 1-65535, no Zod required
-	DEBUG: booleanValidator // parses "true", "yes", "1", "on" and their opposites
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  DATABASE_URL: z.string().url(),
+  PORT: portValidator, // number, validated 1-65535, no Zod required
+  DEBUG: booleanValidator // parses "true", "yes", "1", "on" and their opposites
 });
 
 // env.NODE_ENV is 'development' | 'production' | 'test'
@@ -47,7 +47,20 @@ const env = validateEnv(process.env, {
 npm install validatenv
 ```
 
+The examples below use Zod, but any Standard Schema validator works:
+
+```bash
+npm install zod
+```
+
 ## Usage
+
+Pick the helper that matches the config shape:
+
+- `validateEnv`: validate a full env spec into one typed config object
+- `validateEnvVar`: validate one variable outside a full spec
+- `createEnv`: split server, client, and shared specs with client-side access guards
+- `createViteEnvDefine`: create Vite `define` values from validated env variables
 
 `validateEnv` reads a spec object where each key maps to a validator. The object key is the environment variable name by default, and validation throws synchronously if any variable is missing or invalid:
 
@@ -56,9 +69,9 @@ import { booleanValidator, portValidator, validateEnv } from 'validatenv';
 import * as z from 'zod';
 
 const env = validateEnv(process.env, {
-	PORT: portValidator,
-	DEBUG: booleanValidator,
-	API_URL: z.string().url()
+  PORT: portValidator,
+  DEBUG: booleanValidator,
+  API_URL: z.string().url()
 });
 ```
 
@@ -66,12 +79,12 @@ Use an object spec when the env key differs from the output key, or when you nee
 
 ```ts
 const env = validateEnv(process.env, {
-	dbUrl: {
-		envKey: 'DATABASE_URL',
-		validator: z.string().url(),
-		description: 'Postgres connection URL',
-		example: 'postgres://user:password@localhost:5432/app'
-	}
+  dbUrl: {
+    envKey: 'DATABASE_URL',
+    validator: z.string().url(),
+    description: 'Postgres connection URL',
+    example: 'postgres://user:password@localhost:5432/app'
+  }
 });
 ```
 
@@ -81,7 +94,7 @@ Pass any [Standard Schema](https://github.com/standard-schema/standard-schema) c
 import * as v from 'valibot';
 
 const env = validateEnv(process.env, {
-	APP_NAME: v.string()
+  APP_NAME: v.string()
 });
 ```
 
@@ -93,8 +106,8 @@ Validates all variables in `specs` against `env` and returns a typed object. Thr
 
 ```ts
 const env = validateEnv(process.env, {
-	PORT: portValidator,
-	DATABASE_URL: z.string().url()
+  PORT: portValidator,
+  DATABASE_URL: z.string().url()
 });
 ```
 
@@ -129,17 +142,17 @@ Validates grouped server, client, and shared specs. On the client, server specs 
 import { createEnv, urlValidator } from 'validatenv';
 
 const env = createEnv({
-	env: process.env,
-	isServer: typeof window === 'undefined',
-	server: {
-		DATABASE_URL: urlValidator
-	},
-	client: {
-		NEXT_PUBLIC_API_URL: urlValidator
-	},
-	shared: {
-		APP_VERSION: '1.2.3'
-	}
+  env: process.env,
+  isServer: typeof window === 'undefined',
+  server: {
+    DATABASE_URL: urlValidator
+  },
+  client: {
+    NEXT_PUBLIC_API_URL: urlValidator
+  },
+  shared: {
+    APP_VERSION: '1.2.3'
+  }
 });
 ```
 
@@ -166,7 +179,7 @@ Schema transforms are supported. The inferred type follows the output of the tra
 
 ```ts
 const env = validateEnv(process.env, {
-	PORT: z.string().transform(Number)
+  PORT: z.string().transform(Number)
 });
 
 env.PORT; // number
@@ -176,10 +189,10 @@ When a schema transforms its input, the default should match the schema input ty
 
 ```ts
 const env = validateEnv(process.env, {
-	PORT: {
-		validator: z.string().transform(Number),
-		defaultValue: '3000' // string input, number output
-	}
+  PORT: {
+    validator: z.string().transform(Number),
+    defaultValue: '3000' // string input, number output
+  }
 });
 
 env.PORT; // number
@@ -191,25 +204,25 @@ Use `preprocess` for small raw-value cleanup before defaults and validation run.
 
 ```ts
 import {
-	emptyStringAsUndefined,
-	pipePreprocess,
-	stringValidator,
-	stripTrailingSlash,
-	urlValidator,
-	validateEnv
+  emptyStringAsUndefined,
+  pipePreprocess,
+  stringValidator,
+  stripTrailingSlash,
+  urlValidator,
+  validateEnv
 } from 'validatenv';
 
 const env = validateEnv(process.env, {
-	API_KEY: {
-		validator: stringValidator,
-		preprocess: emptyStringAsUndefined,
-		defaultValue: 'local-api-key'
-	},
-	API_URL: {
-		validator: urlValidator,
-		preprocess: pipePreprocess(emptyStringAsUndefined, stripTrailingSlash),
-		defaultValue: 'http://localhost:3000'
-	}
+  API_KEY: {
+    validator: stringValidator,
+    preprocess: emptyStringAsUndefined,
+    defaultValue: 'local-api-key'
+  },
+  API_URL: {
+    validator: urlValidator,
+    preprocess: pipePreprocess(emptyStringAsUndefined, stripTrailingSlash),
+    defaultValue: 'http://localhost:3000'
+  }
 });
 ```
 
@@ -229,27 +242,27 @@ Default helpers supply a fallback value after preprocessing and before validatio
 
 ```ts
 import {
-	devDefault,
-	localDefault,
-	pipeDefaults,
-	portValidator,
-	testDefault,
-	urlValidator,
-	validateEnv
+  devDefault,
+  localDefault,
+  pipeDefaults,
+  portValidator,
+  testDefault,
+  urlValidator,
+  validateEnv
 } from 'validatenv';
 
 const env = validateEnv(process.env, {
-	PORT: {
-		validator: portValidator,
-		defaultValue: devDefault(3000) // only active when NODE_ENV=development
-	},
-	API_URL: {
-		validator: urlValidator,
-		defaultValue: pipeDefaults(
-			localDefault('http://localhost:3000'), // NODE_ENV=local or development
-			testDefault('http://localhost:3000') // NODE_ENV=test
-		)
-	}
+  PORT: {
+    validator: portValidator,
+    defaultValue: devDefault(3000) // only active when NODE_ENV=development
+  },
+  API_URL: {
+    validator: urlValidator,
+    defaultValue: pipeDefaults(
+      localDefault('http://localhost:3000'), // NODE_ENV=local or development
+      testDefault('http://localhost:3000') // NODE_ENV=test
+    )
+  }
 });
 ```
 
@@ -277,21 +290,21 @@ import { createViteEnvDefine, stringValidator, urlValidator } from 'validatenv';
 import { defineConfig, loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
-	const env = {
-		...process.env,
-		...loadEnv(mode, process.cwd(), '')
-	};
+  const env = {
+    ...process.env,
+    ...loadEnv(mode, process.cwd(), '')
+  };
 
-	return {
-		define: createViteEnvDefine(env, {
-			PACKAGE_VERSION: {
-				envKey: 'npm_package_version',
-				validator: stringValidator,
-				defaultValue: '0.0.0'
-			},
-			VITE_API_URL: urlValidator
-		})
-	};
+  return {
+    define: createViteEnvDefine(env, {
+      PACKAGE_VERSION: {
+        envKey: 'npm_package_version',
+        validator: stringValidator,
+        defaultValue: '0.0.0'
+      },
+      VITE_API_URL: urlValidator
+    })
+  };
 });
 ```
 
@@ -299,8 +312,8 @@ The helper returns Vite-compatible replacement expressions:
 
 ```ts
 {
-	'import.meta.env.PACKAGE_VERSION': '"0.0.0"',
-	'import.meta.env.VITE_API_URL': '"https://api.example.com"'
+  'import.meta.env.PACKAGE_VERSION': '"0.0.0"',
+  'import.meta.env.VITE_API_URL': '"https://api.example.com"'
 }
 ```
 
@@ -328,11 +341,11 @@ Use `preprocess` for raw env cleanup that should happen before defaults, such as
 
 ```ts
 const env = validateEnv(process.env, {
-	API_URL: {
-		validator: urlValidator,
-		preprocess: emptyStringAsUndefined,
-		defaultValue: 'http://localhost:3000'
-	}
+  API_URL: {
+    validator: urlValidator,
+    preprocess: emptyStringAsUndefined,
+    defaultValue: 'http://localhost:3000'
+  }
 });
 ```
 
@@ -340,7 +353,7 @@ Use schema transforms for parsing and semantic normalization, such as string-to-
 
 ```ts
 const env = validateEnv(process.env, {
-	PORT: z.string().transform(Number)
+  PORT: z.string().transform(Number)
 });
 ```
 
@@ -352,8 +365,8 @@ Yes. Top-level raw values are copied into the validated output as static config 
 
 ```ts
 const env = validateEnv(process.env, {
-	DATABASE_URL: z.string().url(),
-	PACKAGE_VERSION: '1.2.3'
+  DATABASE_URL: z.string().url(),
+  PACKAGE_VERSION: '1.2.3'
 });
 ```
 
@@ -369,13 +382,13 @@ Use `defaultValue` to supply a fallback when the variable is absent. If no fallb
 
 ```ts
 const env = validateEnv(process.env, {
-	// Falls back to 3000 when PORT is not set
-	PORT: {
-		validator: portValidator,
-		defaultValue: 3000
-	},
-	// Absent value passes through as undefined
-	SENTRY_DSN: z.string().url().optional()
+  // Falls back to 3000 when PORT is not set
+  PORT: {
+    validator: portValidator,
+    defaultValue: 3000
+  },
+  // Absent value passes through as undefined
+  SENTRY_DSN: z.string().url().optional()
 });
 
 // env.PORT is number
@@ -419,12 +432,12 @@ Validate each source in its own module and import only what each side needs:
 ```ts
 // server/env.ts
 export const env = validateEnv(process.env, {
-	DATABASE_URL: z.string().url()
+  DATABASE_URL: z.string().url()
 });
 
 // client/env.ts
 export const publicEnv = validateEnv(import.meta.env, {
-	VITE_API_URL: z.string().url()
+  VITE_API_URL: z.string().url()
 });
 ```
 

@@ -2,8 +2,21 @@
 	"name": "rollup-presets",
 	"version": "0.0.27",
 	"private": false,
-	"description": "A collection of opinionated, production-ready Rollup presets",
-	"keywords": [],
+	"description": "Rollup presets for TypeScript libraries with package export discovery, ESM/CJS output, and declarations",
+	"keywords": [
+		"rollup",
+		"rollup-preset",
+		"typescript",
+		"typescript-library",
+		"library-build",
+		"bundler",
+		"esm",
+		"cjs",
+		"declarations",
+		"dts",
+		"tsconfig-paths",
+		"package-exports"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
