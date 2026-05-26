@@ -142,17 +142,17 @@ export interface TOpenApiMethod<GPaths extends object, GMethod extends HttpMetho
 	>;
 }
 
-// Note: Wrap PathsWithMethod because it preserves number keys from arbitrary path maps, but fetch paths are strings
-type TOpenApiMethodPath<GPaths extends object, GMethod extends HttpMethod> = Extract<
-	PathsWithMethod<GPaths, GMethod>,
-	string
->;
-
 type TOpenApiPathOperation<
 	GPaths extends object,
 	GMethod extends HttpMethod,
 	GPath extends TOpenApiMethodPath<GPaths, GMethod>
 > = FilterKeys<GPaths[GPath], GMethod>;
+
+// Note: Wrap PathsWithMethod because it preserves number keys from arbitrary path maps, but fetch paths are strings
+type TOpenApiMethodPath<GPaths extends object, GMethod extends HttpMethod> = Extract<
+	PathsWithMethod<GPaths, GMethod>,
+	string
+>;
 
 type TOpenApiMethodOptionsArgs<GOptions extends object> =
 	RequiredKeysOf<GOptions> extends never ? [options?: GOptions] : [options: GOptions];
@@ -160,11 +160,10 @@ type TOpenApiMethodOptionsArgs<GOptions extends object> =
 /** Request options inferred from one OpenAPI operation. */
 export type TOpenApiFetchOptions<GOperation, GParseAs extends TParseAs = 'json'> = Omit<
 	TFetchOptions<GParseAs>,
-	'bodySerializer' | 'headers' | 'pathParams' | 'pathSerializer' | 'queryParams' | 'querySerializer'
+	'headers' | 'pathParams' | 'pathSerializer' | 'queryParams' | 'querySerializer'
 > & {
 	pathSerializer?: TPathSerializer<TOpenApiPathSerializerParams<GOperation>>;
 	querySerializer?: TQuerySerializer<TOpenApiQuerySerializerParams<GOperation>>;
-	bodySerializer?: TBodySerializer<TOpenApiRequestBody<GOperation>>;
 } & TOpenApiPathParamsOption<GOperation> &
 	TOpenApiQueryParamsOption<GOperation> &
 	TOpenApiHeadersOption<GOperation> &
@@ -208,14 +207,23 @@ type TOpenApiJsonMediaType = `${string}/json` | `${string}/${string}+json`;
 
 // MARK: - Request Body
 
-// Note: Writable removes OpenAPI readOnly fields from request bodies
-type TOpenApiRequestBody<GOperation> = Writable<OperationRequestBodyContent<GOperation>>;
-
 type TOpenApiRequestBodyOption<GOperation> = [TOpenApiRequestBody<GOperation>] extends [never]
-	? { body?: never }
-	: IsOperationRequestBodyOptional<GOperation> extends true
-		? { body?: TOpenApiRequestBody<GOperation> }
-		: { body: TOpenApiRequestBody<GOperation> };
+	? {
+			body?: never;
+			bodySerializer?: never;
+		}
+	: {
+			bodySerializer?: TBodySerializer<TOpenApiRequestBody<GOperation>>;
+		} & (IsOperationRequestBodyOptional<GOperation> extends true
+			? { body?: TOpenApiRequestBody<GOperation> }
+			: { body: TOpenApiRequestBody<GOperation> });
+
+// Note: Wrap OperationRequestBodyContent to remove OpenAPI readOnly fields and map no-body operations from undefined to never
+type TOpenApiRequestBody<GOperation> = [
+	NonNullable<OperationRequestBodyContent<GOperation>>
+] extends [never]
+	? never
+	: Writable<OperationRequestBodyContent<GOperation>>;
 
 // MARK: - Path Parameters
 

@@ -1,4 +1,4 @@
-import type { $Read, $Write } from 'openapi-typescript-helpers';
+import type { $Read, $Write, OperationRequestBodyContent } from 'openapi-typescript-helpers';
 import { describe, expectTypeOf, it } from 'vitest';
 import type { components, paths } from '../__tests__/resources/mock-openapi-types';
 import { createFetchClient } from '../create-fetch-client';
@@ -125,6 +125,26 @@ describe('openApiFeature function', () => {
 			void client.post('/store/order', {
 				body: {
 					petId: 10
+				}
+			});
+		});
+
+		it('should not expose request bodies for operations without a body', () => {
+			const client = createOpenApiFetchClient<TPostNoBodyPaths>();
+
+			expectTypeOf<
+				OperationRequestBodyContent<TPostNoBodyPaths['/events']['post']>
+			>().toEqualTypeOf<undefined>();
+
+			void client.post('/events', {
+				// @ts-expect-error this operation does not declare a request body serializer.
+				bodySerializer: () => ''
+			});
+
+			void client.post('/events', {
+				// @ts-expect-error this operation does not declare a request body.
+				body: {
+					ok: true
 				}
 			});
 		});
@@ -351,6 +371,23 @@ interface TNumericPathKeyPaths {
 	};
 	'/items': {
 		get: {
+			requestBody?: never;
+			responses: {
+				200: {
+					content: {
+						'application/json': {
+							ok: boolean;
+						};
+					};
+				};
+			};
+		};
+	};
+}
+
+interface TPostNoBodyPaths {
+	'/events': {
+		post: {
 			requestBody?: never;
 			responses: {
 				200: {

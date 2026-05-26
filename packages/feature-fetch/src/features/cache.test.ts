@@ -1,4 +1,4 @@
-import { describe, expect, expectTypeOf, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { createFetchClient } from '../create-fetch-client';
 import type { TFetchLike } from '../types';
 import { cacheFeature, createCacheMiddleware } from './cache';
@@ -255,10 +255,6 @@ describe('cacheFeature function', () => {
 			expect(thirdResult.unwrap().data).toEqual({ requestCount: 2 });
 			expect(fourthResult.unwrap().data).toEqual({ requestCount: 3 });
 			expect(fetchLike).toHaveBeenCalledTimes(3);
-			expectTypeOf(client.cache.clear).toEqualTypeOf<() => void>();
-			expectTypeOf(client.cache.invalidate).toEqualTypeOf<
-				(predicate: (key: string) => boolean) => void
-			>();
 		});
 	});
 

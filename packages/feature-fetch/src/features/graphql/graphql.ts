@@ -184,7 +184,7 @@ type TGraphQLOperationOptionsArgs<GOptions extends object> =
 /** Request options for GraphQL operations. Variables are required when the document type requires them. */
 export type TGraphQLOperationOptions<GVariables extends object = Record<string, unknown>> = Omit<
 	TFetchOptions<'json'>,
-	'body' | 'parseAs'
+	'parseAs'
 > &
 	TGraphQLVariablesOption<GVariables>;
 

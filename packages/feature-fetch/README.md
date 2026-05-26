@@ -182,13 +182,14 @@ Each call to `request()` and the method helpers from installed features accept t
 | `pathParams`  | `{}`     | Values for `{param}` placeholders in the path                                     |
 | `queryParams` | `{}`     | Appended to the URL as a query string                                             |
 | `headers`     |          | Per-request headers merged after client defaults. `null` removes a default header |
-| `body`        |          | Request body. Objects are JSON-serialized when no `Content-Type` is set           |
 | `parseAs`     | `'json'` | Response parser: `'json'`, `'text'`, `'blob'`, `'arrayBuffer'`, or `'stream'`     |
 | `signal`      |          | `AbortSignal` for cancellation                                                    |
 | `meta`        | `{}`     | Request-scoped metadata passed to `prepareRequest` and `prepareResponse` hooks    |
 | `middleware`  | `[]`     | Request-scoped middleware appended after client middleware                        |
 | `baseUrl`     |          | Overrides the client base URL for this request                                    |
 | `requestInit` |          | Overrides native `RequestInit` values except `body`, `method`, and `headers`      |
+
+`request()` and body-capable helpers also accept `body` and `bodySerializer`. Non-body REST helpers and OpenAPI operations without a request body reject body-specific options.
 
 The REST, OpenAPI, and GraphQL helpers also accept `withResponse: true` when you need the raw `Response` on the success branch.
 

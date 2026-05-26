@@ -120,34 +120,60 @@ export interface TApiBodyMethod {
 	<
 		GSuccessResponseBody = unknown,
 		GErrorResponseBody = unknown,
-		GRequestBody extends TUnserializedBody = Record<string, unknown>,
+		GRequestBody extends TUnserializedBody = never,
 		GParseAs extends TParseAs = 'json'
 	>(
 		path: string,
-		options: TFetchOptionsWithBody<GRequestBody, GParseAs> & { withResponse: true }
+		...args: [options: TApiBodyOptions<GRequestBody, GParseAs> & { withResponse: true }]
 	): Promise<TApiResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs, true>>;
 	<
 		GSuccessResponseBody = unknown,
 		GErrorResponseBody = unknown,
-		GRequestBody extends TUnserializedBody = Record<string, unknown>,
+		GRequestBody extends TUnserializedBody = never,
 		GParseAs extends TParseAs = 'json'
 	>(
 		path: string,
-		options?: TFetchOptionsWithBody<GRequestBody, GParseAs> & { withResponse?: false }
+		...args: TApiBodyMethodOptionsArgs<
+			GRequestBody,
+			TApiBodyOptions<GRequestBody, GParseAs> & { withResponse?: false }
+		>
 	): Promise<TApiResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs>>;
 	<
 		GSuccessResponseBody = unknown,
 		GErrorResponseBody = unknown,
-		GRequestBody extends TUnserializedBody = Record<string, unknown>,
+		GRequestBody extends TUnserializedBody = never,
 		GParseAs extends TParseAs = 'json',
 		GWithResponse extends boolean = boolean
 	>(
 		path: string,
-		options?: TFetchOptionsWithBody<GRequestBody, GParseAs> & {
-			withResponse?: GWithResponse;
-		}
+		...args: TApiBodyMethodOptionsArgs<
+			GRequestBody,
+			TApiBodyOptions<GRequestBody, GParseAs> & {
+				withResponse?: GWithResponse;
+			}
+		>
 	): Promise<TApiResponse<GSuccessResponseBody, GErrorResponseBody, GParseAs, GWithResponse>>;
 }
+
+type TApiBodyMethodOptionsArgs<GRequestBody extends TUnserializedBody, GOptions extends object> = [
+	GRequestBody
+] extends [never]
+	? [options?: GOptions]
+	: [options: GOptions];
+
+type TApiBodyOptions<
+	GRequestBody extends TUnserializedBody,
+	GParseAs extends TParseAs
+> = TFetchOptionsWithBody<TApiRequestBody<GRequestBody>, GParseAs> &
+	TApiRequestBodyOption<GRequestBody>;
+
+type TApiRequestBodyOption<GRequestBody extends TUnserializedBody> = [GRequestBody] extends [never]
+	? unknown
+	: { body: GRequestBody };
+
+type TApiRequestBody<GRequestBody extends TUnserializedBody> = [GRequestBody] extends [never]
+	? TUnserializedBody
+	: GRequestBody;
 
 // MARK: - Response
 

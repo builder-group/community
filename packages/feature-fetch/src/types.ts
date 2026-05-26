@@ -130,6 +130,8 @@ export type TFetchOptionsWithBody<
 > = {
 	/** Request body before serialization. Objects and JSON primitives are serialized by the active body serializer. */
 	body?: GBody;
+	/** Body serializer override for this request. */
+	bodySerializer?: TBodySerializer<GBody>;
 } & TFetchOptions<GParseAs>;
 
 /** Defines request body input accepted before the active body serializer runs. */
@@ -159,8 +161,6 @@ export interface TFetchOptions<GParseAs extends TParseAs = TParseAs> {
 	pathSerializer?: TPathSerializer;
 	/** Query serializer override for this request. */
 	querySerializer?: TQuerySerializer;
-	/** Body serializer override for this request. */
-	bodySerializer?: TBodySerializer;
 }
 
 export type TFetchRequestInit = Omit<RequestInit, 'body' | 'method' | 'headers'>;
@@ -204,10 +204,10 @@ export type TQuerySerializer<
 > = (queryParams: GQueryParams) => string;
 
 /** Serializes a request body before it is passed to fetch. */
-export type TBodySerializer<GBody = unknown, GResult extends TSerializedBody = TSerializedBody> = (
-	body: GBody,
-	contentType?: string
-) => GResult;
+export type TBodySerializer<
+	GBody = TUnserializedBody,
+	GResult extends TSerializedBody = TSerializedBody
+> = (body: GBody, contentType?: string) => GResult;
 
 export type TSerializedBody = RequestInit['body'];
 
