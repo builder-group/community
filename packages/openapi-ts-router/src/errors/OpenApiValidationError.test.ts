@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { OpenApiValidationError } from './OpenApiValidationError';
 import { OpenApiRouterError } from './OpenApiRouterError';
+import { OpenApiValidationError } from './OpenApiValidationError';
 
 describe('OpenApiValidationError class', () => {
 	it('should expose validation status and issues', () => {
@@ -36,8 +36,6 @@ describe('OpenApiValidationError class', () => {
 		const error = new OpenApiValidationError(issues);
 
 		// Assert
-		expect(error.message).toBe(
-			'[#ERR_OPENAPI_VALIDATION] 2 request validation errors occurred'
-		);
+		expect(error.message).toBe('[#ERR_OPENAPI_VALIDATION] 2 request validation errors occurred');
 	});
 });

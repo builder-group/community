@@ -277,12 +277,6 @@ importers:
       valibot:
         specifier: 1.2.0
         version: 1.2.0(typescript@6.0.3)
-      validation-adapters:
-        specifier: workspace:*
-        version: link:../../../../packages/validation-adapters
-      zod:
-        specifier: ^4.3.5
-        version: 4.3.6
     devDependencies:
       '@blgc/config':
         specifier: workspace:*
@@ -310,25 +304,16 @@ importers:
     dependencies:
       '@hono/node-server':
         specifier: ^1.19.9
-        version: 1.19.13(hono@4.12.12)
-      '@hono/zod-validator':
-        specifier: ^0.7.6
-        version: 0.7.6(hono@4.12.12)(zod@4.3.6)
+        version: 1.19.13(hono@4.12.21)
       hono:
-        specifier: ^4.11.4
-        version: 4.12.12
+        specifier: ^4.12.21
+        version: 4.12.21
       openapi-ts-router:
         specifier: workspace:*
         version: link:../../../../packages/openapi-ts-router
       valibot:
         specifier: 1.2.0
         version: 1.2.0(typescript@6.0.3)
-      validation-adapters:
-        specifier: workspace:*
-        version: link:../../../../packages/validation-adapters
-      zod:
-        specifier: ^4.3.5
-        version: 4.3.6
     devDependencies:
       '@types/node':
         specifier: ^25.0.8
@@ -433,10 +418,6 @@ importers:
         version: 6.0.3
 
   packages/ecsify:
-    dependencies:
-      '@blgc/utils':
-        specifier: workspace:*
-        version: link:../utils
     devDependencies:
       '@blgc/config':
         specifier: workspace:*
@@ -573,12 +554,12 @@ importers:
 
   packages/openapi-ts-router:
     dependencies:
-      '@blgc/types':
-        specifier: workspace:*
-        version: link:../types
-      validation-adapter:
-        specifier: workspace:*
-        version: link:../validation-adapter
+      '@standard-schema/spec':
+        specifier: ^1.1.0
+        version: 1.1.0
+      openapi-typescript-helpers:
+        specifier: ^0.1.0
+        version: 0.1.0
     devDependencies:
       '@blgc/config':
         specifier: workspace:*
@@ -586,9 +567,6 @@ importers:
       '@types/express':
         specifier: ^5.0.6
         version: 5.0.6
-      '@types/express-serve-static-core':
-        specifier: ^5.1.1
-        version: 5.1.1
       '@types/node':
         specifier: ^25.9.1
         version: 25.9.1
@@ -604,9 +582,6 @@ importers:
       valibot:
         specifier: 1.4.0
         version: 1.4.0(typescript@6.0.3)
-      validation-adapters:
-        specifier: workspace:*
-        version: link:../validation-adapters
 
   packages/rollup-presets:
     dependencies:
@@ -1456,12 +1431,6 @@ packages:
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
-
-  '@hono/zod-validator@0.7.6':
-    resolution: {integrity: sha512-Io1B6d011Gj1KknV4rXYz4le5+5EubcWEU/speUjuw9XMMIaP3n78yXLhjd2A3PXaXaUwEAluOiAyLqhBEJgsw==}
-    peerDependencies:
-      hono: '>=3.9.0'
-      zod: ^3.25.0 || ^4.0.0
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -3725,10 +3694,6 @@ packages:
   hermes-parser@0.25.1:
     resolution: {integrity: sha512-6pEjquH3rqaI6cYAXYPcz9MS4rY6R4ngRgrgfDshRptUZIc3lw0MCIJIGDj9++mfySOuPTHB4nrSW99BCvOPIA==}
 
-  hono@4.12.12:
-    resolution: {integrity: sha512-p1JfQMKaceuCbpJKAPKVqyqviZdS0eUxH9v82oWo1kb9xjQ5wA6iP3FNVAPDFlz5/p7d45lO+BpSk1tuSZMF4Q==}
-    engines: {node: '>=16.9.0'}
-
   hono@4.12.21:
     resolution: {integrity: sha512-uV63apnb0kyPtAUwoWgaGh9HyIFcv8lgmzPZSiTBQAFOFGIzka5EZ1dZocmGnn0XdX0+XTqJ6Tqv7selMuGLRQ==}
     engines: {node: '>=16.9.0'}
@@ -5870,9 +5835,6 @@ packages:
     peerDependencies:
       zod: ^3.25.0 || ^4.0.0
 
-  zod@4.3.6:
-    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
-
   zod@4.4.3:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
@@ -6442,14 +6404,9 @@ snapshots:
       graphql: 16.14.0
       typescript: 6.0.3
 
-  '@hono/node-server@1.19.13(hono@4.12.12)':
+  '@hono/node-server@1.19.13(hono@4.12.21)':
     dependencies:
-      hono: 4.12.12
-
-  '@hono/zod-validator@0.7.6(hono@4.12.12)(zod@4.3.6)':
-    dependencies:
-      hono: 4.12.12
-      zod: 4.3.6
+      hono: 4.12.21
 
   '@humanfs/core@0.19.1': {}
 
@@ -8953,8 +8910,6 @@ snapshots:
     dependencies:
       hermes-estree: 0.25.1
 
-  hono@4.12.12: {}
-
   hono@4.12.21: {}
 
   hookable@6.1.1: {}
@@ -11226,8 +11181,6 @@ snapshots:
   zod-validation-error@4.0.2(zod@4.4.3):
     dependencies:
       zod: 4.4.3
-
-  zod@4.3.6: {}
 
   zod@4.4.3: {}
 

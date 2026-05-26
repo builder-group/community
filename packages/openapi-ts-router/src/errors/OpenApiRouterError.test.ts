@@ -23,9 +23,7 @@ describe('OpenApiRouterError class', () => {
 
 		// Assert
 		expect(error.status).toBe(400);
-		expect(error.message).toBe(
-			'[#ERR_OPENAPI_PARSE_BODY] Failed to parse request body as JSON'
-		);
+		expect(error.message).toBe('[#ERR_OPENAPI_PARSE_BODY] Failed to parse request body as JSON');
 	});
 
 	it('should use the cause message when no message is provided', () => {
