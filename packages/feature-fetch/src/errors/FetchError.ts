@@ -25,16 +25,30 @@ export interface TFetchErrorOptions {
 	cause?: unknown;
 }
 
-/** Feature-fetch error code format. */
-export type TFetchErrorCode = `#ERR_${string}`;
+/** Feature-fetch error code. Known package codes are suggested while custom `#ERR_` codes keep extension points flexible. */
+export type TFetchErrorCode = TFetchKnownErrorCode | `#ERR_${string}`;
+
+/** Error codes emitted by feature-fetch itself. */
+export type TFetchKnownErrorCode =
+	| '#ERR_BUILD_URL'
+	| '#ERR_FETCH_MIDDLEWARE'
+	| '#ERR_GRAPHQL_OPERATION'
+	| '#ERR_GRAPHQL_PRINT'
+	| '#ERR_HTTP_STATUS'
+	| '#ERR_MISSING_FETCH'
+	| '#ERR_NETWORK'
+	| '#ERR_PARSE_RESPONSE_DATA'
+	| '#ERR_PREPARE_REQUEST'
+	| '#ERR_PREPARE_RESPONSE'
+	| '#ERR_SERIALIZE_BODY'
+	| '#ERR_SERIALIZE_PARAMS';
 
 function formatFetchErrorMessage(
 	code: TFetchErrorCode,
 	message: string | undefined,
 	cause: unknown
 ): string {
-	const baseMessage = 'Feature fetch failed';
-	const detail = message ?? getCauseMessage(cause) ?? baseMessage;
+	const detail = message ?? getCauseMessage(cause) ?? 'Feature fetch failed';
 	return `[${code}] ${detail}`;
 }
 

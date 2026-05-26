@@ -13,7 +13,7 @@ import type {
 	Writable
 } from 'openapi-typescript-helpers';
 
-export type { HttpMethod, MediaType };
+export type { HttpMethod as THttpMethod, MediaType as TMediaType };
 
 /** Configures default param parsing for every route registered through a router wrapper. */
 export interface TCreateOpenApiRouterOptions {
