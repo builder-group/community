@@ -1,9 +1,6 @@
 import { Router } from 'express';
-import { createExpressOpenApiRouter } from 'openapi-ts-router';
+import { createExpressOpenApiRouter } from 'openapi-ts-router/express';
 import * as v from 'valibot';
-import { vValidator } from 'validation-adapters/valibot';
-import { zValidator } from 'validation-adapters/zod';
-import * as z from 'zod';
 import { type paths } from './gen/v1';
 import { PetSchema } from './schemas';
 
@@ -11,22 +8,20 @@ export const router: Router = Router();
 export const openApiRouter = createExpressOpenApiRouter<paths>(router);
 
 openApiRouter.get('/pet/{petId}', {
-	pathValidator: zValidator(
-		z.object({
-			petId: z.number()
-		})
-	),
-	middlewares: [
+	pathSchema: v.object({
+		petId: v.number()
+	}),
+	middleware: [
 		(req, res, next) => {
 			console.log('middleware');
 			next();
 		}
 	],
 	handler: (req, res) => {
-		const { petId } = req.valid.params;
+		const { petId } = req.valid.path;
 		console.log('handler', petId, typeof petId);
 
-		res.send({
+		res.json({
 			name: 'Falko',
 			photoUrls: []
 		});
@@ -34,22 +29,18 @@ openApiRouter.get('/pet/{petId}', {
 });
 
 openApiRouter.post('/pet/{petId}/uploadImage', {
-	pathValidator: vValidator(
-		v.object({
-			petId: v.number()
-		})
-	),
-	queryValidator: zValidator(
-		z.object({
-			additionalMetadata: z.string().optional()
-		})
-	),
+	pathSchema: v.object({
+		petId: v.number()
+	}),
+	querySchema: v.object({
+		additionalMetadata: v.optional(v.string())
+	}),
 	handler: (req, res) => {
-		const { petId } = req.valid.params;
+		const { petId } = req.valid.path;
 		const { additionalMetadata } = req.valid.query;
 		console.log('uploadFile', { petId, additionalMetadata });
 
-		res.send({
+		res.json({
 			code: 200,
 			type: 'success',
 			message: 'File uploaded successfully'
@@ -58,10 +49,10 @@ openApiRouter.post('/pet/{petId}/uploadImage', {
 });
 
 openApiRouter.post('/pet', {
-	bodyValidator: vValidator(PetSchema),
+	bodySchema: PetSchema,
 	handler: (req, res) => {
-		const { name, photoUrls } = req.body;
+		const { name, photoUrls } = req.valid.body;
 
-		res.send({ name, photoUrls });
+		res.json({ name, photoUrls });
 	}
 });

@@ -1,35 +1,40 @@
-# Hono Petstore Example
+# openapi-ts-router Hono Petstore
 
-This example demonstrates how to create a [Hono](https://hono.dev/) TypeScript server, utilizing the Petstore OpenApi specification and using [openapi-ts-router](https://www.npmjs.com/package/openapi-ts-router).
+Minimal TypeScript Hono example for `openapi-ts-router/hono`. It uses the Petstore OpenAPI schema, generated operation types, and Valibot validators.
 
-## Setup Instructions
+## What It Shows
 
-1. **Build the Monorepo** (only required once):
-   - At the root of the monorepo, run:
-     ```bash
-     pnpm build
-     ```
+- Hono app with `createHonoOpenApiRouter`
+- typed route handlers from generated OpenAPI paths
+- runtime validation with Standard Schema-compatible Valibot schemas
+- parsed and validated values through `c.req.valid(...)`
+- `tsx watch` development server
 
-2. **Install Dependencies**:
-   - In this example directory, run:
-     ```bash
-     pnpm install
-     ```
+## Run
 
-3. **Start the Development Server**:
-   - In this example directory, run:
-     ```bash
-     pnpm dev
-     ```
-
-## About
-
-This project was bootstrapped using the Hono TypeScript template:
-
-```bash
-pnpm create hono@latest
+```sh
+pnpm dev
 ```
 
-## Petstore OpenApi
+The server runs on `http://localhost:3000`.
 
-For detailed information about the Petstore OpenApi, refer to the [OpenAPI v1 YAML source](https://github.com/swagger-api/swagger-petstore).
+## Try It
+
+```sh
+curl http://localhost:3000/pet/123
+curl -X POST http://localhost:3000/pet \
+  -H 'content-type: application/json' \
+  -d '{"name":"Falko","photoUrls":[]}'
+```
+
+## Refresh Generated Types
+
+Generated OpenAPI types are committed. Refresh them when the schema changes:
+
+```sh
+pnpm openapi:generate
+```
+
+## API Source
+
+- Swagger Petstore OpenAPI schema: [swagger-petstore](https://github.com/swagger-api/swagger-petstore)

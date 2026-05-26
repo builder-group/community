@@ -2,6 +2,8 @@
 
 Vanilla TypeScript example for `feature-fetch`. It shows REST helpers, OpenAPI-generated types, and GraphQL documents using the same tuple-result client model.
 
+## What It Shows
+
 - REST calls with `createApiFetchClient`
 - OpenAPI-typed calls with `createOpenApiFetchClient`
 - GraphQL calls with `createGraphQLFetchClient`
