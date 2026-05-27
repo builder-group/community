@@ -60,6 +60,8 @@ $form.isDirty.get(); // true if any field differs from its default value
 unbind();
 ```
 
+Migrating from `0.0.x`? See [MIGRATION.md](./MIGRATION.md).
+
 ## Install
 
 ```bash

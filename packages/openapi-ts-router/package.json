@@ -1,6 +1,6 @@
 {
 	"name": "openapi-ts-router",
-	"version": "0.1.0-beta.1",
+	"version": "0.4.0",
 	"private": false,
 	"description": "Typed Express and Hono route helpers backed by OpenAPI paths and Standard Schema validation",
 	"keywords": [
@@ -67,7 +67,8 @@
 	},
 	"files": [
 		"dist",
-		"README.md"
+		"README.md",
+		"MIGRATION.md"
 	],
 	"scripts": {
 		"build": "shx rm -rf dist && rollup -c rollup.config.js",

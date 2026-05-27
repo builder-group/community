@@ -69,6 +69,8 @@ openApiRouter.get('/pet/{petId}', {
 });
 ```
 
+Migrating from `0.3.x`? See [MIGRATION.md](./MIGRATION.md).
+
 ## Install
 
 Install the router package and the OpenAPI type generator:

@@ -57,6 +57,8 @@ const EmailField = () => {
 };
 ```
 
+Migrating from `0.0.x`? See [MIGRATION.md](./MIGRATION.md).
+
 ## Install
 
 ```bash

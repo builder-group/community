@@ -1,6 +1,6 @@
 {
 	"name": "tuple-result",
-	"version": "0.1.0-beta.1",
+	"version": "0.1.0",
 	"private": false,
 	"description": "Plain TypeScript Result tuples with typed errors, narrowing, helpers, and JSON-friendly arrays",
 	"keywords": [
@@ -33,7 +33,8 @@
 	"types": "./dist/types/index.d.ts",
 	"files": [
 		"dist",
-		"README.md"
+		"README.md",
+		"MIGRATION.md"
 	],
 	"scripts": {
 		"build": "shx rm -rf dist && rollup -c rollup.config.js",

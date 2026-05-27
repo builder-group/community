@@ -41,6 +41,8 @@ const env = validateEnv(process.env, {
 // env.DEBUG is boolean, inferred from the validator
 ```
 
+Migrating from `0.0.x`? See [MIGRATION.md](./MIGRATION.md).
+
 ## Install
 
 ```bash

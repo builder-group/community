@@ -1,6 +1,6 @@
 {
 	"name": "feature-logger",
-	"version": "0.1.0-beta.1",
+	"version": "0.1.0",
 	"private": false,
 	"description": "Composable console logger with per-instance levels, formatting, middleware, and testable output",
 	"keywords": [
@@ -34,7 +34,8 @@
 	"types": "./dist/types/index.d.ts",
 	"files": [
 		"dist",
-		"README.md"
+		"README.md",
+		"MIGRATION.md"
 	],
 	"scripts": {
 		"build": "shx rm -rf dist && rollup -c rollup.config.js",
