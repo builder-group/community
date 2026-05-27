@@ -5,16 +5,9 @@
 	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
 		// Language and Environment
-		"target": "es2020",
-		"lib": ["es2020", "dom", "dom.iterable"],
-		"jsx": "react-jsx",
-
-		// Modules
-		"module": "esnext",
-		"moduleResolution": "bundler",
-
-		// JavaScript Support
-		"allowJs": true
+		"target": "es2022",
+		"lib": ["es2022", "dom", "dom.iterable"],
+		"jsx": "react-jsx"
 	},
 	"include": ["src"]
 }

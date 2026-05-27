@@ -4,15 +4,7 @@
 	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
 		// Language and Environment
-		"lib": ["esnext"],
-		"target": "esnext",
-
-		// Modules
-		"module": "commonjs",
-		"moduleResolution": "bundler",
-
-		// JavaScript Support
-		"allowJs": true
+		"lib": ["es2022"]
 	},
 	"include": ["src"]
 }

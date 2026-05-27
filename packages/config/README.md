@@ -71,7 +71,7 @@ Use the config entry that matches the tool you are setting up:
 - `@blgc/config/eslint/react`: flat ESLint config for React packages and apps
 - `@blgc/config/eslint/next`: flat ESLint config for Next.js apps
 - `@blgc/config/eslint/tanstack`: flat ESLint config for TanStack apps
-- `@blgc/config/typescript/library`: TypeScript config for Node-targeted libraries
+- `@blgc/config/typescript/library`: TypeScript config for bundled libraries without DOM APIs
 - `@blgc/config/typescript/library-dom`: TypeScript config for DOM-capable libraries
 - `@blgc/config/typescript/node20`: TypeScript config for Node 20 projects
 - `@blgc/config/typescript/react`: TypeScript config for React packages and apps
@@ -158,17 +158,19 @@ Extend the closest TypeScript config:
 
 Available configs:
 
-| Config                                | Use for                               |
-| ------------------------------------- | ------------------------------------- |
-| `@blgc/config/typescript/base`        | Shared strict base settings           |
-| `@blgc/config/typescript/library`     | TypeScript libraries without DOM APIs |
-| `@blgc/config/typescript/library-dom` | Libraries that use DOM globals        |
-| `@blgc/config/typescript/node20`      | Node 20 packages and tools            |
-| `@blgc/config/typescript/react`       | React packages and Vite apps          |
-| `@blgc/config/typescript/next`        | Next.js apps                          |
-| `@blgc/config/typescript/tanstack`    | TanStack apps                         |
+| Config                                | Use for                            |
+| ------------------------------------- | ---------------------------------- |
+| `@blgc/config/typescript/base`        | Shared strict base settings        |
+| `@blgc/config/typescript/library`     | Bundled libraries without DOM APIs |
+| `@blgc/config/typescript/library-dom` | Libraries that use DOM globals     |
+| `@blgc/config/typescript/node20`      | Node 20 packages and tools         |
+| `@blgc/config/typescript/react`       | React packages and Vite apps       |
+| `@blgc/config/typescript/next`        | Next.js apps                       |
+| `@blgc/config/typescript/tanstack`    | TanStack apps                      |
 
-Defaults to know: the base configs enable declarations and declaration maps, use `skipLibCheck`, and leave TypeScript unused checks off. The library presets allow JavaScript files. `@blgc/config/typescript/library` uses CommonJS output, so override `compilerOptions.module` when a project needs TypeScript to emit ESM directly.
+Defaults to know: the base config uses ES2022, `module: preserve`, bundler module resolution, forced module detection, declarations, declaration maps, `skipLibCheck`, and strict type checking. TypeScript unused checks stay off because ESLint owns unused diagnostics.
+
+Use `@blgc/config/typescript/library` when a package emits JavaScript through a bundler and uses TypeScript for declaration emit. Use `@blgc/config/typescript/node20` for Node packages or tools that emit JavaScript with `tsc`.
 
 ## Vitest
 
@@ -213,6 +215,14 @@ CommonJS keeps the config package usable from both CommonJS and ESM project conf
 ### Why does the React ESLint config use jiti?
 
 `@eslint-react/eslint-plugin` is ESM-only. `jiti` lets the CommonJS ESLint presets load that plugin without forcing every consumer to migrate its `eslint.config.js` to ESM.
+
+### Why does the library TypeScript config use module preserve?
+
+Most Builder Group packages let Rollup or esbuild emit JavaScript and let TypeScript emit declarations. `module: preserve` keeps TypeScript's import resolution closer to what those bundlers see. Node packages that emit JavaScript with `tsc` should use the Node preset or override `compilerOptions.module`.
+
+### Why not enable every strict TypeScript flag?
+
+Flags like `exactOptionalPropertyTypes`, `verbatimModuleSyntax`, and `erasableSyntaxOnly` are useful migration targets, but they require source-level cleanup or disallow current enum patterns. Enable them locally once a project is ready for that stricter contract.
 
 ### Why keep these configs in a package?
 

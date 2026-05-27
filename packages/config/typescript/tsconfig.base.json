@@ -3,21 +3,18 @@
 	"display": "Base TypeScript configuration",
 	"compilerOptions": {
 		// Projects
-		"composite": false,
 		"declaration": true,
 		"declarationMap": true,
 
 		// Language and Environment
-		"target": "esnext",
-		"module": "esnext",
+		"target": "es2022",
+		"module": "preserve",
 
 		// Modules
 		"moduleResolution": "bundler",
+		"moduleDetection": "force",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
-
-		// Emit
-		"inlineSources": false,
 
 		// Interop Constraints
 		"esModuleInterop": true,
@@ -25,9 +22,10 @@
 
 		// Type Checking
 		"strict": true,
-		"noImplicitAny": true,
-		"strictNullChecks": true,
+		"noImplicitOverride": true,
 		"strictPropertyInitialization": false,
+		"allowUnusedLabels": false,
+		"allowUnreachableCode": false,
 		"noUnusedLocals": false,
 		"noUnusedParameters": false,
 		"noUncheckedIndexedAccess": true,

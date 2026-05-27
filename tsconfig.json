@@ -1,3 +1,4 @@
 {
-	"extends": "@blgc/config/typescript/base"
+	"extends": "@blgc/config/typescript/base",
+	"files": []
 }

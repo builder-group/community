@@ -10,10 +10,7 @@
 
 		// Modules
 		"module": "nodenext",
-		"moduleResolution": "node16",
-
-		// JavaScript Support
-		"allowJs": true
+		"moduleResolution": "node16"
 	},
 	"include": ["src"]
 }

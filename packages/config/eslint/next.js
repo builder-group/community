@@ -9,7 +9,10 @@ const { defineConfig, globalIgnores } = require('eslint/config');
  */
 module.exports = defineConfig([
 	...require('./react.js'),
-	globalIgnores(['**/.next/'], '@blgc/config/next/ignores'),
+	globalIgnores(
+		['**/.next/', '**/out/', '**/build/', 'next-env.d.ts'],
+		'@blgc/config/next/ignores'
+	),
 	{
 		name: '@blgc/config/next/core-web-vitals',
 		plugins: {

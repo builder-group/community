@@ -4,6 +4,6 @@
 	"extends": "./tsconfig.library.json",
 	"compilerOptions": {
 		// Language and Environment
-		"lib": ["esnext", "dom"]
+		"lib": ["es2022", "dom", "dom.iterable"]
 	}
 }

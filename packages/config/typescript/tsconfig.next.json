@@ -13,9 +13,6 @@
 		"module": "esnext",
 		"moduleResolution": "bundler",
 
-		// JavaScript Support
-		"allowJs": true,
-
 		// Emit
 		"noEmit": true,
 		"incremental": true,
