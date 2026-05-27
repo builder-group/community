@@ -2,8 +2,8 @@
 	display: grid;
 	gap: 24px;
 	margin: 0 auto;
-	max-width: 960px;
 	padding: 40px 24px;
+	max-width: 960px;
 }
 
 form,
@@ -28,10 +28,10 @@ form,
 }
 
 .field-row {
-	align-items: start;
 	display: grid;
-	gap: 8px;
 	grid-template-columns: 140px minmax(160px, 1fr) minmax(180px, 1fr) 110px 180px;
+	align-items: start;
+	gap: 8px;
 }
 
 .actions {

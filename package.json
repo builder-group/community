@@ -17,7 +17,7 @@
 		"build": "turbo run build",
 		"build:packages": "turbo run build:prod --filter='./packages/*'",
 		"clean": "turbo run clean && shx rm -rf .turbo && shx rm -rf node_modules",
-		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
+		"format": "prettier --write \"**/*.{ts,tsx,js,jsx,cjs,mjs,md,mdx,json,css}\"",
 		"install:clean": "pnpm run clean && pnpm install && pnpm build",
 		"lint": "turbo run lint",
 		"lint:fix": "turbo run lint --force -- --fix",

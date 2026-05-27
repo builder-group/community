@@ -2,8 +2,8 @@
 	display: grid;
 	gap: 24px;
 	margin: 0 auto;
-	max-width: 960px;
 	padding: 40px 24px;
+	max-width: 960px;
 }
 
 .grid {
@@ -12,9 +12,9 @@
 }
 
 .section {
-	border: 1px solid #d8d8d8;
 	display: grid;
 	gap: 12px;
+	border: 1px solid #d8d8d8;
 	padding: 16px;
 }
 
