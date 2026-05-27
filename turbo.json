@@ -20,6 +20,7 @@
 			"cache": false
 		},
 		"test": {
+			"dependsOn": ["^build"],
 			"cache": false
 		},
 		"update:latest": {

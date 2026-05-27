@@ -14,7 +14,7 @@ permissions:
 
 env:
   NODE_VERSION: '24'
-  PNPM_VERSION: '10.33.2'
+  PNPM_VERSION: '11.3.0'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
@@ -79,9 +79,8 @@ jobs:
         id: test
         run: pnpm test
 
-      # Exclude templates here because they are starter projects, not shipped artifacts
-      # and some of them require native toolchains that we validate separately
       - name: 🏗️ Build
         id: build-monorepo
         shell: bash
-        run: pnpm exec turbo run build --filter='!@template/*'
+        # Note: Skip the Tauri template build because it requires native system toolchains
+        run: pnpm exec turbo run build --filter='!@template/desktop-tauri'

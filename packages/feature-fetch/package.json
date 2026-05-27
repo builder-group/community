@@ -58,7 +58,6 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"msw": "^2.14.6",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [
