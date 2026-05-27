@@ -49,7 +49,7 @@
 	"scripts": {
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
-		"publish:patch": "pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"publish:patch": "pnpm version patch --no-git-tag-version && pnpm publish --no-git-checks --access=public",
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
