@@ -40,7 +40,7 @@
 		"build:prod": "export NODE_ENV=production && pnpm build",
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
-		"lint": "eslint . --fix",
+		"lint": "eslint .",
 		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
 		"size": "size-limit --why",
 		"start:dev": "tsc -w",

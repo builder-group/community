@@ -20,6 +20,7 @@
 		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
 		"install:clean": "pnpm clean && pnpm install && pnpm build",
 		"lint": "turbo run lint",
+		"lint:fix": "turbo run lint --force -- --fix",
 		"test": "turbo run test",
 		"update:latest": "turbo run update:latest --force && pnpm update --latest '!eslint' '!@eslint/js' && pnpm build"
 	},
