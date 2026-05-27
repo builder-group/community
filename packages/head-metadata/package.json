@@ -1,6 +1,6 @@
 {
 	"name": "head-metadata",
-	"version": "0.0.12",
+	"version": "0.0.13",
 	"private": false,
 	"description": "Typed HTML head metadata extraction for title, meta, link, and custom extractors",
 	"keywords": [

@@ -1,6 +1,6 @@
 {
 	"name": "xml-tokenizer",
-	"version": "0.0.45",
+	"version": "0.0.46",
 	"private": false,
 	"description": "Streaming XML, HTML, and SVG tokenizer with typed tokens, selectors, and object helpers",
 	"keywords": [
