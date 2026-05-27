@@ -1,62 +1,119 @@
 # mado (窓)
 
-> A simple, clean window monitoring and app information library for Rust
+`mado` is a macOS-focused Rust crate for reading the active app and focused window. It wraps native macOS APIs through Swift, listens to focus changes, and can enrich browser windows with URL and website metadata. Use it in desktop apps, productivity tools, and agents that need current user context.
 
-## 🌐 Platform Support
-
-- ✅ **macOS**: Full support
-- 🚧 **Linux**: Planned
-- 🚧 **Windows**: Planned
-
-### Requirements
-
-**macOS:**
-
-- macOS 10.15+
-- **Accessibility permissions** required if `track_window_changes: true` (default)
-  - System Settings > Privacy & Security > Accessibility
-  - Not required if only tracking app switches (`track_window_changes: false`)
-
-## 📦 Installation
-
-```toml
-[dependencies]
-mado = "0.0.2"
-```
-
-## 📖 Usage
-
-### Query current state
+- Query the active app or focused window when you need a snapshot
+- Listen to app activations, window focus changes, and title changes without polling
+- Add browser URLs, private-mode state, website domains, favicons, and colors only when needed
+- Read installed app names, bundle IDs, icons, and colors without Accessibility permission
+- Handle macOS Accessibility and sandbox limits explicitly
 
 ```rust
-use mado;
+use mado::{MonitorConfig, WindowEvent, WindowListener, WindowMonitor};
 
-// Get current app
-let app = mado::get_active_app()?;
-println!("Current app: {}", app);
+struct FocusListener;
 
-// Get current window (fast, default)
-let window = mado::get_active_window()?;
-println!("Window: {}", window);
+impl WindowListener for FocusListener {
+    fn on_focus_change(&self, event: WindowEvent) {
+        match event {
+            WindowEvent::AppActivated { app } => {
+                println!("App activated: {:?}", app.name);
+            }
+            WindowEvent::WindowChanged { window } => {
+                let app_name = window.app.name.as_deref().unwrap_or("Unknown app");
+                let title = window.title.as_deref().unwrap_or("Untitled window");
+                println!("{app_name}: {title}");
 
-// With browser URL and website info
-let window = mado::get_active_window_with_config(mado::QueryConfig {
-    include_browser_info: true,
-    include_website_info: true,
-    ..Default::default()
-})?;
-if let Some(browser) = &window.browser {
-    println!("URL: {:?}", browser.url);
-    if let Some(website) = &browser.website {
-        println!("Domain: {}", website.domain);
+                if let Some(browser) = &window.browser {
+                    println!("URL: {:?}", browser.url);
+                }
+            }
+        }
     }
+}
+
+fn main() -> Result<(), mado::Error> {
+    if !mado::is_accessibility_trusted() {
+        eprintln!("Grant Accessibility access in System Settings before tracking windows");
+        return Ok(());
+    }
+
+    let monitor = WindowMonitor::with_config(
+        FocusListener,
+        MonitorConfig {
+            include_browser_info: true,
+            track_window_changes: true,
+            ..Default::default()
+        },
+    );
+
+    monitor.run()
 }
 ```
 
-### Listen to changes
+## Install
+
+```toml
+[dependencies]
+mado = "0.0.3"
+```
+
+## Requirements
+
+`mado` currently targets macOS.
+
+| Platform | Status    | Notes                                |
+| -------- | --------- | ------------------------------------ |
+| macOS    | Supported | macOS 10.15+ with a Swift toolchain  |
+| Linux    | Planned   | APIs return a platform error for now |
+| Windows  | Planned   | APIs return a platform error for now |
+
+Window focus, window title, window bounds, and browser URL extraction require macOS Accessibility permission. Active app queries, installed app scans, app icons, and app colors do not require that permission.
+
+## Usage
+
+Pick the API that matches the job:
+
+- Snapshot queries: `get_active_app()`, `get_active_window()`, and their `_with_config` variants
+- Event monitoring: `WindowMonitor` with a `WindowListener`
+- Installed apps: `get_installed_apps()`, `get_app_icon()`, and `get_app_color()`
+- Permission checks: `is_accessibility_trusted()`
+
+### Query Current State
+
+Use snapshot queries when you only need the current app or window:
 
 ```rust
-use mado::{WindowListener, WindowMonitor, WindowEvent};
+fn main() -> Result<(), mado::Error> {
+    let app = mado::get_active_app()?;
+    println!("Current app: {}", app);
+
+    let window = mado::get_active_window_with_config(mado::QueryConfig {
+        include_browser_info: true,
+        include_website_info: true,
+        ..Default::default()
+    })?;
+
+    if let Some(browser) = &window.browser {
+        println!("URL: {:?}", browser.url);
+
+        if let Some(website) = &browser.website {
+            println!("Domain: {}", website.domain);
+        }
+    }
+
+    Ok(())
+}
+```
+
+`include_website_info` depends on `include_browser_info` because it needs the current URL. Website metadata can fetch favicons over the network and is cached by domain.
+
+### Listen To Focus Changes
+
+Use `WindowMonitor` when you want event-driven updates:
+
+```rust
+use mado::{WindowEvent, WindowListener, WindowMonitor};
 
 struct FocusListener;
 
@@ -73,187 +130,227 @@ impl WindowListener for FocusListener {
     }
 }
 
-let monitor = WindowMonitor::new(FocusListener);
-monitor.run()?;
+fn main() -> Result<(), mado::Error> {
+    let monitor = WindowMonitor::new(FocusListener);
+    monitor.run()
+}
 ```
 
-### Browser and website info (macOS only)
+`run()` blocks until `WindowMonitor::stop()` is called. Only one monitor can run at a time. A second monitor returns `Error::AlreadyRunning`.
+
+Stop a monitor from another thread:
 
 ```rust
-use mado::{WindowListener, WindowMonitor, MonitorConfig, WindowEvent};
+use std::thread;
+use std::time::Duration;
 
-struct MyListener;
+thread::spawn(|| {
+    thread::sleep(Duration::from_secs(5));
+    let _ = mado::WindowMonitor::stop();
+});
+```
 
-impl WindowListener for MyListener {
+Keep `on_focus_change()` callbacks fast. Send events to another thread or async task when processing needs I/O, database work, or network calls. Panics inside callbacks are caught and logged so the monitor can continue.
+
+### Browser And Website Info
+
+Enable browser metadata when you need the active tab URL, private-mode state, website domain, favicon, or website color:
+
+```rust
+use mado::{MonitorConfig, WindowEvent, WindowListener, WindowMonitor};
+
+struct BrowserListener;
+
+impl WindowListener for BrowserListener {
     fn on_focus_change(&self, event: WindowEvent) {
-        if let WindowEvent::WindowChanged { window } = event {
-            if let Some(browser) = &window.browser {
-                // Browser info: URL and private mode
-                if let Some(url) = &browser.url {
-                    println!("URL: {}", url);
-                }
-                // Website info: domain, favicon, and color (nested in browser)
-                if let Some(website) = &browser.website {
-                    println!("Domain: {}", website.domain);
-                    if let Some(color) = &website.color {
-                        println!("Brand color: {}", color);
-                    }
-                }
-            }
+        let window = match event {
+            WindowEvent::WindowChanged { window } => window,
+            WindowEvent::AppActivated { .. } => return,
+        };
+
+        let Some(browser) = &window.browser else {
+            return;
+        };
+
+        println!("URL: {:?}", browser.url);
+        println!("Private mode: {:?}", browser.is_private);
+
+        if let Some(website) = &browser.website {
+            println!("Domain: {}", website.domain);
+            println!("Color: {:?}", website.color);
         }
     }
 }
 
-let config = MonitorConfig {
-    include_browser_info: true,  // Extract URL and private mode
-    include_website_info: true,  // Extract domain, favicon, and color
-    ..Default::default()
-};
-let monitor = WindowMonitor::with_config(MyListener, config);
-monitor.run()?;
-```
+fn main() -> Result<(), mado::Error> {
+    let monitor = WindowMonitor::with_config(
+        BrowserListener,
+        MonitorConfig {
+            include_browser_info: true,
+            include_website_info: true,
+            ..Default::default()
+        },
+    );
 
-**Supported browsers:** Chrome, Safari, Brave, Edge, Arc, Opera, Firefox (and their variants).
-
-**Config options:**
-
-| Option                 | Default | Description                                                           |
-| ---------------------- | ------- | --------------------------------------------------------------------- |
-| `include_app_icon`     | `false` | Extract app icon as base64 PNG                                        |
-| `include_app_color`    | `false` | Also derive the dominant app color when `include_app_icon` is enabled |
-| `include_browser_info` | `false` | Extract browser URL and private mode                                  |
-| `include_website_info` | `false` | Extract domain, fetch favicon, and extract color (~50-500ms, cached)  |
-| `track_window_changes` | `true`  | Track window focus/title changes (requires Accessibility permission)  |
-
-### Stop monitoring
-
-```rust
-use mado::WindowMonitor;
-use std::thread;
-use std::time::Duration;
-
-let monitor = WindowMonitor::new(MyListener);
-
-thread::spawn(move || {
-    thread::sleep(Duration::from_secs(5));
-    WindowMonitor::stop().unwrap();
-});
-
-monitor.run()?;
-```
-
-### Check permissions (macOS)
-
-```rust
-if !mado::is_accessibility_trusted() {
-    eprintln!("Please grant accessibility permissions in System Settings");
+    monitor.run()
 }
 ```
 
-### Installed apps (macOS)
+Supported browser families include Chrome, Safari, Brave, Edge, Arc, Opera, Firefox, and their common variants.
 
-Query installed applications and their icons. No special permissions required.
+### Installed Apps
+
+Installed app queries do not need Accessibility permission:
 
 ```rust
 use mado::InstalledAppsConfig;
 
-// Fast scan without icons
-let apps = mado::get_installed_apps(InstalledAppsConfig::default());
-for app in &apps {
-    println!("{}: {}", app.name, app.bundle_id);
-}
+fn main() {
+    let apps = mado::get_installed_apps(InstalledAppsConfig::default());
 
-// Get icon for a specific app
-let icon = mado::get_app_icon("com.apple.finder", 64, false);
-if let Some(data_url) = &icon.data_url {
-    println!("Icon: {} bytes", data_url.len());
-}
-if let Some(color) = mado::get_app_color("com.apple.finder") {
-    println!("Brand color: {}", color);
+    for app in apps.iter().take(10) {
+        println!("{}: {}", app.name, app.bundle_id);
+    }
+
+    let icon = mado::get_app_icon("com.apple.finder", 64, false);
+    if let Some(data_url) = &icon.data_url {
+        println!("Finder icon: {} bytes", data_url.len());
+    }
+
+    if let Some(color) = mado::get_app_color("com.apple.finder") {
+        println!("Finder color: {}", color);
+    }
 }
 ```
 
-**Config options:**
+## Configuration
 
-| Option              | Default | Description                                                       |
-| ------------------- | ------- | ----------------------------------------------------------------- |
-| `include_icon`      | `false` | Extract icons as base64 PNG                                       |
-| `include_app_color` | `false` | Also derive the dominant app color when `include_icon` is enabled |
-| `icon_size`         | `32`    | Icon size in pixels                                               |
+`QueryConfig` controls snapshot queries:
 
-## 📐 Architecture
+| Option                 | Default | Description                                                        |
+| ---------------------- | ------- | ------------------------------------------------------------------ |
+| `include_app_icon`     | `false` | Adds a base64 PNG app icon to `AppInfo`                            |
+| `include_app_color`    | `false` | Derives the dominant app color when app icon extraction is enabled |
+| `include_browser_info` | `false` | Extracts the active browser URL and private-mode state             |
+| `include_website_info` | `false` | Extracts domain, favicon, and color from the browser URL           |
 
-### Why Event-Driven?
+`MonitorConfig` supports the same enrichment options and adds `track_window_changes`:
 
-Event-driven monitoring minimizes latency and reduces CPU usage by avoiding continuous polling.
+| Option                 | Default | Description                                                                |
+| ---------------------- | ------- | -------------------------------------------------------------------------- |
+| `track_window_changes` | `true`  | Tracks window focus and title changes in addition to app activation events |
+| `include_app_icon`     | `false` | Adds a base64 PNG app icon to emitted app or window data                   |
+| `include_app_color`    | `false` | Derives the dominant app color when app icon extraction is enabled         |
+| `include_browser_info` | `false` | Extracts the active browser URL and private-mode state                     |
+| `include_website_info` | `false` | Extracts domain, favicon, and color from the browser URL                   |
 
-### Why Two Event Types?
+`InstalledAppsConfig` controls installed app scans:
 
-Two events handle different scenarios:
+| Option              | Default | Description                                                    |
+| ------------------- | ------- | -------------------------------------------------------------- |
+| `include_icon`      | `false` | Adds a base64 PNG icon to each installed app                   |
+| `include_app_color` | `false` | Derives the dominant app color when icon extraction is enabled |
+| `icon_size`         | `32`    | Icon size in pixels                                            |
 
-- **`AppActivated`**: Fires immediately when app is activated (even if no window yet)
-- **`WindowChanged`**: Fires when window data is available (title, bounds, browser info)
+## Events
 
-**Why not combine into one event?** A single event with `Option<WindowInfo>` would miss app activations when apps don't have windows (e.g. tray apps, apps activated via Spotlight before opening a window). Consumers need to know the app was activated even if no window exists yet.
+`WindowEvent` has two variants:
 
-### macOS Implementation
+| Event           | When it fires                                                                 |
+| --------------- | ----------------------------------------------------------------------------- |
+| `AppActivated`  | Immediately when the focused app changes, even if no window is available yet  |
+| `WindowChanged` | When focused window data is available, a window changes, or the title changes |
 
-Uses Swift via [swift-rs](https://github.com/Brendonovich/swift-rs) for native API access:
+Use `event.app()` when both variants should be handled by app identity.
 
-| Component             | Purpose                                                       |
-| --------------------- | ------------------------------------------------------------- |
-| **NSWorkspace**       | App switch detection via `didActivateApplicationNotification` |
-| **Accessibility API** | Window focus/title changes, browser URL extraction            |
-| **CoreGraphics**      | Stable window IDs and accurate bounds                         |
+## macOS Permissions
 
-**Why Accessibility API for browser URLs?** Previously used AppleScript, but it required per-browser Automation permissions and didn't support Firefox. The Accessibility API only needs the system-wide Accessibility permission and works with all browsers by traversing the UI tree to find the URL bar.
-
-**Browser URL extraction strategies:**
-
-- **Chromium** (Chrome, Brave, Edge, Arc, Opera): Find `AXTextField` by `AXDOMIdentifier` or placeholder text
-- **Safari**: Read `AXURL` from `AXWebArea` element
-- **Firefox**: Find `AXTextField` with "address" in description
-
-**Threading Model:**
-
-- Monitor runs in a spawned thread with its own CFRunLoop
-- NSWorkspace notifications arrive on main thread, forwarded to monitor thread via `CFRunLoopPerformBlock`
-- AXObserver callbacks delivered directly to monitor thread's runloop
-
-**Delayed Window Handling:**
-
-Some apps (especially when launched from Dock) activate before their window appears. We use exponential backoff polling (200ms → 400ms → 800ms → 1.6s capped, max ~30s total) to catch delayed windows.
-
-## 🔒 App Sandbox (Mac App Store)
-
-macOS App Sandbox restricts cross-process access, which affects mado's capabilities:
-
-| Feature                                           | Sandboxed | Unsandboxed |
-| ------------------------------------------------- | --------- | ----------- |
-| App activation tracking (`NSWorkspace`)           | Works     | Works       |
-| Window title/focus tracking (`Accessibility API`) | Blocked   | Works       |
-| Browser URL extraction (`Accessibility API`)      | Blocked   | Works       |
-| Window bounds (`CoreGraphics`)                    | Blocked   | Works       |
-| App icon/installed apps                           | Works     | Works       |
-
-**Why:** The Accessibility API (`AXUIElement`, `AXObserver`) requires cross-process access to read other apps' UI state. The App Sandbox prevents this. `AXObserverCreate` may succeed, but notifications are never delivered for other processes.
-
-**Recommended config for sandboxed builds:**
+Check permission before enabling window tracking:
 
 ```rust
-let config = MonitorConfig {
-    track_window_changes: false, // AX observers won't work
-    include_browser_info: false, // URL extraction uses AX API
-    include_app_icon: true,      // Works fine in sandbox
-    include_app_color: false,
+if !mado::is_accessibility_trusted() {
+    eprintln!("Open System Settings > Privacy & Security > Accessibility");
+}
+```
+
+Accessibility permission is required for:
+
+- `track_window_changes: true`
+- active window title and bounds
+- browser URL and private-mode extraction
+- website metadata based on the browser URL
+
+Accessibility permission is not required for:
+
+- `get_active_app()`
+- app activation events with `track_window_changes: false`
+- `get_installed_apps()`
+- `get_app_icon()` and `get_app_color()`
+
+## App Sandbox
+
+macOS App Sandbox blocks cross-process Accessibility and CoreGraphics access. That changes which features can work:
+
+| Feature                                    | Sandboxed | Unsandboxed |
+| ------------------------------------------ | --------- | ----------- |
+| App activation tracking with `NSWorkspace` | Works     | Works       |
+| Window title and focus tracking            | Blocked   | Works       |
+| Browser URL extraction                     | Blocked   | Works       |
+| Window bounds                              | Blocked   | Works       |
+| Installed apps and app icons               | Works     | Works       |
+
+Use this config in sandboxed builds:
+
+```rust
+let config = mado::MonitorConfig {
+    track_window_changes: false,
+    include_browser_info: false,
     include_website_info: false,
+    include_app_icon: true,
+    include_app_color: false,
 };
 ```
 
-With this config, the monitor only emits `AppActivated` events (via `NSWorkspace.didActivateApplicationNotification`), which works in sandbox. `WindowChanged` events are not emitted.
+With this setup, the monitor emits `AppActivated` events only.
 
-## 💡 Resources / References
+## Examples
 
-- [swift-rs](https://github.com/Brendonovich/swift-rs) - Rust ↔ Swift FFI
-- [Creating a standalone Swift package with Xcode](https://developer.apple.com/documentation/xcode/creating-a-standalone-swift-package-with-xcode)
-- [Accessibility API Reference](https://developer.apple.com/documentation/applicationservices/axuielement_h)
+From the repository root:
+
+```bash
+cargo run -p mado --example poll
+cargo run -p mado --example listen
+cargo run -p mado --example installed_apps
+```
+
+## FAQ
+
+### Why does mado use callbacks instead of polling?
+
+Event-driven monitoring reacts to app and window changes as they happen. It avoids keeping a timer alive just to rediscover the same focused window. Use snapshot queries when polling is the better fit for your app.
+
+### Why are there separate `AppActivated` and `WindowChanged` events?
+
+macOS can activate an app before a focused window exists, for example after launching from Spotlight or switching to an app with no open windows. `AppActivated` lets you react immediately. `WindowChanged` follows when window data becomes available.
+
+### Why does browser URL extraction need Accessibility permission?
+
+Browsers expose the current URL through their UI tree in different ways. `mado` uses Accessibility APIs to read that state without per-browser AppleScript Automation permissions.
+
+### Does `mado` validate or classify websites?
+
+No. It extracts the current URL, domain, favicon, and favicon-derived color when those options are enabled. Website classification, allow lists, and policy decisions belong in app code.
+
+### What happens on Linux or Windows today?
+
+The crate compiles with platform stubs, but monitoring and query APIs return `Error::Platform` because Linux and Windows support is not implemented yet.
+
+### What does `mado` mean?
+
+`mado` means window in Japanese.
+
+## Resources
+
+- [swift-rs](https://github.com/Brendonovich/swift-rs)
+- [Apple Accessibility API](https://developer.apple.com/documentation/applicationservices/axuielement_h)
+- [Swift Package Manager](https://www.swift.org/package-manager/)

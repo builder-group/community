@@ -456,7 +456,7 @@ export const projectsConfig: {
 		{
 			id: 'mado',
 			name: 'mado',
-			description: 'Rust library for macOS active window monitoring and app metadata',
+			description: 'macOS active app and window monitoring with browser metadata',
 			startedAt: { year: 2026, month: 1 },
 			status: 'maintenance',
 			category: 'package',

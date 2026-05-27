@@ -11,7 +11,7 @@
     </a>
 </p>
 
-Open source packages and templates from [builder.group](https://builder.group) projects.
+Open source packages, crates, and templates from [builder.group](https://builder.group) projects.
 
 ## Packages
 
@@ -32,7 +32,13 @@ Open source packages and templates from [builder.group](https://builder.group) p
 | [validatenv](https://github.com/builder-group/community/tree/develop/packages/validatenv)               | Typed env validation with Standard Schema validators, built-in parsers, error reports      | [`validatenv`](https://www.npmjs.com/package/validatenv)               |
 | [xml-tokenizer](https://github.com/builder-group/community/tree/develop/packages/xml-tokenizer)         | Streaming XML, HTML, and SVG tokenizer with typed tokens, selectors, object helpers        | [`xml-tokenizer`](https://www.npmjs.com/package/xml-tokenizer)         |
 
-### Deprecated Packages
+## Crates
+
+| Crate                                                                       | Description                                                  | Crates.io                               |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------ | --------------------------------------- |
+| [mado](https://github.com/builder-group/community/tree/develop/crates/mado) | macOS active app and window monitoring with browser metadata | [`mado`](https://crates.io/crates/mado) |
+
+## Deprecated Packages
 
 > These packages live under `packages/_deprecated`. They remain listed for existing users and historical context, but they are not actively maintained. Prefer the active packages above when starting new work.
 
