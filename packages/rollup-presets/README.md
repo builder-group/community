@@ -41,7 +41,7 @@ module.exports = libraryPreset({
 npm install -D rollup typescript rollup-presets
 ```
 
-`libraryPreset` expects a `tsconfig.json` in the package unless you pass custom compiler options.
+`libraryPreset` expects a `tsconfig.json` in the package. Use `compilerOptions` to override parsed TypeScript options when needed.
 
 ## Usage
 
@@ -222,6 +222,12 @@ Declaration generation is more reliable with `tsc` when `preserveModules` is ena
 ### When should I enable `crossModuleImports`?
 
 Enable it for multi-entry packages where one exported entry imports another exported entry through a relative source path. Leave it off for single-entry libraries or packages without cross-entry imports.
+
+### Why does the library preset target ES6 output?
+
+Published libraries should avoid surprising consumers with modern syntax requirements. The preset targets ES6 by default for broad output compatibility. Use `esbuildOptions.target` when a package intentionally targets modern runtimes.
+
+The esbuild target controls emitted JavaScript syntax, not available runtime APIs. Add polyfills or document runtime requirements for newer APIs your library calls.
 
 ### Can I still customize the generated Rollup config?
 
