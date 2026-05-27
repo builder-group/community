@@ -17,7 +17,6 @@
 	"scripts": {
 		"build": "pnpm typecheck && vite build",
 		"clean": "shx rm -rf dist && shx rm -rf .tanstack && shx rm -rf .turbo && shx rm -rf node_modules",
-		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx,css}\"",
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint .",
 		"start:dev": "vite dev",
