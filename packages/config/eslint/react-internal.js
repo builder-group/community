@@ -1,6 +1,10 @@
-const pluginReact = require('eslint-plugin-react');
 const pluginReactHooks = require('eslint-plugin-react-hooks');
 const globals = require('globals');
+const { createJiti } = require('jiti');
+
+// Load the ESM-only React plugin from CommonJS
+const jiti = createJiti(__filename, { interopDefault: true });
+const eslintReact = jiti('@eslint-react/eslint-plugin');
 
 /**
  * ESLint configuration for applications and libraries that use ReactJs.
@@ -10,10 +14,14 @@ const globals = require('globals');
  */
 module.exports = [
 	...require('./base.js'),
-	pluginReact.configs.flat.recommended,
+	eslintReact.configs['recommended-typescript'],
 	{
 		languageOptions: {
-			...pluginReact.configs.flat.recommended.languageOptions,
+			parserOptions: {
+				ecmaFeatures: {
+					jsx: true
+				}
+			},
 			globals: {
 				...cleanGlobals(globals.serviceworker),
 				...cleanGlobals(globals.browser)
@@ -24,12 +32,9 @@ module.exports = [
 		plugins: {
 			'react-hooks': pluginReactHooks
 		},
-		settings: { react: { version: 'detect' } },
 		rules: {
 			...pluginReactHooks.configs.recommended.rules,
-			'react/react-in-jsx-scope': 'off',
-			'react/prop-types': 'off',
-			'react/no-unknown-property': ['error', { ignore: ['variant'] }]
+			'@eslint-react/dom-no-unknown-property': ['error', { ignore: ['variant'] }]
 		}
 	}
 ];

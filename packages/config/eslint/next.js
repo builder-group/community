@@ -1,7 +1,11 @@
 const pluginNext = require('@next/eslint-plugin-next');
-const pluginReact = require('eslint-plugin-react');
 const pluginReactHooks = require('eslint-plugin-react-hooks');
 const globals = require('globals');
+const { createJiti } = require('jiti');
+
+// Load the ESM-only React plugin from CommonJS
+const jiti = createJiti(__filename, { interopDefault: true });
+const eslintReact = jiti('@eslint-react/eslint-plugin');
 
 /**
  * ESLint configuration for applications that use Next.js.
@@ -12,9 +16,13 @@ const globals = require('globals');
 module.exports = [
 	...require('./base.js'),
 	{
-		...pluginReact.configs.flat.recommended,
+		...eslintReact.configs['recommended-typescript'],
 		languageOptions: {
-			...pluginReact.configs.flat.recommended.languageOptions,
+			parserOptions: {
+				ecmaFeatures: {
+					jsx: true
+				}
+			},
 			globals: {
 				...globals.serviceworker
 			}
@@ -33,10 +41,8 @@ module.exports = [
 		plugins: {
 			'react-hooks': pluginReactHooks
 		},
-		settings: { react: { version: 'detect' } },
 		rules: {
-			...pluginReactHooks.configs.recommended.rules,
-			'react/react-in-jsx-scope': 'off'
+			...pluginReactHooks.configs.recommended.rules
 		}
 	}
 ];

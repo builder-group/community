@@ -22,16 +22,16 @@
 		"lint": "turbo run lint",
 		"lint:fix": "turbo run lint --force -- --fix",
 		"test": "turbo run test",
-		"update:latest": "turbo run update:latest --force && pnpm update --latest '!eslint' '!@eslint/js' && pnpm build"
+		"update:latest": "turbo run update:latest --force && pnpm update --latest && pnpm build"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@eslint/js": "^9.39.2",
+		"@eslint/js": "^10.0.1",
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
 		"@size-limit/esbuild": "^12.1.0",
 		"@size-limit/esbuild-why": "^12.1.0",
 		"@size-limit/preset-small-lib": "^12.1.0",
-		"eslint": "^9.39.2",
+		"eslint": "^10.4.0",
 		"prettier": "^3.8.3",
 		"rollup": "^4.60.4",
 		"shx": "^0.4.0",

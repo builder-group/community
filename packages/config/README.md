@@ -138,6 +138,8 @@ Choose the preset by project type:
 
 The base config includes recommended JavaScript rules, TypeScript strict rules, Prettier compatibility, Turbo env-var warnings, `only-warn`, and generated-file ignores.
 
+The React presets use ESLint React for JSX and React rules, plus the official `eslint-plugin-react-hooks` preset for hooks and React compiler rules.
+
 `only-warn` makes ESLint report rule failures as warnings. Use `eslint --max-warnings=0` in CI when warnings should fail the build.
 
 ## TypeScript
@@ -199,6 +201,14 @@ No. Install the tools that your project runs. For example, a package that only e
 ### Can I override rules?
 
 Yes. Add another config object after the shared config in `eslint.config.js`, add `compilerOptions` in `tsconfig.json`, or pass project-specific options to `mergeConfig` for Vitest.
+
+### Why are the shared config files CommonJS?
+
+CommonJS keeps the config package usable from both CommonJS and ESM project configs. ESM projects can import CommonJS presets, but CommonJS projects cannot synchronously `require()` ESM presets.
+
+### Why does the React ESLint config use jiti?
+
+`@eslint-react/eslint-plugin` is ESM-only. `jiti` lets the CommonJS ESLint presets load that plugin without forcing every consumer to migrate its `eslint.config.js` to ESM.
 
 ### Why keep these configs in a package?
 
