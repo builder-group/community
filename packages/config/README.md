@@ -14,37 +14,24 @@
     </a>
 </p>
 
-`@blgc/config` packages Builder Group's shared TypeScript, ESLint, Prettier, and Vitest config. It gives packages the same strict defaults, import ordering, generated-file ignores, and test setup without copying config files between repos.
+`@blgc/config` is Builder Group's shared config package for TypeScript projects. It keeps formatting, linting, type checking, and Node test defaults in one versioned dependency, so packages can share strict tool behavior without copying config files.
 
-- Share one Prettier config with import sorting, Tailwind class sorting, CSS ordering, and package.json sorting
-- Use flat ESLint configs for libraries, React, Next.js, and TanStack projects
-- Extend TypeScript configs for libraries, DOM libraries, Node 20, React, Next.js, and TanStack
-- Reuse a Vitest node config with TypeScript path resolution and coverage defaults
+- Format code, Markdown, imports, CSS declarations, Tailwind classes, and package manifests with one Prettier config
+- Pick flat ESLint presets for libraries, React, Next.js, and TanStack projects
+- Extend TypeScript presets for bundled libraries, DOM libraries, Node 20, React, Next.js, and TanStack
+- Reuse a Vitest node preset with TypeScript path resolution and coverage reporters
 
 ```js
 // eslint.config.js
-module.exports = [
-  ...require('@blgc/config/eslint/library'),
-  {
-    rules: {
-      // project-specific overrides
-    }
-  }
-];
+module.exports = [...require('@blgc/config/eslint/library')];
 ```
 
-```js
-// eslint.config.mjs
-import libraryConfig from '@blgc/config/eslint/library';
-
-export default [
-  ...libraryConfig,
-  {
-    rules: {
-      // project-specific overrides
-    }
-  }
-];
+```jsonc
+// tsconfig.json
+{
+  "extends": "@blgc/config/typescript/library",
+  "include": ["src"]
+}
 ```
 
 ```json
@@ -53,31 +40,54 @@ export default [
 }
 ```
 
+Migrating from `0.0.x`? See [MIGRATION.md](./MIGRATION.md).
+
 ## Install
 
-```bash
-npm install -D @blgc/config eslint prettier typescript
+Install the config package:
+
+```sh
+npm install -D @blgc/config
 ```
 
-Install the tools you use in the project. Add `vitest` directly when you use the shared Vitest config because it imports `vitest/config` and your scripts still run the Vitest CLI.
+Install the tool packages for the entrypoints your project uses:
+
+```sh
+# ESLint presets
+npm install -D eslint typescript
+
+# Prettier config
+npm install -D prettier
+
+# TypeScript configs
+npm install -D typescript
+
+# Vitest config
+npm install -D vitest
+```
+
+The shared plugin dependencies resolve from `@blgc/config`, so projects only need to install the tool packages they run directly.
 
 ## Usage
 
-Use the config entry that matches the tool you are setting up:
+Use the entrypoint that matches the tool or project type:
 
-- `@blgc/config/prettier`: shared Prettier rules and sorting plugins
-- `@blgc/config/eslint/base`: shared ESLint foundation for custom presets
-- `@blgc/config/eslint/library`: flat ESLint config for TypeScript libraries
-- `@blgc/config/eslint/react`: flat ESLint config for React packages and apps
-- `@blgc/config/eslint/next`: flat ESLint config for Next.js apps
-- `@blgc/config/eslint/tanstack`: flat ESLint config for TanStack apps
-- `@blgc/config/typescript/library`: TypeScript config for bundled libraries without DOM APIs
-- `@blgc/config/typescript/library-dom`: TypeScript config for DOM-capable libraries
-- `@blgc/config/typescript/node20`: TypeScript config for Node 20 projects
-- `@blgc/config/typescript/react`: TypeScript config for React packages and apps
-- `@blgc/config/typescript/next`: TypeScript config for Next.js apps
-- `@blgc/config/typescript/tanstack`: TypeScript config for TanStack apps
-- `@blgc/config/vitest/node`: Vitest config for Node test environments
+| Entrypoint                            | Use for                                     |
+| ------------------------------------- | ------------------------------------------- |
+| `@blgc/config/prettier`               | Shared formatting and sorting rules         |
+| `@blgc/config/eslint/base`            | Shared ESLint foundation for custom presets |
+| `@blgc/config/eslint/library`         | TypeScript libraries                        |
+| `@blgc/config/eslint/react`           | React packages and Vite apps                |
+| `@blgc/config/eslint/next`            | Next.js apps                                |
+| `@blgc/config/eslint/tanstack`        | TanStack Router or TanStack Start apps      |
+| `@blgc/config/typescript/base`        | Shared strict TypeScript defaults           |
+| `@blgc/config/typescript/library`     | Bundled libraries without DOM globals       |
+| `@blgc/config/typescript/library-dom` | Bundled libraries that use DOM globals      |
+| `@blgc/config/typescript/node20`      | Node 20 packages and tools                  |
+| `@blgc/config/typescript/react`       | React packages and Vite apps                |
+| `@blgc/config/typescript/next`        | Next.js apps                                |
+| `@blgc/config/typescript/tanstack`    | TanStack apps                               |
+| `@blgc/config/vitest/node`            | Node test environments                      |
 
 ## Prettier
 
@@ -89,15 +99,24 @@ Reference the shared config from `package.json`:
 }
 ```
 
-The Prettier config includes:
+The config includes:
 
-- tabs for code files, two-space indentation for Markdown, single quotes, semicolons, and `printWidth: 100`
-- sorted imports through `@ianvs/prettier-plugin-sort-imports`
-- Tailwind class sorting through `prettier-plugin-tailwindcss`
+- LF line endings, tabs for code files, two-space Markdown indentation, single quotes, semicolons, and `printWidth: 100`
+- import sorting through `@ianvs/prettier-plugin-sort-imports`
 - CSS declaration ordering through `prettier-plugin-css-order`
 - package.json ordering through `prettier-plugin-packagejson`
+- Tailwind class sorting through `prettier-plugin-tailwindcss`
 
-Projects that need a Tailwind v4 stylesheet path or Tailwind v3 config path should extend this config and set `tailwindStylesheet` or `tailwindConfig` locally.
+The Prettier plugins resolve from `@blgc/config`, so consuming packages do not need to install those plugins directly.
+
+Projects that need a Tailwind v4 stylesheet path or Tailwind v3 config path can extend the config locally:
+
+```js
+module.exports = {
+  ...require('@blgc/config/prettier'),
+  tailwindStylesheet: './src/styles.css'
+};
+```
 
 ## ESLint
 
@@ -131,16 +150,15 @@ export default [
 
 Choose the preset by project type:
 
-| Preset                         | Use for                       |
-| ------------------------------ | ----------------------------- |
-| `@blgc/config/eslint/library`  | TypeScript packages           |
-| `@blgc/config/eslint/react`    | React packages and Vite apps  |
-| `@blgc/config/eslint/next`     | Next.js apps                  |
-| `@blgc/config/eslint/tanstack` | TanStack Router or Start apps |
+| Preset                         | Adds                                                            |
+| ------------------------------ | --------------------------------------------------------------- |
+| `@blgc/config/eslint/base`     | JavaScript, TypeScript, Turbo, warning mode, Prettier, ignores  |
+| `@blgc/config/eslint/library`  | The base config for TypeScript package code                     |
+| `@blgc/config/eslint/react`    | Browser globals, JSX parsing, ESLint React, React Hooks         |
+| `@blgc/config/eslint/next`     | React config, Next.js Core Web Vitals, Next.js build ignores    |
+| `@blgc/config/eslint/tanstack` | React config, TanStack build ignores, Vite env-var allowlisting |
 
-The base config includes recommended JavaScript rules, TypeScript strict rules, Prettier compatibility, warning-only lint reporting, Turbo env-var warnings, unused disable reporting, and general generated/build artifact ignores. Framework presets add their own build artifact ignores, such as `.next`, `.output`, and `.tanstack`.
-
-The React presets use ESLint React for JSX and React rules, plus the official `eslint-plugin-react-hooks` preset for hooks and React compiler rules.
+The base preset uses `@eslint/js` recommended rules, `typescript-eslint` strict rules, Turbo env-var warnings, generated/build artifact ignores, Node globals for config files, and Prettier compatibility. Shared rule findings report as warnings through `eslint-plugin-only-warn`; use `eslint --max-warnings=0` in CI when a project is ready to enforce a clean result.
 
 ## TypeScript
 
@@ -170,7 +188,7 @@ Available configs:
 | `@blgc/config/typescript/next`        | Next.js apps                       |
 | `@blgc/config/typescript/tanstack`    | TanStack apps                      |
 
-Defaults to know: the base config uses ES2022, `module: preserve`, bundler module resolution, forced module detection, declarations, declaration maps, `skipLibCheck`, and strict type checking. TypeScript unused checks stay off because ESLint owns unused diagnostics.
+Defaults to know: the base config uses ES2022, `module: preserve`, bundler module resolution, forced module detection, declaration output, declaration maps, `skipLibCheck`, and strict type checking. TypeScript unused checks stay off because ESLint owns unused diagnostics.
 
 Use `@blgc/config/typescript/library` when a package emits JavaScript through a bundler and uses TypeScript for declaration emit. Use `@blgc/config/typescript/node20` for Node packages or tools that emit JavaScript with `tsc`.
 
@@ -198,7 +216,7 @@ The node config sets the Node test environment, enables TypeScript path resoluti
 
 ### Do I need every peer tool installed?
 
-No. Install the tools that your project runs. For example, a package that only extends TypeScript config does not need to run ESLint or Prettier.
+No. Install the tools your project runs. For example, a package that only extends TypeScript config does not need ESLint, Prettier, or Vitest installed.
 
 ### Can I override rules?
 
@@ -229,10 +247,6 @@ Flags like `exactOptionalPropertyTypes`, `verbatimModuleSyntax`, and `erasableSy
 ### Why keep these configs in a package?
 
 A package keeps defaults versioned, reviewable, and reusable. Projects can update one dependency instead of copying config changes by hand.
-
-### Why only one Vitest preset?
-
-The shared preset covers the common Node package tests. Browser tests, app plugins, and framework-specific Vite setup should stay local until multiple projects need the same preset.
 
 ## Credits
 
