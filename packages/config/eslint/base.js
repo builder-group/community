@@ -3,21 +3,28 @@ const eslintConfigPrettier = require('eslint-config-prettier');
 const globals = require('globals');
 const onlyWarn = require('eslint-plugin-only-warn');
 const turboPlugin = require('eslint-plugin-turbo');
-const { globalIgnores } = require('eslint/config');
+const { defineConfig, globalIgnores } = require('eslint/config');
 const tseslint = require('typescript-eslint');
 
 /**
  * Base ESLint configuration.
  *
  * @see https://eslint.org/docs/latest/use/configure/configuration-files
- * @type {import("eslint").Linter.Config}
+ * @type {import("eslint").Linter.Config[]}
  */
-module.exports = [
+module.exports = defineConfig([
 	js.configs.recommended,
-	eslintConfigPrettier,
-	...tseslint.configs.recommended,
 	...tseslint.configs.strict,
+	globalIgnores(
+		['**/dist/', '**/gen/', '**/.turbo/', '**/eslint.config.*', '**/*.gen.{ts,tsx}'],
+		'@blgc/config/base/ignores'
+	),
 	{
+		...eslintConfigPrettier,
+		name: '@blgc/config/base/prettier'
+	},
+	{
+		name: '@blgc/config/base/turbo',
 		plugins: {
 			turbo: turboPlugin
 		},
@@ -26,11 +33,13 @@ module.exports = [
 		}
 	},
 	{
+		name: '@blgc/config/base/only-warn',
 		plugins: {
 			onlyWarn
 		}
 	},
 	{
+		name: '@blgc/config/base/typescript-overrides',
 		rules: {
 			'@typescript-eslint/no-unused-vars': [
 				'error',
@@ -40,16 +49,13 @@ module.exports = [
 	},
 	// Tooling config files run in Node and may intentionally use CommonJS
 	{
-		files: ['*.config.js', '*.config.cjs'],
+		name: '@blgc/config/base/tooling-configs',
+		files: ['**/*.config.{js,cjs,mjs,ts,cts,mts}'],
 		languageOptions: {
 			globals: globals.node
 		},
 		rules: {
 			'@typescript-eslint/no-require-imports': 'off'
 		}
-	},
-	globalIgnores(
-		['**/dist/', '**/gen/', 'node_modules/', '.turbo/', 'eslint.config.*', '**/*.gen.ts'],
-		'Ignore generated files'
-	)
-];
+	}
+]);

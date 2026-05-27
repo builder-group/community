@@ -1,15 +1,16 @@
-const { globalIgnores } = require('eslint/config');
+const { defineConfig, globalIgnores } = require('eslint/config');
 
 /**
  * ESLint configuration for TanStack Router/Start applications.
  *
  * @see https://eslint.org/docs/latest/use/configure/configuration-files
- * @type {import("eslint").Linter.Config}
+ * @type {import("eslint").Linter.Config[]}
  */
-module.exports = [
+module.exports = defineConfig([
 	...require('./react-internal.js'),
-	globalIgnores(['.output/', '.tanstack/'], 'Ignore TanStack generated files'),
+	globalIgnores(['.output/', '.tanstack/'], '@blgc/config/tanstack/ignores'),
 	{
+		name: '@blgc/config/tanstack/vite-env',
 		// Vite injects these built-ins, so Turbo should not require repo env declarations
 		rules: {
 			'turbo/no-undeclared-env-vars': [
@@ -20,4 +21,4 @@ module.exports = [
 			]
 		}
 	}
-];
+]);
