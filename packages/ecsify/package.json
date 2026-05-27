@@ -1,9 +1,23 @@
 {
 	"name": "ecsify",
-	"version": "0.0.20",
+	"version": "0.0.21",
 	"private": false,
-	"description": "A flexible, typesafe, and performance-focused Entity Component System (ECS) library for TypeScript.",
-	"keywords": [],
+	"description": "TypeScript ECS with typed plugins, flexible component storage, fast queries, and change tracking",
+	"keywords": [
+		"ecs",
+		"entity-component-system",
+		"typescript",
+		"type-safe",
+		"game-development",
+		"simulation",
+		"components",
+		"systems",
+		"queries",
+		"change-tracking",
+		"data-oriented",
+		"plugin-system",
+		"game-engine"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
@@ -27,15 +41,12 @@
 		"build:prod": "export NODE_ENV=production && pnpm build",
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
-		"lint": "eslint . --fix",
-		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"lint": "eslint .",
+		"publish:patch": "pnpm build:prod && pnpm version patch --no-git-tag-version && pnpm publish --no-git-checks --access=public",
 		"size": "size-limit --why",
 		"start:dev": "tsc -w",
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest"
-	},
-	"dependencies": {
-		"@blgc/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",

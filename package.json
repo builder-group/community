@@ -17,35 +17,31 @@
 		"build": "turbo run build",
 		"build:packages": "turbo run build:prod --filter='./packages/*'",
 		"clean": "turbo run clean && shx rm -rf .turbo && shx rm -rf node_modules",
-		"format": "prettier --write \"**/*.{ts,tsx,md,json,js,jsx}\"",
-		"install:clean": "pnpm clean && pnpm install && pnpm build",
+		"format": "prettier --write \"**/*.{ts,tsx,js,jsx,cjs,mjs,md,mdx,json,css}\"",
+		"install:clean": "pnpm run clean && pnpm install && pnpm build",
 		"lint": "turbo run lint",
-		"packages:change": "changeset",
-		"packages:publish": "pnpm build:packages && changeset publish",
-		"packages:version": "changeset version",
+		"lint:fix": "turbo run lint --force -- --fix",
 		"test": "turbo run test",
-		"update:latest": "turbo run update:latest --force && pnpm update --latest '!eslint' '!@eslint/js' && pnpm build"
+		"update:latest": "turbo run update:latest --force && pnpm update --latest && pnpm build"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@changesets/changelog-github": "^0.6.0",
-		"@changesets/cli": "^2.31.0",
-		"@eslint/js": "^9.39.2",
+		"@eslint/js": "^10.0.1",
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
 		"@size-limit/esbuild": "^12.1.0",
 		"@size-limit/esbuild-why": "^12.1.0",
 		"@size-limit/preset-small-lib": "^12.1.0",
-		"eslint": "^9.39.2",
+		"eslint": "^10.4.0",
 		"prettier": "^3.8.3",
-		"rollup": "^4.60.2",
+		"rollup": "^4.60.4",
 		"shx": "^0.4.0",
 		"size-limit": "^12.1.0",
-		"turbo": "^2.9.8",
+		"turbo": "^2.9.14",
 		"typescript": "^6.0.3",
-		"vite": "^8.0.10",
-		"vitest": "^4.1.5"
+		"vite": "^8.0.14",
+		"vitest": "^4.1.7"
 	},
-	"packageManager": "pnpm@10.33.2",
+	"packageManager": "pnpm@11.3.0",
 	"engines": {
 		"node": ">=24"
 	}

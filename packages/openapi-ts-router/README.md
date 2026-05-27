@@ -17,172 +17,371 @@
     </a>
 </p>
 
-> Status: Experimental
+`openapi-ts-router` turns generated OpenAPI `paths` into typed Express and Hono route methods. You keep native routers, handlers, and middleware, while OpenAPI controls which paths compile, which request schemas are required, and what JSON success bodies handlers can return.
 
-`openapi-ts-router` is a thin wrapper around the router of web frameworks like Express and Hono, offering OpenAPI typesafety and seamless integration with validation libraries such as Valibot and Zod.
+- Keep OpenAPI path syntax in route code while the wrapper registers framework routes
+- Catch wrong paths, wrong methods, missing required schemas, and wrong JSON success responses in TypeScript
+- Validate path params, query params, and JSON bodies with any [Standard Schema](https://standardschema.dev/) library
+- Read parsed and validated values from `req.valid` in Express or `c.req.valid()` in Hono
+- Add OpenAPI-backed routes without replacing your existing Express or Hono app
 
-- Full type safety for routes, methods, params, body and responses
-- Runtime validation using Zod/Valibot
-- Catches API spec mismatches at compile time
-- Zero manual type definitions needed
-- Seamless integration with existing Express/Hono applications
-- Enforces OpenAPI schema compliance at both compile-time and runtime
+Express:
 
-### 📚 Examples
+```ts
+import { Router } from 'express';
+import { createExpressOpenApiRouter } from 'openapi-ts-router/express';
+import * as z from 'zod';
+import type { paths } from './gen/openapi';
+
+const router = Router();
+const openApiRouter = createExpressOpenApiRouter<paths>(router);
+
+openApiRouter.get('/pet/{petId}', {
+  pathSchema: z.object({
+    petId: z.number()
+  }),
+  handler: (req, res) => {
+    const { petId } = req.valid.path;
+    res.json({ name: `Pet ${petId}`, photoUrls: [] });
+  }
+});
+```
+
+Hono:
+
+```ts
+import { Hono } from 'hono';
+import { createHonoOpenApiRouter } from 'openapi-ts-router/hono';
+import * as v from 'valibot';
+import type { paths } from './gen/openapi';
+
+const app = new Hono();
+const openApiRouter = createHonoOpenApiRouter<paths>(app);
+
+openApiRouter.get('/pet/{petId}', {
+  pathSchema: v.object({
+    petId: v.number()
+  }),
+  handler: (c) => {
+    const { petId } = c.req.valid('param');
+    return c.json({ name: `Pet ${petId}`, photoUrls: [] });
+  }
+});
+```
+
+Migrating from `0.3.x`? See [MIGRATION.md](./MIGRATION.md).
+
+## Install
+
+Install the router package and the OpenAPI type generator:
+
+```sh
+npm install openapi-ts-router
+npm install -D openapi-typescript
+```
+
+Install the framework and validator you use:
+
+```sh
+# Express
+npm install express
+npm install -D @types/express
+
+# Hono
+npm install hono
+
+# Standard Schema validator
+npm install zod
+# or
+npm install valibot
+```
+
+Generate TypeScript types from your OpenAPI document:
+
+```sh
+npx openapi-typescript ./openapi.yaml -o ./src/gen/openapi.ts
+```
+
+The generated file must export the `paths` type from `openapi-typescript`.
+
+## Usage
+
+Create a router wrapper with your generated `paths` type. The wrapper keeps your framework router, but narrows each route method to paths that exist in your OpenAPI schema.
+
+Pass OpenAPI path strings such as `/pet/{petId}` to `openApiRouter`. The wrapper registers the framework route as `/pet/:petId` for Express and Hono. Do not use framework `:param` syntax in `openApiRouter` calls.
+
+### Express
+
+```ts
+import express, { Router } from 'express';
+import { createExpressOpenApiRouter } from 'openapi-ts-router/express';
+import * as z from 'zod';
+import type { paths } from './gen/openapi';
+
+const app = express();
+const router = Router();
+const openApiRouter = createExpressOpenApiRouter<paths>(router);
+
+app.use(express.json());
+app.use(router);
+
+openApiRouter.get('/pet/{petId}', {
+  pathSchema: z.object({
+    petId: z.number()
+  }),
+  handler: (req, res) => {
+    const { petId } = req.valid.path;
+    res.json({ name: `Pet ${petId}`, photoUrls: [] });
+  }
+});
+
+openApiRouter.post('/pet', {
+  bodySchema: z.object({
+    name: z.string(),
+    photoUrls: z.array(z.string())
+  }),
+  handler: (req, res) => {
+    const { name, photoUrls } = req.valid.body;
+    res.json({ name, photoUrls });
+  }
+});
+```
+
+Express body validation reads `req.body`, so mount `express.json()` or an equivalent body parser before the router.
+
+### Hono
+
+```ts
+import { Hono } from 'hono';
+import { createHonoOpenApiRouter } from 'openapi-ts-router/hono';
+import * as v from 'valibot';
+import type { paths } from './gen/openapi';
+
+const app = new Hono();
+const openApiRouter = createHonoOpenApiRouter<paths>(app);
+
+openApiRouter.get('/pet/{petId}', {
+  pathSchema: v.object({
+    petId: v.number()
+  }),
+  handler: (c) => {
+    const { petId } = c.req.valid('param');
+    return c.json({ name: `Pet ${petId}`, photoUrls: [] });
+  }
+});
+
+openApiRouter.post('/pet', {
+  bodySchema: v.object({
+    name: v.string(),
+    photoUrls: v.array(v.string())
+  }),
+  handler: (c) => {
+    const { name, photoUrls } = c.req.valid('json');
+    return c.json({ name, photoUrls });
+  }
+});
+```
+
+## What TypeScript Checks
+
+`openapi-ts-router` ties route registration to one OpenAPI operation.
+
+```ts
+openApiRouter.get('/pet/{petId}', {
+  pathSchema: z.object({ petId: z.number() }),
+  handler: (req, res) => {
+    req.valid.path.petId; // number
+    res.json({ name: 'Falko', photoUrls: [] }); // checked against the 2xx JSON response
+  }
+});
+```
+
+These mistakes fail before runtime:
+
+```ts
+// The OpenAPI path has no POST operation.
+openApiRouter.post('/store/inventory', {
+  handler: () => undefined
+});
+
+// The OpenAPI path has required path params, so pathSchema is required.
+openApiRouter.get('/pet/{petId}', {
+  handler: (_req, res) => {
+    res.json({ name: 'Falko', photoUrls: [] });
+  }
+});
+
+// The success response must match the OpenAPI 2xx JSON response body.
+openApiRouter.get('/pet/{petId}', {
+  pathSchema: z.object({ petId: z.number() }),
+  handler: (_req, res) => {
+    res.json('not a pet');
+  }
+});
+```
+
+## Route Config
+
+| Option             | Description                                                                                                          |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| `handler`          | Native Express or Hono handler called after parsing, validation, and route middleware                                |
+| `middleware`       | Native Express or Hono middleware for this route. Runs after validation and before `handler`                         |
+| `pathSchema`       | Standard Schema validator for OpenAPI path params. Required when the OpenAPI operation has required path params      |
+| `querySchema`      | Standard Schema validator for OpenAPI query params. Required when the OpenAPI operation has required query params    |
+| `bodySchema`       | Standard Schema validator for the JSON request body. Required when the OpenAPI operation has a required request body |
+| `pathParamParser`  | Route-level path param parser override. Set to `false` to validate raw router strings                                |
+| `queryParamParser` | Route-level query param parser override. Set to `false` to validate raw router query values                          |
+
+Required OpenAPI request parts require matching schemas at compile time. Optional request parts may omit their schemas.
+
+## Validated Data
+
+Parsed values, and validated values when a schema runs, are stored separately from the raw framework request data:
+
+| Request part | Express           | Hono                   |
+| ------------ | ----------------- | ---------------------- |
+| Path params  | `req.valid.path`  | `c.req.valid('param')` |
+| Query params | `req.valid.query` | `c.req.valid('query')` |
+| JSON body    | `req.valid.body`  | `c.req.valid('json')`  |
+
+This keeps handlers honest: `req.params`, `req.query`, and `req.body` may still contain raw framework values, while the `valid` slots contain parser output and schema output for the request parts you validated.
+
+## Param Parsing
+
+Path and query params start as strings in web frameworks. By default, `openapi-ts-router` runs `parseParams()` before validation:
+
+- `'123'` becomes `123`
+- `'true'` and `'false'` become booleans
+- `'null'` becomes `null`
+- repeated query params stay arrays
+- nested query objects and arrays are parsed recursively
+
+Set parser defaults on the router:
+
+```ts
+const openApiRouter = createExpressOpenApiRouter<paths>(router, {
+  pathParamParser: false,
+  queryParamParser: false
+});
+```
+
+Override parsing for one route when a value should stay raw:
+
+```ts
+import { parseParams } from 'openapi-ts-router';
+
+openApiRouter.get('/items/{sku}', {
+  pathParamParser: (params) => ({
+    ...parseParams(params),
+    sku: params['sku']
+  }),
+  pathSchema: z.object({
+    sku: z.string()
+  }),
+  handler: (req, res) => {
+    res.json({ sku: req.valid.path.sku });
+  }
+});
+```
+
+## Middleware
+
+Use native middleware exactly where your framework expects it. Route-level middleware receives the same typed validated data as the final handler.
+
+```ts
+openApiRouter.get('/pet/{petId}', {
+  pathSchema: z.object({ petId: z.number() }),
+  middleware: [
+    (req, _res, next) => {
+      auditPetRead(req.valid.path.petId);
+      next();
+    }
+  ],
+  handler: (req, res) => {
+    res.json({ name: `Pet ${req.valid.path.petId}`, photoUrls: [] });
+  }
+});
+```
+
+Global Express middleware and Hono middleware still work normally around the wrapped router.
+
+## Errors
+
+Validation failures throw `OpenApiValidationError` with `status: 400` and an `issues` array.
+
+```ts
+import type { ErrorRequestHandler } from 'express';
+import { OpenApiValidationError } from 'openapi-ts-router';
+
+export const errorMiddleware: ErrorRequestHandler = (error, _req, res, _next) => {
+  if (error instanceof OpenApiValidationError) {
+    res.status(error.status).json({ issues: error.issues });
+    return;
+  }
+
+  res.status(500).json({ message: 'Internal server error' });
+};
+```
+
+Hono can handle the same error through `app.onError()`:
+
+```ts
+import { OpenApiValidationError } from 'openapi-ts-router';
+
+app.onError((error, c) => {
+  if (error instanceof OpenApiValidationError) {
+    return c.json({ issues: error.issues }, error.status);
+  }
+
+  return c.json({ message: 'Internal server error' }, 500);
+});
+```
+
+Request body parse failures and unexpected validator failures throw `OpenApiRouterError`. Request-level errors can include `status`, while internal schema failures expose `code`, `message`, and `cause`.
+
+## Examples
 
 - [Express Petstore](https://github.com/builder-group/community/tree/develop/examples/openapi-ts-router/express/petstore)
 - [Hono Petstore](https://github.com/builder-group/community/tree/develop/examples/openapi-ts-router/hono/petstore)
 
-## 📖 Usage
+## FAQ
 
-### [ExpressJs](https://expressjs.com/)
+### Why do I still write schemas when OpenAPI already has types?
 
-[`openapi-ts-router`](https://github.com/builder-group/community/tree/develop/packages/openapi-ts-router) provides full type-safety and runtime validation for your Express API routes by wrapping a [Express router](https://expressjs.com/en/5x/api.html#router):
+OpenAPI types only exist at compile time. A schema validates real requests at runtime. `openapi-ts-router` connects the two: if the OpenAPI operation requires a path param, query param, or body, TypeScript requires a matching schema before the route can compile.
 
-> **Good to Know**: While TypeScript ensures compile-time type safety, runtime validation is equally important. `openapi-ts-router` integrates with Zod/Valibot to provide both:
->
-> - Types verify your code matches the OpenAPI spec during development
-> - Validators ensure incoming requests match the spec at runtime
+### Which validators can I use?
 
-```ts
-import { Router } from 'express';
-import { createExpressOpenApiRouter } from 'openapi-ts-router';
-import { zValidator } from 'validation-adapters/zod';
-import * as z from 'zod';
-import { paths } from './gen/v1'; // OpenAPI-generated types
-import { PetSchema } from './schemas'; // Custom reusable schema for validation
+Any validator that implements [Standard Schema](https://standardschema.dev/) works. Valibot and Zod are the common choices. No package-specific validation adapter is required.
 
-export const router: Router = Router();
-export const openApiRouter = createExpressOpenApiRouter<paths>(router);
+### Does this generate OpenAPI specs?
 
-// GET /pet/{petId}
-openApiRouter.get('/pet/{petId}', {
-	pathValidator: zValidator(
-		z.object({
-			petId: z.number() // Validate that petId is a number
-		})
-	),
-	handler: (req, res) => {
-		const { petId } = req.valid.params; // Access parsed & validated params
-		res.send({ name: 'Falko', photoUrls: [] });
-	}
-});
+No. Your OpenAPI document stays the source of truth. Generate TypeScript with `openapi-typescript`, then pass the generated `paths` type to the router wrapper.
 
-// POST /pet
-openApiRouter.post('/pet', {
-	bodyValidator: zValidator(PetSchema), // Validate request body using PetSchema
-	handler: (req, res) => {
-		const { name, photoUrls } = req.body; // Access validated body data
-		res.send({ name, photoUrls });
-	}
-});
+### Does this validate responses at runtime?
 
-// TypeScript will error if route/method doesn't exist in OpenAPI spec
-// or if response doesn't match defined schema
-```
+No. JSON success responses are checked by TypeScript in handlers, but the package does not run response validators at runtime. Keep response runtime checks in tests or framework middleware if your app needs them.
 
-[Full example](https://github.com/builder-group/community/tree/develop/examples/openapi-ts-router/express/petstore)
+### What happens when I omit an optional schema?
 
-### [Hono](https://hono.dev/)
+TypeScript still infers the OpenAPI request shape, but runtime validation does not run for that request part. Use a schema when handlers need trusted parsed and validated values.
 
-[`openapi-ts-router`](https://github.com/builder-group/community/tree/develop/packages/openapi-ts-router) provides full type-safety and runtime validation for your HonoAPI routes by wrapping a [Hono router](https://hono.dev/docs/api/routing):
+### Why are error responses not typed on handlers?
 
-> **Good to Know**: While TypeScript ensures compile-time type safety, runtime validation is equally important. `openapi-ts-router` integrates with Zod/Valibot to provide both:
->
-> - Types verify your code matches the OpenAPI spec during development
-> - Validators ensure incoming requests match the spec at runtime
+Error responses usually come from shared error handling, not the happy-path route handler. Throw domain errors or `OpenApiRouterError` values from routes, then map them to your API error shape in Express error middleware or Hono `app.onError()`.
 
-> **Note**: Hono's TypeScript integration provides type suggestions for `c.json()` based on generically defined response types, but it doesn't enforce these types at compile-time. For example, `c.json('')` won't raise a type error even if the expected type is `{ someType: string }`. This is due to Hono's internal use of `TypedResponse<T>`, which infers but doesn't strictly enforce the passed generic type. [Hono Discussion](https://github.com/orgs/honojs/discussions/3331)
+### What request parts are supported?
 
-```ts
-import { Hono } from 'hono';
-import { createHonoOpenApiRouter } from 'openapi-ts-router';
-import { zValidator } from 'validation-adapters/zod';
-import * as z from 'zod';
-import { paths } from './gen/v1'; // OpenAPI-generated types
-import { PetSchema } from './schemas'; // Custom reusable schema for validation
+The router validates path params, query params, and JSON request bodies. Keep auth, headers, cookies, multipart uploads, and framework-specific request concerns in native Express or Hono middleware.
 
-export const router = new Hono();
-export const openApiRouter = createHonoOpenApiRouter<paths>(router);
+### Which HTTP methods are supported?
 
-// GET /pet/{petId}
-openApiRouter.get('/pet/{petId}', {
-	pathValidator: zValidator(
-		z.object({
-			petId: z.number() // Validate that petId is a number
-		})
-	),
-	handler: (c) => {
-		const { petId } = c.req.valid('param'); // Access validated params
-		return c.json({ name: 'Falko', photoUrls: [] });
-	}
-});
+`get`, `post`, `put`, `patch`, and `delete` are supported.
 
-// POST /pet
-openApiRouter.post('/pet', {
-	bodyValidator: zValidator(PetSchema), // Validate request body using PetSchema
-	handler: (c) => {
-		const { name, photoUrls } = c.req.valid('json'); // Access validated body data
-		return c.json({ name, photoUrls });
-	}
-});
+### Which framework versions are supported?
 
-// TypeScript will error if route/method doesn't exist in OpenAPI spec
-// or if response doesn't match defined schema
-```
+The package targets Express 5 and Hono 4 through peer dependencies.
 
-[Full example](https://github.com/builder-group/community/tree/develop/examples/openapi-ts-router/hono/petstore)
+### Can I migrate one route at a time?
 
-## ❓ FAQ
-
-### **Why are error types not supported in the response type?**
-
-We intentionally **only type success responses (2xx)** while leaving error responses out. Here’s why:
-
-**Errors should be handled via exceptions & middleware**  
-Instead of typing every possible error response inline, we believe that handling errors globally in middleware provides **clearer, more maintainable code**.  
-👉 Example: [Hono Example](https://github.com/builder-group/community/blob/develop/examples/openapi-ts-router/hono/petstore/src/handlers/error-handler.ts) ([Docs](https://hono.dev/docs/api/exception)) & [Express Example](https://github.com/builder-group/community/blob/develop/examples/openapi-ts-router/express/petstore/src/middlewares/error-middleware.ts) ([Docs](https://expressjs.com/en/guide/error-handling.html))
-
-**Inline error responses require `as any`**  
-Since `.send()` only expects success types, **explicit casting** is required to enforce an error response:
-
-```ts
-res.status(500).send({
-	code: '#ERR_XYZ',
-	message: 'Error Message'
-} satisfies TOperationResponseContent<paths['/pet/{petId}']['get'], 500> as any);
-```
-
-### **Why is the Status Code not inferred?**
-
-**Express and Hono don't infer status codes for `res.send()` / `c.json()`**  
-Since we can’t infer the value of the `res.status()` / `c.json()` method call, `res.send()` / `c.json()` is typed as a union of success response types. For example, it could be:
-
-```ts
-{ message: 'Success Body of 200' } | { message: 'Success Body of 201' }
-```
-
-**To enforce a specific success type, use `satisfies`**  
-Example of explicitly enforcing a **201 response type**:
-
-```ts
-res.status(201).send({
-	id: 123
-} satisfies TOperationResponseContent<paths['/pet/{petId}']['get'], 201>);
-```
-
-### **Hono `c.json()` not typesafe?**
-
-Hono's TypeScript integration provides type suggestions for `c.json()` based on generically defined response types, but it doesn't enforce these types at compile-time. For example, `c.json('')` won't raise a type error even if the expected type is `{ someType: string }`. This is due to Hono's internal use of `TypedResponse<T>`, which infers but doesn't strictly enforce the passed generic type. [Hono Discussion](https://github.com/orgs/honojs/discussions/3331)
-
-**To enforce a specific success type, use `satisfies`**  
-Example of explicitly enforcing a **201 response type**:
-
-```ts
-c.json(
-	{
-		id: 123
-	} satisfies TOperationResponseContent<paths['/pet/{petId}']['get'], 201>,
-	201
-);
-```
+Yes. Wrap an existing Express router or Hono app, then register OpenAPI-backed routes through `openApiRouter`. Existing framework routes and middleware can keep running next to it while you migrate.

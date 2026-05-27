@@ -1,9 +1,22 @@
 {
 	"name": "tuple-result",
-	"version": "0.0.12",
+	"version": "0.1.0",
 	"private": false,
-	"description": "A minimal, functional, and tree-shakable Result library for TypeScript that prioritizes simplicity and serialization",
-	"keywords": [],
+	"description": "Plain TypeScript Result tuples with typed errors, narrowing, helpers, and JSON-friendly arrays",
+	"keywords": [
+		"result",
+		"result-type",
+		"error-handling",
+		"error-as-value",
+		"typed-errors",
+		"typescript",
+		"tuple",
+		"tuple-result",
+		"json",
+		"serializable",
+		"destructuring",
+		"either"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
@@ -20,15 +33,16 @@
 	"types": "./dist/types/index.d.ts",
 	"files": [
 		"dist",
-		"README.md"
+		"README.md",
+		"MIGRATION.md"
 	],
 	"scripts": {
 		"build": "shx rm -rf dist && rollup -c rollup.config.js",
 		"build:prod": "export NODE_ENV=production && pnpm build",
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
-		"lint": "eslint . --fix",
-		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"lint": "eslint .",
+		"publish:patch": "pnpm build:prod && pnpm version patch --no-git-tag-version && pnpm publish --no-git-checks --access=public",
 		"size": "size-limit --why",
 		"start:dev": "tsc -w",
 		"test": "vitest run",

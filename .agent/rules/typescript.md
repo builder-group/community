@@ -35,20 +35,20 @@ This file covers TypeScript- and TSX-specific enforcement.
 
 ```ts
 export function createClient(options: TCreateClientOptions = {}): TClient {
-	const { timeoutMs = 5000, baseUrl = 'https://api.example.com' } = options;
-	return {
-		timeoutMs,
-		baseUrl
-	};
+  const { timeoutMs = 5000, baseUrl = 'https://api.example.com' } = options;
+  return {
+    timeoutMs,
+    baseUrl
+  };
 }
 
 interface TCreateClientOptions {
-	timeoutMs?: number;
-	baseUrl?: string;
+  timeoutMs?: number;
+  baseUrl?: string;
 }
 
 interface TClient {
-	timeoutMs: number;
-	baseUrl: string;
+  timeoutMs: number;
+  baseUrl: string;
 }
 ```

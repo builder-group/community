@@ -1,5 +1,5 @@
 import type express from 'express';
-import { AppError } from 'openapi-ts-router';
+import { OpenApiValidationError } from 'openapi-ts-router';
 import { type components } from '../gen/v1';
 
 export function errorMiddleware(
@@ -16,17 +16,15 @@ export function errorMiddleware(
 		additional_errors: []
 	};
 
-	// Handle application-specific errors (instances of AppError)
-	if (err instanceof AppError) {
+	if (err instanceof OpenApiValidationError) {
 		statusCode = err.status;
 		jsonResponse.error_code = err.code;
-		jsonResponse.error_description = err.description;
-		jsonResponse.error_uri = err.uri ?? null;
-		jsonResponse.additional_errors = err.additionalErrors as any;
-	}
-
-	// Handle unknown errors
-	else if (typeof err === 'object' && err != null) {
+		jsonResponse.error_description = err.message;
+	} else if (isHttpError(err)) {
+		statusCode = err.status;
+		jsonResponse.error_code = err.code ?? '#ERR_UNKNOWN';
+		jsonResponse.error_description = err.message;
+	} else if (typeof err === 'object' && err != null) {
 		if ('message' in err && typeof err.message === 'string') {
 			jsonResponse.error_description = err.message;
 		}
@@ -38,4 +36,21 @@ export function errorMiddleware(
 	}
 
 	res.status(statusCode).json(jsonResponse);
+}
+
+interface THttpError {
+	status: number;
+	code?: string;
+	message: string;
+}
+
+function isHttpError(error: unknown): error is THttpError {
+	return (
+		typeof error === 'object' &&
+		error != null &&
+		'status' in error &&
+		typeof error.status === 'number' &&
+		'message' in error &&
+		typeof error.message === 'string'
+	);
 }

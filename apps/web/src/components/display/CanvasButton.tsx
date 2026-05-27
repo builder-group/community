@@ -18,11 +18,11 @@ export interface TCanvasButtonProps
 		VariantProps<typeof canvasButtonVariants> {}
 
 export const canvasButtonVariants = cva(
-	'rounded-lg px-5 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-base-500 focus-visible:ring-offset-2',
+	'focus-visible:ring-base-500 rounded-lg px-5 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
 	{
 		variants: {
 			variant: {
-				outline: 'text-base-700 ring-1 ring-base-300 hover:bg-base-200 hover:ring-base-400',
+				outline: 'text-base-700 ring-base-300 hover:bg-base-200 hover:ring-base-400 ring-1',
 				primary: 'bg-base-950 text-base-0 hover:bg-base-800'
 			}
 		},

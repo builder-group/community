@@ -1,9 +1,9 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
-	"display": "Typescript configuration for TypeScript libraries that rely on DOM globals",
+	"display": "TypeScript configuration for libraries that rely on DOM globals",
 	"extends": "./tsconfig.library.json",
 	"compilerOptions": {
 		// Language and Environment
-		"lib": ["esnext", "dom"]
+		"lib": ["es2022", "dom", "dom.iterable"]
 	}
 }

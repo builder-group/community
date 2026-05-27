@@ -1,2 +1,2 @@
 export * from './hooks';
-export * from './register-form-field';
+export * from './get-field-input-props';

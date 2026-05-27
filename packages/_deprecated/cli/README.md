@@ -40,10 +40,10 @@ Define the source file and output locations in `package.json`:
 
 ```json
 {
-	"source": "./src/index.ts",
-	"main": "./dist/cjs/index.js",
-	"module": "./dist/esm/index.js",
-	"types": "./dist/types/index.d.ts"
+  "source": "./src/index.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts"
 }
 ```
 
@@ -59,14 +59,14 @@ To bundle multiple files, use the `exports` field:
 
 ```json
 {
-	"exports": {
-		"./package1": {
-			"source": "./src/index.ts",
-			"main": "./dist/package1/cjs/index.js",
-			"module": "./dist/package1/esm/index.js",
-			"types": "./dist/package1/types/index.d.ts"
-		}
-	}
+  "exports": {
+    "./package1": {
+      "source": "./src/index.ts",
+      "main": "./dist/package1/cjs/index.js",
+      "module": "./dist/package1/esm/index.js",
+      "types": "./dist/package1/types/index.d.ts"
+    }
+  }
 }
 ```
 
@@ -125,13 +125,13 @@ In the below example we expand the preset library Rollup config with the `rollup
  * @type {import('@blgc/cli').TDynConfig}
  */
 module.exports = {
-	library: {
-		rollupConfig: {
-			isBase: false,
-			options: {
-				plugins: [preserveDirectives()]
-			}
-		}
-	}
+  library: {
+    rollupConfig: {
+      isBase: false,
+      options: {
+        plugins: [preserveDirectives()]
+      }
+    }
+  }
 };
 ```

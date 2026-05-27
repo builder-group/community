@@ -1,8 +1,10 @@
 //! # mado (窓)
 //!
-//! A simple, clean window monitoring library for Rust.
+//! macOS active app and window monitoring with browser metadata.
 //!
-//! **mado** (窓) means "window" in Japanese - simple and direct.
+//! `mado` wraps native macOS APIs through Swift. Use it to query the active
+//! app and focused window, listen to focus changes, extract browser URL metadata,
+//! and scan installed apps from Rust.
 //!
 //! ## Quick Start
 //!
@@ -44,9 +46,9 @@
 //!
 //! ## Platform Support
 //!
-//! - ✅ **macOS**: Full support
-//! - 🚧 **Linux**: Planned
-//! - 🚧 **Windows**: Planned
+//! - **macOS**: supported
+//! - **Linux**: planned
+//! - **Windows**: planned
 //!
 //! ## Requirements
 //!

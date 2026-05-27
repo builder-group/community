@@ -1,122 +1,32 @@
 import { bench, describe } from 'vitest';
-import { FlatQueue } from '../FlatQueue';
+import { FlatQueue } from '../features';
 
-function createDataSet(size: number): TDataSet {
-	return Array(size)
-		.fill(0)
-		.map((_, i) => ({ id: i, priority: Math.random() }));
-}
+const dataSets: TBenchmarkDataSet[] = [
+	{ name: 'Tiny data (5 items)', data: createDataSet(5) },
+	{ name: 'Small data (10 items)', data: createDataSet(10) },
+	{ name: 'Medium data (1,000 items)', data: createDataSet(1000) },
+	{ name: 'Large data (10,000 items)', data: createDataSet(10000) }
+];
 
-function initSortedArray(data: TDataSet): TDataItem[] {
-	return [...data];
-}
+describe('queue benchmark', () => {
+	for (const { name, data } of dataSets) {
+		describe(name, () => {
+			bench('array insertion order', () => {
+				const queue = createArrayQueue(data);
+				drainArrayQueueInInsertionOrder(queue);
+			});
 
-function initFlatQueue(data: TDataSet): FlatQueue<TDataItem> {
-	const queue = new FlatQueue<TDataItem>();
-	for (let i = 0; i < data.length; i++) {
-		queue.push(data[i] as TDataItem, data[i]?.priority as number);
+			bench('array priority sort', () => {
+				const queue = createArrayQueue(data);
+				drainArrayQueueByPriority(queue);
+			});
+
+			bench('FlatQueue priority heap', () => {
+				const queue = createFlatQueue(data);
+				drainFlatQueue(queue);
+			});
+		});
 	}
-	return queue;
-}
-
-function extractFromSortedArray(data: TDataItem[]): number {
-	const sortedData = data.sort((a, b) => a.priority - b.priority); // Not sorting at init because thats how the Feature State queue works
-	let sum = 0;
-	for (let i = 0; i < sortedData.length; i++) {
-		sum += sortedData[i]?.id as number;
-	}
-	return sum;
-}
-
-function extractFromFlatQueue(queue: FlatQueue<TDataItem>, count: number): number {
-	let sum = 0;
-	for (let i = 0; i < count; i++) {
-		sum += queue.pop()?.id as number;
-	}
-	return sum;
-}
-
-// Create datasets of different sizes
-const smallData: TDataSet = createDataSet(10);
-const mediumData: TDataSet = createDataSet(1000);
-const largeData: TDataSet = createDataSet(10000);
-
-describe('Priority Queue Benchmark', () => {
-	describe('Extraction Phase', () => {
-		describe('Small Data (10 items)', () => {
-			bench('Array Sort', () => {
-				const data = initSortedArray(smallData);
-				extractFromSortedArray(data);
-			});
-
-			bench('FlatQueue', () => {
-				const queue = initFlatQueue(smallData);
-				extractFromFlatQueue(queue, smallData.length);
-			});
-		});
-
-		describe('Medium Data (1,000 items)', () => {
-			bench('Array Sort', () => {
-				const data = initSortedArray(mediumData);
-				extractFromSortedArray(data);
-			});
-
-			bench('FlatQueue', () => {
-				const queue = initFlatQueue(mediumData);
-				extractFromFlatQueue(queue, mediumData.length);
-			});
-		});
-
-		describe('Large Data (10,000 items)', () => {
-			bench('Array Sort', () => {
-				const data = initSortedArray(largeData);
-				extractFromSortedArray(data);
-			});
-
-			bench('FlatQueue', () => {
-				const queue = initFlatQueue(largeData);
-				extractFromFlatQueue(queue, largeData.length);
-			});
-		});
-	});
-
-	describe('Total Operation', () => {
-		describe('Small Data (10 items)', () => {
-			bench('Array Sort', () => {
-				const data = initSortedArray(smallData);
-				extractFromSortedArray(data);
-			});
-
-			bench('FlatQueue', () => {
-				const queue = initFlatQueue(smallData);
-				extractFromFlatQueue(queue, smallData.length);
-			});
-		});
-
-		describe('Medium Data (1,000 items)', () => {
-			bench('Array Sort', () => {
-				const data = initSortedArray(mediumData);
-				extractFromSortedArray(data);
-			});
-
-			bench('FlatQueue', () => {
-				const queue = initFlatQueue(mediumData);
-				extractFromFlatQueue(queue, mediumData.length);
-			});
-		});
-
-		describe('Large Data (10,000 items)', () => {
-			bench('Array Sort', () => {
-				const data = initSortedArray(largeData);
-				extractFromSortedArray(data);
-			});
-
-			bench('FlatQueue', () => {
-				const queue = initFlatQueue(largeData);
-				extractFromFlatQueue(queue, largeData.length);
-			});
-		});
-	});
 });
 
 interface TDataItem {
@@ -125,3 +35,78 @@ interface TDataItem {
 }
 
 type TDataSet = TDataItem[];
+
+interface TBenchmarkDataSet {
+	name: string;
+	data: TDataSet;
+}
+
+function createDataSet(size: number): TDataSet {
+	let seed = size;
+	const data: TDataSet = [];
+
+	for (let id = 0; id < size; id++) {
+		seed = (seed * 1664525 + 1013904223) >>> 0;
+		data.push({ id, priority: seed / 0xffffffff });
+	}
+
+	return data;
+}
+
+function createArrayQueue(data: TDataSet): TDataItem[] {
+	const queue: TDataItem[] = [];
+
+	for (const item of data) {
+		queue.push(item);
+	}
+
+	return queue;
+}
+
+function drainArrayQueueInInsertionOrder(queue: TDataItem[]): number {
+	let sum = 0;
+
+	for (const item of queue) {
+		sum += item.id;
+	}
+
+	return sum;
+}
+
+function drainArrayQueueByPriority(queue: TDataItem[]): number {
+	queue.sort(comparePriority);
+
+	let sum = 0;
+	for (const item of queue) {
+		sum += item.id;
+	}
+
+	return sum;
+}
+
+function createFlatQueue(data: TDataSet): FlatQueue<TDataItem> {
+	const queue = new FlatQueue<TDataItem>();
+
+	for (const item of data) {
+		queue.push(item, item.priority);
+	}
+
+	return queue;
+}
+
+function drainFlatQueue(queue: FlatQueue<TDataItem>): number {
+	let sum = 0;
+
+	while (queue.length > 0) {
+		const item = queue.pop();
+		if (item != null) {
+			sum += item.id;
+		}
+	}
+
+	return sum;
+}
+
+function comparePriority(a: TDataItem, b: TDataItem): number {
+	return a.priority - b.priority;
+}

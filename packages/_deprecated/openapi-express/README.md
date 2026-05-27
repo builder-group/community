@@ -83,49 +83,49 @@ import { z } from 'zod';
 import { openApiRouter } from '../router';
 
 const posts = [
-	{ id: '1', title: 'First Post', content: 'This is the first post.' },
-	{ id: '2', title: 'Second Post', content: 'This is the second post.' }
+  { id: '1', title: 'First Post', content: 'This is the first post.' },
+  { id: '2', title: 'Second Post', content: 'This is the second post.' }
 ];
 
 // Get all posts
 openApiRouter.get('/posts', {}, async (req, res) => {
-	res.json(posts);
+  res.json(posts);
 });
 
 // Get a post by ID
 openApiRouter.get(
-	'/posts/{id}',
-	{
-		pathSchema: {
-			id: z.string()
-		}
-	},
-	async (req, res) => {
-		const post = posts.find((p) => p.id === req.params.id);
-		if (post) {
-			res.json(post);
-		} else {
-			res.status(404).json({ message: 'Post not found' });
-		}
-	}
+  '/posts/{id}',
+  {
+    pathSchema: {
+      id: z.string()
+    }
+  },
+  async (req, res) => {
+    const post = posts.find((p) => p.id === req.params.id);
+    if (post) {
+      res.json(post);
+    } else {
+      res.status(404).json({ message: 'Post not found' });
+    }
+  }
 );
 
 // Create a new post
 openApiRouter.post(
-	'/posts',
-	{
-		bodySchema: z.object({
-			title: z.string(),
-			content: z.string()
-		})
-	},
-	async (req, res) => {
-		const newPost = {
-			id: (posts.length + 1).toString(),
-			...req.body
-		};
-		posts.push(newPost);
-		res.status(201).json(newPost);
-	}
+  '/posts',
+  {
+    bodySchema: z.object({
+      title: z.string(),
+      content: z.string()
+    })
+  },
+  async (req, res) => {
+    const newPost = {
+      id: (posts.length + 1).toString(),
+      ...req.body
+    };
+    posts.push(newPost);
+    res.status(201).json(newPost);
+  }
 );
 ```

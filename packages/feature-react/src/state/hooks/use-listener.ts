@@ -1,36 +1,39 @@
-import { TFeatureDefinition } from '@blgc/types/features';
-import type { TListenerContext, TListenerOptions, TState } from 'feature-state';
+import { type TAnyFeature } from 'feature-core';
+import type { TListenerContext, TState } from 'feature-state';
 import React from 'react';
+import { useEventCallback } from './use-event-callback';
 
-export function useListener<GValue, GFeatures extends TFeatureDefinition[]>(
+/**
+ * Registers a listener for state changes as a side effect and removes it when the component unmounts.
+ *
+ * The callback fires on every future change, matching `state.listen()`. It can return a cleanup
+ * function that runs before the next invocation and on unmount. Pass `null` or `undefined`
+ * for `state` to register no listener.
+ */
+export function useListener<GValue, GFeatures extends TAnyFeature[]>(
 	state: TState<GValue, GFeatures> | null | undefined,
-	callback: TUseListenerCallback<GValue>,
-	deps: React.DependencyList = [],
-	options: TUseListenerOptions<GValue> = {}
+	callback: TUseListenerCallback<GValue>
 ): void {
-	const { ...listenerOptions } = options;
+	const stableCallback = useEventCallback(callback);
 
 	React.useEffect(() => {
 		let cleanup: (() => void) | undefined;
 
-		const unbind = state?.listen(
-			async (cx) => {
-				cleanup?.();
-				const result = await callback(cx);
-				cleanup = typeof result === 'function' ? result : undefined;
-			},
-			{ key: 'use-listener', ...listenerOptions }
-		);
+		const unbind = state?.listen((context) => {
+			cleanup?.();
+			const result = stableCallback(context);
+			cleanup = typeof result === 'function' ? result : undefined;
+		});
 
 		return () => {
 			cleanup?.();
 			unbind?.();
 		};
-	}, [state, ...deps]);
+	}, [state, stableCallback]);
 }
 
-export interface TUseListenerOptions<GValue> extends TListenerOptions<GValue> {}
-
+/** Receives each future listener context and may return cleanup for the next call or unmount. */
 export type TUseListenerCallback<GValue> = (
 	context: TListenerContext<GValue>
-) => (() => void) | Promise<() => void> | void | Promise<void>;
+	// eslint-disable-next-line @typescript-eslint/no-invalid-void-type -- callbacks may return nothing, async work, or a cleanup
+) => (() => void) | Promise<void> | void;

@@ -1,2 +1,2 @@
-export * from './with-global-bind';
-export * from './with-local-storage';
+export * from './global-bind';
+export * from './local-storage';

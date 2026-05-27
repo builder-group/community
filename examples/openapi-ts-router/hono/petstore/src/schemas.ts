@@ -1,20 +1,20 @@
-import * as z from 'zod';
+import * as v from 'valibot';
 
-export const CategorySchema = z.object({
-	id: z.number().int().optional(),
-	name: z.string().optional()
+export const CategorySchema = v.object({
+	id: v.optional(v.number()),
+	name: v.optional(v.string())
 });
 
-export const TagSchema = z.object({
-	id: z.number().int().optional(),
-	name: z.string().optional()
+export const TagSchema = v.object({
+	id: v.optional(v.number()),
+	name: v.optional(v.string())
 });
 
-export const PetSchema = z.object({
-	id: z.number().int().optional(),
-	name: z.string(),
-	category: CategorySchema.optional(),
-	photoUrls: z.array(z.string()),
-	tags: z.array(TagSchema).optional(),
-	status: z.enum(['available', 'pending', 'sold']).optional()
+export const PetSchema = v.object({
+	id: v.optional(v.number()),
+	name: v.string(),
+	category: v.optional(CategorySchema),
+	photoUrls: v.array(v.string()),
+	tags: v.optional(v.array(TagSchema)),
+	status: v.optional(v.picklist(['available', 'pending', 'sold']))
 });

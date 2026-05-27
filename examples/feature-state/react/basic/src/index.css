@@ -1,0 +1,20 @@
+body {
+	margin: 0;
+	line-height: 1.5;
+	font-family: system-ui, sans-serif;
+}
+
+button,
+input,
+select {
+	font: inherit;
+}
+
+h1 {
+	margin: 0;
+}
+
+h2,
+p {
+	margin: 0;
+}

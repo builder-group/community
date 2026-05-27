@@ -1,26 +1,20 @@
 const pluginNext = require('@next/eslint-plugin-next');
-const pluginReact = require('eslint-plugin-react');
-const pluginReactHooks = require('eslint-plugin-react-hooks');
-const globals = require('globals');
+const { defineConfig, globalIgnores } = require('eslint/config');
 
 /**
  * ESLint configuration for applications that use Next.js.
  *
  * @see https://eslint.org/docs/latest/use/configure/configuration-files
- * @type {import("eslint").Linter.Config}
+ * @type {import("eslint").Linter.Config[]}
  */
-module.exports = [
-	...require('./base.js'),
+module.exports = defineConfig([
+	...require('./react.js'),
+	globalIgnores(
+		['**/.next/', '**/out/', '**/build/', 'next-env.d.ts'],
+		'@blgc/config/next/ignores'
+	),
 	{
-		...pluginReact.configs.flat.recommended,
-		languageOptions: {
-			...pluginReact.configs.flat.recommended.languageOptions,
-			globals: {
-				...globals.serviceworker
-			}
-		}
-	},
-	{
+		name: '@blgc/config/next/core-web-vitals',
 		plugins: {
 			'@next/next': pluginNext
 		},
@@ -28,15 +22,5 @@ module.exports = [
 			...pluginNext.configs.recommended.rules,
 			...pluginNext.configs['core-web-vitals'].rules
 		}
-	},
-	{
-		plugins: {
-			'react-hooks': pluginReactHooks
-		},
-		settings: { react: { version: 'detect' } },
-		rules: {
-			...pluginReactHooks.configs.recommended.rules,
-			'react/react-in-jsx-scope': 'off'
-		}
 	}
-];
+]);

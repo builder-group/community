@@ -1,62 +1,41 @@
-import {
-	createListenerQueue,
-	getListenerQueue,
-	TCreateListenerQueueOptions
-} from './listener-queue';
-import type { TListener, TListenerContext, TState } from './types';
+import { createFeatureHost } from 'feature-core';
+import type { TListener, TListenerCallback, TListenerContext, TState, TStateBase } from './types';
 
-export const SET_SOURCE_KEY = 'state_set';
-
-export function createState<GValue>(
-	initialValue: GValue,
-	options: TCreateStateOptions = {}
-): TState<GValue, []> {
-	const {
-		queue:
-			// Default to sync queue to avoid side-effects
-			// https://evilmartians.com/chronicles/how-to-avoid-tricky-async-state-manager-pitfalls-react
-			queueConfigOrKey = 'sync'
-	} = options;
-
-	let queue = getListenerQueue(
-		typeof queueConfigOrKey === 'string' ? queueConfigOrKey : queueConfigOrKey.key
-	);
-	if (queue == null) {
-		const { key, ...queueOptions } =
-			typeof queueConfigOrKey === 'string'
-				? { key: queueConfigOrKey, async: queueConfigOrKey === 'async' }
-				: queueConfigOrKey;
-		queue = createListenerQueue(key, queueOptions);
-	}
-
-	return {
-		_features: [],
+/**
+ * Creates a reactive state container.
+ *
+ * The state exposes `value`, `get()`, `set()`, `notify()`, `listen()`, and `subscribe()`.
+ * `set()` skips notification when the new value equals the current one (`Object.is`).
+ * Extend the state with features by calling `.with(feature())`.
+ */
+export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
+	return createFeatureHost<TStateBase<GValue>>({
 		_listeners: [],
 		_v: initialValue,
-		_queue: queue,
-		_notify(notifyOptions = {}) {
-			const { processListenerQueue = true, listenerContext = {}, prevValue } = notifyOptions;
+		get value() {
+			return this._v;
+		},
+		set value(newValue) {
+			this.set(newValue);
+		},
+		notify(notifyOptions = {}) {
+			const { listenerContext = {}, prevValue } = notifyOptions;
+			// Note: Only the outermost notify drains the queue. Nested notify calls append work to the active flush.
+			const shouldProcessListenerQueue = !listenerQueue.length;
 
-			// Push all listeners to the state's queue
 			for (const listener of this._listeners) {
-				const context: TListenerContext<GValue> = Object.assign(listenerContext, {
-					value: this._v,
-					prevValue
+				listenerQueue.push({
+					callback: listener.callback,
+					context: {
+						...listenerContext,
+						value: this._v,
+						prevValue
+					}
 				});
-				if (listener.queueIf == null || listener.queueIf(context)) {
-					this._queue.push(
-						{
-							context,
-							callback: listener.callback
-						},
-						listener.priority
-					);
-				}
 			}
 
-			// Process the state's queue
-			if (processListenerQueue) {
-				void this._queue.process();
+			if (shouldProcessListenerQueue) {
+				processListenerQueue();
 			}
 		},
 		get() {
@@ -68,51 +47,76 @@ export function createState<GValue>(
 					? (newValueOrUpdater as (value: GValue) => GValue)(this._v)
 					: newValueOrUpdater;
 			const prevValue = this._v;
-			if (prevValue !== newValue) {
-				const { listenerContext = {}, processListenerQueue = true } = setOptions;
-				listenerContext.source = listenerContext.source ?? SET_SOURCE_KEY;
-				this._v = newValue;
-				this._notify({
-					listenerContext,
-					processListenerQueue,
-					prevValue
-				});
+			if (Object.is(prevValue, newValue)) {
+				return;
 			}
+
+			const { listenerContext = {} } = setOptions;
+			this._v = newValue;
+			this.notify({
+				listenerContext: {
+					...listenerContext,
+					source: listenerContext.source ?? setSourceKey
+				},
+				prevValue
+			});
 		},
-		listen(callback, listenOptions = {}) {
-			const { priority = EStateListenerQueuePriority.DEFAULT, key, queueIf } = listenOptions;
+		listen(callback) {
 			const listener: TListener<GValue> = {
-				key,
-				priority,
-				callback,
-				queueIf
+				callback
 			};
 			this._listeners.push(listener);
 
-			// Unbind
 			return () => {
+				removeQueuedListenerCalls(callback);
 				const index = this._listeners.indexOf(listener);
 				if (index !== -1) {
 					this._listeners.splice(index, 1);
 				}
 			};
 		},
-		subscribe(callback, subscribeOptions) {
-			const unbind = this.listen(callback, subscribeOptions);
+		subscribe(callback) {
+			const unbind = this.listen(callback);
+			// Note: prevValue mirrors value on the initial call so listeners never receive undefined for prevValue
 			void callback({ value: this._v, prevValue: this._v });
 			return unbind;
 		}
-	};
+	});
 }
 
-export interface TCreateStateOptions {
-	queue?: ({ key: string } & TCreateListenerQueueOptions) | string;
+/** Source key set on the listener context when a value is changed via `set()`. */
+export const setSourceKey = 'stateSet';
+
+// MARK: - Queue
+
+const listenerQueue: TListenerQueueItem[] = [];
+let listenerQueueIndex = 0;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- the shared queue stores listener calls from states with different value types
+interface TListenerQueueItem<GValue = any> {
+	callback: TListenerCallback<GValue>;
+	context: TListenerContext<GValue>;
 }
 
-export enum EStateListenerQueuePriority {
-	FIRST = 0,
-	EARLY = 125,
-	DEFAULT = 250,
-	LATE = 375,
-	LAST = 500
+function processListenerQueue(): void {
+	try {
+		for (listenerQueueIndex = 0; listenerQueueIndex < listenerQueue.length; listenerQueueIndex++) {
+			const item = listenerQueue[listenerQueueIndex];
+			if (item != null) {
+				void item.callback(item.context);
+			}
+		}
+	} finally {
+		listenerQueue.length = 0;
+		listenerQueueIndex = 0;
+	}
+}
+
+function removeQueuedListenerCalls<GValue>(callback: TListener<GValue>['callback']): void {
+	for (let i = listenerQueueIndex + 1; i < listenerQueue.length; i++) {
+		if (listenerQueue[i]?.callback === callback) {
+			listenerQueue.splice(i, 1);
+			i--;
+		}
+	}
 }

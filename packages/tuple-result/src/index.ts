@@ -1,417 +1,263 @@
 /**
- * Represents a successful result as an array with literal types.
- * Structure: [true, undefined, T] where T is the success value.
- * Extends Array to provide both array destructuring and common Result methods.
+ * A successful result. Structure: `[true, undefined, value]`.
+ * Supports array destructuring as `[isOk, error, value]` and method-based access.
  */
-export class OkResult<T, E> extends Array<true | undefined | T> {
+export class OkResult<GValue, GError> extends Array<true | undefined | GValue> {
 	declare 0: true;
 	declare 1: undefined;
-	declare 2: T;
+	declare 2: GValue;
 	declare length: 3;
 
-	constructor(value: T) {
+	constructor(value: GValue) {
 		super(3);
 		this[0] = true;
 		this[1] = undefined;
 		this[2] = value;
 	}
 
-	/**
-	 * Gets the success value from this result.
-	 * @returns The success value of type T
-	 */
-	public get value(): T {
+	/** The success value. */
+	public get value(): GValue {
 		return this[2];
 	}
 
-	/**
-	 * Gets the error value (always undefined for Ok results).
-	 * @returns Always undefined for Ok results
-	 */
-	public get error(): E | undefined {
+	/** Always `undefined` for Ok results. */
+	public get error(): GError | undefined {
 		return this[1];
 	}
 
-	/**
-	 * Type guard to check if this result is successful.
-	 * @returns Always true for OkResult instances
-	 */
-	public isOk(): this is OkResult<T, E> {
+	public isOk(): this is OkResult<GValue, GError> {
 		return true;
 	}
 
-	/**
-	 * Type guard to check if this result is an error.
-	 * @returns Always false for OkResult instances
-	 */
-	public isErr(): this is ErrResult<T, E> {
+	public isErr(): this is ErrResult<GValue, GError> {
 		return false;
 	}
 
-	/**
-	 * Extracts the success value from this result.
-	 * @returns The success value of type T
-	 */
-	public unwrap(): T {
+	/** Returns the success value. */
+	public unwrap(): GValue {
 		return this[2];
 	}
 
-	/**
-	 * Converts the result to a plain array for serialization.
-	 * @returns A plain array [true, undefined, T]
-	 */
-	public toArray(): [true, undefined, T] {
+	/** Converts to a plain serializable array `[true, undefined, value]`. */
+	public toArray(): TOkResultArray<GValue> {
 		return [true, undefined, this[2]];
 	}
 }
 
 /**
- * Represents an error result as an array with literal types.
- * Structure: [false, E, undefined] where E is the error value.
- * Extends Array to provide both array destructuring and common Result methods.
+ * An error result. Structure: `[false, error, undefined]`.
+ * Supports array destructuring as `[isOk, error, value]` and method-based access.
  */
-export class ErrResult<T, E> extends Array<false | E | undefined> {
+export class ErrResult<GValue, GError> extends Array<false | GError | undefined> {
 	declare 0: false;
-	declare 1: E;
+	declare 1: GError;
 	declare 2: undefined;
 	declare length: 3;
 
-	constructor(error: E) {
+	constructor(error: GError) {
 		super(3);
 		this[0] = false;
 		this[1] = error;
 		this[2] = undefined;
 	}
 
-	/**
-	 * Gets the success value (always undefined for Err results).
-	 * @returns Always undefined for Err results
-	 */
-	public get value(): T | undefined {
+	/** Always `undefined` for Err results. */
+	public get value(): GValue | undefined {
 		return this[2];
 	}
 
-	/**
-	 * Gets the error value from this result.
-	 * @returns The error value of type E
-	 */
-	public get error(): E {
+	/** The error value. */
+	public get error(): GError {
 		return this[1];
 	}
 
-	/**
-	 * Type guard to check if this result is successful.
-	 * @returns Always false for ErrResult instances
-	 */
-	public isOk(): this is OkResult<T, E> {
+	public isOk(): this is OkResult<GValue, GError> {
 		return false;
 	}
 
-	/**
-	 * Type guard to check if this result is an error.
-	 * @returns Always true for ErrResult instances
-	 */
-	public isErr(): this is ErrResult<T, E> {
+	public isErr(): this is ErrResult<GValue, GError> {
 		return true;
 	}
 
-	/**
-	 * Attempts to extract the success value, but always throws since this is an error result.
-	 * @throws The error contained in this result
-	 */
+	/** Throws the stored error value exactly. */
 	public unwrap(): never {
-		const error = this[1];
-		if (error instanceof Error) {
-			throw error;
-		} else if (typeof error === 'string') {
-			throw new Error(error);
-		} else {
-			throw new Error('Unknown error');
-		}
+		// Note: Preserve the typed Err payload instead of coercing it into an Error
+		throw this[1];
 	}
 
-	/**
-	 * Converts the result to a plain array for serialization.
-	 * @returns A plain array [false, E, undefined]
-	 */
-	public toArray(): [false, E, undefined] {
+	/** Converts to a plain serializable array `[false, error, undefined]`. */
+	public toArray(): TErrResultArray<GError> {
 		return [false, this[1], undefined];
 	}
 }
 
-/**
- * Union type representing either a successful or error result.
- * Can be destructured as [boolean, E | undefined, T | undefined].
- */
-export type TResult<T, E> = OkResult<T, E> | ErrResult<T, E>;
+/** A method-based result instance. Supports array destructuring as `[isOk, error, value]`. */
+export type TResult<GValue, GError> = OkResult<GValue, GError> | ErrResult<GValue, GError>;
 
-/**
- * Represents a result as a plain array.
- * Can be destructured as [boolean, E | undefined, T | undefined].
- */
-export type TResultArray<T, E> = [true, undefined, T] | [false, E, undefined];
+/** Plain array form for successful results. The inactive error slot may be `null` after JSON parsing. */
+export type TOkResultArray<GValue> = readonly [true, undefined | null, GValue];
 
-/**
- * Creates a successful result containing the given value.
- * @param value - The success value to wrap
- * @returns An OkResult instance
- */
-export function Ok<T, E>(value: T): OkResult<T, E> {
+/** Plain array form for error results. The inactive value slot may be `null` after JSON parsing. */
+export type TErrResultArray<GError> = readonly [false, GError, undefined | null];
+
+/** Plain result array: `[true, undefined | null, value]` or `[false, error, undefined | null]`. */
+export type TResultArray<GValue, GError> = TOkResultArray<GValue> | TErrResultArray<GError>;
+
+/** Any result shape accepted by helpers: method-based result instance or plain result array. */
+export type TResultLike<GValue, GError> = TResult<GValue, GError> | TResultArray<GValue, GError>;
+
+/** Creates a successful result. */
+export function Ok<GValue, GError = never>(value: GValue): OkResult<GValue, GError> {
 	return new OkResult(value);
 }
 
 export const ok = Ok;
 
-/**
- * Creates an error result containing the given error.
- * @param error - The error value to wrap
- * @returns An ErrResult instance
- */
-export function Err<T, E>(error: E): ErrResult<T, E> {
+/** Creates an error result. */
+export function Err<GValue = never, GError = unknown>(error: GError): ErrResult<GValue, GError> {
 	return new ErrResult(error);
 }
 
 export const err = Err;
 
-/**
- * Type guard to check if a result is successful.
- * @param result - The result to check
- * @returns True if the result is Ok, false otherwise
- */
-export function isOk<T, E>(result: TResult<T, E>): result is OkResult<T, E>;
-export function isOk<T, E>(result: TResultArray<T, E>): result is [true, undefined, T];
-export function isOk<T, E>(
-	result: TResult<T, E> | TResultArray<T, E>
-): result is OkResult<T, E> | [true, undefined, T] {
+/** Returns `true` and narrows to the successful result shape. */
+export function isOk<GValue, GError>(
+	result: TResultLike<GValue, GError>
+): result is OkResult<GValue, GError> | TOkResultArray<GValue> {
 	return result[0];
 }
 
-/**
- * Type guard to check if a result is an error.
- * @param result - The result to check
- * @returns True if the result is Err, false otherwise
- */
-export function isErr<T, E>(result: TResult<T, E>): result is ErrResult<T, E>;
-export function isErr<T, E>(result: TResultArray<T, E>): result is [false, E, undefined];
-export function isErr<T, E>(
-	result: TResult<T, E> | TResultArray<T, E>
-): result is ErrResult<T, E> | [false, E, undefined] {
+/** Returns `true` and narrows to the error result shape. */
+export function isErr<GValue, GError>(
+	result: TResultLike<GValue, GError>
+): result is ErrResult<GValue, GError> | TErrResultArray<GError> {
 	return !result[0];
 }
 
-/**
- * Extracts the value from a result, throwing if it's an error.
- * @param result - The result to unwrap
- * @returns The success value
- * @throws The error if the result is Err
- */
-export function unwrap<T, E>(result: TResult<T, E>): T;
-export function unwrap<T, E>(result: TResultArray<T, E>): T;
-export function unwrap<T, E>(result: TResult<T, E> | TResultArray<T, E>): T {
+/** Extracts the success value. Throws the stored error value exactly if the result is Err. */
+export function unwrap<GValue, GError>(result: TResultLike<GValue, GError>): GValue {
 	if (result[0]) {
 		return result[2];
 	}
 
-	const error = result[1];
-	if (error instanceof Error) {
-		throw error;
-	} else if (typeof error === 'string') {
-		throw new Error(error);
-	} else {
-		throw new Error('Unknown error');
-	}
+	// Note: Preserve the typed Err payload instead of coercing it into an Error
+	throw result[1];
 }
 
-/**
- * Extracts the value from an Ok result, throwing if it's an error.
- * @param result - The result to unwrap
- * @returns The success value
- * @throws Error if the result is not Ok
- */
-export function unwrapOk<T, E>(result: TResult<T, E>): T;
-export function unwrapOk<T, E>(result: TResultArray<T, E>): T;
-export function unwrapOk<T, E>(result: TResult<T, E> | TResultArray<T, E>): T {
+/** Extracts the success value. Throws a generic `Error` if the result is not Ok. */
+export function unwrapOk<GValue, GError>(result: TResultLike<GValue, GError>): GValue {
 	if (result[0]) {
 		return result[2];
 	}
+
 	throw new Error('Expected an Ok result');
 }
 
-/**
- * Extracts the error from an Err result, throwing if it's successful.
- * @param result - The result to unwrap
- * @returns The error value
- * @throws Error if the result is not Err
- */
-export function unwrapErr<T, E>(result: TResult<T, E>): E;
-export function unwrapErr<T, E>(result: TResultArray<T, E>): E;
-export function unwrapErr<T, E>(result: TResult<T, E> | TResultArray<T, E>): E {
+/** Extracts the error value. Throws a generic `Error` if the result is not Err. */
+export function unwrapErr<GValue, GError>(result: TResultLike<GValue, GError>): GError {
 	if (!result[0]) {
 		return result[1];
 	}
+
 	throw new Error('Expected an Err result');
 }
 
-/**
- * Extracts the value from a result, returning a default if it's an error.
- * @param result - The result to unwrap
- * @param defaultValue - The value to return if the result is Err
- * @returns The success value or the default value
- */
-export function unwrapOr<T, E>(result: TResult<T, E>, defaultValue: T): T;
-export function unwrapOr<T, E>(result: TResultArray<T, E>, defaultValue: T): T;
-export function unwrapOr<T, E>(result: TResult<T, E> | TResultArray<T, E>, defaultValue: T): T {
+/** Extracts the success value, returning `defaultValue` if the result is an error. */
+export function unwrapOr<GValue, GError>(
+	result: TResultLike<GValue, GError>,
+	defaultValue: GValue
+): GValue {
 	return result[0] ? result[2] : defaultValue;
 }
 
-/**
- * Extracts the value from a result, returning null if it's an error.
- * @param result - The result to unwrap
- * @returns The success value or null
- */
-export function unwrapOrNull<T, E>(result: TResultArray<T, E>): T | null;
-export function unwrapOrNull<T, E>(result: TResult<T, E>): T | null;
-export function unwrapOrNull<T, E>(result: TResult<T, E> | TResultArray<T, E>): T | null {
+/** Extracts the success value, returning `null` if the result is an error. */
+export function unwrapOrNull<GValue, GError>(result: TResultLike<GValue, GError>): GValue | null {
 	return result[0] ? result[2] : null;
 }
 
-/**
- * Extracts the value from a result, returning undefined if it's an error.
- * @param result - The result to unwrap
- * @returns The success value or undefined
- */
-export function unwrapOrUndefined<T, E>(result: TResultArray<T, E>): T | undefined;
-export function unwrapOrUndefined<T, E>(result: TResult<T, E>): T | undefined;
-export function unwrapOrUndefined<T, E>(result: TResult<T, E> | TResultArray<T, E>): T | undefined {
+/** Extracts the success value, returning `undefined` if the result is an error. */
+export function unwrapOrUndefined<GValue, GError>(
+	result: TResultLike<GValue, GError>
+): GValue | undefined {
 	return result[0] ? result[2] : undefined;
 }
 
-/**
- * Maps the value inside an Ok result using the provided function.
- * Returns a new result with the mapped value or the original error.
- * @param result - The result to map
- * @param mapFn - Function to transform the success value
- * @returns A new result with the mapped value or the original error
- */
-export function mapOk<T, E, U>(result: TResult<T, E>, mapFn: (value: T) => U): TResult<U, E>;
-export function mapOk<T, E, U>(result: TResultArray<T, E>, mapFn: (value: T) => U): TResult<U, E>;
-export function mapOk<T, E, U>(
-	result: TResult<T, E> | TResultArray<T, E>,
-	mapFn: (value: T) => U
-): TResult<U, E> {
+/** Transforms the success value with `mapFn`. Passes errors through unchanged. */
+export function mapOk<GValue, GError, GNextValue>(
+	result: TResultLike<GValue, GError>,
+	mapFn: (value: GValue) => GNextValue
+): TResult<GNextValue, GError> {
 	if (result[0]) {
-		return Ok(mapFn(result[2]));
+		return Ok<GNextValue, GError>(mapFn(result[2]));
 	}
-	return Err(result[1]);
+
+	return Err<GNextValue, GError>(result[1]);
 }
 
-/**
- * Maps the error inside an Err result using the provided function.
- * Returns a new result with the mapped error or the original success value.
- * @param result - The result to map
- * @param mapFn - Function to transform the error value
- * @returns A new result with the mapped error or the original success value
- */
-export function mapErr<T, E, F>(result: TResult<T, E>, mapFn: (error: E) => F): TResult<T, F>;
-export function mapErr<T, E, F>(result: TResultArray<T, E>, mapFn: (error: E) => F): TResult<T, F>;
-export function mapErr<T, E, F>(
-	result: TResult<T, E> | TResultArray<T, E>,
-	mapFn: (error: E) => F
-): TResult<T, F> {
+/** Transforms the error value with `mapFn`. Passes successes through unchanged. */
+export function mapErr<GValue, GError, GNextError>(
+	result: TResultLike<GValue, GError>,
+	mapFn: (error: GError) => GNextError
+): TResult<GValue, GNextError> {
 	if (!result[0]) {
-		return Err(mapFn(result[1]));
+		return Err<GValue, GNextError>(mapFn(result[1]));
 	}
-	return Ok(result[2]);
+
+	return Ok<GValue, GNextError>(result[2]);
 }
 
-/**
- * Converts a result to a plain array for serialization.
- * @param result - The result to convert
- * @returns A plain array representation
- */
-export function toArray<T, E>(result: TResult<T, E>): TResultArray<T, E>;
-export function toArray<T, E>(result: TResultArray<T, E>): TResultArray<T, E>;
-export function toArray<T, E>(result: TResult<T, E> | TResultArray<T, E>): TResultArray<T, E> {
+/** Converts a result to a plain array with `undefined` in the inactive slot. */
+export function toArray<GValue, GError>(
+	result: TResultLike<GValue, GError>
+): TResultArray<GValue, GError> {
 	return result[0] ? [true, undefined, result[2]] : [false, result[1], undefined];
 }
 
-/**
- * Creates a result from a plain array.
- * @param array - The array to convert
- * @returns A result instance with methods
- */
-export function fromArray<T, E>(array: TResultArray<T, E>): TResult<T, E>;
-export function fromArray<T, E>(array: TResult<T, E>): TResult<T, E>;
-export function fromArray<T, E>(array: TResult<T, E> | TResultArray<T, E>): TResult<T, E> {
-	if (array[0]) {
-		return new OkResult(array[2] as T);
-	} else {
-		return new ErrResult(array[1] as E);
+/** Reconstructs an `OkResult` or `ErrResult` instance from a result array. */
+export function fromArray<GValue, GError>(
+	result: TResultArray<GValue, GError>
+): TResult<GValue, GError> {
+	if (result[0]) {
+		return Ok<GValue, GError>(result[2]);
 	}
+
+	return Err<GValue, GError>(result[1]);
 }
 
-/**
- * Wraps a synchronous function call in a result.
- * @param fn - The function to wrap
- * @param args - Arguments to pass to the function
- * @returns A result containing the function's return value or error
- */
-export function t<T, Args extends any[]>(
-	fn: (...args: Args) => T,
-	...args: Args
-): TResult<T, unknown> {
+/** Wraps a synchronous function call in a result. Returns `Err` if the function throws. */
+export function t<GValue, GArgs extends unknown[]>(
+	fn: (...args: GArgs) => GValue,
+	...args: GArgs
+): TResult<GValue, unknown> {
 	try {
-		const result = fn(...args);
-		return Ok(result as T);
+		return Ok<GValue, unknown>(fn(...args));
 	} catch (error) {
-		return Err(error);
+		return Err<GValue, unknown>(error);
 	}
 }
 
-/**
- * Wraps a Promise in a Result.
- * @param promise - The promise to wrap
- * @returns A Promise that resolves to a result
- */
-export async function tAsync<T>(promise: Promise<T>): Promise<TResult<T, unknown>> {
+/** Wraps a promise in a result. Returns `Err` if the promise rejects. */
+export async function tAsync<GValue>(
+	promise: PromiseLike<GValue>
+): Promise<TResult<GValue, unknown>> {
 	try {
-		const result = await promise;
-		return Ok(result);
+		return Ok<GValue, unknown>(await promise);
 	} catch (error) {
-		return Err<T, unknown>(error);
+		return Err<GValue, unknown>(error);
 	}
 }
 
-/**
- * Pattern matches on a result, calling the appropriate handler.
- * Similar to Rust's match! macro but following KISS principles.
- * @param result - The result to match on
- * @param handlers - Object with ok and err handlers
- * @returns The result of calling the appropriate handler
- */
-export function match<T, E, R>(
-	result: TResult<T, E>,
+/** Calls the matching handler and returns its return value. */
+export function match<GValue, GError, GReturn>(
+	result: TResultLike<GValue, GError>,
 	handlers: {
-		ok: (value: T) => R;
-		err: (error: E) => R;
+		ok: (value: GValue) => GReturn;
+		err: (error: GError) => GReturn;
 	}
-): R;
-export function match<T, E, R>(
-	result: TResultArray<T, E>,
-	handlers: {
-		ok: (value: T) => R;
-		err: (error: E) => R;
-	}
-): R;
-export function match<T, E, R>(
-	result: TResult<T, E> | TResultArray<T, E>,
-	handlers: {
-		ok: (value: T) => R;
-		err: (error: E) => R;
-	}
-): R {
+): GReturn {
 	if (result[0]) {
 		return handlers.ok(result[2]);
 	}
+
 	return handlers.err(result[1]);
 }

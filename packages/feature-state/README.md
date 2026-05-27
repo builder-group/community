@@ -10,223 +10,375 @@
         <img src="https://img.shields.io/bundlephobia/minzip/feature-state.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
     </a>
     <a href="https://www.npmjs.com/package/feature-state">
-        <img src="https://img.shields.io/npm/dt/featuer-state.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>
+        <img src="https://img.shields.io/npm/dt/feature-state.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>
     </a>
     <a href="https://discord.gg/w4xE3bSjhQ">
         <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=FDE200" alt="Join Discord"/>
     </a>
 </p>
 
-`feature-state` is a straightforward, typesafe, and feature-based state management library for ReactJs.
+`feature-state` is reactive state that grows by installing features. Start with one observable value, derive read-only values with `createComputed()`, then add undo, storage, custom equality, queues, or custom capabilities with `.with()` only where you need them.
 
-- **Lightweight & Tree Shakable**: Function-based and modular design (< 1KB minified)
-- **Fast**: Minimal code ensures high performance, and state changes can be deferred in "the bucket"
-- **Modular & Extendable**: Easily extendable with features like `withStorage()`, `withUndo()`, ..
-- **Typesafe**: Build with TypeScript for strong type safety
-- **Standalone**: Zero dependencies, ensuring ease of use in various environments
-
-### 📚 Examples
-
-- [ReactJs Counter](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/counter) ([Code Sandbox](https://codesandbox.io/p/sandbox/counter-k74k9k))
-
-### 🌟 Motivation
-
-Create a typesafe, straightforward, and lightweight state management library designed to be modular and extendable with features like `withStorage()`, `withUndo()`, .. Having previously built [AgileTs](https://agile-ts.org/), I realized the importance of simplicity and modularity. AgileTs, while powerful, became bloated and complex. Learning from that experience, I followed the KISS (Keep It Simple, Stupid) principle for `feature-state`, aiming to provide a more streamlined and efficient solution. Because no code is the best code.
-
-### ⚖️ Alternatives
-
-- [nanostores](https://github.com/nanostores/nanostores)
-- [jotai](https://github.com/pmndrs/jotai)
-- [AgileTs](https://github.com/agile-ts/agile)
-
-## 📖 Usage
-
-`store/tasks.ts`
+- Install capabilities per state: undo, storage, queues, and equality stay opt-in
+- Share the same framework-free state object across vanilla JS, Node.js, tests, and UI frameworks
+- Let TypeScript track installed capabilities: `undo()` exists only after `undoFeature()`
+- Build custom feature packs on the same typed host model as the built-ins
 
 ```ts
-import { createState } from 'feature-state';
+import { createComputed, createState, undoFeature } from 'feature-state';
 
-export const $tasks = createState<Task[]>([]);
+type TTask = { id: number; title: string; done: boolean };
 
-export function addTask(task: Task) {
-	$tasks.set([...$tasks.get(), task]);
-}
-```
+const $tasks = createState<TTask[]>([]).with(undoFeature());
+const $openTasks = createComputed($tasks, (tasks) => tasks.filter((task) => !task.done));
 
-`components/Tasks.tsx`
-
-```tsx
-import { useFeatureState } from 'feature-state-react';
-import { $tasks } from '../store/tasks';
-
-export const Tasks = () => {
-	const tasks = useFeatureState($tasks);
-
-	return (
-		<ul>
-			{tasks.map((task) => (
-				<li>{task.title}</li>
-			))}
-		</ul>
-	);
-};
-```
-
-### Atom-based
-
-States in `feature-state` are atom-based, meaning each state should only represent a single piece of data. They can store various types of data such as strings, numbers, arrays, or even objects.
-
-To create an state, use `createState(initialValue)` and pass the initial value as the first argument.
-
-```ts
-import { createState } from 'feature-state';
-
-export const $temperature = createState(20); // °C
-```
-
-In TypeScript, you can optionally specify the value type using a type parameter.
-
-```ts
-export type TWeatherCondition = 'sunny' | 'cloudy' | 'rainy';
-
-export const $weatherCondition = createState<TWeatherCondition>('sunny');
-```
-
-To get the current value of the state, use `$state.get()`. To change the value, use `$state.set(nextValue)`.
-
-```ts
-$temperature.set($temperature.get() + 5);
-```
-
-### Subscribing to State Changes
-
-You can subscribe to state changes using `$state.subscribe(callback)`, which works in vanilla JS. For React, special hooks like [`useFeatureState($state)`](https://github.com/builder-group/community/tree/develop/packages/feature-state-react) are available to re-render components on state changes.
-
-Listener callbacks will receive the new value as the first argument.
-
-```ts
-const unsubscribe = $temperature.subscribe((newValue) => {
-	console.log(`Temperature changed to ${newValue}°C`);
+const unlisten = $openTasks.listen(({ value }) => {
+  console.log(value);
 });
+
+$tasks.set([{ id: 1, title: 'Buy milk', done: false }]);
+
+$openTasks.get(); // [{ id: 1, title: 'Buy milk', done: false }]
+$tasks.undo(); // back to []
+unlisten();
 ```
 
-Unlike `$state.listen(callback)`, `$state.subscribe(callback)` immediately invokes the listener during the subscription.
+Migrating from `0.0.x`? See [MIGRATION.md](./MIGRATION.md).
 
-## 📙 Features
+## Install
 
-### `withStorage()`
+```bash
+npm install feature-state
+```
 
-Adds persistence functionality to the state, allowing the state to be saved to and loaded from a storage medium.
+## Usage
+
+A state holds a single value and notifies listeners when it changes:
 
 ```ts
-import { createState, withStorage } from 'feature-state';
+import { createState } from 'feature-state';
+
+const $count = createState(0);
+
+$count.listen(({ value, prevValue }) => {
+  console.log(value, prevValue);
+});
+
+$count.set(5);
+$count.set((v) => v + 1); // updater form, value is now 6
+```
+
+Extend a state with features using `.with()`. Each installed feature adds typed methods:
+
+```ts
+import { createState, multiUndoFeature, undoFeature } from 'feature-state';
+
+const $count = createState(0).with(undoFeature(), multiUndoFeature());
+
+$count.set(1);
+$count.set(2);
+$count.set(3);
+$count.undo(); // 2
+$count.multiUndo(2); // 0
+```
+
+Derive a read-only value from one or more states with `createComputed`. It recomputes whenever a source state changes:
+
+```ts
+import { createComputed, createState } from 'feature-state';
+
+type TTask = { id: number; title: string; done: boolean };
+
+const $tasks = createState<TTask[]>([]);
+const $done = createComputed($tasks, (tasks) => tasks.filter((t) => t.done));
+
+$tasks.set([{ id: 1, title: 'Buy milk', done: true }]);
+$done.get(); // [{ id: 1, title: 'Buy milk', done: true }]
+```
+
+Persist state across sessions with `storageFeature`. Pass any storage adapter that implements `save`, `load`, and `delete`:
+
+```ts
+import { createState, missingStorageValue, storageFeature } from 'feature-state';
+
+const localAdapter = {
+  save: (key: string, value: unknown) => {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  },
+  load: (key: string) => {
+    const raw = localStorage.getItem(key);
+    return raw != null ? JSON.parse(raw) : missingStorageValue;
+  },
+  delete: (key: string) => {
+    localStorage.removeItem(key);
+    return true;
+  }
+};
+
+const $tasks = createState<string[]>([]).with(storageFeature(localAdapter, 'tasks'));
+
+await $tasks.persist(); // loads saved value on first call; auto-saves on every set()
+```
+
+## State
+
+### `createState(initialValue)`
+
+Creates a state container and returns it as a feature host.
+
+```ts
+const $count = createState(0);
+const $status = createState<'idle' | 'loading' | 'error'>('idle');
+```
+
+### `value` / `get()` / `set()`
+
+```ts
+$count.value; // 0
+$count.get(); // 0
+
+$count.set(5);
+$count.set((v) => v + 1); // updater form
+
+$count.value = 10; // same as set(10)
+```
+
+`set()` skips updating and notifying when the new value is identical to the current one (`Object.is` comparison).
+
+### `notify()`
+
+Triggers all listeners without replacing the value. Use this after mutating an object value in place, or when a feature updates internal state by other means.
+
+```ts
+const $settings = createState({ theme: 'light', sidebarOpen: true });
+
+const prevValue = { ...$settings.value };
+$settings.value.theme = 'dark'; // mutate in place, no notification yet
+$settings.notify({ prevValue }); // notify listeners manually
+```
+
+Use `_v` only inside features or low-level integrations. App code should prefer `set()`, `value`, `get()`, and `notify()`.
+
+Pass custom metadata to every listener in the same notification:
+
+```ts
+$count.notify({ listenerContext: { source: 'mySync', background: true } });
+```
+
+### `listen(callback)` / `subscribe(callback)`
+
+`listen` registers a callback for future changes and returns an unsubscribe function. `subscribe` does the same but also calls the callback immediately with the current value.
+
+```ts
+const unlisten = $count.listen(({ value, prevValue, source }) => {
+  console.log(value, prevValue, source);
+});
+
+unlisten(); // remove listener
+```
+
+Calling `unlisten()` inside the listener itself is safe. Any pending call to that callback in the current notification cycle is removed immediately.
+
+**Listener context**
+
+| Field        | Description                                                                              |
+| ------------ | ---------------------------------------------------------------------------------------- |
+| `value`      | The new value.                                                                           |
+| `prevValue`  | The previous value. Undefined when `notify()` is called without a prior value.           |
+| `source`     | What triggered the change. `'stateSet'` for `set()`. Features set their own source keys. |
+| `background` | When `true`, signals that the change is a background sync and UI updates can be skipped. |
+
+Listeners run synchronously in registration order. A nested `set()` inside a listener appends its listeners to the active queue. They run after already queued listeners, before the outermost `set()` or `notify()` returns. Queue features replace this behavior.
+
+### `createComputed(source, compute, options?)`
+
+Creates a read-only state derived from one source state:
+
+```ts
+import { createComputed, createState } from 'feature-state';
+
+type TTask = { done: boolean; category: string };
+
+const $tasks = createState<TTask[]>([]);
+const $completedCount = createComputed($tasks, (tasks) => tasks.filter((task) => task.done).length);
+```
+
+Pass a tuple when the value depends on multiple states:
+
+```ts
+const $filter = createState('work');
+const $filteredTasks = createComputed([$tasks, $filter] as const, ([tasks, filter]) =>
+  tasks.filter((task) => task.category === filter)
+);
+```
+
+Computed states expose the normal read and subscription API (`value`, `get()`, `listen()`, and `subscribe()`), but `set()` and assigning `value` throw because source states own the data. Computed states are still feature hosts. Use queue-oriented features when the computed state needs custom scheduling, but keep write-oriented features such as `undoFeature`, `storageFeature`, and `isEqualFeature` on source states because they call or replace `set()`. Call `destroy()` when the containing object is torn down to unsubscribe from source states.
+
+`isEqual` defaults to `Object.is`. Pass a custom comparator to suppress notifications when the computed structure is equivalent but not referentially identical. Pass `false` to notify on every source update.
+
+## Built-in Features
+
+Features are installed via `.with()` and extend the state with new methods.
+
+### `undoFeature(historyLimit?)`
+
+Adds `undo()`. Keeps the last 50 values by default. History is seeded with the initial value at install time.
+
+```ts
+import { createState, undoFeature } from 'feature-state';
+
+const $count = createState(0).with(undoFeature());
+
+$count.set(1);
+$count.set(2);
+$count.undo(); // 1
+$count.undo(); // 0
+$count.undo(); // no-op, already at oldest
+```
+
+### `multiUndoFeature()`
+
+Adds `multiUndo(count)`. Requires `undoFeature` to be installed first.
+
+```ts
+import { createState, multiUndoFeature, undoFeature } from 'feature-state';
+
+const $count = createState(0).with(undoFeature(), multiUndoFeature());
+
+$count.set(1);
+$count.set(2);
+$count.set(3);
+$count.multiUndo(2); // back to 1
+```
+
+### `storageFeature(storage, key)`
+
+Adds `persist()`, `loadFromStorage()`, and `deleteFromStorage()`. The storage adapter is a plain object with `save`, `load`, and `delete` methods.
+
+```ts
+import { createState, missingStorageValue, storageFeature } from 'feature-state';
 
 const storage = {
-	async save(key, value) {
-		localStorage.setItem(key, JSON.stringify(value));
-		return true;
-	},
-	async load(key) {
-		const value = localStorage.getItem(key);
-		return value ? JSON.parse(value) : undefined;
-	},
-	async delete(key) {
-		localStorage.removeItem(key);
-		return true;
-	}
+  save(key: string, value: unknown) {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  },
+  load(key: string) {
+    const raw = localStorage.getItem(key);
+    return raw != null ? JSON.parse(raw) : missingStorageValue;
+  },
+  delete(key: string) {
+    localStorage.removeItem(key);
+    return true;
+  }
 };
 
-const state = withStorage(createState([]), storage, 'tasks');
+const $tasks = createState<string[]>([]).with(storageFeature(storage, 'tasks'));
 
-await state.persist();
-
-state.addTask({ id: 1, title: 'Task 1' });
+await $tasks.persist();
 ```
 
-- **`storage`**: An object implementing the `StorageInterface` with methods `save`, `load`, and `delete` for handling the persistence
-- **`key`**: The key used to identify the state in the storage medium
+`persist()` loads any previously saved value. If nothing is stored it saves the current state instead, then auto-saves on every subsequent `set()`. Calling `persist()` more than once is safe.
 
-### `withUndo()`
+**`TStorageInterface` contract:** `load` must return `missingStorageValue` (a Symbol) when the key is absent. `null` and `undefined` are treated as valid stored values.
 
-Adds undo functionality to the state, allowing the state to revert to previous values.
+### `isEqualFeature(isEqual)`
+
+Overrides `set()` with a domain-specific equality check. Use it when reference equality would notify listeners even though the visible state did not change.
 
 ```ts
-import { createState, withUndo } from 'feature-state';
+import { createState, isEqualFeature } from 'feature-state';
 
-const state = withUndo(createState([]), 50);
-
-state.addTask({ id: 1, title: 'Task 1' });
-state.undo();
+const $status = createState({ type: 'valid' }).with(
+  isEqualFeature((prevValue, nextValue) => prevValue.type === nextValue.type)
+);
 ```
 
-- **`historyLimit`**: The maximum number of states to keep in history for undo functionality. The default is `50`
+### `asyncQueueFeature()`
 
-### `withMultiUndo()`
-
-Adds multi-undo functionality to the state, allowing the state to revert to multiple previous values at once.
+Replaces the default sync listener queue with a microtask-based FIFO queue. Listeners still run in registration order, but after the current call stack resolves. Async listeners are awaited one by one.
 
 ```ts
-import { createState, withMultiUndo, withUndo } from 'feature-state';
+import { asyncQueueFeature, createState } from 'feature-state';
 
-const state = withMultiUndo(withUndo(createState([]), 50));
+const $count = createState(0).with(asyncQueueFeature<number>());
 
-state.addTask({ id: 1, title: 'Task 1' });
-state.addTask({ id: 2, title: 'Task 2' });
-state.multiUndo(2);
-```
-
-- **`count`**: The number of undo steps to perform, reverting the state back by the specified number of changes
-
-## ❓ FAQ
-
-### Why can't we pass the state itself into the listener queue?
-
-When passing the state object directly into the listener queue, any subsequent state changes before the queue is processed will affect the state reference in the queued listeners. This means listeners would always capture the latest state value rather than the value at the time they were queued.
-
-For example:
-
-```ts
-const $counter = createState(0);
-
-$counter.listen((context) => {
-	// By the time this runs, state._v might be different
-	// from when the listener was queued
-	console.log(context.state._v);
+$count.listen(async ({ value }) => {
+  await fetch('/api/count', {
+    method: 'POST',
+    body: JSON.stringify({ value })
+  });
 });
 
-$counter.set(1); // Queues listener
-$counter.set(2); // Changes state before queue processes
+await $count.notify(); // resolves when all listeners have completed
 ```
 
-If you want to access the state inside the listener, you can simply capture it:
+`notify()` returns the active queue flush promise. Multiple `notify()` calls before the microtask fires share the same promise. `set()` still returns `void`, so listener errors from `set()` are not awaitable through `set()` itself.
+
+### `priorityQueueFeature()`
+
+Replaces the default sync listener queue with a priority-based sync queue. Lower priority values run first. Listeners with the same priority keep registration order.
 
 ```ts
-const $counter = createState(0);
+import { createState, EListenerPriority, priorityQueueFeature } from 'feature-state';
 
-$counter.listen(() => {
-	$counter.set((v) => v + 1);
-});
+const $count = createState(0).with(priorityQueueFeature<number>());
+
+$count.listen(() => {}, { priority: EListenerPriority.LATE });
+$count.listen(() => {}, { priority: EListenerPriority.EARLY }); // runs first
 ```
 
-While you can reference `$counter` directly in listeners, there's no guarantee about its value since it might have changed between queueing and execution of the listener. That's why using `context.value` is the safer approach.
+`EListenerPriority` provides named constants: `FIRST = 0`, `EARLY = 125`, `DEFAULT = 250`, `LATE = 375`, `LAST = 500`. Any number is valid.
 
-### Why are all listeners processed asynchronously?
+## Extending with Features
 
-All listeners are processed asynchronously through a priority queue to maintain a consistent execution order. Adding a separate sync listener queue would:
+States are `feature-core` feature hosts. Add behavior with `.with(yourFeature())`. See the [feature-core README](https://github.com/builder-group/community/tree/develop/packages/feature-core) for a full guide on `defineFeature()`, dependency declaration, and the feature model.
 
-1. Disrupt the priority-based execution order
-2. Add complexity to the mental model (sync vs async execution paths)
-3. Make state updates less predictable
+## Examples
 
-If you need immediate listener processing, you can disable automatic queue processing and handle it manually:
+- [React Basic](https://github.com/builder-group/community/tree/develop/examples/feature-state/react/basic)
 
-```ts
-// Disable automatic queue processing
-$counter.set(1, { processListenerQueue: false });
-$counter.set(2, { processListenerQueue: false });
+## FAQ
 
-// Process the queue when you're ready
-await processStateQueue();
-```
+### How does it compare to Nanostores, Zustand, and MobX?
 
-Alternatively, we could switch to a fully sync listener queue. However, this would compromise the benefits of asynchronous processing.
+`feature-state` is centered on composable feature hosts. Use it when you want state objects that can gain typed capabilities over time without committing to proxies, decorators, or a React-specific store model.
+
+- [nanostores](https://github.com/nanostores/nanostores): framework-agnostic atom-based state with framework integrations
+- [zustand](https://github.com/pmndrs/zustand): store-based state management, primarily for React
+- [MobX](https://mobx.js.org): reactive state via proxies and decorators, class-oriented
+
+### Why does `set()` skip notification when the value is the same?
+
+Skipping on reference equality (`Object.is`) prevents redundant re-renders and listener calls. To force a notification without changing the value, call `notify()` directly.
+
+### Why does `subscribe()` pass `prevValue` equal to `value` on the initial call?
+
+The initial call has no prior state, so `prevValue` is set to the current value. Listeners never receive `undefined` for `prevValue` and can be written without a null check.
+
+### Is it safe to unsubscribe inside a listener?
+
+Yes. The unsubscribe function removes the callback from `_listeners` and also removes any pending call to that callback already queued in the current notification cycle. The listener will not fire again even if `notify()` is still draining.
+
+### Can I combine `asyncQueueFeature` and `priorityQueueFeature`?
+
+No. Both features override the same internal queue (`listen`, `subscribe`, and `notify`). Installing both means the last one installed takes effect and the first is silently ignored. Pick one.
+
+### When should I use `_v` directly instead of `set()`?
+
+Use `_v` only inside features or low-level integrations that need raw backing-value access. For app code that mutates an object in place, use `value` or `get()` to reach the object, keep your own `prevValue` when listeners need it, then call `notify()`. This is an escape hatch; prefer replacing the value with `set()` when possible.
+
+### How does `storageFeature` prevent save loops?
+
+When `loadFromStorage()` calls `set()` internally it passes `source: 'loadFromStorage'` in the listener context. The auto-save listener ignores changes with that source, so loading a value does not immediately write it back to storage.
+
+### What happens if a listener throws?
+
+With the default queue and `priorityQueueFeature`, synchronous listener errors propagate from `set()` or `notify()` and stop the current flush. Async rejections are not awaited unless you use `asyncQueueFeature()`.
+
+With `asyncQueueFeature()`, `notify()` returns a promise that rejects when a listener rejects. `set()` still returns `void`, so catch errors inside listeners triggered by `set()`.
+
+### Does `.with()` create a new state?
+
+No. `.with()` installs features on the same state object and returns that object with a wider TypeScript type. Install features before sharing references that expect the added methods.

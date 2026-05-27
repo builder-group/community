@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parseParams } from './parse-params';
 
-describe('parseRequestQuery function', () => {
+describe('parseParams function', () => {
 	it('should parse boolean strings correctly', () => {
 		const query = { boolTrue: 'true', boolFalse: 'false' };
 		const parsed = parseParams(query);
@@ -10,17 +10,19 @@ describe('parseRequestQuery function', () => {
 	});
 
 	it('should parse number strings correctly', () => {
-		const query = { number: '123', notNumber: 'abc' };
+		const query = { infinity: 'Infinity', number: '123', notNumber: 'abc', whitespace: ' ' };
 		const parsed = parseParams(query);
+		expect(parsed.infinity).toBe('Infinity');
 		expect(parsed.number).toBe(123);
 		expect(parsed.notNumber).toBe('abc');
+		expect(parsed.whitespace).toBe(' ');
 	});
 
-	it('should parse null and undefined strings correctly', () => {
+	it('should parse null strings and preserve undefined strings', () => {
 		const query = { nullValue: 'null', undefinedValue: 'undefined', empty: '' };
 		const parsed = parseParams(query);
 		expect(parsed.nullValue).toBe(null);
-		expect(parsed.undefinedValue).toBe(undefined);
+		expect(parsed.undefinedValue).toBe('undefined');
 		expect(parsed.empty).toBe('');
 	});
 
@@ -30,17 +32,15 @@ describe('parseRequestQuery function', () => {
 		expect(parsed.array).toEqual([true, 123, null]);
 	});
 
-	it('should handle nested objects correctly', () => {
-		const query = { nested: { bool: 'false', number: '42' } };
+	it('should parse nested objects and arrays correctly', () => {
+		const query = { nested: { bool: 'false', numbers: ['1', '2'] } };
 		const parsed = parseParams(query);
-		expect(parsed.nested).toEqual({ bool: false, number: 42 });
+		expect(parsed.nested).toEqual({ bool: false, numbers: [1, 2] });
 	});
 
-	it('should not parse blacklisted keys', () => {
-		const query = { parse: 'true', dontParse: '123', alsoparse: 'false' };
-		const parsed = parseParams(query, ['dontParse']);
-		expect(parsed.parse).toBe(true);
-		expect(parsed.dontParse).toBe('123');
-		expect(parsed.alsoparse).toBe(false);
+	it('should leave non-string values unchanged', () => {
+		const query = { value: undefined };
+		const parsed = parseParams(query);
+		expect(parsed.value).toBeUndefined();
 	});
 });

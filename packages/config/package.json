@@ -1,9 +1,21 @@
 {
 	"name": "@blgc/config",
-	"version": "0.0.42",
+	"version": "0.1.0",
 	"private": false,
-	"description": "Builder.Group's engineering style guide",
-	"keywords": [],
+	"description": "Shared TypeScript, ESLint, Prettier, and Vitest configs for Builder Group projects",
+	"keywords": [
+		"config",
+		"shared-config",
+		"eslint",
+		"eslint-config",
+		"prettier",
+		"prettier-config",
+		"typescript",
+		"tsconfig",
+		"vitest",
+		"vitest-config",
+		"style-guide"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
@@ -16,56 +28,59 @@
 	"author": "@bennobuilder",
 	"exports": {
 		"./eslint/*": "./eslint/*.js",
-		"./vite/*": "./vite/*.mjs",
 		"./prettier": "./prettier/index.js",
 		"./typescript/base": "./typescript/tsconfig.base.json",
 		"./typescript/library": "./typescript/tsconfig.library.json",
 		"./typescript/library-dom": "./typescript/tsconfig.library-dom.json",
 		"./typescript/next": "./typescript/tsconfig.next.json",
 		"./typescript/node20": "./typescript/tsconfig.node20.json",
-		"./typescript/react-internal": "./typescript/tsconfig.react-internal.json",
-		"./typescript/tanstack": "./typescript/tsconfig.tanstack.json"
+		"./typescript/react": "./typescript/tsconfig.react.json",
+		"./typescript/tanstack": "./typescript/tsconfig.tanstack.json",
+		"./vitest/*": "./vitest/*.mjs"
 	},
 	"files": [
 		"eslint",
-		"vite",
 		"prettier",
 		"typescript",
-		"README.md"
+		"vitest",
+		"README.md",
+		"MIGRATION.md"
 	],
 	"scripts": {
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
-		"publish:patch": "pnpm version patch && pnpm publish --no-git-checks --access=public",
-		"update:latest": "pnpm update --latest '!eslint' '!@eslint/js'"
+		"publish:patch": "pnpm version patch --no-git-tag-version && pnpm publish --no-git-checks --access=public",
+		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@eslint/js": "^9.39.2",
+		"@eslint-react/eslint-plugin": "^5.8.5",
+		"@eslint/js": "^10.0.1",
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
-		"@next/eslint-plugin-next": "^16.2.4",
-		"@typescript-eslint/eslint-plugin": "^8.59.1",
-		"@typescript-eslint/parser": "^8.59.1",
+		"@next/eslint-plugin-next": "^16.2.6",
+		"@typescript-eslint/eslint-plugin": "^8.60.0",
+		"@typescript-eslint/parser": "^8.60.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-only-warn": "^1.2.1",
-		"eslint-plugin-react": "^7.37.5",
 		"eslint-plugin-react-hooks": "^7.1.1",
-		"eslint-plugin-turbo": "^2.9.8",
+		"eslint-plugin-turbo": "^2.9.14",
 		"globals": "^17.6.0",
+		"jiti": "^2.7.0",
 		"prettier-plugin-css-order": "^2.2.0",
 		"prettier-plugin-packagejson": "^3.0.2",
 		"prettier-plugin-tailwindcss": "^0.8.0",
-		"typescript-eslint": "^8.59.1",
-		"vitest": "^4.1.5"
+		"typescript-eslint": "^8.60.0"
 	},
 	"devDependencies": {
-		"eslint": "^9.39.2",
+		"eslint": "^10.4.0",
 		"prettier": "^3.8.3",
-		"typescript": "^6.0.3"
+		"typescript": "^6.0.3",
+		"vitest": "^4.1.7"
 	},
 	"peerDependencies": {
-		"eslint": "^9.22.0",
+		"eslint": "^10.3.0",
 		"prettier": "^3.0.0",
-		"typescript": "^6.0.0"
+		"typescript": "^6.0.0",
+		"vitest": "^4.1.7"
 	},
 	"peerDependenciesMeta": {
 		"eslint": {
@@ -75,6 +90,9 @@
 			"optional": true
 		},
 		"typescript": {
+			"optional": true
+		},
+		"vitest": {
 			"optional": true
 		}
 	}

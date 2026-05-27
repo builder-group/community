@@ -11,7 +11,7 @@ Use `tuple-result` as the default Result pattern when working with repo code tha
 - Treat the first slot as the primary branch condition
 - Handle the error branch explicitly before using the value
 - Use `Ok(...)` and `Err(...)` to construct results
-- Use helpers like `mapOk`, `mapErr`, `match`, `unwrapOr`, and `tAsync` when they make the code simpler
+- Use helpers like `t`, `tAsync`, `mapOk`, `mapErr`, `match`, and `unwrapOr` when they make the code simpler
 
 ## Avoid
 
@@ -27,7 +27,7 @@ Use `tuple-result` as the default Result pattern when working with repo code tha
 const configResult = await loadConfig();
 const [isConfigOk, configErr, config] = configResult;
 if (!isConfigOk) {
-	throw new AppError('Failed to load config', { cause: configErr });
+  throw new AppError('Failed to load config', { cause: configErr });
 }
 
 return config;

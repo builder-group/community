@@ -1,7 +1,7 @@
 [package]
 name = "mado"
 version = "0.0.3"
-description = "A macOS-focused Rust library for active window monitoring and app metadata"
+description = "macOS active app and window monitoring with browser metadata"
 authors = { workspace = true }
 license = { workspace = true }
 edition = { workspace = true }

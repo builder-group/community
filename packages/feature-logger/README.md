@@ -17,79 +17,283 @@
     </a>
 </p>
 
-> Status: Experimental
+`feature-logger` is a console logger you compose per instance. Keep the familiar `trace`, `debug`, `log`, `info`, `warn`, and `error` methods while each logger owns its level, formatting pipeline, and output sink.
 
-`feature-logger` is a straightforward, typesafe, and feature-based logging library.
-
-- **Lightweight & Tree Shakable**: Function-based and modular design (< 1KB minified)
-- **Fast**: Minimal code ensures high performance
-- **Modular & Extendable**: Easily extendable with features like `withTimestamp()`, `withPrefix()`, ..
-- **Typesafe**: Build with TypeScript for strong type safety
-- **Standalone**: Zero dependencies, ensuring ease of use in various environments
-
-### 🌟 Motivation
-
-Create a typesafe, straightforward, and lightweight logging library designed to be modular and extendable with features like `withTimestamp()`, `withPrefix()`, ..
-
-### ⚖️ Alternatives
-
-- [winston](https://github.com/winstonjs/winston)
-- [pino](https://github.com/pinojs/pino)
-
-## 📖 Usage
+- Set a level once and keep call sites clean
+- Add prefixes, timestamps, ids, and browser styles with `.with()` features
+- Capture test output with `invokeConsole` instead of patching global `console`
+- Add custom middleware or methods without changing unrelated loggers
 
 ```ts
-import { createLogger } from 'feature-logger';
+import { createLogger, ELogLevel, prefixFeature, timestampPrefixFeature } from 'feature-logger';
 
-export const logger = createLogger();
+const logger = createLogger({ level: ELogLevel.INFO }).with(
+  prefixFeature('[App]'),
+  timestampPrefixFeature()
+);
 
-logger.trace("I'm a trace message!");
-logger.log("I'm a log message!");
-logger.info("I'm a info message!");
-logger.warn("I'm a warn message!");
-logger.error("I'm a error message!");
+logger.debug('hidden'); // below INFO, not emitted
+logger.info('server ready'); // emits with the app prefix and a timestamp
+
+// Test: capture output without patching console or using spies
+const logs: Array<[string, unknown[]]> = [];
+const testLogger = createLogger({
+  invokeConsole: (data, context) => {
+    logs.push([context.logMethod, data]);
+  }
+}).with(prefixFeature('[App]'));
+
+testLogger.warn('something happened');
+// logs = [['warn', ['[App] something happened']]]
 ```
 
-## 📙 Features
+Migrating from `0.0.x`? See [MIGRATION.md](./MIGRATION.md).
 
-### `withPrefix()`
+## Install
 
-Adds a static prefix to all log messages, allowing for consistent and easily identifiable log entries.
-
-```ts
-import { createLogger, withPrefix } from 'feature-logger';
-
-const logger = withPrefix(createLogger(), 'PREFIX');
-
-logger.log('This is a log message.');
-// Output: "PREFIX This is a log message."
+```bash
+npm install feature-logger
 ```
 
-### `withTimestamp()`
+## Usage
 
-Adds a timestamp to all log messages, enabling you to track when each log entry was created.
+Create a logger and write messages. Set a level to suppress lower-priority output:
 
 ```ts
-import { createLogger, withTimestamp } from 'feature-logger';
+import { createLogger, ELogLevel } from 'feature-logger';
 
-const logger = withTimestamp(createLogger());
+const logger = createLogger({ level: ELogLevel.INFO });
 
-logger.log('This is a log message.');
-// Output: "[MM/DD/YYYY, HH:MM:SS AM/PM] This is a log message."
+logger.debug('hidden'); // below INFO, not emitted
+logger.info('server started');
+logger.error('request failed', { status: 500 });
 ```
 
-### `withMethodPrefix()`
-
-Adds the log method name as a prefix to all log messages, allowing you to easily identify the log level or method used.
+Add `logMethodPrefixFeature` to label each line with its log level, and `styleFeature` to apply color in browser consoles:
 
 ```ts
-import { createLogger, withMethodPrefix } from 'feature-logger';
+import { createLogger, logMethodPrefixFeature, styleFeature } from 'feature-logger';
 
-const logger = withMethodPrefix(createLogger());
+const logger = createLogger().with(logMethodPrefixFeature(), styleFeature());
 
-logger.log('This is a log message.');
-// Output: "Log: This is a log message."
+logger.error('connection lost'); // "Error: connection lost" in red
+logger.warn('retrying'); // "Warn: retrying" in orange
+```
 
-logger.error('This is an error message.');
-// Output: "Error: This is an error message."
+Swap the console invoker to capture output in tests without patching `console`:
+
+```ts
+const logs: Array<[string, unknown[]]> = [];
+const logger = createLogger({
+  invokeConsole: (data, context) => {
+    logs.push([context.logMethod, data]);
+  }
+});
+
+logger.warn('something happened');
+// logs = [['warn', ['something happened']]]
+```
+
+## Logger
+
+### `createLogger(options?)`
+
+Creates a logger instance and returns it as a feature host.
+
+```ts
+import { createLogger, ELogLevel } from 'feature-logger';
+
+const logger = createLogger({
+  active: true,
+  level: ELogLevel.INFO
+});
+
+logger.debug('hidden');
+logger.info('visible');
+```
+
+| Option          | Default                   | Description                                  |
+| --------------- | ------------------------- | -------------------------------------------- |
+| `active`        | `true`                    | When false, all log calls are skipped.       |
+| `level`         | `ELogLevel.ALL`           | Minimum level that should be emitted.        |
+| `middleware`    | `[]`                      | Logger middleware applied to every log call. |
+| `invokeConsole` | matching `console.*` call | Final output sink, useful for tests or I/O.  |
+
+Custom invokers and middleware receive `(data, context)`. `data` is the processed argument array, and `context` contains the `logMethod`, `level`, and optional per-call middleware.
+
+`ELogLevel` uses ordered threshold values: `ALL = 0`, `TRACE = 100`, `DEBUG = 200`, `LOG = 300`, `INFO = 400`, `WARN = 500`, and `ERROR = 600`.
+
+### Log Methods
+
+The logger implements `trace`, `debug`, `log`, `info`, `warn`, and `error`. Each method accepts console-style arguments and forwards them to the matching `console.*` method unless level filtering, `active: false`, or middleware changes the call.
+
+```ts
+logger.trace('trace');
+logger.debug('debug');
+logger.log('log');
+logger.info('info');
+logger.warn('warn');
+logger.error('error');
+```
+
+## Built-in Features
+
+Features are installed via `.with()` and can add formatting, override methods, or add extra methods.
+
+### `prefixFeature(prefix, options?)`
+
+Adds a static prefix to each log call.
+
+```ts
+const logger = createLogger().with(prefixFeature('[API]'));
+
+logger.log('ready'); // "[API] ready"
+```
+
+`newLineBehavior` controls multiline string messages:
+
+| Value      | Description                                            |
+| ---------- | ------------------------------------------------------ |
+| `'indent'` | Prefixes the first line and indents following lines.   |
+| `'prefix'` | Prefixes every line.                                   |
+| `'ignore'` | Treats the message as one string and prefixes it once. |
+
+### `timestampPrefixFeature(options?)`
+
+Adds the current local timestamp to each log call.
+
+```ts
+const logger = createLogger().with(
+  timestampPrefixFeature({
+    formatTimestamp: (date) => `[${date.toISOString()}]`
+  })
+);
+
+logger.info('ready');
+```
+
+| Option            | Default                   | Description                                     |
+| ----------------- | ------------------------- | ----------------------------------------------- |
+| `formatTimestamp` | `[date.toLocaleString()]` | Formats the timestamp prefix for each log call. |
+
+### `logMethodPrefixFeature(options?)`
+
+Adds the console method name to each log call.
+
+```ts
+const logger = createLogger().with(
+  logMethodPrefixFeature({
+    formatLogMethod: (method) => `[${method.toUpperCase()}]`
+  })
+);
+
+logger.error('failed'); // "[ERROR] failed"
+```
+
+| Option            | Default      | Description                                  |
+| ----------------- | ------------ | -------------------------------------------- |
+| `formatLogMethod` | `LogMethod:` | Formats the log method prefix for each call. |
+
+### `styleFeature(styles?)`
+
+Applies browser console CSS styles to string messages. Custom styles override the defaults by log method.
+
+```ts
+const logger = createLogger().with(
+  styleFeature({
+    info: 'color: dodgerblue; font-weight: bold'
+  })
+);
+
+logger.info('styled');
+```
+
+### `logIdFeature(options?)`
+
+Prefixes every log call with a generated id and makes each log method return it.
+
+```ts
+const logger = createLogger().with(logIdFeature());
+
+const id = logger.log('created');
+```
+
+The existing `trace`, `debug`, `log`, `info`, `warn`, and `error` methods keep their console-like arguments, but return the generated id.
+
+IDs are generated before level filtering, so suppressed log calls still return an id.
+
+| Option       | Default        | Description                               |
+| ------------ | -------------- | ----------------------------------------- |
+| `generateId` | 16-char hex id | Creates the id returned by each log call. |
+| `formatId`   | `[id]`         | Formats the id before it is prefixed.     |
+
+## Extending with Features
+
+Loggers are `feature-core` feature hosts. A custom feature can add middleware, add methods, or both.
+
+```ts
+import { defineFeature, type TFeature } from 'feature-core';
+import type { TLoggerBase } from 'feature-logger';
+
+export function labelFeature(label: string): TLabelFeature {
+  return defineFeature<TLabelFeature>({
+    key: 'label',
+    install(logger: TLoggerBase) {
+      logger._middleware.push((next) => {
+        return (data, context) => {
+          if (typeof data[0] === 'string') {
+            next([`${label}: ${data[0]}`, ...data.slice(1)], context);
+            return;
+          }
+
+          next([label, ...data], context);
+        };
+      });
+
+      return {};
+    }
+  });
+}
+
+export type TLabelFeature = TFeature<'label', object>;
+```
+
+## FAQ
+
+### How does it compare to Winston, Pino, and debug?
+
+`feature-logger` keeps the console API and focuses on per-instance composition. Use it when you want formatted console output, testable invocation, and custom middleware without adopting transports, JSON logging, or a global namespace registry.
+
+- [winston](https://github.com/winstonjs/winston): full-featured Node.js logger with transports and structured logging
+- [pino](https://github.com/pinojs/pino): high-performance JSON logger for Node.js
+- [debug](https://github.com/debug-js/debug): lightweight namespace-based debug logger
+
+### What is the difference between `invokeConsole` and middleware?
+
+By default, `invokeConsole` writes to the matching `console.*` method. A custom `invokeConsole` is the final output sink and receives the fully processed data after all middleware has run. Middleware transforms data before it reaches `invokeConsole`. Use middleware to modify or annotate log output. Use `invokeConsole` to redirect it entirely.
+
+### When should I use `active: false` instead of setting a high `level`?
+
+Use `active: false` to silence everything without changing the level threshold. This is useful for toggling a logger on and off at runtime while preserving the configured level for when it is re-enabled.
+
+### Can I use this in Node.js?
+
+Yes. The logger calls `console.*` methods directly and works in any environment that provides a standard `console` object. In Node.js, `%c` is ignored and the CSS argument is consumed by formatting, so `styleFeature` output is unstyled.
+
+### Can I compose multiple features?
+
+Yes. Call `.with()` once with multiple features or chain multiple `.with()` calls. Features are installed in order and each can add middleware, methods, or both.
+
+### How do I test a logger that uses features like `prefixFeature`?
+
+Pass a custom `invokeConsole` to `createLogger`, then apply the same features with `.with()`. The `invokeConsole` receives data after all middleware runs, so the captured output reflects the full formatting pipeline.
+
+```ts
+const logs: string[] = [];
+const logger = createLogger({
+  invokeConsole: (data) => logs.push(data.join(' '))
+}).with(prefixFeature('[Auth]'));
+
+logger.info('token verified');
+// logs = ['[Auth] token verified']
 ```

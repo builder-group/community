@@ -1,9 +1,23 @@
 {
 	"name": "head-metadata",
-	"version": "0.0.12",
+	"version": "0.0.13",
 	"private": false,
-	"description": "Typesafe and straightforward utility for extracting structured metadata (like `<meta>`, `<title>`, and `<link>`) from the `<head>` of an HTML document",
-	"keywords": [],
+	"description": "Typed HTML head metadata extraction for title, meta, link, and custom extractors",
+	"keywords": [
+		"html",
+		"metadata",
+		"head-metadata",
+		"head",
+		"meta-tags",
+		"open-graph",
+		"twitter-card",
+		"seo",
+		"title",
+		"link-tags",
+		"typescript",
+		"extractor",
+		"xml-tokenizer"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
@@ -27,8 +41,8 @@
 		"build:prod": "export NODE_ENV=production && pnpm build",
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
-		"lint": "eslint . --fix",
-		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"lint": "eslint .",
+		"publish:patch": "pnpm build:prod && pnpm version patch --no-git-tag-version && pnpm publish --no-git-checks --access=public",
 		"size": "size-limit --why",
 		"start:dev": "tsc -w",
 		"test": "vitest run",
@@ -38,7 +52,7 @@
 		"xml-tokenizer": "workspace:*"
 	},
 	"devDependencies": {
-		"@types/node": "^25.6.0",
+		"@types/node": "^25.9.1",
 		"rollup-presets": "workspace:*"
 	},
 	"size-limit": [

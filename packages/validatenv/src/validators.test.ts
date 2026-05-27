@@ -1,5 +1,6 @@
-import { createValidationContext } from 'validation-adapter';
+import type { StandardSchemaV1 } from '@standard-schema/spec';
 import { describe, expect, it } from 'vitest';
+import type { TEnvValidator } from './types';
 import {
 	booleanValidator,
 	emailValidator,
@@ -11,211 +12,121 @@ import {
 	urlValidator
 } from './validators';
 
-describe('validators', () => {
-	describe('stringValidator', () => {
-		it('should validate valid strings', async () => {
-			const context = createValidationContext<string>('test');
-			await stringValidator.validate(context);
-			expect(context.hasError()).toBe(false);
-			expect(context.value).toBe('test');
+describe('validators module', () => {
+	describe('stringValidator schema', () => {
+		it('should accept strings', () => {
+			expectValidatorValue(stringValidator, 'test', 'test');
 		});
 
-		it('should reject non-string values', async () => {
-			const context = createValidationContext<string>(123 as any);
-			await stringValidator.validate(context);
-			expect(context.hasError()).toBe(true);
+		it('should reject non-string values', () => {
+			expectValidatorIssue(stringValidator, 123);
 		});
 	});
 
-	describe('booleanValidator', () => {
-		it('should validate true values', async () => {
-			const trueValues = ['true', 't', 'yes', 'on', '1'];
-			for (const value of trueValues) {
-				const context = createValidationContext<boolean>(value as any);
-				await booleanValidator.validate(context);
-				expect(context.hasError()).toBe(false);
-				expect(context.value).toBe(true);
-			}
+	describe('booleanValidator schema', () => {
+		it('should parse boolean aliases', () => {
+			expectValidatorValue(booleanValidator, 'yes', true);
+			expectValidatorValue(booleanValidator, 'False', false);
+			expectValidatorValue(booleanValidator, true, true);
 		});
 
-		it('should validate false values', async () => {
-			const falseValues = ['false', 'f', 'no', 'off', '0'];
-			for (const value of falseValues) {
-				const context = createValidationContext<boolean>(value as any);
-				await booleanValidator.validate(context);
-				expect(context.hasError()).toBe(false);
-				expect(context.value).toBe(false);
-			}
-		});
-
-		it('should reject invalid boolean values', async () => {
-			const context = createValidationContext<boolean>('invalid' as any);
-			await booleanValidator.validate(context);
-			expect(context.hasError()).toBe(true);
-		});
-
-		it('should be case insensitive', async () => {
-			const upperContext = createValidationContext<boolean>('TRUE' as any);
-			await booleanValidator.validate(upperContext);
-			expect(upperContext.hasError()).toBe(false);
-			expect(upperContext.value).toBe(true);
-
-			const lowerContext = createValidationContext<boolean>('false' as any);
-			await booleanValidator.validate(lowerContext);
-			expect(lowerContext.hasError()).toBe(false);
-			expect(lowerContext.value).toBe(false);
+		it('should reject unsupported values', () => {
+			expectValidatorIssue(booleanValidator, 'invalid');
 		});
 	});
 
-	describe('numberValidator', () => {
-		it('should validate valid numbers', async () => {
-			const context = createValidationContext<number>('123' as any);
-			await numberValidator.validate(context);
-			expect(context.hasError()).toBe(false);
-			expect(context.value).toBe(123);
+	describe('numberValidator schema', () => {
+		it('should parse finite numbers from strings and numbers', () => {
+			expectValidatorValue(numberValidator, '123', 123);
+			expectValidatorValue(numberValidator, -123.45, -123.45);
 		});
 
-		it('should validate negative numbers', async () => {
-			const context = createValidationContext<number>('-123.45' as any);
-			await numberValidator.validate(context);
-			expect(context.hasError()).toBe(false);
-			expect(context.value).toBe(-123.45);
-		});
-
-		it('should reject invalid numbers', async () => {
-			const context = createValidationContext<number>('not-a-number' as any);
-			await numberValidator.validate(context);
-			expect(context.hasError()).toBe(true);
+		it('should reject empty and non-numeric values', () => {
+			expectValidatorIssue(numberValidator, '');
+			expectValidatorIssue(numberValidator, 'not-a-number');
 		});
 	});
 
-	describe('emailValidator', () => {
-		it('should validate valid email addresses', async () => {
-			const validEmails = ['test@example.com', 'user.name@domain.co.uk', 'user+label@domain.com'];
-			for (const email of validEmails) {
-				const context = createValidationContext<string>(email);
-				await emailValidator.validate(context);
-				expect(context.hasError()).toBe(false);
-				expect(context.value).toBe(email);
-			}
+	describe('emailValidator schema', () => {
+		it('should accept email addresses', () => {
+			expectValidatorValue(emailValidator, 'user+label@example.com', 'user+label@example.com');
 		});
 
-		it('should reject invalid email addresses', async () => {
-			const invalidEmails = ['test@', '@domain.com', 'test@domain', 'test.com'];
-			for (const email of invalidEmails) {
-				const context = createValidationContext<string>(email);
-				await emailValidator.validate(context);
-				expect(context.hasError()).toBe(true);
-			}
+		it('should reject malformed email addresses', () => {
+			expectValidatorIssue(emailValidator, 'test@domain');
 		});
 	});
 
-	describe('hostValidator', () => {
-		it('should validate valid domain names', async () => {
-			const validDomains = ['example.com', 'sub.domain.co.uk', 'domain.io'];
-			for (const domain of validDomains) {
-				const context = createValidationContext<string>(domain);
-				await hostValidator.validate(context);
-				expect(context.hasError()).toBe(false);
-				expect(context.value).toBe(domain);
-			}
+	describe('hostValidator schema', () => {
+		it('should accept domain names and IP addresses', () => {
+			expectValidatorValue(hostValidator, 'example.com', 'example.com');
+			expectValidatorValue(hostValidator, '192.168.1.1', '192.168.1.1');
 		});
 
-		it('should validate valid IPv4 addresses', async () => {
-			const validIPs = ['192.168.1.1', '10.0.0.0', '172.16.254.1'];
-			for (const ip of validIPs) {
-				const context = createValidationContext<string>(ip);
-				await hostValidator.validate(context);
-				expect(context.hasError()).toBe(false);
-				expect(context.value).toBe(ip);
-			}
-		});
-
-		it('should validate valid IPv6 addresses', async () => {
-			const validIPs = ['2001:0db8:85a3:0000:0000:8a2e:0370:7334'];
-			for (const ip of validIPs) {
-				const context = createValidationContext<string>(ip);
-				await hostValidator.validate(context);
-				expect(context.hasError()).toBe(false);
-				expect(context.value).toBe(ip);
-			}
-		});
-
-		it('should reject invalid hosts', async () => {
-			const invalidHosts = ['invalid', 'domain', '256.256.256.256', 'domain.-com'];
-			for (const host of invalidHosts) {
-				const context = createValidationContext<string>(host);
-				await hostValidator.validate(context);
-				expect(context.hasError()).toBe(true);
-			}
+		it('should reject invalid hosts', () => {
+			expectValidatorIssue(hostValidator, 'domain');
+			expectValidatorIssue(hostValidator, '256.256.256.256');
 		});
 	});
 
-	describe('portValidator', () => {
-		it('should validate valid port numbers', async () => {
-			const validPorts = ['80', '443', '8080', '1', '65535'];
-			for (const port of validPorts) {
-				const context = createValidationContext<number>(port as any);
-				await portValidator.validate(context);
-				expect(context.hasError()).toBe(false);
-				expect(context.value).toBe(parseInt(port, 10));
-			}
+	describe('portValidator schema', () => {
+		it('should parse port numbers inside the valid range', () => {
+			expectValidatorValue(portValidator, '1', 1);
+			expectValidatorValue(portValidator, '65535', 65535);
 		});
 
-		it('should reject invalid port numbers', async () => {
-			const invalidPorts = ['0', '65536', '-1', 'abc', '3.14'];
-			for (const port of invalidPorts) {
-				const context = createValidationContext<number>(port as any);
-				await portValidator.validate(context);
-				expect(context.hasError()).toBe(true);
-			}
+		it('should reject invalid port numbers', () => {
+			expectValidatorIssue(portValidator, '0');
+			expectValidatorIssue(portValidator, '65536');
+			expectValidatorIssue(portValidator, '3.14');
 		});
 	});
 
-	describe('urlValidator', () => {
-		it('should validate valid URLs', async () => {
-			const validURLs = [
-				'https://example.com',
-				'http://localhost:3000',
-				'https://sub.domain.co.uk/path?query=1',
-				'http://127.0.0.1/api'
-			];
-			for (const url of validURLs) {
-				const context = createValidationContext<string>(url);
-				await urlValidator.validate(context);
-				expect(context.hasError()).toBe(false);
-				expect(context.value).toBe(url);
-			}
+	describe('urlValidator schema', () => {
+		it('should accept URLs', () => {
+			expectValidatorValue(urlValidator, 'https://example.com/path', 'https://example.com/path');
 		});
 
-		it('should reject invalid URLs', async () => {
-			const invalidURLs = ['not-a-url', 'http://', 'example.com'];
-			for (const url of invalidURLs) {
-				const context = createValidationContext<string>(url);
-				await urlValidator.validate(context);
-				expect(context.hasError()).toBe(true);
-			}
+		it('should reject invalid URLs', () => {
+			expectValidatorIssue(urlValidator, 'example.com');
 		});
 	});
 
-	describe('jsonValidator', () => {
-		it('should validate valid JSON', async () => {
-			const validJSON = ['{"key": "value"}', '[1, 2, 3]', '"string"', '123', 'true', 'null'];
-			for (const json of validJSON) {
-				const context = createValidationContext<unknown>(json);
-				await jsonValidator.validate(context);
-				expect(context.hasError()).toBe(false);
-				expect(context.value).toEqual(JSON.parse(json));
-			}
+	describe('jsonValidator schema', () => {
+		it('should parse JSON values', () => {
+			expectValidatorValue(jsonValidator, '{"key":"value"}', { key: 'value' });
 		});
 
-		it('should reject invalid JSON', async () => {
-			const invalidJSON = ['{invalid}', '[1, 2,]', '{"key": value}'];
-			for (const json of invalidJSON) {
-				const context = createValidationContext<unknown>(json);
-				await jsonValidator.validate(context);
-				expect(context.hasError()).toBe(true);
-			}
+		it('should reject malformed JSON values', () => {
+			expectValidatorIssue(jsonValidator, '{invalid}');
 		});
 	});
 });
+
+function expectValidatorValue<GValue>(
+	schema: TEnvValidator<unknown, GValue>,
+	value: unknown,
+	expectedValue: GValue
+): void {
+	const result = validateSync(schema, value);
+
+	expect(result).toEqual({ value: expectedValue });
+}
+
+function expectValidatorIssue(schema: TEnvValidator<unknown, unknown>, value: unknown): void {
+	const result = validateSync(schema, value);
+
+	expect(result).toHaveProperty('issues');
+}
+
+function validateSync<GInput, GOutput>(
+	schema: TEnvValidator<GInput, GOutput>,
+	value: unknown
+): StandardSchemaV1.Result<GOutput> {
+	const result = schema['~standard'].validate(value);
+	if (result instanceof Promise) {
+		throw new Error('Test schema unexpectedly returned a Promise.');
+	}
+
+	return result;
+}

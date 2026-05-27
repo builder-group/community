@@ -1,9 +1,24 @@
 {
 	"name": "validatenv",
-	"version": "0.0.44",
+	"version": "0.1.0",
 	"private": false,
-	"description": "Validate environment variables",
-	"keywords": [],
+	"description": "Typed env validation with Standard Schema validators, built-in parsers, and startup error reports",
+	"keywords": [
+		"env",
+		"environment-variables",
+		"env-validation",
+		"process-env",
+		"config",
+		"validation",
+		"startup-validation",
+		"typescript",
+		"type-safe",
+		"standard-schema",
+		"zod",
+		"valibot",
+		"arktype",
+		"vite"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
@@ -20,23 +35,23 @@
 	"types": "./dist/types/index.d.ts",
 	"files": [
 		"dist",
-		"README.md"
+		"README.md",
+		"MIGRATION.md"
 	],
 	"scripts": {
 		"build": "shx rm -rf dist && rollup -c rollup.config.js",
 		"build:prod": "export NODE_ENV=production && pnpm build",
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
-		"lint": "eslint . --fix",
-		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"lint": "eslint .",
+		"publish:patch": "pnpm build:prod && pnpm version patch --no-git-tag-version && pnpm publish --no-git-checks --access=public",
 		"size": "size-limit --why",
 		"start:dev": "tsc -w",
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@blgc/utils": "workspace:*",
-		"validation-adapter": "workspace:*"
+		"@standard-schema/spec": "^1.1.0"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",

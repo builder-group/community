@@ -10,20 +10,53 @@
         <img src="https://img.shields.io/bundlephobia/minzip/head-metadata.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
     </a>
     <a href="https://www.npmjs.com/package/head-metadata">
-        <img src="https://img.shields.io/npm/dt/featuer-state.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>
+        <img src="https://img.shields.io/npm/dt/head-metadata.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>
     </a>
     <a href="https://discord.gg/w4xE3bSjhQ">
         <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=FDE200" alt="Join Discord"/>
     </a>
 </p>
 
-> Status: Experimental
+`head-metadata` extracts structured metadata from the `<head>` of an HTML document. It tokenizes the first head element with `xml-tokenizer`, ships extractors for `title`, `meta`, and `link`, and lets you add focused extractors for project-specific tags.
 
-`head-metadata` is a typesafe and straightforward utility for extracting structured metadata (like `<meta>`, `<title>`, and `<link>`) from the `<head>` of an HTML document.
+- Read page title, meta tags, Open Graph tags, charset, and canonical links into typed output
+- Stop after the first `<head>` so full-page HTML does not need a DOM parse
+- Combine built-in extractors with custom `single` and `collection` extractors
+- Keep the extraction shape explicit: output keys come from the extractor config
 
-## 📖 Usage
+```ts
+import { extractHeadMetadata, linkExtractor, metaExtractor, titleExtractor } from 'head-metadata';
 
-### Extract Metadata from `<head>`
+const html = `
+  <head>
+    <title>Example</title>
+    <meta name="description" content="An example page" />
+    <meta property="og:title" content="Example OG title" />
+    <link rel="canonical" href="https://example.com" />
+  </head>
+`;
+
+const metadata = extractHeadMetadata(html, {
+  title: titleExtractor,
+  meta: metaExtractor,
+  link: linkExtractor
+});
+
+console.log(metadata.title);
+console.log(metadata.meta.description);
+console.log(metadata.meta['og:title']);
+console.log(metadata.link.canonical);
+```
+
+## Install
+
+```bash
+npm install head-metadata
+```
+
+## Usage
+
+Pass HTML and the extractors you want to run:
 
 ```ts
 import { extractHeadMetadata, linkExtractor, metaExtractor, titleExtractor } from 'head-metadata';
@@ -33,47 +66,163 @@ const html = `
     <head>
       <title>Example</title>
       <meta name="description" content="An example page" />
+      <meta property="og:title" content="Example OG title" />
       <link rel="canonical" href="https://example.com" />
     </head>
+    <body>Hello</body>
   </html>
 `;
 
 const metadata = extractHeadMetadata(html, {
-	meta: metaExtractor,
-	title: titleExtractor,
-	link: linkExtractor
+  title: titleExtractor,
+  meta: metaExtractor,
+  link: linkExtractor
 });
 
-console.log(metadata);
-/*
-{
-  title: 'Example',
-  meta: {
-    description: 'An example page'
-  },
-  link: {
-    canonical: 'https://example.com'
-  }
-}
-*/
+metadata.title; // Example
+metadata.meta.description; // An example page
+metadata.meta['og:title']; // Example OG title
+metadata.link.canonical; // https://example.com
 ```
 
-### Create Custom Extractors
+The output shape follows the extractor config. Config object keys choose the element names each extractor receives. `key` and `parent` choose metadata fields. Collection extractors write records under `parent`, while single extractors set a string under `key` when the callback returns a value.
 
-You can write your own extractors to handle any `<head>` child element:
+## Built-in Extractors
+
+### `titleExtractor`
+
+Reads text content from `<title>` and returns it as `metadata.title`.
 
 ```ts
-export const customLinkExtractor = {
-	type: 'collection' as const,
-	parent: 'link' as const,
-	callback: (node) => {
-		const rel = node.attributes.find((a) => a.local === 'rel');
-		const href = node.attributes.find((a) => a.local === 'href');
-		if (rel != null && href != null) {
-			return { key: rel.value, value: href.value };
-		}
+const metadata = extractHeadMetadata(html, {
+  title: titleExtractor
+});
+```
 
-		return null;
-	}
+### `metaExtractor`
+
+Reads `<meta>` tags into `metadata.meta`.
+
+```html
+<meta charset="utf-8" />
+<meta name="description" content="An example page" />
+<meta property="og:title" content="Example OG title" />
+```
+
+The extractor uses `charset`, `name`, or `property` as the record key.
+
+### `linkExtractor`
+
+Reads `<link>` tags into `metadata.link`.
+
+```html
+<link rel="canonical" href="https://example.com" />
+```
+
+The extractor uses `rel` as the record key and `href` as the value.
+
+## Custom Extractors
+
+Use a `single` extractor for one output value:
+
+```ts
+import type { TSingleExtractor } from 'head-metadata';
+
+const viewportExtractor = {
+  type: 'single',
+  key: 'viewport',
+  callback: (node) => {
+    const name = node.attributes.find((attr) => attr.local === 'name');
+    const content = node.attributes.find((attr) => attr.local === 'content');
+
+    return name?.value === 'viewport' && content != null ? content.value : null;
+  }
+} satisfies TSingleExtractor;
+```
+
+```ts
+const metadata = extractHeadMetadata(html, {
+  meta: viewportExtractor
+});
+
+metadata.viewport;
+```
+
+In this example, `meta` means the extractor receives `<meta>` elements. `key: 'viewport'` controls the output field.
+
+Use a `collection` extractor when many tags should contribute to one record:
+
+```ts
+import type { TCollectionExtractor } from 'head-metadata';
+
+const iconExtractor = {
+  type: 'collection',
+  parent: 'link',
+  callback: (node) => {
+    const rel = node.attributes.find((attr) => attr.local === 'rel');
+    const href = node.attributes.find((attr) => attr.local === 'href');
+
+    if (rel?.value.includes('icon') === true && href != null) {
+      return { key: rel.value, value: href.value };
+    }
+
+    return null;
+  }
 } satisfies TCollectionExtractor;
 ```
+
+Install custom extractors under the tag name they should receive:
+
+```ts
+const metadata = extractHeadMetadata(html, {
+  link: iconExtractor
+});
+```
+
+## API
+
+### `extractHeadMetadata(html, extractors)`
+
+Tokenizes the first `<head>` element and returns metadata collected by the provided extractors.
+
+```ts
+const metadata = extractHeadMetadata(html, {
+  title: titleExtractor,
+  meta: metaExtractor
+});
+```
+
+Extractor callbacks receive a `TXmlNode` with this shape:
+
+| Field        | Description                                      |
+| ------------ | ------------------------------------------------ |
+| `local`      | Local element name                               |
+| `prefix`     | Namespace prefix when present                    |
+| `attributes` | Parsed attributes with local name, prefix, value |
+| `content`    | Child nodes and text content                     |
+
+## FAQ
+
+### Is this a full metadata crawler?
+
+No. `head-metadata` extracts metadata from HTML you already have. Fetching pages, following redirects, resolving relative URLs, and crawling links stay in your application code.
+
+### Why does it use extractors instead of returning every head tag?
+
+Extractors keep the output shape explicit and typed. You choose which tags matter, how keys are derived, and which tags should be ignored.
+
+### Can I extract Open Graph and Twitter metadata?
+
+Yes. `metaExtractor` stores both `name` and `property` attributes as keys, so tags such as `og:title` and `twitter:card` are included in `metadata.meta`.
+
+### What happens with multiple `<head>` elements?
+
+Only the first matched `<head>` is read. Later `<head>` elements are ignored.
+
+### What happens when two tags produce the same key?
+
+Collection output is a record. The later value replaces the earlier value for the same key.
+
+### Does it validate SEO metadata?
+
+No. It extracts selected values only. It does not validate SEO rules, normalize metadata, or resolve relative URLs.

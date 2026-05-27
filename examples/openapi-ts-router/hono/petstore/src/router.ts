@@ -1,9 +1,6 @@
 import { Hono } from 'hono';
-import { createHonoOpenApiRouter } from 'openapi-ts-router';
+import { createHonoOpenApiRouter } from 'openapi-ts-router/hono';
 import * as v from 'valibot';
-import { vValidator } from 'validation-adapters/valibot';
-import { zValidator } from 'validation-adapters/zod';
-import * as z from 'zod';
 import { paths } from './gen/v1';
 import { PetSchema } from './schemas';
 
@@ -11,12 +8,10 @@ export const router = new Hono();
 export const openApiRouter = createHonoOpenApiRouter<paths>(router);
 
 openApiRouter.get('/pet/{petId}', {
-	pathValidator: zValidator(
-		z.object({
-			petId: z.number()
-		})
-	),
-	middlewares: [
+	pathSchema: v.object({
+		petId: v.number()
+	}),
+	middleware: [
 		async (c, next) => {
 			console.log('middleware');
 			await next();
@@ -34,16 +29,12 @@ openApiRouter.get('/pet/{petId}', {
 });
 
 openApiRouter.post('/pet/{petId}/uploadImage', {
-	pathValidator: vValidator(
-		v.object({
-			petId: v.number()
-		})
-	),
-	queryValidator: zValidator(
-		z.object({
-			additionalMetadata: z.string().optional()
-		})
-	),
+	pathSchema: v.object({
+		petId: v.number()
+	}),
+	querySchema: v.object({
+		additionalMetadata: v.optional(v.string())
+	}),
 	handler: (c) => {
 		const { petId } = c.req.valid('param');
 		const { additionalMetadata } = c.req.valid('query');
@@ -58,7 +49,7 @@ openApiRouter.post('/pet/{petId}/uploadImage', {
 });
 
 openApiRouter.post('/pet', {
-	bodyValidator: zValidator(PetSchema),
+	bodySchema: PetSchema,
 	handler: (c) => {
 		const { name, photoUrls } = c.req.valid('json');
 

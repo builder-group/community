@@ -1,7 +1,7 @@
 export * from './create-fetch-client';
-export * from './exceptions';
+export * from './errors';
 export * from './features';
-export * from './helper';
+export * from './lib';
 export * from './types';
 
 // Re-export tuple-result for convenience

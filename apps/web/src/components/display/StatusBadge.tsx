@@ -32,7 +32,7 @@ export interface TStatusBadgeProps extends VariantProps<typeof statusBadgeVarian
 }
 
 export const statusBadgeVariants = cva(
-	'rounded-full px-2 py-1 text-[11px] font-medium leading-none',
+	'rounded-full px-2 py-1 text-[11px] leading-none font-medium',
 	{
 		variants: {
 			status: {

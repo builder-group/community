@@ -1,0 +1,35 @@
+.app {
+	display: grid;
+	gap: 24px;
+	margin: 0 auto;
+	padding: 40px 24px;
+	max-width: 960px;
+}
+
+.grid {
+	display: grid;
+	gap: 16px;
+}
+
+.section {
+	display: grid;
+	gap: 12px;
+	border: 1px solid #d8d8d8;
+	padding: 16px;
+}
+
+.stack {
+	display: grid;
+	gap: 10px;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.render-count {
+	color: #666;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}

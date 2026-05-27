@@ -1,61 +1,44 @@
-# @rollup-plugin-cross-module-import
+# rollup-plugin-cross-module-import
 
-A Rollup plugin for handling cross-module imports within a monorepo package.
+Rollup plugin that rewrites relative imports between exported package entry points. It helps multi-entry packages keep source imports local while built output imports the published entry path.
 
-**Key Features**:
+- Reads entry points from `package.json` exports
+- Rewrites cross-entry imports for ESM and CJS output
+- Preserves specific file imports under the target entry
+- Marks rewritten cross-entry imports as external
 
-- Preserves specific file imports while transforming module paths
-- Handles both ESM and CJS formats
-- Marks cross-module imports as external
+## Example
 
-## How it works
+Input package exports:
 
-The plugin transforms cross-module imports based on package.json exports configuration:
+```json
+{
+  "exports": {
+    "./module1": {
+      "source": "./src/module1/index.ts",
+      "import": "./dist/module1/esm/index.js",
+      "require": "./dist/module1/cjs/index.js"
+    },
+    "./module2": {
+      "source": "./src/module2/index.ts",
+      "import": "./dist/module2/esm/index.js",
+      "require": "./dist/module2/cjs/index.js"
+    }
+  }
+}
+```
 
-1. **Source Code Structure**:
+Input source:
 
-   ```
-   src/
-     module1/
-       index.ts         # Exports main module1 functionality
-       internal.ts      # Internal module1 file
-     module2/
-       index.ts        # Imports from module1
-       nested/
-         deep.ts       # Imports from module1 and its internal files
-   ```
+```ts
+// src/module2/nested/deep.ts
+import { something } from '../../module1';
+import { internal } from '../../module1/internal';
+```
 
-2. **Package.json Exports**:
+Resolved external ids for ESM output:
 
-   ```json
-   {
-   	"exports": {
-   		"./module1": {
-   			"source": "./src/module1/index.ts",
-   			"import": "./dist/module1/esm/index.js",
-   			"require": "./dist/module1/cjs/index.js"
-   		},
-   		"./module2": {
-   			"source": "./src/module2/index.ts",
-   			"import": "./dist/module2/esm/index.js",
-   			"require": "./dist/module2/cjs/index.js"
-   		}
-   	}
-   }
-   ```
-
-3. **Import Examples**:
-
-   ```typescript
-   // In src/module2/nested/deep.ts
-
-   // Main module import - transforms to build path
-
-   // ↓
-   import { something } from '../../../module1/esm';
-   // ↓
-   import { internal } from '../../../module1/esm/internal';
-   import { something } from '../../module1';
-   // Specific file import - preserves file path
-   import { internal } from '../../module1/internal';
-   ```
+```ts
+import { something } from '../../../module1/esm';
+import { internal } from '../../../module1/esm/internal';
+```

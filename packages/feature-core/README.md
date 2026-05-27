@@ -1,0 +1,347 @@
+<h1 align="center">
+    <img src="https://raw.githubusercontent.com/builder-group/community/develop/packages/feature-core/.github/banner.svg" alt="feature-core banner">
+</h1>
+
+<p align="left">
+    <a href="https://github.com/builder-group/community/blob/develop/LICENSE">
+        <img src="https://img.shields.io/github/license/builder-group/community.svg?label=license&style=flat&colorA=293140&colorB=FDE200" alt="GitHub License"/>
+    </a>
+    <a href="https://www.npmjs.com/package/feature-core">
+        <img src="https://img.shields.io/bundlephobia/minzip/feature-core.svg?label=minzipped%20size&style=flat&colorA=293140&colorB=FDE200" alt="NPM bundle minzipped size"/>
+    </a>
+    <a href="https://www.npmjs.com/package/feature-core">
+        <img src="https://img.shields.io/npm/dt/feature-core.svg?label=downloads&style=flat&colorA=293140&colorB=FDE200" alt="NPM total downloads"/>
+    </a>
+    <a href="https://discord.gg/w4xE3bSjhQ">
+        <img src="https://img.shields.io/discord/795291052897992724.svg?label=&logo=discord&logoColor=000000&color=293140&labelColor=FDE200" alt="Join Discord"/>
+    </a>
+</p>
+
+`feature-core` is the `.with(feature())` engine for extensible TypeScript libraries. Wrap a plain object once, define opt-in features, and let TypeScript track installed capabilities, dependencies, and intentional overrides.
+
+- Add typed capabilities to a host object without registries, decorators, or framework lifecycle hooks
+- Catch missing feature dependencies at the `.with()` call site
+- Compose one feature at a time or install a validated feature list in order
+- Reuse feature logic across any host that provides the API the feature needs
+- Keep runtime guards for duplicate features, missing dependencies, and accidental property collisions
+
+Read `.with(a, b)` as left-to-right installation on the same object: each feature can use APIs installed before it.
+
+```ts
+import { createFeatureHost, defineFeature, type TFeature } from 'feature-core';
+
+interface TCounterBase {
+  get(): number;
+  set(nextValue: number): void;
+}
+
+type TResetFeature = TFeature<'reset', { reset(): void }>;
+type TResetTwiceFeature = TFeature<'resetTwice', { resetTwice(): void }, [TResetFeature]>;
+
+function createCounter(initialValue: number) {
+  let value = initialValue;
+
+  return createFeatureHost({
+    get: () => value,
+    set: (nextValue: number) => {
+      value = nextValue;
+    }
+  });
+}
+
+function resetFeature(): TResetFeature {
+  return defineFeature<TResetFeature>({
+    key: 'reset',
+    install(counter: TCounterBase) {
+      const initialValue = counter.get();
+
+      return {
+        reset: () => counter.set(initialValue)
+      };
+    }
+  });
+}
+
+function resetTwiceFeature(): TResetTwiceFeature {
+  return defineFeature<TResetTwiceFeature>({
+    key: 'resetTwice',
+    requires: ['reset'],
+    install(counter) {
+      return {
+        resetTwice: () => {
+          counter.reset();
+          counter.reset();
+        }
+      };
+    }
+  });
+}
+
+const counter = createCounter(0).with(resetFeature(), resetTwiceFeature());
+
+counter.set(5);
+counter.resetTwice(); // typed because resetFeature was installed first
+```
+
+## Install
+
+```bash
+npm install feature-core
+```
+
+## Usage
+
+Most package code falls into one of three roles:
+
+| Role               | Responsibility                                 |
+| ------------------ | ---------------------------------------------- |
+| **Consumer**       | Composes features on a host with `.with()`     |
+| **Library author** | Wraps a base object with `createFeatureHost()` |
+| **Feature author** | Creates features with `defineFeature()`        |
+
+## Consumer
+
+Call `.with()` with one or more features. Features are validated in order. Each one is checked against the host produced by all preceding features:
+
+```ts
+// Chained: one feature at a time
+const counter = createCounter(0).with(resetFeature()).with(resetTwiceFeature());
+
+// Variadic: all at once, validated left to right
+const counter = createCounter(0).with(resetFeature(), resetTwiceFeature());
+```
+
+Both forms are equivalent. Prefer chained calls when the list gets long.
+
+`.with()` mutates the original object and returns it. The base reference and the result are the same object:
+
+```ts
+const base = createCounter(0);
+const withReset = base.with(resetFeature());
+// base === withReset, same object, reset() is now on both
+```
+
+Use `hasFeature()` for runtime checks:
+
+```ts
+if (hasFeature<TResetFeature>(value, 'reset')) {
+  value.reset(); // narrowed
+}
+```
+
+## Library Author
+
+Wrap the base object with `createFeatureHost()` and export a typed host alias:
+
+```ts
+import { createFeatureHost, type TFeature, type TFeatureHost } from 'feature-core';
+
+interface TCounterBase {
+  get: () => number;
+  set: (nextValue: number) => void;
+}
+
+type TResetFeature = TFeature<'reset', { reset(): void }>;
+type TResetTwiceFeature = TFeature<'resetTwice', { resetTwice(): void }, [TResetFeature]>;
+
+type TCounterFeature = TResetFeature | TResetTwiceFeature;
+export type TCounter<GFeatures extends TCounterFeature[]> = TFeatureHost<TCounterBase, GFeatures>;
+
+export function createCounter(initialValue: number): TCounter<[]> {
+  let value = initialValue;
+
+  return createFeatureHost({
+    get() {
+      return value;
+    },
+    set(nextValue) {
+      value = nextValue;
+    }
+  });
+}
+```
+
+`TFeature` has four parts:
+
+```ts
+type TMyFeature = TFeature<'my-feature', TMyFeatureApi, [TRequiredFeature], 'methodToOverride'>;
+//                          ^ runtime key  ^ API shape   ^ required features  ^ override keys
+```
+
+The third and fourth generics are optional and default to `[]` and `never`.
+
+**Checklist:**
+
+- Define the base API as an interface
+- Define feature contracts with named `TFeature` aliases
+- Export the host type as `TFeatureHost<TBase, GFeatures>`
+- Return `createFeatureHost(base)` from the factory
+- Keep feature keys unique. Known duplicates fail at type level; dynamic duplicates still throw at runtime.
+
+Use `TAnyFeature` as the feature type in generic utilities that work across any feature type, for example a function that accepts any feature host.
+
+Use `TInstalledFeaturesOf<THost>` when a generic utility needs to recover the installed feature tuple from a host type.
+
+## Feature Author
+
+Use `defineFeature()`. Pass the feature type explicitly so TypeScript checks the key, returned API shape, `requires`, and `overrides`:
+
+```ts
+import { defineFeature, type TFeature } from 'feature-core';
+
+type TResetFeature = TFeature<'reset', { reset(): void }>;
+
+export function resetFeature(): TResetFeature {
+  return defineFeature<TResetFeature>({
+    key: 'reset',
+    install(counter: TCounterBase) {
+      const initialValue = counter.get();
+
+      return {
+        reset() {
+          counter.set(initialValue);
+        }
+      };
+    }
+  });
+}
+```
+
+Required features type the dependency APIs available in `install()`. Annotate the `install()` parameter with the base host type when the feature needs base APIs. The parameter is `never` by default. There is no implicit base host type because features are designed to work across different host shapes.
+
+For local or one-off features, the generic can be omitted and the type is inferred:
+
+```ts
+const debugFeature = () =>
+  defineFeature({
+    key: 'debug',
+    install() {
+      return {
+        debug() {
+          return true;
+        }
+      };
+    }
+  });
+```
+
+### Dependent Features
+
+List required feature types in the third `TFeature` generic and mirror those keys in `requires`. The order must match:
+
+```ts
+type TResetTwiceFeature = TFeature<'resetTwice', { resetTwice(): void }, [TResetFeature]>;
+
+export function resetTwiceFeature(): TResetTwiceFeature {
+  return defineFeature<TResetTwiceFeature>({
+    key: 'resetTwice',
+    requires: ['reset'],
+    install(counter) {
+      return {
+        resetTwice() {
+          counter.reset();
+          counter.reset();
+        }
+      };
+    }
+  });
+}
+```
+
+The `install()` host is typed from the required feature APIs, so `counter.reset()` above is available without any cast. If the feature also needs base APIs, annotate the parameter with the full host type:
+
+```ts
+install(counter: TCounter<[TResetFeature]>) { ... }
+```
+
+### API-less Features
+
+Features that only mutate internal configuration return an empty object:
+
+```ts
+type TCacheFeature = TFeature<'cache', Record<never, never>>;
+
+export function cacheFeature(): TCacheFeature {
+  return defineFeature<TCacheFeature>({
+    key: 'cache',
+    install(client: TFetchClientBase) {
+      client._config.requestMiddlewares.push(cacheMiddleware());
+      return {};
+    }
+  });
+}
+```
+
+### Overriding Host APIs
+
+Most features add new methods. When a feature intentionally replaces an existing host method, declare that in `overrides` and in the fourth `TFeature` generic:
+
+```ts
+type TLoggedSetFeature = TFeature<'logged-set', { set(nextValue: number): void }, [], 'set'>;
+
+export function loggedSetFeature(): TLoggedSetFeature {
+  return defineFeature<TLoggedSetFeature>({
+    key: 'logged-set',
+    overrides: ['set'],
+    install(counter: TCounterBase) {
+      // Capture the original before Object.assign replaces it with this override
+      const originalSet = counter.set.bind(counter);
+
+      return {
+        set(nextValue) {
+          console.log('set', nextValue);
+          originalSet(nextValue);
+        }
+      };
+    }
+  });
+}
+```
+
+Capture the previous method before returning the override when you want `super`-style behavior. Calling `counter.set()` inside the returned `set()` method would call the override again after installation.
+
+## FAQ
+
+### Why "features" instead of "plugins"?
+
+"Plugin" implies discovery, lifecycle hooks, registries, or installable packages. `feature-core` composes typed capabilities directly onto a host object. That narrower contract is better described as a feature.
+
+### Why does the host get mutated instead of copied?
+
+`.with()` mutates the host when you call it. The intended pattern is to compose features during construction, then pass around the fully composed host. Mutation keeps the model simple: there is one object, its identity never changes, and installed feature APIs are just properties on it. Copying would require re-typing the result on every `.with()` call anyway, so there is no practical benefit.
+
+### Why does `requires` order have to mirror the dependency tuple?
+
+An unordered approach (union array) would only validate that listed keys are _allowed_, not that _every_ required key is present. A partial `requires` would silently pass. The positional tuple enforces completeness, with one rule: the `requires` array order must mirror the `GRequiredFeatures` tuple order.
+
+### Why do I have to annotate the `install()` parameter myself?
+
+Features are host-agnostic. The same feature can be installed on different host shapes, so there is no single type to infer. Annotate the parameter with whatever the feature actually needs: the library base type, a full host type, or nothing at all if the feature does not use the host:
+
+```ts
+install(host: TCounterBase) { ... }              // needs base APIs
+install(host: TCounter<[TResetFeature]>) { ... } // needs base + reset
+install() { ... }                                // does not use the host
+```
+
+### Does `feature-core` validate the base host type?
+
+No. `feature-core` validates feature dependencies and the APIs added by installed features, but it does not carry a global base-host constraint per feature. If a feature needs base APIs, annotate the `install()` parameter with the host shape it actually uses.
+
+This keeps features reusable across libraries and avoids making every feature carry extra generic state. Package-specific tests should cover whether a feature is valid for that package's base host.
+
+### Which guarantees are TypeScript-only and which are runtime checks?
+
+TypeScript rejects missing dependencies and duplicate feature keys when host and feature types stay literal. Runtime `.with()` still checks missing dependencies, duplicate installs, invalid overrides, and accidental property collisions.
+
+Runtime checks do not validate the base host shape or method signatures. If a feature depends on base APIs, type the `install()` parameter and cover that package-specific contract in tests.
+
+### When should I use explicit `defineFeature<TMyFeature>()` vs inferred?
+
+Use explicit when the feature is exported or referenced by name elsewhere. TypeScript will validate that the key, API shape, and `requires` all match the declared type contract, catching mismatches at definition time. Use inferred for local or one-off features where no external contract exists.
+
+### Why does `overrides` require an explicit declaration instead of allowing any collision?
+
+The explicit declaration is what distinguishes an intentional replacement from a mistake. Without it, a typo in a returned method name would silently overwrite an existing host method instead of throwing. `overrides` makes the intent auditable at a glance and keeps the collision guard intact for everything not listed.
+
+It also avoids implicit chaining. An automatic `super`-style approach would call the previous method on your behalf, but that hides whether the original runs at all, and when. Capturing the previous method in a closure is one extra line and makes both facts explicit in the code.

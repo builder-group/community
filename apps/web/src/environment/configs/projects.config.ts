@@ -8,7 +8,8 @@ export const projectsConfig: {
 		{
 			id: 'abstand',
 			name: 'Abstand',
-			description: 'Desktop app for building intentional distance from distractions',
+			description:
+				'macOS app to schedule focus sessions with automatic app blocking and forced breaks',
 			logo: { type: 'image', src: '/illustrations/logos/abstand.png' },
 			startedAt: { year: 2026, month: 4 },
 			status: 'in-progress',
@@ -22,7 +23,7 @@ export const projectsConfig: {
 		{
 			id: 'kairos',
 			name: 'Kairos',
-			description: 'iOS timer app that picks a random finish within a set range',
+			description: 'iOS timer app that picks a random end time within a set range',
 			logo: { type: 'image', src: '/illustrations/logos/kairos.png' },
 			startedAt: { year: 2026, month: 3 },
 			status: 'maintenance',
@@ -59,7 +60,7 @@ export const projectsConfig: {
 		{
 			id: 'derive',
 			name: 'Derive',
-			description: 'iPhone app: pick a color, find 9 things, fill a 3×3 photo grid',
+			description: 'iPhone app to pick a color, find 9 matching things, and fill a 3×3 photo grid',
 			logo: { type: 'image', src: '/illustrations/logos/derive.png' },
 			startedAt: { year: 2026, month: 1 },
 			status: 'maintenance',
@@ -92,7 +93,7 @@ export const projectsConfig: {
 		{
 			id: 'learnlinesfaster',
 			name: 'LearnLinesFaster',
-			description: 'Line-learning tool using the first-letter method',
+			description: 'Web app for learning scripts using the first-letter mnemonic method',
 			logo: { type: 'emoji', value: '✨' },
 			startedAt: { year: 2025, month: 10 },
 			status: 'maintenance',
@@ -147,7 +148,8 @@ export const projectsConfig: {
 		{
 			id: 'gazegames',
 			name: 'GazeGames',
-			description: 'Generates image sets where person gazes at a moving target',
+			description:
+				'Web tool that generates a set of images where eyes and objects gaze at a moving target',
 			logo: { type: 'emoji', value: '👀' },
 			startedAt: { year: 2025, month: 11 },
 			endedAt: { year: 2025, month: 11 },
@@ -192,7 +194,7 @@ export const projectsConfig: {
 		{
 			id: 'tasu',
 			name: 'Tasu',
-			description: 'Video-first customer support tool',
+			description: 'Open-source, video-first customer support tool',
 			logo: { type: 'image', src: '/illustrations/logos/tasu.png' },
 			startedAt: { year: 2025, month: 8 },
 			endedAt: { year: 2025, month: 10 },
@@ -203,7 +205,7 @@ export const projectsConfig: {
 		{
 			id: 'actorpal',
 			name: 'ActorPal',
-			description: 'Tools for actor line learning, scene practice, and auditions',
+			description: 'Suite of tools for actor line learning, scene practice, and mock auditions',
 			logo: { type: 'emoji', value: '✨' },
 			startedAt: { year: 2025, month: 10 },
 			endedAt: { year: 2025, month: 10 },
@@ -214,7 +216,7 @@ export const projectsConfig: {
 		{
 			id: 'chatsnap',
 			name: 'ChatSnap',
-			description: 'Automated channel generating chat-conversation videos',
+			description: 'Automated YouTube channel posting AI-generated chat conversation videos',
 			logo: { type: 'image', src: '/illustrations/logos/chatsnap.png' },
 			startedAt: { year: 2024, month: 9 },
 			endedAt: { year: 2024, month: 12 },
@@ -225,7 +227,7 @@ export const projectsConfig: {
 		{
 			id: 'midimarble',
 			name: 'MidiMarble',
-			description: 'Automated channel generating marble music videos',
+			description: 'Automated YouTube channel posting AI-generated marble music videos',
 			logo: { type: 'image', src: '/illustrations/logos/midimarble.png' },
 			startedAt: { year: 2024, month: 9 },
 			endedAt: { year: 2024, month: 12 },
@@ -236,7 +238,7 @@ export const projectsConfig: {
 		{
 			id: 'eu-blocks',
 			name: 'EU Blocks',
-			description: 'Shopify app with GDPR and EU energy label compliant UI blocks',
+			description: 'Shopify app with pre-built GDPR and EU energy label compliant UI blocks',
 			logo: { type: 'image', src: '/illustrations/logos/eu-blocks.png' },
 			startedAt: { year: 2024, month: 7 },
 			endedAt: { year: 2024, month: 9 },
@@ -270,7 +272,8 @@ export const projectsConfig: {
 		{
 			id: 'ecsify',
 			name: 'ecsify',
-			description: 'Typesafe Entity Component System (ECS) library for TypeScript',
+			description:
+				'TypeScript ECS with typed plugins, flexible component storage, queries, and tracking',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -280,9 +283,23 @@ export const projectsConfig: {
 			]
 		},
 		{
+			id: 'feature-core',
+			name: 'feature-core',
+			description:
+				'Typed .with() feature composition with dependency checks for TypeScript objects',
+			startedAt: { year: 2026 },
+			status: 'maintenance',
+			category: 'package',
+			tags: [
+				{ type: 'npm', url: 'https://www.npmjs.com/package/feature-core' },
+				{ type: 'github', url: `${appConfig.social.githubPackages}/feature-core` }
+			]
+		},
+		{
 			id: 'feature-fetch',
 			name: 'feature-fetch',
-			description: 'Typesafe fetch wrapper with OpenAPI type support',
+			description:
+				'Typed fetch client with tuple results and opt-in REST, OpenAPI, GraphQL, retry, cache',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -294,7 +311,8 @@ export const projectsConfig: {
 		{
 			id: 'feature-form',
 			name: 'feature-form',
-			description: 'Straightforward, typesafe, and feature-based form library',
+			description:
+				'Framework-agnostic reactive form state with Standard Schema validation and triggers',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -306,7 +324,8 @@ export const projectsConfig: {
 		{
 			id: 'feature-logger',
 			name: 'feature-logger',
-			description: 'Straightforward, typesafe, and feature-based logging library',
+			description:
+				'Composable console logger with levels, formatting, middleware, and testable output',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -318,7 +337,7 @@ export const projectsConfig: {
 		{
 			id: 'feature-react',
 			name: 'feature-react',
-			description: 'React hooks and components for feature-state and feature-form',
+			description: 'Provider-free React hooks for feature-state and feature-form subscriptions',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -330,7 +349,8 @@ export const projectsConfig: {
 		{
 			id: 'feature-state',
 			name: 'feature-state',
-			description: 'Typesafe, feature-based state management library for React',
+			description:
+				'Reactive state with computed values and opt-in undo, storage, equality, and queues',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -342,7 +362,8 @@ export const projectsConfig: {
 		{
 			id: 'openapi-ts-router',
 			name: 'openapi-ts-router',
-			description: 'Typesafe OpenAPI router wrapper for Express and Hono',
+			description:
+				'Typed Express and Hono routes backed by OpenAPI paths and Standard Schema validation',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -354,7 +375,8 @@ export const projectsConfig: {
 		{
 			id: 'xml-tokenizer',
 			name: 'xml-tokenizer',
-			description: 'Typesafe XML tokenizer with callback-based token streaming',
+			description:
+				'Streaming XML, HTML, and SVG tokenizer with typed tokens, selectors, object helpers',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -366,7 +388,8 @@ export const projectsConfig: {
 		{
 			id: 'tuple-result',
 			name: 'tuple-result',
-			description: 'Minimal, tree-shakable Result type library for TypeScript',
+			description:
+				'Plain TypeScript Result tuples with typed errors, narrowing, helpers, JSON-friendly arrays',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -378,7 +401,8 @@ export const projectsConfig: {
 		{
 			id: 'validatenv',
 			name: 'validatenv',
-			description: 'Typesafe env variable validation with Zod, Valibot, and Yup',
+			description:
+				'Typed env validation with Standard Schema validators, built-in parsers, error reports',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -390,31 +414,37 @@ export const projectsConfig: {
 		{
 			id: 'validation-adapter',
 			name: 'validation-adapter',
-			description: 'Universal adapter interface for Zod, Valibot, and Yup',
+			description: 'Universal validation abstraction for Zod, Valibot, and Yup',
 			startedAt: { year: 2024 },
-			status: 'maintenance',
+			endedAt: { year: 2026, month: 5 },
+			status: 'discontinued',
 			category: 'package',
 			tags: [
 				{ type: 'npm', url: 'https://www.npmjs.com/package/validation-adapter' },
-				{ type: 'github', url: `${appConfig.social.githubPackages}/validation-adapter` }
+				{ type: 'github', url: `${appConfig.social.githubPackages}/_deprecated/validation-adapter` }
 			]
 		},
 		{
 			id: 'validation-adapters',
 			name: 'validation-adapters',
-			description: 'Pre-built adapters for validation-adapter: Zod and Valibot',
+			description: 'Validator adapter implementations for Zod, Valibot, Yup, and Standard Schema',
 			startedAt: { year: 2024 },
-			status: 'maintenance',
+			endedAt: { year: 2026, month: 5 },
+			status: 'discontinued',
 			category: 'package',
 			tags: [
 				{ type: 'npm', url: 'https://www.npmjs.com/package/validation-adapters' },
-				{ type: 'github', url: `${appConfig.social.githubPackages}/validation-adapters` }
+				{
+					type: 'github',
+					url: `${appConfig.social.githubPackages}/_deprecated/validation-adapters`
+				}
 			]
 		},
 		{
 			id: 'head-metadata',
 			name: 'head-metadata',
-			description: 'Typesafe utility to extract metadata from an HTML <head>',
+			description:
+				'Typed HTML head metadata extraction for title, meta, link, and custom extractors',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -426,7 +456,7 @@ export const projectsConfig: {
 		{
 			id: 'mado',
 			name: 'mado',
-			description: 'A macOS-focused Rust library for active window monitoring and app metadata',
+			description: 'macOS active app and window monitoring with browser metadata',
 			startedAt: { year: 2026, month: 1 },
 			status: 'maintenance',
 			category: 'package',
@@ -441,43 +471,47 @@ export const projectsConfig: {
 		{
 			id: 'utils',
 			name: '@blgc/utils',
-			description: 'Typesafe, tree-shakable collection of utility functions',
+			description: 'TypeScript utilities for colors, IDs, objects, URLs, and math',
 			startedAt: { year: 2024 },
-			status: 'maintenance',
+			endedAt: { year: 2026, month: 5 },
+			status: 'discontinued',
 			category: 'package',
 			tags: [
 				{ type: 'npm', url: 'https://www.npmjs.com/package/@blgc/utils' },
-				{ type: 'github', url: `${appConfig.social.githubPackages}/utils` }
+				{ type: 'github', url: `${appConfig.social.githubPackages}/_deprecated/utils` }
 			]
 		},
 		{
 			id: 'types',
 			name: '@blgc/types',
-			description: 'Shared TypeScript types across builder.group packages',
+			description: 'Shared utility, API, and OpenAPI TypeScript types',
 			startedAt: { year: 2024 },
-			status: 'maintenance',
+			endedAt: { year: 2026, month: 5 },
+			status: 'discontinued',
 			category: 'package',
 			tags: [
 				{ type: 'npm', url: 'https://www.npmjs.com/package/@blgc/types' },
-				{ type: 'github', url: `${appConfig.social.githubPackages}/types` }
+				{ type: 'github', url: `${appConfig.social.githubPackages}/_deprecated/types` }
 			]
 		},
 		{
 			id: 'eprel-client',
 			name: 'eprel-client',
-			description: 'Typesafe fetch client for the EU EPREL energy label API',
+			description: 'EU EPREL energy label registry API client',
 			startedAt: { year: 2024 },
-			status: 'maintenance',
+			endedAt: { year: 2026, month: 5 },
+			status: 'discontinued',
 			category: 'package',
 			tags: [
 				{ type: 'npm', url: 'https://www.npmjs.com/package/eprel-client' },
-				{ type: 'github', url: `${appConfig.social.githubPackages}/eprel-client` }
+				{ type: 'github', url: `${appConfig.social.githubPackages}/_deprecated/eprel-client` }
 			]
 		},
 		{
 			id: 'config',
 			name: '@blgc/config',
-			description: 'Collection of ESLint, Vite, and TypeScript configurations',
+			description:
+				'Shared TypeScript, ESLint, Prettier, and Vitest configs for Builder Group projects',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -489,7 +523,8 @@ export const projectsConfig: {
 		{
 			id: 'rollup-presets',
 			name: 'rollup-presets',
-			description: 'Opinionated, production-ready Rollup configuration presets',
+			description:
+				'Rollup presets for TypeScript libraries with package export discovery and declarations',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -501,14 +536,126 @@ export const projectsConfig: {
 		{
 			id: 'split-flap-board',
 			name: 'split-flap-board',
-			description:
-				'Web component that simulates a split-flap display inspired by airport and train station boards',
+			description: 'Web Components for animated split-flap boards',
 			startedAt: { year: 2026 },
-			status: 'maintenance',
+			endedAt: { year: 2026, month: 5 },
+			status: 'discontinued',
 			category: 'package',
 			tags: [
 				{ type: 'npm', url: 'https://www.npmjs.com/package/split-flap-board' },
-				{ type: 'github', url: `${appConfig.social.githubPackages}/split-flap-board` }
+				{ type: 'github', url: `${appConfig.social.githubPackages}/_deprecated/split-flap-board` }
+			]
+		},
+		{
+			id: 'figma-connect',
+			name: 'figma-connect',
+			description: 'Typed message bridge between Figma plugin UI iframes and sandbox code',
+			startedAt: { year: 2024 },
+			endedAt: { year: 2025, month: 11 },
+			status: 'discontinued',
+			category: 'package',
+			tags: [
+				{ type: 'npm', url: 'https://www.npmjs.com/package/figma-connect' },
+				{ type: 'github', url: `${appConfig.social.githubPackages}/_deprecated/figma-connect` }
+			]
+		},
+		{
+			id: 'google-webfonts-client',
+			name: 'google-webfonts-client',
+			description: 'Google Web Fonts metadata and font download client',
+			startedAt: { year: 2024 },
+			endedAt: { year: 2025, month: 11 },
+			status: 'discontinued',
+			category: 'package',
+			tags: [
+				{ type: 'npm', url: 'https://www.npmjs.com/package/google-webfonts-client' },
+				{
+					type: 'github',
+					url: `${appConfig.social.githubPackages}/_deprecated/google-webfonts-client`
+				}
+			]
+		},
+		{
+			id: 'elevenlabs-client',
+			name: 'elevenlabs-client',
+			description: 'ElevenLabs text-to-speech API client',
+			startedAt: { year: 2024 },
+			endedAt: { year: 2025, month: 11 },
+			status: 'discontinued',
+			category: 'package',
+			tags: [
+				{ type: 'npm', url: 'https://www.npmjs.com/package/elevenlabs-client' },
+				{ type: 'github', url: `${appConfig.social.githubPackages}/_deprecated/elevenlabs-client` }
+			]
+		},
+		{
+			id: 'kleinanzeigen-client',
+			name: 'kleinanzeigen-client',
+			description: 'Kleinanzeigen scraping and listing extraction client',
+			startedAt: { year: 2025 },
+			endedAt: { year: 2025, month: 11 },
+			status: 'discontinued',
+			category: 'package',
+			tags: [
+				{ type: 'npm', url: 'https://www.npmjs.com/package/kleinanzeigen-client' },
+				{
+					type: 'github',
+					url: `${appConfig.social.githubPackages}/_deprecated/kleinanzeigen-client`
+				}
+			]
+		},
+		{
+			id: 'cli',
+			name: '@blgc/cli',
+			description: 'Rollup and esbuild CLI for bundling TypeScript libraries',
+			startedAt: { year: 2024 },
+			endedAt: { year: 2026, month: 3 },
+			status: 'discontinued',
+			category: 'package',
+			tags: [
+				{ type: 'npm', url: 'https://www.npmjs.com/package/@blgc/cli' },
+				{ type: 'github', url: `${appConfig.social.githubPackages}/_deprecated/cli` }
+			]
+		},
+		{
+			id: 'widget-grid',
+			name: 'widget-grid',
+			description: 'Framework-agnostic widget grid model with cell-based layouts and widget data',
+			startedAt: { year: 2024 },
+			status: 'discontinued',
+			category: 'package',
+			tags: [
+				{ type: 'npm', url: 'https://www.npmjs.com/package/widget-grid' },
+				{
+					type: 'github',
+					url: 'https://github.com/builder-group/saku-v1/tree/develop/apps/web/src/features/editor'
+				}
+			]
+		},
+		{
+			id: 'openapi-express',
+			name: 'openapi-express',
+			description: 'OpenAPI-typed Express router wrapper with Zod request validation',
+			startedAt: { year: 2024 },
+			endedAt: { year: 2025, month: 1 },
+			status: 'discontinued',
+			category: 'package',
+			tags: [
+				{ type: 'npm', url: 'https://www.npmjs.com/package/openapi-express' },
+				{ type: 'github', url: `${appConfig.social.githubPackages}/_deprecated/openapi-express` }
+			]
+		},
+		{
+			id: 'webito',
+			name: 'webito',
+			description: 'ECS-powered visual web editor with plugin-based customization',
+			startedAt: { year: 2024 },
+			endedAt: { year: 2026, month: 5 },
+			status: 'discontinued',
+			category: 'package',
+			tags: [
+				{ type: 'npm', url: 'https://www.npmjs.com/package/webito' },
+				{ type: 'github', url: `${appConfig.social.githubPackages}/_deprecated/webito` }
 			]
 		}
 	]

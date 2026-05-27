@@ -43,7 +43,7 @@ Write rules so they are easy for humans to maintain and easy for agents to follo
 ```ts
 // Process in batches so we stay under the rate limit
 for (const chunk of chunks(items, 100)) {
-	await submit(chunk);
+  await submit(chunk);
 }
 ```
 ````

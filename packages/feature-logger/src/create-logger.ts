@@ -1,74 +1,91 @@
-import { TLoggerMiddleware, type TInvokeConsole, type TLogger, type TLogMethod } from './types';
+import { createFeatureHost } from 'feature-core';
+import type { TInvokeConsole, TLogger, TLoggerBase, TLoggerMiddleware } from './types';
 
+/**
+ * Creates a logger with `trace`, `debug`, `log`, `info`, `warn`, and `error` methods.
+ *
+ * Set `level` to suppress output below a minimum priority. Set `active` to `false` to
+ * silence all output without removing the logger. Pass `invokeConsole` to redirect output
+ * or capture it in tests without patching `console`.
+ * Extend with features using `.with(feature())`.
+ */
 export function createLogger(options: TCreateLoggerOptions = {}): TLogger<[]> {
-	const { active = true, level = 0, middlewares = [] } = options;
+	const { active = true, level = ELogLevel.ALL, middleware = [], invokeConsole } = options;
 
-	let invokeConsole: TInvokeConsole;
-	if (typeof options.invokeConsole === 'function') {
-		invokeConsole = options.invokeConsole;
-	} else if (typeof console === 'object') {
-		invokeConsole = defaultInvokeConsole;
-	} else {
-		throw Error(`Failed to invoke console object!`);
-	}
-
-	return {
-		_features: [],
+	return createFeatureHost<TLoggerBase>({
+		_invokeConsole: resolveInvokeConsole(invokeConsole),
 		active,
 		level,
-		middlewares,
-		_invokeConsole: invokeConsole,
-		_baseLog(category, data) {
-			if (this.active && category.level >= this.level) {
-				this.middlewares
-					.concat(category.middlewares ?? [])
-					.reduceRight((acc, middleware) => middleware(acc), invokeConsole)(
-					category.logMethod,
-					data
-				);
+		_middleware: middleware,
+		_baseLog(data, context) {
+			if (!this.active || context.level < this.level) {
+				return;
 			}
+
+			const invokeConsoleWithMiddleware = this._middleware
+				.concat(context.middleware ?? [])
+				.reduceRight((next, middleware) => middleware(next), this._invokeConsole);
+			invokeConsoleWithMiddleware(data, context);
 		},
-		trace(message, ...optionalParams) {
-			this._baseLog({ logMethod: 'trace', level: LOG_LEVEL.TRACE }, [message, ...optionalParams]);
+		trace(...data) {
+			this._baseLog(data, { logMethod: 'trace', level: ELogLevel.TRACE });
 		},
-		debug(message, ...optionalParams) {
-			this._baseLog({ logMethod: 'debug', level: LOG_LEVEL.DEBUG }, [message, ...optionalParams]);
+		debug(...data) {
+			this._baseLog(data, { logMethod: 'debug', level: ELogLevel.DEBUG });
 		},
-		log(message, ...optionalParams) {
-			this._baseLog({ logMethod: 'log', level: LOG_LEVEL.LOG }, [message, ...optionalParams]);
+		log(...data) {
+			this._baseLog(data, { logMethod: 'log', level: ELogLevel.LOG });
 		},
-		info(message, ...optionalParams) {
-			this._baseLog({ logMethod: 'info', level: LOG_LEVEL.INFO }, [message, ...optionalParams]);
+		info(...data) {
+			this._baseLog(data, { logMethod: 'info', level: ELogLevel.INFO });
 		},
-		warn(message, ...optionalParams) {
-			this._baseLog({ logMethod: 'warn', level: LOG_LEVEL.WARN }, [message, ...optionalParams]);
+		warn(...data) {
+			this._baseLog(data, { logMethod: 'warn', level: ELogLevel.WARN });
 		},
-		error(message, ...optionalParams) {
-			this._baseLog({ logMethod: 'error', level: LOG_LEVEL.ERROR }, [message, ...optionalParams]);
+		error(...data) {
+			this._baseLog(data, { logMethod: 'error', level: ELogLevel.ERROR });
 		}
-	};
+	});
 }
 
 export interface TCreateLoggerOptions {
+	/** Whether the logger is active. When `false`, all log calls are silenced. Defaults to `true`. */
 	active?: boolean;
+	/** Minimum log level. Calls below this level are suppressed. Defaults to `ELogLevel.ALL`. */
 	level?: number;
-	middlewares?: TLoggerMiddleware[];
+	/** Initial middleware stack. Merged with middleware added later via `.with()`. */
+	middleware?: TLoggerMiddleware[];
+	/** Custom console invoker. Use to redirect output or capture logs in tests. */
 	invokeConsole?: TInvokeConsole;
 }
 
-function defaultInvokeConsole(logMethod: TLogMethod, data: unknown[]): void {
-	if (logMethod in console && typeof console[logMethod] === 'function') {
-		console[logMethod](...data);
-	} else {
-		throw Error(`Failed to invoke console.${logMethod}!`);
-	}
+/** Numeric severity values used by logger level filtering. Higher values are more severe. */
+export enum ELogLevel {
+	ALL = 0,
+	TRACE = 100,
+	DEBUG = 200,
+	LOG = 300,
+	INFO = 400,
+	WARN = 500,
+	ERROR = 600
 }
 
-export enum LOG_LEVEL {
-	TRACE = 4,
-	DEBUG = 8,
-	LOG = 16,
-	INFO = 32,
-	WARN = 64,
-	ERROR = 128
+function resolveInvokeConsole(invokeConsole: TInvokeConsole | undefined): TInvokeConsole {
+	if (invokeConsole != null) {
+		return invokeConsole;
+	}
+
+	if (typeof console !== 'object') {
+		throw new Error('Failed to resolve console object');
+	}
+
+	return (data, context) => {
+		const { logMethod } = context;
+		if (logMethod in console && typeof console[logMethod] === 'function') {
+			console[logMethod](...data);
+			return;
+		}
+
+		throw new Error(`Failed to invoke console.${logMethod}`);
+	};
 }

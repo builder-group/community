@@ -1,9 +1,23 @@
 {
 	"name": "feature-state",
-	"version": "0.0.66",
+	"version": "0.1.0",
 	"private": false,
-	"description": "Straightforward, typesafe, and feature-based state management library for ReactJs",
-	"keywords": [],
+	"description": "Reactive state with computed values and opt-in features for undo, storage, equality, and queues",
+	"keywords": [
+		"state",
+		"state-management",
+		"reactive",
+		"reactive-state",
+		"observable",
+		"computed",
+		"typescript",
+		"type-safe",
+		"framework-agnostic",
+		"feature-composition",
+		"undo",
+		"storage",
+		"persistence"
+	],
 	"homepage": "https://builder.group/?utm_source=package-json",
 	"bugs": {
 		"url": "https://github.com/builder-group/community/issues"
@@ -20,23 +34,23 @@
 	"types": "./dist/types/index.d.ts",
 	"files": [
 		"dist",
-		"README.md"
+		"README.md",
+		"MIGRATION.md"
 	],
 	"scripts": {
 		"build": "shx rm -rf dist && rollup -c rollup.config.js",
 		"build:prod": "export NODE_ENV=production && pnpm build",
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
-		"lint": "eslint . --fix",
-		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
+		"lint": "eslint .",
+		"publish:patch": "pnpm build:prod && pnpm version patch --no-git-tag-version && pnpm publish --no-git-checks --access=public",
 		"size": "size-limit --why",
 		"start:dev": "tsc -w",
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@blgc/types": "workspace:*",
-		"@blgc/utils": "workspace:*"
+		"feature-core": "workspace:*"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
