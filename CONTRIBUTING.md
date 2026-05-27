@@ -31,7 +31,6 @@ pnpm build
 - `pnpm lint`: run ESLint across the workspace
 - `pnpm format`: format TypeScript, JavaScript, JSON, and Markdown files
 - `pnpm build:packages`: build publishable packages
-- `pnpm packages:change`: create a Changeset for publishable package changes
 - `pnpm --filter <workspace> test`: run a command for one package or example
 
 Example:
@@ -59,7 +58,6 @@ For publishable packages:
 - Keep `keywords` focused on what users search for
 - Keep entry fields such as `main`, `module`, `source`, `types`, `exports`, and `files` aligned with the package output
 - Keep peer dependencies explicit when consumers must provide them
-- Add a Changeset with `pnpm packages:change` when the change should be released
 
 ## README Changes
 
@@ -80,7 +78,6 @@ Before opening a pull request:
 - Run the relevant tests or explain why you did not
 - Run `pnpm format` for docs or formatting changes
 - Update package metadata when the README changes the public positioning
-- Add a Changeset for publishable package changes
 - Include enough context for reviewers to understand the problem, the fix, and the verification
 
 ## License
