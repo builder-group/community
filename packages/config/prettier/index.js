@@ -3,15 +3,14 @@
  * @type {import("prettier").Config}
  */
 module.exports = {
-	// Editor Config Overrides
-	// These settings can be overridden by EditorConfig, so we define them explicitly
+	// EditorConfig overrides
 	// https://github.com/prettier/prettier/blob/main/docs/configuration.md#editorconfig
 	endOfLine: 'lf',
 	tabWidth: 2,
 	useTabs: true,
 	printWidth: 100,
 
-	// Code Style
+	// Code style
 	singleQuote: true,
 	trailingComma: 'none',
 	semi: true,
@@ -29,21 +28,21 @@ module.exports = {
 	],
 
 	// Plugins
-	// Note: Use require.resolve() to ensure plugins are found from this package's node_modules.
-	// Without this, Prettier tries to resolve plugins from where Prettier runs (usually the root),
-	// which fails when plugins are only installed as dependencies of this config package.
+	// Note: Resolve plugin paths from this package so consumers do not need to install them directly
 	plugins: [
 		require.resolve('@ianvs/prettier-plugin-sort-imports'),
-		require.resolve('prettier-plugin-tailwindcss'),
 		require.resolve('prettier-plugin-css-order'),
-		require.resolve('prettier-plugin-packagejson')
+		require.resolve('prettier-plugin-packagejson'),
+		// Note: Tailwind must be loaded last to compose with other Prettier plugins
+		// https://github.com/tailwindlabs/prettier-plugin-tailwindcss#compatibility-with-other-prettier-plugins
+		require.resolve('prettier-plugin-tailwindcss')
 	],
 
-	// prettier-plugin-tailwindcss configuration
+	// Tailwind class sorting
 	// https://github.com/tailwindlabs/prettier-plugin-tailwindcss
 	tailwindFunctions: ['clsx', 'cn', 'cva'],
 
-	// prettier-plugin-sort-imports configuration
+	// Import sorting
 	// https://github.com/IanVS/prettier-plugin-sort-imports
 	importOrder: [
 		// External packages
@@ -55,5 +54,5 @@ module.exports = {
 		'^[./]'
 	],
 	importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
-	importOrderTypeScriptVersion: '6.0.3'
+	importOrderTypeScriptVersion: '6.0.0'
 };

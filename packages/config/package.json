@@ -14,7 +14,6 @@
 		"tsconfig",
 		"vitest",
 		"vitest-config",
-		"vite-config",
 		"style-guide"
 	],
 	"homepage": "https://builder.group/?utm_source=package-json",
@@ -29,7 +28,6 @@
 	"author": "@bennobuilder",
 	"exports": {
 		"./eslint/*": "./eslint/*.js",
-		"./vite/*": "./vite/*.mjs",
 		"./prettier": "./prettier/index.js",
 		"./typescript/base": "./typescript/tsconfig.base.json",
 		"./typescript/library": "./typescript/tsconfig.library.json",
@@ -37,13 +35,14 @@
 		"./typescript/next": "./typescript/tsconfig.next.json",
 		"./typescript/node20": "./typescript/tsconfig.node20.json",
 		"./typescript/react": "./typescript/tsconfig.react.json",
-		"./typescript/tanstack": "./typescript/tsconfig.tanstack.json"
+		"./typescript/tanstack": "./typescript/tsconfig.tanstack.json",
+		"./vitest/*": "./vitest/*.mjs"
 	},
 	"files": [
 		"eslint",
-		"vite",
 		"prettier",
 		"typescript",
+		"vitest",
 		"README.md"
 	],
 	"scripts": {

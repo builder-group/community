@@ -77,7 +77,7 @@ Use the config entry that matches the tool you are setting up:
 - `@blgc/config/typescript/react`: TypeScript config for React packages and apps
 - `@blgc/config/typescript/next`: TypeScript config for Next.js apps
 - `@blgc/config/typescript/tanstack`: TypeScript config for TanStack apps
-- `@blgc/config/vite/node`: Vitest config for Node test environments
+- `@blgc/config/vitest/node`: Vitest config for Node test environments
 
 ## Prettier
 
@@ -96,6 +96,8 @@ The Prettier config includes:
 - Tailwind class sorting through `prettier-plugin-tailwindcss`
 - CSS declaration ordering through `prettier-plugin-css-order`
 - package.json ordering through `prettier-plugin-packagejson`
+
+Projects that need a Tailwind v4 stylesheet path or Tailwind v3 config path should extend this config and set `tailwindStylesheet` or `tailwindConfig` locally.
 
 ## ESLint
 
@@ -174,10 +176,10 @@ Use `@blgc/config/typescript/library` when a package emits JavaScript through a 
 
 ## Vitest
 
-Merge the shared Vite/Vitest node config when you want the default test setup:
+Merge the shared Vitest node config when you want the default test setup:
 
 ```js
-import { nodeConfig } from '@blgc/config/vite/node';
+import { nodeConfig } from '@blgc/config/vitest/node';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
 export default mergeConfig(
@@ -190,7 +192,7 @@ export default mergeConfig(
 );
 ```
 
-The node config enables TypeScript path resolution and coverage reporters for text, JSON, and HTML.
+The node config sets the Node test environment, enables TypeScript path resolution, and uses text, JSON, and HTML coverage reporters.
 
 ## FAQ
 
@@ -227,6 +229,10 @@ Flags like `exactOptionalPropertyTypes`, `verbatimModuleSyntax`, and `erasableSy
 ### Why keep these configs in a package?
 
 A package keeps defaults versioned, reviewable, and reusable. Projects can update one dependency instead of copying config changes by hand.
+
+### Why only one Vitest preset?
+
+The shared preset covers the common Node package tests. Browser tests, app plugins, and framework-specific Vite setup should stay local until multiple projects need the same preset.
 
 ## Credits
 

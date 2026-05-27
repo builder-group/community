@@ -5,6 +5,7 @@ const nodeConfig = defineConfig({
 		tsconfigPaths: true
 	},
 	test: {
+		environment: 'node',
 		coverage: {
 			reporter: ['text', 'json', 'html']
 		}
@@ -12,3 +13,4 @@ const nodeConfig = defineConfig({
 });
 
 export { nodeConfig };
+export default nodeConfig;
