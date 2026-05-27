@@ -68,13 +68,13 @@ Use the config entry that matches the tool you are setting up:
 - `@blgc/config/prettier`: shared Prettier rules and sorting plugins
 - `@blgc/config/eslint/base`: shared ESLint foundation for custom presets
 - `@blgc/config/eslint/library`: flat ESLint config for TypeScript libraries
-- `@blgc/config/eslint/react-internal`: flat ESLint config for internal React packages
+- `@blgc/config/eslint/react`: flat ESLint config for React packages and apps
 - `@blgc/config/eslint/next`: flat ESLint config for Next.js apps
 - `@blgc/config/eslint/tanstack`: flat ESLint config for TanStack apps
 - `@blgc/config/typescript/library`: TypeScript config for Node-targeted libraries
 - `@blgc/config/typescript/library-dom`: TypeScript config for DOM-capable libraries
 - `@blgc/config/typescript/node20`: TypeScript config for Node 20 projects
-- `@blgc/config/typescript/react-internal`: TypeScript config for internal React packages
+- `@blgc/config/typescript/react`: TypeScript config for React packages and apps
 - `@blgc/config/typescript/next`: TypeScript config for Next.js apps
 - `@blgc/config/typescript/tanstack`: TypeScript config for TanStack apps
 - `@blgc/config/vite/node`: Vitest config for Node test environments
@@ -129,18 +129,16 @@ export default [
 
 Choose the preset by project type:
 
-| Preset                               | Use for                       |
-| ------------------------------------ | ----------------------------- |
-| `@blgc/config/eslint/library`        | TypeScript packages           |
-| `@blgc/config/eslint/react-internal` | React packages and Vite apps  |
-| `@blgc/config/eslint/next`           | Next.js apps                  |
-| `@blgc/config/eslint/tanstack`       | TanStack Router or Start apps |
+| Preset                         | Use for                       |
+| ------------------------------ | ----------------------------- |
+| `@blgc/config/eslint/library`  | TypeScript packages           |
+| `@blgc/config/eslint/react`    | React packages and Vite apps  |
+| `@blgc/config/eslint/next`     | Next.js apps                  |
+| `@blgc/config/eslint/tanstack` | TanStack Router or Start apps |
 
-The base config includes recommended JavaScript rules, TypeScript strict rules, Prettier compatibility, Turbo env-var warnings, `only-warn`, and generated-file ignores.
+The base config includes recommended JavaScript rules, TypeScript strict rules, Prettier compatibility, warning-only lint reporting, Turbo env-var warnings, unused disable reporting, and general generated/build artifact ignores. Framework presets add their own build artifact ignores, such as `.next`, `.output`, and `.tanstack`.
 
 The React presets use ESLint React for JSX and React rules, plus the official `eslint-plugin-react-hooks` preset for hooks and React compiler rules.
-
-`only-warn` makes ESLint report rule failures as warnings. Use `eslint --max-warnings=0` in CI when warnings should fail the build.
 
 ## TypeScript
 
@@ -160,15 +158,15 @@ Extend the closest TypeScript config:
 
 Available configs:
 
-| Config                                   | Use for                               |
-| ---------------------------------------- | ------------------------------------- |
-| `@blgc/config/typescript/base`           | Shared strict base settings           |
-| `@blgc/config/typescript/library`        | TypeScript libraries without DOM APIs |
-| `@blgc/config/typescript/library-dom`    | Libraries that use DOM globals        |
-| `@blgc/config/typescript/node20`         | Node 20 packages and tools            |
-| `@blgc/config/typescript/react-internal` | React packages and Vite apps          |
-| `@blgc/config/typescript/next`           | Next.js apps                          |
-| `@blgc/config/typescript/tanstack`       | TanStack apps                         |
+| Config                                | Use for                               |
+| ------------------------------------- | ------------------------------------- |
+| `@blgc/config/typescript/base`        | Shared strict base settings           |
+| `@blgc/config/typescript/library`     | TypeScript libraries without DOM APIs |
+| `@blgc/config/typescript/library-dom` | Libraries that use DOM globals        |
+| `@blgc/config/typescript/node20`      | Node 20 packages and tools            |
+| `@blgc/config/typescript/react`       | React packages and Vite apps          |
+| `@blgc/config/typescript/next`        | Next.js apps                          |
+| `@blgc/config/typescript/tanstack`    | TanStack apps                         |
 
 Defaults to know: the base configs enable declarations and declaration maps, use `skipLibCheck`, and leave TypeScript unused checks off. The library presets allow JavaScript files. `@blgc/config/typescript/library` uses CommonJS output, so override `compilerOptions.module` when a project needs TypeScript to emit ESM directly.
 
@@ -201,6 +199,12 @@ No. Install the tools that your project runs. For example, a package that only e
 ### Can I override rules?
 
 Yes. Add another config object after the shared config in `eslint.config.js`, add `compilerOptions` in `tsconfig.json`, or pass project-specific options to `mergeConfig` for Vitest.
+
+### Why does ESLint report warnings instead of failing?
+
+The shared ESLint config is a guideline first. Rule findings report as warnings so humans and agents can see what to improve without blocking local work.
+
+Use `eslint --max-warnings=0` in CI or a package script when a project is ready to enforce a clean lint result.
 
 ### Why are the shared config files CommonJS?
 

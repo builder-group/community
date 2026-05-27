@@ -2,7 +2,7 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
 	"extends": "./tsconfig.base.json",
-	"display": "Typescript configuration for applications and libraries that use Node 20",
+	"display": "TypeScript configuration for applications and libraries that use Node 20",
 	"compilerOptions": {
 		// Language and Environment
 		"lib": ["es2023"],
@@ -12,12 +12,8 @@
 		"module": "nodenext",
 		"moduleResolution": "node16",
 
-		// Javascript Support
+		// JavaScript Support
 		"allowJs": true
-
-		// Emit
-		// "outDir": "./dist",
-		// "rootDir": "./src"
 	},
 	"include": ["src"]
 }

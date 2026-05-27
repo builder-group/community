@@ -1,5 +1,5 @@
 const pluginNext = require('@next/eslint-plugin-next');
-const { defineConfig } = require('eslint/config');
+const { defineConfig, globalIgnores } = require('eslint/config');
 
 /**
  * ESLint configuration for applications that use Next.js.
@@ -8,7 +8,8 @@ const { defineConfig } = require('eslint/config');
  * @type {import("eslint").Linter.Config[]}
  */
 module.exports = defineConfig([
-	...require('./react-internal.js'),
+	...require('./react.js'),
+	globalIgnores(['**/.next/'], '@blgc/config/next/ignores'),
 	{
 		name: '@blgc/config/next/core-web-vitals',
 		plugins: {

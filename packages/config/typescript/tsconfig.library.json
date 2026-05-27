@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
-	"display": "Typescript configuration for TypeScript libraries",
+	"display": "TypeScript configuration for libraries",
 	"extends": "./tsconfig.base.json",
 	"compilerOptions": {
 		// Language and Environment
@@ -11,12 +11,8 @@
 		"module": "commonjs",
 		"moduleResolution": "bundler",
 
-		// Javascript Support
+		// JavaScript Support
 		"allowJs": true
-
-		// Emit
-		// "outDir": "./dist",
-		// "rootDir": "./src",
 	},
 	"include": ["src"]
 }

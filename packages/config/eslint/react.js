@@ -3,7 +3,7 @@ const { defineConfig } = require('eslint/config');
 const globals = require('globals');
 const { createJiti } = require('jiti');
 
-// Note: @eslint-react/eslint-plugin is ESM-only, so CommonJS presets load it through jiti
+// Note: jiti loads the ESM-only @eslint-react/eslint-plugin from this CommonJS preset
 const jiti = createJiti(__filename, { interopDefault: true });
 const eslintReact = jiti('@eslint-react/eslint-plugin');
 
@@ -25,7 +25,6 @@ module.exports = defineConfig([
 				}
 			},
 			globals: {
-				...globals.serviceworker,
 				...globals.browser
 			}
 		}
@@ -36,8 +35,13 @@ module.exports = defineConfig([
 			'react-hooks': pluginReactHooks
 		},
 		rules: {
-			...pluginReactHooks.configs.recommended.rules,
-			'@eslint-react/dom-no-unknown-property': ['error', { ignore: ['variant'] }],
+			...pluginReactHooks.configs.recommended.rules
+		}
+	},
+	{
+		name: '@blgc/config/react/rule-overrides',
+		rules: {
+			'@eslint-react/dom-no-unknown-property': 'error',
 			// Note: eslint-plugin-react-hooks owns hook diagnostics to avoid duplicate reports
 			'@eslint-react/exhaustive-deps': 'off',
 			'@eslint-react/rules-of-hooks': 'off'

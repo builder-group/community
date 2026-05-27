@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
-	"display": "Base Typescript configuration",
+	"display": "Base TypeScript configuration",
 	"compilerOptions": {
 		// Projects
 		"composite": false,

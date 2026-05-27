@@ -7,11 +7,11 @@ const { defineConfig, globalIgnores } = require('eslint/config');
  * @type {import("eslint").Linter.Config[]}
  */
 module.exports = defineConfig([
-	...require('./react-internal.js'),
-	globalIgnores(['.output/', '.tanstack/'], '@blgc/config/tanstack/ignores'),
+	...require('./react.js'),
+	globalIgnores(['**/.output/', '**/.tanstack/'], '@blgc/config/tanstack/ignores'),
 	{
 		name: '@blgc/config/tanstack/vite-env',
-		// Vite injects these built-ins, so Turbo should not require repo env declarations
+		// Note: Vite provides these built-ins, so Turbo should not require repo env declarations
 		rules: {
 			'turbo/no-undeclared-env-vars': [
 				'warn',

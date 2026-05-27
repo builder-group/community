@@ -16,12 +16,27 @@ module.exports = defineConfig([
 	js.configs.recommended,
 	...tseslint.configs.strict,
 	globalIgnores(
-		['**/dist/', '**/gen/', '**/.turbo/', '**/eslint.config.*', '**/*.gen.{ts,tsx}'],
+		['**/.turbo/', '**/coverage/', '**/dist/', '**/gen/', '**/*.{gen,generated}.{js,jsx,ts,tsx}'],
 		'@blgc/config/base/ignores'
 	),
 	{
-		...eslintConfigPrettier,
-		name: '@blgc/config/base/prettier'
+		name: '@blgc/config/base/linter-options',
+		linterOptions: {
+			reportUnusedDisableDirectives: 'warn',
+			reportUnusedInlineConfigs: 'warn'
+		}
+	},
+	{
+		name: '@blgc/config/base/warning-mode',
+		plugins: {
+			onlyWarn
+		}
+	},
+	{
+		name: '@blgc/config/base/javascript-overrides',
+		rules: {
+			eqeqeq: ['error', 'always', { null: 'ignore' }]
+		}
 	},
 	{
 		name: '@blgc/config/base/turbo',
@@ -33,12 +48,6 @@ module.exports = defineConfig([
 		}
 	},
 	{
-		name: '@blgc/config/base/only-warn',
-		plugins: {
-			onlyWarn
-		}
-	},
-	{
 		name: '@blgc/config/base/typescript-overrides',
 		rules: {
 			'@typescript-eslint/no-unused-vars': [
@@ -47,7 +56,7 @@ module.exports = defineConfig([
 			]
 		}
 	},
-	// Tooling config files run in Node and may intentionally use CommonJS
+	// Note: Tooling config files run in Node and may intentionally use CommonJS
 	{
 		name: '@blgc/config/base/tooling-configs',
 		files: ['**/*.config.{js,cjs,mjs,ts,cts,mts}'],
@@ -57,5 +66,9 @@ module.exports = defineConfig([
 		rules: {
 			'@typescript-eslint/no-require-imports': 'off'
 		}
+	},
+	{
+		...eslintConfigPrettier,
+		name: '@blgc/config/base/prettier'
 	}
 ]);
