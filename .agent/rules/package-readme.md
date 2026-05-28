@@ -10,6 +10,7 @@ Apply this together with `.agent/rules/writing.md`.
 - Keep the above-the-fold section strong: one clear description, concrete bullets, and one compact example that shows the core workflow
 - Make bullets outcome-driven: focus on what users can build, avoid, catch, or simplify
 - Make the above-the-fold example a small proof of value: simple enough to scan, but specific enough to show the package differentiator
+- For packages with two or three equally primary entry points or adapters, use a compact chooser or paired mini examples above the fold
 - Show real usage early with enough imports, setup, and result context for the reader to understand the workflow
 - Keep examples practical rather than exhaustive: the main path should be easy to adapt, while later snippets may elide obvious context to keep the point clear
 - Put installation after the value section unless the package cannot be understood without setup context
@@ -17,6 +18,8 @@ Apply this together with `.agent/rules/writing.md`.
 - Treat `Usage` as the fast path to get started, not as the full reference
 - Use a short chooser in `Usage` when the package has multiple primary entry points, adapters, or workflows
 - Use API reference sections to answer detailed questions after the reader understands the mental model
+- For published packages, document each public export at least once in the README/API reference or source doc comments
+- Cover public inputs, outputs, defaults, thrown errors, mutation, async behavior, runtime behavior, TypeScript-only guarantees, and important constraints when they apply
 - Match README depth to package scope: tiny utilities can stay short, broad libraries need concept and FAQ sections
 - Keep example READMEs shorter than package READMEs: description, compact bullets, run command, and only non-obvious setup notes
 - Add FAQ entries for tradeoffs, comparisons, limitations, and common confusion that would interrupt the main flow
@@ -34,7 +37,7 @@ Apply this together with `.agent/rules/writing.md`.
 - Do not leave readers guessing about non-obvious setup; add local context when missing details would block understanding
 - Do not force every package README into the same length or exact section order
 - Do not add long example walkthroughs to small example READMEs unless setup is genuinely non-obvious
-- Do not keep generic maturity notices in README prose when the package version already communicates maturity. Keep warnings only when they change user behavior or setup
+- Do not keep generic maturity disclaimers in README prose; keep notices for deprecation, experimental APIs, support windows, breaking migration risk, security boundaries, or compatibility limits when they affect adoption or upgrade decisions
 
 ## Examples
 

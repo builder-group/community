@@ -1,6 +1,6 @@
 # XML Tokenizer Rules
 
-Use `xml-tokenizer` as a streaming parser, not as a DOM replacement.
+Use `xml-tokenizer` for streaming parsing, selectors, processors, and lightweight object conversion, not as a browser or full XML DOM replacement.
 
 ## Enforce
 
@@ -9,12 +9,13 @@ Use `xml-tokenizer` as a streaming parser, not as a DOM replacement.
   - `htmlConfig` for HTML
   - `xmlConfig` for strict XML
   - `svgConfig` for SVG
-- Type callback tokens explicitly with `TXmlToken`
+- Type callback tokens explicitly with `TXmlToken` in public examples and untyped callback boundaries
 - Keep parser state outside the callback
 - Use `stream.goToEnd()` when only the first relevant match is needed
 - Handle `ElementStart`, `ElementEnd`, and `Attribute` deliberately when structure matters
 - Wrap parsing at the call boundary when failure should become a domain error
 - Prefer streaming extraction over collecting unnecessary token state
+- Use `xmlToObject` or `xmlToSimplifiedObject` when the caller genuinely needs the package's lightweight tree shape
 
 ## Avoid
 
@@ -22,6 +23,8 @@ Use `xml-tokenizer` as a streaming parser, not as a DOM replacement.
 - Do not keep processing once the target data is found
 - Do not bury complex state transitions inside ad-hoc local mutations
 - Do not return nullable parse results without an explicit error path when data is required
+- Do not force token annotations where `TTokenCallback`, `TSelectedTokenCallback`, or `TProcessor` already provides the callback type
+- Do not treat lightweight object conversion as a browser DOM or complete XML object model
 
 ## Example
 

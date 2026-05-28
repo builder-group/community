@@ -1,6 +1,6 @@
 # Comment Rules
 
-Add comments when they make the code easier to understand or maintain. Omit them when the code speaks for itself. For prose style within comments, see `writing.md`.
+Add comments when they make the code easier to understand or maintain. Omit them when the code speaks for itself. For prose style within comments, see `.agent/rules/writing.md`.
 
 ## Enforce
 

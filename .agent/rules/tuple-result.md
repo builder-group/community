@@ -1,6 +1,6 @@
 # Tuple Result Rules
 
-Use `tuple-result` as the default Result pattern when working with repo code that returns results.
+Use `tuple-result` for packages that depend on, expose, or integrate with tuple-result contracts.
 
 ## Enforce
 
@@ -20,6 +20,7 @@ Use `tuple-result` as the default Result pattern when working with repo code tha
 - Do not unwrap eagerly when normal branching keeps control flow clearer
 - Do not churn unrelated old code only to migrate result style
 - Do not mix many result-handling styles in the same module without a reason
+- Do not replace Standard Schema, validation-library, framework-required, or package-specific result shapes with tuple-result just for consistency
 
 ## Example
 

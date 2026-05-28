@@ -1,59 +1,52 @@
 # Feature State Rules
 
-Use `feature-state` and `feature-react/state` as the default state pattern in projects that depend on them.
+Use `feature-state` for framework-independent state models. Apply
+`.agent/rules/feature-react.md` for React subscriptions and form bindings.
 
 ## Enforce
 
 - Keep state atom-based; one state should represent one clear piece of data
 - Name states with a `$` prefix like `$count`, `$status`, or `$selectedId`
-- Use `useFeatureState(state)` when the component needs the raw value and should re-render on changes
-- Use `useCompute(state, compute)` when the component needs a derived value from one state
-- Use `useCompute(states, compute)` when the view depends on multiple states together
-- Use `useListener(state, callback)` for side effects driven by state changes
 - Keep state creation and state mutation helpers outside components unless the state is truly local to one component
+- Use `createComputed(...)` for reusable derived state that should exist outside one render
+- Keep render-only derivations in `feature-react` subscriptions instead of promoting them to shared state
+- Install features with `.with(...)` only where the state needs that capability
 
 ## Avoid
 
 - Do not put many unrelated fields into one state object when separate atoms would stay clearer
-- Do not read `state._v` directly in app code when a hook or public API fits
-- Do not use `useFeatureState` and then derive large computed values inline on every render when `useCompute` would express the intent better
-- Do not use `useListener` for simple rendering; keep it for effects and subscriptions
-- Do not create ad-hoc React state when the feature already has a matching `feature-state` source of truth
+- Do not read or mutate `state._v` directly when a public API fits
+- Do not mirror a feature-state value into ad-hoc React state unless the UI draft is intentionally separate
+- Do not create shared computed states for labels or booleans used by only one component render
+- Do not install write-oriented features on computed states; keep them on source states
 
 ## Examples
 
 ### Good
 
-```tsx
-const label = useCompute($seconds, (seconds = 0) => formatSeconds(seconds));
-const isDisabled = useCompute(
-  [$status, $selectedId] as const,
-  ([status = 'idle', selectedId = null]) => {
-    return status === 'loading' || selectedId == null;
-  }
-);
+```ts
+const $items = createState<TItem[]>([]);
+const $filter = createState('');
+const $visibleItems = createComputed([$items, $filter] as const, ([items, filter]) => {
+  return items.filter((item) => item.name.includes(filter));
+});
 
-useListener(
-  $status,
-  ({ value }) => {
-    if (value === 'error') {
-      showToast('Something went wrong');
-    }
-  },
-  [showToast]
-);
+export function renameItem(id: string, name: string): void {
+  $items.set((items) => items.map((item) => (item.id === id ? { ...item, name } : item)));
+}
 ```
 
 ### Avoid
 
-```tsx
-const status = useFeatureState($status);
-const selectedId = useFeatureState($selectedId);
-const isDisabled = status === 'loading' || selectedId == null;
+```ts
+const $listPage = createState({
+  filter: '',
+  items: [] as TItem[],
+  label: 'No items',
+  selectedId: null as string | null,
+  status: 'idle'
+});
 
-React.useEffect(() => {
-  if (status === 'error') {
-    showToast('Something went wrong');
-  }
-}, [status, showToast]);
+$listPage._v.items.push(nextItem);
+$listPage.notify();
 ```

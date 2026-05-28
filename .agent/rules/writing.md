@@ -10,6 +10,7 @@ Apply these rules to all prose: comments, READMEs, doc strings, PR descriptions,
 - Write in active voice
 - Keep sentences short and direct; one idea per sentence is the default
 - End full sentences with a period; omit the period on short fragments used as labels or list items
+- Let `.agent/rules/comments.md` override punctuation for short single-line regular code comments; doc comments use sentence punctuation
 
 ## Avoid
 

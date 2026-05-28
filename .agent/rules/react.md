@@ -9,14 +9,15 @@ Follow the established project React pattern unless the local code clearly does 
 - In component files, each component owns a local cluster: component body, then its props interface, then its component-owned constants like variants; this cluster repeats per component
 - Use `React.useState`, `React.useMemo`, `React.useCallback`, `React.useEffect`, and related hooks through the `React.` namespace
 - Keep larger components in a predictable top-to-bottom flow: props, state and refs, derived values, `// MARK: - Actions`, `// MARK: - Effects`, `// MARK: - UI`
-- Use `React.useMemo` for meaningful derived collections, computed view state, or grouped derived values
+- Use `React.useMemo` for meaningful derived collections, computed view state, or grouped derived values from props or React-local state
+- Use `useCompute` from `feature-react/state` for derived render values from `feature-state` sources
 - Use `React.useCallback` for handlers, imperative actions, and functions passed to children or hooks
 - Keep helper subcomponents in the same file when they are tightly coupled to the parent view
 - Use short JSX comments only when they help readers skim a dense visual structure
 
 ### TanStack Router
 
-- Use `function RouteComponent()` so the `Route` definition can appear above it
+- Use function declarations for route-owned components referenced by TanStack route objects before declaration, such as `RouteComponent`, `RootComponent`, `ShellComponent`, or `NotFoundComponent`
 
 ## Avoid
 

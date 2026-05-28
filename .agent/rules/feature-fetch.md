@@ -5,7 +5,8 @@ Use `feature-fetch` as the typed API layer. Prefer consistent client setup and e
 ## Enforce
 
 - Create clients in dedicated environment or library files, not inside components
-- Use generated or declared API types for paths, params, and responses
+- Use generated `paths` types for `createOpenApiFetchClient(...)`
+- Use declared response, error, body, and params types for `createApiFetchClient(...)` call sites where generated API types do not exist
 - Compose only the features you need, in a clear order
 - Handle `tuple-result` values explicitly; prefer the tuple pattern from `.agent/rules/tuple-result.md`
 - Distinguish network failures from request failures when behavior differs
