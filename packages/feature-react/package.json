@@ -90,9 +90,12 @@
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@types/react": "^19.2.15",
+		"@types/react-dom": "^19.2.3",
 		"feature-form": "workspace:*",
 		"feature-state": "workspace:*",
+		"happy-dom": "^20.9.0",
 		"react": "^19.2.6",
+		"react-dom": "^19.2.6",
 		"rollup-presets": "workspace:*"
 	},
 	"peerDependencies": {
