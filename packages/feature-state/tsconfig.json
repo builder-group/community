@@ -6,5 +6,5 @@
 		"declarationDir": "./dist/types"
 	},
 	"include": ["src"],
-	"exclude": ["**/__tests__/*", "**/*.test.ts"]
+	"exclude": ["**/__tests__/**", "**/*.test.ts", "**/*.test-d.ts", "**/*.bench.ts"]
 }
