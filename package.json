@@ -26,8 +26,6 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@eslint/js": "^10.0.1",
-		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
 		"@size-limit/esbuild": "^12.1.0",
 		"@size-limit/esbuild-why": "^12.1.0",
 		"@size-limit/preset-small-lib": "^12.1.0",
