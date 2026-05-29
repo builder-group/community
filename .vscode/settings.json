@@ -46,10 +46,56 @@
 		"tsconfig.json": "tsconfig.*.json"
 	},
 
-	// TypeScript settings
-	// https://stackoverflow.com/questions/74642723/how-do-i-force-visual-studio-code-to-always-use-my-workspaces-version-of-typesc
-	"typescript.tsdk": "./node_modules/typescript/lib",
-	"typescript.enablePromptUseWorkspaceTsdk": true,
+	// JavaScript and TypeScript settings
+	"js/ts.tsdk.path": "./node_modules/typescript/lib",
+	"js/ts.tsdk.promptToUseWorkspaceVersion": true,
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": "explicit",
+			"source.organizeImports": "never"
+		}
+	},
+	"[javascriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": "explicit",
+			"source.organizeImports": "never"
+		}
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": "explicit",
+			"source.organizeImports": "never"
+		}
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.codeActionsOnSave": {
+			"source.fixAll.eslint": "explicit",
+			"source.organizeImports": "never"
+		}
+	},
+
+	// JSON settings
+	"[json]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+
+	// CSS settings
+	"[css]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[postcss]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[scss]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
 
 	// Rust settings
 	"[rust]": {
@@ -64,8 +110,5 @@
 	],
 
 	// Tailwind CSS settings
-	"tailwindCSS.experimental.classRegex": [
-		["(?<=cva\\([\\s\\S]*?)[\"']([^\"']+)[\"']"],
-		["(?:cn|cx)\\(([^)]*)\\)", "[\"'`]([^\"'`]*)[\"'`]"]
-	]
+	"tailwindCSS.classFunctions": ["clsx", "cn", "cx", "cva"]
 }
