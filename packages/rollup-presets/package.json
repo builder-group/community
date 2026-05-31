@@ -45,7 +45,7 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@rollup/plugin-commonjs": "^29.0.2",
+		"@rollup/plugin-commonjs": "^29.0.3",
 		"execa": "9.6.1",
 		"picocolors": "^1.1.1",
 		"rollup-plugin-dts": "^6.4.1",

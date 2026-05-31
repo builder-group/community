@@ -92,9 +92,9 @@
 		"@types/express": "^5.0.6",
 		"@types/node": "^25.9.1",
 		"express": "^5.2.1",
-		"hono": "^4.12.21",
+		"hono": "^4.12.23",
 		"rollup-presets": "workspace:*",
-		"valibot": "1.4.0"
+		"valibot": "1.4.1"
 	},
 	"peerDependencies": {
 		"@types/express": "^5.0.6",
