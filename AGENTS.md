@@ -15,7 +15,7 @@ Use this file first when working in this repository. It defines the default agen
 - Follow the user request and explicit task constraints first
 - If a rule appears to conflict with the user's explicit request or clearly implied task goal, follow the user. Mention meaningful conflicts briefly so the rule can be improved.
 - Before editing, read the matching rule from `.agent/rules/` and the nearby implementation
-- Before behavior, public API, or package-level changes, also read the local package README, package manifest, and nearby tests
+- Before behavior, public API, or package-level changes, read the local package README, package manifest, and nearby tests
 - Prefer repository conventions and local package patterns over generic defaults
 - Keep changes focused on the requested behavior. Do not do unrelated cleanup or opportunistic rewrites.
 - Match surrounding style unless a local, low-risk improvement makes the edited code clearer
@@ -62,4 +62,4 @@ Use the closest matching rule for the file or behavior you are changing.
 
 Commands are reusable workflows. Use them when the user asks for that workflow.
 
-- Review staged and unstaged changes: `.agent/commands/review.md`
+- Review staged changes before committing: `.agent/commands/review.md`
