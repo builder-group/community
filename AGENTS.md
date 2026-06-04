@@ -1,7 +1,6 @@
 # Project Agent Guide
 
-Use this file first when working in this repository. It defines the default agent
-workflow and points to the more specific rules and commands.
+Use this file first when working in this repository. It defines the default agent workflow and points to the more specific rules and commands.
 
 ## Repository Context
 
@@ -9,34 +8,21 @@ workflow and points to the more specific rules and commands.
 - TypeScript workspaces are managed with pnpm and Turbo across `packages/*`, `apps/*`, `templates/*`, and `examples/**`
 - Rust workspace members live under `crates/*` and `templates/*/src-tauri`
 - Active TypeScript libraries live in `packages/*`; `packages/_deprecated/*` is historical and should not be used as the model for new work
-- Many packages are published APIs; treat exported types, runtime behavior, README examples, and package entrypoints as public surface
+- Many packages are published APIs. Treat exported types, runtime behavior, README examples, and package entrypoints as public surface.
 
-## Working Defaults
-
-- Before any code edit, read the matching rules and nearby implementation
-- Before behavior, public API, or package-level changes, also read the local package README, package manifest, and nearby tests
-- Prefer repository conventions and local package patterns over generic defaults
-- Keep changes focused on the requested behavior; avoid unrelated cleanup or opportunistic rewrites
-- Choose the most maintainable long-term solution that fits the existing codebase
-- Add abstractions only when they remove real complexity, reduce meaningful duplication, or match an existing pattern
-- Match surrounding style unless improving it is local, low-risk, and useful for the change
-- Keep comments, docs, and explanations proportional to the code they support
-
-## Precedence
+## Working Model
 
 - Follow the user request and explicit task constraints first
-- Follow the git safety rules in this file unless the user explicitly asks for a specific git-mutating action
-- Use command workflows from `.agent/commands/` when the user asks for that workflow
-- Use package READMEs, manifests, nearby tests, and surrounding code to understand package-specific intent
-- Follow all matching rules; when rules conflict, the more specific package, pattern, or framework rule wins over broader language or style rules
-- If local code conflicts with the repo target standard, align the edited area when it is local and low-risk; leave broader cleanup to an explicit migration task
-
-## Rule Usage
-
-- Treat rules as the repo target standard for the code they cover
-- Apply matching rules to new and touched code; do repo-wide cleanup only when the task explicitly calls for migration
-- Read the matching rule from `.agent/rules/` before touching a covered language, library, or pattern
-- Read `.agent/rules/rule-authoring.md` before creating or changing rules
+- If a rule appears to conflict with the user's explicit request or clearly implied task goal, follow the user. Mention meaningful conflicts briefly so the rule can be improved.
+- Before editing, read the matching rule from `.agent/rules/` and the nearby implementation
+- Before behavior, public API, or package-level changes, also read the local package README, package manifest, and nearby tests
+- Prefer repository conventions and local package patterns over generic defaults
+- Keep changes focused on the requested behavior. Do not do unrelated cleanup or opportunistic rewrites.
+- Match surrounding style unless a local, low-risk improvement makes the edited code clearer
+- Add abstractions only when they remove real complexity, reduce meaningful duplication, or match an existing pattern
+- Write comments, docs, and explanations for future maintainers rather than the current session
+- Treat matching rules as the target standard for new and touched code. If rules conflict, the more specific package, pattern, or framework rule wins.
+- Do repo-wide cleanup only when the task explicitly calls for migration
 
 ## Git
 
@@ -48,6 +34,7 @@ workflow and points to the more specific rules and commands.
 - Find the owning `package.json` or `Cargo.toml` for changed files before choosing validation
 - Prefer focused package checks such as `pnpm --filter <package> test`, `pnpm --filter <package> lint`, or `cargo test -p <crate>` when the package exposes them
 - Use Turbo filters or root `pnpm`/`cargo` commands when changes cross package boundaries or shared tooling
+- Do not validate routine changes with browser-driven, Playwright/Cypress-style, or manual browser e2e testing unless explicitly asked. For UI-specific tasks, ask before starting a browser-based validation workflow.
 - Report the checks you ran, and say clearly when a relevant check was skipped
 
 ## Rule Map

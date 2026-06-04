@@ -9,7 +9,11 @@ Apply these rules to all prose: comments, READMEs, doc strings, PR descriptions,
 - Use parentheses for brief asides that do not need to interrupt the sentence rhythm
 - Write in active voice
 - Keep sentences short and direct; one idea per sentence is the default
-- End full sentences with a period; omit the period on short fragments used as labels or list items
+- Write for future maintainers, not the current session
+- Match detail to lasting value: explain non-obvious behavior, constraints, tradeoffs, and risks future readers need
+- Do not overstate temporary context, and do not understate durable constraints or compatibility concerns
+- End full sentences in paragraphs with periods
+- In bullet lists, omit periods for single-sentence bullets, short fragments, labels, and index-style lists; use periods when a bullet contains multiple sentences
 - Let `.agent/rules/comments.md` override punctuation for short single-line regular code comments; doc comments use sentence punctuation
 
 ## Avoid
