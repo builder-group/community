@@ -14,6 +14,8 @@ Follow the established project React pattern unless the local code clearly does 
 - Use `React.useCallback` for handlers, imperative actions, and functions passed to children or hooks
 - Keep helper subcomponents in the same file when they are tightly coupled to the parent view
 - Use short JSX comments only when they help readers skim a dense visual structure
+- Use `&_svg` for components that own their icon subtree: children are only text/raw icons, or an internal wrapper renders the icon
+- Use `&>svg` for slots that may receive composed UI or rich item rows, so sizing does not leak across component boundaries
 
 ### TanStack Router
 
