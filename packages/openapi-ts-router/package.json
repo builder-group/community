@@ -90,9 +90,9 @@
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@types/express": "^5.0.6",
-		"@types/node": "^25.9.1",
+		"@types/node": "^25.9.2",
 		"express": "^5.2.1",
-		"hono": "^4.12.23",
+		"hono": "^4.12.25",
 		"rollup-presets": "workspace:*",
 		"valibot": "1.4.1"
 	},
