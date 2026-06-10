@@ -1,5 +1,6 @@
 {
 	// Editor settings
+	"editor.rulers": [100],
 	"editor.formatOnSave": true,
 	"editor.formatOnPaste": false,
 	"editor.codeActionsOnSave": {
