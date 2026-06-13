@@ -16,3 +16,4 @@ swift!(pub fn mado_get_active_window(include_app_icon: bool, include_app_color: 
 swift!(pub fn mado_get_installed_apps(include_icon: bool, include_app_color: bool, icon_size: i32) -> Option<SRString>);
 swift!(pub fn mado_get_app_icon(bundle_id: &SRString, icon_size: i32, include_color: bool) -> Option<SRString>);
 swift!(pub fn mado_get_app_color(bundle_id: &SRString) -> Option<SRString>);
+swift!(pub fn mado_get_website_icon(url: &SRString, include_color: bool) -> Option<SRString>);

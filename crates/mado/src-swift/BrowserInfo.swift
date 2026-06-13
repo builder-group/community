@@ -211,7 +211,7 @@ struct BrowserInfo {
             }
         }
 
-        // Looks like a domain - add https://
+        // Looks like a website hostname - add https://
         if trimmed.contains(".") && !trimmed.contains(" ") {
             return "https://\(trimmed)"
         }

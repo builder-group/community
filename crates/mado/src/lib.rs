@@ -67,7 +67,8 @@ pub use error::Error;
 pub use listener::WindowListener;
 pub use monitor::WindowMonitor;
 pub use types::{
-    AppIcon, AppInfo, BrowserInfo, InstalledApp, WebsiteInfo, WindowBounds, WindowEvent, WindowInfo,
+    AppIcon, AppInfo, BrowserInfo, InstalledApp, WebsiteIcon, WebsiteInfo, WindowBounds,
+    WindowEvent, WindowInfo,
 };
 
 // MARK: - Window Monitoring
@@ -177,7 +178,7 @@ pub fn get_active_window() -> Result<WindowInfo, Error> {
 /// if let Some(browser) = &window.browser {
 ///     println!("URL: {:?}", browser.url);
 ///     if let Some(website) = &browser.website {
-///         println!("Domain: {}", website.domain);
+///         println!("Hostname: {}", website.hostname);
 ///         if let Some(color) = &website.color {
 ///             println!("Color: {}", color);
 ///         }
@@ -254,7 +255,7 @@ pub fn get_installed_apps(config: InstalledAppsConfig) -> Vec<InstalledApp> {
 ///
 /// * `bundle_id` - The app's bundle identifier (e.g., "com.apple.Safari")
 /// * `size` - Icon size in pixels (default: 32 if 0)
-/// * `include_color` - Whether to also derive the dominant brand color
+/// * `include_color` - Whether to also include the app display color
 ///
 /// # Example
 ///
@@ -268,9 +269,31 @@ pub fn get_app_icon(bundle_id: &str, size: u32, include_color: bool) -> AppIcon 
     platform::get_app_icon(bundle_id, size, include_color)
 }
 
-/// Get the dominant brand color for a specific app by bundle identifier.
+/// Get the display color for a specific app by bundle identifier.
 ///
 /// On non-macOS platforms, returns `None`.
 pub fn get_app_color(bundle_id: &str) -> Option<String> {
     platform::get_app_color(bundle_id)
+}
+
+/// Get favicon for a website URL.
+///
+/// URLs without a scheme are treated as HTTPS. Only the URL hostname is used for
+/// lookup and caching. On non-macOS platforms, returns default (empty) result.
+///
+/// # Arguments
+///
+/// * `url` - The website URL (e.g., "github.com" or "https://github.com/path")
+/// * `include_color` - Whether to also include the favicon-derived color
+///
+/// # Example
+///
+/// ```rust,no_run
+/// let result = mado::get_website_icon("github.com", true);
+/// if let Some(icon) = result.data_url {
+///     println!("Favicon: {} bytes", icon.len());
+/// }
+/// ```
+pub fn get_website_icon(url: &str, include_color: bool) -> WebsiteIcon {
+    platform::get_website_icon(url, include_color)
 }

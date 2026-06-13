@@ -45,7 +45,7 @@ func getAppIconByBundleId(
     )
 }
 
-/// App icon with brand color.
+/// App icon with optional app display color.
 struct AppIcon {
     let dataUrl: String?
     let color: String?

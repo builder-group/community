@@ -59,11 +59,11 @@ pub struct BrowserInfo {
 #[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct WebsiteInfo {
-    /// Domain extracted from the browser URL (e.g., "github.com")
-    pub domain: String,
+    /// Hostname extracted from the browser URL (e.g., "github.com")
+    pub hostname: String,
     /// Favicon as base64 PNG data URL (e.g., "data:image/png;base64,...")
     pub favicon: Option<String>,
-    /// Dominant color extracted from favicon as hex string (e.g., "#FF5733")
+    /// Favicon-derived color as hex string (e.g., "#FF5733")
     pub color: Option<String>,
 }
 
@@ -118,7 +118,7 @@ impl fmt::Display for WindowInfo {
             writeln!(f, "      Mode:       {}", mode_str)?;
 
             if let Some(website) = &browser.website {
-                writeln!(f, "      Domain:     {}", website.domain)?;
+                writeln!(f, "      Hostname:   {}", website.hostname)?;
                 if website.favicon.is_some() {
                     writeln!(
                         f,
@@ -205,13 +205,23 @@ pub struct InstalledApp {
     pub icon: Option<AppIcon>,
 }
 
-/// App icon payload with optional brand color.
+/// App icon payload with optional app display color.
 #[derive(Debug, Clone, Default, Serialize, Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub struct AppIcon {
     /// Icon as base64 PNG data URL
     pub data_url: Option<String>,
-    /// Brand color as hex string like "#5865F2"
+    /// App display color as hex string like "#5865F2"
+    pub color: Option<String>,
+}
+
+/// Website favicon payload with optional favicon-derived color.
+#[derive(Debug, Clone, Default, Serialize, Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct WebsiteIcon {
+    /// Favicon as base64 PNG data URL
+    pub data_url: Option<String>,
+    /// Favicon-derived color as hex string like "#5865F2"
     pub color: Option<String>,
 }
 

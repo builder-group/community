@@ -4,8 +4,8 @@
 
 - Query the active app or focused window when you need a snapshot
 - Listen to app activations, window focus changes, and title changes without polling
-- Add browser URLs, private-mode state, website domains, favicons, and colors only when needed
-- Read installed app names, bundle IDs, icons, and colors without Accessibility permission
+- Add browser URLs, private-mode state, website hostnames, favicons, and favicon-derived colors only when needed
+- Read installed app names, bundle IDs, icons, and display colors without Accessibility permission
 - Handle macOS Accessibility and sandbox limits explicitly
 
 ```rust
@@ -68,7 +68,7 @@ mado = "0.0.3"
 | Linux    | Planned   | APIs return a platform error for now |
 | Windows  | Planned   | APIs return a platform error for now |
 
-Window focus, window title, window bounds, and browser URL extraction require macOS Accessibility permission. Active app queries, installed app scans, app icons, and app colors do not require that permission.
+Window focus, window title, window bounds, and browser URL extraction require macOS Accessibility permission. Active app queries, installed app scans, app icons, and app display colors do not require that permission.
 
 ## Usage
 
@@ -77,6 +77,7 @@ Pick the API that matches the job:
 - Snapshot queries: `get_active_app()`, `get_active_window()`, and their `_with_config` variants
 - Event monitoring: `WindowMonitor` with a `WindowListener`
 - Installed apps: `get_installed_apps()`, `get_app_icon()`, and `get_app_color()`
+- Website assets: `get_website_icon()`
 - Permission checks: `is_accessibility_trusted()`
 
 ### Query Current State
@@ -98,7 +99,7 @@ fn main() -> Result<(), mado::Error> {
         println!("URL: {:?}", browser.url);
 
         if let Some(website) = &browser.website {
-            println!("Domain: {}", website.domain);
+            println!("Hostname: {}", website.hostname);
         }
     }
 
@@ -106,7 +107,7 @@ fn main() -> Result<(), mado::Error> {
 }
 ```
 
-`include_website_info` depends on `include_browser_info` because it needs the current URL. Website metadata can fetch favicons over the network and is cached by domain.
+`include_website_info` depends on `include_browser_info` because it needs the current URL. Website metadata can fetch favicons over the network and is cached by hostname.
 
 ### Listen To Focus Changes
 
@@ -154,7 +155,7 @@ Keep `on_focus_change()` callbacks fast. Send events to another thread or async 
 
 ### Browser And Website Info
 
-Enable browser metadata when you need the active tab URL, private-mode state, website domain, favicon, or website color:
+Enable browser metadata when you need the active tab URL, private-mode state, website hostname, favicon, or favicon-derived color:
 
 ```rust
 use mado::{MonitorConfig, WindowEvent, WindowListener, WindowMonitor};
@@ -176,7 +177,7 @@ impl WindowListener for BrowserListener {
         println!("Private mode: {:?}", browser.is_private);
 
         if let Some(website) = &browser.website {
-            println!("Domain: {}", website.domain);
+            println!("Hostname: {}", website.hostname);
             println!("Color: {:?}", website.color);
         }
     }
@@ -223,16 +224,36 @@ fn main() {
 }
 ```
 
+### Website Icons
+
+Resolve a website favicon directly from a website URL:
+
+```rust
+fn main() {
+    let icon = mado::get_website_icon("https://github.com/builder-group/community", true);
+
+    if let Some(data_url) = &icon.data_url {
+        println!("GitHub favicon: {} bytes", data_url.len());
+    }
+
+    if let Some(color) = &icon.color {
+        println!("GitHub color: {}", color);
+    }
+}
+```
+
+`get_website_icon()` treats URLs without a scheme as HTTPS. Only the URL hostname is used for lookup and caching.
+
 ## Configuration
 
 `QueryConfig` controls snapshot queries:
 
-| Option                 | Default | Description                                                        |
-| ---------------------- | ------- | ------------------------------------------------------------------ |
-| `include_app_icon`     | `false` | Adds a base64 PNG app icon to `AppInfo`                            |
-| `include_app_color`    | `false` | Derives the dominant app color when app icon extraction is enabled |
-| `include_browser_info` | `false` | Extracts the active browser URL and private-mode state             |
-| `include_website_info` | `false` | Extracts domain, favicon, and color from the browser URL           |
+| Option                 | Default | Description                                                                |
+| ---------------------- | ------- | -------------------------------------------------------------------------- |
+| `include_app_icon`     | `false` | Adds a base64 PNG app icon to `AppInfo`                                    |
+| `include_app_color`    | `false` | Adds app display color when app icon extraction is enabled                 |
+| `include_browser_info` | `false` | Extracts the active browser URL and private-mode state                     |
+| `include_website_info` | `false` | Extracts hostname, favicon, and favicon-derived color from the browser URL |
 
 `MonitorConfig` supports the same enrichment options and adds `track_window_changes`:
 
@@ -240,17 +261,17 @@ fn main() {
 | ---------------------- | ------- | -------------------------------------------------------------------------- |
 | `track_window_changes` | `true`  | Tracks window focus and title changes in addition to app activation events |
 | `include_app_icon`     | `false` | Adds a base64 PNG app icon to emitted app or window data                   |
-| `include_app_color`    | `false` | Derives the dominant app color when app icon extraction is enabled         |
+| `include_app_color`    | `false` | Adds app display color when app icon extraction is enabled                 |
 | `include_browser_info` | `false` | Extracts the active browser URL and private-mode state                     |
-| `include_website_info` | `false` | Extracts domain, favicon, and color from the browser URL                   |
+| `include_website_info` | `false` | Extracts hostname, favicon, and favicon-derived color from the browser URL |
 
 `InstalledAppsConfig` controls installed app scans:
 
-| Option              | Default | Description                                                    |
-| ------------------- | ------- | -------------------------------------------------------------- |
-| `include_icon`      | `false` | Adds a base64 PNG icon to each installed app                   |
-| `include_app_color` | `false` | Derives the dominant app color when icon extraction is enabled |
-| `icon_size`         | `32`    | Icon size in pixels                                            |
+| Option              | Default | Description                                            |
+| ------------------- | ------- | ------------------------------------------------------ |
+| `include_icon`      | `false` | Adds a base64 PNG icon to each installed app           |
+| `include_app_color` | `false` | Adds app display color when icon extraction is enabled |
+| `icon_size`         | `32`    | Icon size in pixels                                    |
 
 ## Events
 
@@ -286,6 +307,7 @@ Accessibility permission is not required for:
 - app activation events with `track_window_changes: false`
 - `get_installed_apps()`
 - `get_app_icon()` and `get_app_color()`
+- `get_website_icon()`
 
 ## App Sandbox
 
@@ -339,7 +361,7 @@ Browsers expose the current URL through their UI tree in different ways. `mado` 
 
 ### Does `mado` validate or classify websites?
 
-No. It extracts the current URL, domain, favicon, and favicon-derived color when those options are enabled. Website classification, allow lists, and policy decisions belong in app code.
+No. It extracts the current URL, hostname, favicon, and favicon-derived color when those options are enabled. Website classification, allow lists, and policy decisions belong in app code.
 
 ### What happens on Linux or Windows today?
 

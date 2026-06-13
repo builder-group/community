@@ -123,7 +123,7 @@ mod tests {
             "browser": {
                 "url": "https://github.com",
                 "isPrivate": false,
-                "website": {"domain": "github.com", "favicon": "data:image/png;base64,ABC123", "color": "#24292E"}
+                "website": {"hostname": "github.com", "favicon": "data:image/png;base64,ABC123", "color": "#24292E"}
             }
         }"##;
 
@@ -132,7 +132,7 @@ mod tests {
         let browser = window.browser.unwrap();
         assert!(browser.website.is_some());
         let website = browser.website.unwrap();
-        assert_eq!(website.domain, "github.com");
+        assert_eq!(website.hostname, "github.com");
         assert_eq!(
             website.favicon,
             Some("data:image/png;base64,ABC123".to_string())
@@ -150,14 +150,14 @@ mod tests {
             "browser": {
                 "url": "https://github.com",
                 "isPrivate": false,
-                "website": {"domain": "github.com", "favicon": null, "color": null}
+                "website": {"hostname": "github.com", "favicon": null, "color": null}
             }
         }"#;
 
         let window = parse_window_info(json).unwrap();
         let browser = window.browser.unwrap();
         let website = browser.website.unwrap();
-        assert_eq!(website.domain, "github.com");
+        assert_eq!(website.hostname, "github.com");
         assert!(website.favicon.is_none());
         assert!(website.color.is_none());
     }

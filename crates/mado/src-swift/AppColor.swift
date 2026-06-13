@@ -1,17 +1,17 @@
 import AppKit
 
-/// Get app brand color from preset or by extracting from icon.
+/// Get app display color from preset or by extracting from icon.
 func getAppColor(forBundleId bundleId: String?, icon: NSImage?) -> String? {
-    // Check presets first (known brand colors)
-    if let bundleId = bundleId, let preset = appColorPresets[bundleId] {
+    // Check known app display colors first
+    if let bundleId = bundleId, let preset = appDisplayColorPresets[bundleId] {
         return preset
     }
 
     guard let icon = icon else { return nil }
-    return extractBrandColor(from: icon)
+    return extractDisplayColor(from: icon)
 }
 
-/// Get app brand color by bundle identifier, resolving the icon only if needed.
+/// Get app display color by bundle identifier, resolving the icon only if needed.
 func getAppColorByBundleId(_ bundleId: String) -> String? {
     if let preset = getAppColor(forBundleId: bundleId, icon: nil) {
         return preset
@@ -31,9 +31,9 @@ func getAppColorByBundleId(_ bundleId: String) -> String? {
 
 // MARK: - Color Extraction
 
-/// Extract brand color using k-means palette.
+/// Extract a display color using k-means palette.
 /// Picks most vibrant color, or falls back to dominant non-white for grayscale icons.
-func extractBrandColor(from image: NSImage) -> String? {
+func extractDisplayColor(from image: NSImage) -> String? {
     let palette = extractColorPalette(from: image, numberOfColors: 5)
     guard !palette.isEmpty else { return nil }
 
@@ -54,8 +54,8 @@ func extractBrandColor(from image: NSImage) -> String? {
 
 // MARK: - Presets
 
-/// Brand colors for popular apps, keyed by bundle identifier.
-private let appColorPresets: [String: String] = [
+/// Display color presets for popular apps, keyed by bundle identifier.
+private let appDisplayColorPresets: [String: String] = [
     // Communication
     "com.hnc.Discord": "#5865F2",  // Discord
     "com.apple.MobileSMS": "#2AC344",  // Messages

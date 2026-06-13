@@ -6,7 +6,7 @@ use crate::{
     config::{InstalledAppsConfig, MonitorConfig, QueryConfig},
     error::Error,
     listener::WindowListener,
-    types::{AppIcon, AppInfo, InstalledApp, WindowInfo},
+    types::{AppIcon, AppInfo, InstalledApp, WebsiteIcon, WindowInfo},
 };
 use ffi::*;
 use parser::{parse_app_info, parse_event, parse_window_info};
@@ -179,9 +179,23 @@ pub fn get_app_icon(bundle_id: &str, size: u32, include_color: bool) -> AppIcon 
     }
 }
 
-/// Get brand color for a specific app by bundle identifier.
+/// Get color for a specific app by bundle identifier.
 pub fn get_app_color(bundle_id: &str) -> Option<String> {
     let bundle_id_sr = SRString::from(bundle_id);
     let color_opt = unsafe { mado_get_app_color(&bundle_id_sr) };
     color_opt.map(|color| color.as_str().to_string())
+}
+
+/// Get favicon for a website URL.
+pub fn get_website_icon(url: &str, include_color: bool) -> WebsiteIcon {
+    let url_sr = SRString::from(url);
+    let json_opt = unsafe { mado_get_website_icon(&url_sr, include_color) };
+
+    match json_opt {
+        Some(json) => {
+            let json_str = json.as_str().to_string();
+            serde_json::from_str(&json_str).unwrap_or_default()
+        }
+        None => WebsiteIcon::default(),
+    }
 }

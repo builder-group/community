@@ -3,145 +3,235 @@ import Foundation
 
 /// Website information extracted from browser URL.
 struct WebsiteInfo {
-    let domain: String
+    let hostname: String
     let favicon: String?
     let color: String?
 
     /// Convert to dictionary for JSON serialization.
     func toDictionary() -> [String: Any?] {
         return [
-            "domain": domain,
+            "hostname": hostname,
             "favicon": favicon,
             "color": color,
         ]
     }
 
     /// Extract website info from a URL string.
-    /// Returns nil if URL is invalid or domain cannot be extracted.
+    /// Returns nil if URL is invalid or hostname cannot be extracted.
     static func extract(from url: String) -> WebsiteInfo? {
-        guard let domain = extractDomain(from: url) else { return nil }
-
-        // Check cache first
-        if let cached = WebsiteInfoCache.shared.get(domain: domain) {
-            return cached
-        }
-
-        // Fetch favicon and extract color
-        let faviconUrl =
-            "https://www.google.com/s2/favicons?domain=\(domain)&sz=64"
-        let (favicon, color) = fetchFavicon(from: faviconUrl)
-
-        let info = WebsiteInfo(
-            domain: domain,
-            favicon: favicon,
-            color: color
-        )
-
-        // Cache for future use
-        WebsiteInfoCache.shared.set(domain: domain, info: info)
-
-        return info
-    }
-
-    /// Fetch favicon from URL and extract color.
-    private static func fetchFavicon(from urlString: String) -> (
-        String?, String?
-    ) {
-        guard let url = URL(string: urlString) else {
-            return (nil, nil)
-        }
-
-        // Synchronous fetch (blocks, but cached so only first call per domain is slow)
-        guard let data = try? Data(contentsOf: url),
-            let image = NSImage(data: data)
+        guard let assets = getWebsiteAssets(from: url, includeColor: true)
         else {
-            return (nil, nil)
-        }
-
-        let dataUrl = image.pngData(size: 64).map {
-            "data:image/png;base64,\($0.base64EncodedString())"
-        }
-        let color = extractBrandColor(from: image)
-
-        return (dataUrl, color)
-    }
-
-    /// Extract domain from URL string.
-    private static func extractDomain(from url: String) -> String? {
-        var url = url.trimmingCharacters(in: .whitespaces).lowercased()
-
-        // Skip internal browser URLs
-        let internalProtocols = [
-            "about:", "chrome://", "edge://", "brave://", "arc://", "file://",
-        ]
-        for proto in internalProtocols {
-            if url.hasPrefix(proto) {
-                return nil
-            }
-        }
-
-        // Remove protocol
-        if url.hasPrefix("https://") {
-            url = String(url.dropFirst(8))
-        } else if url.hasPrefix("http://") {
-            url = String(url.dropFirst(7))
-        }
-
-        // Take host only (before /)
-        if let slashIndex = url.firstIndex(of: "/") {
-            url = String(url[..<slashIndex])
-        }
-
-        // Remove port
-        if let colonIndex = url.firstIndex(of: ":") {
-            url = String(url[..<colonIndex])
-        }
-
-        // Remove www.
-        if url.hasPrefix("www.") {
-            url = String(url.dropFirst(4))
-        }
-
-        // Validate we have something that looks like a domain
-        guard !url.isEmpty, url.contains(".") else {
             return nil
         }
 
-        return url
+        return WebsiteInfo(
+            hostname: assets.hostname,
+            favicon: assets.favicon,
+            color: assets.color
+        )
     }
 }
 
-// MARK: - Cache
+// MARK: - Website Assets
 
-/// Simple in-memory cache for website info.
-/// Thread-safe, caches by domain to avoid repeated fetches.
-final class WebsiteInfoCache: @unchecked Sendable {
-    static let shared = WebsiteInfoCache()
+/// Resolve website assets from a URL, accepting schemeless website URLs as HTTPS.
+func getWebsiteAssets(
+    from url: String,
+    includeColor: Bool = false
+) -> WebsiteAssets? {
+    guard let hostname = normalizedWebsiteHostname(from: url) else {
+        return nil
+    }
+    return loadWebsiteAssets(hostname: hostname, includeColor: includeColor)
+}
 
-    private var cache: [String: WebsiteInfo] = [:]
+/// Website assets resolved for a normalized URL hostname.
+struct WebsiteAssets {
+    let hostname: String
+    let favicon: String?
+    let color: String?
+    // Note: nil color can mean either not requested yet or resolved without a result
+    let isColorResolved: Bool
+}
+
+private func loadWebsiteAssets(
+    hostname: String,
+    includeColor: Bool
+) -> WebsiteAssets {
+    let cache = WebsiteAssetsCache.shared
+    let cached = cache.get(hostname: hostname)
+
+    if let cached = cached {
+        let hasResolvedColorIfNeeded = !includeColor || cached.isColorResolved
+        if hasResolvedColorIfNeeded {
+            return cached
+        }
+    }
+
+    let fetched = fetchWebsiteAssets(
+        hostname: hostname,
+        includeColor: includeColor
+    )
+
+    // Re-check cache after fetch so concurrent calls cannot downgrade cached assets
+    let latest = cache.get(hostname: hostname)
+    if let fallback = latest ?? cached {
+        let hasResolvedColorIfNeeded = !includeColor || fallback.isColorResolved
+        if hasResolvedColorIfNeeded {
+            return fallback
+        }
+
+        // Keep an existing favicon if a later color refresh fails
+        if fetched.favicon == nil, fallback.favicon != nil {
+            return fallback
+        }
+    }
+
+    cache.set(fetched)
+    return fetched
+}
+
+private func fetchWebsiteAssets(
+    hostname: String,
+    includeColor: Bool
+) -> WebsiteAssets {
+    guard let url = googleFaviconURL(hostname: hostname) else {
+        return WebsiteAssets(
+            hostname: hostname,
+            favicon: nil,
+            color: nil,
+            isColorResolved: includeColor
+        )
+    }
+
+    guard let data = try? Data(contentsOf: url),
+        let image = NSImage(data: data)
+    else {
+        return WebsiteAssets(
+            hostname: hostname,
+            favicon: nil,
+            color: nil,
+            isColorResolved: includeColor
+        )
+    }
+
+    let dataUrl = image.pngData(size: websiteFaviconSize).map {
+        "data:image/png;base64,\($0.base64EncodedString())"
+    }
+    let color = includeColor ? extractDisplayColor(from: image) : nil
+
+    return WebsiteAssets(
+        hostname: hostname,
+        favicon: dataUrl,
+        color: color,
+        isColorResolved: includeColor
+    )
+}
+
+private let websiteFaviconSize = 64
+
+private func googleFaviconURL(hostname: String) -> URL? {
+    var components = URLComponents(string: "https://www.google.com/s2/favicons")
+    components?.queryItems = [
+        URLQueryItem(name: "domain", value: hostname),
+        URLQueryItem(name: "sz", value: String(websiteFaviconSize)),
+    ]
+    return components?.url
+}
+
+private func normalizedWebsiteHostname(from url: String) -> String? {
+    let value = url.trimmingCharacters(in: .whitespacesAndNewlines)
+    guard !value.isEmpty else { return nil }
+
+    let lowercasedValue = value.lowercased()
+
+    // Note: Browser-internal URLs are not websites and should not trigger favicon fetches
+    let internalPrefixes = [
+        "about:", "chrome://", "edge://", "brave://", "arc://", "file://",
+    ]
+    for prefix in internalPrefixes {
+        if lowercasedValue.hasPrefix(prefix) {
+            return nil
+        }
+    }
+
+    guard let normalizedURL = normalizedWebsiteURLString(from: lowercasedValue),
+        let hostname = URLComponents(string: normalizedURL)?.host
+    else {
+        return nil
+    }
+
+    // Note: Require an internet-style hostname before calling Google's favicon endpoint
+    guard hostname.contains(".") else { return nil }
+
+    return hostname
+}
+
+private func normalizedWebsiteURLString(from value: String) -> String? {
+    if let schemeRange = value.range(of: "://") {
+        let scheme = value[..<schemeRange.lowerBound]
+        guard scheme == "http" || scheme == "https" else {
+            return nil
+        }
+
+        return value
+    }
+
+    guard isSchemelessWebsiteURL(value) else {
+        return nil
+    }
+
+    // Treat github.com and github.com/path as HTTPS shorthand
+    return "https://\(value)"
+}
+
+private func isSchemelessWebsiteURL(_ value: String) -> Bool {
+    let authority = value.prefix { character in
+        character != "/" && character != "?" && character != "#"
+    }
+    guard !authority.isEmpty else { return false }
+
+    guard let colonIndex = authority.firstIndex(of: ":") else {
+        return true
+    }
+
+    let port = authority[authority.index(after: colonIndex)...]
+    if port.isEmpty {
+        return false
+    }
+
+    return port.allSatisfy { $0.isNumber }
+}
+
+/// Thread-safe in-memory cache for website assets, keyed by hostname.
+private final class WebsiteAssetsCache: @unchecked Sendable {
+    static let shared = WebsiteAssetsCache()
+
+    private var cache: [String: WebsiteAssets] = [:]
     private let lock = NSLock()
     private let maxSize = 100
 
     private init() {}
 
-    func get(domain: String) -> WebsiteInfo? {
+    func get(hostname: String) -> WebsiteAssets? {
         lock.lock()
         defer { lock.unlock() }
-        return cache[domain]
+        return cache[hostname]
     }
 
-    func set(domain: String, info: WebsiteInfo) {
+    func set(_ assets: WebsiteAssets) {
         lock.lock()
         defer { lock.unlock() }
 
-        // Simple eviction: clear half when full
-        if cache.count >= maxSize {
+        // Simple eviction: clear half when adding beyond the limit
+        let isAddingHostname = cache[assets.hostname] == nil
+        if isAddingHostname && cache.count >= maxSize {
             let keysToRemove = Array(cache.keys.prefix(maxSize / 2))
             for key in keysToRemove {
                 cache.removeValue(forKey: key)
             }
         }
 
-        cache[domain] = info
+        cache[assets.hostname] = assets
     }
 }

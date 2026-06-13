@@ -129,6 +129,18 @@ public func madoGetAppColor(bundleId: SRString) -> SRString? {
     return SRString(color)
 }
 
+@_cdecl("mado_get_website_icon")
+public func madoGetWebsiteIcon(
+    url: SRString,
+    includeColor: Bool
+) -> SRString? {
+    let icon = getWebsiteIcon(
+        from: url.toString(),
+        includeColor: includeColor
+    )
+    return toJson(icon.toDictionary())
+}
+
 // MARK: - Helpers
 
 private func toJson(_ dict: [String: Any?]) -> SRString? {

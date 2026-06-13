@@ -9,7 +9,7 @@ use crate::{
     config::{InstalledAppsConfig, MonitorConfig, QueryConfig},
     error::Error,
     listener::WindowListener,
-    types::{AppIcon, AppInfo, InstalledApp, WindowEvent, WindowInfo},
+    types::{AppIcon, AppInfo, InstalledApp, WebsiteIcon, WindowEvent, WindowInfo},
 };
 use std::sync::Arc;
 
@@ -154,5 +154,20 @@ pub fn get_app_color(bundle_id: &str) -> Option<String> {
     {
         let _ = bundle_id;
         return None;
+    }
+}
+
+/// Get favicon for a website URL.
+///
+/// Returns the favicon as a base64 PNG data URL. On non-macOS platforms, returns default
+/// (empty) result.
+pub fn get_website_icon(url: &str, include_color: bool) -> WebsiteIcon {
+    #[cfg(target_os = "macos")]
+    return macos::get_website_icon(url, include_color);
+
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = (url, include_color);
+        return WebsiteIcon::default();
     }
 }

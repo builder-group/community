@@ -8,7 +8,7 @@ pub struct MonitorConfig {
     /// Default: `false`
     pub include_app_icon: bool,
 
-    /// Whether to derive the dominant app color when `include_app_icon` is enabled.
+    /// Whether to include the app display color when `include_app_icon` is enabled.
     ///
     /// Default: `false`
     pub include_app_color: bool,
@@ -21,13 +21,13 @@ pub struct MonitorConfig {
     /// Default: `false`
     pub include_browser_info: bool,
 
-    /// Whether to extract website info (domain, favicon, and color).
+    /// Whether to extract website info (hostname, favicon, and color).
     ///
-    /// When enabled, extracts the domain from the browser URL, fetches the favicon,
-    /// and extracts the dominant color. Populates `browser.website` in `WindowInfo`.
+    /// When enabled, extracts the hostname from the browser URL, fetches the favicon,
+    /// and extracts the favicon-derived color. Populates `browser.website` in `WindowInfo`.
     ///
     /// Requires `include_browser_info` to be enabled (needs URL to fetch favicon).
-    /// Network fetch, slower (~50-500ms), cached by domain.
+    /// Network fetch, slower (~50-500ms), cached by hostname.
     ///
     /// Default: `false`
     pub include_website_info: bool,
@@ -65,7 +65,7 @@ pub struct QueryConfig {
     /// Default: `false`
     pub include_app_icon: bool,
 
-    /// Whether to derive the dominant app color when `include_app_icon` is enabled.
+    /// Whether to include the app display color when `include_app_icon` is enabled.
     ///
     /// Default: `false`
     pub include_app_color: bool,
@@ -78,13 +78,13 @@ pub struct QueryConfig {
     /// Default: `false`
     pub include_browser_info: bool,
 
-    /// Whether to extract website info (domain, favicon, and color).
+    /// Whether to extract website info (hostname, favicon, and color).
     ///
-    /// When enabled, extracts the domain from the browser URL, fetches the favicon,
-    /// and extracts the dominant color. Populates `browser.website` in `WindowInfo`.
+    /// When enabled, extracts the hostname from the browser URL, fetches the favicon,
+    /// and extracts the favicon-derived color. Populates `browser.website` in `WindowInfo`.
     ///
     /// Requires `include_browser_info` to be enabled (needs URL to fetch favicon).
-    /// Network fetch, slower (~50-500ms), cached by domain.
+    /// Network fetch, slower (~50-500ms), cached by hostname.
     ///
     /// Default: `false`
     pub include_website_info: bool,
@@ -111,7 +111,7 @@ pub struct InstalledAppsConfig {
     /// Default: `false` (faster without icon)
     pub include_icon: bool,
 
-    /// Whether to derive the dominant app color when `include_icon` is enabled.
+    /// Whether to include the app display color when `include_icon` is enabled.
     ///
     /// Default: `false`
     pub include_app_color: bool,
