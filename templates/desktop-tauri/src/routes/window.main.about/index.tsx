@@ -13,9 +13,7 @@ function RouteComponent() {
 			<WindowHeader floating title="About" />
 			<div className="mx-auto w-full max-w-3xl">
 				<section className="rounded-3xl border border-black/10 bg-white/80 px-7 py-6 backdrop-blur-sm">
-					<h1 className="text-3xl font-semibold tracking-normal text-black sm:text-4xl">
-						About
-					</h1>
+					<h1 className="text-3xl font-semibold tracking-normal text-black sm:text-4xl">About</h1>
 					<p className="mt-3 max-w-2xl text-base leading-7 text-black/60">
 						A reusable desktop app starter with routed windows, typed Specta bindings, Rust and
 						Swift greeting examples, and macOS Liquid Glass support.
