@@ -12,7 +12,7 @@ export const projectsConfig: {
 				'macOS app to schedule focus sessions with automatic app blocking and forced breaks',
 			logo: { type: 'image', src: '/illustrations/logos/abstand.png' },
 			startedAt: { year: 2026, month: 4 },
-			status: 'in-progress',
+			status: 'maintenance',
 			category: 'saas',
 			tags: [
 				{ type: 'website', url: 'https://abstand.app/' },

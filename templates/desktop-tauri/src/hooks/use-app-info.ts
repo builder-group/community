@@ -17,7 +17,12 @@ export function useAppInfo(): TAppInfo {
 					...nextAppInfo,
 					isPending: false
 				});
-			} catch {}
+			} catch {
+				setAppInfo((currentAppInfo) => ({
+					...currentAppInfo,
+					isPending: false
+				}));
+			}
 		})();
 	}, []);
 
