@@ -25,31 +25,16 @@ enum BrowserURLExtractor {
     {
         if let url = findNormalizedURLBarValue(
             in: windowElement,
-            matching: { isURLBarTextFieldByDOMIdentifier($0) }
-        ) {
-            return url
-        }
-
-        // Note: Some Chromium variants expose the address bar by label/placeholder, not urlbar DOM id
-        if let url = findNormalizedURLBarValue(
-            in: windowElement,
             matching: { isAddressBarTextField($0) }
         ) {
             return url
         }
 
-        if let url = extractAXURLFromWebContent(windowElement) {
+        if let url = findTopLevelWebContentURL(in: windowElement) {
             return url
         }
 
         return nil
-    }
-
-    private static func isURLBarTextFieldByDOMIdentifier(
-        _ element: AXUIElement
-    ) -> Bool {
-        return getRole(from: element) == "AXTextField"
-            && getDOMIdentifier(from: element) == "urlbar-input"
     }
 
     // MARK: - Safari
@@ -57,7 +42,7 @@ enum BrowserURLExtractor {
     private static func extractSafariURL(from windowElement: AXUIElement)
         -> String?
     {
-        return extractAXURLFromWebContent(windowElement)
+        return findTopLevelWebContentURL(in: windowElement)
     }
 
     // MARK: - Firefox
@@ -67,50 +52,47 @@ enum BrowserURLExtractor {
     {
         if let url = findNormalizedURLBarValue(
             in: windowElement,
-            matching: {
-                isAddressBarTextField($0)
-                    || isFirefoxSearchEntryTextField($0)
-            }
+            matching: { isAddressBarTextField($0) }
         ) {
             return url
         }
 
-        if let url = extractAXURLFromWebContent(windowElement) {
+        if let url = findTopLevelWebContentURL(in: windowElement) {
             return url
         }
 
         return nil
     }
 
-    private static func isFirefoxSearchEntryTextField(
-        _ element: AXUIElement
-    ) -> Bool {
-        guard getRole(from: element) == "AXTextField" else { return false }
-
-        // Note: Firefox labels its combined address/search bar as a search entry
-        let description = (getDescription(from: element) ?? "").lowercased()
-        return description.contains("search") && description.contains("enter")
-    }
-
     // MARK: - Shared URL Strategies
 
-    private static func extractAXURLFromWebContent(
-        _ windowElement: AXUIElement
+    /// Returns the AXURL from the nearest web-content node without descending into nested web content.
+    private static func findTopLevelWebContentURL(
+        in element: AXUIElement
     ) -> String? {
-        if let webArea = findElement(
-            in: windowElement,
-            where: { getRole(from: $0) == "AXWebArea" },
-            maxDepth: maxBrowserURLSearchDepth
-        ), let url = getAXURL(from: webArea) {
-            return url.absoluteString
-        }
+        var queue = [(element: element, depth: 0)]
+        var index = 0
 
-        if let doc = findElement(
-            in: windowElement,
-            where: { getRole(from: $0) == "AXDocument" },
-            maxDepth: maxBrowserURLSearchDepth
-        ), let url = getAXURL(from: doc) {
-            return url.absoluteString
+        while index < queue.count {
+            let current = queue[index]
+            index += 1
+
+            guard current.depth <= maxBrowserURLSearchDepth else {
+                continue
+            }
+
+            let role = getRole(from: current.element)
+            if isWebContentRole(role) {
+                if let url = getAXURL(from: current.element) {
+                    return url.absoluteString
+                }
+
+                continue
+            }
+
+            for child in getTraversalChildren(from: current.element) {
+                queue.append((element: child, depth: current.depth + 1))
+            }
         }
 
         return nil
@@ -120,17 +102,38 @@ enum BrowserURLExtractor {
         in element: AXUIElement,
         matching predicate: (AXUIElement) -> Bool
     ) -> String? {
-        if let urlBar = findElement(
-            in: element,
-            where: { field in
-                predicate(field) && normalizedURLValue(from: field) != nil
-            },
-            maxDepth: maxBrowserURLSearchDepth
-        ) {
-            return normalizedURLValue(from: urlBar)
+        var queue = [(element: element, depth: 0)]
+        var index = 0
+
+        while index < queue.count {
+            let current = queue[index]
+            index += 1
+
+            guard current.depth <= maxBrowserURLSearchDepth else {
+                continue
+            }
+
+            let role = getRole(from: current.element)
+            if isWebContentRole(role) {
+                continue
+            }
+
+            if predicate(current.element),
+                let url = normalizedURLValue(from: current.element)
+            {
+                return url
+            }
+
+            for child in getTraversalChildren(from: current.element) {
+                queue.append((element: child, depth: current.depth + 1))
+            }
         }
 
         return nil
+    }
+
+    private static func isWebContentRole(_ role: String?) -> Bool {
+        return role == "AXWebArea" || role == "AXDocument"
     }
 
     private static func normalizedURLValue(from element: AXUIElement) -> String?
