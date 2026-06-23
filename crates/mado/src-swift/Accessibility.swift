@@ -75,6 +75,38 @@ func getChildren(from element: AXUIElement) -> [AXUIElement]? {
     return childrenRef as? [AXUIElement]
 }
 
+/// Get child-like elements used when traversing accessibility trees.
+func getTraversalChildren(from element: AXUIElement) -> [AXUIElement] {
+    let children = getChildren(from: element) ?? []
+    // Note: AXVisibleChildren can expose reachable UI controls that are absent from AXChildren
+    let visibleChildren = getVisibleChildren(from: element) ?? []
+
+    var traversalChildren: [AXUIElement] = []
+    for child in children + visibleChildren {
+        if traversalChildren.contains(where: { CFEqual($0, child) }) {
+            continue
+        }
+        traversalChildren.append(child)
+    }
+    return traversalChildren
+}
+
+/// Get visible child elements from an accessibility element.
+func getVisibleChildren(from element: AXUIElement) -> [AXUIElement]? {
+    var childrenRef: CFTypeRef?
+    guard
+        AXUIElementCopyAttributeValue(
+            element,
+            "AXVisibleChildren" as CFString,
+            &childrenRef
+        ) == .success,
+        let childrenRef
+    else {
+        return nil
+    }
+    return childrenRef as? [AXUIElement]
+}
+
 /// Get the role of an accessibility element (e.g., "AXTextField", "AXWebArea").
 func getRole(from element: AXUIElement) -> String? {
     var roleRef: CFTypeRef?
@@ -130,7 +162,7 @@ func getDOMIdentifier(from element: AXUIElement) -> String? {
     return idRef as? String
 }
 
-/// Get the AXURL property (Safari-specific, returns URL of web content).
+/// Get the AXURL property from web content when a browser exposes it.
 func getAXURL(from element: AXUIElement) -> URL? {
     var urlRef: CFTypeRef?
     guard
@@ -139,11 +171,18 @@ func getAXURL(from element: AXUIElement) -> URL? {
             "AXURL" as CFString,
             &urlRef
         ) == .success,
-        let url = urlRef as? NSURL
+        let urlRef
     else {
         return nil
     }
-    return url as URL
+
+    if let url = urlRef as? NSURL {
+        return url as URL
+    }
+    if let value = urlRef as? String {
+        return URL(string: value)
+    }
+    return nil
 }
 
 /// Recursively find an element in the accessibility tree matching a predicate.
@@ -161,8 +200,8 @@ func findElement(
         return element
     }
 
-    // Recursively check children
-    guard let children = getChildren(from: element) else {
+    let children = getTraversalChildren(from: element)
+    guard !children.isEmpty else {
         return nil
     }
 

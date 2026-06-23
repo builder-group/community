@@ -147,7 +147,8 @@ private func normalizedWebsiteHostname(from url: String) -> String? {
 
     // Note: Browser-internal URLs are not websites and should not trigger favicon fetches
     let internalPrefixes = [
-        "about:", "chrome://", "edge://", "brave://", "arc://", "file://",
+        "about:", "chrome://", "edge://", "brave://", "arc://", "opera://",
+        "file://",
     ]
     for prefix in internalPrefixes {
         if lowercasedValue.hasPrefix(prefix) {
