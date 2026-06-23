@@ -55,7 +55,7 @@ fn main() -> Result<(), mado::Error> {
 
 ```toml
 [dependencies]
-mado = "0.0.3"
+mado = "0.0.5"
 ```
 
 ## Requirements
