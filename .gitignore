@@ -10,7 +10,9 @@
 .env.*.local
 
 # Tooling
+**/.tanstack/
 **/.turbo/
+**/.vite/
 
 # Test artifacts
 **/coverage/

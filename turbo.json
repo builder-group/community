@@ -1,14 +1,19 @@
 {
-	"$schema": "https://turbo.build/schema.json",
-	"globalDependencies": ["**/.env.*local"],
+	"$schema": "./node_modules/turbo/schema.json",
+	"ui": "tui",
 	"tasks": {
 		"build": {
 			"dependsOn": ["^build"],
-			"outputs": [".next/**", "!.next/cache/**", ".output/**", "dist/**"]
+			"inputs": ["$TURBO_DEFAULT$", ".env*"],
+			"outputs": [".output/**", "dist/**"]
 		},
 		"build:prod": {
 			"dependsOn": ["^build:prod"],
-			"outputs": [".next/**", "!.next/cache/**", ".output/**", "dist/**"]
+			"inputs": ["$TURBO_DEFAULT$", ".env*"],
+			"outputs": [".output/**", "dist/**"]
+		},
+		"clean": {
+			"cache": false
 		},
 		"lint": {
 			"dependsOn": ["^lint"]
@@ -16,11 +21,9 @@
 		"start:dev": {
 			"cache": false
 		},
-		"clean": {
-			"cache": false
-		},
 		"test": {
 			"dependsOn": ["^build"],
+			"inputs": ["$TURBO_DEFAULT$", ".env*"],
 			"cache": false
 		},
 		"update:latest": {

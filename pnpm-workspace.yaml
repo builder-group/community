@@ -6,7 +6,7 @@ packages:
   - 'examples/**'
 
 allowBuilds:
-  # Required by Vite/tsx/Vitest/size-limit; needed for build and test tooling
+  # Required by Vite and Vitest tooling
   esbuild: true
   # Optional dependency of piscina via camaro; denied because camaro is only xml-tokenizer benchmark/playground tooling
   nice-napi: false
