@@ -1,1 +1,0 @@
-- [StageTimer Terms of Service](https://stagetimer.io/terms-of-service/)

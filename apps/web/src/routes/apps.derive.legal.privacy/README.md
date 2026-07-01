@@ -1,1 +1,0 @@
-- [StageTimer Privacy Policy](https://stagetimer.io/privacy-policy/)
