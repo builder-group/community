@@ -78,7 +78,7 @@ mod tests {
     }
 
     #[test]
-    fn parse_window_info_full() {
+    fn parse_window_info_without_browser() {
         let json = r#"{
             "title": "Documents",
             "windowId": 42,
@@ -90,7 +90,11 @@ mod tests {
         let window = parse_window_info(json).unwrap();
         assert_eq!(window.title, Some("Documents".to_string()));
         assert_eq!(window.window_id, Some(42));
-        assert!(window.bounds.is_some());
+        let bounds = window.bounds.unwrap();
+        assert_eq!(bounds.x, 100.0);
+        assert_eq!(bounds.y, 200.0);
+        assert_eq!(bounds.width, 800.0);
+        assert_eq!(bounds.height, 600.0);
         assert_eq!(window.app.pid, 1234);
         assert!(window.browser.is_none());
     }
@@ -100,17 +104,26 @@ mod tests {
         let json = r#"{
             "title": "GitHub",
             "windowId": 123,
-            "bounds": null,
+            "bounds": {"x": 100.0, "y": 120.0, "width": 1200.0, "height": 800.0},
             "app": {"pid": 5678, "name": "Chrome", "bundleId": "com.google.Chrome", "processPath": null},
-            "browser": {"url": "https://github.com", "isPrivate": false, "website": null}
+            "browser": {
+                "url": "https://github.com",
+                "contentBounds": {"x": 100.0, "y": 200.0, "width": 1200.0, "height": 720.0},
+                "isPrivate": false,
+                "website": null
+            }
         }"#;
 
         let window = parse_window_info(json).unwrap();
-        assert!(window.browser.is_some());
         let browser = window.browser.unwrap();
         assert_eq!(browser.url, Some("https://github.com".to_string()));
         assert_eq!(browser.is_private, Some(false));
         assert!(browser.website.is_none());
+        let content_bounds = browser.content_bounds.unwrap();
+        assert_eq!(content_bounds.x, 100.0);
+        assert_eq!(content_bounds.y, 200.0);
+        assert_eq!(content_bounds.width, 1200.0);
+        assert_eq!(content_bounds.height, 720.0);
     }
 
     #[test]

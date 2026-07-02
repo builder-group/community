@@ -1,21 +1,26 @@
-# Browser URL Accessibility
+# Browser Accessibility Extraction
 
-`mado` reads browser URLs through macOS Accessibility without browser-specific
-Automation permissions. Browsers expose URL state through browser chrome, web
-content, or both.
+`mado` reads browser metadata through macOS Accessibility without
+browser-specific Automation permissions. Browsers expose active-tab URLs and web
+content bounds through browser chrome, web content, or both.
 
-The extractor uses observed browser signals and should prefer no URL over a
-guessed URL when a browser shape is unobserved.
+Extractors use observed browser signals and should prefer missing metadata over
+guessed metadata when a browser shape is unobserved.
 
 ## Extraction Signals
 
 `AXTextField` can expose the URL from browser chrome. `AXWebArea.AXURL` can
-expose the loaded document URL from web content. Address bar values and
-`AXWebArea.AXURL` values can differ in canonical form.
+expose the loaded document URL from web content. `AXWebArea` and `AXDocument`
+frames can expose the visible browser content area even when `AXURL` is missing.
+Address bar values and `AXWebArea.AXURL` values can differ in canonical form.
 
-Nested `AXWebArea` nodes can represent embedded content, not the active tab URL.
-Traversal should stop at the nearest web-content node unless it is explicitly
-looking for nested content.
+`BrowserInfo` stays anchored to an active-tab URL. Content bounds are included
+when browser metadata is returned, but mado does not emit browser metadata from
+bounds alone.
+
+Nested `AXWebArea` nodes can represent embedded content, not the active tab URL
+or viewport. Traversal should stop at the nearest web-content node unless it is
+explicitly looking for nested content.
 
 ## Probe Notes
 

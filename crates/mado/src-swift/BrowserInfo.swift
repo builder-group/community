@@ -1,9 +1,10 @@
 import ApplicationServices
 import Foundation
 
-/// Browser information (URL, private mode, website).
+/// Browser information (URL, content bounds, private mode, website).
 struct BrowserInfo {
     let url: String?
+    let contentBounds: [String: Double]?
     let isPrivate: Bool?
     let website: WebsiteInfo?
 
@@ -11,13 +12,14 @@ struct BrowserInfo {
     func toDictionary() -> [String: Any?] {
         return [
             "url": url,
+            "contentBounds": contentBounds,
             "isPrivate": isPrivate,
             "website": website?.toDictionary(),
         ]
     }
 
     /// Extract browser info using the Accessibility API.
-    /// Returns nil if not a browser or extraction fails.
+    /// Returns nil if the app is not a browser or the active-tab URL cannot be read.
     static func extract(
         bundleId: String,
         windowElement: AXUIElement,
@@ -33,13 +35,15 @@ struct BrowserInfo {
             family: family,
             from: windowElement
         )
+        let contentBounds = BrowserContentBoundsExtractor.extract(
+            from: windowElement
+        )
         let isPrivate = detectPrivateMode(
             windowTitle: windowTitle ?? getTitle(from: windowElement)
         )
 
         guard url != nil else { return nil }
 
-        // Extract website info if enabled
         let website: WebsiteInfo? =
             if includeWebsiteInfo, let url = url {
                 WebsiteInfo.extract(from: url)
@@ -47,7 +51,12 @@ struct BrowserInfo {
                 nil
             }
 
-        return BrowserInfo(url: url, isPrivate: isPrivate, website: website)
+        return BrowserInfo(
+            url: url,
+            contentBounds: contentBounds,
+            isPrivate: isPrivate,
+            website: website
+        )
     }
 
     // MARK: - Private Mode Detection

@@ -46,6 +46,11 @@ impl fmt::Display for AppInfo {
 pub struct BrowserInfo {
     /// Current URL of the active tab.
     pub url: Option<String>,
+    /// Bounds of the visible browser content area, when exposed by Accessibility.
+    ///
+    /// This is the visible web content viewport, not the full browser window,
+    /// and may be `None` when the browser does not expose it.
+    pub content_bounds: Option<WindowBounds>,
     /// Whether the window is in private/incognito mode.
     ///
     /// - `None` if detection failed or not supported
@@ -110,6 +115,14 @@ impl fmt::Display for WindowInfo {
         if let Some(browser) = &self.browser {
             writeln!(f, "   Browser:")?;
             writeln!(f, "      URL:        {}", fmt_display(&browser.url))?;
+            let content_bounds_str = match browser.content_bounds.as_ref() {
+                Some(bounds) => format!(
+                    "({:.0}, {:.0}) {:.0}×{:.0}",
+                    bounds.x, bounds.y, bounds.width, bounds.height
+                ),
+                None => "(not available)".to_string(),
+            };
+            writeln!(f, "      Content:    {}", content_bounds_str)?;
             let mode_str = match browser.is_private {
                 Some(true) => "Private/Incognito",
                 Some(false) => "Normal",

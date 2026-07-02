@@ -70,32 +70,10 @@ enum BrowserURLExtractor {
     private static func findTopLevelWebContentURL(
         in element: AXUIElement
     ) -> String? {
-        var queue = [(element: element, depth: 0)]
-        var index = 0
-
-        while index < queue.count {
-            let current = queue[index]
-            index += 1
-
-            guard current.depth <= maxBrowserURLSearchDepth else {
-                continue
-            }
-
-            let role = getRole(from: current.element)
-            if isWebContentRole(role) {
-                if let url = getAXURL(from: current.element) {
-                    return url.absoluteString
-                }
-
-                continue
-            }
-
-            for child in getTraversalChildren(from: current.element) {
-                queue.append((element: child, depth: current.depth + 1))
-            }
-        }
-
-        return nil
+        return BrowserWebContent.findTopLevelValue(
+            in: element,
+            extract: { getAXURL(from: $0)?.absoluteString }
+        )
     }
 
     private static func findNormalizedURLBarValue(
@@ -114,7 +92,7 @@ enum BrowserURLExtractor {
             }
 
             let role = getRole(from: current.element)
-            if isWebContentRole(role) {
+            if BrowserWebContent.isWebContentRole(role) {
                 continue
             }
 
@@ -130,10 +108,6 @@ enum BrowserURLExtractor {
         }
 
         return nil
-    }
-
-    private static func isWebContentRole(_ role: String?) -> Bool {
-        return role == "AXWebArea" || role == "AXDocument"
     }
 
     private static func normalizedURLValue(from element: AXUIElement) -> String?

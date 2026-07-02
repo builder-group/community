@@ -4,7 +4,7 @@
 
 - Query the active app or focused window when you need a snapshot
 - Listen to app activations, window focus changes, and title changes without polling
-- Add browser URLs, private-mode state, website hostnames, favicons, and favicon-derived colors only when needed
+- Add browser URLs, content-area bounds, private-mode state, website hostnames, favicons, and favicon-derived colors only when needed
 - Read installed app names, bundle IDs, icons, and display colors without Accessibility permission
 - Handle macOS Accessibility and sandbox limits explicitly
 
@@ -155,7 +155,7 @@ Keep `on_focus_change()` callbacks fast. Send events to another thread or async 
 
 ### Browser And Website Info
 
-Enable browser metadata when you need the active tab URL, private-mode state, website hostname, favicon, or favicon-derived color:
+Enable browser metadata when you need the active tab URL, browser content-area bounds, private-mode state, website hostname, favicon, or favicon-derived color:
 
 ```rust
 use mado::{MonitorConfig, WindowEvent, WindowListener, WindowMonitor};
@@ -174,6 +174,7 @@ impl WindowListener for BrowserListener {
         };
 
         println!("URL: {:?}", browser.url);
+        println!("Content bounds: {:?}", browser.content_bounds);
         println!("Private mode: {:?}", browser.is_private);
 
         if let Some(website) = &browser.website {
@@ -197,7 +198,11 @@ fn main() -> Result<(), mado::Error> {
 }
 ```
 
-Supported browser families include Chrome, Safari, Brave, Edge, Arc, Opera, Firefox, and their common variants.
+Supported browser families include Chrome, Safari, Brave, Edge, Arc, Opera,
+Firefox, and their common variants.
+
+Browser content bounds are best-effort Accessibility data and may be `None`
+when the browser does not expose a top-level web content frame.
 
 ### Installed Apps
 
