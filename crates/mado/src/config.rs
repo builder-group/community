@@ -32,17 +32,27 @@ pub struct MonitorConfig {
     /// Default: `false`
     pub include_website_info: bool,
 
-    /// Whether to track window changes within the same app.
+    /// Whether to track focused window changes in addition to app activations.
     ///
     /// When `true` (default), fires events for:
-    /// - App switches (always tracked)
     /// - Window focus changes within the same app
     /// - Window title changes (e.g. tab switches in browsers)
+    /// - Window information becoming available after app activation
     ///
-    /// When `false`, only fires events for app switches.
+    /// App activation events are always emitted. Set this to `false` to disable
+    /// `WindowChanged` events while still receiving `AppActivated` events.
     ///
-    /// Default: `true` (track all changes)
+    /// Default: `true`
     pub track_window_changes: bool,
+
+    /// Whether to track focused window move and resize changes.
+    ///
+    /// When `true`, fires `WindowBoundsChanged` events for the focused window.
+    /// This is separate from `track_window_changes` so consumers can receive
+    /// geometry updates without routing them through `WindowChanged`.
+    ///
+    /// Default: `false`
+    pub track_window_bounds_changes: bool,
 }
 
 impl Default for MonitorConfig {
@@ -53,6 +63,7 @@ impl Default for MonitorConfig {
             include_browser_info: false,
             include_website_info: false,
             track_window_changes: true,
+            track_window_bounds_changes: false,
         }
     }
 }

@@ -1,11 +1,13 @@
 use crate::types::WindowEvent;
 
-/// Trait for listening to window and app focus events.
+/// Trait for listening to `WindowMonitor` events.
 ///
-/// Implement this trait to receive notifications when focus changes.
-/// The callback receives a `WindowEvent` which can be either:
+/// Implement this trait to receive notifications when the active app, focused
+/// window, or focused window bounds change.
+/// The callback receives a `WindowEvent` which can be one of:
 /// - `AppActivated`: Always fires when an app is switched to (even if it has no window yet, e.g. tray apps)
 /// - `WindowChanged`: Fires when window focus/title changes or when a window becomes available
+/// - `WindowBoundsChanged`: Fires when the focused window moves or resizes, if enabled
 ///
 /// ## Performance Considerations
 ///
@@ -53,24 +55,29 @@ use crate::types::WindowEvent;
 ///             WindowEvent::WindowChanged { window } => {
 ///                 println!("Window: {}", window);
 ///             }
+///             WindowEvent::WindowBoundsChanged { window } => {
+///                 println!("Window moved/resized: {:?}", window.bounds);
+///             }
 ///         }
 ///     }
 /// }
 /// ```
 pub trait WindowListener: Send + Sync {
-    /// Called whenever the focused window or app changes.
+    /// Called whenever the monitor emits an event.
     ///
-    /// Focus can change to:
+    /// The active context can change to:
     /// - An app (`AppActivated` event) - fires immediately when app is activated, even if it has no window yet
     ///   (e.g. tray apps, apps activated via Spotlight/Dock before opening a window)
     /// - A window (`WindowChanged` event) - fires when window focus/title changes or when window becomes available
+    /// - A window bounds update (`WindowBoundsChanged` event) - fires when enabled and the focused window moves or resizes
     ///
     /// This includes:
     /// - App switches (always `AppActivated` first, then `WindowChanged` when window is ready)
     /// - Window switches within the same app (`WindowChanged` only)
     /// - Window title changes (`WindowChanged` only)
+    /// - Focused window move/resize changes (`WindowBoundsChanged` only, if enabled)
     ///
-    /// Use `event.app()` to get app information from either event type.
+    /// Use `event.app()` to get app information from any event type.
     ///
     /// **Note**: Keep this callback fast. For heavy work, spawn async tasks. Panics are caught
     /// and logged but won't crash the monitor thread.

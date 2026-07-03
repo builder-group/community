@@ -1,9 +1,9 @@
 # mado (窓)
 
-`mado` is a macOS-focused Rust crate for reading the active app and focused window. It wraps native macOS APIs through Swift, listens to focus changes, and can enrich browser windows with URL and website metadata. Use it in desktop apps, productivity tools, and agents that need current user context.
+`mado` is a macOS-focused Rust crate for reading the active app and focused window. It wraps native macOS APIs through Swift, listens to app, window, and bounds changes, and can enrich browser windows with URL and website metadata. Use it in desktop apps, productivity tools, and agents that need current user context.
 
 - Query the active app or focused window when you need a snapshot
-- Listen to app activations, window focus changes, and title changes without polling
+- Listen to app activations, focused-window changes, title changes, and opt-in window bounds changes without polling
 - Add browser URLs, content-area bounds, private-mode state, website hostnames, favicons, and favicon-derived colors only when needed
 - Read installed app names, bundle IDs, icons, and display colors without Accessibility permission
 - Handle macOS Accessibility and sandbox limits explicitly
@@ -28,6 +28,9 @@ impl WindowListener for FocusListener {
                     println!("URL: {:?}", browser.url);
                 }
             }
+            WindowEvent::WindowBoundsChanged { window } => {
+                println!("Window moved/resized: {:?}", window.bounds);
+            }
         }
     }
 }
@@ -43,6 +46,7 @@ fn main() -> Result<(), mado::Error> {
         MonitorConfig {
             include_browser_info: true,
             track_window_changes: true,
+            track_window_bounds_changes: true,
             ..Default::default()
         },
     );
@@ -127,6 +131,9 @@ impl WindowListener for FocusListener {
             WindowEvent::WindowChanged { window } => {
                 println!("Window: {}", window);
             }
+            WindowEvent::WindowBoundsChanged { window } => {
+                println!("Window moved/resized: {:?}", window.bounds);
+            }
         }
     }
 }
@@ -167,6 +174,7 @@ impl WindowListener for BrowserListener {
         let window = match event {
             WindowEvent::WindowChanged { window } => window,
             WindowEvent::AppActivated { .. } => return,
+            WindowEvent::WindowBoundsChanged { .. } => return,
         };
 
         let Some(browser) = &window.browser else {
@@ -260,15 +268,16 @@ fn main() {
 | `include_browser_info` | `false` | Extracts the active browser URL and private-mode state                     |
 | `include_website_info` | `false` | Extracts hostname, favicon, and favicon-derived color from the browser URL |
 
-`MonitorConfig` supports the same enrichment options and adds `track_window_changes`:
+`MonitorConfig` supports the same enrichment options and adds monitor behavior flags:
 
-| Option                 | Default | Description                                                                |
-| ---------------------- | ------- | -------------------------------------------------------------------------- |
-| `track_window_changes` | `true`  | Tracks window focus and title changes in addition to app activation events |
-| `include_app_icon`     | `false` | Adds a base64 PNG app icon to emitted app or window data                   |
-| `include_app_color`    | `false` | Adds app display color when app icon extraction is enabled                 |
-| `include_browser_info` | `false` | Extracts the active browser URL and private-mode state                     |
-| `include_website_info` | `false` | Extracts hostname, favicon, and favicon-derived color from the browser URL |
+| Option                        | Default | Description                                                                |
+| ----------------------------- | ------- | -------------------------------------------------------------------------- |
+| `track_window_changes`        | `true`  | Tracks window focus and title changes in addition to app activation events |
+| `track_window_bounds_changes` | `false` | Tracks focused window move and resize changes                              |
+| `include_app_icon`            | `false` | Adds a base64 PNG app icon to emitted app or window data                   |
+| `include_app_color`           | `false` | Adds app display color when app icon extraction is enabled                 |
+| `include_browser_info`        | `false` | Extracts the active browser URL and private-mode state                     |
+| `include_website_info`        | `false` | Extracts hostname, favicon, and favicon-derived color from the browser URL |
 
 `InstalledAppsConfig` controls installed app scans:
 
@@ -280,14 +289,15 @@ fn main() {
 
 ## Events
 
-`WindowEvent` has two variants:
+`WindowEvent` has three variants:
 
-| Event           | When it fires                                                                 |
-| --------------- | ----------------------------------------------------------------------------- |
-| `AppActivated`  | Immediately when the focused app changes, even if no window is available yet  |
-| `WindowChanged` | When focused window data is available, a window changes, or the title changes |
+| Event                 | When it fires                                                               |
+| --------------------- | --------------------------------------------------------------------------- |
+| `AppActivated`        | Immediately when the active app changes, even if no window is available yet |
+| `WindowChanged`       | When focused window data is available, focus changes, or the title changes  |
+| `WindowBoundsChanged` | When the focused window moves or resizes, if enabled                        |
 
-Use `event.app()` when both variants should be handled by app identity.
+Use `event.app()` when all variants should be handled by app identity.
 
 ## macOS Permissions
 
@@ -302,6 +312,7 @@ if !mado::is_accessibility_trusted() {
 Accessibility permission is required for:
 
 - `track_window_changes: true`
+- `track_window_bounds_changes: true`
 - active window title and bounds
 - browser URL and private-mode extraction
 - website metadata based on the browser URL
@@ -309,7 +320,7 @@ Accessibility permission is required for:
 Accessibility permission is not required for:
 
 - `get_active_app()`
-- app activation events with `track_window_changes: false`
+- app activation events when `track_window_changes` and `track_window_bounds_changes` are both `false`
 - `get_installed_apps()`
 - `get_app_icon()` and `get_app_color()`
 - `get_website_icon()`
@@ -331,10 +342,9 @@ Use this config in sandboxed builds:
 ```rust
 let config = mado::MonitorConfig {
     track_window_changes: false,
-    include_browser_info: false,
-    include_website_info: false,
+    track_window_bounds_changes: false,
     include_app_icon: true,
-    include_app_color: false,
+    ..Default::default()
 };
 ```
 

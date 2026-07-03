@@ -87,6 +87,17 @@ pub struct WindowInfo {
     pub browser: Option<BrowserInfo>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct WindowBoundsChange {
+    /// Platform-specific window identifier
+    pub window_id: Option<u32>,
+    /// Window position and size
+    pub bounds: Option<WindowBounds>,
+    /// Application information
+    pub app: AppInfo,
+}
+
 impl fmt::Display for WindowInfo {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "   Window:")?;
@@ -162,16 +173,16 @@ pub struct WindowBounds {
     pub height: f64,
 }
 
-/// Event type for window and app focus changes.
+/// Event emitted by `WindowMonitor`.
 ///
-/// Distinguishes between app activation (always fires on app switch) and window changes
-/// (fires when window focus/title changes or when window becomes available).
+/// The monitor emits app activation, focused-window, and opt-in window bounds
+/// events as separate variants.
 #[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub enum WindowEvent {
-    /// Application was activated/switched to.
+    /// Application became active.
     ///
-    /// This event **always** fires when the user switches to a different app.
+    /// This event is always emitted when the user switches to a different app.
     /// It provides immediate notification of the app change, even if the app has no window yet.
     ///
     /// Common scenarios:
@@ -190,6 +201,12 @@ pub enum WindowEvent {
     ///
     /// Note: App switches are always signaled via `AppActivated` events first.
     WindowChanged { window: WindowInfo },
+    /// Focused window moved or resized.
+    ///
+    /// This event only fires when `MonitorConfig::track_window_bounds_changes`
+    /// is enabled. It is lightweight and only includes app identity, window id,
+    /// and bounds.
+    WindowBoundsChanged { window: WindowBoundsChange },
 }
 
 impl WindowEvent {
@@ -198,6 +215,7 @@ impl WindowEvent {
         match self {
             WindowEvent::AppActivated { app } => app,
             WindowEvent::WindowChanged { window } => &window.app,
+            WindowEvent::WindowBoundsChanged { window } => &window.app,
         }
     }
 }

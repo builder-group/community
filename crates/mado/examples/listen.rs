@@ -1,10 +1,11 @@
-//! Example: Listen to focus changes in real-time
+//! Example: Listen to app, window, and bounds changes in real time
 //!
 //! This example demonstrates event-driven monitoring.
 //! The monitor runs continuously and calls your handler whenever:
 //! - The user switches to a different app (AppActivated event)
 //! - The focused window changes within the same app (WindowChanged event)
 //! - The focused window title changes (WindowChanged event)
+//! - The focused window moves or resizes, if enabled (WindowBoundsChanged event)
 
 use mado::{MonitorConfig, WindowEvent, WindowListener, WindowMonitor};
 
@@ -19,12 +20,15 @@ impl WindowListener for FocusListener {
             WindowEvent::WindowChanged { window } => {
                 println!("\n🪟 Window Change:\n{}", window);
             }
+            WindowEvent::WindowBoundsChanged { window } => {
+                println!("\n📐 Window Bounds Change:\n{:?}", window.bounds);
+            }
         }
     }
 }
 
 fn main() -> Result<(), mado::Error> {
-    println!("🎧 Listening for focus changes...");
+    println!("🎧 Listening for app and window events...");
     println!("   Switch apps or windows to see events");
     println!("   Press Ctrl+C to stop\n");
 
@@ -46,6 +50,7 @@ fn main() -> Result<(), mado::Error> {
             include_browser_info: true,
             include_website_info: true,
             track_window_changes: true,
+            track_window_bounds_changes: true,
         },
     );
     monitor.run()

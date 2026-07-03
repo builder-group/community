@@ -13,7 +13,7 @@ use crate::{
 };
 use std::sync::Arc;
 
-/// Start monitoring window and application focus changes.
+/// Start monitoring `WindowMonitor` events.
 ///
 /// This blocks the current thread until `stop()` is called.
 pub fn run(listener: Arc<dyn WindowListener>, config: MonitorConfig) -> Result<(), Error> {

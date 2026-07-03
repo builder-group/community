@@ -4,7 +4,7 @@ use crate::config::MonitorConfig;
 use crate::error::Error;
 use crate::listener::WindowListener;
 
-/// Monitor for window and application focus changes.
+/// Monitor for active app, focused-window, and window-bounds events.
 ///
 /// ## Example
 ///
@@ -20,6 +20,9 @@ use crate::listener::WindowListener;
 ///             }
 ///             WindowEvent::WindowChanged { window } => {
 ///                 println!("Window: {}", window);
+///             }
+///             WindowEvent::WindowBoundsChanged { window } => {
+///                 println!("Window moved/resized: {:?}", window.bounds);
 ///             }
 ///         }
 ///     }

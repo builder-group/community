@@ -24,13 +24,15 @@ static RUNNING: AtomicBool = AtomicBool::new(false);
 /// Global listener storage for C callback access
 static GLOBAL_LISTENER: Mutex<Option<Arc<dyn WindowListener>>> = Mutex::new(None);
 
-/// Start monitoring window and application focus changes.
+/// Start monitoring `WindowMonitor` events.
 /// Blocks current thread until `stop()` is called.
 pub fn run(listener: Arc<dyn WindowListener>, config: MonitorConfig) -> Result<(), Error> {
-    // Check permissions if tracking window changes
-    if config.track_window_changes && !is_accessibility_trusted() {
+    // Check permissions if tracking window details
+    if (config.track_window_changes || config.track_window_bounds_changes)
+        && !is_accessibility_trusted()
+    {
         return Err(Error::MissingPermission(
-            "Accessibility permissions required for window change tracking".to_string(),
+            "Accessibility permissions required for window tracking".to_string(),
         ));
     }
 
@@ -54,6 +56,7 @@ pub fn run(listener: Arc<dyn WindowListener>, config: MonitorConfig) -> Result<(
         mado_start_monitor(
             callback_ptr,
             config.track_window_changes,
+            config.track_window_bounds_changes,
             config.include_app_icon,
             config.include_app_color,
             config.include_browser_info,

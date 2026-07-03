@@ -6,7 +6,7 @@ use crate::{
 };
 use std::sync::Arc;
 
-/// Start monitoring window and application focus changes.
+/// Start monitoring `WindowMonitor` events.
 pub fn run(_listener: Arc<dyn WindowListener>, _config: MonitorConfig) -> Result<(), Error> {
     Err(Error::Platform(
         "Windows support is not yet implemented".to_string(),

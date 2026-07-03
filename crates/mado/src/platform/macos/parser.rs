@@ -1,4 +1,4 @@
-use crate::types::{AppInfo, WindowEvent, WindowInfo};
+use crate::types::{AppInfo, WindowBoundsChange, WindowEvent, WindowInfo};
 use serde::de::Error;
 use serde_json::Value;
 
@@ -13,7 +13,7 @@ pub fn parse_window_info(json: &str) -> Result<WindowInfo, serde_json::Error> {
 }
 
 /// Parse WindowEvent from Swift's JSON format.
-/// Swift sends: `{ "type": "AppActivated"|"WindowChanged", "data": {...} }`
+/// Swift sends: `{ "type": "AppActivated"|"WindowChanged"|"WindowBoundsChanged", "data": {...} }`
 pub fn parse_event(json: &str) -> Result<WindowEvent, serde_json::Error> {
     let value: Value = serde_json::from_str(json)?;
 
@@ -37,6 +37,10 @@ pub fn parse_event(json: &str) -> Result<WindowEvent, serde_json::Error> {
         "WindowChanged" => {
             let window: WindowInfo = serde_json::from_value(data.clone())?;
             return Ok(WindowEvent::WindowChanged { window });
+        }
+        "WindowBoundsChanged" => {
+            let window: WindowBoundsChange = serde_json::from_value(data.clone())?;
+            return Ok(WindowEvent::WindowBoundsChanged { window });
         }
         _ => {
             return Err(serde_json::Error::custom(format!(
@@ -215,6 +219,32 @@ mod tests {
                 assert!(window.browser.is_none());
             }
             _ => panic!("Expected WindowChanged event"),
+        }
+    }
+
+    #[test]
+    fn parse_event_window_bounds_changed() {
+        let json = r#"{
+            "type": "WindowBoundsChanged",
+            "data": {
+                "windowId": 42,
+                "bounds": {"x": 120.0, "y": 220.0, "width": 900.0, "height": 700.0},
+                "app": {"pid": 1234, "name": "App", "bundleId": null, "processPath": null}
+            }
+        }"#;
+
+        let event = parse_event(json).unwrap();
+        match event {
+            WindowEvent::WindowBoundsChanged { window } => {
+                assert_eq!(window.window_id, Some(42));
+                assert_eq!(window.app.pid, 1234);
+                let bounds = window.bounds.unwrap();
+                assert_eq!(bounds.x, 120.0);
+                assert_eq!(bounds.y, 220.0);
+                assert_eq!(bounds.width, 900.0);
+                assert_eq!(bounds.height, 700.0);
+            }
+            _ => panic!("Expected WindowBoundsChanged event"),
         }
     }
 

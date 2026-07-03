@@ -3,9 +3,10 @@ import ApplicationServices
 import Foundation
 import SwiftRs
 
-/// Monitors window and app focus changes using NSWorkspace and Accessibility API.
+/// Monitors active app, focused-window, and window bounds events using NSWorkspace
+/// and Accessibility API.
 ///
-/// Threading Model:
+/// Threading model:
 /// - Monitor runs in spawned thread with its own CFRunLoop (wherever monitor.run() is called)
 /// - NSWorkspace notifications arrive on main thread → forwarded via CFRunLoopPerformBlock
 /// - AXObserver callbacks delivered directly to monitor thread's run loop
@@ -18,6 +19,7 @@ final class WindowMonitor: NSObject {
 
     private let callback: WindowEventCallback
     private let trackWindowChanges: Bool
+    private let trackWindowBoundsChanges: Bool
     private let includeAppIcon: Bool
     private let includeAppColor: Bool
     private let includeBrowserInfo: Bool
@@ -30,7 +32,7 @@ final class WindowMonitor: NSObject {
     // Accessibility observer state
     private var axObservers: [AXObserver] = []
     private var currentPID: pid_t = 0
-    private var currentTitleObservedWindow: AXUIElement?
+    private var currentObservedWindow: AXUIElement?
 
     // Polling state for delayed windows.
     // Apps launched from Dock/Spotlight can take seconds to show their window.
@@ -41,15 +43,18 @@ final class WindowMonitor: NSObject {
     private let baseDelay: Double = 0.2
     private let maxDelay: Double = 1.6
 
-    // Deduplication to prevent duplicate WindowChanged events
+    // Deduplication for monitor events.
     private var lastWindowId: UInt32?
     private var lastWindowTitle: String?
+    private var lastBoundsChangeWindowId: UInt32?
+    private var lastBoundsChange: [String: Double]?
 
     private var keepAliveSource: CFRunLoopSource?
 
     init(
         callback: @escaping WindowEventCallback,
         trackWindowChanges: Bool,
+        trackWindowBoundsChanges: Bool,
         includeAppIcon: Bool,
         includeAppColor: Bool,
         includeBrowserInfo: Bool,
@@ -57,6 +62,7 @@ final class WindowMonitor: NSObject {
     ) {
         self.callback = callback
         self.trackWindowChanges = trackWindowChanges
+        self.trackWindowBoundsChanges = trackWindowBoundsChanges
         self.includeAppIcon = includeAppIcon
         self.includeAppColor = includeAppColor
         self.includeBrowserInfo = includeBrowserInfo
@@ -74,7 +80,6 @@ final class WindowMonitor: NSObject {
         setupRunLoopKeepAlive()
         setupAppActivationObserver()
 
-        // Observe initial app
         if let app = NSWorkspace.shared.frontmostApplication {
             handleAppActivation(app: app, pid: app.processIdentifier)
         }
@@ -110,10 +115,9 @@ final class WindowMonitor: NSObject {
     ///
     /// Why we need it:
     /// CFRunLoopRun() exits immediately when no sources or timers are registered.
-    /// The only source we add is the AXObserver, but that's skipped when
-    /// `trackWindowChanges=false` (e.g. sandboxed builds). NSWorkspace notifications
-    /// are forwarded via CFRunLoopPerformBlock, which doesn't count as a source.
-    /// Without this, the monitor thread exits immediately.
+    /// The AXObserver source is only added when window or bounds tracking is enabled.
+    /// NSWorkspace notifications are forwarded via CFRunLoopPerformBlock, which doesn't
+    /// count as a source. Without this, the monitor thread exits immediately.
     ///
     /// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/Multithreading/RunLoopManagement/RunLoopManagement.html
     private func setupRunLoopKeepAlive() {
@@ -132,8 +136,7 @@ final class WindowMonitor: NSObject {
             perform: { _ in }
         )
 
-        if let source = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &context)
-        {
+        if let source = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &context) {
             keepAliveSource = source
             CFRunLoopAddSource(runLoop, source, .defaultMode)
         }
@@ -193,9 +196,11 @@ final class WindowMonitor: NSObject {
         currentPID = pid
         sendAppActivatedEvent(app: app)
 
-        guard trackWindowChanges else { return }
+        guard trackWindowChanges || trackWindowBoundsChanges else { return }
 
         setupAccessibilityObserver(pid: pid)
+
+        guard trackWindowChanges else { return }
 
         // Try to send window event immediately. If it fails (no window yet),
         // start polling to wait for window to appear (common when app launched from Dock).
@@ -206,7 +211,7 @@ final class WindowMonitor: NSObject {
 
     // MARK: - Accessibility Observers
 
-    /// Setup accessibility observer for app. Callbacks delivered to monitor thread's run loop.
+    /// Set up accessibility observer for app. Callbacks are delivered to the monitor thread's run loop.
     private func setupAccessibilityObserver(pid: pid_t) {
         var observer: AXObserver?
         guard AXObserverCreate(pid, axCallback, &observer) == .success,
@@ -219,7 +224,6 @@ final class WindowMonitor: NSObject {
         let app = AXUIElementCreateApplication(pid)
         let context = Unmanaged.passUnretained(self).toOpaque()
 
-        // Observe focus changes at app level (user switches windows within app)
         AXObserverAddNotification(
             observer,
             app,
@@ -227,8 +231,7 @@ final class WindowMonitor: NSObject {
             context
         )
 
-        // Observe title changes on current window (e.g. tab switches in browsers)
-        registerTitleObserver(observer: observer, pid: pid)
+        registerWindowObservers(observer: observer, pid: pid)
 
         if let runLoop = monitorRunLoop {
             CFRunLoopAddSource(
@@ -241,32 +244,57 @@ final class WindowMonitor: NSObject {
         axObservers.append(observer)
     }
 
-    /// Re-register title observer on focused window (title observer is window-specific).
-    private func registerTitleObserver(observer: AXObserver, pid: pid_t) {
+    /// Re-register observers tied to the currently focused window.
+    private func registerWindowObservers(observer: AXObserver, pid: pid_t) {
         let app = AXUIElementCreateApplication(pid)
 
-        // Remove previous observer if exists
-        if let previousWindow = currentTitleObservedWindow {
+        if let previousWindow = currentObservedWindow {
             AXObserverRemoveNotification(
                 observer,
                 previousWindow,
                 kAXTitleChangedNotification as CFString
             )
+            AXObserverRemoveNotification(
+                observer,
+                previousWindow,
+                kAXMovedNotification as CFString
+            )
+            AXObserverRemoveNotification(
+                observer,
+                previousWindow,
+                kAXResizedNotification as CFString
+            )
         }
 
         guard let windowElement = getFocusedWindow(from: app) else {
-            currentTitleObservedWindow = nil
+            currentObservedWindow = nil
             return
         }
 
         let context = Unmanaged.passUnretained(self).toOpaque()
-        AXObserverAddNotification(
-            observer,
-            windowElement,
-            kAXTitleChangedNotification as CFString,
-            context
-        )
-        currentTitleObservedWindow = windowElement
+        if trackWindowChanges {
+            AXObserverAddNotification(
+                observer,
+                windowElement,
+                kAXTitleChangedNotification as CFString,
+                context
+            )
+        }
+        if trackWindowBoundsChanges {
+            AXObserverAddNotification(
+                observer,
+                windowElement,
+                kAXMovedNotification as CFString,
+                context
+            )
+            AXObserverAddNotification(
+                observer,
+                windowElement,
+                kAXResizedNotification as CFString,
+                context
+            )
+        }
+        currentObservedWindow = windowElement
     }
 
     private func cleanupAccessibilityObservers() {
@@ -282,22 +310,26 @@ final class WindowMonitor: NSObject {
         }
 
         axObservers.removeAll()
-        currentTitleObservedWindow = nil
+        currentObservedWindow = nil
         currentPID = 0
     }
 
     /// Called by axCallback when window focus changes. Runs on monitor thread.
-    /// Note: fileprivate allows axCallback (C callback) to access this.
     fileprivate func handleFocusChange(observer: AXObserver) {
-        registerTitleObserver(observer: observer, pid: currentPID)
+        registerWindowObservers(observer: observer, pid: currentPID)
     }
 
     /// Called by axCallback on any window change. Runs on monitor thread.
-    /// Note: fileprivate allows axCallback (C callback) to access this.
     fileprivate func handleWindowChange() {
+        guard trackWindowChanges else { return }
         stopWindowPolling()
-        // Result is discarded: we always try to send, deduplication handles duplicates
         _ = sendWindowChangedEvent()
+    }
+
+    /// Called by axCallback when the focused window moves or resizes. Runs on monitor thread.
+    fileprivate func handleWindowBoundsChange() {
+        guard trackWindowBoundsChanges else { return }
+        _ = sendWindowBoundsChangedEvent()
     }
 
     // MARK: - Window Polling
@@ -317,7 +349,6 @@ final class WindowMonitor: NSObject {
             return
         }
 
-        // Invalidate previous timer if it exists (prevents multiple timers running)
         if let oldTimer = pollingTimer {
             CFRunLoopTimerInvalidate(oldTimer)
             pollingTimer = nil
@@ -328,7 +359,7 @@ final class WindowMonitor: NSObject {
         let delay = min(
             baseDelay * pow(2.0, Double(pollingRetryCount - 1)),
             maxDelay
-        )  // Exponential backoff
+        )
         let fireDate = CFAbsoluteTimeGetCurrent() + delay
 
         var context = CFRunLoopTimerContext()
@@ -377,11 +408,9 @@ final class WindowMonitor: NSObject {
         )
 
         if windowInfo.windowId != nil {
-            // Window appeared, send event and stop polling
             stopWindowPolling()
             _ = sendWindowChangedEvent()
         } else {
-            // Window not ready yet, continue polling
             scheduleNextWindowPoll()
         }
     }
@@ -419,12 +448,10 @@ final class WindowMonitor: NSObject {
             includeWebsiteInfo: includeWebsiteInfo
         )
 
-        // Skip if no valid window (no window ID means window not ready yet)
         guard let windowId = windowInfo.windowId, windowId != 0 else {
             return false
         }
 
-        // Deduplicate: only send if window ID or title changed
         if lastWindowId == windowId, lastWindowTitle == windowInfo.title {
             return false
         }
@@ -434,6 +461,43 @@ final class WindowMonitor: NSObject {
         sendEvent(
             type: EventType.windowChanged,
             data: windowInfo.toDictionary() as [String: Any]
+        )
+        return true
+    }
+
+    /// Send WindowBoundsChanged event if focused window bounds changed. Returns true if sent.
+    @discardableResult
+    private func sendWindowBoundsChangedEvent() -> Bool {
+        guard currentPID != 0 else { return false }
+
+        let windowInfo = WindowInfo.fromPID(
+            currentPID,
+            includeAppIcon: false,
+            includeAppColor: false,
+            includeBrowserInfo: false,
+            includeWebsiteInfo: false
+        )
+
+        guard let windowId = windowInfo.windowId, windowId != 0 else {
+            return false
+        }
+
+        if lastBoundsChangeWindowId == windowId,
+            boundsEqual(lastBoundsChange, windowInfo.bounds)
+        {
+            return false
+        }
+
+        lastBoundsChangeWindowId = windowId
+        lastBoundsChange = windowInfo.bounds
+        var eventData: [String: Any] = [
+            "windowId": windowId,
+            "app": windowInfo.app.toDictionary(),
+        ]
+        eventData["bounds"] = windowInfo.bounds ?? NSNull()
+        sendEvent(
+            type: EventType.windowBoundsChanged,
+            data: eventData
         )
         return true
     }
@@ -455,7 +519,22 @@ final class WindowMonitor: NSObject {
     private func resetDeduplication() {
         lastWindowId = nil
         lastWindowTitle = nil
+        lastBoundsChangeWindowId = nil
+        lastBoundsChange = nil
     }
+}
+
+private func boundsEqual(_ lhs: [String: Double]?, _ rhs: [String: Double]?)
+    -> Bool
+{
+    guard let lhs = lhs, let rhs = rhs else {
+        return lhs == nil && rhs == nil
+    }
+
+    return lhs["x"] == rhs["x"]
+        && lhs["y"] == rhs["y"]
+        && lhs["width"] == rhs["width"]
+        && lhs["height"] == rhs["height"]
 }
 
 // MARK: - C Callback
@@ -473,12 +552,23 @@ private func axCallback(
     let monitor = Unmanaged<WindowMonitor>.fromOpaque(refcon)
         .takeUnretainedValue()
 
-    // Handle focus change separately to re-register title observer on new window
     if CFEqual(notification, kAXFocusedWindowChangedNotification as CFString) {
+        // Note: Per-window AX notifications must be registered again for the new focused window
         monitor.handleFocusChange(observer: observer)
+        monitor.handleWindowChange()
+        return
     }
 
-    monitor.handleWindowChange()
+    if CFEqual(notification, kAXMovedNotification as CFString)
+        || CFEqual(notification, kAXResizedNotification as CFString)
+    {
+        monitor.handleWindowBoundsChange()
+        return
+    }
+
+    if CFEqual(notification, kAXTitleChangedNotification as CFString) {
+        monitor.handleWindowChange()
+    }
 }
 
 // MARK: - Types
@@ -488,4 +578,5 @@ typealias WindowEventCallback = @convention(c) (UnsafePointer<SRString>) -> Void
 private enum EventType {
     static let appActivated = "AppActivated"
     static let windowChanged = "WindowChanged"
+    static let windowBoundsChanged = "WindowBoundsChanged"
 }

@@ -8,6 +8,7 @@ import SwiftRs
 public func madoStartMonitor(
     callbackPtr: UnsafeRawPointer,
     trackWindowChanges: Bool,
+    trackWindowBoundsChanges: Bool,
     includeAppIcon: Bool,
     includeAppColor: Bool,
     includeBrowserInfo: Bool,
@@ -21,6 +22,7 @@ public func madoStartMonitor(
     let monitor = WindowMonitor(
         callback: callback,
         trackWindowChanges: trackWindowChanges,
+        trackWindowBoundsChanges: trackWindowBoundsChanges,
         includeAppIcon: includeAppIcon,
         includeAppColor: includeAppColor,
         includeBrowserInfo: includeBrowserInfo,

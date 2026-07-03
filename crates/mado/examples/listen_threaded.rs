@@ -29,6 +29,13 @@ impl WindowListener for ThreadedListener {
                 println!("\n[Threaded Monitor] Event #{}: Window Changed", count);
                 println!("   Window: {}", window);
             }
+            WindowEvent::WindowBoundsChanged { window } => {
+                println!(
+                    "\n[Threaded Monitor] Event #{}: Window Bounds Changed",
+                    count
+                );
+                println!("   Bounds: {:?}", window.bounds);
+            }
         }
     }
 }
@@ -68,6 +75,7 @@ fn main() -> Result<(), mado::Error> {
                 include_browser_info: true,
                 include_website_info: true,
                 track_window_changes: true,
+                track_window_bounds_changes: false,
             },
         );
 

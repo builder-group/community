@@ -3,8 +3,8 @@
 //! macOS active app and window monitoring with browser metadata.
 //!
 //! `mado` wraps native macOS APIs through Swift. Use it to query the active
-//! app and focused window, listen to focus changes, extract browser URL metadata,
-//! and scan installed apps from Rust.
+//! app and focused window, listen to app, window, and bounds changes,
+//! extract browser URL metadata, and scan installed apps from Rust.
 //!
 //! ## Quick Start
 //!
@@ -35,6 +35,9 @@
 //!             WindowEvent::WindowChanged { window } => {
 //!                 println!("Window: {}", window);
 //!             }
+//!             WindowEvent::WindowBoundsChanged { window } => {
+//!                 println!("Window moved/resized: {:?}", window.bounds);
+//!             }
 //!         }
 //!     }
 //! }
@@ -53,7 +56,7 @@
 //! ## Requirements
 //!
 //! **macOS:**
-//! - Accessibility permissions required if `track_window_changes: true` (default)
+//! - Accessibility permissions required if `track_window_changes` or `track_window_bounds_changes` is enabled
 
 pub mod config;
 pub mod error;
@@ -68,7 +71,7 @@ pub use listener::WindowListener;
 pub use monitor::WindowMonitor;
 pub use types::{
     AppIcon, AppInfo, BrowserInfo, InstalledApp, WebsiteIcon, WebsiteInfo, WindowBounds,
-    WindowEvent, WindowInfo,
+    WindowBoundsChange, WindowEvent, WindowInfo,
 };
 
 // MARK: - Window Monitoring
