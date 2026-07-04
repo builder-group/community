@@ -4,9 +4,11 @@ Add comments when they make the code easier to understand or maintain. Omit them
 
 ## Enforce
 
-- Add regular comments to explain **why**, a constraint, domain behavior, or to orient the reader at the start of a non-obvious block
+- Add regular comments only when they explain **why**, a constraint, domain behavior, or the purpose of a non-obvious block
+- Write comments for future maintainers who do not have the current session context; use concrete conditions and named behavior over abstract shorthand
+- Keep regular comments short and direct. Use a complete sentence when explaining a constraint, exception, or platform behavior
 - Place the comment directly above the code it explains
-- Omit the trailing period in a short single-line regular comment
+- Omit the trailing period in short single-line regular comments
 - Add doc comments to public and exported functions, methods, and types only when the name and signature alone do not make the behavior or contract clear; describe what it does first, then note constraints, side effects, or non-obvious return or error behavior when needed
 - Start doc comments with a single sentence in active voice and end it with a period
 - Use `// MARK: -` sparingly as a file-level or large-structure navigation aid, mainly in long files
@@ -40,7 +42,7 @@ for (const item of sortedItems) {
 ```
 
 ```ts
-// Retry with exponential backoff; the upstream service rate-limits on burst
+// Retry with exponential backoff because the upstream service rate-limits bursts
 for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
   const result = await fetchWithDelay(attempt);
   if (result.ok) return result;
@@ -67,7 +69,7 @@ export function isAuthenticated(): boolean;
 ```
 
 ```ts
-// Note: Skips permission check here; caller is expected to pre-validate
+// Note: Skips permission check here because the caller is expected to pre-validate
 applyChange(payload);
 ```
 
