@@ -98,6 +98,15 @@ pub struct WindowBoundsChange {
     pub app: AppInfo,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct WindowLifecycleChange {
+    /// Platform-specific window identifier
+    pub window_id: Option<u32>,
+    /// Application information
+    pub app: AppInfo,
+}
+
 impl fmt::Display for WindowInfo {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "   Window:")?;
@@ -207,6 +216,23 @@ pub enum WindowEvent {
     /// is enabled. It is lightweight and only includes app identity, window id,
     /// and bounds.
     WindowBoundsChanged { window: WindowBoundsChange },
+    /// Focused window was minimized.
+    ///
+    /// This event only fires for the currently observed focused window when
+    /// `MonitorConfig::track_window_changes` is enabled.
+    WindowMinimized { window: WindowLifecycleChange },
+    /// Focused window was restored from minimized state.
+    ///
+    /// This event only fires for the currently observed focused window when
+    /// `MonitorConfig::track_window_changes` is enabled. A restore that
+    /// activates an app before its accessibility observer is installed may only
+    /// appear as `AppActivated` followed by `WindowChanged`.
+    WindowRestored { window: WindowLifecycleChange },
+    /// Focused window accessibility element was destroyed.
+    ///
+    /// This event uses the last cached focused-window data because the
+    /// destroyed accessibility element can no longer be queried safely.
+    WindowDestroyed { window: WindowLifecycleChange },
 }
 
 impl WindowEvent {
@@ -216,6 +242,9 @@ impl WindowEvent {
             WindowEvent::AppActivated { app } => app,
             WindowEvent::WindowChanged { window } => &window.app,
             WindowEvent::WindowBoundsChanged { window } => &window.app,
+            WindowEvent::WindowMinimized { window } => &window.app,
+            WindowEvent::WindowRestored { window } => &window.app,
+            WindowEvent::WindowDestroyed { window } => &window.app,
         }
     }
 }

@@ -32,7 +32,7 @@ final class WindowMonitor: NSObject {
     // Accessibility observer state
     private var axObservers: [AXObserver] = []
     private var currentPID: pid_t = 0
-    private var currentObservedWindow: AXUIElement?
+    private var currentObservedWindow: ObservedWindow?
 
     // Polling state for delayed windows.
     // Apps launched from Dock/Spotlight can take seconds to show their window.
@@ -230,6 +230,21 @@ final class WindowMonitor: NSObject {
             kAXFocusedWindowChangedNotification as CFString,
             context
         )
+        if trackWindowChanges {
+            // Note: Minimize/restore are registered on the app, then filtered by the affected window element
+            AXObserverAddNotification(
+                observer,
+                app,
+                kAXWindowMiniaturizedNotification as CFString,
+                context
+            )
+            AXObserverAddNotification(
+                observer,
+                app,
+                kAXWindowDeminiaturizedNotification as CFString,
+                context
+            )
+        }
 
         registerWindowObservers(observer: observer, pid: pid)
 
@@ -248,11 +263,21 @@ final class WindowMonitor: NSObject {
     private func registerWindowObservers(observer: AXObserver, pid: pid_t) {
         let app = AXUIElementCreateApplication(pid)
 
-        if let previousWindow = currentObservedWindow {
+        guard let windowElement = getFocusedWindow(from: app) else {
+            // Note: Keep the last observed window registered because minimize/close can temporarily leave no focused window
+            return
+        }
+
+        if let previousWindow = currentObservedWindow?.element {
             AXObserverRemoveNotification(
                 observer,
                 previousWindow,
                 kAXTitleChangedNotification as CFString
+            )
+            AXObserverRemoveNotification(
+                observer,
+                previousWindow,
+                kAXUIElementDestroyedNotification as CFString
             )
             AXObserverRemoveNotification(
                 observer,
@@ -266,10 +291,14 @@ final class WindowMonitor: NSObject {
             )
         }
 
-        guard let windowElement = getFocusedWindow(from: app) else {
-            currentObservedWindow = nil
-            return
-        }
+        let observedWindow = ObservedWindow(
+            element: windowElement,
+            windowId: findWindowId(
+                pid: pid,
+                bounds: getBounds(from: windowElement)
+            ),
+            app: AppInfo.fromPID(pid)
+        )
 
         let context = Unmanaged.passUnretained(self).toOpaque()
         if trackWindowChanges {
@@ -277,6 +306,12 @@ final class WindowMonitor: NSObject {
                 observer,
                 windowElement,
                 kAXTitleChangedNotification as CFString,
+                context
+            )
+            AXObserverAddNotification(
+                observer,
+                windowElement,
+                kAXUIElementDestroyedNotification as CFString,
                 context
             )
         }
@@ -294,7 +329,7 @@ final class WindowMonitor: NSObject {
                 context
             )
         }
-        currentObservedWindow = windowElement
+        currentObservedWindow = observedWindow
     }
 
     private func cleanupAccessibilityObservers() {
@@ -331,6 +366,28 @@ final class WindowMonitor: NSObject {
     fileprivate func handleWindowBoundsChange() {
         guard trackWindowBoundsChanges else { return }
         _ = sendWindowBoundsChangedEvent()
+    }
+
+    fileprivate func handleWindowLifecycleChange(
+        type: String,
+        element: AXUIElement
+    ) {
+        guard trackWindowChanges else { return }
+
+        guard
+            let observedWindow = currentObservedWindow,
+            CFEqual(element, observedWindow.element)
+        else {
+            return
+        }
+
+        sendEvent(
+            type: type,
+            data: observedWindow.toLifecycleChangeDictionary() as [String: Any]
+        )
+        if type == EventType.windowDestroyed {
+            currentObservedWindow = nil
+        }
     }
 
     // MARK: - Window Polling
@@ -568,6 +625,30 @@ private func axCallback(
         return
     }
 
+    if CFEqual(notification, kAXWindowMiniaturizedNotification as CFString) {
+        monitor.handleWindowLifecycleChange(
+            type: EventType.windowMinimized,
+            element: element
+        )
+        return
+    }
+
+    if CFEqual(notification, kAXWindowDeminiaturizedNotification as CFString) {
+        monitor.handleWindowLifecycleChange(
+            type: EventType.windowRestored,
+            element: element
+        )
+        return
+    }
+
+    if CFEqual(notification, kAXUIElementDestroyedNotification as CFString) {
+        monitor.handleWindowLifecycleChange(
+            type: EventType.windowDestroyed,
+            element: element
+        )
+        return
+    }
+
     if CFEqual(notification, kAXTitleChangedNotification as CFString) {
         monitor.handleWindowChange()
     }
@@ -577,8 +658,24 @@ private func axCallback(
 
 typealias WindowEventCallback = @convention(c) (UnsafePointer<SRString>) -> Void
 
+private struct ObservedWindow {
+    let element: AXUIElement
+    let windowId: UInt32?
+    let app: AppInfo
+
+    func toLifecycleChangeDictionary() -> [String: Any?] {
+        return [
+            "windowId": windowId,
+            "app": app.toDictionary(),
+        ]
+    }
+}
+
 private enum EventType {
     static let appActivated = "AppActivated"
     static let windowChanged = "WindowChanged"
     static let windowBoundsChanged = "WindowBoundsChanged"
+    static let windowMinimized = "WindowMinimized"
+    static let windowRestored = "WindowRestored"
+    static let windowDestroyed = "WindowDestroyed"
 }

@@ -24,6 +24,15 @@ use crate::listener::WindowListener;
 ///             WindowEvent::WindowBoundsChanged { window } => {
 ///                 println!("Window moved/resized: {:?}", window.bounds);
 ///             }
+///             WindowEvent::WindowMinimized { window } => {
+///                 println!("Window minimized: {:?}", window.window_id);
+///             }
+///             WindowEvent::WindowRestored { window } => {
+///                 println!("Window restored: {:?}", window.window_id);
+///             }
+///             WindowEvent::WindowDestroyed { window } => {
+///                 println!("Window destroyed: {:?}", window.window_id);
+///             }
 ///         }
 ///     }
 /// }

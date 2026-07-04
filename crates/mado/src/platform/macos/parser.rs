@@ -1,4 +1,4 @@
-use crate::types::{AppInfo, WindowBoundsChange, WindowEvent, WindowInfo};
+use crate::types::{AppInfo, WindowBoundsChange, WindowEvent, WindowInfo, WindowLifecycleChange};
 use serde::de::Error;
 use serde_json::Value;
 
@@ -13,7 +13,7 @@ pub fn parse_window_info(json: &str) -> Result<WindowInfo, serde_json::Error> {
 }
 
 /// Parse WindowEvent from Swift's JSON format.
-/// Swift sends: `{ "type": "AppActivated"|"WindowChanged"|"WindowBoundsChanged", "data": {...} }`
+/// Swift sends: `{ "type": "AppActivated"|"WindowChanged"|..., "data": {...} }`
 pub fn parse_event(json: &str) -> Result<WindowEvent, serde_json::Error> {
     let value: Value = serde_json::from_str(json)?;
 
@@ -41,6 +41,18 @@ pub fn parse_event(json: &str) -> Result<WindowEvent, serde_json::Error> {
         "WindowBoundsChanged" => {
             let window: WindowBoundsChange = serde_json::from_value(data.clone())?;
             return Ok(WindowEvent::WindowBoundsChanged { window });
+        }
+        "WindowMinimized" => {
+            let window: WindowLifecycleChange = serde_json::from_value(data.clone())?;
+            return Ok(WindowEvent::WindowMinimized { window });
+        }
+        "WindowRestored" => {
+            let window: WindowLifecycleChange = serde_json::from_value(data.clone())?;
+            return Ok(WindowEvent::WindowRestored { window });
+        }
+        "WindowDestroyed" => {
+            let window: WindowLifecycleChange = serde_json::from_value(data.clone())?;
+            return Ok(WindowEvent::WindowDestroyed { window });
         }
         _ => {
             return Err(serde_json::Error::custom(format!(
@@ -249,6 +261,42 @@ mod tests {
     }
 
     #[test]
+    fn parse_event_window_minimized() {
+        let event = parse_window_lifecycle_event("WindowMinimized");
+        match event {
+            WindowEvent::WindowMinimized { window } => {
+                assert_eq!(window.window_id, Some(42));
+                assert_eq!(window.app.pid, 1234);
+            }
+            _ => panic!("Expected WindowMinimized event"),
+        }
+    }
+
+    #[test]
+    fn parse_event_window_restored() {
+        let event = parse_window_lifecycle_event("WindowRestored");
+        match event {
+            WindowEvent::WindowRestored { window } => {
+                assert_eq!(window.window_id, Some(42));
+                assert_eq!(window.app.pid, 1234);
+            }
+            _ => panic!("Expected WindowRestored event"),
+        }
+    }
+
+    #[test]
+    fn parse_event_window_destroyed() {
+        let event = parse_window_lifecycle_event("WindowDestroyed");
+        match event {
+            WindowEvent::WindowDestroyed { window } => {
+                assert_eq!(window.window_id, Some(42));
+                assert_eq!(window.app.pid, 1234);
+            }
+            _ => panic!("Expected WindowDestroyed event"),
+        }
+    }
+
+    #[test]
     fn parse_event_missing_type() {
         let json = r#"{"data": {}}"#;
         assert!(parse_event(json).is_err());
@@ -265,5 +313,20 @@ mod tests {
     fn parse_event_missing_data() {
         let json = r#"{"type": "AppActivated"}"#;
         assert!(parse_event(json).is_err());
+    }
+
+    fn parse_window_lifecycle_event(event_type: &str) -> WindowEvent {
+        let json = format!(
+            r#"{{
+                "type": "{}",
+                "data": {{
+                    "windowId": 42,
+                    "app": {{"pid": 1234, "name": "App", "bundleId": null, "processPath": null}}
+                }}
+            }}"#,
+            event_type
+        );
+
+        return parse_event(&json).unwrap();
     }
 }

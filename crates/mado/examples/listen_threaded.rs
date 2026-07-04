@@ -36,6 +36,18 @@ impl WindowListener for ThreadedListener {
                 );
                 println!("   Bounds: {:?}", window.bounds);
             }
+            WindowEvent::WindowMinimized { window } => {
+                println!("\n[Threaded Monitor] Event #{}: Window Minimized", count);
+                println!("   Window ID: {:?}", window.window_id);
+            }
+            WindowEvent::WindowRestored { window } => {
+                println!("\n[Threaded Monitor] Event #{}: Window Restored", count);
+                println!("   Window ID: {:?}", window.window_id);
+            }
+            WindowEvent::WindowDestroyed { window } => {
+                println!("\n[Threaded Monitor] Event #{}: Window Destroyed", count);
+                println!("   Window ID: {:?}", window.window_id);
+            }
         }
     }
 }

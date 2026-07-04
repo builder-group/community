@@ -5,6 +5,7 @@
 //! - The user switches to a different app (AppActivated event)
 //! - The focused window changes within the same app (WindowChanged event)
 //! - The focused window title changes (WindowChanged event)
+//! - The focused window is minimized, restored, or destroyed
 //! - The focused window moves or resizes, if enabled (WindowBoundsChanged event)
 
 use mado::{MonitorConfig, WindowEvent, WindowListener, WindowMonitor};
@@ -22,6 +23,15 @@ impl WindowListener for FocusListener {
             }
             WindowEvent::WindowBoundsChanged { window } => {
                 println!("\n📐 Window Bounds Change:\n{:?}", window.bounds);
+            }
+            WindowEvent::WindowMinimized { window } => {
+                println!("\n🪟 Window Minimized:\n{:?}", window.window_id);
+            }
+            WindowEvent::WindowRestored { window } => {
+                println!("\n🪟 Window Restored:\n{:?}", window.window_id);
+            }
+            WindowEvent::WindowDestroyed { window } => {
+                println!("\n🪟 Window Destroyed:\n{:?}", window.window_id);
             }
         }
     }

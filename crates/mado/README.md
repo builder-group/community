@@ -3,7 +3,7 @@
 `mado` is a macOS-focused Rust crate for reading the active app and focused window. It wraps native macOS APIs through Swift, listens to app, window, and bounds changes, and can enrich browser windows with URL and website metadata. Use it in desktop apps, productivity tools, and agents that need current user context.
 
 - Query the active app or focused window when you need a snapshot
-- Listen to app activations, focused-window changes, title changes, and opt-in window bounds changes without polling
+- Listen to app activations, focused-window changes, title/lifecycle changes, and opt-in window bounds changes without polling
 - Add browser URLs, content-area bounds, private-mode state, website hostnames, favicons, and favicon-derived colors only when needed
 - Read installed app names, bundle IDs, icons, and display colors without Accessibility permission
 - Handle macOS Accessibility and sandbox limits explicitly
@@ -30,6 +30,15 @@ impl WindowListener for FocusListener {
             }
             WindowEvent::WindowBoundsChanged { window } => {
                 println!("Window moved/resized: {:?}", window.bounds);
+            }
+            WindowEvent::WindowMinimized { window } => {
+                println!("Window minimized: {:?}", window.window_id);
+            }
+            WindowEvent::WindowRestored { window } => {
+                println!("Window restored: {:?}", window.window_id);
+            }
+            WindowEvent::WindowDestroyed { window } => {
+                println!("Window destroyed: {:?}", window.window_id);
             }
         }
     }
@@ -134,6 +143,15 @@ impl WindowListener for FocusListener {
             WindowEvent::WindowBoundsChanged { window } => {
                 println!("Window moved/resized: {:?}", window.bounds);
             }
+            WindowEvent::WindowMinimized { window } => {
+                println!("Window minimized: {:?}", window.window_id);
+            }
+            WindowEvent::WindowRestored { window } => {
+                println!("Window restored: {:?}", window.window_id);
+            }
+            WindowEvent::WindowDestroyed { window } => {
+                println!("Window destroyed: {:?}", window.window_id);
+            }
         }
     }
 }
@@ -175,6 +193,9 @@ impl WindowListener for BrowserListener {
             WindowEvent::WindowChanged { window } => window,
             WindowEvent::AppActivated { .. } => return,
             WindowEvent::WindowBoundsChanged { .. } => return,
+            WindowEvent::WindowMinimized { .. } => return,
+            WindowEvent::WindowRestored { .. } => return,
+            WindowEvent::WindowDestroyed { .. } => return,
         };
 
         let Some(browser) = &window.browser else {
@@ -289,13 +310,18 @@ fn main() {
 
 ## Events
 
-`WindowEvent` has three variants:
+`WindowEvent` has these variants:
 
-| Event                 | When it fires                                                               |
-| --------------------- | --------------------------------------------------------------------------- |
-| `AppActivated`        | Immediately when the active app changes, even if no window is available yet |
-| `WindowChanged`       | When focused window data is available, focus changes, or the title changes  |
-| `WindowBoundsChanged` | When the focused window moves or resizes, if enabled                        |
+| Event                  | When it fires                                                               |
+| ---------------------- | --------------------------------------------------------------------------- |
+| `AppActivated`         | Immediately when the active app changes, even if no window is available yet |
+| `WindowChanged`        | When focused window data is available, focus changes, or the title changes  |
+| `WindowBoundsChanged`  | When the focused window moves or resizes, if enabled                        |
+| `WindowMinimized`      | When the observed focused window is minimized                               |
+| `WindowRestored`       | When the observed focused window is restored from minimized state           |
+| `WindowDestroyed`      | When the observed focused window accessibility element is destroyed         |
+
+Lifecycle events only cover windows observed after the active app observer is installed. A restore that activates an app may appear as `AppActivated` followed by `WindowChanged` instead of `WindowRestored`.
 
 Use `event.app()` when all variants should be handled by app identity.
 

@@ -38,6 +38,7 @@ pub struct MonitorConfig {
     /// - Window focus changes within the same app
     /// - Window title changes (e.g. tab switches in browsers)
     /// - Window information becoming available after app activation
+    /// - Focused window minimize, restore, and destroy changes
     ///
     /// App activation events are always emitted. Set this to `false` to disable
     /// `WindowChanged` events while still receiving `AppActivated` events.

@@ -38,6 +38,15 @@
 //!             WindowEvent::WindowBoundsChanged { window } => {
 //!                 println!("Window moved/resized: {:?}", window.bounds);
 //!             }
+//!             WindowEvent::WindowMinimized { window } => {
+//!                 println!("Window minimized: {:?}", window.window_id);
+//!             }
+//!             WindowEvent::WindowRestored { window } => {
+//!                 println!("Window restored: {:?}", window.window_id);
+//!             }
+//!             WindowEvent::WindowDestroyed { window } => {
+//!                 println!("Window destroyed: {:?}", window.window_id);
+//!             }
 //!         }
 //!     }
 //! }
@@ -71,7 +80,7 @@ pub use listener::WindowListener;
 pub use monitor::WindowMonitor;
 pub use types::{
     AppIcon, AppInfo, BrowserInfo, InstalledApp, WebsiteIcon, WebsiteInfo, WindowBounds,
-    WindowBoundsChange, WindowEvent, WindowInfo,
+    WindowBoundsChange, WindowEvent, WindowInfo, WindowLifecycleChange,
 };
 
 // MARK: - Window Monitoring
