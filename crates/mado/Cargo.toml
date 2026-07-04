@@ -1,6 +1,6 @@
 [package]
 name = "mado"
-version = "0.0.7"
+version = "0.0.8"
 description = "macOS active app and window monitoring with browser metadata"
 authors = { workspace = true }
 license = { workspace = true }

@@ -314,9 +314,10 @@ final class WindowMonitor: NSObject {
         currentPID = 0
     }
 
-    /// Called by axCallback when window focus changes. Runs on monitor thread.
-    fileprivate func handleFocusChange(observer: AXObserver) {
+    /// Called by axCallback when the focused window changes. Runs on monitor thread.
+    fileprivate func handleFocusedWindowChanged(observer: AXObserver) {
         registerWindowObservers(observer: observer, pid: currentPID)
+        handleWindowChange()
     }
 
     /// Called by axCallback on any window change. Runs on monitor thread.
@@ -409,6 +410,9 @@ final class WindowMonitor: NSObject {
 
         if windowInfo.windowId != nil {
             stopWindowPolling()
+            if let observer = axObservers.first {
+                registerWindowObservers(observer: observer, pid: currentPID)
+            }
             _ = sendWindowChangedEvent()
         } else {
             scheduleNextWindowPoll()
@@ -553,9 +557,7 @@ private func axCallback(
         .takeUnretainedValue()
 
     if CFEqual(notification, kAXFocusedWindowChangedNotification as CFString) {
-        // Note: Per-window AX notifications must be registered again for the new focused window
-        monitor.handleFocusChange(observer: observer)
-        monitor.handleWindowChange()
+        monitor.handleFocusedWindowChanged(observer: observer)
         return
     }
 
