@@ -48,9 +48,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/window/main/about/'
-    | '/window/main/home/'
-    | '/window/main/splash/'
+    '/window/main/about/' | '/window/main/home/' | '/window/main/splash/'
   fileRoutesByTo: FileRoutesByTo
   to: '/window/main/about' | '/window/main/home' | '/window/main/splash'
   id:

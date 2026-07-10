@@ -93,7 +93,7 @@
 		"@types/react-dom": "^19.2.3",
 		"feature-form": "workspace:*",
 		"feature-state": "workspace:*",
-		"happy-dom": "^20.10.2",
+		"happy-dom": "^20.10.6",
 		"react": "^19.2.7",
 		"react-dom": "^19.2.7",
 		"rollup-presets": "workspace:*"
