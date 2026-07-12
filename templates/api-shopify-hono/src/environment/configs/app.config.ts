@@ -31,7 +31,7 @@ const packageVersion = validateEnvVar(
 );
 
 export const appConfig = {
-	name: 'API Hono',
+	name: 'Shopify Hono API',
 	environment: environment.nodeEnv,
 	version: `${packageVersion}${environment.nodeEnv.slice(0, 1).toLowerCase()}`,
 	packageVersion,
