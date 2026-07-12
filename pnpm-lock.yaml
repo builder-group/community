@@ -709,6 +709,49 @@ importers:
         specifier: ^4.23.0
         version: 4.23.0
 
+  templates/api-shopify-hono:
+    dependencies:
+      '@hono/zod-openapi':
+        specifier: ^1.4.0
+        version: 1.4.0(hono@4.12.29)(zod@4.4.3)
+      '@shopify/shopify-api':
+        specifier: ^13.1.0
+        version: 13.1.0
+      '@shopify/shopify-app-session-storage':
+        specifier: ^5.0.1
+        version: 5.0.1(@shopify/shopify-api@13.1.0)
+      '@shopify/shopify-app-session-storage-memory':
+        specifier: ^6.0.1
+        version: 6.0.1(@shopify/shopify-api@13.1.0)(@shopify/shopify-app-session-storage@5.0.1(@shopify/shopify-api@13.1.0))
+      hono:
+        specifier: ^4.12.29
+        version: 4.12.29
+      validatenv:
+        specifier: workspace:*
+        version: link:../../packages/validatenv
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@blgc/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@hono/node-server':
+        specifier: ^2.0.8
+        version: 2.0.8(hono@4.12.29)
+      '@types/node':
+        specifier: ^26.1.1
+        version: 26.1.1
+      openapi-typescript:
+        specifier: ^7.13.0
+        version: 7.13.0(typescript@6.0.3)
+      rollup-presets:
+        specifier: workspace:*
+        version: link:../../packages/rollup-presets
+      tsx:
+        specifier: ^4.23.0
+        version: 4.23.0
+
   templates/desktop-tauri:
     dependencies:
       '@tanstack/react-router':
@@ -767,7 +810,7 @@ importers:
         specifier: ^4.3.2
         version: 4.3.2
 
-  templates/shopify-tanstack:
+  templates/shopify-tanstack-inline-api:
     dependencies:
       '@hono/zod-openapi':
         specifier: ^1.4.0

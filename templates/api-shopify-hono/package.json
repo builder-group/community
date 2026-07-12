@@ -1,0 +1,81 @@
+{
+	"name": "@template/api-shopify-hono",
+	"version": "0.0.1",
+	"private": true,
+	"description": "",
+	"keywords": [],
+	"bugs": {
+		"url": "https://github.com/builder-group/community/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/builder-group/community.git"
+	},
+	"license": "MIT",
+	"author": "@bennobuilder",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/types/index.d.ts",
+			"source": "./src/index.ts",
+			"import": "./dist/esm/index.js",
+			"require": "./dist/cjs/index.cjs",
+			"default": "./dist/esm/index.js"
+		},
+		"./openapi": {
+			"types": "./dist/types/openapi/index.d.ts",
+			"source": "./src/openapi/index.ts",
+			"import": "./dist/openapi/esm/index.js",
+			"require": "./dist/openapi/cjs/index.cjs",
+			"default": "./dist/openapi/esm/index.js"
+		},
+		"./openapi.json": "./openapi.json",
+		"./package.json": "./package.json"
+	},
+	"typesVersions": {
+		"*": {
+			".": [
+				"./dist/types/index.d.ts"
+			],
+			"openapi": [
+				"./dist/types/openapi/index.d.ts"
+			]
+		}
+	},
+	"files": [
+		"dist",
+		"openapi.json",
+		"README.md"
+	],
+	"scripts": {
+		"build": "shx rm -rf dist && rollup -c rollup.config.js",
+		"build:prod": "export NODE_ENV=production && pnpm build",
+		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
+		"install:clean": "pnpm run clean && pnpm install",
+		"lint": "eslint .",
+		"openapi:generate": "pnpm run openapi:generate:document && pnpm run openapi:generate:types",
+		"openapi:generate:document": "tsx scripts/generate-openapi.ts && prettier --write openapi.json",
+		"openapi:generate:types": "openapi-typescript openapi.json -o src/openapi/api-v1.gen.ts",
+		"start:dev": "tsx watch --env-file-if-exists=.env.local scripts/dev.ts",
+		"test": "echo \"🧪 No tests defined yet.\"",
+		"typecheck": "tsc --noEmit && tsc -p scripts/tsconfig.json",
+		"update:latest": "pnpm update --latest"
+	},
+	"dependencies": {
+		"@hono/zod-openapi": "^1.4.0",
+		"@shopify/shopify-api": "^13.1.0",
+		"@shopify/shopify-app-session-storage": "^5.0.1",
+		"@shopify/shopify-app-session-storage-memory": "^6.0.1",
+		"hono": "^4.12.29",
+		"validatenv": "workspace:*",
+		"zod": "^4.4.3"
+	},
+	"devDependencies": {
+		"@blgc/config": "workspace:*",
+		"@hono/node-server": "^2.0.8",
+		"@types/node": "^26.1.1",
+		"openapi-typescript": "^7.13.0",
+		"rollup-presets": "workspace:*",
+		"tsx": "^4.23.0"
+	}
+}
