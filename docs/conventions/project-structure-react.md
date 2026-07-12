@@ -9,7 +9,7 @@ Keep app code split by responsibility:
 ```txt
 src/
 ├── routes/       # Route entry points and screen composition
-├── environment/  # App-wide initialized values and runtime setup
+├── environment/  # App-wide config, bindings, and runtime resources
 ├── modules/      # Bounded product, system, or integration behavior
 └── lib/          # Thin shared helpers
 ```
@@ -18,13 +18,33 @@ Only create the folders the app needs. Small apps can stay small.
 
 ## Folder Roles
 
-`routes/` owns navigation entry points and screen composition.
+### `routes/`
 
-`environment/` owns values initialized once for the whole app, such as app config, shared API setup, generated bindings, and app-wide providers.
+Owns navigation entry points and screen composition.
 
-`modules/` owns bounded product, system, or integration behavior.
+### `environment/`
 
-`lib/` owns helpers that are shared across multiple modules and do not belong to one specific module.
+Owns app-wide configuration, generated bindings, initialized resources, and runtime setup.
+
+Keep one top-level `environment/`. Organize its contents by app-wide infrastructure concern. Keep `modules/` organized by bounded behavior:
+
+- Put declarative app-wide configuration in `environment/configs/`
+- Put each app-wide runtime resource or set of generated bindings in a descriptive folder, such as `environment/api/` or `environment/generated/`
+- Keep request-, flow-, or module-scoped configuration and setup directly in its owning module
+- Do not use `environment/` as a generic home for constants
+
+### `modules/`
+
+Owns bounded product, system, or integration behavior.
+
+- Keep setup specific to a behavior inside its owning module
+- Do not depend on routes
+
+### `lib/`
+
+Owns helpers that are shared across multiple modules and do not belong to one specific module.
+
+- Keep `lib/` thin, and move helpers into a module when they are only used there
 
 ## Example
 
@@ -46,14 +66,4 @@ src/
     └── cn.ts
 ```
 
-For example, app config or an API client initialized once and intentionally shared across the app belongs in `environment/`. State and values scoped to a request or flow, or used only by one module, remain with the behavior that owns them. A framework-neutral class-name helper used throughout the app can remain in `lib/`.
-
-## Guidance
-
-- Keep routes focused on composition and navigation
-- Keep app-wide initialized values and runtime setup in `environment/`
-- Keep state and setup scoped to a request, flow, or module in their owning module
-- Do not use `environment/` as a generic home for constants
-- Keep behavior close to the module that owns it
-- Keep `lib/` thin and move helpers into a module when they are only used there
-- Keep dependency direction clear: modules must not depend on routes
+App config or an API client intentionally shared across the app belongs in `environment/`. State, configuration, clients, and providers scoped to one module remain with that module. A class-name helper used by several unrelated modules can remain in `lib/`.
