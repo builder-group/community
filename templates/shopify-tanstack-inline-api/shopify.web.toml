@@ -1,0 +1,5 @@
+roles = ["frontend", "backend"]
+port = 3000
+
+[commands]
+dev = "pnpm start:app"

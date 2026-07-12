@@ -1,0 +1,25 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "95d0f8b601252682603fbd942fc1596f"
+name = "sfy-tanstack-template"
+application_url = "https://example.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = ""
+use_legacy_install_flow = false
+
+[webhooks]
+api_version = "2026-07"
+
+[[webhooks.subscriptions]]
+uri = "/api/webhooks/shopify/app/uninstalled"
+topics = ["app/uninstalled"]
+
+[auth]
+redirect_urls = []
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = true

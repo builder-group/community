@@ -1,0 +1,204 @@
+{
+	"openapi": "3.1.0",
+	"info": {
+		"title": "Shopify TanStack API",
+		"version": "0.0.1"
+	},
+	"components": {
+		"securitySchemes": {
+			"shopifySessionToken": {
+				"type": "http",
+				"scheme": "bearer"
+			}
+		},
+		"schemas": {
+			"HealthResponse": {
+				"type": "object",
+				"properties": {
+					"status": {
+						"type": "string",
+						"enum": ["ok"],
+						"example": "ok"
+					}
+				},
+				"required": ["status"]
+			},
+			"ErrorResponse": {
+				"type": "object",
+				"properties": {
+					"type": {
+						"type": "string",
+						"example": "about:blank"
+					},
+					"title": {
+						"type": "string",
+						"example": "Unauthorized"
+					},
+					"status": {
+						"type": "integer",
+						"example": 401
+					},
+					"detail": {
+						"type": "string",
+						"example": "A valid Shopify session token is required"
+					},
+					"instance": {
+						"type": "string",
+						"example": "/v1/shop"
+					},
+					"code": {
+						"type": "string",
+						"example": "#ERR_SHOPIFY_UNAUTHORIZED"
+					},
+					"errors": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ErrorDetail"
+						}
+					}
+				},
+				"required": ["type", "title", "status", "detail", "instance", "code"]
+			},
+			"ErrorDetail": {
+				"type": "object",
+				"properties": {
+					"source": {
+						"type": "string",
+						"enum": ["body", "path", "query", "header", "cookie"],
+						"example": "query"
+					},
+					"path": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"type": "string"
+								},
+								{
+									"type": "number"
+								}
+							]
+						},
+						"example": ["name"]
+					},
+					"detail": {
+						"type": "string",
+						"example": "String must contain at least 1 character"
+					}
+				},
+				"required": ["source", "path", "detail"]
+			},
+			"ShopResponse": {
+				"type": "object",
+				"properties": {
+					"shop": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "string",
+								"example": "gid://shopify/Shop/1"
+							},
+							"name": {
+								"type": "string",
+								"example": "Example shop"
+							},
+							"domain": {
+								"type": "string",
+								"example": "example.myshopify.com"
+							}
+						},
+						"required": ["id", "name", "domain"]
+					}
+				},
+				"required": ["shop"]
+			}
+		},
+		"parameters": {}
+	},
+	"paths": {
+		"/v1/health": {
+			"get": {
+				"tags": ["health"],
+				"summary": "Check API health",
+				"operationId": "checkHealth",
+				"responses": {
+					"200": {
+						"description": "The API is healthy",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HealthResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The API could not complete the health check",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/shop": {
+			"get": {
+				"tags": ["shop"],
+				"summary": "Get the authenticated shop",
+				"operationId": "getShop",
+				"security": [
+					{
+						"shopifySessionToken": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The authenticated shop",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ShopResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "A valid Shopify session token is required",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The API could not load the shop",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"502": {
+						"description": "Shopify did not return a valid response",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"webhooks": {}
+}

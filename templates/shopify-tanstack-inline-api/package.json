@@ -1,0 +1,60 @@
+{
+	"name": "@template/shopify-tanstack-inline-api",
+	"version": "0.0.1",
+	"private": true,
+	"description": "",
+	"keywords": [],
+	"bugs": {
+		"url": "https://github.com/builder-group/community/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/builder-group/community.git"
+	},
+	"license": "MIT",
+	"author": "@bennobuilder",
+	"type": "module",
+	"scripts": {
+		"build": "pnpm typecheck && vite build",
+		"clean": "shx rm -rf .output && shx rm -rf .tanstack && shx rm -rf .turbo && shx rm -rf node_modules",
+		"install:clean": "pnpm run clean && pnpm install",
+		"lint": "eslint .",
+		"openapi:generate": "pnpm openapi:generate:document && pnpm openapi:generate:types",
+		"openapi:generate:document": "tsx scripts/generate-openapi.ts && prettier --write openapi.json",
+		"openapi:generate:types": "openapi-typescript openapi.json -o src/api/openapi/api-v1.gen.ts",
+		"start": "node .output/server/index.mjs",
+		"start:app": "vite dev",
+		"start:dev": "shopify app dev",
+		"test": "echo \"🧪 No tests defined yet.\"",
+		"typecheck": "tsc --noEmit",
+		"update:latest": "pnpm update --latest"
+	},
+	"dependencies": {
+		"@hono/zod-openapi": "^1.4.0",
+		"@shopify/shopify-api": "^13.1.0",
+		"@shopify/shopify-app-session-storage": "^5.0.1",
+		"@shopify/shopify-app-session-storage-memory": "^6.0.1",
+		"@tanstack/react-router": "^1.170.17",
+		"@tanstack/react-router-devtools": "^1.167.0",
+		"@tanstack/react-start": "^1.168.27",
+		"feature-fetch": "workspace:*",
+		"hono": "^4.12.29",
+		"react": "^19.2.7",
+		"react-dom": "^19.2.7",
+		"zod": "^4.4.3"
+	},
+	"devDependencies": {
+		"@blgc/config": "workspace:*",
+		"@shopify/app-bridge-types": "^0.7.1",
+		"@shopify/polaris-types": "^1.0.7",
+		"@tailwindcss/vite": "^4.3.2",
+		"@types/node": "^26.1.1",
+		"@types/react": "^19.2.17",
+		"@types/react-dom": "^19.2.3",
+		"@vitejs/plugin-react": "^6.0.3",
+		"nitro": "3.0.260610-beta",
+		"openapi-typescript": "^7.13.0",
+		"tailwindcss": "^4.3.2",
+		"tsx": "^4.23.0"
+	}
+}
