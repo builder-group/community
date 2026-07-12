@@ -1,7 +1,7 @@
 {
 	"openapi": "3.1.0",
 	"info": {
-		"title": "API Hono",
+		"title": "Shopify Hono API",
 		"version": "0.0.1"
 	},
 	"components": {

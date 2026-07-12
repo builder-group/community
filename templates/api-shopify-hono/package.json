@@ -56,7 +56,7 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint .",
 		"openapi:generate": "pnpm run openapi:generate:document && pnpm run openapi:generate:types",
-		"openapi:generate:document": "tsx scripts/generate-openapi.ts && prettier --write openapi.json",
+		"openapi:generate:document": "tsx --env-file-if-exists=.env.local scripts/generate-openapi.ts && prettier --write openapi.json",
 		"openapi:generate:types": "openapi-typescript openapi.json -o src/openapi/api-v1.gen.ts",
 		"start:dev": "tsx watch --env-file-if-exists=.env.local scripts/dev.ts",
 		"test": "echo \"🧪 No tests defined yet.\"",
