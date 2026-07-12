@@ -34,9 +34,7 @@ export type TOpenApiRouterErrorCode = TOpenApiRouterKnownErrorCode | `#ERR_OPENA
 
 /** Error codes emitted by this package. */
 export type TOpenApiRouterKnownErrorCode =
-	| '#ERR_OPENAPI_PARSE_BODY'
-	| '#ERR_OPENAPI_SCHEMA'
-	| '#ERR_OPENAPI_VALIDATION';
+	'#ERR_OPENAPI_PARSE_BODY' | '#ERR_OPENAPI_SCHEMA' | '#ERR_OPENAPI_VALIDATION';
 
 function formatOpenApiRouterErrorMessage(
 	code: TOpenApiRouterErrorCode,

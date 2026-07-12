@@ -1,6 +1,6 @@
 import { createRootRoute, HeadContent, Scripts } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { createServerFn } from '@tanstack/react-start';
 import React from 'react';
 import { appConfig } from '@/environment';
 import styles from '../styles.css?url';

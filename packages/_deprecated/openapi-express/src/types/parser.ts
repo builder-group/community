@@ -12,9 +12,7 @@ export interface TParserYupEsque<GResult> {
 }
 
 export type TParserEsque<GResult> =
-	| TParserCustomValidatorEsque<GResult>
-	| TParserZodEsque<GResult>
-	| TParserYupEsque<GResult>;
+	TParserCustomValidatorEsque<GResult> | TParserZodEsque<GResult> | TParserYupEsque<GResult>;
 
 export type TParserSchema<T> = {
 	[P in keyof Required<T>]: TParserEsque<T[P]>;

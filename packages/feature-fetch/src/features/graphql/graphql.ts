@@ -265,9 +265,7 @@ export interface TGraphQLError {
 
 /** GraphQL operation input accepted by query and mutation helpers. */
 export type TGraphQLDocumentInput<GResult = object, GVariables = Record<string, unknown>> =
-	| string
-	| DocumentNode
-	| TTypedDocumentNode<GResult, GVariables>;
+	string | DocumentNode | TTypedDocumentNode<GResult, GVariables>;
 
 /** GraphQL document with result and variables types, compatible with `gql.tada` and typed-document-node. */
 export type TTypedDocumentNode<

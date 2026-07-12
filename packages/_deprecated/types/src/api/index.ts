@@ -15,14 +15,7 @@ import { type TFilterKeys } from '../utils';
 
 /** Return HTTP methods */
 export type THttpMethod =
-	| 'get'
-	| 'put'
-	| 'post'
-	| 'delete'
-	| 'options'
-	| 'head'
-	| 'patch'
-	| 'trace';
+	'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch' | 'trace';
 
 /** Return 2XX status codes */
 export type TOkStatus = 200 | 201 | 202 | 203 | 204 | 206 | 207 | '2XX';

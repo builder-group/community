@@ -243,8 +243,7 @@ export interface TCreateFormConfig<GFormData extends TFormData> {
 /** Maps each form data property to a form field config or an existing form field. */
 export type TCreateFormConfigFormFields<GFormData extends TFormData> = {
 	[Key in TFormFieldKey<GFormData>]:
-		| TCreateFormConfigFormField<GFormData[Key]>
-		| TFormField<GFormData[Key]>;
+		TCreateFormConfigFormField<GFormData[Key]> | TFormField<GFormData[Key]>;
 };
 
 /** Infers form data from field configs and existing form fields passed to `createForm()`. */

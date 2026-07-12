@@ -678,12 +678,7 @@ export type TProjectDate = { year: number; month?: number };
 export type TProjectCategory = 'saas' | 'package';
 
 export type TProjectStatus =
-	| 'in-progress'
-	| 'maintenance'
-	| 'discontinued'
-	| 'paused'
-	| 'pivoted'
-	| 'completed';
+	'in-progress' | 'maintenance' | 'discontinued' | 'paused' | 'pivoted' | 'completed';
 
 export type TProjectLogo = { type: 'image'; src: string } | { type: 'emoji'; value: string };
 

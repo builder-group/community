@@ -4,7 +4,7 @@ Use `feature-fetch` as the typed API layer. Prefer consistent client setup and e
 
 ## Enforce
 
-- Create clients in dedicated environment or library files, not inside components
+- Create clients in dedicated environment, module, or library files according to their lifecycle and ownership, not inside components
 - Use generated `paths` types for `createOpenApiFetchClient(...)`
 - Use declared response, error, body, and params types for `createApiFetchClient(...)` call sites where generated API types do not exist
 - Compose only the features you need, in a clear order

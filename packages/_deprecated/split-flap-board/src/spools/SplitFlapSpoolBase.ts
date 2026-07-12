@@ -300,12 +300,14 @@ export abstract class SplitFlapSpoolBase extends LitElement {
 			<div class="half top">${this._renderHalf(current, 'top')}</div>
 			<div class="half bottom">${this._renderHalf(bottomStatic, 'bottom')}</div>
 
-			${this._stepping
-				? html`
-						<div class="half top flipping">${this._renderHalf(prev, 'top')}</div>
-						<div class="half bottom flipping">${this._renderHalf(current, 'bottom')}</div>
-					`
-				: nothing}
+			${
+				this._stepping
+					? html`
+							<div class="half top flipping">${this._renderHalf(prev, 'top')}</div>
+							<div class="half bottom flipping">${this._renderHalf(current, 'bottom')}</div>
+						`
+					: nothing
+			}
 		`;
 	}
 }

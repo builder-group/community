@@ -225,9 +225,7 @@ export type TValidationStatus = TState<
 >;
 
 export type TValidationStatusValue =
-	| TInvalidValidationStatus
-	| TValidValidationStatus
-	| TUnvalidatedValidationStatus;
+	TInvalidValidationStatus | TValidValidationStatus | TUnvalidatedValidationStatus;
 
 /** Validation failed with one or more errors. */
 export interface TInvalidValidationStatus {
