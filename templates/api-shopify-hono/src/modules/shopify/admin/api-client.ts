@@ -7,7 +7,7 @@ export function createShopifyAdminApiClient(
 	const { shop, accessToken } = options;
 
 	return createGraphQLFetchClient({
-		baseUrl: shopifyConfig.adminApiUrl(shop),
+		baseUrl: shopifyConfig.admin.graphqlUrl(shop),
 		headers: {
 			'X-Shopify-Access-Token': accessToken
 		}

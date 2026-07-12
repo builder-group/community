@@ -5,16 +5,29 @@
 		"version": "0.0.1"
 	},
 	"components": {
+		"securitySchemes": {
+			"shopifySessionToken": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT",
+				"description": "Shopify App Bridge session token"
+			}
+		},
 		"schemas": {
-			"GreetResponse": {
+			"HealthResponse": {
 				"type": "object",
 				"properties": {
-					"message": {
+					"status": {
 						"type": "string",
-						"example": "Hello, Builder!"
+						"enum": ["ok"],
+						"example": "ok"
+					},
+					"version": {
+						"type": "string",
+						"example": "0.0.1d"
 					}
 				},
-				"required": ["message"]
+				"required": ["status", "version"]
 			},
 			"ErrorResponse": {
 				"type": "object",
@@ -37,7 +50,7 @@
 					},
 					"instance": {
 						"type": "string",
-						"example": "/v1/greet"
+						"example": "/v1/shop"
 					},
 					"code": {
 						"type": "string",
@@ -81,77 +94,34 @@
 				},
 				"required": ["source", "path", "detail"]
 			},
-			"HealthResponse": {
+			"ShopResponse": {
 				"type": "object",
 				"properties": {
-					"status": {
-						"type": "string",
-						"enum": ["ok"],
-						"example": "ok"
-					},
-					"version": {
-						"type": "string",
-						"example": "0.0.1d"
+					"shop": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "string",
+								"example": "gid://shopify/Shop/1"
+							},
+							"name": {
+								"type": "string",
+								"example": "Example shop"
+							},
+							"domain": {
+								"type": "string",
+								"example": "example.myshopify.com"
+							}
+						},
+						"required": ["id", "name", "domain"]
 					}
 				},
-				"required": ["status", "version"]
+				"required": ["shop"]
 			}
 		},
 		"parameters": {}
 	},
 	"paths": {
-		"/v1/greet": {
-			"get": {
-				"tags": ["greet"],
-				"summary": "Create a greeting",
-				"operationId": "greet",
-				"parameters": [
-					{
-						"schema": {
-							"type": "string",
-							"minLength": 1,
-							"default": "Builder",
-							"example": "Builder"
-						},
-						"required": false,
-						"name": "name",
-						"in": "query"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "A greeting",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/GreetResponse"
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "The greeting request is invalid",
-						"content": {
-							"application/problem+json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					},
-					"500": {
-						"description": "The API could not create the greeting",
-						"content": {
-							"application/problem+json": {
-								"schema": {
-									"$ref": "#/components/schemas/ErrorResponse"
-								}
-							}
-						}
-					}
-				}
-			}
-		},
 		"/v1/health": {
 			"get": {
 				"tags": ["health"],
@@ -170,6 +140,80 @@
 					},
 					"500": {
 						"description": "The API could not complete the health check",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/shop": {
+			"get": {
+				"tags": ["shop"],
+				"summary": "Get the authenticated shop",
+				"operationId": "getShop",
+				"security": [
+					{
+						"shopifySessionToken": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The authenticated shop",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ShopResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "A valid Shopify session token is required",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Shopify Admin API rate limit exceeded",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The API could not load the shop",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"502": {
+						"description": "Shopify did not return a valid response",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Shopify is unavailable",
 						"content": {
 							"application/problem+json": {
 								"schema": {

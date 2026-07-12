@@ -21,7 +21,7 @@ export const ErrorResponseSchema = z
 		title: z.string().openapi({ example: 'Bad Request' }),
 		status: z.number().int().openapi({ example: 400 }),
 		detail: z.string().openapi({ example: 'The request could not be validated' }),
-		instance: z.string().openapi({ example: '/v1/greet' }),
+		instance: z.string().openapi({ example: '/v1/shop' }),
 		code: z.string().openapi({ example: '#ERR_VALIDATION_FAILED' }),
 		errors: z.array(ErrorDetailSchema).optional()
 	})

@@ -34,10 +34,17 @@ const environment = validateEnv(process.env, {
 });
 
 export const shopifyConfig = {
-	apiVersion,
 	apiKey: environment.apiKey,
 	apiSecretKey: environment.apiSecretKey,
 	appUrl: environment.appUrl,
 	scopes: environment.scopes,
-	adminApiUrl: (shop: string) => `https://${shop}/admin/api/${apiVersion}/graphql.json`
+	apiVersion,
+	sessionToken: {
+		// Note: App Bridge retries XHR requests with a fresh session token when this header is returned
+		retryHeader: 'X-Shopify-Retry-Invalid-Session-Request'
+	},
+	admin: {
+		expiringOfflineAccessTokens: true,
+		graphqlUrl: (shop: string) => `https://${shop}/admin/api/${apiVersion}/graphql.json`
+	}
 } as const;

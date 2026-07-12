@@ -12,9 +12,15 @@ export function createApi(): OpenAPIHono {
 
 	const corsOrigin = appConfig.cors.origin;
 	if (corsOrigin != null) {
-		api.use('*', cors({ origin: corsOrigin }));
+		api.use('*', cors(appConfig.cors));
 	}
 
+	api.openAPIRegistry.registerComponent('securitySchemes', 'shopifySessionToken', {
+		type: 'http',
+		scheme: 'bearer',
+		bearerFormat: 'JWT',
+		description: 'Shopify App Bridge session token'
+	});
 	registerApiRoutes(api);
 	api.doc31('/openapi.json', openApiDocumentConfig);
 

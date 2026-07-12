@@ -11,6 +11,7 @@
 		"plugins": [
 			{
 				"name": "gql.tada/ts-plugin",
+				// Note: Keep this schema version aligned with shopifyConfig.apiVersion
 				"schema": "https://shopify.dev/admin-graphql-direct-proxy/2026-07",
 				"tadaOutputLocation": "./src/environment/gql/shopify-admin/graphql-env.d.ts"
 			}

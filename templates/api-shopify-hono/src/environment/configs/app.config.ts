@@ -1,5 +1,7 @@
+import type { cors } from 'hono/cors';
 import { emptyStringAsUndefined, validateEnv, validateEnvVar } from 'validatenv';
 import { z } from 'zod';
+import { shopifyConfig } from './shopify.config';
 
 const environment = validateEnv(process.env, {
 	nodeEnv: {
@@ -36,6 +38,9 @@ export const appConfig = {
 	version: `${packageVersion}${environment.nodeEnv.slice(0, 1).toLowerCase()}`,
 	packageVersion,
 	cors: {
-		origin: environment.corsOrigin
-	}
+		origin: environment.corsOrigin,
+		exposeHeaders: [shopifyConfig.sessionToken.retryHeader]
+	} satisfies TCorsOptions
 } as const;
+
+type TCorsOptions = Parameters<typeof cors>[0];

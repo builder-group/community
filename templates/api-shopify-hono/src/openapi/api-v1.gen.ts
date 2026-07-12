@@ -4,23 +4,6 @@
  */
 
 export interface paths {
-    "/v1/greet": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Create a greeting */
-        get: operations["greet"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/v1/health": {
         parameters: {
             query?: never;
@@ -38,13 +21,35 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/shop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the authenticated shop */
+        get: operations["getShop"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        GreetResponse: {
-            /** @example Hello, Builder! */
-            message: string;
+        HealthResponse: {
+            /**
+             * @example ok
+             * @enum {string}
+             */
+            status: "ok";
+            /** @example 0.0.1d */
+            version: string;
         };
         ErrorResponse: {
             /** @example about:blank */
@@ -55,7 +60,7 @@ export interface components {
             status: number;
             /** @example The request could not be validated */
             detail: string;
-            /** @example /v1/greet */
+            /** @example /v1/shop */
             instance: string;
             /** @example #ERR_VALIDATION_FAILED */
             code: string;
@@ -76,14 +81,15 @@ export interface components {
             /** @example String must contain at least 1 character */
             detail: string;
         };
-        HealthResponse: {
-            /**
-             * @example ok
-             * @enum {string}
-             */
-            status: "ok";
-            /** @example 0.0.1d */
-            version: string;
+        ShopResponse: {
+            shop: {
+                /** @example gid://shopify/Shop/1 */
+                id: string;
+                /** @example Example shop */
+                name: string;
+                /** @example example.myshopify.com */
+                domain: string;
+            };
         };
     };
     responses: never;
@@ -94,46 +100,6 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    greet: {
-        parameters: {
-            query?: {
-                name?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description A greeting */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GreetResponse"];
-                };
-            };
-            /** @description The greeting request is invalid */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description The API could not create the greeting */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/problem+json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
     checkHealth: {
         parameters: {
             query?: never;
@@ -154,6 +120,71 @@ export interface operations {
             };
             /** @description The API could not complete the health check */
             500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getShop: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authenticated shop */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopResponse"];
+                };
+            };
+            /** @description A valid Shopify session token is required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Shopify Admin API rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The API could not load the shop */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Shopify did not return a valid response */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Shopify is unavailable */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
