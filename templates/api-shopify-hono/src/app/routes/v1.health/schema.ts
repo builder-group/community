@@ -1,13 +1,6 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import { createErrorResponse } from '@/modules/error';
 
-export const HealthResponseSchema = z
-	.object({
-		status: z.literal('ok').openapi({ example: 'ok' }),
-		version: z.string().openapi({ example: '0.0.1d' })
-	})
-	.openapi('HealthResponse');
-
 export const CheckHealthRoute = createRoute({
 	method: 'get',
 	path: '/v1/health',
@@ -19,7 +12,12 @@ export const CheckHealthRoute = createRoute({
 			description: 'The API is healthy',
 			content: {
 				'application/json': {
-					schema: HealthResponseSchema
+					schema: z
+						.object({
+							status: z.literal('ok').openapi({ example: 'ok' }),
+							version: z.string().openapi({ example: '0.0.1d' })
+						})
+						.openapi('HealthResponse')
 				}
 			}
 		},

@@ -2,16 +2,6 @@ import { createRoute, z } from '@hono/zod-openapi';
 import { createErrorResponse } from '@/modules/error';
 import { shopifyAdminAuth } from '../../middleware';
 
-export const ShopResponseSchema = z
-	.object({
-		shop: z.object({
-			id: z.string().openapi({ example: 'gid://shopify/Shop/1' }),
-			name: z.string().openapi({ example: 'Example shop' }),
-			domain: z.string().openapi({ example: 'example.myshopify.com' })
-		})
-	})
-	.openapi('ShopResponse');
-
 export const GetShopRoute = createRoute({
 	method: 'get',
 	path: '/v1/shop',
@@ -25,7 +15,15 @@ export const GetShopRoute = createRoute({
 			description: 'The authenticated shop',
 			content: {
 				'application/json': {
-					schema: ShopResponseSchema
+					schema: z
+						.object({
+							shop: z.object({
+								id: z.string().openapi({ example: 'gid://shopify/Shop/1' }),
+								name: z.string().openapi({ example: 'Example shop' }),
+								domain: z.string().openapi({ example: 'example.myshopify.com' })
+							})
+						})
+						.openapi('ShopResponse')
 				}
 			}
 		},

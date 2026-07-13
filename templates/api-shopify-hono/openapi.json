@@ -117,6 +117,60 @@
 					}
 				},
 				"required": ["shop"]
+			},
+			"AppUninstalledWebhookPayload": {
+				"type": "object",
+				"properties": {},
+				"additionalProperties": {}
+			},
+			"AppScopesUpdateWebhookPayload": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "number",
+						"example": 1
+					},
+					"shop_id": {
+						"type": "string",
+						"example": "gid://shopify/Shop/548380009"
+					},
+					"previous": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"example": ["read_products"]
+					},
+					"current": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"example": ["read_products", "write_products"]
+					},
+					"updated_at": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2024-06-25T00:00:00.000Z"
+					}
+				},
+				"required": ["id", "shop_id", "previous", "current", "updated_at"],
+				"additionalProperties": {}
+			},
+			"CustomersDataRequestWebhookPayload": {
+				"type": "object",
+				"properties": {},
+				"additionalProperties": {}
+			},
+			"CustomersRedactWebhookPayload": {
+				"type": "object",
+				"properties": {},
+				"additionalProperties": {}
+			},
+			"ShopRedactWebhookPayload": {
+				"type": "object",
+				"properties": {},
+				"additionalProperties": {}
 			}
 		},
 		"parameters": {}
@@ -214,6 +268,296 @@
 					},
 					"503": {
 						"description": "Shopify is unavailable",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/webhooks/shopify/app/uninstalled": {
+			"post": {
+				"tags": ["webhooks", "shopify"],
+				"summary": "Handle an app uninstalled webhook",
+				"operationId": "handleAppUninstalledWebhook",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AppUninstalledWebhookPayload"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The webhook was acknowledged"
+					},
+					"400": {
+						"description": "The webhook request is invalid",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "The webhook could not be verified",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The webhook could not be processed",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Shopify session storage is unavailable",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/webhooks/shopify/app/scopes-update": {
+			"post": {
+				"tags": ["webhooks", "shopify"],
+				"summary": "Handle an app scopes update webhook",
+				"operationId": "handleAppScopesUpdateWebhook",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AppScopesUpdateWebhookPayload"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The webhook was acknowledged"
+					},
+					"400": {
+						"description": "The webhook request is invalid",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "The webhook could not be verified",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The webhook could not be processed",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Shopify session storage is unavailable",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/webhooks/shopify/customers/data-request": {
+			"post": {
+				"tags": ["webhooks", "shopify"],
+				"summary": "Handle a customer data request webhook",
+				"operationId": "handleCustomersDataRequestWebhook",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CustomersDataRequestWebhookPayload"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The webhook was acknowledged"
+					},
+					"400": {
+						"description": "The webhook request is invalid",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "The webhook could not be verified",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The webhook could not be processed",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/webhooks/shopify/customers/redact": {
+			"post": {
+				"tags": ["webhooks", "shopify"],
+				"summary": "Handle a customer redaction webhook",
+				"operationId": "handleCustomersRedactWebhook",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CustomersRedactWebhookPayload"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The webhook was acknowledged"
+					},
+					"400": {
+						"description": "The webhook request is invalid",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "The webhook could not be verified",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The webhook could not be processed",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/webhooks/shopify/shop/redact": {
+			"post": {
+				"tags": ["webhooks", "shopify"],
+				"summary": "Handle a shop redaction webhook",
+				"operationId": "handleShopRedactWebhook",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ShopRedactWebhookPayload"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The webhook was acknowledged"
+					},
+					"400": {
+						"description": "The webhook request is invalid",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "The webhook could not be verified",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The webhook could not be processed",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Shopify session storage is unavailable",
 						"content": {
 							"application/problem+json": {
 								"schema": {
