@@ -1,0 +1,10 @@
+{
+	"extends": "@blgc/config/typescript/tanstack",
+	"compilerOptions": {
+		"paths": {
+			"@/*": ["./src/*"]
+		}
+	},
+	"include": ["**/*.ts", "**/*.tsx"],
+	"exclude": ["node_modules"]
+}
