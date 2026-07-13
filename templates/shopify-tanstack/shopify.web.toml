@@ -1,0 +1,5 @@
+roles = ["frontend", "backend"]
+webhooks_path = "/api/v1/webhooks/shopify/app/uninstalled"
+
+[commands]
+dev = "pnpm start:app"

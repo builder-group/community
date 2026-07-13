@@ -9,38 +9,89 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as EmbeddedRouteRouteImport } from './routes/embedded/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EmbeddedIndexRouteImport } from './routes/embedded/index'
+import { Route as ApiSplatRouteImport } from './routes/api/$'
+import { Route as EmbeddedAdditionalIndexRouteImport } from './routes/embedded.additional/index'
 
+const EmbeddedRouteRoute = EmbeddedRouteRouteImport.update({
+  id: '/embedded',
+  path: '/embedded',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmbeddedIndexRoute = EmbeddedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EmbeddedRouteRoute,
+} as any)
+const ApiSplatRoute = ApiSplatRouteImport.update({
+  id: '/api/$',
+  path: '/api/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmbeddedAdditionalIndexRoute = EmbeddedAdditionalIndexRouteImport.update({
+  id: '/additional/',
+  path: '/additional/',
+  getParentRoute: () => EmbeddedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/embedded': typeof EmbeddedRouteRouteWithChildren
+  '/api/$': typeof ApiSplatRoute
+  '/embedded/': typeof EmbeddedIndexRoute
+  '/embedded/additional/': typeof EmbeddedAdditionalIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/$': typeof ApiSplatRoute
+  '/embedded': typeof EmbeddedIndexRoute
+  '/embedded/additional': typeof EmbeddedAdditionalIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/embedded': typeof EmbeddedRouteRouteWithChildren
+  '/api/$': typeof ApiSplatRoute
+  '/embedded/': typeof EmbeddedIndexRoute
+  '/embedded/additional/': typeof EmbeddedAdditionalIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    '/' | '/embedded' | '/api/$' | '/embedded/' | '/embedded/additional/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/api/$' | '/embedded' | '/embedded/additional'
+  id:
+    | '__root__'
+    | '/'
+    | '/embedded'
+    | '/api/$'
+    | '/embedded/'
+    | '/embedded/additional/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EmbeddedRouteRoute: typeof EmbeddedRouteRouteWithChildren
+  ApiSplatRoute: typeof ApiSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/embedded': {
+      id: '/embedded'
+      path: '/embedded'
+      fullPath: '/embedded'
+      preLoaderRoute: typeof EmbeddedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +99,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/embedded/': {
+      id: '/embedded/'
+      path: '/'
+      fullPath: '/embedded/'
+      preLoaderRoute: typeof EmbeddedIndexRouteImport
+      parentRoute: typeof EmbeddedRouteRoute
+    }
+    '/api/$': {
+      id: '/api/$'
+      path: '/api/$'
+      fullPath: '/api/$'
+      preLoaderRoute: typeof ApiSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/embedded/additional/': {
+      id: '/embedded/additional/'
+      path: '/additional'
+      fullPath: '/embedded/additional/'
+      preLoaderRoute: typeof EmbeddedAdditionalIndexRouteImport
+      parentRoute: typeof EmbeddedRouteRoute
+    }
   }
 }
 
+interface EmbeddedRouteRouteChildren {
+  EmbeddedIndexRoute: typeof EmbeddedIndexRoute
+  EmbeddedAdditionalIndexRoute: typeof EmbeddedAdditionalIndexRoute
+}
+
+const EmbeddedRouteRouteChildren: EmbeddedRouteRouteChildren = {
+  EmbeddedIndexRoute: EmbeddedIndexRoute,
+  EmbeddedAdditionalIndexRoute: EmbeddedAdditionalIndexRoute,
+}
+
+const EmbeddedRouteRouteWithChildren = EmbeddedRouteRoute._addFileChildren(
+  EmbeddedRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EmbeddedRouteRoute: EmbeddedRouteRouteWithChildren,
+  ApiSplatRoute: ApiSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

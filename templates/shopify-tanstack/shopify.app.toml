@@ -1,0 +1,41 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "95d0f8b601252682603fbd942fc1596f"
+name = "Shopify TanStack Template"
+application_url = "https://example.com"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = ""
+use_legacy_install_flow = false
+
+[webhooks]
+api_version = "2026-07"
+
+[[webhooks.subscriptions]]
+uri = "/api/v1/webhooks/shopify/app/uninstalled"
+topics = ["app/uninstalled"]
+
+[[webhooks.subscriptions]]
+uri = "/api/v1/webhooks/shopify/app/scopes-update"
+topics = ["app/scopes_update"]
+
+[[webhooks.subscriptions]]
+uri = "/api/v1/webhooks/shopify/customers/data-request"
+compliance_topics = ["customers/data_request"]
+
+[[webhooks.subscriptions]]
+uri = "/api/v1/webhooks/shopify/customers/redact"
+compliance_topics = ["customers/redact"]
+
+[[webhooks.subscriptions]]
+uri = "/api/v1/webhooks/shopify/shop/redact"
+compliance_topics = ["shop/redact"]
+
+[auth]
+redirect_urls = []
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = true
