@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "95d0f8b601252682603fbd942fc1596f"
-name = "Shopify TanStack Template"
+name = "TanStack App Template"
 application_url = "https://example.com"
 embedded = true
 

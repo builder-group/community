@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { shopifyConfig } from '@/environment/configs/shopify.config.server';
-import { shopifyIframeProtectionMiddleware } from '@/modules/shopify';
+import { shopifyBounceIframeProtectionMiddleware } from '@/modules/shopify';
 
 export const Route = createFileRoute('/auth/session-token/')({
 	server: {
-		middleware: [shopifyIframeProtectionMiddleware],
+		middleware: [shopifyBounceIframeProtectionMiddleware],
 		handlers: {
 			GET: () => {
 				return new Response(createSessionTokenBounceHtml(), {
