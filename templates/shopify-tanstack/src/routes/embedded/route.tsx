@@ -1,10 +1,14 @@
 import type { SAppNavLinkAttributes } from '@shopify/app-bridge-types';
 import { createFileRoute, Outlet } from '@tanstack/react-router';
-import { getPublicShopifyConfig, shopifyIframeProtectionMiddleware } from '@/modules/shopify';
+import {
+	getPublicShopifyConfig,
+	shopifyIframeProtectionMiddleware,
+	shopifySessionTokenMiddleware
+} from '@/modules/shopify';
 
 export const Route = createFileRoute('/embedded')({
 	server: {
-		middleware: [shopifyIframeProtectionMiddleware]
+		middleware: [shopifyIframeProtectionMiddleware, shopifySessionTokenMiddleware]
 	},
 	loader: () => getPublicShopifyConfig(),
 	head: ({ loaderData }) => {

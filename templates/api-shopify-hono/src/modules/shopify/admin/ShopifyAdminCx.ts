@@ -4,11 +4,13 @@ import { AppError } from '@/modules/error';
 import { createShopifyAdminApiClient, type TShopifyAdminApiClient } from './api-client';
 
 export class ShopifyAdminCx {
+	public readonly sessionId: string;
 	public readonly shop: string;
 	public readonly accessToken: string;
 	public readonly apiClient: TShopifyAdminApiClient;
 
-	private constructor(shop: string, accessToken: string) {
+	private constructor(sessionId: string, shop: string, accessToken: string) {
+		this.sessionId = sessionId;
 		this.shop = shop;
 		this.accessToken = accessToken;
 		this.apiClient = createShopifyAdminApiClient({ shop, accessToken });
@@ -26,6 +28,6 @@ export class ShopifyAdminCx {
 			);
 		}
 
-		return Ok(new ShopifyAdminCx(shop, accessToken));
+		return Ok(new ShopifyAdminCx(session.id, shop, accessToken));
 	}
 }

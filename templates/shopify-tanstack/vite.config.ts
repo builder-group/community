@@ -2,12 +2,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import viteReact from '@vitejs/plugin-react';
 import { nitro } from 'nitro/vite';
-import {
-	emptyStringAsUndefined,
-	portValidator,
-	urlValidator,
-	validateEnv
-} from 'validatenv';
+import { emptyStringAsUndefined, portValidator, urlValidator, validateEnv } from 'validatenv';
 import { defineConfig } from 'vite';
 
 // Note: Shopify CLI still provides HOST, which Vite otherwise interprets as its bind address

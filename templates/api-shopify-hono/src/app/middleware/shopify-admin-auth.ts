@@ -1,7 +1,11 @@
 import { createMiddleware } from 'hono/factory';
 import { shopifyConfig } from '@/environment';
 import { AppError } from '@/modules/error';
-import { authenticateShopifyAdmin, type ShopifyAdminCx } from '@/modules/shopify';
+import {
+	authenticateShopifyAdmin,
+	invalidateShopifySessionAccessToken,
+	type ShopifyAdminCx
+} from '@/modules/shopify';
 
 export const shopifyAdminAuth = createMiddleware<{
 	Variables: { shopifyAdminCx: ShopifyAdminCx };
@@ -34,5 +38,27 @@ export const shopifyAdminAuth = createMiddleware<{
 	}
 
 	context.set('shopifyAdminCx', shopifyAdminCx);
-	await next();
+	try {
+		await next();
+	} catch (cause) {
+		if (cause instanceof AppError && cause.code === '#ERR_SHOPIFY_ADMIN_ACCESS_TOKEN_INVALID') {
+			const [isSessionInvalidated, sessionInvalidationErr] =
+				await invalidateShopifySessionAccessToken(
+					shopifyAdminCx.sessionId,
+					shopifyAdminCx.accessToken
+				);
+			if (!isSessionInvalidated) {
+				throw sessionInvalidationErr;
+			}
+
+			throw new AppError('#ERR_SHOPIFY_SESSION_TOKEN_INVALID', {
+				status: 401,
+				title: 'Unauthorized',
+				detail: 'The Shopify session must be refreshed',
+				cause
+			});
+		}
+
+		throw cause;
+	}
 });

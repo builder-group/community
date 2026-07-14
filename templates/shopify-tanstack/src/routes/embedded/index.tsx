@@ -1,15 +1,26 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { appConfig } from '@/environment';
+import { apiClient, appConfig, mapApiError } from '@/environment';
+import { ShopPanel } from '@/modules/shop';
 
 export const Route = createFileRoute('/embedded/')({
+	loader: async () => {
+		const [isShopOk, shopErr, shopResponse] = await apiClient.get('/v1/shop');
+		if (!isShopOk) {
+			throw mapApiError(shopErr);
+		}
+
+		return shopResponse;
+	},
 	component: RouteComponent
 });
 
 function RouteComponent() {
+	const { shop } = Route.useLoaderData();
+
 	return (
 		<s-page heading={appConfig.name}>
-			<s-section heading="Embedded app">
-				<s-text>The Shopify runtime is ready for application modules.</s-text>
+			<s-section heading="Authenticated shop">
+				<ShopPanel shop={shop} />
 			</s-section>
 		</s-page>
 	);

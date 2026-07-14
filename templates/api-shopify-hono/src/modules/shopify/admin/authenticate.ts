@@ -4,6 +4,7 @@ import { AppError } from '@/modules/error';
 import { loadOrCreateOfflineShopifySession } from '../sessions';
 import { ShopifyAdminCx } from './ShopifyAdminCx';
 
+// https://shopify.dev/docs/apps/build/authentication-authorization/implement-custom-authorization?extension=javascript#validate-the-session-token
 export async function authenticateShopifyAdmin(
 	sessionToken: string
 ): Promise<TResult<ShopifyAdminCx, AppError>> {

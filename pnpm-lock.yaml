@@ -836,6 +836,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      feature-fetch:
+        specifier: workspace:*
+        version: link:../../packages/feature-fetch
       react:
         specifier: ^19.2.7
         version: 19.2.7

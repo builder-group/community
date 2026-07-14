@@ -41,6 +41,7 @@ export const shopifyConfig = {
 	apiVersion,
 	sessionToken: {
 		// Note: App Bridge retries XHR requests with a fresh session token when this header is returned
+		// https://shopify.dev/docs/apps/build/authentication-authorization/implement-custom-authorization?extension=javascript#validate-the-session-token
 		retryHeader: 'X-Shopify-Retry-Invalid-Session-Request'
 	},
 	admin: {

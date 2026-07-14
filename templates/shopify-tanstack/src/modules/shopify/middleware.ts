@@ -1,5 +1,7 @@
+import { redirect } from '@tanstack/react-router';
 import { createMiddleware } from '@tanstack/react-start';
 import { setResponseHeader } from '@tanstack/react-start/server';
+import { createShopifySessionTokenBounceHref, extractShopifySessionToken } from './session-token';
 
 export const shopifyIframeProtectionMiddleware = createMiddleware().server(
 	async ({ next, request }) => {
@@ -9,6 +11,20 @@ export const shopifyIframeProtectionMiddleware = createMiddleware().server(
 		// https://shopify.dev/docs/apps/build/security/set-up-iframe-protection
 		const frameAncestors = shop == null ? "'none'" : `https://${shop} https://admin.shopify.com`;
 		setResponseHeader('Content-Security-Policy', `frame-ancestors ${frameAncestors};`);
+
+		return next();
+	}
+);
+
+export const shopifySessionTokenMiddleware = createMiddleware().server(
+	async ({ next, request }) => {
+		const sessionToken = extractShopifySessionToken(request);
+		if (sessionToken == null) {
+			throw redirect({
+				href: createShopifySessionTokenBounceHref(request),
+				statusCode: 302
+			});
+		}
 
 		return next();
 	}

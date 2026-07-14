@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as EmbeddedIndexRouteImport } from './routes/embedded/index'
 import { Route as ApiSplatRouteImport } from './routes/api/$'
 import { Route as EmbeddedAdditionalIndexRouteImport } from './routes/embedded.additional/index'
+import { Route as AuthSessionTokenIndexRouteImport } from './routes/auth.session-token/index'
 
 const EmbeddedRouteRoute = EmbeddedRouteRouteImport.update({
   id: '/embedded',
@@ -40,18 +41,25 @@ const EmbeddedAdditionalIndexRoute = EmbeddedAdditionalIndexRouteImport.update({
   path: '/additional/',
   getParentRoute: () => EmbeddedRouteRoute,
 } as any)
+const AuthSessionTokenIndexRoute = AuthSessionTokenIndexRouteImport.update({
+  id: '/auth/session-token/',
+  path: '/auth/session-token/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/embedded': typeof EmbeddedRouteRouteWithChildren
   '/api/$': typeof ApiSplatRoute
   '/embedded/': typeof EmbeddedIndexRoute
+  '/auth/session-token/': typeof AuthSessionTokenIndexRoute
   '/embedded/additional/': typeof EmbeddedAdditionalIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/$': typeof ApiSplatRoute
   '/embedded': typeof EmbeddedIndexRoute
+  '/auth/session-token': typeof AuthSessionTokenIndexRoute
   '/embedded/additional': typeof EmbeddedAdditionalIndexRoute
 }
 export interface FileRoutesById {
@@ -60,20 +68,32 @@ export interface FileRoutesById {
   '/embedded': typeof EmbeddedRouteRouteWithChildren
   '/api/$': typeof ApiSplatRoute
   '/embedded/': typeof EmbeddedIndexRoute
+  '/auth/session-token/': typeof AuthSessionTokenIndexRoute
   '/embedded/additional/': typeof EmbeddedAdditionalIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/embedded' | '/api/$' | '/embedded/' | '/embedded/additional/'
+    | '/'
+    | '/embedded'
+    | '/api/$'
+    | '/embedded/'
+    | '/auth/session-token/'
+    | '/embedded/additional/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/$' | '/embedded' | '/embedded/additional'
+  to:
+    | '/'
+    | '/api/$'
+    | '/embedded'
+    | '/auth/session-token'
+    | '/embedded/additional'
   id:
     | '__root__'
     | '/'
     | '/embedded'
     | '/api/$'
     | '/embedded/'
+    | '/auth/session-token/'
     | '/embedded/additional/'
   fileRoutesById: FileRoutesById
 }
@@ -81,6 +101,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EmbeddedRouteRoute: typeof EmbeddedRouteRouteWithChildren
   ApiSplatRoute: typeof ApiSplatRoute
+  AuthSessionTokenIndexRoute: typeof AuthSessionTokenIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -120,6 +141,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmbeddedAdditionalIndexRouteImport
       parentRoute: typeof EmbeddedRouteRoute
     }
+    '/auth/session-token/': {
+      id: '/auth/session-token/'
+      path: '/auth/session-token'
+      fullPath: '/auth/session-token/'
+      preLoaderRoute: typeof AuthSessionTokenIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -141,6 +169,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EmbeddedRouteRoute: EmbeddedRouteRouteWithChildren,
   ApiSplatRoute: ApiSplatRoute,
+  AuthSessionTokenIndexRoute: AuthSessionTokenIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

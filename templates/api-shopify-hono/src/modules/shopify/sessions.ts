@@ -8,6 +8,7 @@ import { Err, Ok, type TResult } from 'tuple-result';
 import { shopify, shopifyConfig, shopifySessionStorage } from '@/environment';
 import { AppError } from '@/modules/error';
 
+// https://shopify.dev/docs/apps/build/authentication-authorization/implement-custom-authorization?extension=javascript#token-exchange
 export async function loadOrCreateOfflineShopifySession(
 	shop: string,
 	sessionToken: string
@@ -27,7 +28,7 @@ export async function loadOrCreateOfflineShopifySession(
 		);
 	}
 
-	if (storedSession?.isActive(shopifyConfig.scopes)) {
+	if (storedSession?.isActive(shopifyConfig.scopes, shopifySessionExpiryBufferMs)) {
 		return Ok(storedSession);
 	}
 
@@ -41,7 +42,13 @@ export async function loadOrCreateOfflineShopifySession(
 		});
 		session = tokenExchange.session;
 	} catch (cause) {
-		if (cause instanceof InvalidJwtError) {
+		// https://github.com/Shopify/shopify-app-js/blob/main/packages/apps/shopify-app-react-router/src/server/authenticate/admin/strategies/token-exchange.ts
+		const isInvalidSessionToken =
+			cause instanceof InvalidJwtError ||
+			(cause instanceof HttpResponseError &&
+				cause.response.code === 400 &&
+				cause.response.body?.error === 'invalid_subject_token');
+		if (isInvalidSessionToken) {
 			return Err(
 				new AppError('#ERR_SHOPIFY_SESSION_TOKEN_INVALID', {
 					status: 401,
@@ -60,8 +67,8 @@ export async function loadOrCreateOfflineShopifySession(
 		if (isRejectedTokenExchange) {
 			return Err(
 				new AppError('#ERR_SHOPIFY_TOKEN_EXCHANGE_REJECTED', {
-					status: 401,
-					title: 'Unauthorized',
+					status: 500,
+					title: 'Internal Server Error',
 					detail: 'Shopify rejected the session token exchange',
 					cause
 				})
@@ -103,9 +110,10 @@ export async function loadOrCreateOfflineShopifySession(
 	return Ok(session);
 }
 
-export async function deleteShopifySessions(
-	shop: string
-): Promise<TResult<void, AppError>> {
+// https://github.com/Shopify/shopify-app-js/blob/main/packages/apps/shopify-app-react-router/src/server/helpers/ensure-offline-token-is-not-expired.ts
+const shopifySessionExpiryBufferMs = 5 * 60 * 1000;
+
+export async function deleteShopifySessions(shop: string): Promise<TResult<void, AppError>> {
 	try {
 		const sessions = await shopifySessionStorage.findSessionsByShop(shop);
 		if (!sessions.length) {
@@ -172,6 +180,41 @@ export async function updateShopifySessionScopes(
 				status: 503,
 				title: 'Service Unavailable',
 				detail: 'The Shopify session scopes could not be updated',
+				cause
+			})
+		);
+	}
+}
+
+export async function invalidateShopifySessionAccessToken(
+	sessionId: string,
+	rejectedAccessToken: string
+): Promise<TResult<void, AppError>> {
+	try {
+		const session = await shopifySessionStorage.loadSession(sessionId);
+		if (session == null || session.accessToken !== rejectedAccessToken) {
+			return Ok(undefined);
+		}
+
+		session.accessToken = undefined;
+		const isSessionStored = await shopifySessionStorage.storeSession(session);
+		if (!isSessionStored) {
+			return Err(
+				new AppError('#ERR_SHOPIFY_SESSION_INVALIDATE_FAILED', {
+					status: 503,
+					title: 'Service Unavailable',
+					detail: 'The Shopify session could not be invalidated'
+				})
+			);
+		}
+
+		return Ok(undefined);
+	} catch (cause) {
+		return Err(
+			new AppError('#ERR_SHOPIFY_SESSION_INVALIDATE_FAILED', {
+				status: 503,
+				title: 'Service Unavailable',
+				detail: 'The Shopify session could not be invalidated',
 				cause
 			})
 		);

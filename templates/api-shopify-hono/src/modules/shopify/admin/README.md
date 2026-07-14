@@ -29,6 +29,7 @@ Production session storage must persist access-token expiry, refresh-token, and 
 ## Invalid Session Retries
 
 When a supplied session token cannot be verified, the API signals Shopify App Bridge to retry with a fresh token.
+When Shopify rejects a stored Admin API access token, the session is invalidated so the next authenticated request acquires a replacement.
 
 ## Design Decisions
 

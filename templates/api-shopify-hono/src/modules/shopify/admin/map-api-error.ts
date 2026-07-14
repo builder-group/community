@@ -7,7 +7,22 @@ export function mapShopifyAdminApiError(
 ): AppError {
 	const { code, detail } = options;
 
-	if (isShopifyThrottledError(error)) {
+	if (error instanceof HttpError && error.status === 401) {
+		return new AppError('#ERR_SHOPIFY_ADMIN_ACCESS_TOKEN_INVALID', {
+			status: 401,
+			title: 'Unauthorized',
+			detail: 'Shopify rejected the stored Admin API access token',
+			cause: error
+		});
+	}
+
+	// https://shopify.dev/docs/api/usage/limits
+	const isHttpThrottled = error instanceof HttpError && error.status === 429;
+	// Note: Shopify reports GraphQL throttling inside HTTP 200 responses: https://shopify.dev/docs/api/admin-graphql/latest#status-and-error-codes
+	const isGraphqlThrottled =
+		error instanceof GraphQLError &&
+		error.errors.some((graphQLError) => graphQLError.extensions?.['code'] === 'THROTTLED');
+	if (isHttpThrottled || isGraphqlThrottled) {
 		return new AppError(code, {
 			status: 429,
 			title: 'Too Many Requests',
@@ -36,17 +51,4 @@ export function mapShopifyAdminApiError(
 interface TMapShopifyAdminApiErrorOptions {
 	code: TAppErrorCode;
 	detail: string;
-}
-
-// Shopify Admin API rate limits: https://shopify.dev/docs/api/usage/limits
-function isShopifyThrottledError(error: FetchError): boolean {
-	if (error instanceof HttpError && error.status === 429) {
-		return true;
-	}
-
-	// Note: Shopify reports GraphQL throttling inside HTTP 200 responses: https://shopify.dev/docs/api/admin-graphql/latest#status-and-error-codes
-	return (
-		error instanceof GraphQLError &&
-		error.errors.some((graphQLError) => graphQLError.extensions?.['code'] === 'THROTTLED')
-	);
 }
