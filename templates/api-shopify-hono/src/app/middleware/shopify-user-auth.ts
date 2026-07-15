@@ -32,6 +32,7 @@ export const shopifyUserAuth = createMiddleware<{
 		await authenticateShopifyUser(sessionToken);
 	if (!isShopifyUserCxOk) {
 		if (shopifyUserCxErr.code === '#ERR_SHOPIFY_SESSION_TOKEN_INVALID') {
+			// Note: App Bridge may safely retry because application behavior has not started yet
 			context.header(shopifyConfig.sessionToken.retryHeader, '1');
 		}
 		throw shopifyUserCxErr;
@@ -51,7 +52,8 @@ export const shopifyUserAuth = createMiddleware<{
 				throw accessTokenInvalidationErr;
 			}
 
-			context.header(shopifyConfig.sessionToken.retryHeader, '1');
+			// Note: Do not request automatic replay here because application behavior may already have
+			// produced side effects
 			throw new AppError('#ERR_SHOPIFY_SESSION_TOKEN_INVALID', {
 				status: 401,
 				title: 'Unauthorized',

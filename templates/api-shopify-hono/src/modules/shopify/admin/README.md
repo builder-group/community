@@ -60,9 +60,12 @@ credentials remain separate because they represent different authorization scope
 
 ## Invalid Session Retries
 
-When a supplied session token cannot be verified, the API signals Shopify App Bridge to retry with a fresh token.
+When a supplied session token cannot be verified, the API signals Shopify App Bridge to retry with
+a fresh token. Application behavior has not started, so replaying the request is safe.
+
 When Shopify rejects a stored Admin API access token, the relevant offline or online token is marked
-for renewal before App Bridge retries the request with a fresh session token.
+for renewal. The API does not request automatic replay because application behavior may already
+have produced side effects.
 
 ## Design Decisions
 
