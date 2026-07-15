@@ -2,13 +2,13 @@ import { createMiddleware } from 'hono/factory';
 import { shopifyConfig } from '@/environment';
 import { AppError } from '@/modules/error';
 import {
-	authenticateShopifyAdmin,
-	invalidateShopifyOfflineAccessToken,
-	type ShopifyAdminCx
+	authenticateShopifyUser,
+	invalidateShopifyOnlineAccessToken,
+	type ShopifyUserCx
 } from '@/modules/shopify';
 
-export const shopifyAdminAuth = createMiddleware<{
-	Variables: { shopifyAdminCx: ShopifyAdminCx };
+export const shopifyUserAuth = createMiddleware<{
+	Variables: { shopifyUserCx: ShopifyUserCx };
 }>(async (context, next) => {
 	const authorization = context.req.header('Authorization');
 	if (authorization == null) {
@@ -28,25 +28,25 @@ export const shopifyAdminAuth = createMiddleware<{
 		});
 	}
 
-	const [isShopifyAdminCxOk, shopifyAdminCxErr, shopifyAdminCx] =
-		await authenticateShopifyAdmin(sessionToken);
-	if (!isShopifyAdminCxOk) {
-		if (shopifyAdminCxErr.code === '#ERR_SHOPIFY_SESSION_TOKEN_INVALID') {
+	const [isShopifyUserCxOk, shopifyUserCxErr, shopifyUserCx] =
+		await authenticateShopifyUser(sessionToken);
+	if (!isShopifyUserCxOk) {
+		if (shopifyUserCxErr.code === '#ERR_SHOPIFY_SESSION_TOKEN_INVALID') {
 			context.header(shopifyConfig.sessionToken.retryHeader, '1');
 		}
-		throw shopifyAdminCxErr;
+		throw shopifyUserCxErr;
 	}
 
-	context.set('shopifyAdminCx', shopifyAdminCx);
+	context.set('shopifyUserCx', shopifyUserCx);
 	try {
 		await next();
 	} catch (cause) {
 		if (cause instanceof AppError && cause.code === '#ERR_SHOPIFY_ADMIN_ACCESS_TOKEN_INVALID') {
 			const [isAccessTokenInvalidated, accessTokenInvalidationErr] =
-				await invalidateShopifyOfflineAccessToken(
-				shopifyAdminCx.shopifyInstallationId,
-				shopifyAdminCx.accessToken
-			);
+				await invalidateShopifyOnlineAccessToken(
+					shopifyUserCx.shopifyUser.id,
+					shopifyUserCx.accessToken
+				);
 			if (!isAccessTokenInvalidated) {
 				throw accessTokenInvalidationErr;
 			}

@@ -1,7 +1,7 @@
 import { Err, Ok, type TResult } from 'tuple-result';
 import { gql } from '@/environment';
 import { AppError } from '@/modules/error';
-import { mapShopifyAdminApiError, type ShopifyAdminCx } from '@/modules/shopify';
+import { mapShopifyAdminApiError, type ShopifyInstallationCx } from '@/modules/shopify';
 
 const GET_SHOP_QUERY = gql(`
 	query GetShop {
@@ -13,7 +13,7 @@ const GET_SHOP_QUERY = gql(`
 	}
 `);
 
-export async function getShop(cx: ShopifyAdminCx): Promise<TResult<TShop, AppError>> {
+export async function getShop(cx: ShopifyInstallationCx): Promise<TResult<TShop, AppError>> {
 	const [isShopOk, shopErr, shopData] = await cx.apiClient.query(GET_SHOP_QUERY);
 	if (!isShopOk) {
 		return Err(

@@ -1,13 +1,14 @@
-import { and, eq, exists, isNull, lte, sql } from 'drizzle-orm';
+import { and, eq, exists, isNull, lt, lte, or, sql } from 'drizzle-orm';
 import { Err, Ok, type TResult } from 'tuple-result';
 import {
 	db,
 	shopifyInstallationTable,
 	shopifyOfflineTokenTable,
+	shopifyOnlineTokenTable,
 	shopifyUserTable
 } from '@/environment';
 import { AppError } from '@/modules/error';
-import type { TShopifyOfflineToken } from './offline-token';
+import type { TShopifyOfflineToken, TShopifyOnlineToken, TShopifyUser } from './token';
 
 export async function loadShopifyOfflineToken(
 	shop: string
@@ -15,7 +16,7 @@ export async function loadShopifyOfflineToken(
 	try {
 		const rows = await db
 			.select({
-				shopifyInstallationId: shopifyInstallationTable.id,
+				installationId: shopifyInstallationTable.id,
 				shop: shopifyInstallationTable.shopDomain,
 				grantedScopes: shopifyInstallationTable.grantedScopes,
 				accessToken: shopifyOfflineTokenTable.accessToken,
@@ -55,32 +56,110 @@ export interface TStoredShopifyOfflineToken extends TShopifyOfflineToken {
 	refreshTokenExpiresAt: Date;
 }
 
+export async function loadShopifyOnlineToken(
+	installationId: string,
+	shopifyUserId: string
+): Promise<TResult<TShopifyOnlineToken | null, AppError>> {
+	try {
+		const rows = await db
+			.select({
+				installationId: shopifyInstallationTable.id,
+				shop: shopifyInstallationTable.shopDomain,
+				shopifyUser: {
+					id: shopifyUserTable.id,
+					shopifyId: shopifyUserTable.shopifyId,
+					firstName: shopifyUserTable.firstName,
+					lastName: shopifyUserTable.lastName,
+					email: shopifyUserTable.email,
+					emailVerified: shopifyUserTable.emailVerified,
+					accountOwner: shopifyUserTable.accountOwner,
+					locale: shopifyUserTable.locale,
+					collaborator: shopifyUserTable.collaborator
+				},
+				accessToken: shopifyOnlineTokenTable.accessToken,
+				accessTokenExpiresAt: shopifyOnlineTokenTable.accessTokenExpiresAt,
+				scopes: shopifyOnlineTokenTable.scopes,
+				associatedUserScopes: shopifyOnlineTokenTable.associatedUserScopes
+			})
+			.from(shopifyInstallationTable)
+			.innerJoin(
+				shopifyUserTable,
+				eq(shopifyUserTable.shopifyInstallationId, shopifyInstallationTable.id)
+			)
+			.innerJoin(
+				shopifyOnlineTokenTable,
+				eq(shopifyOnlineTokenTable.shopifyUserId, shopifyUserTable.id)
+			)
+			.where(
+				and(
+					eq(shopifyInstallationTable.id, installationId),
+					eq(shopifyUserTable.shopifyId, shopifyUserId),
+					isNull(shopifyInstallationTable.uninstalledAt)
+				)
+			)
+			.limit(1);
+
+		return Ok(rows[0] ?? null);
+	} catch (cause) {
+		return Err(
+			new AppError('#ERR_SHOPIFY_TOKEN_STORE_UNAVAILABLE', {
+				status: 503,
+				title: 'Service Unavailable',
+				detail: 'The Shopify online access token could not be loaded',
+				cause
+			})
+		);
+	}
+}
+
 /** Stores an exchanged offline token and creates or reactivates its Shopify installation. */
 export async function storeExchangedShopifyOfflineToken(
-	input: TStoreShopifyOfflineTokenInput
+	input: TStoreExchangedShopifyOfflineTokenInput
 ): Promise<TResult<TShopifyOfflineToken, AppError>> {
-	const { shop, scopes, accessToken, accessTokenExpiresAt, refreshToken, refreshTokenExpiresAt } =
-		input;
+	const {
+		shop,
+		scopes,
+		accessToken,
+		accessTokenExpiresAt,
+		refreshToken,
+		refreshTokenExpiresAt,
+		sessionTokenIssuedAt
+	} = input;
 	const now = new Date();
 
 	try {
-		const shopifyInstallationId = await db.transaction(async (transaction) => {
+		const installationId = await db.transaction(async (transaction) => {
 			const installations = await transaction
 				.insert(shopifyInstallationTable)
-				.values({ shopDomain: shop, grantedScopes: scopes })
+				.values({
+					shopDomain: shop,
+					grantedScopes: scopes,
+					installedAt: sessionTokenIssuedAt
+				})
 				.onConflictDoUpdate({
 					target: shopifyInstallationTable.shopDomain,
 					set: {
 						grantedScopes: scopes,
-						installedAt: sql`case when ${shopifyInstallationTable.uninstalledAt} is null then ${shopifyInstallationTable.installedAt} else now() end`,
+						// Note: Keep the original installation time while the app remains installed. After
+						// a reinstall, reset it so webhooks from the previous installation can be ignored.
+						installedAt: sql`case when ${shopifyInstallationTable.uninstalledAt} is null then ${shopifyInstallationTable.installedAt} else ${sessionTokenIssuedAt} end`,
 						uninstalledAt: null,
 						updatedAt: now
-					}
+					},
+					// Note: Only a session issued during the current lifecycle or after its uninstall
+					// may store a replacement credential
+					setWhere: or(
+						and(
+							isNull(shopifyInstallationTable.uninstalledAt),
+							lte(shopifyInstallationTable.installedAt, sessionTokenIssuedAt)
+						),
+						lt(shopifyInstallationTable.uninstalledAt, sessionTokenIssuedAt)
+					)
 				})
 				.returning({ id: shopifyInstallationTable.id });
 			const installation = installations[0];
 			if (installation == null) {
-				throw new Error('Shopify installation upsert returned no row');
+				return null;
 			}
 
 			await transaction
@@ -107,9 +186,18 @@ export async function storeExchangedShopifyOfflineToken(
 
 			return installation.id;
 		});
+		if (installationId == null) {
+			return Err(
+				new AppError('#ERR_SHOPIFY_SESSION_TOKEN_INVALID', {
+					status: 401,
+					title: 'Unauthorized',
+					detail: 'The Shopify session token is no longer valid for this installation'
+				})
+			);
+		}
 
 		return Ok({
-			shopifyInstallationId,
+			installationId,
 			shop,
 			accessToken,
 			accessTokenExpiresAt
@@ -126,6 +214,10 @@ export async function storeExchangedShopifyOfflineToken(
 	}
 }
 
+interface TStoreExchangedShopifyOfflineTokenInput extends TStoreShopifyOfflineTokenInput {
+	sessionTokenIssuedAt: Date;
+}
+
 interface TStoreShopifyOfflineTokenInput {
 	shop: string;
 	scopes: string[];
@@ -135,15 +227,151 @@ interface TStoreShopifyOfflineTokenInput {
 	refreshTokenExpiresAt: Date;
 }
 
+/** Stores an exchanged online token and updates its Shopify user profile. */
+export async function storeExchangedShopifyOnlineToken(
+	input: TStoreExchangedShopifyOnlineTokenInput
+): Promise<TResult<TShopifyOnlineToken, AppError>> {
+	const {
+		installationId,
+		shop,
+		shopifyUser,
+		accessToken,
+		accessTokenExpiresAt,
+		scopes,
+		associatedUserScopes,
+		sessionTokenIssuedAt
+	} = input;
+	const now = new Date();
+
+	try {
+		const userId = await db.transaction(async (transaction) => {
+			const installations = await transaction
+				.select({ id: shopifyInstallationTable.id })
+				.from(shopifyInstallationTable)
+				.where(
+					and(
+						eq(shopifyInstallationTable.id, installationId),
+						eq(shopifyInstallationTable.shopDomain, shop),
+						isNull(shopifyInstallationTable.uninstalledAt),
+						lte(shopifyInstallationTable.installedAt, sessionTokenIssuedAt)
+					)
+				)
+				.for('update');
+			if (installations[0] == null) {
+				return null;
+			}
+
+			const users = await transaction
+				.insert(shopifyUserTable)
+				.values({
+					shopifyInstallationId: installationId,
+					shopifyId: shopifyUser.shopifyId,
+					firstName: shopifyUser.firstName,
+					lastName: shopifyUser.lastName,
+					email: shopifyUser.email,
+					emailVerified: shopifyUser.emailVerified,
+					accountOwner: shopifyUser.accountOwner,
+					locale: shopifyUser.locale,
+					collaborator: shopifyUser.collaborator
+				})
+				.onConflictDoUpdate({
+					target: [shopifyUserTable.shopifyInstallationId, shopifyUserTable.shopifyId],
+					set: {
+						firstName: shopifyUser.firstName,
+						lastName: shopifyUser.lastName,
+						email: shopifyUser.email,
+						emailVerified: shopifyUser.emailVerified,
+						accountOwner: shopifyUser.accountOwner,
+						locale: shopifyUser.locale,
+						collaborator: shopifyUser.collaborator,
+						updatedAt: now
+					}
+				})
+				.returning({ id: shopifyUserTable.id });
+			const storedUser = users[0];
+			if (storedUser == null) {
+				throw new Error('Shopify user upsert returned no row');
+			}
+
+			await transaction
+				.insert(shopifyOnlineTokenTable)
+				.values({
+					shopifyUserId: storedUser.id,
+					accessToken,
+					accessTokenExpiresAt,
+					scopes,
+					associatedUserScopes
+				})
+				.onConflictDoUpdate({
+					target: shopifyOnlineTokenTable.shopifyUserId,
+					set: {
+						accessToken,
+						accessTokenExpiresAt,
+						scopes,
+						associatedUserScopes,
+						updatedAt: now
+					}
+				});
+
+			return storedUser.id;
+		});
+		if (userId == null) {
+			return Err(
+				new AppError('#ERR_SHOPIFY_SESSION_TOKEN_INVALID', {
+					status: 401,
+					title: 'Unauthorized',
+					detail: 'The Shopify session token is no longer valid for this installation'
+				})
+			);
+		}
+
+		return Ok({
+			installationId,
+			shop,
+			shopifyUser: {
+				id: userId,
+				...shopifyUser
+			},
+			accessToken,
+			accessTokenExpiresAt,
+			scopes,
+			associatedUserScopes
+		});
+	} catch (cause) {
+		return Err(
+			new AppError('#ERR_SHOPIFY_TOKEN_STORE_FAILED', {
+				status: 503,
+				title: 'Service Unavailable',
+				detail: 'The Shopify online access token could not be stored',
+				cause
+			})
+		);
+	}
+}
+
+interface TStoreExchangedShopifyOnlineTokenInput extends TStoreShopifyOnlineTokenInput {
+	sessionTokenIssuedAt: Date;
+}
+
+interface TStoreShopifyOnlineTokenInput {
+	installationId: string;
+	shop: string;
+	shopifyUser: Omit<TShopifyUser, 'id'>;
+	accessToken: string;
+	accessTokenExpiresAt: Date;
+	scopes: string[];
+	associatedUserScopes: string[];
+}
+
 /**
- * Rotates an existing offline token without creating or reactivating its installation.
- * Rejects the refresh result if the installation or credential changed before persistence.
+ * Rotates an offline token only while the app remains installed and the stored refresh token
+ * still matches.
  */
 export async function rotateShopifyOfflineToken(
 	input: TRotateShopifyOfflineTokenInput
 ): Promise<TResult<TShopifyOfflineToken, AppError>> {
 	const {
-		shopifyInstallationId,
+		installationId,
 		shop,
 		previousRefreshToken,
 		scopes,
@@ -167,7 +395,7 @@ export async function rotateShopifyOfflineToken(
 			})
 			.where(
 				and(
-					eq(shopifyOfflineTokenTable.shopifyInstallationId, shopifyInstallationId),
+					eq(shopifyOfflineTokenTable.shopifyInstallationId, installationId),
 					eq(shopifyOfflineTokenTable.refreshToken, previousRefreshToken),
 					exists(
 						db
@@ -175,14 +403,14 @@ export async function rotateShopifyOfflineToken(
 							.from(shopifyInstallationTable)
 							.where(
 								and(
-									eq(shopifyInstallationTable.id, shopifyInstallationId),
+									eq(shopifyInstallationTable.id, installationId),
 									isNull(shopifyInstallationTable.uninstalledAt)
 								)
 							)
 					)
 				)
 			)
-			.returning({ shopifyInstallationId: shopifyOfflineTokenTable.shopifyInstallationId });
+			.returning({ installationId: shopifyOfflineTokenTable.shopifyInstallationId });
 		const token = tokens[0];
 		if (token == null) {
 			return Err(
@@ -195,7 +423,7 @@ export async function rotateShopifyOfflineToken(
 		}
 
 		return Ok({
-			shopifyInstallationId: token.shopifyInstallationId,
+			installationId: token.installationId,
 			shop,
 			accessToken,
 			accessTokenExpiresAt
@@ -213,13 +441,13 @@ export async function rotateShopifyOfflineToken(
 }
 
 interface TRotateShopifyOfflineTokenInput extends TStoreShopifyOfflineTokenInput {
-	shopifyInstallationId: string;
+	installationId: string;
 	previousRefreshToken: string;
 }
 
-/** Invalidates a rejected offline access token only if it remains current for the installation. */
+/** Marks a rejected offline access token as expired only if the same token is still stored. */
 export async function invalidateShopifyOfflineAccessToken(
-	shopifyInstallationId: string,
+	installationId: string,
 	rejectedAccessToken: string
 ): Promise<TResult<void, AppError>> {
 	const now = new Date();
@@ -230,8 +458,9 @@ export async function invalidateShopifyOfflineAccessToken(
 			.set({ accessTokenExpiresAt: now, updatedAt: now })
 			.where(
 				and(
-					eq(shopifyOfflineTokenTable.shopifyInstallationId, shopifyInstallationId),
-					// Note: This match makes the update a no-op if another request already stored a replacement token
+					eq(shopifyOfflineTokenTable.shopifyInstallationId, installationId),
+					// Note: Matching the rejected token prevents this request from invalidating a newer
+					// token
 					eq(shopifyOfflineTokenTable.accessToken, rejectedAccessToken)
 				)
 			);
@@ -248,8 +477,40 @@ export async function invalidateShopifyOfflineAccessToken(
 	}
 }
 
+/** Marks a rejected online access token as expired only if the same token is still stored. */
+export async function invalidateShopifyOnlineAccessToken(
+	userId: string,
+	rejectedAccessToken: string
+): Promise<TResult<void, AppError>> {
+	const now = new Date();
+
+	try {
+		await db
+			.update(shopifyOnlineTokenTable)
+			.set({ accessTokenExpiresAt: now, updatedAt: now })
+			.where(
+				and(
+					eq(shopifyOnlineTokenTable.shopifyUserId, userId),
+					// Note: Matching the rejected token prevents this request from invalidating a newer
+					// token
+					eq(shopifyOnlineTokenTable.accessToken, rejectedAccessToken)
+				)
+			);
+		return Ok(undefined);
+	} catch (cause) {
+		return Err(
+			new AppError('#ERR_SHOPIFY_ACCESS_TOKEN_INVALIDATION_FAILED', {
+				status: 503,
+				title: 'Service Unavailable',
+				detail: 'The Shopify online access token could not be invalidated',
+				cause
+			})
+		);
+	}
+}
+
 /**
- * Ends the current installation lifecycle and removes its credentials and Shopify user data.
+ * Marks the app as uninstalled and removes its credentials and Shopify user data.
  * Retains the installation record until Shopify requests shop redaction.
  */
 export async function uninstallShopifyInstallation(
@@ -293,7 +554,10 @@ export async function uninstallShopifyInstallation(
 	}
 }
 
-/** Updates grants for an active installation when the scope event belongs to its current lifecycle. */
+/**
+ * Updates scopes only when the app remains installed and the event was triggered after the
+ * installation began.
+ */
 export async function updateShopifyInstallationScopes(
 	shop: string,
 	grantedScopes: string[],

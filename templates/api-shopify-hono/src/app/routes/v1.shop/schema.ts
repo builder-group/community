@@ -1,6 +1,6 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import { createErrorResponse } from '@/modules/error';
-import { shopifyAdminAuth } from '../../middleware';
+import { shopifyInstallationAuth } from '../../middleware';
 
 export const GetShopRoute = createRoute({
 	method: 'get',
@@ -8,7 +8,7 @@ export const GetShopRoute = createRoute({
 	tags: ['shop'],
 	summary: 'Get the authenticated shop',
 	operationId: 'getShop',
-	middleware: [shopifyAdminAuth] as const,
+	middleware: [shopifyInstallationAuth] as const,
 	security: [{ shopifySessionToken: [] }],
 	responses: {
 		200: {

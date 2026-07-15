@@ -16,9 +16,26 @@ export function mapShopifyAdminApiError(
 		});
 	}
 
+	// Note: Shopify can report permission denial as either HTTP 403 or a GraphQL error response
+	// https://shopify.dev/docs/apps/build/authentication-authorization/access-tokens/online-access-tokens#authorization
+	// https://shopify.dev/docs/api/admin-graphql/latest#status-and-error-codes
+	const isHttpAccessDenied = error instanceof HttpError && error.status === 403;
+	const isGraphqlAccessDenied =
+		error instanceof GraphQLError &&
+		error.errors.some((graphQLError) => graphQLError.extensions?.['code'] === 'ACCESS_DENIED');
+	if (isHttpAccessDenied || isGraphqlAccessDenied) {
+		return new AppError(code, {
+			status: 403,
+			title: 'Forbidden',
+			detail: 'Shopify denied access to the requested Admin API resource',
+			cause: error
+		});
+	}
+
+	// Note: Shopify can report throttling as either HTTP 429 or a GraphQL error response
 	// https://shopify.dev/docs/api/usage/limits
+	// https://shopify.dev/docs/api/admin-graphql/latest#status-and-error-codes
 	const isHttpThrottled = error instanceof HttpError && error.status === 429;
-	// Note: Shopify reports GraphQL throttling inside HTTP 200 responses: https://shopify.dev/docs/api/admin-graphql/latest#status-and-error-codes
 	const isGraphqlThrottled =
 		error instanceof GraphQLError &&
 		error.errors.some((graphQLError) => graphQLError.extensions?.['code'] === 'THROTTLED');
@@ -27,6 +44,22 @@ export function mapShopifyAdminApiError(
 			status: 429,
 			title: 'Too Many Requests',
 			detail,
+			cause: error
+		});
+	}
+
+	// Note: Shopify can report an inactive shop as HTTP 402 or 423, or as a GraphQL error response
+	// https://shopify.dev/docs/api/admin-graphql/latest#status-and-error-codes
+	const isHttpShopInactive =
+		error instanceof HttpError && (error.status === 402 || error.status === 423);
+	const isGraphqlShopInactive =
+		error instanceof GraphQLError &&
+		error.errors.some((graphQLError) => graphQLError.extensions?.['code'] === 'SHOP_INACTIVE');
+	if (isHttpShopInactive || isGraphqlShopInactive) {
+		return new AppError(code, {
+			status: 423,
+			title: 'Locked',
+			detail: 'The Shopify shop is inactive or unavailable',
 			cause: error
 		});
 	}
