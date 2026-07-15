@@ -279,6 +279,15 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description The Shopify installation has not granted all required access scopes */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Shopify Admin API rate limit exceeded */
             429: {
                 headers: {
@@ -364,7 +373,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Shopify session storage is unavailable */
+            /** @description Shopify installation storage is unavailable */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -422,7 +431,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Shopify session storage is unavailable */
+            /** @description Shopify installation storage is unavailable */
             503: {
                 headers: {
                     [name: string]: unknown;
@@ -578,7 +587,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Shopify session storage is unavailable */
+            /** @description Shopify installation storage is unavailable */
             503: {
                 headers: {
                     [name: string]: unknown;

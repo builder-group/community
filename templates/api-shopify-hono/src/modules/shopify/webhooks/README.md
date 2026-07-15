@@ -6,7 +6,7 @@ Authenticated boundary for lifecycle and compliance events delivered by Shopify.
 
 - Verify every delivery against the exact raw request body
 - Validate the shop domain and expected topic before processing
-- Keep stored Shopify sessions aligned with app lifecycle and scope changes
+- Keep stored Shopify installations aligned with app lifecycle and scope changes
 - Provide the mandatory privacy compliance endpoints for App Store distribution
 
 ## Delivery Model
@@ -17,11 +17,13 @@ Handlers must remain idempotent because Shopify can deliver the same webhook mor
 
 ## Lifecycle Events
 
-`app/uninstalled` removes every stored session for the shop. `app/scopes_update` updates stored session scopes so later Admin API authentication can detect missing configured access.
+`app/uninstalled` marks the installation as uninstalled and removes its credentials and Shopify users. `app/scopes_update` records the installation's current granted scopes.
+
+Lifecycle handlers compare Shopify's event time with the installation time so a delayed webhook cannot mutate a newer reinstallation.
 
 ## Compliance Events
 
-The base template stores no customer data and no shop-owned application data beyond Shopify sessions. Customer compliance events therefore require no application cleanup, while `shop/redact` removes any remaining sessions.
+The base template stores no customer data and no shop-owned application data beyond the Shopify installation, users, and credentials. Customer compliance events therefore require no application cleanup, while `shop/redact` removes the remaining Shopify installation data.
 
 Extend these handlers when introducing persistent customer or shop data.
 

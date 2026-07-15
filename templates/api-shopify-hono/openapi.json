@@ -236,6 +236,16 @@
 							}
 						}
 					},
+					"403": {
+						"description": "The Shopify installation has not granted all required access scopes",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
 					"429": {
 						"description": "Shopify Admin API rate limit exceeded",
 						"content": {
@@ -329,7 +339,7 @@
 						}
 					},
 					"503": {
-						"description": "Shopify session storage is unavailable",
+						"description": "Shopify installation storage is unavailable",
 						"content": {
 							"application/problem+json": {
 								"schema": {
@@ -391,7 +401,7 @@
 						}
 					},
 					"503": {
-						"description": "Shopify session storage is unavailable",
+						"description": "Shopify installation storage is unavailable",
 						"content": {
 							"application/problem+json": {
 								"schema": {
@@ -557,7 +567,7 @@
 						}
 					},
 					"503": {
-						"description": "Shopify session storage is unavailable",
+						"description": "Shopify installation storage is unavailable",
 						"content": {
 							"application/problem+json": {
 								"schema": {

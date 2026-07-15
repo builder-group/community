@@ -28,6 +28,7 @@ export const GetShopRoute = createRoute({
 			}
 		},
 		401: createErrorResponse('A valid Shopify session token is required'),
+		403: createErrorResponse('The Shopify installation has not granted all required access scopes'),
 		429: createErrorResponse('Shopify Admin API rate limit exceeded'),
 		500: createErrorResponse('The API could not load the shop'),
 		502: createErrorResponse('Shopify did not return a valid response'),

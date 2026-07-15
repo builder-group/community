@@ -1,5 +1,9 @@
 import type { OpenAPIHono } from '@hono/zod-openapi';
-import { deleteShopifySessions, updateShopifySessionScopes } from '@/modules/shopify';
+import {
+	redactShopifyInstallation,
+	uninstallShopifyInstallation,
+	updateShopifyInstallationScopes
+} from '@/modules/shopify';
 import {
 	AppScopesUpdateWebhookRoute,
 	AppUninstalledWebhookRoute,
@@ -11,9 +15,12 @@ import {
 export function registerShopifyWebhookRoutes(router: OpenAPIHono): void {
 	router.openapi(AppUninstalledWebhookRoute, async (context) => {
 		const { shopifyWebhook } = context.var;
-		const [areSessionsDeleted, sessionsErr] = await deleteShopifySessions(shopifyWebhook.shop);
-		if (!areSessionsDeleted) {
-			throw sessionsErr;
+		const [isInstallationUninstalled, installationErr] = await uninstallShopifyInstallation(
+			shopifyWebhook.shop,
+			shopifyWebhook.triggeredAt
+		);
+		if (!isInstallationUninstalled) {
+			throw installationErr;
 		}
 
 		return context.body(null, 200);
@@ -21,10 +28,11 @@ export function registerShopifyWebhookRoutes(router: OpenAPIHono): void {
 
 	router.openapi(AppScopesUpdateWebhookRoute, async (context) => {
 		const { shopifyWebhook } = context.var;
-		const { current } = context.req.valid('json');
-		const [areScopesUpdated, scopesErr] = await updateShopifySessionScopes(
+		const { current, updated_at: scopesUpdatedAt } = context.req.valid('json');
+		const [areScopesUpdated, scopesErr] = await updateShopifyInstallationScopes(
 			shopifyWebhook.shop,
-			current
+			current,
+			new Date(scopesUpdatedAt)
 		);
 		if (!areScopesUpdated) {
 			throw scopesErr;
@@ -45,9 +53,12 @@ export function registerShopifyWebhookRoutes(router: OpenAPIHono): void {
 
 	router.openapi(ShopRedactWebhookRoute, async (context) => {
 		const { shopifyWebhook } = context.var;
-		const [areSessionsDeleted, sessionsErr] = await deleteShopifySessions(shopifyWebhook.shop);
-		if (!areSessionsDeleted) {
-			throw sessionsErr;
+		const [isInstallationRedacted, installationErr] = await redactShopifyInstallation(
+			shopifyWebhook.shop,
+			shopifyWebhook.triggeredAt
+		);
+		if (!isInstallationRedacted) {
+			throw installationErr;
 		}
 
 		// Note: Delete other shop-owned data here when the application introduces persistent storage

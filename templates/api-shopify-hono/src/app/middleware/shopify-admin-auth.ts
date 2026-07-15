@@ -3,7 +3,7 @@ import { shopifyConfig } from '@/environment';
 import { AppError } from '@/modules/error';
 import {
 	authenticateShopifyAdmin,
-	invalidateShopifySessionAccessToken,
+	invalidateShopifyOfflineAccessToken,
 	type ShopifyAdminCx
 } from '@/modules/shopify';
 
@@ -42,15 +42,16 @@ export const shopifyAdminAuth = createMiddleware<{
 		await next();
 	} catch (cause) {
 		if (cause instanceof AppError && cause.code === '#ERR_SHOPIFY_ADMIN_ACCESS_TOKEN_INVALID') {
-			const [isSessionInvalidated, sessionInvalidationErr] =
-				await invalidateShopifySessionAccessToken(
-					shopifyAdminCx.sessionId,
-					shopifyAdminCx.accessToken
-				);
-			if (!isSessionInvalidated) {
-				throw sessionInvalidationErr;
+			const [isAccessTokenInvalidated, accessTokenInvalidationErr] =
+				await invalidateShopifyOfflineAccessToken(
+				shopifyAdminCx.shopifyInstallationId,
+				shopifyAdminCx.accessToken
+			);
+			if (!isAccessTokenInvalidated) {
+				throw accessTokenInvalidationErr;
 			}
 
+			context.header(shopifyConfig.sessionToken.retryHeader, '1');
 			throw new AppError('#ERR_SHOPIFY_SESSION_TOKEN_INVALID', {
 				status: 401,
 				title: 'Unauthorized',

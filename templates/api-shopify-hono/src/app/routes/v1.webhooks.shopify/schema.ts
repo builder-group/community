@@ -26,7 +26,7 @@ export const AppUninstalledWebhookRoute = createRoute({
 		400: createErrorResponse('The webhook request is invalid'),
 		401: createErrorResponse('The webhook could not be verified'),
 		500: createErrorResponse('The webhook could not be processed'),
-		503: createErrorResponse('Shopify session storage is unavailable')
+		503: createErrorResponse('Shopify installation storage is unavailable')
 	}
 });
 
@@ -63,7 +63,7 @@ export const AppScopesUpdateWebhookRoute = createRoute({
 		400: createErrorResponse('The webhook request is invalid'),
 		401: createErrorResponse('The webhook could not be verified'),
 		500: createErrorResponse('The webhook could not be processed'),
-		503: createErrorResponse('Shopify session storage is unavailable')
+		503: createErrorResponse('Shopify installation storage is unavailable')
 	}
 });
 
@@ -142,6 +142,6 @@ export const ShopRedactWebhookRoute = createRoute({
 		400: createErrorResponse('The webhook request is invalid'),
 		401: createErrorResponse('The webhook could not be verified'),
 		500: createErrorResponse('The webhook could not be processed'),
-		503: createErrorResponse('Shopify session storage is unavailable')
+		503: createErrorResponse('Shopify installation storage is unavailable')
 	}
 });

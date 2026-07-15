@@ -46,12 +46,23 @@ export async function authenticateShopifyWebhook(
 		);
 	}
 
+	const triggeredAt = validation.triggeredAt == null ? null : new Date(validation.triggeredAt);
+	if (triggeredAt == null || Number.isNaN(triggeredAt.getTime())) {
+		return Err(
+			new AppError('#ERR_SHOPIFY_WEBHOOK_TRIGGERED_AT_INVALID', {
+				status: 400,
+				title: 'Bad Request',
+				detail: 'The Shopify webhook does not contain a valid trigger timestamp'
+			})
+		);
+	}
+
 	return Ok({
 		shop,
 		topic: validation.topic,
 		webhookId: validation.webhookId,
 		apiVersion: validation.apiVersion,
-		triggeredAt: validation.triggeredAt,
+		triggeredAt,
 		eventId: validation.eventId
 	});
 }
@@ -61,6 +72,6 @@ export interface TShopifyWebhook {
 	topic: string;
 	webhookId: string;
 	apiVersion: string;
-	triggeredAt?: string;
+	triggeredAt: Date;
 	eventId?: string;
 }

@@ -1,7 +1,7 @@
-import { Err, type TResult } from 'tuple-result';
+import { Err, Ok, type TResult } from 'tuple-result';
 import { shopify } from '@/environment';
 import { AppError } from '@/modules/error';
-import { loadOrCreateOfflineShopifySession } from '../sessions';
+import { resolveShopifyOfflineToken } from '../offline-token';
 import { ShopifyAdminCx } from './ShopifyAdminCx';
 
 // https://shopify.dev/docs/apps/build/authentication-authorization/implement-custom-authorization?extension=javascript#validate-the-session-token
@@ -33,13 +33,13 @@ export async function authenticateShopifyAdmin(
 		);
 	}
 
-	const [isSessionOk, sessionErr, session] = await loadOrCreateOfflineShopifySession(
+	const [isOfflineTokenOk, offlineTokenErr, offlineToken] = await resolveShopifyOfflineToken(
 		shop,
 		sessionToken
 	);
-	if (!isSessionOk) {
-		return Err(sessionErr);
+	if (!isOfflineTokenOk) {
+		return Err(offlineTokenErr);
 	}
 
-	return ShopifyAdminCx.fromSession(session);
+	return Ok(ShopifyAdminCx.fromOfflineToken(offlineToken));
 }

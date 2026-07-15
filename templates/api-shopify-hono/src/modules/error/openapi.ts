@@ -11,7 +11,7 @@ export const ErrorDetailSchema = z
 	.openapi('ErrorDetail');
 
 /**
- * RFC 9457 Problem Details response schema with custom `code` and `errors` extension members.
+ * Defines an RFC 9457 Problem Details response schema with custom extension members.
  *
  * https://datatracker.ietf.org/doc/html/rfc9457
  */
