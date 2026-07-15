@@ -17,7 +17,7 @@ Use comments to expose code structure or preserve context that the code cannot c
 - Add a direct reference link when behavior depends on a non-obvious external contract that future maintainers may need to verify
 - Write comments for future maintainers without relying on current task, session, or refactor context
 - Place comments directly above the code they explain
-- Keep regular comments short and direct. Omit the trailing period from short single-line comments.
+- Keep regular comments short and direct. Omit the trailing period when a regular comment contains one sentence, even when it wraps across lines. Use sentence punctuation when it contains multiple sentences.
 - Use consecutive `//` lines for multi-line regular comments. Reserve `/** ... */` for documentation comments.
 
 ## Avoid
