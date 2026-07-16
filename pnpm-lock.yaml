@@ -723,6 +723,9 @@ importers:
       feature-fetch:
         specifier: workspace:*
         version: link:../../packages/feature-fetch
+      feature-logger:
+        specifier: workspace:*
+        version: link:../../packages/feature-logger
       gql.tada:
         specifier: ^1.11.2
         version: 1.11.2(graphql@16.14.0)(typescript@6.0.3)

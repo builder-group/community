@@ -1,6 +1,7 @@
 import type { ErrorHandler, NotFoundHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
+import { logger } from '@/environment';
 import { AppError, type TAppErrorCode, type TAppErrorDetail } from './AppError';
 import type { TErrorResponse } from './openapi';
 
@@ -12,6 +13,10 @@ export const errorHandler: ErrorHandler = (error, context) => {
 
 	let errorResponse: TErrorResponseDetails;
 	if (error instanceof AppError) {
+		if (error.status >= 500) {
+			logger.error(error, { method: context.req.method, path: context.req.path });
+		}
+
 		errorResponse = {
 			code: error.code,
 			status: error.status,
@@ -21,6 +26,8 @@ export const errorHandler: ErrorHandler = (error, context) => {
 			errors: error.errors
 		};
 	} else {
+		logger.error(error, { method: context.req.method, path: context.req.path });
+
 		errorResponse = {
 			code: '#ERR_INTERNAL_SERVER',
 			status: 500,

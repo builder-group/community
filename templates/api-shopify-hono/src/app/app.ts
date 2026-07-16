@@ -1,6 +1,7 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { cors } from 'hono/cors';
-import { appConfig, openApiDocumentConfig } from '@/environment';
+import { logger as loggerMiddleware } from 'hono/logger';
+import { appConfig, logger, openApiDocumentConfig } from '@/environment';
 import { errorHandler, notFoundHandler, validationHook } from '@/modules/error';
 import { registerApiRoutes } from './routes';
 
@@ -9,6 +10,12 @@ export function createApi(): OpenAPIHono {
 
 	api.onError(errorHandler);
 	api.notFound(notFoundHandler);
+	api.use(
+		'*',
+		loggerMiddleware((message) => {
+			logger.info(message);
+		})
+	);
 
 	const corsOrigin = appConfig.cors.origin;
 	if (corsOrigin != null) {

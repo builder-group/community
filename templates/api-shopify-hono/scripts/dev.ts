@@ -1,5 +1,6 @@
 import { serve } from '@hono/node-server';
 import { createApi } from '../src';
+import { logger } from '../src/environment';
 
 const api = createApi();
 
@@ -9,6 +10,6 @@ serve(
 		port: 8787
 	},
 	(info) => {
-		console.log(`API Hono is running at http://localhost:${info.port}`);
+		logger.info(`API Hono is running at http://localhost:${info.port}`);
 	}
 );
