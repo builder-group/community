@@ -1,5 +1,6 @@
 // Note: Import directly to avoid circular dependencies
 import { getCauseMessage } from '../lib/get-cause-message';
+import type { TFetchResponseError } from '../types';
 import { FetchError, type TFetchErrorCode } from './FetchError';
 
 /** Represents a completed HTTP response with a non-OK status. */
@@ -48,13 +49,22 @@ function formatHttpErrorMessage(
 
 /** Checks `HttpError` instances and error-like objects with a numeric `status`. */
 export function hasStatusCode(error: unknown, statusCode: number): boolean {
-	if (error instanceof HttpError) {
+	if (isHttpError(error)) {
 		return error.status === statusCode;
 	}
 	if (isObject(error) && typeof error['status'] === 'number') {
 		return error['status'] === statusCode;
 	}
 	return false;
+}
+
+/** Checks `HttpError` instances while preserving the typed response body. */
+export function isHttpError<GData>(
+	error: TFetchResponseError<GData> | null | undefined
+): error is HttpError<GData>;
+export function isHttpError(error: unknown): error is HttpError;
+export function isHttpError(error: unknown): error is HttpError {
+	return error instanceof HttpError;
 }
 
 /** Maps a non-OK `Response` to an `HttpError` with parsed error data when possible. */

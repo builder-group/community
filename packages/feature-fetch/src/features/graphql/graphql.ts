@@ -210,8 +210,12 @@ export type TGraphQLOperationResponse<
 	GWithResponse extends boolean = false
 > = TResult<
 	GWithResponse extends true ? TGraphQLOperationResponseDetails<GData> : GData,
-	TFetchResponseError<GErrorResponseBody>
+	TGraphQLOperationError<GData, GErrorResponseBody>
 >;
+
+/** Error union returned by `query()` and `mutate()`. */
+export type TGraphQLOperationError<GData, GErrorResponseBody = unknown> =
+	GraphQLError<GData> | TFetchResponseError<GErrorResponseBody>;
 
 /** Tuple-result response returned by `queryRaw()` and `mutateRaw()`. */
 export type TGraphQLRawOperationResponse<GData, GErrorResponseBody = unknown> = TResult<

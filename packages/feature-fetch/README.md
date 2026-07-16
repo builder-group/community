@@ -393,7 +393,7 @@ All request methods return a `tuple-result`. The error branch is one of three ty
 GraphQL `errors` arrays return `GraphQLError`, which extends `FetchError`.
 
 ```ts
-import { FetchError, hasStatusCode, HttpError, NetworkError } from 'feature-fetch';
+import { FetchError, hasStatusCode, isHttpError, NetworkError } from 'feature-fetch';
 
 const [isUserOk, userErr, user] = await api.get<User>('/users/123');
 
@@ -402,7 +402,7 @@ if (!isUserOk) {
     console.error('Not found');
   } else if (userErr instanceof NetworkError) {
     console.error('Network error:', userErr.message);
-  } else if (userErr instanceof HttpError) {
+  } else if (isHttpError(userErr)) {
     console.error('HTTP error:', userErr.status, userErr.data); // userErr.data is the parsed error body
   } else if (userErr instanceof FetchError) {
     console.error('Client error:', userErr.code, userErr.message); // userErr.code e.g. '#ERR_SERIALIZE_BODY'
@@ -410,7 +410,7 @@ if (!isUserOk) {
 }
 ```
 
-`hasStatusCode(error, code)` checks `HttpError` instances and error-like objects with a numeric `status`. Use `error instanceof HttpError` when you need narrowing.
+`hasStatusCode(error, code)` checks `HttpError` instances and error-like objects with a numeric `status`. Use `isHttpError(error)` when you need the typed HTTP response body. Use `isGraphQLError(error)` when you need typed partial GraphQL operation data.
 
 ## Examples
 
@@ -449,7 +449,7 @@ If you need to read or modify the final URL or `RequestInit`, use middleware. If
 
 ### Can I type the error response body?
 
-Yes. Pass it as the second generic parameter on any request method:
+Yes. Pass it as the second generic parameter on an API request method. OpenAPI clients infer it from the operation's non-2xx response bodies.
 
 ```ts
 interface ApiError {
@@ -459,8 +459,8 @@ interface ApiError {
 
 const [isUserOk, userErr, user] = await api.get<User, ApiError>('/users/123');
 
-if (!isUserOk && userErr instanceof HttpError) {
-  console.error(userErr.data.code); // typed as ApiError
+if (!isUserOk && isHttpError(userErr)) {
+  console.error(userErr.data?.code); // data is typed as ApiError | undefined
 }
 ```
 

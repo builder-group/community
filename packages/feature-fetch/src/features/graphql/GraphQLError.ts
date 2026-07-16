@@ -1,5 +1,5 @@
 import { FetchError, type TFetchErrorCode } from '../../errors';
-import type { TGraphQLError } from './graphql';
+import type { TGraphQLError, TGraphQLOperationError } from './graphql';
 
 /** Represents a GraphQL response whose `errors` array is not empty. */
 export class GraphQLError<GData = unknown> extends FetchError {
@@ -44,4 +44,13 @@ function formatGraphQLErrorMessage(errors: TGraphQLError[]): string {
 	}
 
 	return `GraphQL operation failed with ${errors.length} errors: ${errorMessages}`;
+}
+
+/** Checks `GraphQLError` instances while preserving typed partial operation data. */
+export function isGraphQLError<GData>(
+	error: TGraphQLOperationError<GData> | null | undefined
+): error is GraphQLError<GData>;
+export function isGraphQLError(error: unknown): error is GraphQLError;
+export function isGraphQLError(error: unknown): error is GraphQLError {
+	return error instanceof GraphQLError;
 }
