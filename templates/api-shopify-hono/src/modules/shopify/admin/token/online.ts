@@ -2,7 +2,7 @@ import { AuthScopes, RequestedTokenType, type Session } from '@shopify/shopify-a
 import { Err, Ok, type TResult } from 'tuple-result';
 import { shopifyConfig } from '@/environment';
 import { AppError } from '@/modules/error';
-import { loadShopifyOnlineToken, storeExchangedShopifyOnlineToken } from '../repository';
+import { loadShopifyOnlineToken, storeExchangedShopifyOnlineToken } from '../../repository';
 import { exchangeShopifySessionToken, type TVerifiedShopifySessionToken } from './session';
 
 /**

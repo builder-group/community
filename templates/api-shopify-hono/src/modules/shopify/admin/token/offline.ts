@@ -11,7 +11,7 @@ import {
 	loadShopifyOfflineToken,
 	rotateShopifyOfflineToken,
 	storeExchangedShopifyOfflineToken
-} from '../repository';
+} from '../../repository';
 import {
 	exchangeShopifySessionToken,
 	isShopifyTokenRequestTransientFailure,

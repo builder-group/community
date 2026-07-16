@@ -1,5 +1,5 @@
-import type { TShopifyOfflineToken } from '../token';
 import { createShopifyAdminApiClient, type TShopifyAdminApiClient } from './api-client';
+import type { TShopifyOfflineToken } from './token';
 
 export class ShopifyInstallationCx {
 	public readonly installationId: string;

@@ -3,3 +3,4 @@ export * from './authenticate';
 export * from './error';
 export * from './ShopifyInstallationCx';
 export * from './ShopifyUserCx';
+export * from './token';

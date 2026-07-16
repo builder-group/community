@@ -1,5 +1,5 @@
-import type { TShopifyOnlineToken, TShopifyUser } from '../token';
 import { createShopifyAdminApiClient, type TShopifyAdminApiClient } from './api-client';
+import type { TShopifyOnlineToken, TShopifyUser } from './token';
 
 export class ShopifyUserCx {
 	public readonly installationId: string;

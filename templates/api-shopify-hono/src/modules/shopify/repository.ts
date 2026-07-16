@@ -8,7 +8,7 @@ import {
 	shopifyUserTable
 } from '@/environment';
 import { AppError } from '@/modules/error';
-import type { TShopifyOfflineToken, TShopifyOnlineToken, TShopifyUser } from './token';
+import type { TShopifyOfflineToken, TShopifyOnlineToken, TShopifyUser } from './admin/token';
 
 export async function loadShopifyOfflineToken(
 	shop: string

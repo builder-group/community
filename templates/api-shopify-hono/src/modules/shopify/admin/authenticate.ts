@@ -1,12 +1,12 @@
 import { Err, Ok, type TResult } from 'tuple-result';
 import { AppError } from '@/modules/error';
+import { ShopifyInstallationCx } from './ShopifyInstallationCx';
+import { ShopifyUserCx } from './ShopifyUserCx';
 import {
 	resolveShopifyOfflineToken,
 	resolveShopifyOnlineToken,
 	verifyShopifySessionToken
-} from '../token';
-import { ShopifyInstallationCx } from './ShopifyInstallationCx';
-import { ShopifyUserCx } from './ShopifyUserCx';
+} from './token';
 
 export async function authenticateShopifyInstallation(
 	sessionToken: string
