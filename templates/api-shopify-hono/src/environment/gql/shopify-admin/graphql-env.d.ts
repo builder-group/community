@@ -1,3 +1,5 @@
+import * as gqlTada from 'gql.tada';
+
 /* eslint-disable */
 /* prettier-ignore */
 
@@ -3557,17 +3559,15 @@ export type introspection_types = {
  * instead save to a .ts instead of a .d.ts file.
  */
 export type introspection = {
-  name: never;
-  query: 'QueryRoot';
-  mutation: 'Mutation';
-  subscription: never;
-  types: introspection_types;
+	name: never;
+	query: 'QueryRoot';
+	mutation: 'Mutation';
+	subscription: never;
+	types: introspection_types;
 };
 
-import * as gqlTada from 'gql.tada';
-
 declare module 'gql.tada' {
-  interface setupSchema {
-    introspection: introspection
-  }
+	interface setupSchema {
+		introspection: introspection;
+	}
 }

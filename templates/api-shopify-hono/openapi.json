@@ -94,6 +94,22 @@
 				},
 				"required": ["source", "path", "detail"]
 			},
+			"ProductCountResponse": {
+				"type": "object",
+				"properties": {
+					"count": {
+						"type": "integer",
+						"minimum": 0,
+						"example": 42
+					},
+					"precision": {
+						"type": "string",
+						"enum": ["EXACT", "AT_LEAST"],
+						"example": "EXACT"
+					}
+				},
+				"required": ["count", "precision"]
+			},
 			"ShopResponse": {
 				"type": "object",
 				"properties": {
@@ -117,6 +133,66 @@
 					}
 				},
 				"required": ["shop"]
+			},
+			"UserResponse": {
+				"type": "object",
+				"properties": {
+					"user": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "string",
+								"format": "uuid",
+								"example": "123e4567-e89b-12d3-a456-426614174000"
+							},
+							"shopifyId": {
+								"type": "string",
+								"example": "123456789"
+							},
+							"firstName": {
+								"type": "string",
+								"example": "Ada"
+							},
+							"lastName": {
+								"type": "string",
+								"example": "Lovelace"
+							},
+							"email": {
+								"type": "string",
+								"format": "email",
+								"example": "ada@example.com"
+							},
+							"emailVerified": {
+								"type": "boolean",
+								"example": true
+							},
+							"accountOwner": {
+								"type": "boolean",
+								"example": true
+							},
+							"locale": {
+								"type": "string",
+								"example": "en"
+							},
+							"collaborator": {
+								"type": "boolean",
+								"example": false
+							}
+						},
+						"required": [
+							"id",
+							"shopifyId",
+							"firstName",
+							"lastName",
+							"email",
+							"emailVerified",
+							"accountOwner",
+							"locale",
+							"collaborator"
+						]
+					}
+				},
+				"required": ["user"]
 			},
 			"AppUninstalledWebhookPayload": {
 				"type": "object",
@@ -205,6 +281,100 @@
 				}
 			}
 		},
+		"/v1/products/count": {
+			"get": {
+				"tags": ["products"],
+				"summary": "Get the product count available to the authenticated Shopify user",
+				"operationId": "getProductCount",
+				"security": [
+					{
+						"shopifySessionToken": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The product count available to the authenticated Shopify user",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ProductCountResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "A valid Shopify session token is required",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "The app or authenticated Shopify user cannot access products",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"423": {
+						"description": "The Shopify shop is inactive or unavailable",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Shopify Admin API rate limit exceeded",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The API could not load the product count",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"502": {
+						"description": "Shopify did not return a valid product count",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Shopify or the token store is unavailable",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
 		"/v1/shop": {
 			"get": {
 				"tags": ["shop"],
@@ -246,6 +416,16 @@
 							}
 						}
 					},
+					"423": {
+						"description": "The Shopify shop is inactive or unavailable",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
 					"429": {
 						"description": "Shopify Admin API rate limit exceeded",
 						"content": {
@@ -278,6 +458,80 @@
 					},
 					"503": {
 						"description": "Shopify is unavailable",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/user": {
+			"get": {
+				"tags": ["user"],
+				"summary": "Get the authenticated Shopify user",
+				"operationId": "getUser",
+				"security": [
+					{
+						"shopifySessionToken": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The authenticated Shopify user",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "A valid Shopify session token is required",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "The Shopify installation has not granted all required access scopes",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The API could not authenticate the Shopify user",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"502": {
+						"description": "Shopify did not return a valid online access token",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Shopify or the token store is unavailable",
 						"content": {
 							"application/problem+json": {
 								"schema": {

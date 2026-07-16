@@ -3,6 +3,7 @@ import { gql } from '@/environment';
 import { AppError } from '@/modules/error';
 import { mapShopifyAdminApiError, type ShopifyInstallationCx } from '@/modules/shopify';
 
+// https://shopify.dev/docs/api/admin-graphql/latest/queries/shop
 const GET_SHOP_QUERY = gql(`
 	query GetShop {
 		shop {

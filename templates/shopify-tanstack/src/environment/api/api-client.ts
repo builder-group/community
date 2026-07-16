@@ -3,9 +3,9 @@ import { getRequest } from '@tanstack/react-start/server';
 import type { apiV1 } from '@template/api-shopify-hono/openapi';
 import {
 	createOpenApiFetchClient,
-	HttpError,
+	isHttpError,
 	setHeader,
-	type FetchError,
+	type TFetchResponseError,
 	type TPrepareRequestContext
 } from 'feature-fetch';
 import { createShopifySessionTokenBounceRedirect, getShopifySessionToken } from '@/modules/shopify';
@@ -33,18 +33,17 @@ const apiFetch = createIsomorphicFn()
 	.client((url: URL | string, init?: RequestInit) => fetch(url, init));
 
 export function mapApiError(
-	error: FetchError
-): FetchError | ReturnType<typeof createShopifySessionTokenBounceRedirect> {
+	error: TApiError
+): TApiError | ReturnType<typeof createShopifySessionTokenBounceRedirect> {
 	const isShopifySessionTokenInvalid =
-		error instanceof HttpError &&
+		isHttpError(error) &&
 		error.status === 401 &&
-		typeof error.data === 'object' &&
-		error.data != null &&
-		'code' in error.data &&
-		error.data.code === '#ERR_SHOPIFY_SESSION_TOKEN_INVALID';
+		error.data?.code === '#ERR_SHOPIFY_SESSION_TOKEN_INVALID';
 	if (isShopifySessionTokenInvalid) {
 		return createShopifySessionTokenBounceRedirect();
 	}
 
 	return error;
 }
+
+type TApiError = TFetchResponseError<apiV1.components['schemas']['ErrorResponse']>;

@@ -21,6 +21,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/products/count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the product count available to the authenticated Shopify user */
+        get: operations["getProductCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/shop": {
         parameters: {
             query?: never;
@@ -30,6 +47,23 @@ export interface paths {
         };
         /** Get the authenticated shop */
         get: operations["getShop"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/user": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the authenticated Shopify user */
+        get: operations["getUser"];
         put?: never;
         post?: never;
         delete?: never;
@@ -166,6 +200,15 @@ export interface components {
             /** @example String must contain at least 1 character */
             detail: string;
         };
+        ProductCountResponse: {
+            /** @example 42 */
+            count: number;
+            /**
+             * @example EXACT
+             * @enum {string}
+             */
+            precision: "EXACT" | "AT_LEAST";
+        };
         ShopResponse: {
             shop: {
                 /** @example gid://shopify/Shop/1 */
@@ -174,6 +217,34 @@ export interface components {
                 name: string;
                 /** @example example.myshopify.com */
                 domain: string;
+            };
+        };
+        UserResponse: {
+            user: {
+                /**
+                 * Format: uuid
+                 * @example 123e4567-e89b-12d3-a456-426614174000
+                 */
+                id: string;
+                /** @example 123456789 */
+                shopifyId: string;
+                /** @example Ada */
+                firstName: string;
+                /** @example Lovelace */
+                lastName: string;
+                /**
+                 * Format: email
+                 * @example ada@example.com
+                 */
+                email: string;
+                /** @example true */
+                emailVerified: boolean;
+                /** @example true */
+                accountOwner: boolean;
+                /** @example en */
+                locale: string;
+                /** @example false */
+                collaborator: boolean;
             };
         };
         AppUninstalledWebhookPayload: {
@@ -252,6 +323,89 @@ export interface operations {
             };
         };
     };
+    getProductCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The product count available to the authenticated Shopify user */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductCountResponse"];
+                };
+            };
+            /** @description A valid Shopify session token is required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The app or authenticated Shopify user cannot access products */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The Shopify shop is inactive or unavailable */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Shopify Admin API rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The API could not load the product count */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Shopify did not return a valid product count */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Shopify or the token store is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     getShop: {
         parameters: {
             query?: never;
@@ -288,6 +442,15 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ErrorResponse"];
                 };
             };
+            /** @description The Shopify shop is inactive or unavailable */
+            423: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
             /** @description Shopify Admin API rate limit exceeded */
             429: {
                 headers: {
@@ -316,6 +479,71 @@ export interface operations {
                 };
             };
             /** @description Shopify is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    getUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The authenticated Shopify user */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserResponse"];
+                };
+            };
+            /** @description A valid Shopify session token is required */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The Shopify installation has not granted all required access scopes */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description The API could not authenticate the Shopify user */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Shopify did not return a valid online access token */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Shopify or the token store is unavailable */
             503: {
                 headers: {
                     [name: string]: unknown;
