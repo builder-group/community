@@ -40,7 +40,9 @@ const environment = validateEnv(process.env, {
 
 const appHost = new URL(environment.appUrl).hostname;
 
-// Note: Shopify CLI proxies local HMR on a fixed port and tunneled HMR through HTTPS
+// Note: Shopify CLI proxies local HMR over a fixed WebSocket port and tunneled HMR over a secure
+// WebSocket
+// https://vite.dev/config/server-options.html#server-ws
 const webSocketConfig =
 	appHost === 'localhost'
 		? {

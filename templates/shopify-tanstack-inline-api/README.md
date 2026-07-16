@@ -1,1 +1,0 @@
-# shopify-tanstack-inline-api
