@@ -385,6 +385,9 @@ importers:
       jiti:
         specifier: ^2.7.0
         version: 2.7.0
+      postcss:
+        specifier: ^8.5.19
+        version: 8.5.19
       prettier-plugin-css-order:
         specifier: ^2.2.0
         version: 2.2.0(postcss@8.5.19)(prettier@3.9.5)

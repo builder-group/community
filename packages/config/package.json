@@ -65,6 +65,7 @@
 		"eslint-plugin-turbo": "^2.10.5",
 		"globals": "^17.7.0",
 		"jiti": "^2.7.0",
+		"postcss": "^8.5.19",
 		"prettier-plugin-css-order": "^2.2.0",
 		"prettier-plugin-packagejson": "^3.0.2",
 		"prettier-plugin-tailwindcss": "^0.8.1",
