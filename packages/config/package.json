@@ -53,26 +53,27 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@eslint-react/eslint-plugin": "^5.13.1",
+		"@eslint-react/eslint-plugin": "^5.16.1",
 		"@eslint/js": "^10.0.1",
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
 		"@next/eslint-plugin-next": "^16.2.10",
-		"@typescript-eslint/eslint-plugin": "^8.63.0",
-		"@typescript-eslint/parser": "^8.63.0",
+		"@typescript-eslint/eslint-plugin": "^8.64.0",
+		"@typescript-eslint/parser": "^8.64.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-only-warn": "^1.2.1",
 		"eslint-plugin-react-hooks": "^7.1.1",
-		"eslint-plugin-turbo": "^2.10.4",
+		"eslint-plugin-turbo": "^2.10.5",
 		"globals": "^17.7.0",
 		"jiti": "^2.7.0",
+		"postcss": "^8.5.19",
 		"prettier-plugin-css-order": "^2.2.0",
 		"prettier-plugin-packagejson": "^3.0.2",
-		"prettier-plugin-tailwindcss": "^0.8.0",
-		"typescript-eslint": "^8.63.0"
+		"prettier-plugin-tailwindcss": "^0.8.1",
+		"typescript-eslint": "^8.64.0"
 	},
 	"devDependencies": {
-		"eslint": "^10.6.0",
-		"prettier": "^3.9.4",
+		"eslint": "^10.7.0",
+		"prettier": "^3.9.5",
 		"typescript": "^6.0.3",
 		"vitest": "^4.1.10"
 	},

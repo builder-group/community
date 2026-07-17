@@ -9,8 +9,8 @@ Keep app code split by responsibility:
 ```txt
 AppName/
 ├── Routes/       # Screen entry points and navigation-owned composition
-├── Environment/  # App-wide config, managers, persistence, runtime setup
-├── Modules/      # Bounded areas of app behavior
+├── Environment/  # App-wide config, bindings, and runtime resources
+├── Modules/      # Bounded product, system, or integration behavior
 ├── Views/        # Shared view building blocks
 └── Extensions/   # Small type extensions shared across the app
 ```
@@ -19,15 +19,39 @@ Only create the folders the app needs. Small apps can stay small.
 
 ## Folder Roles
 
-`Routes/` owns screen entry points and navigation-owned composition.
+### `Routes/`
 
-`Environment/` owns things that exist once for the whole app, such as app config, data containers, extension managers, runtime setup, and shared stores.
+Owns screen entry points and navigation-owned composition.
 
-`Modules/` owns bounded product or system behavior, such as camera activation, onboarding flows, sync, updater logic, or other areas with clear ownership.
+### `Environment/`
 
-`Views/` owns reusable UI building blocks that are shared across routes or modules.
+Owns app-wide configuration, generated bindings, initialized resources, and runtime setup.
 
-`Extensions/` owns small type extensions that improve readability and do not belong to one specific module.
+Keep one top-level `Environment/`. Organize its contents by app-wide infrastructure concern. Keep `Modules/` organized by bounded behavior:
+
+- Put declarative app-wide configuration in `Environment/Configs/`
+- Put each app-wide runtime resource or set of generated bindings in a descriptive folder, such as `Environment/Persistence/` or `Environment/Generated/`
+- Keep request-, flow-, or module-scoped configuration and setup directly in its owning module
+- Do not use `Environment/` as a generic home for constants
+
+### `Modules/`
+
+Owns bounded product, system, or integration behavior.
+
+- Keep setup specific to a behavior inside its owning module
+- Do not depend on routes
+
+### `Views/`
+
+Owns reusable UI building blocks that are shared across routes or modules.
+
+- Keep `Views/` thin, and move a view into a module when it only serves that area
+
+### `Extensions/`
+
+Owns small type extensions that improve readability and do not belong to one specific module.
+
+- Keep `Extensions/` thin, and move an extension into a module when it only serves that area
 
 ## Example
 
@@ -42,10 +66,11 @@ AppName/
 ├── Environment/
 │   ├── Configs/
 │   │   └── AppConfig.swift
-│   └── DataContainer.swift
+│   └── Persistence/
+│       └── DataContainer.swift
 ├── Modules/
-│   ├── CameraExtension/
-│   │   └── CameraExtensionActivationManager.swift
+│   ├── Account/
+│   │   └── AccountStore.swift
 │   └── Onboarding/
 │       └── OnboardingStore.swift
 ├── Views/
@@ -54,10 +79,4 @@ AppName/
     └── Color+App.swift
 ```
 
-## Guidance
-
-- Keep top-level screen composition in `Routes/`
-- Keep app-wide setup in `Environment/`
-- Keep bounded product or system behavior in `Modules/`
-- Prefer `Modules/` over `Features/` for new Swift app structure
-- Keep `Views/` and `Extensions/` thin and move code into a module when it only serves one area
+App config or a data container intentionally shared across the app belongs in `Environment/`. State, configuration, stores, and managers scoped to one module remain with that module. A banner used across unrelated routes can remain in `Views/`.

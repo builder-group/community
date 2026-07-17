@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { hasStatusCode, HttpError, mapResponseToHttpError } from './HttpError';
+import { hasStatusCode, HttpError, isHttpError, mapResponseToHttpError } from './HttpError';
 
 describe('HttpError module', () => {
 	describe('HttpError class', () => {
@@ -75,6 +75,27 @@ describe('HttpError module', () => {
 		it('should return false for errors without the status code', () => {
 			// Act
 			const result = hasStatusCode(new Error('failed'), 500);
+
+			// Assert
+			expect(result).toBe(false);
+		});
+	});
+
+	describe('isHttpError function', () => {
+		it('should identify HttpError instances', () => {
+			// Prepare
+			const error = new HttpError(new Response('', { status: 404 }));
+
+			// Act
+			const result = isHttpError(error);
+
+			// Assert
+			expect(result).toBe(true);
+		});
+
+		it('should reject other errors', () => {
+			// Act
+			const result = isHttpError(new Error('failed'));
 
 			// Assert
 			expect(result).toBe(false);

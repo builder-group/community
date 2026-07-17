@@ -1,9 +1,7 @@
 import { XmlStream, type TXmlToken } from '../tokenizer';
 
 export type TSelectedXmlToken = (
-	| TXmlToken
-	| { type: 'SelectionStart' }
-	| { type: 'SelectionEnd' }
+	TXmlToken | { type: 'SelectionStart' } | { type: 'SelectionEnd' }
 ) & { key?: string };
 
 export type TSelectedTokenCallback = (token: TSelectedXmlToken, stream: XmlStream) => void;

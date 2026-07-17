@@ -183,10 +183,7 @@ export type TFetchHeadersInit = NonNullable<RequestInit['headers']> | TFetchHead
 /** Header record that also supports primitive arrays, `null` deletes, and ignored `undefined` values. */
 export type TFetchHeadersInitRecord = Record<string, TFetchHeaderInitValue>;
 export type TFetchHeaderInitValue =
-	| TFetchHeaderPrimitive
-	| TFetchHeaderPrimitive[]
-	| null
-	| undefined;
+	TFetchHeaderPrimitive | TFetchHeaderPrimitive[] | null | undefined;
 export type TFetchHeaderPrimitive = string | number | boolean;
 
 /** Normalized header record used internally. Header names are lowercased. */
@@ -225,9 +222,7 @@ export type TFetchRequestResponse<
 
 /** Error union returned by feature-fetch request methods. */
 export type TFetchResponseError<GErrorResponseBody = unknown> =
-	| NetworkError
-	| HttpError<GErrorResponseBody>
-	| FetchError;
+	NetworkError | HttpError<GErrorResponseBody> | FetchError;
 
 /** Success value returned by the low-level `request()` method. */
 export interface TFetchResponseSuccess<

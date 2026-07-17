@@ -2,7 +2,7 @@ import type { $Read, $Write, OperationRequestBodyContent } from 'openapi-typescr
 import { describe, expectTypeOf, it } from 'vitest';
 import type { components, paths } from '../__tests__/resources/mock-openapi-types';
 import { createFetchClient } from '../create-fetch-client';
-import { HttpError } from '../errors';
+import { isHttpError } from '../errors';
 import type { TFetchClient } from '../types';
 import { createOpenApiFetchClient, openApiFeature, type TOpenApiFeature } from './openapi';
 
@@ -261,6 +261,21 @@ describe('openApiFeature function', () => {
 				expectTypeOf(result.value).toEqualTypeOf<never>();
 			}
 		});
+
+		it('should preserve typed error data', async () => {
+			const client = createOpenApiFetchClient<TReadWritePaths>();
+
+			const result = await client.post('/users', {
+				body: {
+					username: 'jeff',
+					password: 'secret'
+				}
+			});
+			if (result.isErr() && isHttpError(result.error)) {
+				expectTypeOf(result.error.data).toEqualTypeOf<{ message: string } | undefined>();
+				expectTypeOf(result.error.data).not.toBeAny();
+			}
+		});
 	});
 
 	describe('read and write markers', () => {
@@ -294,10 +309,6 @@ describe('openApiFeature function', () => {
 					id: string;
 					username: string;
 				}>();
-			}
-			if (result.isErr() && result.error instanceof HttpError) {
-				const errorData: { message: string } | undefined = result.error.data;
-				void errorData;
 			}
 		});
 	});

@@ -35,10 +35,7 @@ export interface TParseParamsInput {
 }
 
 type TParseParamsInputValue =
-	| undefined
-	| string
-	| TParseParamsInputValue[]
-	| { [key: string]: TParseParamsInputValue };
+	undefined | string | TParseParamsInputValue[] | { [key: string]: TParseParamsInputValue };
 
 // MARK: - Route
 

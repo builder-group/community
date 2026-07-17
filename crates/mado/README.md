@@ -312,14 +312,14 @@ fn main() {
 
 `WindowEvent` has these variants:
 
-| Event                  | When it fires                                                               |
-| ---------------------- | --------------------------------------------------------------------------- |
-| `AppActivated`         | Immediately when the active app changes, even if no window is available yet |
-| `WindowChanged`        | When focused window data is available, focus changes, or the title changes  |
-| `WindowBoundsChanged`  | When the focused window moves or resizes, if enabled                        |
-| `WindowMinimized`      | When the observed focused window is minimized                               |
-| `WindowRestored`       | When the observed focused window is restored from minimized state           |
-| `WindowDestroyed`      | When the observed focused window accessibility element is destroyed         |
+| Event                 | When it fires                                                               |
+| --------------------- | --------------------------------------------------------------------------- |
+| `AppActivated`        | Immediately when the active app changes, even if no window is available yet |
+| `WindowChanged`       | When focused window data is available, focus changes, or the title changes  |
+| `WindowBoundsChanged` | When the focused window moves or resizes, if enabled                        |
+| `WindowMinimized`     | When the observed focused window is minimized                               |
+| `WindowRestored`      | When the observed focused window is restored from minimized state           |
+| `WindowDestroyed`     | When the observed focused window accessibility element is destroyed         |
 
 Lifecycle events only cover windows observed after the active app observer is installed. A restore that activates an app may appear as `AppActivated` followed by `WindowChanged` instead of `WindowRestored`.
 

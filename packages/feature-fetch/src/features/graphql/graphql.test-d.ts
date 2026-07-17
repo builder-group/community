@@ -4,6 +4,7 @@ import {
 	type TGraphQLOperationOptions,
 	type TTypedDocumentNode
 } from './graphql';
+import { isGraphQLError } from './GraphQLError';
 
 describe('graphqlFeature function', () => {
 	describe('variables', () => {
@@ -153,6 +154,28 @@ describe('graphqlFeature function', () => {
 					| null
 					| undefined
 				>();
+			}
+		});
+
+		it('should preserve typed partial data', async () => {
+			const client = createGraphQLFetchClient();
+
+			const result = await client.query(documentWithRequiredVariables, {
+				variables: {
+					id: 'user-1'
+				}
+			});
+			if (result.isErr() && isGraphQLError(result.error)) {
+				expectTypeOf(result.error.data).toEqualTypeOf<
+					| {
+							user: {
+								id: string;
+							};
+					  }
+					| null
+					| undefined
+				>();
+				expectTypeOf(result.error.data).not.toBeAny();
 			}
 		});
 	});

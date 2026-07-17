@@ -2,6 +2,7 @@
 **/node_modules/
 
 # Tooling
+**/.shopify/
 **/.tanstack/
 **/.turbo/
 **/.vite/
@@ -19,7 +20,9 @@
 
 # Generated source
 **/*.gen.ts
+**/drizzle/
 **/gen/
+**/graphql-env.d.ts
 
 # Local files
 .todo

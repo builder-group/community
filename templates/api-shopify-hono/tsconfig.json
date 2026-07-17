@@ -1,0 +1,22 @@
+{
+	"extends": "@blgc/config/typescript/library",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"declarationDir": "./dist/types",
+		"types": ["node"],
+		"paths": {
+			"@/*": ["./src/*"]
+		},
+		"plugins": [
+			{
+				"name": "gql.tada/ts-plugin",
+				// Note: Keep this schema version aligned with shopifyConfig.apiVersion
+				"schema": "https://shopify.dev/admin-graphql-direct-proxy/2026-07",
+				"tadaOutputLocation": "./src/environment/gql/shopify-admin/graphql-env.d.ts"
+			}
+		]
+	},
+	"include": ["src"],
+	"exclude": ["**/__tests__/**", "**/*.test.ts", "**/*.test-d.ts", "**/*.bench.ts"]
+}

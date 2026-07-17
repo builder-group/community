@@ -13,8 +13,8 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: '24'
-  PNPM_VERSION: '11.3.0'
+  NODE_VERSION: "24"
+  PNPM_VERSION: "11.13.1"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}

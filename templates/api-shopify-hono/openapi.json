@@ -1,0 +1,839 @@
+{
+	"openapi": "3.1.0",
+	"info": {
+		"title": "Shopify Hono API",
+		"version": "0.0.1"
+	},
+	"components": {
+		"securitySchemes": {
+			"shopifySessionToken": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT",
+				"description": "Shopify App Bridge session token"
+			}
+		},
+		"schemas": {
+			"HealthResponse": {
+				"type": "object",
+				"properties": {
+					"status": {
+						"type": "string",
+						"enum": ["ok"],
+						"example": "ok"
+					},
+					"version": {
+						"type": "string",
+						"example": "0.0.1d"
+					}
+				},
+				"required": ["status", "version"]
+			},
+			"ErrorResponse": {
+				"type": "object",
+				"properties": {
+					"type": {
+						"type": "string",
+						"example": "about:blank"
+					},
+					"title": {
+						"type": "string",
+						"example": "Bad Request"
+					},
+					"status": {
+						"type": "integer",
+						"example": 400
+					},
+					"detail": {
+						"type": "string",
+						"example": "The request could not be validated"
+					},
+					"instance": {
+						"type": "string",
+						"description": "The request path for client errors or an opaque support reference for server errors",
+						"example": "urn:uuid:618237e4-46e7-4602-9f0c-5dc1c44a32fd"
+					},
+					"code": {
+						"type": "string",
+						"example": "#ERR_VALIDATION_FAILED"
+					},
+					"errors": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ErrorDetail"
+						}
+					}
+				},
+				"required": ["type", "title", "status", "detail", "instance", "code"]
+			},
+			"ErrorDetail": {
+				"type": "object",
+				"properties": {
+					"source": {
+						"type": "string",
+						"enum": ["body", "path", "query", "header", "cookie"],
+						"example": "query"
+					},
+					"path": {
+						"type": "array",
+						"items": {
+							"anyOf": [
+								{
+									"type": "string"
+								},
+								{
+									"type": "number"
+								}
+							]
+						},
+						"example": ["name"]
+					},
+					"detail": {
+						"type": "string",
+						"example": "String must contain at least 1 character"
+					}
+				},
+				"required": ["source", "path", "detail"]
+			},
+			"ProductCountResponse": {
+				"type": "object",
+				"properties": {
+					"count": {
+						"type": "integer",
+						"minimum": 0,
+						"example": 42
+					},
+					"precision": {
+						"type": "string",
+						"enum": ["EXACT", "AT_LEAST"],
+						"example": "EXACT"
+					}
+				},
+				"required": ["count", "precision"]
+			},
+			"ShopResponse": {
+				"type": "object",
+				"properties": {
+					"shop": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "string",
+								"example": "gid://shopify/Shop/1"
+							},
+							"name": {
+								"type": "string",
+								"example": "Example shop"
+							},
+							"domain": {
+								"type": "string",
+								"example": "example.myshopify.com"
+							}
+						},
+						"required": ["id", "name", "domain"]
+					}
+				},
+				"required": ["shop"]
+			},
+			"UserResponse": {
+				"type": "object",
+				"properties": {
+					"user": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "string",
+								"format": "uuid",
+								"example": "123e4567-e89b-12d3-a456-426614174000"
+							},
+							"shopifyId": {
+								"type": "string",
+								"example": "123456789"
+							},
+							"firstName": {
+								"type": "string",
+								"example": "Ada"
+							},
+							"lastName": {
+								"type": "string",
+								"example": "Lovelace"
+							},
+							"email": {
+								"type": "string",
+								"format": "email",
+								"example": "ada@example.com"
+							},
+							"emailVerified": {
+								"type": "boolean",
+								"example": true
+							},
+							"accountOwner": {
+								"type": "boolean",
+								"example": true
+							},
+							"locale": {
+								"type": "string",
+								"example": "en"
+							},
+							"collaborator": {
+								"type": "boolean",
+								"example": false
+							}
+						},
+						"required": [
+							"id",
+							"shopifyId",
+							"firstName",
+							"lastName",
+							"email",
+							"emailVerified",
+							"accountOwner",
+							"locale",
+							"collaborator"
+						]
+					}
+				},
+				"required": ["user"]
+			},
+			"AppUninstalledWebhookPayload": {
+				"type": "object",
+				"properties": {},
+				"additionalProperties": {}
+			},
+			"AppScopesUpdateWebhookPayload": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "number",
+						"example": 1
+					},
+					"shop_id": {
+						"type": "string",
+						"example": "gid://shopify/Shop/548380009"
+					},
+					"previous": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"example": ["read_products"]
+					},
+					"current": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						},
+						"example": ["read_products", "write_products"]
+					},
+					"updated_at": {
+						"type": "string",
+						"format": "date-time",
+						"example": "2024-06-25T00:00:00.000Z"
+					}
+				},
+				"required": ["id", "shop_id", "previous", "current", "updated_at"],
+				"additionalProperties": {}
+			},
+			"CustomersDataRequestWebhookPayload": {
+				"type": "object",
+				"properties": {},
+				"additionalProperties": {}
+			},
+			"CustomersRedactWebhookPayload": {
+				"type": "object",
+				"properties": {},
+				"additionalProperties": {}
+			},
+			"ShopRedactWebhookPayload": {
+				"type": "object",
+				"properties": {},
+				"additionalProperties": {}
+			}
+		},
+		"parameters": {}
+	},
+	"paths": {
+		"/v1/health": {
+			"get": {
+				"tags": ["health"],
+				"summary": "Check API health",
+				"operationId": "checkHealth",
+				"responses": {
+					"200": {
+						"description": "The API is healthy",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HealthResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The API could not complete the health check",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/products/count": {
+			"get": {
+				"tags": ["products"],
+				"summary": "Get the product count available to the authenticated Shopify user",
+				"operationId": "getProductCount",
+				"security": [
+					{
+						"shopifySessionToken": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The product count available to the authenticated Shopify user",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ProductCountResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "A valid Shopify session token is required",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "The app or authenticated Shopify user cannot access products",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"423": {
+						"description": "The Shopify shop is inactive or unavailable",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Shopify Admin API rate limit exceeded",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The API could not load the product count",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"502": {
+						"description": "Shopify did not return a valid product count",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Shopify or the token store is unavailable",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/shop": {
+			"get": {
+				"tags": ["shop"],
+				"summary": "Get the authenticated shop",
+				"operationId": "getShop",
+				"security": [
+					{
+						"shopifySessionToken": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The authenticated shop",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ShopResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "A valid Shopify session token is required",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "The Shopify installation has not granted all required access scopes",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"423": {
+						"description": "The Shopify shop is inactive or unavailable",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Shopify Admin API rate limit exceeded",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The API could not load the shop",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"502": {
+						"description": "Shopify did not return a valid response",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Shopify is unavailable",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/user": {
+			"get": {
+				"tags": ["user"],
+				"summary": "Get the authenticated Shopify user",
+				"operationId": "getUser",
+				"security": [
+					{
+						"shopifySessionToken": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "The authenticated Shopify user",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "A valid Shopify session token is required",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "The Shopify installation has not granted all required access scopes",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The API could not authenticate the Shopify user",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"502": {
+						"description": "Shopify did not return a valid online access token",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Shopify or the token store is unavailable",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/webhooks/shopify/app/uninstalled": {
+			"post": {
+				"tags": ["webhooks", "shopify"],
+				"summary": "Handle an app uninstalled webhook",
+				"operationId": "handleAppUninstalledWebhook",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AppUninstalledWebhookPayload"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The webhook was acknowledged"
+					},
+					"400": {
+						"description": "The webhook request is invalid",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "The webhook could not be verified",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The webhook could not be processed",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Shopify installation storage is unavailable",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/webhooks/shopify/app/scopes-update": {
+			"post": {
+				"tags": ["webhooks", "shopify"],
+				"summary": "Handle an app scopes update webhook",
+				"operationId": "handleAppScopesUpdateWebhook",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AppScopesUpdateWebhookPayload"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The webhook was acknowledged"
+					},
+					"400": {
+						"description": "The webhook request is invalid",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "The webhook could not be verified",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The webhook could not be processed",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Shopify installation storage is unavailable",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/webhooks/shopify/customers/data-request": {
+			"post": {
+				"tags": ["webhooks", "shopify"],
+				"summary": "Handle a customer data request webhook",
+				"operationId": "handleCustomersDataRequestWebhook",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CustomersDataRequestWebhookPayload"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The webhook was acknowledged"
+					},
+					"400": {
+						"description": "The webhook request is invalid",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "The webhook could not be verified",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The webhook could not be processed",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/webhooks/shopify/customers/redact": {
+			"post": {
+				"tags": ["webhooks", "shopify"],
+				"summary": "Handle a customer redaction webhook",
+				"operationId": "handleCustomersRedactWebhook",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CustomersRedactWebhookPayload"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The webhook was acknowledged"
+					},
+					"400": {
+						"description": "The webhook request is invalid",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "The webhook could not be verified",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The webhook could not be processed",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/webhooks/shopify/shop/redact": {
+			"post": {
+				"tags": ["webhooks", "shopify"],
+				"summary": "Handle a shop redaction webhook",
+				"operationId": "handleShopRedactWebhook",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ShopRedactWebhookPayload"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The webhook was acknowledged"
+					},
+					"400": {
+						"description": "The webhook request is invalid",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "The webhook could not be verified",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "The webhook could not be processed",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					},
+					"503": {
+						"description": "Shopify installation storage is unavailable",
+						"content": {
+							"application/problem+json": {
+								"schema": {
+									"$ref": "#/components/schemas/ErrorResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"webhooks": {}
+}

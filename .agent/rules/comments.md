@@ -1,109 +1,120 @@
 # Comment Rules
 
-Add comments when they make the code easier to understand or maintain. Omit them when the code speaks for itself. For prose style within comments, see `.agent/rules/writing.md`.
+Use comments to expose code structure or preserve context that the code cannot communicate clearly on its own. For prose style within comments, see `.agent/rules/writing.md`.
 
 ## Enforce
 
-- Add regular comments only when they explain **why**, a constraint, domain behavior, or the purpose of a non-obvious block
-- Write comments for future maintainers who do not have the current session context; use concrete conditions and named behavior over abstract shorthand
-- Keep regular comments short and direct. Use a complete sentence when explaining a constraint, exception, or platform behavior
-- Place the comment directly above the code it explains
-- Omit the trailing period in short single-line regular comments
-- Add doc comments to public and exported functions, methods, and types only when the name and signature alone do not make the behavior or contract clear; describe what it does first, then note constraints, side effects, or non-obvious return or error behavior when needed
-- Start doc comments with a single sentence in active voice and end it with a period
-- Use `// MARK: -` sparingly as a file-level or large-structure navigation aid, mainly in long files
-- Use `// Note:` for intentional constraints, omissions, or deferrals that a reader might otherwise mistake for a bug or incomplete work
-- Use `// TODO:` for known future work; keep it specific and actionable
+- Prefer concrete language: state what happens and, when useful, why it matters
+- Use complete sentences when they improve clarity. Short phrases are fine when their meaning is already clear, especially for phase comments and labels.
+- Use short `//` phase comments when they make a longer function easier to scan. Describe what the block accomplishes without narrating its individual statements.
+- Use `// Note:` for supplementary non-obvious context, constraints, compatibility behavior, or intentional omissions
+- Use `// MARK: - <name>` sparingly to divide a large file into major regions
+- Use `// TODO:` for specific unfinished work. State the required action or the condition that should trigger it.
+- Use TSDoc (`/** ... */`) for public or exported TypeScript contracts when their names and signatures do not communicate enough. Use the language-equivalent documentation syntax elsewhere.
+- Describe what a documented contract does first, then include non-obvious constraints, side effects, or error behavior when needed
+- Start doc comments with an active-voice sentence and end full sentences with a period
+- Add a reason to TypeScript, lint, or compiler suppression directives using the tool's supported syntax
+- Add a direct reference link when behavior depends on a non-obvious external contract that future maintainers may need to verify
+- Write comments for future maintainers without relying on current task, session, or refactor context
+- Place comments directly above the code they explain
+- Keep regular comments short and direct. Omit the trailing period when a regular comment contains one sentence, even when it wraps across lines. Use sentence punctuation when it contains multiple sentences.
+- Use consecutive `//` lines for multi-line regular comments. Reserve `/** ... */` for documentation comments.
 
 ## Avoid
 
-- Do not restate what the code already says in regular comments
-- Do not use comments as a substitute for good naming
-- Do not add comments above a block when the intent is already obvious from the code
-- Do not annotate every small step inside a larger block once a single higher-level comment already explains the intent
-- Do not use `// MARK: -` inside ordinary functions or small local flows
-- Do not document session history, refactor history, or rejected alternatives
-- Do not repeat type information that is already obvious from the code
-- Do not add doc comments to private helpers unless the contract is non-obvious to a caller within the same module
-- Do not add doc comments just for consistency across a file; each comment should earn its place
-- Do not fill doc comments with implementation details or obvious parameter-by-parameter paraphrases
-- Do not frame doc comments around why the code exists or what layer uses it unless that context is necessary to call it correctly
+- Do not add phase comments for small steps or blocks whose purpose is already obvious
+- Do not use `// Note:` to restate what the following code does
+- Do not use comments as a substitute for clear naming or appropriate function boundaries
+- Do not narrate implementation statements line by line
+- Do not compress an explanation into shorthand that makes the reader reconstruct what happens
+- Do not join separate ideas with a semicolon when two sentences would be clearer
+- Do not use `// MARK: -` inside ordinary functions or small files
+- Do not leave vague TODOs such as `// TODO: improve this`
+- Do not document task history, rejected alternatives, or temporary reasoning
+- Do not repeat type information already expressed by the code
+- Do not add doc comments to obvious contracts or merely for consistency
+- Do not fill doc comments with implementation details or parameter-by-parameter paraphrases
+- Do not use ordinary `/* ... */` comments
 
 ## Examples
 
 ### Good
 
 ```ts
-// Sort once so the UI stays stable across refreshes
-const sortedItems = items.slice().sort(compareItems);
-for (const item of sortedItems) {
-  renderItem(item);
+/** Synchronizes local records and publishes the new version only after persistence succeeds. */
+export async function synchronizeRecords(): Promise<void> {
+  // Establish a consistent local baseline
+  const snapshot = await loadSnapshot();
+  const pendingChanges = await loadPendingChanges(snapshot.version);
+
+  // Reconcile local and upstream changes
+  const upstreamChanges = await fetchUpstreamChanges(snapshot.cursor);
+  const nextSnapshot = reconcileChanges(snapshot, pendingChanges, upstreamChanges);
+
+  // Persist and publish the synchronized state
+  // Note: Observers reload the published version immediately after notification
+  await saveSnapshot(nextSnapshot);
+  await publishSnapshotVersion(nextSnapshot.version);
 }
 ```
 
 ```ts
-// Retry with exponential backoff because the upstream service rate-limits bursts
-for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-  const result = await fetchWithDelay(attempt);
-  if (result.ok) return result;
+// MARK: - Reading
+
+export function loadValue(id: string): TValue | null {
+  return values.get(id) ?? null;
+}
+
+export function listValues(): TValue[] {
+  return [...values.values()];
+}
+
+// MARK: - Writing
+
+export function saveValue(value: TValue): void {
+  values.set(value.id, value);
+}
+
+export function deleteValue(id: string): void {
+  values.delete(id);
 }
 ```
 
 ```ts
-/** Returns the active session, or null if the user is not authenticated. */
-export function getSession(): Session | null;
-```
-
-```rust
-/// Returns the display label for a status code.
-pub fn format_status(code: StatusCode) -> &'static str
-```
-
-```rust
-/// Loads items from the configured source.
-pub fn load_items(config: &LoadConfig) -> Result<Vec<Item>, LoadItemsError>
+// TODO: replace full synchronization with cursor-based updates when the upstream API supports cursors
+await synchronizeAllItems();
 ```
 
 ```ts
-export function isAuthenticated(): boolean;
+// @ts-expect-error: The upstream declaration omits this supported runtime value
+configureRuntime({ mode: 'isolated' });
 ```
 
 ```ts
-// Note: Skips permission check here because the caller is expected to pre-validate
-applyChange(payload);
-```
-
-```ts
-// TODO: replace with incremental sync once the API supports cursors
-const items = await fetchAll(query);
+// Note: Cached permissions can be stale, so they only decide whether the existing credential
+// can be reused. Permissions returned by the server are validated separately.
 ```
 
 ### Avoid
 
 ```ts
-// Sort the items
-const sortedItems = items.slice().sort(compareItems);
+// Check whether the cached value exists
+if (cachedValue != null) {
+  // Return the cached value
+  return cachedValue;
+}
+```
+
+```ts
+// Note: Fetch and cache a current value
+return fetchAndCacheValue();
+```
+
+```ts
+// Note: Cached permissions gate reuse; upstream permissions are authoritative
 ```
 
 ```ts
 /** Returns whether the user is authenticated. */
 export function isAuthenticated(): boolean;
-```
-
-```ts
-/**
- * Formats the status.
- * @param code The status code.
- */
-export function formatStatus(code: StatusCode): string;
-```
-
-```rust
-/// This is used by the sidebar to show items quickly.
-pub fn load_items(config: &LoadConfig) -> Result<Vec<Item>, LoadItemsError>
-```
-
-```rust
-/// Loads items from the configured source and loops through all providers.
-pub fn load_items(config: &LoadConfig) -> Result<Vec<Item>, LoadItemsError>
 ```

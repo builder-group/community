@@ -23,9 +23,7 @@ export type TBaseDynRollupOptions = Omit<RollupOptions, 'plugins'> & {
 };
 
 export type TDynRollupOptions =
-	| TBaseDynRollupOptions
-	| TBaseDynRollupOptions[]
-	| TDynRollupOptionsCallback;
+	TBaseDynRollupOptions | TBaseDynRollupOptions[] | TDynRollupOptionsCallback;
 
 export type TDynRollupOptionsCallback = (
 	config: TDynRollupOptionsCallbackConfig

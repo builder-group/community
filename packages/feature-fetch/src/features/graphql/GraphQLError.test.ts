@@ -1,73 +1,100 @@
 import { describe, expect, it } from 'vitest';
-import { GraphQLError } from './GraphQLError';
+import { GraphQLError, isGraphQLError } from './GraphQLError';
 
-describe('GraphQLError class', () => {
-	it('should format one GraphQL error message', () => {
-		// Prepare
-		const response = new Response();
+describe('GraphQLError module', () => {
+	describe('GraphQLError class', () => {
+		it('should format one GraphQL error message', () => {
+			// Prepare
+			const response = new Response();
 
-		// Act
-		const error = new GraphQLError([{ message: 'User not found' }], {
-			response
+			// Act
+			const error = new GraphQLError([{ message: 'User not found' }], {
+				response
+			});
+
+			// Assert
+			expect(error.name).toBe('GraphQLError');
+			expect(error.code).toBe('#ERR_GRAPHQL_OPERATION');
+			expect(error.message).toBe(
+				'[#ERR_GRAPHQL_OPERATION] GraphQL operation failed: User not found'
+			);
+			expect(error.response).toBe(response);
 		});
 
-		// Assert
-		expect(error.name).toBe('GraphQLError');
-		expect(error.code).toBe('#ERR_GRAPHQL_OPERATION');
-		expect(error.message).toBe('[#ERR_GRAPHQL_OPERATION] GraphQL operation failed: User not found');
-		expect(error.response).toBe(response);
-	});
+		it('should format multiple GraphQL error messages', () => {
+			// Prepare
+			const errors = [
+				{
+					message: 'User not found'
+				},
+				{
+					message: 'Missing permission'
+				}
+			];
 
-	it('should format multiple GraphQL error messages', () => {
-		// Prepare
-		const errors = [
-			{
-				message: 'User not found'
-			},
-			{
-				message: 'Missing permission'
-			}
-		];
+			// Act
+			const error = new GraphQLError(errors, {
+				response: new Response()
+			});
 
-		// Act
-		const error = new GraphQLError(errors, {
-			response: new Response()
+			// Assert
+			expect(error.message).toBe(
+				'[#ERR_GRAPHQL_OPERATION] GraphQL operation failed with 2 errors: User not found, Missing permission'
+			);
 		});
 
-		// Assert
-		expect(error.message).toBe(
-			'[#ERR_GRAPHQL_OPERATION] GraphQL operation failed with 2 errors: User not found, Missing permission'
-		);
-	});
+		it('should keep GraphQL response details', () => {
+			// Prepare
+			const response = new Response();
+			const errors = [
+				{
+					message: 'User not found'
+				}
+			];
 
-	it('should keep GraphQL response details', () => {
-		// Prepare
-		const response = new Response();
-		const errors = [
-			{
-				message: 'User not found'
-			}
-		];
+			// Act
+			const error = new GraphQLError(errors, {
+				data: {
+					user: null
+				},
+				extensions: {
+					requestId: 'request-1'
+				},
+				response
+			});
 
-		// Act
-		const error = new GraphQLError(errors, {
-			data: {
+			// Assert
+			expect(error.errors).toBe(errors);
+			expect(error.data).toEqual({
 				user: null
-			},
-			extensions: {
+			});
+			expect(error.extensions).toEqual({
 				requestId: 'request-1'
-			},
-			response
+			});
+			expect(error.response).toBe(response);
+		});
+	});
+
+	describe('isGraphQLError function', () => {
+		it('should identify GraphQLError instances', () => {
+			// Prepare
+			const error = new GraphQLError([{ message: 'User not found' }], {
+				response: new Response()
+			});
+
+			// Act
+			const result = isGraphQLError(error);
+
+			// Assert
+			expect(result).toBe(true);
 		});
 
-		// Assert
-		expect(error.errors).toBe(errors);
-		expect(error.data).toEqual({
-			user: null
+		it('should reject other errors', () => {
+			// Act
+			const result = isGraphQLError(new Error('failed'));
+
+			// Assert
+			expect(result).toBe(false);
 		});
-		expect(error.extensions).toEqual({
-			requestId: 'request-1'
-		});
-		expect(error.response).toBe(response);
 	});
 });

@@ -55,8 +55,7 @@ export function renderHook<GResult>(useHook: () => GResult): TRenderedHook<GResu
 const hookCleanups: Array<() => void> = [];
 
 type TRenderHookResult<GResult> =
-	| { readonly hasRendered: false }
-	| { readonly hasRendered: true; readonly value: GResult };
+	{ readonly hasRendered: false } | { readonly hasRendered: true; readonly value: GResult };
 
 export interface TRenderedHook<GResult> {
 	readonly result: GResult;

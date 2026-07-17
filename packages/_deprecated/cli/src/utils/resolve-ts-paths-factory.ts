@@ -154,8 +154,7 @@ export interface TResolveTsPathsFactoryOptions {
 	 * Determines if the resolved paths should be relative to the importing file.
 	 */
 	shouldResolveRelativeToImporter?:
-		| boolean
-		| ((source: string, importer: string | undefined) => boolean);
+		boolean | ((source: string, importer: string | undefined) => boolean);
 
 	/**
 	 * Determines if .d.ts files should be resolved to their corresponding source files.

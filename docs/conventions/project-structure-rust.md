@@ -9,8 +9,8 @@ Keep app code split by responsibility:
 ```txt
 src/
 ├── app/          # App lifecycle, shell wiring, framework setup
-├── environment/  # App-wide config, logger, db, runtime setup
-├── modules/      # Bounded areas of app behavior
+├── environment/  # App-wide config, bindings, and runtime resources
+├── modules/      # Bounded product, system, or integration behavior
 └── common/       # Thin shared helpers
 ```
 
@@ -18,13 +18,34 @@ Only create the folders the app needs. Small apps can stay small.
 
 ## Folder Roles
 
-`app/` owns lifecycle, shell wiring, and framework entry points.
+### `app/`
 
-`environment/` owns things that exist once for the whole app, such as app config, logger setup, database setup, runtime paths, and generated bindings.
+Owns lifecycle, shell wiring, and framework entry points.
 
-`modules/` owns bounded areas of app behavior, such as settings, sessions, updater flows, and other product or system areas.
+### `environment/`
 
-`common/` owns helpers that are shared across multiple modules and do not belong to one specific module. Use `common/` instead of `lib/` in Rust apps so it does not get confused with `lib.rs`.
+Owns app-wide configuration, generated bindings, initialized resources, and runtime setup.
+
+Keep one top-level `environment/`. Organize its contents by app-wide infrastructure concern. Keep `modules/` organized by bounded behavior:
+
+- Put declarative app-wide configuration in `environment/configs/`
+- Put each app-wide runtime resource or set of generated bindings in a descriptive module, such as `environment/database/` or `environment/generated/`
+- Keep request-, flow-, or module-scoped configuration and setup directly in its owning module
+- Do not use `environment/` as a generic home for constants
+
+### `modules/`
+
+Owns bounded product, system, or integration behavior.
+
+- Keep setup specific to a behavior inside its owning module
+- Do not depend on app assembly
+
+### `common/`
+
+Owns helpers that are shared across multiple modules and do not belong to one specific module.
+
+- Use `common/` instead of `lib/` in Rust apps so it does not get confused with `lib.rs`
+- Keep `common/` thin, and move helpers into a module when they are only used there
 
 ## Example
 
@@ -32,25 +53,23 @@ Only create the folders the app needs. Small apps can stay small.
 src/
 ├── app/
 │   ├── mod.rs
-│   └── window.rs
+│   └── lifecycle.rs
 ├── environment/
 │   ├── mod.rs
-│   └── configs/
-│       ├── app.rs
+│   ├── configs/
+│   │   ├── app.rs
+│   │   └── mod.rs
+│   └── database/
 │       └── mod.rs
 ├── modules/
 │   ├── mod.rs
-│   └── example/
-│       ├── commands.rs
+│   └── account/
+│       ├── handlers.rs
 │       ├── mod.rs
-│       └── types.rs
+│       └── service.rs
 └── common/
-    └── mod.rs
+    ├── mod.rs
+    └── time.rs
 ```
 
-## Guidance
-
-- Keep shell setup in `app/`
-- Keep app-wide setup in `environment/`
-- Keep behavior close to the module that owns it
-- Keep `common/` thin and move helpers into a module when they are only used there
+App config or a database pool intentionally shared across the app belongs in `environment/`. State, configuration, clients, and caches scoped to one module remain with that module. A time helper used by several unrelated modules can remain in `common/`.

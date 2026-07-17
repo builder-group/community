@@ -9,8 +9,7 @@ export type TBundle<GComponent extends TComponentRef = TComponentRef> =
 	readonly TBundleEntry<GComponent>[];
 
 export type TBundlePart<GComponent extends TComponentRef = TComponentRef> =
-	| TBundleEntry<GComponent>
-	| TBundle<GComponent>;
+	TBundleEntry<GComponent> | TBundle<GComponent>;
 
 export type TBundleComponentFromPart<GPart> =
 	GPart extends TBundleEntry<infer GComponent>
