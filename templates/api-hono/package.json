@@ -62,17 +62,17 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@hono/zod-openapi": "^1.4.0",
-		"hono": "^4.12.29",
+		"@hono/zod-openapi": "^1.5.1",
+		"hono": "^4.12.30",
 		"validatenv": "workspace:*",
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@hono/node-server": "^2.0.8",
+		"@hono/node-server": "^2.0.10",
 		"@types/node": "^26.1.1",
 		"openapi-typescript": "^7.13.0",
 		"rollup-presets": "workspace:*",
-		"tsx": "^4.23.0"
+		"tsx": "^4.23.1"
 	}
 }

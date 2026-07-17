@@ -28,7 +28,7 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@tanstack/react-router": "^1.170.17",
+		"@tanstack/react-router": "^1.170.18",
 		"@tanstack/react-router-devtools": "^1.167.0",
 		"@tauri-apps/api": "^2.11.1",
 		"@tauri-apps/plugin-opener": "^2.5.4",
@@ -41,7 +41,7 @@
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@tailwindcss/vite": "^4.3.2",
-		"@tanstack/router-plugin": "^1.168.19",
+		"@tanstack/router-plugin": "^1.168.20",
 		"@tauri-apps/cli": "^2.11.4",
 		"@types/node": "^26.1.1",
 		"@types/react": "^19.2.17",
