@@ -2,8 +2,16 @@ import tailwindcss from '@tailwindcss/vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import viteReact from '@vitejs/plugin-react';
 import { nitro } from 'nitro/vite';
-import { emptyStringAsUndefined, portValidator, urlValidator, validateEnv } from 'validatenv';
+import {
+	createViteEnvDefine,
+	emptyStringAsUndefined,
+	portValidator,
+	stringValidator,
+	urlValidator,
+	validateEnv
+} from 'validatenv';
 import { defineConfig } from 'vite';
+import { z } from 'zod';
 
 // Note: Shopify CLI still provides HOST, which Vite otherwise interprets as its bind address
 // https://github.com/remix-run/remix/issues/2835#issuecomment-1144102176
@@ -58,24 +66,47 @@ const webSocketConfig =
 				clientPort: 443
 			};
 
-export default defineConfig({
-	resolve: {
-		tsconfigPaths: true
-	},
-	server: {
-		allowedHosts: [appHost],
-		cors: {
-			preflightContinue: true
+export default defineConfig(({ mode }) => {
+	return {
+		define: createViteEnvDefine(
+			{
+				...process.env,
+				MODE: mode
+			},
+			{
+				APP_ENVIRONMENT: {
+					envKey: 'MODE',
+					validator: z.enum(['development', 'production', 'test'])
+				},
+				PACKAGE_VERSION: {
+					envKey: 'npm_package_version',
+					validator: stringValidator,
+					preprocess: emptyStringAsUndefined,
+					defaultValue: '0.0.0'
+				}
+			}
+		),
+		resolve: {
+			tsconfigPaths: true
 		},
-		port: environment.appPort,
-		ws: webSocketConfig
-	},
-	plugins: [
-		tanstackStart({
-			srcDirectory: 'src'
-		}),
-		nitro(),
-		viteReact(),
-		tailwindcss()
-	]
+		server: {
+			allowedHosts: [appHost],
+			cors: {
+				preflightContinue: true
+			},
+			port: environment.appPort,
+			ws: webSocketConfig
+		},
+		plugins: [
+			tanstackStart({
+				srcDirectory: 'src',
+				router: {
+					routeFileIgnorePattern: '^(components|hooks|lib)$'
+				}
+			}),
+			nitro(),
+			viteReact(),
+			tailwindcss()
+		]
+	};
 });

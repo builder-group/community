@@ -13,10 +13,6 @@ export const errorHandler: ErrorHandler = (error, context) => {
 
 	let errorResponse: TErrorResponseDetails;
 	if (error instanceof AppError) {
-		if (error.status >= 500) {
-			logger.error(error, { method: context.req.method, path: context.req.path });
-		}
-
 		errorResponse = {
 			code: error.code,
 			status: error.status,
@@ -26,8 +22,6 @@ export const errorHandler: ErrorHandler = (error, context) => {
 			errors: error.errors
 		};
 	} else {
-		logger.error(error, { method: context.req.method, path: context.req.path });
-
 		errorResponse = {
 			code: '#ERR_INTERNAL_SERVER',
 			status: 500,
@@ -36,13 +30,23 @@ export const errorHandler: ErrorHandler = (error, context) => {
 		};
 	}
 
+	let instance = context.req.path;
+	if (errorResponse.status >= 500) {
+		instance = `urn:uuid:${crypto.randomUUID()}`;
+		logger.error(error, {
+			instance,
+			method: context.req.method,
+			path: context.req.path
+		});
+	}
+
 	return context.json(
 		{
 			type: errorResponse.type ?? 'about:blank',
 			title: errorResponse.title,
 			status: errorResponse.status,
 			detail: errorResponse.detail,
-			instance: context.req.path,
+			instance,
 			code: errorResponse.code,
 			...(errorResponse.errors != null ? { errors: errorResponse.errors } : {})
 		} satisfies TErrorResponse,

@@ -14,7 +14,10 @@ export default defineConfig(async () => ({
 	},
 	plugins: [
 		tanstackStart({
-			srcDirectory: 'src'
+			srcDirectory: 'src',
+			router: {
+				routeFileIgnorePattern: '^(components|hooks|lib)$'
+			}
 		}),
 		nitro(),
 		viteReact(),

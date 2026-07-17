@@ -4,10 +4,10 @@ export const ShopPanel: React.FC<TShopPanelProps> = (props) => {
 	const { shop } = props;
 
 	return (
-		<s-stack direction="block" gap="base">
+		<div className="flex flex-col gap-2">
 			<s-text>{shop.name}</s-text>
 			<s-text>{shop.domain}</s-text>
-		</s-stack>
+		</div>
 	);
 };
 

@@ -5,6 +5,7 @@ import {
 	shopifyIframeProtectionMiddleware,
 	shopifySessionTokenMiddleware
 } from '@/modules/shopify';
+import { ErrorPage } from './components';
 
 export const Route = createFileRoute('/embedded')({
 	server: {
@@ -28,7 +29,8 @@ export const Route = createFileRoute('/embedded')({
 			]
 		};
 	},
-	component: LayoutComponent
+	component: LayoutComponent,
+	errorComponent: ErrorPage
 });
 
 function LayoutComponent() {

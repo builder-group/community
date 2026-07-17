@@ -8,10 +8,11 @@ export const getPublicShopifyConfig = createServerFn({ method: 'GET' }).handler(
 	apiKey: shopifyConfig.apiKey
 }));
 
-// Note: Shopify supplies document tokens through `id_token` while App Bridge supplies fresh browser tokens
+// Note: Shopify supplies document tokens through `id_token`, while App Bridge supplies fresh
+// browser tokens
+// https://shopify.dev/docs/api/app-home/apis/authentication-and-data/id-token-api
 export const getShopifySessionToken = createIsomorphicFn()
 	.server(() => extractShopifySessionToken(getRequest()))
-	// https://shopify.dev/docs/api/app-home/apis/authentication-and-data/id-token-api
 	.client(async () => {
 		const sessionToken = await shopify.idToken();
 		return sessionToken.length === 0 ? null : sessionToken;

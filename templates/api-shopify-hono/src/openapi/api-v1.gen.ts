@@ -179,7 +179,10 @@ export interface components {
             status: number;
             /** @example The request could not be validated */
             detail: string;
-            /** @example /v1/shop */
+            /**
+             * @description The request path for client errors or an opaque support reference for server errors
+             * @example urn:uuid:618237e4-46e7-4602-9f0c-5dc1c44a32fd
+             */
             instance: string;
             /** @example #ERR_VALIDATION_FAILED */
             code: string;
