@@ -21,13 +21,11 @@ export const ErrorResponseSchema = z
 		title: z.string().openapi({ example: 'Bad Request' }),
 		status: z.number().int().openapi({ example: 400 }),
 		detail: z.string().openapi({ example: 'The request could not be validated' }),
-		instance: z
-			.string()
-			.openapi({
-				description:
-					'The request path for client errors or an opaque support reference for server errors',
-				example: 'urn:uuid:618237e4-46e7-4602-9f0c-5dc1c44a32fd'
-			}),
+		instance: z.string().openapi({
+			description:
+				'The request path for client errors or an opaque support reference for server errors',
+			example: 'urn:uuid:618237e4-46e7-4602-9f0c-5dc1c44a32fd'
+		}),
 		code: z.string().openapi({ example: '#ERR_VALIDATION_FAILED' }),
 		errors: z.array(ErrorDetailSchema).optional()
 	})

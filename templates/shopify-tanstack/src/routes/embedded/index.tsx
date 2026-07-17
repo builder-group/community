@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { isHttpError } from 'feature-fetch';
 import { apiClient, appConfig, mapApiError } from '@/environment';
+import { ProductPicker } from '@/modules/product';
 import { ShopPanel } from '@/modules/shop';
 import { UserPanel } from '@/modules/user';
 
@@ -51,6 +52,9 @@ function RouteComponent() {
 			</s-section>
 			<s-section heading="User-scoped Admin API">
 				<s-text>{getProductCountLabel(productCount)}</s-text>
+			</s-section>
+			<s-section heading="App Bridge resource picker">
+				<ProductPicker />
 			</s-section>
 		</s-page>
 	);

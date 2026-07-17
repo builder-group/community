@@ -22,9 +22,7 @@ export const ErrorPage: React.FC<ErrorComponentProps> = (props) => {
 			</s-banner>
 			<div className="flex flex-wrap items-center gap-2">
 				<s-badge tone="neutral">Version {appConfig.version}</s-badge>
-				{reference != null ? (
-					<s-badge tone="neutral">Support reference {reference}</s-badge>
-				) : null}
+				{reference != null ? <s-badge tone="neutral">Support reference {reference}</s-badge> : null}
 			</div>
 		</s-page>
 	);
@@ -62,8 +60,7 @@ function getErrorContent(error: unknown): TErrorContent {
 		};
 	}
 
-	const isServiceUnavailable =
-		isHttpError(error) && (error.status === 502 || error.status === 503);
+	const isServiceUnavailable = isHttpError(error) && (error.status === 502 || error.status === 503);
 	if (isServiceUnavailable) {
 		return {
 			heading: 'The app is temporarily unavailable',
