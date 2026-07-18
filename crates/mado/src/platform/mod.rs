@@ -113,10 +113,11 @@ pub(crate) fn call_listener_safe(listener: &Arc<dyn WindowListener>, event: Wind
     }
 }
 
-/// Get all installed applications on the system.
+/// Discover applications in the standard application directories.
 ///
-/// Scans /Applications and ~/Applications directories for installed apps.
-/// Returns apps sorted alphabetically by name.
+/// Scans the standard user, local, and system application directories recursively.
+/// Directories and application bundles that cannot be read are skipped. Returns apps deduplicated
+/// by bundle identifier and sorted alphabetically by name.
 ///
 /// On non-macOS platforms, returns an empty vector.
 pub fn get_installed_apps(config: InstalledAppsConfig) -> Vec<InstalledApp> {
@@ -127,6 +128,20 @@ pub fn get_installed_apps(config: InstalledAppsConfig) -> Vec<InstalledApp> {
     {
         let _ = config;
         return Vec::new();
+    }
+}
+
+/// Resolve an application registered with the operating system by bundle identifier.
+///
+/// On non-macOS platforms, returns `None`.
+pub fn get_installed_app(bundle_id: &str, config: InstalledAppsConfig) -> Option<InstalledApp> {
+    #[cfg(target_os = "macos")]
+    return macos::get_installed_app(bundle_id, config);
+
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = (bundle_id, config);
+        return None;
     }
 }
 

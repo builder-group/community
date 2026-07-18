@@ -20,6 +20,10 @@ fn main() {
         println!("  ... and {} more\n", apps.len() - 10);
     }
 
+    if let Some(preview) = mado::get_installed_app("com.apple.Preview", config) {
+        println!("Resolved {} at {}\n", preview.name, preview.path);
+    }
+
     // Get icon for a specific app
     println!("\n{}", "─".repeat(60));
     println!("\nFetching Finder icon...\n");

@@ -96,16 +96,26 @@ public func madoGetInstalledApps(
         includeAppColor: includeAppColor,
         iconSize: Int(iconSize)
     )
-    let dicts = apps.map { $0.toDictionary() }
+    return toJson(apps.map { $0.toDictionary() })
+}
 
+@_cdecl("mado_get_installed_app")
+public func madoGetInstalledApp(
+    bundleId: SRString,
+    includeIcon: Bool,
+    includeAppColor: Bool,
+    iconSize: Int32
+) -> SRString? {
     guard
-        let jsonData = try? JSONSerialization.data(withJSONObject: dicts),
-        let jsonString = String(data: jsonData, encoding: .utf8)
-    else {
-        return nil
-    }
+        let app = getInstalledApp(
+            bundleId: bundleId.toString(),
+            includeIcon: includeIcon,
+            includeAppColor: includeAppColor,
+            iconSize: Int(iconSize)
+        )
+    else { return nil }
 
-    return SRString(jsonString)
+    return toJson(app.toDictionary())
 }
 
 @_cdecl("mado_get_app_icon")
@@ -145,9 +155,9 @@ public func madoGetWebsiteIcon(
 
 // MARK: - Helpers
 
-private func toJson(_ dict: [String: Any?]) -> SRString? {
+private func toJson(_ object: Any) -> SRString? {
     guard
-        let jsonData = try? JSONSerialization.data(withJSONObject: dict),
+        let jsonData = try? JSONSerialization.data(withJSONObject: object),
         let jsonString = String(data: jsonData, encoding: .utf8)
     else {
         Log.warn("Failed to serialize query response to JSON")

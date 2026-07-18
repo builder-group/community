@@ -7,61 +7,25 @@ func scanInstalledApps(includeIcon: Bool, includeAppColor: Bool, iconSize: Int)
     var apps: [InstalledApp] = []
     var seenBundleIds = Set<String>()
 
-    let applicationPaths = [
-        "/Applications",
-        NSHomeDirectory() + "/Applications",
-    ]
-
-    for basePath in applicationPaths {
-        let fileManager = FileManager.default
+    for appUrl in installedApplicationUrls() {
+        // Note: Application discovery can return duplicates, so deduplicate before per-app work such as loading optional assets
         guard
-            let contents = try? fileManager.contentsOfDirectory(
-                atPath: basePath
-            )
-        else {
-            continue
-        }
+            let bundle = Bundle(url: appUrl),
+            let bundleId = bundle.bundleIdentifier,
+            !seenBundleIds.contains(bundleId)
+        else { continue }
 
-        for item in contents {
-            guard item.hasSuffix(".app") else { continue }
-
-            let appPath = basePath + "/" + item
-            guard let bundle = Bundle(path: appPath),
-                let bundleId = bundle.bundleIdentifier
-            else {
-                continue
-            }
-
-            // Skip duplicates
-            guard !seenBundleIds.contains(bundleId) else { continue }
-            seenBundleIds.insert(bundleId)
-
-            // Get app name from bundle (localized) or fall back to filename
-            let appName =
-                bundle.localizedInfoDictionary?["CFBundleName"] as? String
-                ?? bundle.infoDictionary?["CFBundleName"] as? String
-                ?? bundle.infoDictionary?["CFBundleDisplayName"] as? String
-                ?? String(item.dropLast(4))
-
-            let icon: AppIcon? =
-                includeIcon
-                ? getAppIcon(
-                    forPath: appPath,
-                    forBundleId: bundleId,
-                    size: iconSize,
-                    includeColor: includeAppColor
-                )
-                : nil
-
-            let app = InstalledApp(
+        seenBundleIds.insert(bundleId)
+        apps.append(
+            installedApp(
+                at: appUrl,
+                bundle: bundle,
                 bundleId: bundleId,
-                name: appName,
-                path: appPath,
-                icon: icon
+                includeIcon: includeIcon,
+                includeAppColor: includeAppColor,
+                iconSize: iconSize
             )
-
-            apps.append(app)
-        }
+        )
     }
 
     apps.sort {
@@ -69,6 +33,90 @@ func scanInstalledApps(includeIcon: Bool, includeAppColor: Bool, iconSize: Int)
     }
 
     return apps
+}
+
+private func installedApplicationUrls() -> [URL] {
+    let fileManager = FileManager.default
+    let applicationDirectories = fileManager.urls(
+        for: .applicationDirectory,
+        in: [.userDomainMask, .localDomainMask, .systemDomainMask]
+    )
+    var appUrls: [URL] = []
+
+    for directory in applicationDirectories {
+        // Note: Package descendants can contain embedded helpers that should not appear as installed apps
+        guard
+            let enumerator = fileManager.enumerator(
+                at: directory,
+                includingPropertiesForKeys: nil,
+                options: [.skipsHiddenFiles, .skipsPackageDescendants]
+            )
+        else { continue }
+
+        for case let url as URL in enumerator {
+            guard
+                url.pathExtension.caseInsensitiveCompare("app") == .orderedSame
+            else { continue }
+            appUrls.append(url)
+        }
+    }
+
+    return appUrls
+}
+
+func getInstalledApp(
+    bundleId: String,
+    includeIcon: Bool,
+    includeAppColor: Bool,
+    iconSize: Int
+) -> InstalledApp? {
+    guard
+        let appUrl = NSWorkspace.shared.urlForApplication(
+            withBundleIdentifier: bundleId
+        ),
+        let bundle = Bundle(url: appUrl),
+        let resolvedBundleId = bundle.bundleIdentifier
+    else { return nil }
+
+    return installedApp(
+        at: appUrl,
+        bundle: bundle,
+        bundleId: resolvedBundleId,
+        includeIcon: includeIcon,
+        includeAppColor: includeAppColor,
+        iconSize: iconSize
+    )
+}
+
+private func installedApp(
+    at appUrl: URL,
+    bundle: Bundle,
+    bundleId: String,
+    includeIcon: Bool,
+    includeAppColor: Bool,
+    iconSize: Int
+) -> InstalledApp {
+    let appName =
+        bundle.localizedInfoDictionary?["CFBundleName"] as? String
+        ?? bundle.infoDictionary?["CFBundleName"] as? String
+        ?? bundle.infoDictionary?["CFBundleDisplayName"] as? String
+        ?? appUrl.deletingPathExtension().lastPathComponent
+    let icon: AppIcon? =
+        includeIcon
+        ? getAppIcon(
+            forPath: appUrl.path,
+            forBundleId: bundleId,
+            size: iconSize,
+            includeColor: includeAppColor
+        )
+        : nil
+
+    return InstalledApp(
+        bundleId: bundleId,
+        name: appName,
+        path: appUrl.path,
+        icon: icon
+    )
 }
 
 struct InstalledApp {

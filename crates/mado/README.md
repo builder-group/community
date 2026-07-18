@@ -89,7 +89,7 @@ Pick the API that matches the job:
 
 - Snapshot queries: `get_active_app()`, `get_active_window()`, and their `_with_config` variants
 - Event monitoring: `WindowMonitor` with a `WindowListener`
-- Installed apps: `get_installed_apps()`, `get_app_icon()`, and `get_app_color()`
+- Installed apps: `get_installed_apps()`, `get_installed_app()`, `get_app_icon()`, and `get_app_color()`
 - Website assets: `get_website_icon()`
 - Permission checks: `is_accessibility_trusted()`
 
@@ -247,6 +247,13 @@ fn main() {
         println!("{}: {}", app.name, app.bundle_id);
     }
 
+    if let Some(preview) = mado::get_installed_app(
+        "com.apple.Preview",
+        InstalledAppsConfig::default(),
+    ) {
+        println!("Preview: {}", preview.path);
+    }
+
     let icon = mado::get_app_icon("com.apple.finder", 64, false);
     if let Some(data_url) = &icon.data_url {
         println!("Finder icon: {} bytes", data_url.len());
@@ -257,6 +264,12 @@ fn main() {
     }
 }
 ```
+
+`get_installed_apps()` recursively scans the standard user, local, and system application
+directories while excluding helpers embedded inside application bundles. Unreadable directories
+and invalid application bundles are skipped. Use `get_installed_app()` when you have a bundle
+identifier and need an exact lookup through macOS application registration; this lookup is not
+limited to those scanned directories.
 
 ### Website Icons
 
@@ -348,6 +361,7 @@ Accessibility permission is not required for:
 - `get_active_app()`
 - app activation events when `track_window_changes` and `track_window_bounds_changes` are both `false`
 - `get_installed_apps()`
+- `get_installed_app()`
 - `get_app_icon()` and `get_app_color()`
 - `get_website_icon()`
 

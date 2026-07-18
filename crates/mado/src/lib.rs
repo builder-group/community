@@ -227,10 +227,12 @@ pub fn is_accessibility_trusted() -> bool {
 
 // MARK: - App Information
 
-/// Get all installed applications on the system.
+/// Discover applications in the standard application directories.
 ///
-/// Scans /Applications and ~/Applications directories for installed apps.
-/// Returns apps sorted alphabetically by name.
+/// Scans the standard user, local, and system application directories recursively.
+/// Embedded helper apps inside application bundles are excluded. Directories and application
+/// bundles that cannot be read are skipped. Results are deduplicated by bundle identifier and
+/// sorted alphabetically by name.
 ///
 /// On non-macOS platforms, returns an empty vector.
 ///
@@ -255,6 +257,26 @@ pub fn is_accessibility_trusted() -> bool {
 /// ```
 pub fn get_installed_apps(config: InstalledAppsConfig) -> Vec<InstalledApp> {
     platform::get_installed_apps(config)
+}
+
+/// Resolve an application registered with the operating system by bundle identifier.
+///
+/// Returns `None` on non-macOS platforms, when the bundle identifier cannot be resolved, or when
+/// the native response cannot be decoded.
+///
+/// # Example
+///
+/// ```rust,no_run
+/// let app = mado::get_installed_app(
+///     "com.apple.Preview",
+///     mado::InstalledAppsConfig::default(),
+/// );
+/// if let Some(app) = app {
+///     println!("{}: {}", app.name, app.path);
+/// }
+/// ```
+pub fn get_installed_app(bundle_id: &str, config: InstalledAppsConfig) -> Option<InstalledApp> {
+    platform::get_installed_app(bundle_id, config)
 }
 
 /// Get icon for a specific app by bundle identifier.

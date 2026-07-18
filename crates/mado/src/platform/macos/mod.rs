@@ -146,7 +146,7 @@ extern "C" fn window_event_callback(event_json_ptr: *const SRString) {
     }
 }
 
-/// Get all installed applications on the system.
+/// Discover applications in the standard application directories.
 pub fn get_installed_apps(config: InstalledAppsConfig) -> Vec<InstalledApp> {
     let icon_size = if config.icon_size == 0 {
         32
@@ -164,6 +164,33 @@ pub fn get_installed_apps(config: InstalledAppsConfig) -> Vec<InstalledApp> {
             serde_json::from_str(&json_str).unwrap_or_default()
         }
         None => Vec::new(),
+    }
+}
+
+/// Resolve an application registered with macOS by bundle identifier.
+pub fn get_installed_app(bundle_id: &str, config: InstalledAppsConfig) -> Option<InstalledApp> {
+    let icon_size = if config.icon_size == 0 {
+        32
+    } else {
+        config.icon_size as i32
+    };
+    let bundle_id_sr = SRString::from(bundle_id);
+
+    let json_opt = unsafe {
+        mado_get_installed_app(
+            &bundle_id_sr,
+            config.include_icon,
+            config.include_app_color,
+            icon_size,
+        )
+    };
+
+    match json_opt {
+        Some(json) => {
+            let json_str = json.as_str().to_string();
+            serde_json::from_str(&json_str).ok()
+        }
+        None => None,
     }
 }
 
