@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import type { createApi as createShopifyApi } from '@template/api-shopify-hono';
+import type { createApi } from '@template/api-shopify-hono';
 import { apiConfig } from '@/environment/configs/api.config.server';
 
 export const Route = createFileRoute('/api/$')({
@@ -45,11 +45,11 @@ async function getEmbeddedApi(): Promise<TEmbeddedApi> {
 		return embeddedApi;
 	}
 
-	const { createApi } = await import('@template/api-shopify-hono');
-	embeddedApi ??= createApi();
+	const apiModule = await import('@template/api-shopify-hono');
+	embeddedApi ??= apiModule.createApi();
 	return embeddedApi;
 }
 
 let embeddedApi: TEmbeddedApi | null = null;
 
-type TEmbeddedApi = ReturnType<typeof createShopifyApi>;
+type TEmbeddedApi = ReturnType<typeof createApi>;
