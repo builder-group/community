@@ -1,15 +1,8 @@
 /// <reference types="node" />
 
-import { existsSync } from 'node:fs';
-import { loadEnvFile } from 'node:process';
 import { defineConfig } from 'drizzle-kit';
 import { validateEnv } from 'validatenv';
 import { z } from 'zod';
-
-// eslint-disable-next-line turbo/no-undeclared-env-vars -- Drizzle commands run outside Turbo's task graph
-if (process.env['DATABASE_URL'] == null && existsSync('.env.local')) {
-	loadEnvFile('.env.local');
-}
 
 const environment = validateEnv(process.env, {
 	databaseUrl: {
