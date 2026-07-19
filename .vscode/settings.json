@@ -2,7 +2,6 @@
 	// Editor settings
 	"editor.rulers": [100],
 	"editor.formatOnSave": true,
-	"editor.formatOnPaste": false,
 	"editor.codeActionsOnSave": {
 		"source.fixAll.eslint": "explicit"
 	},
@@ -22,12 +21,7 @@
 
 	// File settings
 	"files.associations": {
-		"*.scss": "postcss",
-		"*.ts": "typescript",
 		"*.tsconfig.json": "jsonc"
-	},
-	"files.watcherExclude": {
-		"**/*.gen.ts": true
 	},
 	"files.readonlyInclude": {
 		"**/*.gen.ts": true
@@ -90,14 +84,16 @@
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 
+	// Markdown settings
+	"[markdown]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[mdx]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+
 	// CSS settings
 	"[css]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-	"[postcss]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-	"[scss]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 
