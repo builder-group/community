@@ -14,7 +14,7 @@ permissions:
 
 env:
   NODE_VERSION: "24"
-  PNPM_VERSION: "11.13.1"
+  PNPM_VERSION: "11.15.0"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
