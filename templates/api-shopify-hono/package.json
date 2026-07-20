@@ -48,7 +48,7 @@
 		"README.md"
 	],
 	"scripts": {
-		"build": "shx rm -rf dist && rollup -c rollup.config.js",
+		"build": "pnpm typecheck && shx rm -rf dist && rollup -c rollup.config.js",
 		"build:prod": "export NODE_ENV=production && pnpm build",
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"db:generate": "node --env-file-if-exists=.env.local node_modules/drizzle-kit/bin.cjs generate --name",
