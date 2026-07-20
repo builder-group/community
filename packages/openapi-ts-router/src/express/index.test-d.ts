@@ -1,7 +1,7 @@
 import type express from 'express';
 import { describe, expectTypeOf, it } from 'vitest';
 import type { components, paths } from '../__tests__/resources/mock-openapi-types';
-import type { TOpenApiSchema } from '../index';
+import type { TOpenApiSchema } from './index';
 import { createExpressOpenApiRouter } from './index';
 
 describe('createExpressOpenApiRouter function', () => {

@@ -1,8 +1,8 @@
 import type { StandardSchemaV1 } from '@standard-schema/spec';
 import type express from 'express';
+import { OpenApiValidationError } from 'openapi-ts-router';
 import { describe, expect, it, vi } from 'vitest';
 import type { paths } from '../__tests__/resources/mock-openapi-types';
-import { OpenApiValidationError } from '../errors';
 import { createExpressOpenApiRouter } from './index';
 
 describe('createExpressOpenApiRouter function', () => {

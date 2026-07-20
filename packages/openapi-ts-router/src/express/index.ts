@@ -1,6 +1,10 @@
 import type express from 'express';
-import { OpenApiValidationError } from '../errors';
-import { formatOpenApiPath, parseParams, validateStandardSchema } from '../lib';
+import {
+	formatOpenApiPath,
+	OpenApiValidationError,
+	parseParams,
+	validateStandardSchema
+} from 'openapi-ts-router';
 import type {
 	TCreateOpenApiRouterOptions,
 	THttpMethod,
@@ -14,6 +18,8 @@ import type {
 	TOpenApiSuccessResponse,
 	TOpenApiValidationIssue
 } from '../types';
+
+export * from 'openapi-ts-router';
 
 /**
  * Wraps an Express router with methods typed from an OpenAPI `paths` object.

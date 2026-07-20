@@ -1,7 +1,12 @@
 import type { Context, Hono } from 'hono';
 import type * as hono from 'hono/types';
-import { OpenApiRouterError, OpenApiValidationError } from '../errors';
-import { formatOpenApiPath, parseParams, validateStandardSchema } from '../lib';
+import {
+	formatOpenApiPath,
+	OpenApiRouterError,
+	OpenApiValidationError,
+	parseParams,
+	validateStandardSchema
+} from 'openapi-ts-router';
 import type {
 	TCreateOpenApiRouterOptions,
 	THttpMethod,
@@ -16,6 +21,8 @@ import type {
 	TOpenApiValidationIssue,
 	TParseParamsInput
 } from '../types';
+
+export * from 'openapi-ts-router';
 
 /**
  * Wraps a Hono app with methods typed from an OpenAPI `paths` object.

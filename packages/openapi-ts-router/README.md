@@ -308,10 +308,11 @@ Global Express middleware and Hono middleware still work normally around the wra
 ## Errors
 
 Validation failures throw `OpenApiValidationError` with `status: 400` and an `issues` array.
+The Express and Hono entrypoints re-export the shared error classes, so `instanceof` works whether errors are imported from the root package or the matching framework entrypoint.
 
 ```ts
 import type { ErrorRequestHandler } from 'express';
-import { OpenApiValidationError } from 'openapi-ts-router';
+import { OpenApiValidationError } from 'openapi-ts-router/express';
 
 export const errorMiddleware: ErrorRequestHandler = (error, _req, res, _next) => {
   if (error instanceof OpenApiValidationError) {
@@ -326,7 +327,7 @@ export const errorMiddleware: ErrorRequestHandler = (error, _req, res, _next) =>
 Hono can handle the same error through `app.onError()`:
 
 ```ts
-import { OpenApiValidationError } from 'openapi-ts-router';
+import { OpenApiValidationError } from 'openapi-ts-router/hono';
 
 app.onError((error, c) => {
   if (error instanceof OpenApiValidationError) {
