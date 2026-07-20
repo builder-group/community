@@ -1,9 +1,8 @@
 {
-	"extends": "@blgc/config/typescript/library",
+	"extends": "@blgc/config/typescript/base",
 	"compilerOptions": {
-		"outDir": "./dist",
-		"rootDir": "./src",
-		"declarationDir": "./dist/types",
+		"lib": ["es2022"],
+		"noEmit": true,
 		"types": ["node"],
 		"paths": {
 			"@/*": ["./src/*"]

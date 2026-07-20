@@ -15,48 +15,20 @@
 	"author": "@bennobuilder",
 	"type": "module",
 	"exports": {
-		".": {
-			"types": "./dist/types/index.d.ts",
-			"source": "./src/index.ts",
-			"import": "./dist/esm/index.js",
-			"require": "./dist/cjs/index.cjs",
-			"default": "./dist/esm/index.js"
-		},
-		"./openapi": {
-			"types": "./dist/types/openapi/index.d.ts",
-			"source": "./src/openapi/index.ts",
-			"import": "./dist/openapi/esm/index.js",
-			"require": "./dist/openapi/cjs/index.cjs",
-			"default": "./dist/openapi/esm/index.js"
-		},
+		"./openapi": "./src/openapi/index.ts",
 		"./openapi.json": "./openapi.json",
 		"./package.json": "./package.json"
 	},
-	"typesVersions": {
-		"*": {
-			".": [
-				"./dist/types/index.d.ts"
-			],
-			"openapi": [
-				"./dist/types/openapi/index.d.ts"
-			]
-		}
-	},
-	"files": [
-		"dist",
-		"openapi.json",
-		"README.md"
-	],
 	"scripts": {
-		"build": "shx rm -rf dist && rollup -c rollup.config.js",
-		"build:prod": "export NODE_ENV=production && pnpm build",
+		"build": "shx rm -rf dist && esbuild src/server.ts --bundle --platform=node --target=node24 --format=esm --packages=external --outfile=dist/server.js",
 		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint .",
 		"openapi:generate": "pnpm run openapi:generate:runtime && pnpm run openapi:generate:types",
 		"openapi:generate:runtime": "tsx scripts/generate-openapi-runtime.ts",
 		"openapi:generate:types": "openapi-typescript openapi.json -o src/openapi/api-v1.gen.ts",
-		"start:dev": "tsx watch --env-file-if-exists=.env.local scripts/dev.ts",
+		"start": "NODE_ENV=production node --env-file-if-exists=.env.local dist/server.js",
+		"start:dev": "tsx watch --env-file-if-exists=.env.local src/server.ts",
 		"test": "echo \"🧪 No tests defined yet.\"",
 		"typecheck": "tsc --noEmit && tsc -p scripts/tsconfig.json",
 		"update:latest": "pnpm update --latest"
@@ -73,8 +45,8 @@
 		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.6",
 		"@types/node": "^26.1.1",
+		"esbuild": "^0.28.1",
 		"openapi-typescript": "^7.13.0",
-		"rollup-presets": "workspace:*",
 		"tsx": "^4.23.1"
 	}
 }

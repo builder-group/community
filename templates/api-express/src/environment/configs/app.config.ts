@@ -1,5 +1,6 @@
-import { emptyStringAsUndefined, validateEnv, validateEnvVar } from 'validatenv';
+import { emptyStringAsUndefined, validateEnv } from 'validatenv';
 import { z } from 'zod';
+import { version as packageVersion } from '../../../package.json';
 
 const environment = validateEnv(process.env, {
 	nodeEnv: {
@@ -16,19 +17,6 @@ const environment = validateEnv(process.env, {
 		preprocess: emptyStringAsUndefined
 	}
 });
-
-const packageVersion = validateEnvVar(
-	{
-		// @ts-expect-error -- Replaced with package.json version by Rollup/esbuild during builds
-		// eslint-disable-next-line turbo/no-undeclared-env-vars -- Replaced with package metadata during builds
-		npm_package_version: process.env.npm_package_version
-	},
-	'npm_package_version',
-	{
-		validator: z.string().min(1),
-		defaultValue: '0.0.0'
-	}
-);
 
 export const appConfig = {
 	name: 'API Express',
