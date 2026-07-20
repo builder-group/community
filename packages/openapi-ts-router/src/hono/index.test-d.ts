@@ -1,8 +1,7 @@
 import type { Hono } from 'hono';
 import { describe, expectTypeOf, it } from 'vitest';
 import type { components, paths } from '../__tests__/resources/mock-openapi-types';
-import type { TOpenApiSchema } from './index';
-import { createHonoOpenApiRouter } from './index';
+import { createHonoOpenApiRouter, type TOpenApiSchema } from './index';
 
 describe('createHonoOpenApiRouter function', () => {
 	describe('route contracts', () => {

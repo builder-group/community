@@ -6,8 +6,9 @@ import { AppError, type TAppErrorCode, type TAppErrorDetail } from './AppError';
 import type { TErrorResponse } from './openapi';
 
 export const errorHandler: ErrorHandler = (error, context) => {
-	// Preserve intentional Hono responses such as redirects and authentication challenges
-	if (error instanceof HTTPException && error.status < 500) {
+	// Note: Preserve intentional Hono responses such as redirects and authentication challenges
+	// https://hono.dev/docs/api/exception#handling-httpexceptions
+	if (error instanceof HTTPException) {
 		return error.getResponse();
 	}
 
