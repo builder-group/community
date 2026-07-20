@@ -1,6 +1,6 @@
 {
 	"name": "openapi-ts-router",
-	"version": "0.4.0",
+	"version": "0.4.1",
 	"private": false,
 	"description": "Typed Express and Hono route helpers backed by OpenAPI paths and Standard Schema validation",
 	"keywords": [
