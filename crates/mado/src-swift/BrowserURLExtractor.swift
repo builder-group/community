@@ -13,8 +13,6 @@ enum BrowserURLExtractor {
             return extractSafariURL(from: windowElement)
         case .firefox:
             return extractFirefoxURL(from: windowElement)
-        case .unknown:
-            return nil
         }
     }
 

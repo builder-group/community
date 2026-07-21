@@ -32,6 +32,11 @@ let package = Package(
                 .product(name: "SwiftRs", package: "swift-rs")
             ],
             path: "src-swift"
-        )
+        ),
+        .testTarget(
+            name: "MadoTests",
+            dependencies: ["Mado"],
+            path: "tests-swift"
+        ),
     ]
 )

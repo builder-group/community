@@ -227,8 +227,13 @@ fn main() -> Result<(), mado::Error> {
 }
 ```
 
-Supported browser families include Chrome, Safari, Brave, Edge, Arc, Opera,
-Firefox, and their common variants.
+Supported browsers are grouped by extraction family:
+
+- Chromium: Google Chrome (Beta, Dev, and Canary), Chromium, Brave (Beta and
+  Nightly), Microsoft Edge (Beta, Dev, and Canary), Opera (Beta, Developer, and
+  GX), Arc, and Helium
+- Safari: Safari (Technology Preview)
+- Firefox: Firefox (Developer Edition and Nightly)
 
 Browser content bounds are best-effort Accessibility data and may be `None`
 when the browser does not expose a top-level web content frame.

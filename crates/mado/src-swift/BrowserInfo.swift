@@ -28,13 +28,18 @@ struct BrowserInfo {
     )
         -> BrowserInfo?
     {
-        guard SupportedBrowsers.isBrowser(bundleId) else { return nil }
+        guard let family = SupportedBrowsers.family(for: bundleId) else {
+            return nil
+        }
+        guard
+            let url = BrowserURLExtractor.extract(
+                family: family,
+                from: windowElement
+            )
+        else {
+            return nil
+        }
 
-        let family = SupportedBrowsers.family(for: bundleId)
-        let url = BrowserURLExtractor.extract(
-            family: family,
-            from: windowElement
-        )
         let contentBounds = BrowserContentBoundsExtractor.extract(
             from: windowElement
         )
@@ -42,10 +47,8 @@ struct BrowserInfo {
             windowTitle: windowTitle ?? getTitle(from: windowElement)
         )
 
-        guard url != nil else { return nil }
-
         let website: WebsiteInfo? =
-            if includeWebsiteInfo, let url = url {
+            if includeWebsiteInfo {
                 WebsiteInfo.extract(from: url)
             } else {
                 nil
