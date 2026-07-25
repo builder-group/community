@@ -41,6 +41,8 @@ module.exports = libraryPreset({
 npm install -D rollup typescript rollup-presets
 ```
 
+`rollup-presets` requires Node.js 24 or newer.
+
 `libraryPreset` expects a `tsconfig.json` in the package. Use `compilerOptions` to override parsed TypeScript options when needed.
 
 ## Usage

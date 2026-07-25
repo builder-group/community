@@ -1,6 +1,6 @@
 {
 	"name": "rollup-presets",
-	"version": "0.0.28",
+	"version": "0.0.30",
 	"private": false,
 	"description": "Rollup presets for TypeScript libraries with package export discovery, ESM/CJS output, and declarations",
 	"keywords": [
@@ -46,7 +46,7 @@
 	},
 	"dependencies": {
 		"@rollup/plugin-commonjs": "^29.0.3",
-		"execa": "9.6.1",
+		"execa": "10.0.0",
 		"picocolors": "^1.1.1",
 		"rollup-plugin-dts": "^6.4.1",
 		"rollup-plugin-esbuild": "^6.2.1",
@@ -57,5 +57,8 @@
 		"@types/node": "^26.1.1",
 		"rollup": "^4.62.2",
 		"type-fest": "^5.8.0"
+	},
+	"engines": {
+		"node": ">=24"
 	}
 }
