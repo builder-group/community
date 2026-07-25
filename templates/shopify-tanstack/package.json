@@ -29,26 +29,26 @@
 	"dependencies": {
 		"@tanstack/react-router": "^1.170.18",
 		"@tanstack/react-router-devtools": "^1.167.0",
-		"@tanstack/react-start": "^1.168.28",
+		"@tanstack/react-start": "^1.168.32",
 		"@template/api-shopify-hono": "workspace:*",
 		"clsx": "^2.1.1",
 		"feature-fetch": "workspace:*",
-		"react": "^19.2.7",
-		"react-dom": "^19.2.7",
+		"react": "^19.2.8",
+		"react-dom": "^19.2.8",
 		"tailwind-merge": "^3.6.0",
 		"validatenv": "workspace:*",
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@shopify/app-bridge-types": "^0.7.1",
+		"@shopify/app-bridge-types": "^0.7.2",
 		"@shopify/polaris-types": "^1.0.7",
-		"@tailwindcss/vite": "^4.3.2",
+		"@tailwindcss/vite": "^4.3.3",
 		"@types/node": "^26.1.1",
 		"@types/react": "^19.2.17",
 		"@types/react-dom": "^19.2.3",
-		"@vitejs/plugin-react": "^6.0.3",
+		"@vitejs/plugin-react": "^6.0.4",
 		"nitro": "3.0.260610-beta",
-		"tailwindcss": "^4.3.2"
+		"tailwindcss": "^4.3.3"
 	}
 }

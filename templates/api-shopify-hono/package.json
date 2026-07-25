@@ -75,7 +75,7 @@
 		"feature-fetch": "workspace:*",
 		"feature-logger": "workspace:*",
 		"gql.tada": "^1.11.2",
-		"hono": "^4.12.30",
+		"hono": "^4.12.31",
 		"pg": "^8.22.0",
 		"tuple-result": "workspace:*",
 		"validatenv": "workspace:*",
@@ -83,7 +83,7 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@hono/node-server": "^2.0.10",
+		"@hono/node-server": "^2.0.11",
 		"@types/node": "^26.1.1",
 		"@types/pg": "^8.20.0",
 		"drizzle-kit": "^0.31.10",

@@ -10,32 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AppsTaplingIndexRouteImport } from './routes/apps.tapling/index'
-import { Route as AppsKairosIndexRouteImport } from './routes/apps.kairos/index'
 import { Route as AppsDeriveIndexRouteImport } from './routes/apps.derive/index'
-import { Route as AppsTaplingHelpIndexRouteImport } from './routes/apps.tapling.help/index'
-import { Route as AppsKairosHelpIndexRouteImport } from './routes/apps.kairos.help/index'
+import { Route as AppsKairosIndexRouteImport } from './routes/apps.kairos/index'
+import { Route as AppsTaplingIndexRouteImport } from './routes/apps.tapling/index'
 import { Route as AppsDeriveHelpIndexRouteImport } from './routes/apps.derive.help/index'
-import { Route as AppsTaplingLegalTermsIndexRouteImport } from './routes/apps.tapling.legal.terms/index'
-import { Route as AppsTaplingLegalPrivacyIndexRouteImport } from './routes/apps.tapling.legal.privacy/index'
-import { Route as AppsKairosLegalTermsIndexRouteImport } from './routes/apps.kairos.legal.terms/index'
-import { Route as AppsKairosLegalPrivacyIndexRouteImport } from './routes/apps.kairos.legal.privacy/index'
-import { Route as AppsDeriveLegalTermsIndexRouteImport } from './routes/apps.derive.legal.terms/index'
+import { Route as AppsKairosHelpIndexRouteImport } from './routes/apps.kairos.help/index'
+import { Route as AppsTaplingHelpIndexRouteImport } from './routes/apps.tapling.help/index'
 import { Route as AppsDeriveLegalPrivacyIndexRouteImport } from './routes/apps.derive.legal.privacy/index'
+import { Route as AppsDeriveLegalTermsIndexRouteImport } from './routes/apps.derive.legal.terms/index'
+import { Route as AppsKairosLegalPrivacyIndexRouteImport } from './routes/apps.kairos.legal.privacy/index'
+import { Route as AppsKairosLegalTermsIndexRouteImport } from './routes/apps.kairos.legal.terms/index'
+import { Route as AppsTaplingLegalPrivacyIndexRouteImport } from './routes/apps.tapling.legal.privacy/index'
+import { Route as AppsTaplingLegalTermsIndexRouteImport } from './routes/apps.tapling.legal.terms/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppsTaplingIndexRoute = AppsTaplingIndexRouteImport.update({
-  id: '/apps/tapling/',
-  path: '/apps/tapling/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppsKairosIndexRoute = AppsKairosIndexRouteImport.update({
-  id: '/apps/kairos/',
-  path: '/apps/kairos/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppsDeriveIndexRoute = AppsDeriveIndexRouteImport.update({
@@ -43,14 +33,14 @@ const AppsDeriveIndexRoute = AppsDeriveIndexRouteImport.update({
   path: '/apps/derive/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppsTaplingHelpIndexRoute = AppsTaplingHelpIndexRouteImport.update({
-  id: '/apps/tapling/help/',
-  path: '/apps/tapling/help/',
+const AppsKairosIndexRoute = AppsKairosIndexRouteImport.update({
+  id: '/apps/kairos/',
+  path: '/apps/kairos/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppsKairosHelpIndexRoute = AppsKairosHelpIndexRouteImport.update({
-  id: '/apps/kairos/help/',
-  path: '/apps/kairos/help/',
+const AppsTaplingIndexRoute = AppsTaplingIndexRouteImport.update({
+  id: '/apps/tapling/',
+  path: '/apps/tapling/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppsDeriveHelpIndexRoute = AppsDeriveHelpIndexRouteImport.update({
@@ -58,28 +48,20 @@ const AppsDeriveHelpIndexRoute = AppsDeriveHelpIndexRouteImport.update({
   path: '/apps/derive/help/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppsTaplingLegalTermsIndexRoute =
-  AppsTaplingLegalTermsIndexRouteImport.update({
-    id: '/apps/tapling/legal/terms/',
-    path: '/apps/tapling/legal/terms/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AppsTaplingLegalPrivacyIndexRoute =
-  AppsTaplingLegalPrivacyIndexRouteImport.update({
-    id: '/apps/tapling/legal/privacy/',
-    path: '/apps/tapling/legal/privacy/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AppsKairosLegalTermsIndexRoute =
-  AppsKairosLegalTermsIndexRouteImport.update({
-    id: '/apps/kairos/legal/terms/',
-    path: '/apps/kairos/legal/terms/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AppsKairosLegalPrivacyIndexRoute =
-  AppsKairosLegalPrivacyIndexRouteImport.update({
-    id: '/apps/kairos/legal/privacy/',
-    path: '/apps/kairos/legal/privacy/',
+const AppsKairosHelpIndexRoute = AppsKairosHelpIndexRouteImport.update({
+  id: '/apps/kairos/help/',
+  path: '/apps/kairos/help/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppsTaplingHelpIndexRoute = AppsTaplingHelpIndexRouteImport.update({
+  id: '/apps/tapling/help/',
+  path: '/apps/tapling/help/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppsDeriveLegalPrivacyIndexRoute =
+  AppsDeriveLegalPrivacyIndexRouteImport.update({
+    id: '/apps/derive/legal/privacy/',
+    path: '/apps/derive/legal/privacy/',
     getParentRoute: () => rootRouteImport,
   } as any)
 const AppsDeriveLegalTermsIndexRoute =
@@ -88,10 +70,28 @@ const AppsDeriveLegalTermsIndexRoute =
     path: '/apps/derive/legal/terms/',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AppsDeriveLegalPrivacyIndexRoute =
-  AppsDeriveLegalPrivacyIndexRouteImport.update({
-    id: '/apps/derive/legal/privacy/',
-    path: '/apps/derive/legal/privacy/',
+const AppsKairosLegalPrivacyIndexRoute =
+  AppsKairosLegalPrivacyIndexRouteImport.update({
+    id: '/apps/kairos/legal/privacy/',
+    path: '/apps/kairos/legal/privacy/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AppsKairosLegalTermsIndexRoute =
+  AppsKairosLegalTermsIndexRouteImport.update({
+    id: '/apps/kairos/legal/terms/',
+    path: '/apps/kairos/legal/terms/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AppsTaplingLegalPrivacyIndexRoute =
+  AppsTaplingLegalPrivacyIndexRouteImport.update({
+    id: '/apps/tapling/legal/privacy/',
+    path: '/apps/tapling/legal/privacy/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AppsTaplingLegalTermsIndexRoute =
+  AppsTaplingLegalTermsIndexRouteImport.update({
+    id: '/apps/tapling/legal/terms/',
+    path: '/apps/tapling/legal/terms/',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -214,11 +214,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/apps/tapling/': {
-      id: '/apps/tapling/'
-      path: '/apps/tapling'
-      fullPath: '/apps/tapling/'
-      preLoaderRoute: typeof AppsTaplingIndexRouteImport
+    '/apps/derive/': {
+      id: '/apps/derive/'
+      path: '/apps/derive'
+      fullPath: '/apps/derive/'
+      preLoaderRoute: typeof AppsDeriveIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/apps/kairos/': {
@@ -228,25 +228,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppsKairosIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/apps/derive/': {
-      id: '/apps/derive/'
-      path: '/apps/derive'
-      fullPath: '/apps/derive/'
-      preLoaderRoute: typeof AppsDeriveIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/apps/tapling/help/': {
-      id: '/apps/tapling/help/'
-      path: '/apps/tapling/help'
-      fullPath: '/apps/tapling/help/'
-      preLoaderRoute: typeof AppsTaplingHelpIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/apps/kairos/help/': {
-      id: '/apps/kairos/help/'
-      path: '/apps/kairos/help'
-      fullPath: '/apps/kairos/help/'
-      preLoaderRoute: typeof AppsKairosHelpIndexRouteImport
+    '/apps/tapling/': {
+      id: '/apps/tapling/'
+      path: '/apps/tapling'
+      fullPath: '/apps/tapling/'
+      preLoaderRoute: typeof AppsTaplingIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/apps/derive/help/': {
@@ -256,32 +242,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppsDeriveHelpIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/apps/tapling/legal/terms/': {
-      id: '/apps/tapling/legal/terms/'
-      path: '/apps/tapling/legal/terms'
-      fullPath: '/apps/tapling/legal/terms/'
-      preLoaderRoute: typeof AppsTaplingLegalTermsIndexRouteImport
+    '/apps/kairos/help/': {
+      id: '/apps/kairos/help/'
+      path: '/apps/kairos/help'
+      fullPath: '/apps/kairos/help/'
+      preLoaderRoute: typeof AppsKairosHelpIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/apps/tapling/legal/privacy/': {
-      id: '/apps/tapling/legal/privacy/'
-      path: '/apps/tapling/legal/privacy'
-      fullPath: '/apps/tapling/legal/privacy/'
-      preLoaderRoute: typeof AppsTaplingLegalPrivacyIndexRouteImport
+    '/apps/tapling/help/': {
+      id: '/apps/tapling/help/'
+      path: '/apps/tapling/help'
+      fullPath: '/apps/tapling/help/'
+      preLoaderRoute: typeof AppsTaplingHelpIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/apps/kairos/legal/terms/': {
-      id: '/apps/kairos/legal/terms/'
-      path: '/apps/kairos/legal/terms'
-      fullPath: '/apps/kairos/legal/terms/'
-      preLoaderRoute: typeof AppsKairosLegalTermsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/apps/kairos/legal/privacy/': {
-      id: '/apps/kairos/legal/privacy/'
-      path: '/apps/kairos/legal/privacy'
-      fullPath: '/apps/kairos/legal/privacy/'
-      preLoaderRoute: typeof AppsKairosLegalPrivacyIndexRouteImport
+    '/apps/derive/legal/privacy/': {
+      id: '/apps/derive/legal/privacy/'
+      path: '/apps/derive/legal/privacy'
+      fullPath: '/apps/derive/legal/privacy/'
+      preLoaderRoute: typeof AppsDeriveLegalPrivacyIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/apps/derive/legal/terms/': {
@@ -291,11 +270,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppsDeriveLegalTermsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/apps/derive/legal/privacy/': {
-      id: '/apps/derive/legal/privacy/'
-      path: '/apps/derive/legal/privacy'
-      fullPath: '/apps/derive/legal/privacy/'
-      preLoaderRoute: typeof AppsDeriveLegalPrivacyIndexRouteImport
+    '/apps/kairos/legal/privacy/': {
+      id: '/apps/kairos/legal/privacy/'
+      path: '/apps/kairos/legal/privacy'
+      fullPath: '/apps/kairos/legal/privacy/'
+      preLoaderRoute: typeof AppsKairosLegalPrivacyIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apps/kairos/legal/terms/': {
+      id: '/apps/kairos/legal/terms/'
+      path: '/apps/kairos/legal/terms'
+      fullPath: '/apps/kairos/legal/terms/'
+      preLoaderRoute: typeof AppsKairosLegalTermsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apps/tapling/legal/privacy/': {
+      id: '/apps/tapling/legal/privacy/'
+      path: '/apps/tapling/legal/privacy'
+      fullPath: '/apps/tapling/legal/privacy/'
+      preLoaderRoute: typeof AppsTaplingLegalPrivacyIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/apps/tapling/legal/terms/': {
+      id: '/apps/tapling/legal/terms/'
+      path: '/apps/tapling/legal/terms'
+      fullPath: '/apps/tapling/legal/terms/'
+      preLoaderRoute: typeof AppsTaplingLegalTermsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

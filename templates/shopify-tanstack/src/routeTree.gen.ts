@@ -9,21 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as EmbeddedRouteRouteImport } from './routes/embedded/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as EmbeddedIndexRouteImport } from './routes/embedded/index'
+import { Route as EmbeddedRouteRouteImport } from './routes/embedded/route'
 import { Route as ApiSplatRouteImport } from './routes/api/$'
-import { Route as EmbeddedAdditionalIndexRouteImport } from './routes/embedded.additional/index'
+import { Route as EmbeddedIndexRouteImport } from './routes/embedded/index'
 import { Route as AuthSessionTokenIndexRouteImport } from './routes/auth.session-token/index'
+import { Route as EmbeddedAdditionalIndexRouteImport } from './routes/embedded.additional/index'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmbeddedRouteRoute = EmbeddedRouteRouteImport.update({
   id: '/embedded',
   path: '/embedded',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ApiSplatRoute = ApiSplatRouteImport.update({
+  id: '/api/$',
+  path: '/api/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmbeddedIndexRoute = EmbeddedIndexRouteImport.update({
@@ -31,20 +36,15 @@ const EmbeddedIndexRoute = EmbeddedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => EmbeddedRouteRoute,
 } as any)
-const ApiSplatRoute = ApiSplatRouteImport.update({
-  id: '/api/$',
-  path: '/api/$',
+const AuthSessionTokenIndexRoute = AuthSessionTokenIndexRouteImport.update({
+  id: '/auth/session-token/',
+  path: '/auth/session-token/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmbeddedAdditionalIndexRoute = EmbeddedAdditionalIndexRouteImport.update({
   id: '/additional/',
   path: '/additional/',
   getParentRoute: () => EmbeddedRouteRoute,
-} as any)
-const AuthSessionTokenIndexRoute = AuthSessionTokenIndexRouteImport.update({
-  id: '/auth/session-token/',
-  path: '/auth/session-token/',
-  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -106,6 +106,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/embedded': {
       id: '/embedded'
       path: '/embedded'
@@ -113,11 +120,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmbeddedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/api/$': {
+      id: '/api/$'
+      path: '/api/$'
+      fullPath: '/api/$'
+      preLoaderRoute: typeof ApiSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/embedded/': {
@@ -127,11 +134,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmbeddedIndexRouteImport
       parentRoute: typeof EmbeddedRouteRoute
     }
-    '/api/$': {
-      id: '/api/$'
-      path: '/api/$'
-      fullPath: '/api/$'
-      preLoaderRoute: typeof ApiSplatRouteImport
+    '/auth/session-token/': {
+      id: '/auth/session-token/'
+      path: '/auth/session-token'
+      fullPath: '/auth/session-token/'
+      preLoaderRoute: typeof AuthSessionTokenIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/embedded/additional/': {
@@ -140,13 +147,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/embedded/additional/'
       preLoaderRoute: typeof EmbeddedAdditionalIndexRouteImport
       parentRoute: typeof EmbeddedRouteRoute
-    }
-    '/auth/session-token/': {
-      id: '/auth/session-token/'
-      path: '/auth/session-token'
-      fullPath: '/auth/session-token/'
-      preLoaderRoute: typeof AuthSessionTokenIndexRouteImport
-      parentRoute: typeof rootRouteImport
     }
   }
 }

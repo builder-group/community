@@ -34,19 +34,19 @@
 		"@tauri-apps/plugin-opener": "^2.5.4",
 		"@tauri-apps/plugin-os": "^2.3.2",
 		"clsx": "^2.1.1",
-		"react": "^19.2.7",
-		"react-dom": "^19.2.7",
+		"react": "^19.2.8",
+		"react-dom": "^19.2.8",
 		"tailwind-merge": "^3.6.0"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@tailwindcss/vite": "^4.3.2",
-		"@tanstack/router-plugin": "^1.168.20",
+		"@tailwindcss/vite": "^4.3.3",
+		"@tanstack/router-plugin": "^1.168.23",
 		"@tauri-apps/cli": "^2.11.4",
 		"@types/node": "^26.1.1",
 		"@types/react": "^19.2.17",
 		"@types/react-dom": "^19.2.3",
-		"@vitejs/plugin-react": "^6.0.3",
-		"tailwindcss": "^4.3.2"
+		"@vitejs/plugin-react": "^6.0.4",
+		"tailwindcss": "^4.3.3"
 	}
 }

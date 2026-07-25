@@ -9,13 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WindowMainSplashIndexRouteImport } from './routes/window.main.splash/index'
-import { Route as WindowMainHomeIndexRouteImport } from './routes/window.main.home/index'
 import { Route as WindowMainAboutIndexRouteImport } from './routes/window.main.about/index'
+import { Route as WindowMainHomeIndexRouteImport } from './routes/window.main.home/index'
+import { Route as WindowMainSplashIndexRouteImport } from './routes/window.main.splash/index'
 
-const WindowMainSplashIndexRoute = WindowMainSplashIndexRouteImport.update({
-  id: '/window/main/splash/',
-  path: '/window/main/splash/',
+const WindowMainAboutIndexRoute = WindowMainAboutIndexRouteImport.update({
+  id: '/window/main/about/',
+  path: '/window/main/about/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WindowMainHomeIndexRoute = WindowMainHomeIndexRouteImport.update({
@@ -23,9 +23,9 @@ const WindowMainHomeIndexRoute = WindowMainHomeIndexRouteImport.update({
   path: '/window/main/home/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WindowMainAboutIndexRoute = WindowMainAboutIndexRouteImport.update({
-  id: '/window/main/about/',
-  path: '/window/main/about/',
+const WindowMainSplashIndexRoute = WindowMainSplashIndexRouteImport.update({
+  id: '/window/main/splash/',
+  path: '/window/main/splash/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -66,11 +66,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/window/main/splash/': {
-      id: '/window/main/splash/'
-      path: '/window/main/splash'
-      fullPath: '/window/main/splash/'
-      preLoaderRoute: typeof WindowMainSplashIndexRouteImport
+    '/window/main/about/': {
+      id: '/window/main/about/'
+      path: '/window/main/about'
+      fullPath: '/window/main/about/'
+      preLoaderRoute: typeof WindowMainAboutIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/window/main/home/': {
@@ -80,11 +80,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WindowMainHomeIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/window/main/about/': {
-      id: '/window/main/about/'
-      path: '/window/main/about'
-      fullPath: '/window/main/about/'
-      preLoaderRoute: typeof WindowMainAboutIndexRouteImport
+    '/window/main/splash/': {
+      id: '/window/main/splash/'
+      path: '/window/main/splash'
+      fullPath: '/window/main/splash/'
+      preLoaderRoute: typeof WindowMainSplashIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

@@ -30,11 +30,11 @@
 		"@size-limit/esbuild-why": "^12.1.0",
 		"@size-limit/preset-small-lib": "^12.1.0",
 		"eslint": "^10.7.0",
-		"prettier": "^3.9.5",
+		"prettier": "^3.9.6",
 		"rollup": "^4.62.2",
 		"shx": "^0.4.0",
 		"size-limit": "^12.1.0",
-		"turbo": "^2.10.5",
+		"turbo": "^2.10.6",
 		"typescript": "^6.0.3",
 		"vite": "^8.1.5",
 		"vitest": "^4.1.10"

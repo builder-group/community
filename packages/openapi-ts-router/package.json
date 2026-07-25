@@ -92,7 +92,7 @@
 		"@types/express": "^5.0.6",
 		"@types/node": "^26.1.1",
 		"express": "^5.2.1",
-		"hono": "^4.12.30",
+		"hono": "^4.12.31",
 		"rollup-presets": "workspace:*",
 		"valibot": "1.4.2"
 	},
