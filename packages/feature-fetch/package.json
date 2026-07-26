@@ -1,6 +1,6 @@
 {
 	"name": "feature-fetch",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"private": false,
 	"description": "Typed fetch client with tuple results and opt-in REST, OpenAPI, GraphQL, retry, and cache features",
 	"keywords": [

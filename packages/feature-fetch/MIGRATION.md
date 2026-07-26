@@ -1,5 +1,14 @@
 # Migration Guide
 
+## 0.1.1 to 0.1.2
+
+`feature-fetch` now re-exports only `Ok`, `Err`, and `TResult`. Import additional tuple utilities directly from `tuple-result`:
+
+```ts
+import { Err, Ok, type TResult } from 'feature-fetch';
+import { mapOk, unwrapOr } from 'tuple-result';
+```
+
 ## 0.0.x to 0.1.0
 
 `feature-fetch` now uses the shared `.with(feature())` composition model from `feature-core`. The core client is still a tuple-result based fetch wrapper, but feature setup, option names, response helpers, and error classes changed.

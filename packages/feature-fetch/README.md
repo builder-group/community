@@ -380,9 +380,15 @@ Three extension points are available in `_config`:
 
 Feature order matters because middleware is applied outermost-first. Install `cacheFeature` before `retryFeature` so cache is checked first and the retry logic only runs on cache misses.
 
+## Results
+
+All request methods return a `tuple-result`.
+
+Use the re-exported `Ok`, `Err`, and `TResult` when implementing custom methods that follow the same result contract. Import additional tuple utilities directly from `tuple-result`.
+
 ## Errors
 
-All request methods return a `tuple-result`. The error branch is one of three types:
+The error branch is one of three types:
 
 | Error          | When it occurs                                                             |
 | -------------- | -------------------------------------------------------------------------- |
