@@ -39,29 +39,30 @@ export const shopifyInstallationAuth = createMiddleware<{
 	}
 
 	context.set('shopifyInstallationCx', shopifyInstallationCx);
-	try {
-		await next();
-	} catch (cause) {
-		if (cause instanceof AppError && cause.code === '#ERR_SHOPIFY_ADMIN_ACCESS_TOKEN_INVALID') {
-			const [isAccessTokenInvalidated, accessTokenInvalidationErr] =
-				await invalidateShopifyOfflineAccessToken(
-					shopifyInstallationCx.installationId,
-					shopifyInstallationCx.accessToken
-				);
-			if (!isAccessTokenInvalidated) {
-				throw accessTokenInvalidationErr;
-			}
 
-			// Note: Do not request automatic replay here because application behavior may already have
-			// produced side effects
-			throw new AppError('#ERR_SHOPIFY_SESSION_TOKEN_INVALID', {
-				status: 401,
-				title: 'Unauthorized',
-				detail: 'The Shopify session must be refreshed',
-				cause
-			});
+	await next();
+
+	// https://hono.dev/docs/api/context#error
+	const error = context.error;
+	const isAdminAccessTokenInvalid =
+		error instanceof AppError && error.code === '#ERR_SHOPIFY_ADMIN_ACCESS_TOKEN_INVALID';
+	if (isAdminAccessTokenInvalid) {
+		const [isAccessTokenInvalidated, accessTokenInvalidationErr] =
+			await invalidateShopifyOfflineAccessToken(
+				shopifyInstallationCx.installationId,
+				shopifyInstallationCx.accessToken
+			);
+		if (!isAccessTokenInvalidated) {
+			throw accessTokenInvalidationErr;
 		}
 
-		throw cause;
+		// Note: Do not request automatic replay here because application behavior may already have
+		// produced side effects
+		throw new AppError('#ERR_SHOPIFY_SESSION_TOKEN_INVALID', {
+			status: 401,
+			title: 'Unauthorized',
+			detail: 'The Shopify session must be refreshed',
+			cause: error
+		});
 	}
 });

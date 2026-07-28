@@ -34,7 +34,14 @@ export const errorHandler: ErrorHandler = (error, context) => {
 	let instance = context.req.path;
 	if (errorResponse.status >= 500) {
 		instance = `urn:uuid:${crypto.randomUUID()}`;
-		logger.error(error, {
+		// Note: Do not pass the Error directly to the logger because nested causes can expose query
+		// parameters, third-party response data and credentials
+		const stack = getErrorStackFrames(error);
+		logger.error({
+			code: errorResponse.code,
+			name: error.name,
+			message: errorResponse.detail,
+			...(stack != null ? { stack } : {}),
 			instance,
 			method: context.req.method,
 			path: context.req.path
@@ -74,3 +81,11 @@ export const notFoundHandler: NotFoundHandler = (context) => {
 		detail: `The path '${context.req.path}' does not exist`
 	});
 };
+
+function getErrorStackFrames(error: Error): string | undefined {
+	const stack = error.stack
+		?.split('\n')
+		.filter((line) => line.trimStart().startsWith('at '))
+		.join('\n');
+	return stack != null && stack.length > 0 ? stack : undefined;
+}
