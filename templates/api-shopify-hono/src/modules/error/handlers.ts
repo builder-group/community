@@ -74,14 +74,6 @@ interface TErrorResponseDetails {
 	errors?: TAppErrorDetail[];
 }
 
-export const notFoundHandler: NotFoundHandler = (context) => {
-	throw new AppError('#ERR_PATH_NOT_FOUND', {
-		status: 404,
-		title: 'Not Found',
-		detail: `The path '${context.req.path}' does not exist`
-	});
-};
-
 function getErrorStackFrames(error: Error): string | undefined {
 	const stack = error.stack
 		?.split('\n')
@@ -89,3 +81,11 @@ function getErrorStackFrames(error: Error): string | undefined {
 		.join('\n');
 	return stack != null && stack.length > 0 ? stack : undefined;
 }
+
+export const notFoundHandler: NotFoundHandler = (context) => {
+	throw new AppError('#ERR_PATH_NOT_FOUND', {
+		status: 404,
+		title: 'Not Found',
+		detail: `The path '${context.req.path}' does not exist`
+	});
+};
