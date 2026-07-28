@@ -1,6 +1,6 @@
 {
 	"name": "@blgc/config",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"private": false,
 	"description": "Shared TypeScript, ESLint, Prettier, and Vitest configs for Builder Group projects",
 	"keywords": [

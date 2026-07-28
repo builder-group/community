@@ -12,6 +12,7 @@
 **/.shopify/
 **/.tanstack/
 **/.turbo/
+**/.vercel/
 **/.vite/
 
 # Test artifacts

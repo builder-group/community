@@ -16,7 +16,14 @@ module.exports = defineConfig([
 	js.configs.recommended,
 	...tseslint.configs.strict,
 	globalIgnores(
-		['**/.turbo/', '**/coverage/', '**/dist/', '**/gen/', '**/*.{gen,generated}.{js,jsx,ts,tsx}'],
+		[
+			'**/.turbo/',
+			'**/.vercel/',
+			'**/coverage/',
+			'**/dist/',
+			'**/gen/',
+			'**/*.{gen,generated}.{js,jsx,ts,tsx}'
+		],
 		'@blgc/config/base/ignores'
 	),
 	{
