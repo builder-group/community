@@ -201,6 +201,11 @@ pub enum WindowEvent {
     ///
     /// A `WindowChanged` event will follow when a window becomes available (if the app has windows).
     AppActivated { app: AppInfo },
+    /// Previously active application terminated.
+    ///
+    /// This event fires when an application activated during the current monitor
+    /// run exits, even when its window destruction notifications are unavailable.
+    AppTerminated { app: AppInfo },
     /// Focused window information became available or changed.
     ///
     /// This event fires when:
@@ -241,6 +246,7 @@ impl WindowEvent {
     pub fn app(&self) -> &AppInfo {
         match self {
             WindowEvent::AppActivated { app } => app,
+            WindowEvent::AppTerminated { app } => app,
             WindowEvent::WindowChanged { window } => &window.app,
             WindowEvent::WindowBoundsChanged { window } => &window.app,
             WindowEvent::WindowMinimized { window } => &window.app,

@@ -32,7 +32,7 @@ pub struct MonitorConfig {
     /// Default: `false`
     pub include_website_info: bool,
 
-    /// Whether to track focused window changes in addition to app activations.
+    /// Whether to track focused window changes in addition to app lifecycle events.
     ///
     /// When `true` (default), fires events for:
     /// - Window focus changes within the same app
@@ -41,8 +41,8 @@ pub struct MonitorConfig {
     /// - Browser information becoming available after the initial window event
     /// - Focused window minimize, restore, and destroy changes
     ///
-    /// App activation events are always emitted. Set this to `false` to disable
-    /// `WindowChanged` events while still receiving `AppActivated` events.
+    /// App activation and termination events are always emitted. Set this to
+    /// `false` to disable `WindowChanged` events while still receiving app events.
     ///
     /// Default: `true`
     pub track_window_changes: bool,

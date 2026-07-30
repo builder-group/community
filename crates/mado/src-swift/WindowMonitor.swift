@@ -27,7 +27,10 @@ final class WindowMonitor: NSObject {
 
     private var isRunning = false
     private var monitorRunLoop: CFRunLoop?
-    private var notificationObserver: NSObjectProtocol?
+
+    private var appActivationObserver: NSObjectProtocol?
+    private var appTerminationObserver: NSObjectProtocol?
+    private var observedAppPIDs: Set<pid_t> = []
 
     // Accessibility observer state
     private var axObservers: [AXObserver] = []
@@ -81,6 +84,7 @@ final class WindowMonitor: NSObject {
 
         setupRunLoopKeepAlive()
         setupAppActivationObserver()
+        setupAppTerminationObserver()
 
         if let app = NSWorkspace.shared.frontmostApplication {
             handleAppActivation(app: app, pid: app.processIdentifier)
@@ -100,10 +104,15 @@ final class WindowMonitor: NSObject {
         removeRunLoopKeepAlive()
         cleanupAccessibilityObservers()
 
-        if let observer = notificationObserver {
+        if let observer = appActivationObserver {
             NSWorkspace.shared.notificationCenter.removeObserver(observer)
         }
-        notificationObserver = nil
+        appActivationObserver = nil
+        if let observer = appTerminationObserver {
+            NSWorkspace.shared.notificationCenter.removeObserver(observer)
+        }
+        appTerminationObserver = nil
+        observedAppPIDs.removeAll()
 
         if let runLoop = monitorRunLoop {
             CFRunLoopStop(runLoop)
@@ -152,14 +161,14 @@ final class WindowMonitor: NSObject {
         }
     }
 
-    // MARK: - App Activation
+    // MARK: - App Lifecycle
 
     /// NSWorkspace notifications arrive on main thread, forwarded to monitor thread via CFRunLoop.
     ///
     /// CFRunLoopPerformBlock ensures state mutations happen on monitor thread, preventing
     /// race conditions when monitor.run() is called from a spawned thread.
     private func setupAppActivationObserver() {
-        notificationObserver = NSWorkspace.shared.notificationCenter
+        appActivationObserver = NSWorkspace.shared.notificationCenter
             .addObserver(
                 forName: NSWorkspace.didActivateApplicationNotification,
                 object: nil,
@@ -188,9 +197,41 @@ final class WindowMonitor: NSObject {
             }
     }
 
+    private func setupAppTerminationObserver() {
+        appTerminationObserver = NSWorkspace.shared.notificationCenter
+            .addObserver(
+                forName: NSWorkspace.didTerminateApplicationNotification,
+                object: nil,
+                queue: OperationQueue.main
+            ) { [weak self] notification in
+                // Note: Sendable warning is safe because:
+                // - monitorRunLoop is only read (never mutated) from main thread
+                // - All state mutations happen on monitor thread via CFRunLoopPerformBlock
+                guard
+                    let runLoop = self?.monitorRunLoop,
+                    let app = notification.userInfo?[
+                        NSWorkspace.applicationUserInfoKey
+                    ] as? NSRunningApplication
+                else { return }
+
+                CFRunLoopPerformBlock(
+                    runLoop,
+                    CFRunLoopMode.defaultMode.rawValue
+                ) { [weak self] in
+                    self?.handleAppTermination(
+                        app: app,
+                        pid: app.processIdentifier
+                    )
+                }
+                CFRunLoopWakeUp(runLoop)
+            }
+    }
+
     /// Handles app activation. Runs on monitor thread (ensured by CFRunLoopPerformBlock).
     private func handleAppActivation(app: NSRunningApplication, pid: pid_t) {
         guard pid != currentPID else { return }
+
+        observedAppPIDs.insert(pid)
 
         cleanupAccessibilityObservers()
         stopWindowPolling()
@@ -209,6 +250,17 @@ final class WindowMonitor: NSObject {
         if let reason = requiredPollingReason(for: windowInfo) {
             startWindowPolling(for: reason)
         }
+    }
+
+    private func handleAppTermination(app: NSRunningApplication, pid: pid_t) {
+        guard observedAppPIDs.remove(pid) != nil else { return }
+
+        sendAppTerminatedEvent(app: app)
+        guard pid == currentPID else { return }
+
+        stopWindowPolling()
+        cleanupAccessibilityObservers()
+        resetDeduplication()
     }
 
     // MARK: - Accessibility Observers
@@ -514,6 +566,16 @@ final class WindowMonitor: NSObject {
         sendEvent(type: EventType.appActivated, data: eventData)
     }
 
+    private func sendAppTerminatedEvent(app: NSRunningApplication) {
+        let appInfo = AppInfo.fromNS(
+            app,
+            includeIcon: includeAppIcon,
+            includeColor: includeAppColor
+        )
+        let eventData: [String: Any] = ["app": appInfo.toDictionary()]
+        sendEvent(type: EventType.appTerminated, data: eventData)
+    }
+
     /// Captures the focused window and emits it unless its observable identity is unchanged.
     private func sendWindowChangedEvent() -> WindowInfo? {
         guard currentPID != 0 else { return nil }
@@ -729,6 +791,7 @@ private enum WindowPollingReason: Equatable {
 
 private enum EventType {
     static let appActivated = "AppActivated"
+    static let appTerminated = "AppTerminated"
     static let windowChanged = "WindowChanged"
     static let windowBoundsChanged = "WindowBoundsChanged"
     static let windowMinimized = "WindowMinimized"

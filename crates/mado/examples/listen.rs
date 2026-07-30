@@ -3,6 +3,7 @@
 //! This example demonstrates event-driven monitoring.
 //! The monitor runs continuously and calls your handler whenever:
 //! - The user switches to a different app (AppActivated event)
+//! - A previously active app terminates (AppTerminated event)
 //! - The focused window changes within the same app (WindowChanged event)
 //! - The focused window title changes (WindowChanged event)
 //! - The focused window is minimized, restored, or destroyed
@@ -17,6 +18,9 @@ impl WindowListener for FocusListener {
         match event {
             WindowEvent::AppActivated { app } => {
                 println!("\n🔄 App Activated:\n{}", app);
+            }
+            WindowEvent::AppTerminated { app } => {
+                println!("\n⏹️ App Terminated:\n{}", app);
             }
             WindowEvent::WindowChanged { window } => {
                 println!("\n🪟 Window Change:\n{}", window);

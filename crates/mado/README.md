@@ -3,7 +3,7 @@
 `mado` is a macOS-focused Rust crate for reading the active app and focused window. It wraps native macOS APIs through Swift, listens to app, window, and bounds changes, and can enrich browser windows with URL and website metadata. Use it in desktop apps, productivity tools, and agents that need current user context.
 
 - Query the active app or focused window when you need a snapshot
-- Listen to app activations, focused-window changes, title/lifecycle changes, and opt-in window bounds changes without continuous polling
+- Listen to app lifecycle, focused-window, title, and opt-in window bounds changes without continuous polling
 - Add browser URLs, content-area bounds, private-mode state, website hostnames, favicons, and favicon-derived colors only when needed
 - Read installed app names, bundle IDs, icons, and display colors without Accessibility permission
 - Handle macOS Accessibility and sandbox limits explicitly
@@ -18,6 +18,9 @@ impl WindowListener for FocusListener {
         match event {
             WindowEvent::AppActivated { app } => {
                 println!("App activated: {:?}", app.name);
+            }
+            WindowEvent::AppTerminated { app } => {
+                println!("App terminated: {:?}", app.name);
             }
             WindowEvent::WindowChanged { window } => {
                 let app_name = window.app.name.as_deref().unwrap_or("Unknown app");
@@ -137,6 +140,9 @@ impl WindowListener for FocusListener {
             WindowEvent::AppActivated { app } => {
                 println!("App: {}", app);
             }
+            WindowEvent::AppTerminated { app } => {
+                println!("App terminated: {}", app);
+            }
             WindowEvent::WindowChanged { window } => {
                 println!("Window: {}", window);
             }
@@ -192,6 +198,7 @@ impl WindowListener for BrowserListener {
         let window = match event {
             WindowEvent::WindowChanged { window } => window,
             WindowEvent::AppActivated { .. } => return,
+            WindowEvent::AppTerminated { .. } => return,
             WindowEvent::WindowBoundsChanged { .. } => return,
             WindowEvent::WindowMinimized { .. } => return,
             WindowEvent::WindowRestored { .. } => return,
@@ -337,6 +344,7 @@ fn main() {
 | Event                 | When it fires                                                               |
 | --------------------- | --------------------------------------------------------------------------- |
 | `AppActivated`        | Immediately when the active app changes, even if no window is available yet |
+| `AppTerminated`       | When an app activated during the monitor run terminates                     |
 | `WindowChanged`       | When focused window information becomes available or changes                 |
 | `WindowBoundsChanged` | When the focused window moves or resizes, if enabled                        |
 | `WindowMinimized`     | When the observed focused window is minimized                               |
@@ -397,7 +405,7 @@ let config = mado::MonitorConfig {
 };
 ```
 
-With this setup, the monitor emits `AppActivated` events only.
+With this setup, the monitor emits app activation and termination events only.
 
 ## Examples
 

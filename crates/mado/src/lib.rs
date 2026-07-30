@@ -32,6 +32,9 @@
 //!             WindowEvent::AppActivated { app } => {
 //!                 println!("App: {}", app);
 //!             }
+//!             WindowEvent::AppTerminated { app } => {
+//!                 println!("App terminated: {}", app);
+//!             }
 //!             WindowEvent::WindowChanged { window } => {
 //!                 println!("Window: {}", window);
 //!             }

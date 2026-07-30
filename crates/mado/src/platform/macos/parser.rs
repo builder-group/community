@@ -34,6 +34,13 @@ pub fn parse_event(json: &str) -> Result<WindowEvent, serde_json::Error> {
             let app: AppInfo = serde_json::from_value(app_data.clone())?;
             return Ok(WindowEvent::AppActivated { app });
         }
+        "AppTerminated" => {
+            let app_data = data
+                .get("app")
+                .ok_or_else(|| serde_json::Error::custom("Missing 'app' field"))?;
+            let app: AppInfo = serde_json::from_value(app_data.clone())?;
+            return Ok(WindowEvent::AppTerminated { app });
+        }
         "WindowChanged" => {
             let window: WindowInfo = serde_json::from_value(data.clone())?;
             return Ok(WindowEvent::WindowChanged { window });
@@ -207,6 +214,25 @@ mod tests {
                 assert_eq!(app.name, Some("Finder".to_string()));
             }
             _ => panic!("Expected AppActivated event"),
+        }
+    }
+
+    #[test]
+    fn parse_event_app_terminated() {
+        let json = r#"{
+            "type": "AppTerminated",
+            "data": {
+                "app": {"pid": 1234, "name": "Firefox", "bundleId": "org.mozilla.firefox", "processPath": null}
+            }
+        }"#;
+
+        let event = parse_event(json).unwrap();
+        match event {
+            WindowEvent::AppTerminated { app } => {
+                assert_eq!(app.pid, 1234);
+                assert_eq!(app.bundle_id, Some("org.mozilla.firefox".to_string()));
+            }
+            _ => panic!("Expected AppTerminated event"),
         }
     }
 

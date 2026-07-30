@@ -25,6 +25,10 @@ impl WindowListener for ThreadedListener {
                 println!("\n[Threaded Monitor] Event #{}: App Activated", count);
                 println!("   App: {}", app);
             }
+            WindowEvent::AppTerminated { app } => {
+                println!("\n[Threaded Monitor] Event #{}: App Terminated", count);
+                println!("   App: {}", app);
+            }
             WindowEvent::WindowChanged { window } => {
                 println!("\n[Threaded Monitor] Event #{}: Window Changed", count);
                 println!("   Window: {}", window);
