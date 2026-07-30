@@ -9,7 +9,8 @@ use crate::types::WindowEvent;
 /// - `AppTerminated`: Fires when a previously active app terminates
 /// - `WindowChanged`: Fires when focused window information becomes available or changes
 /// - `WindowBoundsChanged`: Fires when the focused window moves or resizes, if enabled
-/// - Focused window lifecycle events: Fires when the observed focused window is minimized, restored, or destroyed
+/// - `WindowMinimized` and `WindowRestored`: Fire for the observed focused window
+/// - `WindowDestroyed`: Fires when a window observed while focused is later destroyed
 ///
 /// ## Performance Considerations
 ///
@@ -86,7 +87,8 @@ pub trait WindowListener: Send + Sync {
     /// - A window (`WindowChanged` event) - fires when focused window information becomes
     ///   available or changes
     /// - A window bounds update (`WindowBoundsChanged` event) - fires when enabled and the focused window moves or resizes
-    /// - A focused-window lifecycle update - fires when the observed focused window is minimized, restored, or destroyed
+    /// - A focused-window lifecycle update (`WindowMinimized` or `WindowRestored`)
+    /// - A previously focused window being destroyed (`WindowDestroyed`)
     ///
     /// This includes:
     /// - App switches (always `AppActivated` first, then `WindowChanged` when window is ready)
@@ -95,7 +97,8 @@ pub trait WindowListener: Send + Sync {
     /// - Window title changes (`WindowChanged` only)
     /// - Browser information becoming available (`WindowChanged` only)
     /// - Focused window move/resize changes (`WindowBoundsChanged` only, if enabled)
-    /// - Focused window minimize, restore, or destroy changes when `track_window_changes` is enabled
+    /// - Focused window minimize or restore changes when `track_window_changes` is enabled
+    /// - Previously focused window destruction when `track_window_changes` is enabled
     ///
     /// Use `event.app()` to get app information from any event type.
     ///

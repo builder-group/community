@@ -36,8 +36,14 @@ final class WindowMonitor: NSObject {
     private var axObservers: [AXObserver] = []
     private var currentPID: pid_t = 0
     private var currentObservedWindow: ObservedWindow?
+    private var lifecycleObservedWindows: [LifecycleObservedWindow] = []
     private var hasPendingAppNotificationRegistration = false
-    private var hasPendingWindowObservation = false
+    private var hasPendingFocusedWindowObservation = false
+    private var hasPendingWindowDestructionRegistration: Bool {
+        return lifecycleObservedWindows.contains {
+            $0.hasPendingDestructionRegistration
+        }
+    }
 
     // Polling state for delayed Accessibility notifications, windows and browser information.
     // Some apps cannot register notifications immediately after activation.
@@ -332,24 +338,23 @@ final class WindowMonitor: NSObject {
 
     /// Re-register observers tied to the currently focused window.
     private func registerWindowObservers(observer: AXObserver, pid: pid_t) {
+        retryPendingWindowDestructionObservers(observer: observer)
+
         let app = AXUIElementCreateApplication(pid)
 
         guard let windowElement = getFocusedWindow(from: app) else {
-            hasPendingWindowObservation = true
+            hasPendingFocusedWindowObservation = true
             // Note: Keep the last observed window registered because minimize/close can temporarily leave no focused window
             return
         }
 
+        // Remove only focus-bound notifications. Destruction stays registered because
+        // focus can change before the previous window reports it.
         if let previousWindow = currentObservedWindow?.element {
             AXObserverRemoveNotification(
                 observer,
                 previousWindow,
                 kAXTitleChangedNotification as CFString
-            )
-            AXObserverRemoveNotification(
-                observer,
-                previousWindow,
-                kAXUIElementDestroyedNotification as CFString
             )
             AXObserverRemoveNotification(
                 observer,
@@ -383,14 +388,38 @@ final class WindowMonitor: NSObject {
                     context
                 )
             )
-            registrationResults.append(
-                AXObserverAddNotification(
+
+            if let lifecycleWindowIndex = lifecycleObservedWindows.firstIndex(
+                where: { CFEqual($0.window.element, windowElement) }
+            ) {
+                lifecycleObservedWindows[lifecycleWindowIndex].window =
+                    observedWindow
+            } else {
+                let result = AXObserverAddNotification(
                     observer,
                     windowElement,
                     kAXUIElementDestroyedNotification as CFString,
                     context
                 )
-            )
+                let hasPendingRegistration: Bool?
+                switch result {
+                case .success, .notificationAlreadyRegistered:
+                    hasPendingRegistration = false
+                case .cannotComplete:
+                    hasPendingRegistration = true
+                default:
+                    hasPendingRegistration = nil
+                }
+                if let hasPendingRegistration {
+                    lifecycleObservedWindows.append(
+                        LifecycleObservedWindow(
+                            window: observedWindow,
+                            hasPendingDestructionRegistration:
+                                hasPendingRegistration
+                        )
+                    )
+                }
+            }
         }
         if trackWindowBoundsChanges {
             registrationResults.append(
@@ -411,9 +440,35 @@ final class WindowMonitor: NSObject {
             )
         }
         currentObservedWindow = observedWindow
-        hasPendingWindowObservation = registrationResults.contains(
+        hasPendingFocusedWindowObservation = registrationResults.contains(
             .cannotComplete
         )
+    }
+
+    private func retryPendingWindowDestructionObservers(observer: AXObserver) {
+        guard trackWindowChanges else { return }
+
+        let context = Unmanaged.passUnretained(self).toOpaque()
+        for index in lifecycleObservedWindows.indices.reversed()
+        where lifecycleObservedWindows[index].hasPendingDestructionRegistration
+        {
+            let element = lifecycleObservedWindows[index].window.element
+            let result = AXObserverAddNotification(
+                observer,
+                element,
+                kAXUIElementDestroyedNotification as CFString,
+                context
+            )
+            switch result {
+            case .success, .notificationAlreadyRegistered:
+                lifecycleObservedWindows[index]
+                    .hasPendingDestructionRegistration = false
+            case .cannotComplete:
+                break
+            default:
+                lifecycleObservedWindows.remove(at: index)
+            }
+        }
     }
 
     private func cleanupAccessibilityObservers() {
@@ -430,8 +485,9 @@ final class WindowMonitor: NSObject {
 
         axObservers.removeAll()
         currentObservedWindow = nil
+        lifecycleObservedWindows.removeAll()
         hasPendingAppNotificationRegistration = false
-        hasPendingWindowObservation = false
+        hasPendingFocusedWindowObservation = false
         currentPID = 0
     }
 
@@ -462,21 +518,47 @@ final class WindowMonitor: NSObject {
     ) {
         guard trackWindowChanges else { return }
 
-        guard
-            let observedWindow = currentObservedWindow,
-            CFEqual(element, observedWindow.element)
+        // Note: Destruction can arrive after focus moves, so resolve it from retained observations
+        if type == EventType.windowDestroyed {
+            guard
+                let index = lifecycleObservedWindows.firstIndex(
+                    where: { CFEqual($0.window.element, element) }
+                )
+            else {
+                return
+            }
+
+            let observedWindow = lifecycleObservedWindows[index].window
+            let isCurrentWindow =
+                currentObservedWindow.map {
+                    CFEqual(element, $0.element)
+                } ?? false
+
+            sendEvent(
+                type: type,
+                data: observedWindow.toLifecycleChangeDictionary()
+                    as [String: Any]
+            )
+
+            lifecycleObservedWindows.remove(at: index)
+            if isCurrentWindow {
+                currentObservedWindow = nil
+                handleWindowChange()
+            }
+            return
+        }
+
+        guard let currentObservedWindow,
+            CFEqual(element, currentObservedWindow.element)
         else {
             return
         }
 
         sendEvent(
             type: type,
-            data: observedWindow.toLifecycleChangeDictionary() as [String: Any]
+            data: currentObservedWindow.toLifecycleChangeDictionary()
+                as [String: Any]
         )
-
-        if type == EventType.windowDestroyed {
-            currentObservedWindow = nil
-        }
         handleWindowChange()
     }
 
@@ -561,7 +643,8 @@ final class WindowMonitor: NSObject {
 
             if appNotificationsWerePending
                 || currentReason == .windowUnavailable
-                || hasPendingWindowObservation
+                || hasPendingFocusedWindowObservation
+                || hasPendingWindowDestructionRegistration
                 || currentObservedWindow == nil
             {
                 registerWindowObservers(observer: observer, pid: currentPID)
@@ -653,7 +736,10 @@ final class WindowMonitor: NSObject {
         if hasPendingAppNotificationRegistration {
             return .appNotificationsUnavailable
         }
-        if hasPendingWindowObservation || currentObservedWindow == nil {
+        if hasPendingFocusedWindowObservation
+            || hasPendingWindowDestructionRegistration
+            || currentObservedWindow == nil
+        {
             return .windowUnavailable
         }
         if trackWindowChanges, windowInfo == nil {
@@ -820,6 +906,11 @@ private struct ObservedWindow {
             "app": app.toDictionary(),
         ]
     }
+}
+
+private struct LifecycleObservedWindow {
+    var window: ObservedWindow
+    var hasPendingDestructionRegistration: Bool
 }
 
 private enum WindowPollingReason: Equatable {

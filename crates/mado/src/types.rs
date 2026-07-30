@@ -234,10 +234,11 @@ pub enum WindowEvent {
     /// activates an app before its accessibility observer is installed may only
     /// appear as `AppActivated` followed by `WindowChanged`.
     WindowRestored { window: WindowLifecycleChange },
-    /// Focused window accessibility element was destroyed.
+    /// A window observed while focused was destroyed.
     ///
-    /// This event uses the last cached focused-window data because the
-    /// destroyed accessibility element can no longer be queried safely.
+    /// The window may no longer be focused when this event arrives. The event
+    /// uses cached window data because the destroyed accessibility element can
+    /// no longer be queried safely.
     WindowDestroyed { window: WindowLifecycleChange },
 }
 

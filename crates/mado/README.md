@@ -349,9 +349,9 @@ fn main() {
 | `WindowBoundsChanged` | When the focused window moves or resizes, if enabled                        |
 | `WindowMinimized`     | When the observed focused window is minimized                               |
 | `WindowRestored`      | When the observed focused window is restored from minimized state           |
-| `WindowDestroyed`     | When the observed focused window accessibility element is destroyed         |
+| `WindowDestroyed`     | When a window observed while focused is later destroyed                     |
 
-Lifecycle events only cover windows observed after the active app observer is installed. A restore that activates an app may appear as `AppActivated` followed by `WindowChanged` instead of `WindowRestored`.
+Lifecycle events only cover windows observed after the active app observer is installed. Minimize and restore events refer to the currently focused window. A destruction event may arrive after focus moves to another window and uses cached data for the destroyed window. A restore that activates an app may appear as `AppActivated` followed by `WindowChanged` instead of `WindowRestored`.
 
 Use `event.app()` when all variants should be handled by app identity.
 
