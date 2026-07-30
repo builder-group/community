@@ -201,12 +201,13 @@ pub enum WindowEvent {
     ///
     /// A `WindowChanged` event will follow when a window becomes available (if the app has windows).
     AppActivated { app: AppInfo },
-    /// Window focus or title changed.
+    /// Focused window information became available or changed.
     ///
     /// This event fires when:
     /// - Window focus changes within the same app
     /// - Window title changes (e.g. tab switches in browsers)
     /// - Complete window information becomes available after app activation
+    /// - Browser information becomes available after the initial window event
     ///
     /// Note: App switches are always signaled via `AppActivated` events first.
     WindowChanged { window: WindowInfo },

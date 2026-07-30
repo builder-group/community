@@ -34,18 +34,20 @@ final class WindowMonitor: NSObject {
     private var currentPID: pid_t = 0
     private var currentObservedWindow: ObservedWindow?
 
-    // Polling state for delayed windows.
+    // Polling state for delayed windows and browser information.
     // Apps launched from Dock/Spotlight can take seconds to show their window.
-    // Exponential backoff: 200ms → 400ms → 800ms → 1.6s (capped), max ~30s.
+    // Browsers can take time to expose URL information after a window change.
+    // Exponential backoff: 200ms → 400ms → 800ms → 1.6s (capped)
     private var pollingTimer: CFRunLoopTimer?
+    private var pollingReason: WindowPollingReason?
     private var pollingRetryCount: UInt32 = 0
-    private let maxRetries: UInt32 = 21
     private let baseDelay: Double = 0.2
     private let maxDelay: Double = 1.6
 
     // Deduplication for monitor events.
     private var lastWindowId: UInt32?
     private var lastWindowTitle: String?
+    private var lastWindowBrowserURL: String?
     private var lastBoundsChangeWindowId: UInt32?
     private var lastBoundsChange: [String: Double]?
 
@@ -136,7 +138,8 @@ final class WindowMonitor: NSObject {
             perform: { _ in }
         )
 
-        if let source = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &context) {
+        if let source = CFRunLoopSourceCreate(kCFAllocatorDefault, 0, &context)
+        {
             keepAliveSource = source
             CFRunLoopAddSource(runLoop, source, .defaultMode)
         }
@@ -202,10 +205,9 @@ final class WindowMonitor: NSObject {
 
         guard trackWindowChanges else { return }
 
-        // Try to send window event immediately. If it fails (no window yet),
-        // start polling to wait for window to appear (common when app launched from Dock).
-        if !sendWindowChangedEvent() {
-            startWindowPolling()
+        let windowInfo = sendWindowChangedEvent()
+        if let reason = requiredPollingReason(for: windowInfo) {
+            startWindowPolling(for: reason)
         }
     }
 
@@ -359,7 +361,10 @@ final class WindowMonitor: NSObject {
     fileprivate func handleWindowChange() {
         guard trackWindowChanges else { return }
         stopWindowPolling()
-        _ = sendWindowChangedEvent()
+        let windowInfo = sendWindowChangedEvent()
+        if let reason = requiredPollingReason(for: windowInfo) {
+            startWindowPolling(for: reason)
+        }
     }
 
     /// Called by axCallback when the focused window moves or resizes. Runs on monitor thread.
@@ -381,28 +386,38 @@ final class WindowMonitor: NSObject {
             return
         }
 
+        if type == EventType.windowMinimized
+            || type == EventType.windowDestroyed
+        {
+            stopWindowPolling()
+        }
+
         sendEvent(
             type: type,
             data: observedWindow.toLifecycleChangeDictionary() as [String: Any]
         )
-        if type == EventType.windowDestroyed {
+        if type == EventType.windowRestored {
+            handleWindowChange()
+        } else if type == EventType.windowDestroyed {
             currentObservedWindow = nil
         }
     }
 
     // MARK: - Window Polling
 
-    /// Start polling for window with exponential backoff.
-    /// Needed because some apps (especially launched from Dock) show their window
-    /// seconds after activation. Without polling, we'd miss the WindowChanged event.
-    private func startWindowPolling() {
+    private func startWindowPolling(for reason: WindowPollingReason) {
+        stopWindowPolling()
+        pollingReason = reason
         pollingRetryCount = 0
         scheduleNextWindowPoll()
     }
 
     private func scheduleNextWindowPoll() {
-        guard pollingRetryCount < maxRetries, let runLoop = monitorRunLoop
-        else {
+        guard let pollingReason, let runLoop = monitorRunLoop else {
+            stopWindowPolling()
+            return
+        }
+        guard pollingRetryCount < pollingReason.maxRetries else {
             stopWindowPolling()
             return
         }
@@ -444,12 +459,12 @@ final class WindowMonitor: NSObject {
     }
 
     private func checkWindowPoll() {
-        guard currentPID != 0 else {
+        guard currentPID != 0, let activeReason = pollingReason else {
             stopWindowPolling()
             return
         }
 
-        // Verify app hasn't changed (user might have switched apps during polling)
+        // Note: Stop when the app loses focus because a later activation starts a new poll
         guard let frontmostApp = NSWorkspace.shared.frontmostApplication,
             frontmostApp.processIdentifier == currentPID
         else {
@@ -457,22 +472,24 @@ final class WindowMonitor: NSObject {
             return
         }
 
-        let windowInfo = WindowInfo.fromPID(
-            currentPID,
-            includeAppIcon: includeAppIcon,
-            includeAppColor: includeAppColor,
-            includeBrowserInfo: includeBrowserInfo,
-            includeWebsiteInfo: includeWebsiteInfo
-        )
+        let windowInfo = sendWindowChangedEvent()
+        // Attach observers once the delayed window becomes available
+        if activeReason == .windowUnavailable,
+            windowInfo != nil,
+            let observer = axObservers.first
+        {
+            registerWindowObservers(observer: observer, pid: currentPID)
+        }
 
-        if windowInfo.windowId != nil {
+        guard let nextReason = requiredPollingReason(for: windowInfo) else {
             stopWindowPolling()
-            if let observer = axObservers.first {
-                registerWindowObservers(observer: observer, pid: currentPID)
-            }
-            _ = sendWindowChangedEvent()
-        } else {
+            return
+        }
+
+        if nextReason == activeReason {
             scheduleNextWindowPoll()
+        } else {
+            startWindowPolling(for: nextReason)
         }
     }
 
@@ -482,6 +499,7 @@ final class WindowMonitor: NSObject {
             pollingTimer = nil
         }
         pollingRetryCount = 0
+        pollingReason = nil
     }
 
     // MARK: - Events
@@ -496,10 +514,9 @@ final class WindowMonitor: NSObject {
         sendEvent(type: EventType.appActivated, data: eventData)
     }
 
-    /// Send WindowChanged event if window is valid. Returns true if sent.
-    @discardableResult
-    private func sendWindowChangedEvent() -> Bool {
-        guard currentPID != 0 else { return false }
+    /// Captures the focused window and emits it unless its observable identity is unchanged.
+    private func sendWindowChangedEvent() -> WindowInfo? {
+        guard currentPID != 0 else { return nil }
 
         let windowInfo = WindowInfo.fromPID(
             currentPID,
@@ -510,20 +527,42 @@ final class WindowMonitor: NSObject {
         )
 
         guard let windowId = windowInfo.windowId, windowId != 0 else {
-            return false
+            return nil
         }
 
-        if lastWindowId == windowId, lastWindowTitle == windowInfo.title {
-            return false
+        let browserURL = windowInfo.browser?.url
+        if lastWindowId == windowId,
+            lastWindowTitle == windowInfo.title,
+            lastWindowBrowserURL == browserURL
+        {
+            return windowInfo
         }
 
         lastWindowId = windowId
         lastWindowTitle = windowInfo.title
+        lastWindowBrowserURL = browserURL
         sendEvent(
             type: EventType.windowChanged,
             data: windowInfo.toDictionary() as [String: Any]
         )
-        return true
+        return windowInfo
+    }
+
+    private func requiredPollingReason(for windowInfo: WindowInfo?)
+        -> WindowPollingReason?
+    {
+        guard let windowInfo else {
+            return .windowUnavailable
+        }
+        guard includeBrowserInfo,
+            let bundleId = windowInfo.app.bundleId,
+            SupportedBrowsers.family(for: bundleId) != nil,
+            windowInfo.browser == nil
+        else {
+            return nil
+        }
+
+        return .browserInfoUnavailable
     }
 
     /// Send WindowBoundsChanged event if focused window bounds changed. Returns true if sent.
@@ -580,6 +619,7 @@ final class WindowMonitor: NSObject {
     private func resetDeduplication() {
         lastWindowId = nil
         lastWindowTitle = nil
+        lastWindowBrowserURL = nil
         lastBoundsChangeWindowId = nil
         lastBoundsChange = nil
     }
@@ -668,6 +708,22 @@ private struct ObservedWindow {
             "windowId": windowId,
             "app": app.toDictionary(),
         ]
+    }
+}
+
+private enum WindowPollingReason: Equatable {
+    case windowUnavailable
+    case browserInfoUnavailable
+
+    var maxRetries: UInt32 {
+        switch self {
+        case .windowUnavailable:
+            // Allow ~30s for apps that expose their first focused window late
+            return 21
+        case .browserInfoUnavailable:
+            // Allow ~8s for late browser information because window changes restart polling
+            return 7
+        }
     }
 }
 

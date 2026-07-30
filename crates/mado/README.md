@@ -3,7 +3,7 @@
 `mado` is a macOS-focused Rust crate for reading the active app and focused window. It wraps native macOS APIs through Swift, listens to app, window, and bounds changes, and can enrich browser windows with URL and website metadata. Use it in desktop apps, productivity tools, and agents that need current user context.
 
 - Query the active app or focused window when you need a snapshot
-- Listen to app activations, focused-window changes, title/lifecycle changes, and opt-in window bounds changes without polling
+- Listen to app activations, focused-window changes, title/lifecycle changes, and opt-in window bounds changes without continuous polling
 - Add browser URLs, content-area bounds, private-mode state, website hostnames, favicons, and favicon-derived colors only when needed
 - Read installed app names, bundle IDs, icons, and display colors without Accessibility permission
 - Handle macOS Accessibility and sandbox limits explicitly
@@ -238,6 +238,10 @@ Supported browsers are grouped by extraction family:
 Browser content bounds are best-effort Accessibility data and may be `None`
 when the browser does not expose a top-level web content frame.
 
+Browser information can become available shortly after a focus or title event.
+The monitor retries while the browser remains active and emits another
+`WindowChanged` event when the information becomes available.
+
 ### Installed Apps
 
 Installed app queries do not need Accessibility permission:
@@ -333,7 +337,7 @@ fn main() {
 | Event                 | When it fires                                                               |
 | --------------------- | --------------------------------------------------------------------------- |
 | `AppActivated`        | Immediately when the active app changes, even if no window is available yet |
-| `WindowChanged`       | When focused window data is available, focus changes, or the title changes  |
+| `WindowChanged`       | When focused window information becomes available or changes                 |
 | `WindowBoundsChanged` | When the focused window moves or resizes, if enabled                        |
 | `WindowMinimized`     | When the observed focused window is minimized                               |
 | `WindowRestored`      | When the observed focused window is restored from minimized state           |
@@ -409,7 +413,7 @@ cargo run -p mado --example installed_apps
 
 ### Why does mado use callbacks instead of polling?
 
-Event-driven monitoring reacts to app and window changes as they happen. It avoids keeping a timer alive just to rediscover the same focused window. Use snapshot queries when polling is the better fit for your app.
+Event-driven monitoring reacts to app and window changes as they happen. It only performs bounded polling when focused window or browser information is not ready yet. Use snapshot queries when continuous polling is the better fit for your app.
 
 ### Why are there separate `AppActivated` and `WindowChanged` events?
 

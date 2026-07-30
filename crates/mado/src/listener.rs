@@ -6,7 +6,7 @@ use crate::types::WindowEvent;
 /// window, or focused window bounds change.
 /// The callback receives a `WindowEvent` which can be one of:
 /// - `AppActivated`: Always fires when an app is switched to (even if it has no window yet, e.g. tray apps)
-/// - `WindowChanged`: Fires when window focus/title changes or when a window becomes available
+/// - `WindowChanged`: Fires when focused window information becomes available or changes
 /// - `WindowBoundsChanged`: Fires when the focused window moves or resizes, if enabled
 /// - Focused window lifecycle events: Fires when the observed focused window is minimized, restored, or destroyed
 ///
@@ -78,7 +78,8 @@ pub trait WindowListener: Send + Sync {
     /// The active context can change to:
     /// - An app (`AppActivated` event) - fires immediately when app is activated, even if it has no window yet
     ///   (e.g. tray apps, apps activated via Spotlight/Dock before opening a window)
-    /// - A window (`WindowChanged` event) - fires when window focus/title changes or when window becomes available
+    /// - A window (`WindowChanged` event) - fires when focused window information becomes
+    ///   available or changes
     /// - A window bounds update (`WindowBoundsChanged` event) - fires when enabled and the focused window moves or resizes
     /// - A focused-window lifecycle update - fires when the observed focused window is minimized, restored, or destroyed
     ///
@@ -86,6 +87,7 @@ pub trait WindowListener: Send + Sync {
     /// - App switches (always `AppActivated` first, then `WindowChanged` when window is ready)
     /// - Window switches within the same app (`WindowChanged` only)
     /// - Window title changes (`WindowChanged` only)
+    /// - Browser information becoming available (`WindowChanged` only)
     /// - Focused window move/resize changes (`WindowBoundsChanged` only, if enabled)
     /// - Focused window minimize, restore, or destroy changes when `track_window_changes` is enabled
     ///
