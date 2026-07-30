@@ -36,8 +36,11 @@ final class WindowMonitor: NSObject {
     private var axObservers: [AXObserver] = []
     private var currentPID: pid_t = 0
     private var currentObservedWindow: ObservedWindow?
+    private var hasPendingAppNotificationRegistration = false
+    private var hasPendingWindowObservation = false
 
-    // Polling state for delayed windows and browser information.
+    // Polling state for delayed Accessibility notifications, windows and browser information.
+    // Some apps cannot register notifications immediately after activation.
     // Apps launched from Dock/Spotlight can take seconds to show their window.
     // Browsers can take time to expose URL information after a window change.
     // Exponential backoff: 200ms → 400ms → 800ms → 1.6s (capped)
@@ -244,9 +247,7 @@ final class WindowMonitor: NSObject {
 
         setupAccessibilityObserver(pid: pid)
 
-        guard trackWindowChanges else { return }
-
-        let windowInfo = sendWindowChangedEvent()
+        let windowInfo = trackWindowChanges ? sendWindowChangedEvent() : nil
         if let reason = requiredPollingReason(for: windowInfo) {
             startWindowPolling(for: reason)
         }
@@ -275,31 +276,7 @@ final class WindowMonitor: NSObject {
             return
         }
 
-        let app = AXUIElementCreateApplication(pid)
-        let context = Unmanaged.passUnretained(self).toOpaque()
-
-        AXObserverAddNotification(
-            observer,
-            app,
-            kAXFocusedWindowChangedNotification as CFString,
-            context
-        )
-        if trackWindowChanges {
-            // Note: Minimize/restore are registered on the app, then filtered by the affected window element
-            AXObserverAddNotification(
-                observer,
-                app,
-                kAXWindowMiniaturizedNotification as CFString,
-                context
-            )
-            AXObserverAddNotification(
-                observer,
-                app,
-                kAXWindowDeminiaturizedNotification as CFString,
-                context
-            )
-        }
-
+        registerAppNotifications(observer: observer, pid: pid)
         registerWindowObservers(observer: observer, pid: pid)
 
         if let runLoop = monitorRunLoop {
@@ -313,11 +290,52 @@ final class WindowMonitor: NSObject {
         axObservers.append(observer)
     }
 
+    private func registerAppNotifications(
+        observer: AXObserver,
+        pid: pid_t
+    ) {
+        let app = AXUIElementCreateApplication(pid)
+        let context = Unmanaged.passUnretained(self).toOpaque()
+        var registrationResults = [
+            AXObserverAddNotification(
+                observer,
+                app,
+                kAXFocusedWindowChangedNotification as CFString,
+                context
+            )
+        ]
+        if trackWindowChanges {
+            // Note: Minimize/restore are registered on the app, then filtered by the affected window element
+            registrationResults.append(
+                AXObserverAddNotification(
+                    observer,
+                    app,
+                    kAXWindowMiniaturizedNotification as CFString,
+                    context
+                )
+            )
+            registrationResults.append(
+                AXObserverAddNotification(
+                    observer,
+                    app,
+                    kAXWindowDeminiaturizedNotification as CFString,
+                    context
+                )
+            )
+        }
+
+        // Note: .cannotComplete can be transient during app launch, so it keeps polling active
+        hasPendingAppNotificationRegistration = registrationResults.contains(
+            .cannotComplete
+        )
+    }
+
     /// Re-register observers tied to the currently focused window.
     private func registerWindowObservers(observer: AXObserver, pid: pid_t) {
         let app = AXUIElementCreateApplication(pid)
 
         guard let windowElement = getFocusedWindow(from: app) else {
+            hasPendingWindowObservation = true
             // Note: Keep the last observed window registered because minimize/close can temporarily leave no focused window
             return
         }
@@ -355,51 +373,65 @@ final class WindowMonitor: NSObject {
         )
 
         let context = Unmanaged.passUnretained(self).toOpaque()
+        var registrationResults: [AXError] = []
         if trackWindowChanges {
-            AXObserverAddNotification(
-                observer,
-                windowElement,
-                kAXTitleChangedNotification as CFString,
-                context
+            registrationResults.append(
+                AXObserverAddNotification(
+                    observer,
+                    windowElement,
+                    kAXTitleChangedNotification as CFString,
+                    context
+                )
             )
-            AXObserverAddNotification(
-                observer,
-                windowElement,
-                kAXUIElementDestroyedNotification as CFString,
-                context
+            registrationResults.append(
+                AXObserverAddNotification(
+                    observer,
+                    windowElement,
+                    kAXUIElementDestroyedNotification as CFString,
+                    context
+                )
             )
         }
         if trackWindowBoundsChanges {
-            AXObserverAddNotification(
-                observer,
-                windowElement,
-                kAXMovedNotification as CFString,
-                context
+            registrationResults.append(
+                AXObserverAddNotification(
+                    observer,
+                    windowElement,
+                    kAXMovedNotification as CFString,
+                    context
+                )
             )
-            AXObserverAddNotification(
-                observer,
-                windowElement,
-                kAXResizedNotification as CFString,
-                context
+            registrationResults.append(
+                AXObserverAddNotification(
+                    observer,
+                    windowElement,
+                    kAXResizedNotification as CFString,
+                    context
+                )
             )
         }
         currentObservedWindow = observedWindow
+        hasPendingWindowObservation = registrationResults.contains(
+            .cannotComplete
+        )
     }
 
     private func cleanupAccessibilityObservers() {
-        guard let runLoop = monitorRunLoop else { return }
-
-        // Remove run loop sources (stops all notifications)
-        for observer in axObservers {
-            CFRunLoopRemoveSource(
-                runLoop,
-                AXObserverGetRunLoopSource(observer),
-                .defaultMode
-            )
+        if let runLoop = monitorRunLoop {
+            // Remove run loop sources (stops all notifications)
+            for observer in axObservers {
+                CFRunLoopRemoveSource(
+                    runLoop,
+                    AXObserverGetRunLoopSource(observer),
+                    .defaultMode
+                )
+            }
         }
 
         axObservers.removeAll()
         currentObservedWindow = nil
+        hasPendingAppNotificationRegistration = false
+        hasPendingWindowObservation = false
         currentPID = 0
     }
 
@@ -411,9 +443,8 @@ final class WindowMonitor: NSObject {
 
     /// Called by axCallback on any window change. Runs on monitor thread.
     fileprivate func handleWindowChange() {
-        guard trackWindowChanges else { return }
         stopWindowPolling()
-        let windowInfo = sendWindowChangedEvent()
+        let windowInfo = trackWindowChanges ? sendWindowChangedEvent() : nil
         if let reason = requiredPollingReason(for: windowInfo) {
             startWindowPolling(for: reason)
         }
@@ -438,21 +469,15 @@ final class WindowMonitor: NSObject {
             return
         }
 
-        if type == EventType.windowMinimized
-            || type == EventType.windowDestroyed
-        {
-            stopWindowPolling()
-        }
-
         sendEvent(
             type: type,
             data: observedWindow.toLifecycleChangeDictionary() as [String: Any]
         )
-        if type == EventType.windowRestored {
-            handleWindowChange()
-        } else if type == EventType.windowDestroyed {
+
+        if type == EventType.windowDestroyed {
             currentObservedWindow = nil
         }
+        handleWindowChange()
     }
 
     // MARK: - Window Polling
@@ -511,7 +536,7 @@ final class WindowMonitor: NSObject {
     }
 
     private func checkWindowPoll() {
-        guard currentPID != 0, let activeReason = pollingReason else {
+        guard currentPID != 0, let currentReason = pollingReason else {
             stopWindowPolling()
             return
         }
@@ -524,21 +549,33 @@ final class WindowMonitor: NSObject {
             return
         }
 
-        let windowInfo = sendWindowChangedEvent()
-        // Attach observers once the delayed window becomes available
-        if activeReason == .windowUnavailable,
-            windowInfo != nil,
-            let observer = axObservers.first
-        {
-            registerWindowObservers(observer: observer, pid: currentPID)
+        if axObservers.isEmpty {
+            setupAccessibilityObserver(pid: currentPID)
+        } else if let observer = axObservers.first {
+            let appNotificationsWerePending =
+                hasPendingAppNotificationRegistration
+
+            if appNotificationsWerePending {
+                registerAppNotifications(observer: observer, pid: currentPID)
+            }
+
+            if appNotificationsWerePending
+                || currentReason == .windowUnavailable
+                || hasPendingWindowObservation
+                || currentObservedWindow == nil
+            {
+                registerWindowObservers(observer: observer, pid: currentPID)
+            }
         }
+
+        let windowInfo = trackWindowChanges ? sendWindowChangedEvent() : nil
 
         guard let nextReason = requiredPollingReason(for: windowInfo) else {
             stopWindowPolling()
             return
         }
 
-        if nextReason == activeReason {
+        if nextReason == currentReason {
             scheduleNextWindowPoll()
         } else {
             startWindowPolling(for: nextReason)
@@ -613,18 +650,30 @@ final class WindowMonitor: NSObject {
     private func requiredPollingReason(for windowInfo: WindowInfo?)
         -> WindowPollingReason?
     {
-        guard let windowInfo else {
+        if hasPendingAppNotificationRegistration {
+            return .appNotificationsUnavailable
+        }
+        if hasPendingWindowObservation || currentObservedWindow == nil {
             return .windowUnavailable
         }
-        guard includeBrowserInfo,
+        if trackWindowChanges, windowInfo == nil {
+            return .windowUnavailable
+        }
+        if let windowInfo,
+            currentObservedWindow?.windowId != windowInfo.windowId
+        {
+            return .windowUnavailable
+        }
+        if includeBrowserInfo,
+            let windowInfo,
             let bundleId = windowInfo.app.bundleId,
             SupportedBrowsers.family(for: bundleId) != nil,
             windowInfo.browser == nil
-        else {
-            return nil
+        {
+            return .browserInfoUnavailable
         }
 
-        return .browserInfoUnavailable
+        return nil
     }
 
     /// Send WindowBoundsChanged event if focused window bounds changed. Returns true if sent.
@@ -774,11 +823,15 @@ private struct ObservedWindow {
 }
 
 private enum WindowPollingReason: Equatable {
+    case appNotificationsUnavailable
     case windowUnavailable
     case browserInfoUnavailable
 
     var maxRetries: UInt32 {
         switch self {
+        case .appNotificationsUnavailable:
+            // Allow ~30s for apps whose Accessibility notifications become available late
+            return 21
         case .windowUnavailable:
             // Allow ~30s for apps that expose their first focused window late
             return 21
