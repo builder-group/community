@@ -29,7 +29,7 @@
 	"dependencies": {
 		"@tanstack/react-router": "^1.170.18",
 		"@tanstack/react-router-devtools": "^1.167.0",
-		"@tanstack/react-start": "^1.168.32",
+		"@tanstack/react-start": "^1.168.33",
 		"@template/api-shopify-hono": "workspace:*",
 		"clsx": "^2.1.1",
 		"feature-fetch": "workspace:*",
@@ -44,7 +44,7 @@
 		"@shopify/app-bridge-types": "^0.7.2",
 		"@shopify/polaris-types": "^1.0.7",
 		"@tailwindcss/vite": "^4.3.3",
-		"@types/node": "^26.1.1",
+		"@types/node": "^26.1.2",
 		"@types/react": "^19.2.17",
 		"@types/react-dom": "^19.2.3",
 		"@vitejs/plugin-react": "^6.0.4",

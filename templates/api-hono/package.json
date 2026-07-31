@@ -63,14 +63,14 @@
 	},
 	"dependencies": {
 		"@hono/zod-openapi": "^1.5.1",
-		"hono": "^4.12.31",
+		"hono": "^4.12.32",
 		"validatenv": "workspace:*",
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@hono/node-server": "^2.0.11",
-		"@types/node": "^26.1.1",
+		"@hono/node-server": "^2.0.12",
+		"@types/node": "^26.1.2",
 		"openapi-typescript": "^7.13.0",
 		"rollup-presets": "workspace:*",
 		"tsx": "^4.23.1"
