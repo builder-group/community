@@ -14,7 +14,11 @@ let package = Package(
             name: "Mado",
             type: .static,
             targets: ["Mado"]
-        )
+        ),
+        .executable(
+            name: "browser-ax-probe",
+            targets: ["BrowserAXProbe"]
+        ),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -37,6 +41,10 @@ let package = Package(
             name: "MadoTests",
             dependencies: ["Mado"],
             path: "tests-swift"
+        ),
+        .executableTarget(
+            name: "BrowserAXProbe",
+            path: "tools/browser-ax-probe"
         ),
     ]
 )

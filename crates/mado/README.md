@@ -240,7 +240,7 @@ Supported browsers are grouped by extraction family:
   Nightly), Microsoft Edge (Beta, Dev, and Canary), Opera (Beta, Developer, and
   GX), Arc, and Helium
 - Safari: Safari (Technology Preview)
-- Firefox: Firefox (Developer Edition and Nightly)
+- Gecko: Firefox (Developer Edition and Nightly) and Zen
 
 Browser content bounds are best-effort Accessibility data and may be `None`
 when the browser does not expose a top-level web content frame.
@@ -345,7 +345,7 @@ fn main() {
 | --------------------- | --------------------------------------------------------------------------- |
 | `AppActivated`        | Immediately when the active app changes, even if no window is available yet |
 | `AppTerminated`       | When an app activated during the monitor run terminates                     |
-| `WindowChanged`       | When focused window information becomes available or changes                 |
+| `WindowChanged`       | When focused window information becomes available or changes                |
 | `WindowBoundsChanged` | When the focused window moves or resizes, if enabled                        |
 | `WindowMinimized`     | When the observed focused window is minimized                               |
 | `WindowRestored`      | When the observed focused window is restored from minimized state           |
@@ -442,6 +442,32 @@ The crate compiles with platform stubs, but monitoring and query APIs return `Er
 ### What does `mado` mean?
 
 `mado` means window in Japanese.
+
+## Contributing
+
+### Add Browser Support
+
+`mado` extracts browser metadata only for explicit bundle IDs with observed
+Accessibility behavior. Before adding a browser:
+
+1. Open `https://example.com/` in the browser.
+2. Run the probe from the repository root:
+
+   ```bash
+   cd crates/mado
+   swift run browser-ax-probe /tmp/mado-browser-ax-probe.md
+   ```
+
+3. Focus the browser during the three-second delay. The terminal running the
+   probe needs macOS Accessibility permission.
+4. Compare the generated Markdown with
+   [the existing browser observations](docs/browser-accessibility-extraction.md).
+5. Add the bundle ID to the matching extraction family, update
+   `SupportedBrowsersTests`, and record the new observation.
+
+The specific page content is not relevant to extraction-family matching.
+`example.com` provides a stable top-level HTTPS page without redirects or
+embedded application UI.
 
 ## Resources
 

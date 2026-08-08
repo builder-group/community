@@ -1,65 +1,71 @@
 # Browser Accessibility Extraction
 
-`mado` reads browser metadata through macOS Accessibility without
-browser-specific Automation permissions. Browsers expose active-tab URLs and web
-content bounds through browser chrome, web content, or both.
+`mado` reads active-tab URLs and browser content bounds through macOS
+Accessibility. It uses explicit browser bundle IDs because sharing a browser
+engine does not guarantee the same Accessibility structure.
 
-Extractors use observed browser signals and should prefer missing metadata over
-guessed metadata when a browser shape is unobserved.
+## Extraction Model
 
-## Extraction Signals
+Each supported browser maps to an observed extraction family:
 
-`AXTextField` can expose the URL from browser chrome. `AXWebArea.AXURL` can
-expose the loaded document URL from web content. `AXWebArea` and `AXDocument`
-frames can expose the visible browser content area even when `AXURL` is missing.
-Address bar values and `AXWebArea.AXURL` values can differ in canonical form.
+- `chromium`: tries the browser chrome URL field, then top-level web content
+- `safari`: reads the URL from top-level web content
+- `gecko`: tries the browser chrome URL field, then top-level web content
 
-`BrowserInfo` stays anchored to an active-tab URL. Content bounds are included
-when browser metadata is returned, but mado does not emit browser metadata from
-bounds alone.
+An `AXTextField` can expose the address bar value. Top-level `AXWebArea.AXURL`
+or `AXDocument.AXURL` can expose the loaded document URL. Address bar and
+web-content values can differ in canonical form.
 
-Nested `AXWebArea` nodes can represent embedded content, not the active tab URL
-or viewport. Traversal should stop at the nearest web-content node unless it is
-explicitly looking for nested content.
+Content bounds come from the nearest top-level web-content frame and are
+clipped to the browser window. `BrowserInfo` remains anchored to a URL: bounds
+alone do not produce browser metadata.
 
-## Probe Notes
+Traversal stops at the nearest web-content node. Nested web areas can represent
+embedded pages rather than the active tab or viewport.
 
-The sample URL was:
+## Probe Workflow
 
-```text
-https://www.reddit.com/r/rust/search/?q=accessibility&type=link
+Use `https://example.com/` as the probe page. A stable top-level HTTPS page
+avoids redirects and embedded application UI.
+
+Run the probe from the repository root:
+
+```bash
+cd crates/mado
+swift run browser-ax-probe /tmp/mado-browser-ax-probe.md
 ```
 
-Missing values are observations from this probe, not guarantees for every
-browser version.
+Focus the browser during the three-second delay. The terminal running the probe
+needs macOS Accessibility permission.
 
-## Probe Environment
-
-- Date: 2026-06-23
-- Hardware: MacBook Pro 14-inch, Nov 2023, Apple M3 Pro, 18 GB memory
-- macOS: 26.5.1 (25F80)
+The generated Markdown records the browser identity, URL fields, top-level web
+content, and bounds. Compare those signals with the observations below before
+assigning an extraction family. Prefer missing metadata over guessing when a
+browser exposes a new structure.
 
 ## Summary
 
 | Browser        | Bundle ID                    | Family     | Browser chrome URL field | Web content `AXURL` |
 | -------------- | ---------------------------- | ---------- | ------------------------ | ------------------- |
 | Brave          | `com.brave.Browser`          | `chromium` | Found                    | Found               |
-| Google Chrome  | `com.google.Chrome`          | `chromium` | Found                    | Not observed        |
+| Google Chrome  | `com.google.Chrome`          | `chromium` | Found                    | Found               |
 | Microsoft Edge | `com.microsoft.edgemac`      | `chromium` | Found                    | Found               |
 | Opera          | `com.operasoftware.Opera`    | `chromium` | Found                    | Not observed        |
 | Arc            | `company.thebrowser.Browser` | `chromium` | Found                    | Found               |
 | Safari         | `com.apple.Safari`           | `safari`   | Found                    | Found               |
-| Firefox        | `org.mozilla.firefox`        | `firefox`  | Not observed             | Found               |
+| Firefox        | `org.mozilla.firefox`        | `gecko`    | Not observed             | Found               |
+| Zen            | `app.zen-browser.zen`        | `gecko`    | Not observed             | Found               |
 
-## Brave
+## Browser Observations
+
+### Brave
 
 - Bundle ID: `com.brave.Browser`
-- Family: `chromium`
-- Version: 1.91.171 (Official Build) (arm64), Chromium 149.0.7827.103
+- Extraction family: `chromium`
+- Browser version: 1.91.171, Chromium 149.0.7827.103 (arm64)
+- Tested: 2026-06-23 on macOS 26.5.1 (25F80)
 
-### Browser Chrome URL Field
-
-Found.
+Browser chrome URL field: Found.
 
 ```text
 AXWindow
@@ -73,15 +79,7 @@ AXWindow
 > AXTextField desc="Address and search bar" placeholder="Search Google or type a URL"
 ```
 
-Observed value:
-
-```text
-https://reddit.com/r/rust/search/?q=accessibility&type=link
-```
-
-### Web Content AXURL
-
-Found.
+Web content `AXURL`: Found.
 
 ```text
 AXWindow
@@ -92,28 +90,20 @@ AXWindow
 > AXGroup
 > AXGroup
 > AXGroup
-> AXWebArea title="accessibility - Reddit Search!"
+> AXWebArea
 ```
 
-Observed value:
-
-```text
-https://www.reddit.com/r/rust/search/?q=accessibility&type=link
-```
-
-## Google Chrome
+### Google Chrome
 
 - Bundle ID: `com.google.Chrome`
-- Family: `chromium`
-- Version: 148.0.7778.97 (Official Build) (arm64)
+- Extraction family: `chromium`
+- Browser version: 151.0.7922.108 (7922.108)
+- Tested: 2026-08-08 on macOS 26.5.2 (25F84)
 
-### Browser Chrome URL Field
-
-Found.
+Browser chrome URL field: Found.
 
 ```text
 AXWindow
-> AXGroup
 > AXGroup
 > AXGroup
 > AXGroup
@@ -123,25 +113,27 @@ AXWindow
 > AXTextField desc="Address and search bar" placeholder="Search Google or type a URL"
 ```
 
-Observed value:
+Web content `AXURL`: Found.
 
 ```text
-https://reddit.com/r/rust/search/?q=accessibility&type=link
+AXWindow
+> AXGroup
+> AXGroup
+> AXGroup
+> AXGroup
+> AXGroup
+> AXGroup
+> AXWebArea
 ```
 
-### Web Content AXURL
-
-Not observed.
-
-## Microsoft Edge
+### Microsoft Edge
 
 - Bundle ID: `com.microsoft.edgemac`
-- Family: `chromium`
-- Version: 149.0.4022.80 (Official build) (arm64)
+- Extraction family: `chromium`
+- Browser version: 149.0.4022.80 (arm64)
+- Tested: 2026-06-23 on macOS 26.5.1 (25F80)
 
-### Browser Chrome URL Field
-
-Found.
+Browser chrome URL field: Found.
 
 ```text
 AXWindow
@@ -155,15 +147,7 @@ AXWindow
 > AXTextField desc="Address and search bar" placeholder="Search or enter web address"
 ```
 
-Observed value:
-
-```text
-https://www.reddit.com/r/rust/search/?q=accessibility&type=link
-```
-
-### Web Content AXURL
-
-Found.
+Web content `AXURL`: Found.
 
 ```text
 AXWindow
@@ -176,24 +160,18 @@ AXWindow
 > AXGroup
 > AXGroup
 > AXGroup
-> AXWebArea title="accessibility - Reddit Search!"
+> AXWebArea
 ```
 
-Observed value:
-
-```text
-https://www.reddit.com/r/rust/search/?q=accessibility&type=link
-```
-
-## Opera
+### Opera
 
 - Bundle ID: `com.operasoftware.Opera`
-- Family: `chromium`
-- Version: 132.0.5905.73 (arm64)
+- Extraction family: `chromium`
+- Browser version: 132.0.5905.73 (arm64)
+- Tested: 2026-06-23 on macOS 26.5.1 (25F80)
 
-### Browser Chrome URL Field
-
-Found.
+Browser chrome URL field: Found. Opera exposed a parent address-bar text field
+and a nested field containing the URL.
 
 ```text
 AXWindow
@@ -214,43 +192,23 @@ AXWindow
 > AXTextField desc="Address field" placeholder="Enter search or web address"
 ```
 
-Observed value:
+Web content `AXURL`: Not observed.
 
-```text
-https://www.reddit.com/r/rust/search/?q=accessibility&type=link
-```
-
-Opera exposed a parent address-bar text field and a nested text field that held
-the URL value.
-
-### Web Content AXURL
-
-Not observed.
-
-## Arc
+### Arc
 
 - Bundle ID: `company.thebrowser.Browser`
-- Family: `chromium`
-- Version: 1.152.0 (82313), Chromium Engine 149.0.7827.156
+- Extraction family: `chromium`
+- Browser version: 1.152.0 (82313), Chromium 149.0.7827.156
+- Tested: 2026-06-23 on macOS 26.5.1 (25F80)
 
-### Browser Chrome URL Field
-
-Found.
+Browser chrome URL field: Found.
 
 ```text
-AXWindow title="Space 1"
+AXWindow
 > AXTextField placeholder="Search or Enter URL..."
 ```
 
-Observed value:
-
-```text
-https://www.reddit.com/r/rust/search/?q=accessibility&type=link
-```
-
-### Web Content AXURL
-
-Found.
+Web content `AXURL`: Found.
 
 ```text
 AXWindow
@@ -258,21 +216,14 @@ AXWindow
 > AXWebArea
 ```
 
-Observed value:
-
-```text
-https://www.reddit.com/r/rust/search/?q=accessibility&type=link
-```
-
-## Safari
+### Safari
 
 - Bundle ID: `com.apple.Safari`
-- Family: `safari`
-- Version: 26.5 (21624.2.5.11.4)
+- Extraction family: `safari`
+- Browser version: 26.5.2 (21624.2.5.11.8)
+- Tested: 2026-08-08 on macOS 26.5.2 (25F84)
 
-### Browser Chrome URL Field
-
-Found.
+Browser chrome URL field: Found.
 
 ```text
 AXWindow
@@ -281,15 +232,7 @@ AXWindow
 > AXTextField desc="smart search field"
 ```
 
-Observed value:
-
-```text
-https://www.reddit.com/r/rust/search/?q=accessibility&type=link
-```
-
-### Web Content AXURL
-
-Found.
+Web content `AXURL`: Found.
 
 ```text
 AXWindow
@@ -298,54 +241,45 @@ AXWindow
 > AXGroup
 > AXGroup
 > AXScrollArea
-> AXWebArea desc="accessibility - Reddit Search!"
+> AXWebArea
 ```
 
-Observed value:
-
-```text
-https://www.reddit.com/r/rust/search/?q=accessibility&type=link
-```
-
-## Firefox
+### Firefox
 
 - Bundle ID: `org.mozilla.firefox`
-- Family: `firefox`
-- Version: 152.0.1 (aarch64)
+- Extraction family: `gecko`
+- Browser version: 153.0.3 (15326.8.3)
+- Tested: 2026-08-08 on macOS 26.5.2 (25F84)
 
-### Browser Chrome URL Field
+Browser chrome URL field: Not observed.
 
-Not observed.
-
-### Web Content AXURL
-
-Found.
+Web content `AXURL`: Found.
 
 ```text
 AXWindow
-> AXGroup desc="accessibility - Reddit Search!"
+> AXGroup
 > AXGroup id="tabbrowser-tabpanels"
 > AXGroup id="panel-3-1"
 > AXScrollArea
-> AXWebArea desc="accessibility - Reddit Search!"
+> AXWebArea
 ```
 
-Observed value:
+### Zen
 
-```text
-https://www.reddit.com/r/rust/search/?q=accessibility&type=link
-```
+- Bundle ID: `app.zen-browser.zen`
+- Extraction family: `gecko`
+- Browser version: 1.21.12b (126.8.7)
+- Tested: 2026-08-08 on macOS 26.5.2 (25F84)
 
-Firefox also exposed nested `AXWebArea` nodes for embedded page content:
+Browser chrome URL field: Not observed.
+
+Web content `AXURL`: Found.
 
 ```text
 AXWindow
-> AXGroup desc="accessibility - Reddit Search!"
+> AXGroup
 > AXGroup id="tabbrowser-tabpanels"
-> AXGroup id="panel-3-1"
+> AXGroup id="panel-3-4"
 > AXScrollArea
-> AXWebArea desc="accessibility - Reddit Search!"
-> ...
-> AXScrollArea id="gsi_..."
-> AXWebArea desc="Sign In - Google Accounts"
+> AXWebArea
 ```
