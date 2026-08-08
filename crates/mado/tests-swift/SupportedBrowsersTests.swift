@@ -14,7 +14,11 @@ final class SupportedBrowsersTests: XCTestCase {
         )
         XCTAssertEqual(
             SupportedBrowsers.family(for: "org.mozilla.firefox"),
-            .firefox
+            .gecko
+        )
+        XCTAssertEqual(
+            SupportedBrowsers.family(for: "app.zen-browser.zen"),
+            .gecko
         )
     }
 

@@ -1,6 +1,6 @@
 enum SupportedBrowsers {
     private static let familiesByBundleId: [String: BrowserFamily] = [
-        // Chromium-based
+        // Chromium family
         "com.google.chrome": .chromium,
         "com.google.chrome.beta": .chromium,
         "com.google.chrome.dev": .chromium,
@@ -24,10 +24,11 @@ enum SupportedBrowsers {
         "com.apple.safari": .safari,
         "com.apple.safaritechnologypreview": .safari,
 
-        // Firefox
-        "org.mozilla.firefox": .firefox,
-        "org.mozilla.firefoxdeveloperedition": .firefox,
-        "org.mozilla.nightly": .firefox,
+        // Gecko family
+        "org.mozilla.firefox": .gecko,
+        "org.mozilla.firefoxdeveloperedition": .gecko,
+        "org.mozilla.nightly": .gecko,
+        "app.zen-browser.zen": .gecko,
     ]
 
     /// Returns the extraction family for an explicitly supported browser.
@@ -39,5 +40,5 @@ enum SupportedBrowsers {
 enum BrowserFamily: Equatable {
     case chromium
     case safari
-    case firefox
+    case gecko
 }

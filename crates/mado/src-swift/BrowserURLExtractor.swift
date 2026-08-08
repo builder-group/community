@@ -11,8 +11,8 @@ enum BrowserURLExtractor {
             return extractChromiumURL(from: windowElement)
         case .safari:
             return extractSafariURL(from: windowElement)
-        case .firefox:
-            return extractFirefoxURL(from: windowElement)
+        case .gecko:
+            return extractGeckoURL(from: windowElement)
         }
     }
 
@@ -43,9 +43,9 @@ enum BrowserURLExtractor {
         return findTopLevelWebContentURL(in: windowElement)
     }
 
-    // MARK: - Firefox
+    // MARK: - Gecko
 
-    private static func extractFirefoxURL(from windowElement: AXUIElement)
+    private static func extractGeckoURL(from windowElement: AXUIElement)
         -> String?
     {
         if let url = findNormalizedURLBarValue(
