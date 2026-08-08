@@ -1,6 +1,6 @@
 {
 	"name": "@blgc/config",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"private": false,
 	"description": "Shared TypeScript, ESLint, Prettier, and Vitest configs for Builder Group projects",
 	"keywords": [
@@ -57,8 +57,6 @@
 		"@eslint/js": "^10.0.1",
 		"@ianvs/prettier-plugin-sort-imports": "^4.7.1",
 		"@next/eslint-plugin-next": "^16.2.12",
-		"@typescript-eslint/eslint-plugin": "^8.65.0",
-		"@typescript-eslint/parser": "^8.65.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-only-warn": "^1.2.1",
 		"eslint-plugin-react-hooks": "^7.1.1",

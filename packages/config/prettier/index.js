@@ -49,8 +49,7 @@ module.exports = {
 		// Internal packages
 		'^@/',
 		// Relative imports
-		'^[../]',
-		'^[./]'
+		'^[.]'
 	],
 	importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
 	importOrderTypeScriptVersion: '6.0.0'
