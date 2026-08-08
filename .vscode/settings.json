@@ -97,6 +97,9 @@
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 
+	// Swift settings
+	"swift.autoGenerateLaunchConfigurations": false,
+
 	// Rust settings
 	"[rust]": {
 		"editor.defaultFormatter": "rust-lang.rust-analyzer"
