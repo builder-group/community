@@ -31,9 +31,8 @@ module.exports = {
 	// Note: Resolve plugin paths from this package so consumers do not need to install them directly
 	plugins: [
 		require.resolve('@ianvs/prettier-plugin-sort-imports'),
-		require.resolve('prettier-plugin-css-order'),
 		require.resolve('prettier-plugin-packagejson'),
-		// Note: Tailwind must be loaded last to compose with other Prettier plugins
+		// Note: Tailwind must load last to compose with other Prettier plugins
 		// https://github.com/tailwindlabs/prettier-plugin-tailwindcss#compatibility-with-other-prettier-plugins
 		require.resolve('prettier-plugin-tailwindcss')
 	],

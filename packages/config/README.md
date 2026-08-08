@@ -16,7 +16,7 @@
 
 `@blgc/config` is Builder Group's shared config package for TypeScript projects. It keeps formatting, linting, type checking, and Node test defaults in one versioned dependency, so packages can share strict tool behavior without copying config files.
 
-- Format code, Markdown, imports, CSS declarations, Tailwind classes, and package manifests with one Prettier config
+- Format code, Markdown, imports, Tailwind classes, and package manifests with one Prettier config
 - Pick flat ESLint presets for libraries, React, Next.js, and TanStack projects
 - Extend TypeScript presets for bundled libraries, DOM libraries, Node 20, React, Next.js, and TanStack
 - Reuse a Vitest node preset with TypeScript path resolution and coverage reporters
@@ -103,7 +103,6 @@ The config includes:
 
 - LF line endings, tabs for code files, two-space Markdown indentation, single quotes, semicolons, and `printWidth: 100`
 - import sorting through `@ianvs/prettier-plugin-sort-imports`
-- CSS declaration ordering through `prettier-plugin-css-order`
 - package.json ordering through `prettier-plugin-packagejson`
 - Tailwind class sorting through `prettier-plugin-tailwindcss`
 
