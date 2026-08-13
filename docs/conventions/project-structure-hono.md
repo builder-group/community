@@ -42,6 +42,8 @@ Keep one top-level `environment/`. Organize its contents by app-wide infrastruct
 Owns bounded product, system, or integration behavior.
 
 - Keep setup specific to a behavior inside its owning module
+- Keep workflows that coordinate operations or resources in their owning module
+- Use the module entry point across module boundaries, and use direct imports within a module
 - Do not depend on routes or app assembly
 
 ### `lib/`
@@ -83,4 +85,4 @@ src/
 └── openapi/
 ```
 
-App config or a database pool intentionally shared across the API belongs in `environment/`. State, configuration, clients, and caches scoped to one module remain with that module. A validation helper used by several unrelated modules can remain in `lib/`.
+App config or a database pool intentionally shared across the API belongs in `environment/`. State, configuration, clients, repositories, and caches scoped to one module remain with that module. A validation helper used by several unrelated modules can remain in `lib/`.

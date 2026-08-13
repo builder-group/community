@@ -11,6 +11,7 @@ src/
 ├── routes/       # Route entry points and screen composition
 ├── environment/  # App-wide config, bindings, and runtime resources
 ├── modules/      # Bounded product, system, or integration behavior
+├── components/   # Shared UI building blocks
 └── lib/          # Thin shared helpers
 ```
 
@@ -38,7 +39,14 @@ Keep one top-level `environment/`. Organize its contents by app-wide infrastruct
 Owns bounded product, system, or integration behavior.
 
 - Keep setup specific to a behavior inside its owning module
+- Use the module entry point across module boundaries, and use direct imports within a module
 - Do not depend on routes
+
+### `components/`
+
+Owns reusable UI building blocks that are shared across routes or modules.
+
+- Keep `components/` thin, and move a component into a module when it only serves that area
 
 ### `lib/`
 
@@ -62,8 +70,10 @@ src/
 │   ├── account/
 │   ├── authentication/
 │   └── settings/
+├── components/
+│   └── Button.tsx
 └── lib/
     └── cn.ts
 ```
 
-App config or an API client intentionally shared across the app belongs in `environment/`. State, configuration, clients, and providers scoped to one module remain with that module. A class-name helper used by several unrelated modules can remain in `lib/`.
+App config or an API client intentionally shared across the app belongs in `environment/`. State, configuration, clients, and providers scoped to one module remain with that module. A UI component shared across unrelated modules can remain in `components/`. A class-name helper used by several unrelated modules can remain in `lib/`.
