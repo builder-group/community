@@ -41,7 +41,7 @@ interface TSummaryInput {
 }
 
 function normalizeValue(value: string | null): string | null {
-  return value == null ? null : value.trim();
+  return value != null ? value.trim() : null;
 }
 
 function formatSummary(value: string, label: string): string {
@@ -60,7 +60,7 @@ interface TSummaryInput {
 const SUMMARY_SEPARATOR = ': ';
 
 function normalizeValue(value: string | null): string | null {
-  return value == null ? null : value.trim();
+  return value != null ? value.trim() : null;
 }
 
 export function buildSummary(input: TSummaryInput): string {

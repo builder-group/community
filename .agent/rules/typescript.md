@@ -12,9 +12,10 @@ This file covers TypeScript- and TSX-specific enforcement.
   - `S*` for schemas
 - Prefer function declarations for named functions; use arrow functions for callbacks and inline functions
 - For React components, follow `.agent/rules/react.md` instead of the function-declaration default
-- Use explicit null checks with `== null` when handling both `null` and `undefined`
+- Use `== null` for absence and `!= null` for presence when handling both `null` and `undefined`
 - Prefer `??` over `||` for fallback values
 - Keep conditionals flat; use guard clauses for invalid states
+- Prefer the meaningful branch first in simple ternaries when the condition remains direct
 - Prefer named booleans for complex checks
 - Use `!items.length` for empty checks and `items.length > 0` for non-empty checks
 - Prefer inline defaults for simple option values instead of extracting a constant too early
