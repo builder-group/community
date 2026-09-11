@@ -71,7 +71,7 @@ fn main() -> Result<(), mado::Error> {
 
 ```toml
 [dependencies]
-mado = "0.0.18"
+mado = "0.0.19"
 ```
 
 ## Requirements
@@ -286,6 +286,7 @@ Supported browsers are grouped by extraction family:
 The loaded document URL takes precedence over the address bar, which may contain
 an uncommitted edit. Chromium and Gecko can fall back to a known unfocused address
 bar. Safari cannot use this fallback: its shortened address may omit the page path.
+Its native Start Page is reported as `about:blank` when no web document is present.
 Missing or unreadable URLs produce `browser: None`, including for supported browsers.
 A missing value does not imply navigation to an empty or allowed page.
 

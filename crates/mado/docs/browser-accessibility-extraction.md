@@ -20,14 +20,17 @@ identifiers identify known address bars independently of localized labels.
 
 Safari's unfocused address bar can expose only a hostname: `example.com/articles`
 may appear as `example.com`. Using it would discard path information, so Safari
-requires the document URL. Chromium and Gecko fallback also requires the address
+requires the document URL for websites. A native Start Page with no web document
+is reported as `about:blank`. Missing metadata alone does not establish a Start Page.
+Chromium and Gecko fallback also requires the address
 bar to report that it is not focused. An unreadable focus attribute produces no
 fallback URL rather than treating an edit as the loaded page.
 
 The monitor observes address-bar value changes as well as window titles to detect
 same-title tab switches. An address-bar notification does not establish that the
 document URL has changed. Optional reconciliation recovers updates when no later
-notification arrives. A browser that exposes neither URL source produces no browser metadata.
+notification arrives. If neither a URL nor a known internal page is available,
+extraction produces no browser metadata.
 
 Content bounds come from the nearest top-level web-content frame and are
 clipped to the browser window. `BrowserInfo` remains anchored to a URL: bounds
@@ -256,6 +259,12 @@ AXWindow
 > AXScrollArea
 > AXWebArea
 ```
+
+The normal and private Start Page expose an `AXList` with
+`AXIdentifier="StartPageCollectionView"` and no web document (observed on macOS
+26.6.2). The collection can coexist with web content during navigation, so its
+presence alone does not establish that the Start Page is active. Window titles
+can also lag behind the loaded page and are not used for this decision.
 
 ### Firefox
 
