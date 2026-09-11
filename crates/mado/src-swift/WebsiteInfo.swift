@@ -73,22 +73,7 @@ private func loadWebsiteAssets(
         includeColor: includeColor
     )
 
-    // Re-check cache after fetch so concurrent calls cannot downgrade cached assets
-    let latest = cache.get(hostname: hostname)
-    if let fallback = latest ?? cached {
-        let hasResolvedColorIfNeeded = !includeColor || fallback.isColorResolved
-        if hasResolvedColorIfNeeded {
-            return fallback
-        }
-
-        // Keep an existing favicon if a later color refresh fails
-        if fetched.favicon == nil, fallback.favicon != nil {
-            return fallback
-        }
-    }
-
-    cache.set(fetched)
-    return fetched
+    return cache.insert(fetched)
 }
 
 private func fetchWebsiteAssets(
@@ -205,14 +190,12 @@ private func isSchemelessWebsiteURL(_ value: String) -> Bool {
 }
 
 /// Thread-safe in-memory cache for website assets, keyed by hostname.
-private final class WebsiteAssetsCache: @unchecked Sendable {
+final class WebsiteAssetsCache: @unchecked Sendable {
     static let shared = WebsiteAssetsCache()
 
     private var cache: [String: WebsiteAssets] = [:]
     private let lock = NSLock()
     private let maxSize = 100
-
-    private init() {}
 
     func get(hostname: String) -> WebsiteAssets? {
         lock.lock()
@@ -220,9 +203,19 @@ private final class WebsiteAssetsCache: @unchecked Sendable {
         return cache[hostname]
     }
 
-    func set(_ assets: WebsiteAssets) {
+    func insert(_ assets: WebsiteAssets) -> WebsiteAssets {
         lock.lock()
         defer { lock.unlock() }
+
+        // Note: Fetches run outside the lock, so compare and insert together to preserve richer results
+        if let cached = cache[assets.hostname] {
+            if !assets.isColorResolved || cached.isColorResolved {
+                return cached
+            }
+            if assets.favicon == nil, cached.favicon != nil {
+                return cached
+            }
+        }
 
         // Simple eviction: clear half when adding beyond the limit
         let isAddingHostname = cache[assets.hostname] == nil
@@ -234,5 +227,6 @@ private final class WebsiteAssetsCache: @unchecked Sendable {
         }
 
         cache[assets.hostname] = assets
+        return assets
     }
 }

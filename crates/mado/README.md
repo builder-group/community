@@ -71,7 +71,7 @@ fn main() -> Result<(), mado::Error> {
 
 ```toml
 [dependencies]
-mado = "0.0.17"
+mado = "0.0.18"
 ```
 
 ## Requirements
@@ -134,39 +134,18 @@ Use `WindowMonitor` when you want event-driven updates:
 ```rust
 use mado::{WindowEvent, WindowListener, WindowMonitor};
 
-struct FocusListener;
+struct WindowContentListener;
 
-impl WindowListener for FocusListener {
+impl WindowListener for WindowContentListener {
     fn on_focus_change(&self, event: WindowEvent) {
-        match event {
-            WindowEvent::AppActivated { app } => {
-                println!("App: {}", app);
-            }
-            WindowEvent::AppTerminated { app } => {
-                println!("App terminated: {}", app);
-            }
-            WindowEvent::WindowChanged { window } | WindowEvent::WindowUpdated { window } => {
-                println!("Window content: {}", window);
-            }
-            WindowEvent::WindowBoundsChanged { window } => {
-                println!("Window moved/resized: {:?}", window.bounds);
-            }
-            WindowEvent::WindowMinimized { window } => {
-                println!("Window minimized: {:?}", window.window_id);
-            }
-            WindowEvent::WindowRestored { window } => {
-                println!("Window restored: {:?}", window.window_id);
-            }
-            WindowEvent::WindowDestroyed { window } => {
-                println!("Window destroyed: {:?}", window.window_id);
-            }
+        if let WindowEvent::WindowChanged { window } | WindowEvent::WindowUpdated { window } = event {
+            println!("Window content: {}", window);
         }
     }
 }
 
 fn main() -> Result<(), mado::Error> {
-    let monitor = WindowMonitor::new(FocusListener);
-    monitor.run()
+    WindowMonitor::new(WindowContentListener).run()
 }
 ```
 
@@ -317,7 +296,7 @@ state uses window-title patterns and is not a security guarantee. See the
 
 Browser information can become available shortly after a focus or title event.
 The monitor retries while the browser remains active and emits another
-`WindowChanged` event when the information becomes available.
+`WindowChanged` event if the information becomes available before retries stop.
 
 ### Installed Apps
 
@@ -414,7 +393,7 @@ fn main() {
 
 | Event                 | When it fires                                                                             |
 | --------------------- | ----------------------------------------------------------------------------------------- |
-| `AppActivated`        | When the active app changes, without waiting for window metadata               |
+| `AppActivated`        | When the active app changes, without waiting for window metadata                          |
 | `AppTerminated`       | When an app activated during the monitor run terminates                                   |
 | `WindowChanged`       | When focused window information becomes available or changes                              |
 | `WindowUpdated`       | When a previously focused background window changes, without changing foreground activity |
@@ -512,6 +491,15 @@ The crate compiles with platform stubs, but monitoring and query APIs return `Er
 `mado` means window in Japanese.
 
 ## Contributing
+
+### Tests
+
+Run both suites from the repository root:
+
+```bash
+cargo test -p mado
+swift test --package-path crates/mado
+```
 
 ### Add Browser Support
 

@@ -3,15 +3,11 @@ import ApplicationServices
 import Foundation
 import SwiftRs
 
-/// Monitors active app, focused-window, and window bounds events using NSWorkspace
-/// and Accessibility API.
+/// Observes app activity and windows discovered through focus.
 ///
-/// Threading model:
-/// - Monitor runs in spawned thread with its own CFRunLoop (wherever monitor.run() is called)
-/// - NSWorkspace notifications arrive on main thread → forwarded via CFRunLoopPerformBlock
-/// - AXObserver callbacks delivered directly to monitor thread's run loop
-/// - All state mutations happen on monitor thread (ensured by CFRunLoopPerformBlock)
-/// Construct and start on the monitor thread. Refresh and stop enqueue work from any thread.
+/// Construct and start on the same thread, which owns observation state and delivers callbacks.
+/// NSWorkspace notifications arrive on the main thread and are forwarded to this run loop.
+/// Refresh and stop enqueue work from any thread.
 final class WindowMonitor: NSObject {
     private static let instanceLock = NSLock()
     // Note: FFI accesses the singleton from multiple threads, so shared uses instanceLock
@@ -119,7 +115,11 @@ final class WindowMonitor: NSObject {
         // Note: Blocks until CFRunLoopStop() is called from stop()
         CFRunLoopRun()
 
-        if isRunning { Log.warn("Monitor run loop exited unexpectedly") }
+        if isRunning {
+            Log.warn("Monitor run loop exited unexpectedly")
+            // Note: Only clean up after the monitor's run loop returns to avoid stopping an enclosing host loop
+            cleanup()
+        }
     }
 
     func refresh() {
@@ -151,6 +151,11 @@ final class WindowMonitor: NSObject {
 
     private func stopOnMonitorThread() {
         guard isRunning else { return }
+        cleanup()
+        CFRunLoopStop(monitorRunLoop)
+    }
+
+    private func cleanup() {
         isRunning = false
 
         stopWindowPolling()
@@ -168,8 +173,6 @@ final class WindowMonitor: NSObject {
         }
         appTerminationObserver = nil
         observedAppPIDs.removeAll()
-
-        CFRunLoopStop(monitorRunLoop)
     }
 
     // MARK: - Run Loop Keep-Alive

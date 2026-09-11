@@ -265,8 +265,8 @@ AXWindow
 - Tested: 2026-09-11 on macOS 26.6.2 (25G83)
 
 Browser chrome URL field: `AXComboBox` with the description "Search with Google or enter address".
-Same-title switches between `example.com` and `example.org` produced updates within the same logged second in the live
-monitor. Editing the address without navigating preserved the loaded document URL.
+Same-title switches between `example.com` and `example.org` produced window updates.
+Editing the address without navigating preserved the loaded document URL.
 
 Web content `AXURL`: Found.
 

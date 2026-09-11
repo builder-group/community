@@ -8,7 +8,7 @@
 //! (required for NSWorkspace notifications). Events are automatically forwarded between threads.
 
 use mado::{MonitorConfig, WindowEvent, WindowListener, WindowMonitor};
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::Ordering;
 use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
@@ -72,13 +72,11 @@ fn main() -> Result<(), mado::Error> {
         ));
     }
 
-    let running = Arc::new(AtomicBool::new(true));
     let event_count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
 
     // Start monitor in background thread
-    let running_clone = running.clone();
     let event_count_clone = event_count.clone();
-    thread::spawn(move || {
+    let monitor_thread = thread::spawn(move || {
         println!("[Monitor Thread] Started");
 
         let monitor = WindowMonitor::with_config(
@@ -101,16 +99,13 @@ fn main() -> Result<(), mado::Error> {
         }
 
         println!("[Monitor Thread] Stopped");
-        running_clone.store(false, Ordering::SeqCst);
     });
 
     // Auto-stop after 30 seconds
-    let running_clone = running.clone();
     thread::spawn(move || {
         thread::sleep(Duration::from_secs(30));
         println!("\n[Timeout] Stopping monitor...");
         WindowMonitor::stop().ok();
-        running_clone.store(false, Ordering::SeqCst);
 
         // Stop main runloop
         unsafe {
@@ -132,6 +127,8 @@ fn main() -> Result<(), mado::Error> {
         CFRunLoopRun();
     }
 
+    // Note: stop() queues shutdown, so wait for the monitor thread to finish
+    monitor_thread.join().expect("Monitor thread panicked");
     println!("\n✅ Monitor stopped");
     Ok(())
 }

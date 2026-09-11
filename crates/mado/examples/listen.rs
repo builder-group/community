@@ -6,8 +6,9 @@
 //! - A previously active app terminates (AppTerminated event)
 //! - The focused window changes within the same app (WindowChanged event)
 //! - The focused window title changes (WindowChanged event)
-//! - The focused window is minimized, restored, or destroyed
-//! - The focused window moves or resizes, if enabled (WindowBoundsChanged event)
+//! - A previously focused background window changes (WindowUpdated event)
+//! - An observed window is minimized, restored, or destroyed
+//! - An observed window moves or resizes, if enabled (WindowBoundsChanged event)
 
 use mado::{MonitorConfig, WindowEvent, WindowListener, WindowMonitor};
 

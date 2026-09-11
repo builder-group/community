@@ -61,6 +61,7 @@ struct AppIcon {
 extension NSImage {
     /// Convert to PNG data at specified size.
     func pngData(size: Int) -> Data? {
+        guard size > 0 else { return nil }
         let targetSize = NSSize(width: size, height: size)
 
         // Create a new image with the target size

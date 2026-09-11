@@ -245,7 +245,7 @@ struct BrowserAXProbe {
     }
 
     private func isAddressField(_ element: AXUIElement, role: String?) -> Bool {
-        guard role == kAXTextFieldRole as String else {
+        guard role == kAXTextFieldRole as String || role == "AXComboBox" else {
             return false
         }
 

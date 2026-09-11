@@ -9,7 +9,7 @@ pub struct MonitorConfig {
     /// foreground retries remain enabled. The interval is not a delivery deadline.
     /// Reconciliation queries the foreground app and previously observed on-screen windows.
     /// Queries run serially on the monitor thread and respect the tracking flags.
-    /// Covered windows can be on screen; minimized and inactive-Space windows are skipped.
+    /// Covered windows can be on screen. Minimized and inactive-Space windows are skipped.
     pub reconcile_interval_ms: u32,
 
     /// Whether to include the app icon.
@@ -42,7 +42,7 @@ pub struct MonitorConfig {
     /// Default: `false`
     pub include_website_info: bool,
 
-    /// Whether to track focused window changes in addition to app lifecycle events.
+    /// Whether to track content and lifecycle changes for windows discovered through focus.
     ///
     /// When `true` (default), fires events for:
     /// - Window focus changes within the same app

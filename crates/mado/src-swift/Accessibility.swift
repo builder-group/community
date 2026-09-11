@@ -184,37 +184,3 @@ func getAXURL(from element: AXUIElement) -> URL? {
     }
     return nil
 }
-
-/// Recursively find an element in the accessibility tree matching a predicate.
-/// Returns the first matching element, or nil if not found.
-func findElement(
-    in element: AXUIElement,
-    where predicate: (AXUIElement) -> Bool,
-    maxDepth: Int = 15,
-    currentDepth: Int = 0
-) -> AXUIElement? {
-    guard currentDepth < maxDepth else { return nil }
-
-    // Check current element
-    if predicate(element) {
-        return element
-    }
-
-    let children = getTraversalChildren(from: element)
-    guard !children.isEmpty else {
-        return nil
-    }
-
-    for child in children {
-        if let found = findElement(
-            in: child,
-            where: predicate,
-            maxDepth: maxDepth,
-            currentDepth: currentDepth + 1
-        ) {
-            return found
-        }
-    }
-
-    return nil
-}

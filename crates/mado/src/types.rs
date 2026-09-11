@@ -48,8 +48,8 @@ pub struct BrowserInfo {
     pub url: Option<String>,
     /// Bounds of the visible browser content area, when exposed by Accessibility.
     ///
-    /// This is the visible web content viewport, not the full browser window,
-    /// and may be `None` when the browser does not expose it.
+    /// Uses the top-level web content frame clipped to the browser window.
+    /// Browser Accessibility data may not describe the exact viewport or may be unavailable.
     pub content_bounds: Option<WindowBounds>,
     /// Estimates private/incognito mode from recognized window-title patterns.
     ///
@@ -223,7 +223,7 @@ pub enum WindowEvent {
     ///
     /// Requires `MonitorConfig::track_window_changes`. This event does not indicate a focus
     /// change. Explicit refresh can emit unchanged data. Reconciliation only checks
-    /// observed windows that are on screen; it does not discover every window.
+    /// observed windows that are on screen. It does not discover every window.
     WindowUpdated { window: WindowInfo },
     /// A window observed while focused moved or resized.
     ///

@@ -23,7 +23,7 @@ enum BrowserContentBoundsExtractor {
         )
     }
 
-    private static func clamp(
+    static func clamp(
         _ bounds: [String: Double],
         to windowBounds: [String: Double]?
     ) -> [String: Double]? {

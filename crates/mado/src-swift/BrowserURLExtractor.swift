@@ -6,21 +6,30 @@ enum BrowserURLExtractor {
         family: BrowserFamily,
         from windowElement: AXUIElement
     ) -> String? {
-        // Note: The address bar can contain an uncommitted edit while the current page remains visible
-        if let url = BrowserWebContent.findTopLevelValue(
+        let documentURL = BrowserWebContent.findTopLevelValue(
             in: windowElement, extract: { getAXURL(from: $0)?.absoluteString }
-        ) {
-            return url
+        )
+        return resolveURL(family: family, documentURL: documentURL) {
+            guard let addressBar = findAddressBar(in: windowElement) else { return nil }
+            var focused: CFTypeRef?
+            AXUIElementCopyAttributeValue(addressBar, kAXFocusedAttribute as CFString, &focused)
+            return (getValue(from: addressBar), focused as? Bool)
         }
+    }
+
+    static func resolveURL(
+        family: BrowserFamily,
+        documentURL: String?,
+        addressBar: () -> (value: String?, isFocused: Bool?)?
+    ) -> String? {
+        // Note: The address bar can contain an uncommitted edit while the current page remains visible
+        if let documentURL { return documentURL }
         // Note: Safari can expose only the hostname in its unfocused address bar, losing the
         // page path (example.com/articles becomes example.com), so require the document URL
         guard family != .safari else { return nil }
-        guard let addressBar = findAddressBar(in: windowElement) else { return nil }
-        var focused: CFTypeRef?
-        AXUIElementCopyAttributeValue(addressBar, kAXFocusedAttribute as CFString, &focused)
         // Note: An unreadable focus state cannot establish that the address is not being edited
-        guard (focused as? Bool) == false else { return nil }
-        return normalizeURL(getValue(from: addressBar))
+        guard let address = addressBar(), address.isFocused == false else { return nil }
+        return normalizeURL(address.value)
     }
 
     static func findAddressBar(in element: AXUIElement) -> AXUIElement? {

@@ -193,3 +193,36 @@ pub fn get_website_icon(url: &str, include_color: bool) -> WebsiteIcon {
         return WebsiteIcon::default();
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    #[test]
+    fn listener_panic_does_not_prevent_later_event_delivery() {
+        struct Listener(Arc<AtomicUsize>);
+        impl WindowListener for Listener {
+            fn on_focus_change(&self, _event: WindowEvent) {
+                if self.0.fetch_add(1, Ordering::SeqCst) == 0 {
+                    panic!("Listener failure");
+                }
+            }
+        }
+
+        let calls = Arc::new(AtomicUsize::new(0));
+        let listener: Arc<dyn WindowListener> = Arc::new(Listener(calls.clone()));
+        let event = WindowEvent::AppActivated {
+            app: AppInfo {
+                pid: 1,
+                name: None,
+                bundle_id: None,
+                process_path: None,
+                icon: None,
+            },
+        };
+        call_listener_safe(&listener, event.clone());
+        call_listener_safe(&listener, event);
+        assert_eq!(calls.load(Ordering::SeqCst), 2);
+    }
+}

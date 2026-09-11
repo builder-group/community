@@ -79,6 +79,67 @@ mod tests {
     use super::*;
 
     #[test]
+    fn window_content_events_preserve_foreground_or_background_classification() {
+        for kind in ["WindowChanged", "WindowUpdated"] {
+            let payload = serde_json::json!({
+                "type": kind,
+                "data": {
+                    "app": {"pid": 1234},
+                    "windowId": 42,
+                    "browser": {"url": "https://example.com/path", "isPrivate": false}
+                }
+            });
+            let event = parse_event(&payload.to_string()).unwrap();
+            assert_eq!(event.app().pid, 1234);
+            let window = match (kind, event) {
+                ("WindowChanged", WindowEvent::WindowChanged { window })
+                | ("WindowUpdated", WindowEvent::WindowUpdated { window }) => window,
+                _ => panic!("Event classification changed for {kind}"),
+            };
+            assert_eq!(window.window_id, Some(42));
+            assert_eq!(
+                window.browser.unwrap().url.as_deref(),
+                Some("https://example.com/path")
+            );
+        }
+    }
+
+    #[test]
+    fn all_events_accept_partial_metadata_and_preserve_app_identity() {
+        for kind in [
+            "AppActivated",
+            "AppTerminated",
+            "WindowChanged",
+            "WindowUpdated",
+            "WindowBoundsChanged",
+            "WindowMinimized",
+            "WindowRestored",
+            "WindowDestroyed",
+        ] {
+            let payload = serde_json::json!({"type": kind, "data": {"app": {"pid": 1234}}});
+            let event = parse_event(&payload.to_string()).unwrap();
+            assert_eq!(event.app().pid, 1234, "{kind}");
+            assert!(event.app().bundle_id.is_none(), "{kind}");
+        }
+    }
+
+    #[test]
+    fn rejects_malformed_event_payloads() {
+        for payload in [
+            "not json",
+            r#"{"type":"WindowUpdated","data":{"app":{}}}"#,
+            r#"{"type":"WindowUpdated","data":{"app":{"pid":"1234"}}}"#,
+            r#"{"type":"WindowBoundsChanged","data":{"app":{"pid":1},"windowId":-1}}"#,
+            r#"{"type":"WindowChanged","data":{"app":{"pid":1},"bounds":{"x":0}}}"#,
+        ] {
+            assert!(
+                parse_event(payload).is_err(),
+                "Accepted malformed payload: {payload}"
+            );
+        }
+    }
+
+    #[test]
     fn parse_app_info_full() {
         let json = r#"{
             "pid": 1234,
