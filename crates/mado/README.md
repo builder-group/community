@@ -196,8 +196,9 @@ Keep `on_focus_change()` callbacks fast. Send events to another thread or async 
 
 The foreground window is the discovery point. Once observed, a window keeps its
 Accessibility notifications until destruction or app termination, even after focus
-moves elsewhere. The monitor does not enumerate every open window. If a browser
-misses a destruction notification, the retained observation can remain until its app exits.
+moves elsewhere. The monitor does not enumerate every open window. If an app omits
+the notification that a window closed, mado can retain that window's observation
+until the app exits. This concerns native windows, not browser tabs.
 
 `WindowChanged` describes foreground window state. `WindowUpdated` describes a
 tracked background window and must not replace the consumer's foreground context.
@@ -205,7 +206,8 @@ Bounds and lifecycle events can also refer to background windows.
 
 Window IDs come from matching Accessibility geometry to CoreGraphics windows, with
 an app-local z-order fallback. This is an estimate rather than a native identity
-mapping. Background queries retain the observed ID instead of repeating that fallback.
+mapping. Background queries reuse the ID recorded when the window was observed.
+Repeating the z-order fallback could assign another window's ID after focus changes.
 
 Updates have three sources:
 
@@ -390,7 +392,7 @@ fn main() {
 
 | Option                        | Default | Description                                                                                      |
 | ----------------------------- | ------- | ------------------------------------------------------------------------------------------------ |
-| `track_window_changes`        | `true`  | Tracks foreground and background content changes and window lifecycle events                     |
+| `track_window_changes`        | `true`  | Tracks content and lifecycle changes for windows discovered through focus                        |
 | `track_window_bounds_changes` | `false` | Tracks move and resize changes for windows observed while focused                                |
 | `reconcile_interval_ms`       | `0`     | Rechecks foreground and observed on-screen windows after missed notifications (zero disables it) |
 | `include_app_icon`            | `false` | Adds a base64 PNG app icon to emitted app or window data                                         |
@@ -405,11 +407,6 @@ fn main() {
 | `include_icon`      | `false` | Adds a base64 PNG icon to each installed app           |
 | `include_app_color` | `false` | Adds app display color when icon extraction is enabled |
 | `icon_size`         | `32`    | Icon size in pixels                                    |
-
-When upgrading code that constructs `MonitorConfig` directly, include
-`reconcile_interval_ms` or use `..Default::default()`. Exhaustive event matches must
-handle `WindowUpdated`. Consumers tracking only foreground activity should ignore
-that variant rather than treating it as a focus change.
 
 ## Events
 
