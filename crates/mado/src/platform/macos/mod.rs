@@ -27,15 +27,6 @@ static GLOBAL_LISTENER: Mutex<Option<Arc<dyn WindowListener>>> = Mutex::new(None
 /// Start monitoring `WindowMonitor` events.
 /// Blocks current thread until `stop()` is called.
 pub fn run(listener: Arc<dyn WindowListener>, config: MonitorConfig) -> Result<(), Error> {
-    // Check permissions if tracking window details
-    if (config.track_window_changes || config.track_window_bounds_changes)
-        && !is_accessibility_trusted()
-    {
-        return Err(Error::MissingPermission(
-            "Accessibility permissions required for window tracking".to_string(),
-        ));
-    }
-
     // Atomic check-and-set: only one monitor can run at a time
     if RUNNING
         .compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)
@@ -61,6 +52,7 @@ pub fn run(listener: Arc<dyn WindowListener>, config: MonitorConfig) -> Result<(
             config.include_app_color,
             config.include_browser_info,
             config.include_website_info,
+            config.reconcile_interval_ms,
         );
     }
 
@@ -77,14 +69,17 @@ pub fn run(listener: Arc<dyn WindowListener>, config: MonitorConfig) -> Result<(
 
 /// Stop the monitor (thread-safe, can be called from any thread).
 pub fn stop() -> Result<(), Error> {
-    if !RUNNING.load(Ordering::SeqCst) {
+    // Note: The native instance becomes available after Rust reserves the monitor slot
+    if !unsafe { mado_stop_monitor() } {
         return Err(Error::NotRunning);
     }
+    return Ok(());
+}
 
-    unsafe {
-        mado_stop_monitor();
+pub fn refresh() -> Result<(), Error> {
+    if !unsafe { mado_refresh_monitor() } {
+        return Err(Error::NotRunning);
     }
-
     return Ok(());
 }
 
@@ -103,6 +98,12 @@ pub fn get_active_app(config: QueryConfig) -> Result<AppInfo, Error> {
 
 /// Get information about the currently active window.
 pub fn get_active_window(config: QueryConfig) -> Result<WindowInfo, Error> {
+    if !is_accessibility_trusted() {
+        return Err(Error::MissingPermission(
+            "Accessibility access is required to query windows".to_string(),
+        ));
+    }
+
     let json = unsafe {
         match mado_get_active_window(
             config.include_app_icon,

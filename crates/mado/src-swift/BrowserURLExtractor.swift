@@ -6,80 +6,27 @@ enum BrowserURLExtractor {
         family: BrowserFamily,
         from windowElement: AXUIElement
     ) -> String? {
-        switch family {
-        case .chromium:
-            return extractChromiumURL(from: windowElement)
-        case .safari:
-            return extractSafariURL(from: windowElement)
-        case .gecko:
-            return extractGeckoURL(from: windowElement)
-        }
-    }
-
-    // MARK: - Chromium
-
-    private static func extractChromiumURL(from windowElement: AXUIElement)
-        -> String?
-    {
-        if let url = findNormalizedURLBarValue(
-            in: windowElement,
-            matching: { isAddressBarTextField($0) }
+        // Note: The address bar can contain an uncommitted edit while the current page remains visible
+        if let url = BrowserWebContent.findTopLevelValue(
+            in: windowElement, extract: { getAXURL(from: $0)?.absoluteString }
         ) {
             return url
         }
-
-        if let url = findTopLevelWebContentURL(in: windowElement) {
-            return url
-        }
-
-        return nil
+        // Note: Safari can expose only the hostname in its unfocused address bar, losing the
+        // page path (example.com/articles becomes example.com), so require the document URL
+        guard family != .safari else { return nil }
+        guard let addressBar = findAddressBar(in: windowElement) else { return nil }
+        var focused: CFTypeRef?
+        AXUIElementCopyAttributeValue(addressBar, kAXFocusedAttribute as CFString, &focused)
+        // Note: An unreadable focus state cannot establish that the address is not being edited
+        guard (focused as? Bool) == false else { return nil }
+        return normalizeURL(getValue(from: addressBar))
     }
 
-    // MARK: - Safari
-
-    private static func extractSafariURL(from windowElement: AXUIElement)
-        -> String?
-    {
-        return findTopLevelWebContentURL(in: windowElement)
-    }
-
-    // MARK: - Gecko
-
-    private static func extractGeckoURL(from windowElement: AXUIElement)
-        -> String?
-    {
-        if let url = findNormalizedURLBarValue(
-            in: windowElement,
-            matching: { isAddressBarTextField($0) }
-        ) {
-            return url
-        }
-
-        if let url = findTopLevelWebContentURL(in: windowElement) {
-            return url
-        }
-
-        return nil
-    }
-
-    // MARK: - Shared URL Strategies
-
-    /// Returns the AXURL from the nearest web-content node without descending into nested web content.
-    private static func findTopLevelWebContentURL(
-        in element: AXUIElement
-    ) -> String? {
-        return BrowserWebContent.findTopLevelValue(
-            in: element,
-            extract: { getAXURL(from: $0)?.absoluteString }
-        )
-    }
-
-    private static func findNormalizedURLBarValue(
-        in element: AXUIElement,
-        matching predicate: (AXUIElement) -> Bool
-    ) -> String? {
+    static func findAddressBar(in element: AXUIElement) -> AXUIElement? {
         var queue = [(element: element, depth: 0)]
         var index = 0
+        var emptyAddressBar: AXUIElement?
 
         while index < queue.count {
             let current = queue[index]
@@ -94,10 +41,12 @@ enum BrowserURLExtractor {
                 continue
             }
 
-            if predicate(current.element),
-                let url = normalizedURLValue(from: current.element)
+            if isAddressBar(current.element, role: role),
+                let value = getValue(from: current.element)
             {
-                return url
+                if normalizeURL(value) != nil { return current.element }
+                // Note: Keep searching past empty fields because Opera can nest the URL field inside one
+                emptyAddressBar = current.element
             }
 
             for child in getTraversalChildren(from: current.element) {
@@ -105,12 +54,7 @@ enum BrowserURLExtractor {
             }
         }
 
-        return nil
-    }
-
-    private static func normalizedURLValue(from element: AXUIElement) -> String?
-    {
-        return normalizeURL(getValue(from: element))
+        return emptyAddressBar
     }
 
     private static func normalizeURL(_ value: String?) -> String? {
@@ -134,8 +78,17 @@ enum BrowserURLExtractor {
         return nil
     }
 
-    private static func isAddressBarTextField(_ element: AXUIElement) -> Bool {
-        guard getRole(from: element) == "AXTextField" else { return false }
+    private static func isAddressBar(_ element: AXUIElement, role: String?) -> Bool {
+        guard role == "AXTextField" || role == "AXComboBox" else { return false }
+
+        var identifier: CFTypeRef?
+        AXUIElementCopyAttributeValue(element, kAXIdentifierAttribute as CFString, &identifier)
+        if let identifier = getDOMIdentifier(from: element) ?? (identifier as? String),
+            ["urlbar-input", "urlbar", "omnibox", "WEB_BROWSER_ADDRESS_AND_SEARCH_FIELD"].contains(
+                identifier)
+        {
+            return true
+        }
 
         let description = (getDescription(from: element) ?? "").lowercased()
         let placeholder = (getPlaceholderValue(from: element) ?? "")

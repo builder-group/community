@@ -8,13 +8,26 @@ engine does not guarantee the same Accessibility structure.
 
 Each supported browser maps to an observed extraction family:
 
-- `chromium`: tries the browser chrome URL field, then top-level web content
+- `chromium`: reads top-level web content, then falls back to an unfocused browser chrome URL field
 - `safari`: reads the URL from top-level web content
-- `gecko`: tries the browser chrome URL field, then top-level web content
+- `gecko`: reads top-level web content, then falls back to an unfocused browser chrome URL field
 
-An `AXTextField` can expose the address bar value. Top-level `AXWebArea.AXURL`
+An `AXTextField` or `AXComboBox` can expose the address bar value. Top-level `AXWebArea.AXURL`
 or `AXDocument.AXURL` can expose the loaded document URL. Address bar and
-web-content values can differ in canonical form.
+web-content values can differ in canonical form. The document URL takes precedence so typing
+an address does not change the reported website before navigation. Stable Accessibility or DOM
+identifiers identify known address bars independently of localized labels.
+
+Safari's unfocused address bar can expose only a hostname: `example.com/articles`
+may appear as `example.com`. Using it would discard path information, so Safari
+requires the document URL. Chromium and Gecko fallback also requires the address
+bar to report that it is not focused. An unreadable focus attribute produces no
+fallback URL rather than treating an edit as the loaded page.
+
+The monitor observes address-bar value changes as well as window titles to detect
+same-title tab switches. An address-bar notification does not establish that the
+document URL has changed. Optional reconciliation recovers updates when no later
+notification arrives. A browser that exposes neither URL source produces no browser metadata.
 
 Content bounds come from the nearest top-level web-content frame and are
 clipped to the browser window. `BrowserInfo` remains anchored to a URL: bounds
@@ -53,7 +66,7 @@ browser exposes a new structure.
 | Opera          | `com.operasoftware.Opera`    | `chromium` | Found                    | Not observed        |
 | Arc            | `company.thebrowser.Browser` | `chromium` | Found                    | Found               |
 | Safari         | `com.apple.Safari`           | `safari`   | Found                    | Found               |
-| Firefox        | `org.mozilla.firefox`        | `gecko`    | Not observed             | Found               |
+| Firefox        | `org.mozilla.firefox`        | `gecko`    | Found (`AXComboBox`)     | Found               |
 | Zen            | `app.zen-browser.zen`        | `gecko`    | Not observed             | Found               |
 
 ## Browser Observations
@@ -248,10 +261,12 @@ AXWindow
 
 - Bundle ID: `org.mozilla.firefox`
 - Extraction family: `gecko`
-- Browser version: 153.0.3 (15326.8.3)
-- Tested: 2026-08-08 on macOS 26.5.2 (25F84)
+- Browser version: 155.0.1
+- Tested: 2026-09-11 on macOS 26.6.2 (25G83)
 
-Browser chrome URL field: Not observed.
+Browser chrome URL field: `AXComboBox` with the description "Search with Google or enter address".
+Same-title switches between `example.com` and `example.org` produced updates within the same logged second in the live
+monitor. Editing the address without navigating preserved the loaded document URL.
 
 Web content `AXURL`: Found.
 

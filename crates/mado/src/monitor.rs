@@ -4,7 +4,7 @@ use crate::config::MonitorConfig;
 use crate::error::Error;
 use crate::listener::WindowListener;
 
-/// Monitor for active app, focused-window, and window-bounds events.
+/// Monitor app activity and changes to foreground and previously focused windows.
 ///
 /// ## Example
 ///
@@ -21,7 +21,7 @@ use crate::listener::WindowListener;
 ///             WindowEvent::AppTerminated { app } => {
 ///                 println!("App terminated: {}", app);
 ///             }
-///             WindowEvent::WindowChanged { window } => {
+///             WindowEvent::WindowChanged { window } | WindowEvent::WindowUpdated { window } => {
 ///                 println!("Window: {}", window);
 ///             }
 ///             WindowEvent::WindowBoundsChanged { window } => {
@@ -68,17 +68,33 @@ impl WindowMonitor {
 
     /// Start monitoring (blocks until stopped).
     ///
+    /// Uses the calling thread. When called on a worker, the host must keep its main
+    /// event loop running to deliver macOS app notifications.
+    ///
+    /// App monitoring starts even without Accessibility access. Window events begin
+    /// after access is granted and an app activates or reconciliation runs.
+    ///
     /// # Errors
     ///
-    /// Returns `Error` if platform initialization fails or permissions are missing.
+    /// Returns `Error` if platform initialization fails or a monitor is already running.
     pub fn run(self) -> Result<(), Error> {
         crate::platform::run(self.listener, self.config)
     }
 
+    /// Schedules fresh events for foreground and observed on-screen windows, even if unchanged.
+    ///
+    /// Respects the monitor configuration and also re-emits `AppActivated` for the foreground app.
+    /// Returns `Error::NotRunning` before native initialization or after shutdown.
+    /// Queries run on the monitor thread. Success means the request was queued, not completed.
+    pub fn refresh() -> Result<(), Error> {
+        crate::platform::refresh()
+    }
+
     /// Stop the monitor (can be called from another thread).
     ///
-    /// This is a static method because the monitor runs in its own thread.
-    /// Call this from any thread to signal the monitor to stop.
+    /// Success means shutdown was queued. Wait for `run()` to return before starting
+    /// another monitor.
+    /// Returns `Error::NotRunning` before native initialization or after shutdown.
     pub fn stop() -> Result<(), Error> {
         crate::platform::stop()
     }

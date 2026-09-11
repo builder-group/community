@@ -1,9 +1,8 @@
 import ApplicationServices
 import Foundation
 
-/// Find window ID using CoreGraphics.
-/// Strategy: Match by bounds first (if available), then fall back to z-order (first window).
-/// Note: We can't identify windows by title because CoreGraphics doesn't provide window titles.
+/// Estimates the focused window ID from bounds, then the app's frontmost on-screen window.
+/// Accessibility does not provide a reliable public window ID for matching these APIs.
 func findWindowId(pid: pid_t, bounds: [String: Double]?) -> UInt32? {
     let option: CGWindowListOption = [
         .optionOnScreenOnly, .excludeDesktopElements,
@@ -46,9 +45,8 @@ func findWindowId(pid: pid_t, bounds: [String: Double]?) -> UInt32? {
         }
     }
 
-    // Strategy 2: Fall back to z-order (first window is focused)
-    // CoreGraphics returns windows in frontmost-first order (z-order),
-    // so the first window for a PID is the focused/frontmost window
+    // Note: Z-order is a fallback estimate, not proof of keyboard focus.
+    // Callers querying background elements must retain their previously resolved ID.
     for window in windowList {
         guard
             let ownerPID = window["kCGWindowOwnerPID"] as? Int,

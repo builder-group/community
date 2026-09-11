@@ -45,6 +45,10 @@ pub fn parse_event(json: &str) -> Result<WindowEvent, serde_json::Error> {
             let window: WindowInfo = serde_json::from_value(data.clone())?;
             return Ok(WindowEvent::WindowChanged { window });
         }
+        "WindowUpdated" => {
+            let window: WindowInfo = serde_json::from_value(data.clone())?;
+            return Ok(WindowEvent::WindowUpdated { window });
+        }
         "WindowBoundsChanged" => {
             let window: WindowBoundsChange = serde_json::from_value(data.clone())?;
             return Ok(WindowEvent::WindowBoundsChanged { window });

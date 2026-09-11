@@ -35,7 +35,7 @@
 //!             WindowEvent::AppTerminated { app } => {
 //!                 println!("App terminated: {}", app);
 //!             }
-//!             WindowEvent::WindowChanged { window } => {
+//!             WindowEvent::WindowChanged { window } | WindowEvent::WindowUpdated { window } => {
 //!                 println!("Window: {}", window);
 //!             }
 //!             WindowEvent::WindowBoundsChanged { window } => {
@@ -90,7 +90,7 @@ pub use types::{
 
 /// Get information about the currently active application
 ///
-/// This is a synchronous query that returns the current state immediately.
+/// Reads the current state synchronously.
 ///
 /// # Errors
 ///
@@ -110,10 +110,6 @@ pub fn get_active_app() -> Result<AppInfo, Error> {
 }
 
 /// Get information about the currently active application with custom configuration.
-///
-/// # Arguments
-///
-/// * `config` - Configuration for the query (e.g. icon extraction)
 ///
 /// # Example
 ///
@@ -142,7 +138,7 @@ pub fn get_active_app_with_config(config: QueryConfig) -> Result<AppInfo, Error>
 
 /// Get information about the currently active window.
 ///
-/// This is a synchronous query that returns the current state immediately.
+/// Reads the current state synchronously.
 /// The returned `WindowInfo` includes both window details and the associated app info.
 ///
 /// # Errors
@@ -164,10 +160,6 @@ pub fn get_active_window() -> Result<WindowInfo, Error> {
 }
 
 /// Get information about the currently active window with custom configuration.
-///
-/// # Arguments
-///
-/// * `config` - Configuration for the query (e.g. browser URL extraction)
 ///
 /// # Errors
 ///

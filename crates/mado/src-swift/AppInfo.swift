@@ -36,7 +36,7 @@ struct AppInfo {
             ? getAppIcon(
                 forPath: bundlePath,
                 forBundleId: bundleId,
-                includeColor: true
+                includeColor: includeColor
             )
             : nil
 

@@ -12,7 +12,8 @@ public func madoStartMonitor(
     includeAppIcon: Bool,
     includeAppColor: Bool,
     includeBrowserInfo: Bool,
-    includeWebsiteInfo: Bool
+    includeWebsiteInfo: Bool,
+    reconcileIntervalMs: UInt32
 ) {
     // Singleton check: Rust side already prevents concurrent calls, this is defensive
     guard WindowMonitor.shared == nil else { return }
@@ -26,16 +27,26 @@ public func madoStartMonitor(
         includeAppIcon: includeAppIcon,
         includeAppColor: includeAppColor,
         includeBrowserInfo: includeBrowserInfo,
-        includeWebsiteInfo: includeWebsiteInfo
+        includeWebsiteInfo: includeWebsiteInfo,
+        reconcileIntervalMs: reconcileIntervalMs
     )
     WindowMonitor.shared = monitor
     monitor.start()
+    WindowMonitor.shared = nil
 }
 
 @_cdecl("mado_stop_monitor")
-public func madoStopMonitor() {
-    WindowMonitor.shared?.stop()
-    WindowMonitor.shared = nil
+public func madoStopMonitor() -> Bool {
+    guard let monitor = WindowMonitor.shared else { return false }
+    monitor.stop()
+    return true
+}
+
+@_cdecl("mado_refresh_monitor")
+public func madoRefreshMonitor() -> Bool {
+    guard let monitor = WindowMonitor.shared else { return false }
+    monitor.refresh()
+    return true
 }
 
 // MARK: - Permissions

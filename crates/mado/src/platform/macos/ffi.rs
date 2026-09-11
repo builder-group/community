@@ -2,8 +2,9 @@ use std::ffi::c_void;
 use swift_rs::{swift, SRString};
 
 // Monitor lifecycle
-swift!(pub fn mado_start_monitor(callback: *const c_void, track_window_changes: bool, track_window_bounds_changes: bool, include_app_icon: bool, include_app_color: bool, include_browser_info: bool, include_website_info: bool));
-swift!(pub fn mado_stop_monitor());
+swift!(pub fn mado_start_monitor(callback: *const c_void, track_window_changes: bool, track_window_bounds_changes: bool, include_app_icon: bool, include_app_color: bool, include_browser_info: bool, include_website_info: bool, reconcile_interval_ms: u32));
+swift!(pub fn mado_stop_monitor() -> bool);
+swift!(pub fn mado_refresh_monitor() -> bool);
 
 // Permissions
 swift!(pub fn mado_is_trusted() -> bool);

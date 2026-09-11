@@ -51,11 +51,13 @@ pub struct BrowserInfo {
     /// This is the visible web content viewport, not the full browser window,
     /// and may be `None` when the browser does not expose it.
     pub content_bounds: Option<WindowBounds>,
-    /// Whether the window is in private/incognito mode.
+    /// Estimates private/incognito mode from recognized window-title patterns.
     ///
-    /// - `None` if detection failed or not supported
-    /// - `Some(true)` if private mode is active
-    /// - `Some(false)` if private mode is not active
+    /// - `None` when no usable title is available
+    /// - `Some(true)` when the title contains a recognized private-mode indicator
+    /// - `Some(false)` when no indicator matches, which does not prove normal browsing
+    ///
+    /// Browser versions and localized titles can affect this heuristic.
     pub is_private: Option<bool>,
     /// Website information (only populated if `include_website_info` is enabled in config)
     pub website: Option<WebsiteInfo>,
@@ -83,7 +85,8 @@ pub struct WindowInfo {
     pub bounds: Option<WindowBounds>,
     /// Application information
     pub app: AppInfo,
-    /// Browser information (only populated if `include_browser_info` is enabled in config)
+    /// Browser metadata when enabled and a supported browser exposes a readable URL.
+    /// Missing metadata does not imply navigation or a non-browser window.
     pub browser: Option<BrowserInfo>,
 }
 
@@ -184,22 +187,22 @@ pub struct WindowBounds {
 
 /// Event emitted by `WindowMonitor`.
 ///
-/// The monitor emits app activation, focused-window, and opt-in window bounds
-/// events as separate variants.
+/// Foreground state, tracked background windows, and app lifecycle use separate variants.
 #[derive(Debug, Clone, Serialize, Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
 pub enum WindowEvent {
     /// Application became active.
     ///
-    /// This event is always emitted when the user switches to a different app.
-    /// It provides immediate notification of the app change, even if the app has no window yet.
+    /// Reports an observed app activation without waiting for window metadata.
+    /// The app may not have a window yet.
     ///
     /// Common scenarios:
     /// - App activated via Spotlight/Dock but hasn't opened a window yet
     /// - Tray apps that don't have windows
     /// - App switching where window information isn't immediately available
     ///
-    /// A `WindowChanged` event will follow when a window becomes available (if the app has windows).
+    /// A `WindowChanged` event can follow when window tracking is enabled and data is available.
+    /// Explicit refresh also re-emits this event without an app switch.
     AppActivated { app: AppInfo },
     /// Previously active application terminated.
     ///
@@ -216,20 +219,26 @@ pub enum WindowEvent {
     ///
     /// Note: App switches are always signaled via `AppActivated` events first.
     WindowChanged { window: WindowInfo },
-    /// Focused window moved or resized.
+    /// A previously focused window changed while in the background.
+    ///
+    /// Requires `MonitorConfig::track_window_changes`. This event does not indicate a focus
+    /// change. Explicit refresh can emit unchanged data. Reconciliation only checks
+    /// observed windows that are on screen; it does not discover every window.
+    WindowUpdated { window: WindowInfo },
+    /// A window observed while focused moved or resized.
     ///
     /// This event only fires when `MonitorConfig::track_window_bounds_changes`
     /// is enabled. It is lightweight and only includes app identity, window id,
     /// and bounds.
     WindowBoundsChanged { window: WindowBoundsChange },
-    /// Focused window was minimized.
+    /// A window observed while focused was minimized.
     ///
-    /// This event only fires for the currently observed focused window when
+    /// This event fires for windows observed during this monitor run when
     /// `MonitorConfig::track_window_changes` is enabled.
     WindowMinimized { window: WindowLifecycleChange },
-    /// Focused window was restored from minimized state.
+    /// A window observed while focused was restored from minimized state.
     ///
-    /// This event only fires for the currently observed focused window when
+    /// This event fires for windows observed during this monitor run when
     /// `MonitorConfig::track_window_changes` is enabled. A restore that
     /// activates an app before its accessibility observer is installed may only
     /// appear as `AppActivated` followed by `WindowChanged`.
@@ -248,7 +257,9 @@ impl WindowEvent {
         match self {
             WindowEvent::AppActivated { app } => app,
             WindowEvent::AppTerminated { app } => app,
-            WindowEvent::WindowChanged { window } => &window.app,
+            WindowEvent::WindowChanged { window } | WindowEvent::WindowUpdated { window } => {
+                &window.app
+            }
             WindowEvent::WindowBoundsChanged { window } => &window.app,
             WindowEvent::WindowMinimized { window } => &window.app,
             WindowEvent::WindowRestored { window } => &window.app,

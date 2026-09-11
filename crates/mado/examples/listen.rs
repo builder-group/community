@@ -22,7 +22,7 @@ impl WindowListener for FocusListener {
             WindowEvent::AppTerminated { app } => {
                 println!("\n⏹️ App Terminated:\n{}", app);
             }
-            WindowEvent::WindowChanged { window } => {
+            WindowEvent::WindowChanged { window } | WindowEvent::WindowUpdated { window } => {
                 println!("\n🪟 Window Change:\n{}", window);
             }
             WindowEvent::WindowBoundsChanged { window } => {
@@ -59,6 +59,7 @@ fn main() -> Result<(), mado::Error> {
     let monitor = WindowMonitor::with_config(
         FocusListener,
         MonitorConfig {
+            reconcile_interval_ms: 2_000,
             include_app_icon: true,
             include_app_color: false,
             include_browser_info: true,

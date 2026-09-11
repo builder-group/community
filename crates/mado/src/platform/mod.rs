@@ -47,9 +47,16 @@ pub fn stop() -> Result<(), Error> {
     return Err(Error::Platform("Unsupported platform".to_string()));
 }
 
+pub fn refresh() -> Result<(), Error> {
+    #[cfg(target_os = "macos")]
+    return macos::refresh();
+    #[cfg(not(target_os = "macos"))]
+    return Err(Error::Platform("Unsupported platform".to_string()));
+}
+
 /// Get information about the currently active application.
 ///
-/// This is a synchronous query that returns the current state immediately.
+/// Reads the current state synchronously.
 pub fn get_active_app(config: QueryConfig) -> Result<AppInfo, Error> {
     #[cfg(target_os = "macos")]
     return macos::get_active_app(config);

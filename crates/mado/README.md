@@ -3,7 +3,7 @@
 `mado` is a macOS-focused Rust crate for reading the active app and focused window. It wraps native macOS APIs through Swift, listens to app, window, and bounds changes, and can enrich browser windows with URL and website metadata. Use it in desktop apps, productivity tools, and agents that need current user context.
 
 - Query the active app or focused window when you need a snapshot
-- Listen to app lifecycle, focused-window, title, and opt-in window bounds changes without continuous polling
+- Listen to app lifecycle, focused-window, title, and opt-in window bounds changes with optional reconciliation for missed notifications
 - Add browser URLs, content-area bounds, private-mode state, website hostnames, favicons, and favicon-derived colors only when needed
 - Read installed app names, bundle IDs, icons, and display colors without Accessibility permission
 - Handle macOS Accessibility and sandbox limits explicitly
@@ -22,7 +22,7 @@ impl WindowListener for FocusListener {
             WindowEvent::AppTerminated { app } => {
                 println!("App terminated: {:?}", app.name);
             }
-            WindowEvent::WindowChanged { window } => {
+            WindowEvent::WindowChanged { window } | WindowEvent::WindowUpdated { window } => {
                 let app_name = window.app.name.as_deref().unwrap_or("Unknown app");
                 let title = window.title.as_deref().unwrap_or("Untitled window");
                 println!("{app_name}: {title}");
@@ -71,7 +71,7 @@ fn main() -> Result<(), mado::Error> {
 
 ```toml
 [dependencies]
-mado = "0.0.5"
+mado = "0.0.17"
 ```
 
 ## Requirements
@@ -123,9 +123,11 @@ fn main() -> Result<(), mado::Error> {
 }
 ```
 
-`include_website_info` depends on `include_browser_info` because it needs the current URL. Website metadata can fetch favicons over the network and is cached by hostname.
+`include_website_info` depends on `include_browser_info` because it needs the current URL. Website metadata can fetch favicons synchronously over the network and is cached by hostname.
+For latency-sensitive monitoring, leave `include_website_info` disabled and call
+`get_website_icon()` from a worker after receiving the URL.
 
-### Listen To Focus Changes
+### Monitor Window Changes
 
 Use `WindowMonitor` when you want event-driven updates:
 
@@ -143,8 +145,8 @@ impl WindowListener for FocusListener {
             WindowEvent::AppTerminated { app } => {
                 println!("App terminated: {}", app);
             }
-            WindowEvent::WindowChanged { window } => {
-                println!("Window: {}", window);
+            WindowEvent::WindowChanged { window } | WindowEvent::WindowUpdated { window } => {
+                println!("Window content: {}", window);
             }
             WindowEvent::WindowBoundsChanged { window } => {
                 println!("Window moved/resized: {:?}", window.bounds);
@@ -168,7 +170,13 @@ fn main() -> Result<(), mado::Error> {
 }
 ```
 
-`run()` blocks until `WindowMonitor::stop()` is called. Only one monitor can run at a time. A second monitor returns `Error::AlreadyRunning`.
+`run()` blocks until `WindowMonitor::stop()` is called. Only one monitor can run at a time. A second monitor returns `Error::AlreadyRunning`. `stop()` queues shutdown. Wait for `run()` to return before starting another monitor. Calls to `stop()` or `refresh()` before native initialization or after shutdown return `Error::NotRunning`.
+
+`run()` uses the calling thread. If you start it on a worker, keep the host's main
+event loop running: macOS app notifications are delivered there before being
+forwarded to the monitor. Tauri and AppKit normally provide this loop. A CLI that
+blocks or sleeps on the main thread needs to run it explicitly. See the
+[threaded example](examples/listen_threaded.rs) for a complete setup.
 
 Stop a monitor from another thread:
 
@@ -184,6 +192,58 @@ thread::spawn(|| {
 
 Keep `on_focus_change()` callbacks fast. Send events to another thread or async task when processing needs I/O, database work, or network calls. Panics inside callbacks are caught and logged so the monitor can continue.
 
+### Observation And Reconciliation
+
+The foreground window is the discovery point. Once observed, a window keeps its
+Accessibility notifications until destruction or app termination, even after focus
+moves elsewhere. The monitor does not enumerate every open window. If a browser
+misses a destruction notification, the retained observation can remain until its app exits.
+
+`WindowChanged` describes foreground window state. `WindowUpdated` describes a
+tracked background window and must not replace the consumer's foreground context.
+Bounds and lifecycle events can also refer to background windows.
+
+Window IDs come from matching Accessibility geometry to CoreGraphics windows, with
+an app-local z-order fallback. This is an estimate rather than a native identity
+mapping. Background queries retain the observed ID instead of repeating that fallback.
+
+Updates have three sources:
+
+| Source                              | When it runs                                                   | Scope                                                     |
+| ----------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------- |
+| App and Accessibility notifications | When macOS or the app sends an event                           | App activity and observed windows                         |
+| Bounded retries                     | When foreground observation or browser metadata is unavailable | The active app, with delays from 200 ms up to 1.6 seconds |
+| Optional reconciliation             | At `reconcile_interval_ms`, disabled by default                | Foreground state and tracked on-screen background windows |
+
+Retries stop when information becomes available, focus moves to another app, or
+the retry budget is exhausted (about 8 seconds for browser metadata and 30 seconds
+for observation setup). Setting the reconciliation interval to zero disables only
+periodic reconciliation, not these temporary retries.
+
+Enable reconciliation to recover from missed notifications or delayed metadata updates:
+
+```rust
+let config = mado::MonitorConfig {
+    include_browser_info: true,
+    reconcile_interval_ms: 2_000,
+    ..Default::default()
+};
+```
+
+On-screen means included in macOS's window list across connected displays. Covered
+windows can still qualify. Minimized windows and windows on inactive Spaces are
+skipped by background reconciliation, but keep their observers. Reconciliation
+respects the tracking flags and compares snapshots before emitting changes.
+
+Notifications, retries, reconciliation, and listener callbacks run serially on the
+monitor thread. The interval is a recovery cadence, not a delivery deadline:
+Accessibility queries, optional website fetches, and slow callbacks can delay updates.
+
+`WindowMonitor::refresh()` requests fresh events even if state is unchanged. It
+re-emits the foreground `AppActivated` event and configured window updates for the
+foreground and tracked on-screen background windows. It queues work on the same
+monitor thread and does not discover all open windows.
+
 ### Browser And Website Info
 
 Enable browser metadata when you need the active tab URL, browser content-area bounds, private-mode state, website hostname, favicon, or favicon-derived color:
@@ -196,7 +256,7 @@ struct BrowserListener;
 impl WindowListener for BrowserListener {
     fn on_focus_change(&self, event: WindowEvent) {
         let window = match event {
-            WindowEvent::WindowChanged { window } => window,
+            WindowEvent::WindowChanged { window } | WindowEvent::WindowUpdated { window } => window,
             WindowEvent::AppActivated { .. } => return,
             WindowEvent::AppTerminated { .. } => return,
             WindowEvent::WindowBoundsChanged { .. } => return,
@@ -242,8 +302,16 @@ Supported browsers are grouped by extraction family:
 - Safari: Safari (Technology Preview)
 - Gecko: Firefox (Developer Edition and Nightly) and Zen
 
+The loaded document URL takes precedence over the address bar, which may contain
+an uncommitted edit. Chromium and Gecko can fall back to a known unfocused address
+bar. Safari cannot use this fallback: its shortened address may omit the page path.
+Missing or unreadable URLs produce `browser: None`, including for supported browsers.
+A missing value does not imply navigation to an empty or allowed page.
+
 Browser content bounds are best-effort Accessibility data and may be `None`
-when the browser does not expose a top-level web content frame.
+when the browser does not expose a top-level web content frame. Private-mode
+state uses window-title patterns and is not a security guarantee. See the
+[browser extraction model and observations](docs/browser-accessibility-extraction.md).
 
 Browser information can become available shortly after a focus or title event.
 The monitor retries while the browser remains active and emits another
@@ -284,7 +352,7 @@ fn main() {
 `get_installed_apps()` recursively scans the standard user, local, and system application
 directories while excluding helpers embedded inside application bundles. Unreadable directories
 and invalid application bundles are skipped. Use `get_installed_app()` when you have a bundle
-identifier and need an exact lookup through macOS application registration; this lookup is not
+identifier and need an exact lookup through macOS application registration. This lookup is not
 limited to those scanned directories.
 
 ### Website Icons
@@ -320,14 +388,15 @@ fn main() {
 
 `MonitorConfig` supports the same enrichment options and adds monitor behavior flags:
 
-| Option                        | Default | Description                                                                |
-| ----------------------------- | ------- | -------------------------------------------------------------------------- |
-| `track_window_changes`        | `true`  | Tracks window focus and title changes in addition to app activation events |
-| `track_window_bounds_changes` | `false` | Tracks focused window move and resize changes                              |
-| `include_app_icon`            | `false` | Adds a base64 PNG app icon to emitted app or window data                   |
-| `include_app_color`           | `false` | Adds app display color when app icon extraction is enabled                 |
-| `include_browser_info`        | `false` | Extracts the active browser URL and private-mode state                     |
-| `include_website_info`        | `false` | Extracts hostname, favicon, and favicon-derived color from the browser URL |
+| Option                        | Default | Description                                                                                      |
+| ----------------------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| `track_window_changes`        | `true`  | Tracks foreground and background content changes and window lifecycle events                     |
+| `track_window_bounds_changes` | `false` | Tracks move and resize changes for windows observed while focused                                |
+| `reconcile_interval_ms`       | `0`     | Rechecks foreground and observed on-screen windows after missed notifications (zero disables it) |
+| `include_app_icon`            | `false` | Adds a base64 PNG app icon to emitted app or window data                                         |
+| `include_app_color`           | `false` | Adds app display color when app icon extraction is enabled                                       |
+| `include_browser_info`        | `false` | Extracts the active browser URL and private-mode state                                           |
+| `include_website_info`        | `false` | Extracts hostname, favicon, and favicon-derived color from the browser URL                       |
 
 `InstalledAppsConfig` controls installed app scans:
 
@@ -337,27 +406,33 @@ fn main() {
 | `include_app_color` | `false` | Adds app display color when icon extraction is enabled |
 | `icon_size`         | `32`    | Icon size in pixels                                    |
 
+When upgrading code that constructs `MonitorConfig` directly, include
+`reconcile_interval_ms` or use `..Default::default()`. Exhaustive event matches must
+handle `WindowUpdated`. Consumers tracking only foreground activity should ignore
+that variant rather than treating it as a focus change.
+
 ## Events
 
 `WindowEvent` has these variants:
 
-| Event                 | When it fires                                                               |
-| --------------------- | --------------------------------------------------------------------------- |
-| `AppActivated`        | Immediately when the active app changes, even if no window is available yet |
-| `AppTerminated`       | When an app activated during the monitor run terminates                     |
-| `WindowChanged`       | When focused window information becomes available or changes                |
-| `WindowBoundsChanged` | When the focused window moves or resizes, if enabled                        |
-| `WindowMinimized`     | When the observed focused window is minimized                               |
-| `WindowRestored`      | When the observed focused window is restored from minimized state           |
-| `WindowDestroyed`     | When a window observed while focused is later destroyed                     |
+| Event                 | When it fires                                                                             |
+| --------------------- | ----------------------------------------------------------------------------------------- |
+| `AppActivated`        | When the active app changes, without waiting for window metadata               |
+| `AppTerminated`       | When an app activated during the monitor run terminates                                   |
+| `WindowChanged`       | When focused window information becomes available or changes                              |
+| `WindowUpdated`       | When a previously focused background window changes, without changing foreground activity |
+| `WindowBoundsChanged` | When an observed window moves or resizes, if enabled                                      |
+| `WindowMinimized`     | When a window observed while focused is minimized                                         |
+| `WindowRestored`      | When a window observed while focused is restored from minimized state                     |
+| `WindowDestroyed`     | When a window observed while focused is later destroyed                                   |
 
-Lifecycle events only cover windows observed after the active app observer is installed. Minimize and restore events refer to the currently focused window. A destruction event may arrive after focus moves to another window and uses cached data for the destroyed window. A restore that activates an app may appear as `AppActivated` followed by `WindowChanged` instead of `WindowRestored`.
+Destruction uses cached data because the accessibility element is no longer readable. A restore that activates an app may appear as `AppActivated` followed by `WindowChanged` instead of `WindowRestored`.
 
 Use `event.app()` when all variants should be handled by app identity.
 
 ## macOS Permissions
 
-Check permission before enabling window tracking:
+Without Accessibility access, monitoring continues with app events. Window tracking starts after permission is granted and the next app activation or enabled reconciliation pass. Snapshot window queries still return a permission error. Check permission when explaining this limitation to users:
 
 ```rust
 if !mado::is_accessibility_trusted() {
@@ -376,7 +451,7 @@ Accessibility permission is required for:
 Accessibility permission is not required for:
 
 - `get_active_app()`
-- app activation events when `track_window_changes` and `track_window_bounds_changes` are both `false`
+- app activation and termination events
 - `get_installed_apps()`
 - `get_installed_app()`
 - `get_app_icon()` and `get_app_color()`
@@ -419,13 +494,9 @@ cargo run -p mado --example installed_apps
 
 ## FAQ
 
-### Why does mado use callbacks instead of polling?
-
-Event-driven monitoring reacts to app and window changes as they happen. It only performs bounded polling when focused window or browser information is not ready yet. Use snapshot queries when continuous polling is the better fit for your app.
-
 ### Why are there separate `AppActivated` and `WindowChanged` events?
 
-macOS can activate an app before a focused window exists, for example after launching from Spotlight or switching to an app with no open windows. `AppActivated` lets you react immediately. `WindowChanged` follows when window data becomes available.
+macOS can activate an app before a focused window exists, for example after launching from Spotlight or switching to an app with no open windows. `AppActivated` reports the app without waiting for window metadata. `WindowChanged` can follow when window tracking is enabled and data becomes available.
 
 ### Why does browser URL extraction need Accessibility permission?
 

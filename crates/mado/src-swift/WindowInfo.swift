@@ -21,23 +21,6 @@ struct WindowInfo {
         ]
     }
 
-    /// Create from NSRunningApplication.
-    static func fromNS(
-        _ app: NSRunningApplication,
-        includeAppIcon: Bool = false,
-        includeAppColor: Bool = false,
-        includeBrowserInfo: Bool = false,
-        includeWebsiteInfo: Bool = false
-    ) -> WindowInfo {
-        return fromPID(
-            app.processIdentifier,
-            includeAppIcon: includeAppIcon,
-            includeAppColor: includeAppColor,
-            includeBrowserInfo: includeBrowserInfo,
-            includeWebsiteInfo: includeWebsiteInfo
-        )
-    }
-
     /// Create from PID.
     static func fromPID(
         _ pid: pid_t,
@@ -52,8 +35,6 @@ struct WindowInfo {
             includeIcon: includeAppIcon,
             includeColor: includeAppColor
         )
-        let bundleId = appInfo.bundleId
-
         // Get focused window via Accessibility API
         guard let windowElement = getFocusedWindow(from: appElement) else {
             return WindowInfo(
@@ -65,11 +46,27 @@ struct WindowInfo {
             )
         }
 
-        let title = getTitle(from: windowElement)
         let bounds = getBounds(from: windowElement)
+        return fromElement(
+            windowElement, app: appInfo,
+            windowId: findWindowId(pid: pid, bounds: bounds),
+            bounds: bounds,
+            includeBrowserInfo: includeBrowserInfo,
+            includeWebsiteInfo: includeWebsiteInfo)
+    }
 
-        // CoreGraphics provides stable window IDs (Accessibility API doesn't expose window IDs reliably).
-        let windowId = findWindowId(pid: pid, bounds: bounds)
+    /// Reads an observed element using its cached identity.
+    /// A missing ID stays missing because the foreground fallback could identify a different window.
+    static func fromElement(
+        _ windowElement: AXUIElement,
+        app appInfo: AppInfo,
+        windowId: UInt32?,
+        bounds: [String: Double]?,
+        includeBrowserInfo: Bool,
+        includeWebsiteInfo: Bool
+    ) -> WindowInfo {
+        let bundleId = appInfo.bundleId
+        let title = getTitle(from: windowElement)
 
         // Get browser info if enabled and app is a browser
         let browser: BrowserInfo? =
@@ -103,12 +100,18 @@ struct WindowInfo {
         guard let app = NSWorkspace.shared.frontmostApplication else {
             return nil
         }
-        return fromNS(
-            app,
-            includeAppIcon: includeAppIcon,
-            includeAppColor: includeAppColor,
+        // Note: One-shot queries require a focused window, while monitor snapshots can contain app data only
+        guard
+            let element = getFocusedWindow(
+                from: AXUIElementCreateApplication(app.processIdentifier))
+        else { return nil }
+        let bounds = getBounds(from: element)
+        return fromElement(
+            element,
+            app: AppInfo.fromNS(app, includeIcon: includeAppIcon, includeColor: includeAppColor),
+            windowId: findWindowId(pid: app.processIdentifier, bounds: bounds),
+            bounds: bounds,
             includeBrowserInfo: includeBrowserInfo,
-            includeWebsiteInfo: includeWebsiteInfo
-        )
+            includeWebsiteInfo: includeWebsiteInfo)
     }
 }

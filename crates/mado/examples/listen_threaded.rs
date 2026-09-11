@@ -29,7 +29,7 @@ impl WindowListener for ThreadedListener {
                 println!("\n[Threaded Monitor] Event #{}: App Terminated", count);
                 println!("   App: {}", app);
             }
-            WindowEvent::WindowChanged { window } => {
+            WindowEvent::WindowChanged { window } | WindowEvent::WindowUpdated { window } => {
                 println!("\n[Threaded Monitor] Event #{}: Window Changed", count);
                 println!("   Window: {}", window);
             }
@@ -86,6 +86,7 @@ fn main() -> Result<(), mado::Error> {
                 event_count: event_count_clone,
             },
             MonitorConfig {
+                reconcile_interval_ms: 2_000,
                 include_app_icon: true,
                 include_app_color: false,
                 include_browser_info: true,
