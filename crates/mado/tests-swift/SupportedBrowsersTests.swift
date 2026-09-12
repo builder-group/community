@@ -3,32 +3,40 @@ import XCTest
 @testable import Mado
 
 final class SupportedBrowsersTests: XCTestCase {
-    func testMapsSupportedBrowsersToTheirExtractionFamily() {
+    func testMapsSupportedBrowsersToTheirKind() {
         XCTAssertEqual(
-            SupportedBrowsers.family(for: "net.imput.helium"),
+            SupportedBrowsers.kind(for: "org.chromium.Chromium"),
             .chromium
         )
         XCTAssertEqual(
-            SupportedBrowsers.family(for: "com.apple.Safari"),
+            SupportedBrowsers.kind(for: "com.vivaldi.Vivaldi"),
+            .vivaldi
+        )
+        XCTAssertEqual(
+            SupportedBrowsers.kind(for: "net.imput.helium"),
+            .chromium
+        )
+        XCTAssertEqual(
+            SupportedBrowsers.kind(for: "com.apple.Safari"),
             .safari
         )
         XCTAssertEqual(
-            SupportedBrowsers.family(for: "org.mozilla.firefox"),
+            SupportedBrowsers.kind(for: "org.mozilla.firefox"),
             .gecko
         )
         XCTAssertEqual(
-            SupportedBrowsers.family(for: "app.zen-browser.zen"),
+            SupportedBrowsers.kind(for: "app.zen-browser.zen"),
             .gecko
         )
     }
 
     func testRejectsUnknownBundleIdentifier() {
-        XCTAssertNil(SupportedBrowsers.family(for: "com.example.browser"))
+        XCTAssertNil(SupportedBrowsers.kind(for: "com.example.browser"))
     }
 
     func testMatchesBundleIdentifierCaseInsensitively() {
         XCTAssertEqual(
-            SupportedBrowsers.family(for: "COM.APPLE.SAFARI"),
+            SupportedBrowsers.kind(for: "COM.APPLE.SAFARI"),
             .safari
         )
     }

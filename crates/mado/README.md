@@ -71,7 +71,7 @@ fn main() -> Result<(), mado::Error> {
 
 ```toml
 [dependencies]
-mado = "0.0.19"
+mado = "0.0.20"
 ```
 
 ## Requirements
@@ -275,18 +275,19 @@ fn main() -> Result<(), mado::Error> {
 }
 ```
 
-Supported browsers are grouped by extraction family:
+Supported browsers:
 
 - Chromium: Google Chrome (Beta, Dev, and Canary), Chromium, Brave (Beta and
   Nightly), Microsoft Edge (Beta, Dev, and Canary), Opera (Beta, Developer, and
-  GX), Arc, and Helium
+  GX), Arc, Helium, and Vivaldi
 - Safari: Safari (Technology Preview)
 - Gecko: Firefox (Developer Edition and Nightly) and Zen
 
 The loaded document URL takes precedence over the address bar, which may contain
 an uncommitted edit. Chromium and Gecko can fall back to a known unfocused address
 bar. Safari cannot use this fallback: its shortened address may omit the page path.
-Its native Start Page is reported as `about:blank` when no web document is present.
+Safari's Start Page and Vivaldi's native internal pages are reported as `about:blank`
+when no web document is present.
 Missing or unreadable URLs produce `browser: None`, including for supported browsers.
 A missing value does not imply navigation to an empty or allowed page.
 
@@ -519,10 +520,9 @@ Accessibility behavior. Before adding a browser:
    probe needs macOS Accessibility permission.
 4. Compare the generated Markdown with
    [the existing browser observations](docs/browser-accessibility-extraction.md).
-5. Add the bundle ID to the matching extraction family, update
+5. Add the bundle ID to the matching browser kind, update
    `SupportedBrowsersTests`, and record the new observation.
 
-The specific page content is not relevant to extraction-family matching.
 `example.com` provides a stable top-level HTTPS page without redirects or
 embedded application UI.
 

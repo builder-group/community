@@ -6,11 +6,16 @@ engine does not guarantee the same Accessibility structure.
 
 ## Extraction Model
 
-Each supported browser maps to an observed extraction family:
+`BrowserInfo` selects shared or browser-specific extraction and routes address-bar
+lookup for observation. Each extraction path returns a URL and optional content
+bounds. Browser-specific tree handling stays in its helper, while URL normalization,
+bounds clipping, and metadata assembly remain shared.
 
-- `chromium`: reads top-level web content, then falls back to an unfocused browser chrome URL field
-- `safari`: reads the URL from top-level web content
-- `gecko`: reads top-level web content, then falls back to an unfocused browser chrome URL field
+Each supported browser maps to a browser kind:
+
+- `chromium` and `gecko`: read top-level web content, then fall back to an unfocused browser chrome URL field
+- `safari`: reads top-level web content and recognizes the native Start Page
+- `vivaldi`: reads the active page inside the browser interface
 
 An `AXTextField` or `AXComboBox` can expose the address bar value. Top-level `AXWebArea.AXURL`
 or `AXDocument.AXURL` can expose the loaded document URL. Address bar and
@@ -32,12 +37,15 @@ document URL has changed. Optional reconciliation recovers updates when no later
 notification arrives. If neither a URL nor a known internal page is available,
 extraction produces no browser metadata.
 
-Content bounds come from the nearest top-level web-content frame and are
-clipped to the browser window. `BrowserInfo` remains anchored to a URL: bounds
-alone do not produce browser metadata.
+The document URL and content bounds come from the same selected element. Bounds
+are clipped to the browser window. Accessibility reads are not atomic, but extraction
+does not select a second document for bounds. `BrowserInfo` remains anchored to a
+URL, including an eligible address-bar fallback: bounds alone do not produce metadata.
 
 Traversal stops at the nearest web-content node. Nested web areas can represent
 embedded pages rather than the active tab or viewport.
+Vivaldi's browser interface is a recognized exception: extraction traverses its
+internal web area to reach the active tab, excluding web panels and inactive tabs.
 
 ## Probe Workflow
 
@@ -56,18 +64,23 @@ needs macOS Accessibility permission.
 
 The generated Markdown records the browser identity, URL fields, top-level web
 content, and bounds. Compare those signals with the observations below before
-assigning an extraction family. Prefer missing metadata over guessing when a
+assigning a browser kind. Prefer missing metadata over guessing when a
 browser exposes a new structure.
 
-## Summary
+Use an existing `BrowserKind` when its extraction rules match. For a distinct
+structure, add a helper returning `BrowserPage` and route it in `BrowserInfo.extract`.
+Check `BrowserInfo.findAddressBar` too, so observation reaches the browser's URL field.
 
-| Browser        | Bundle ID                    | Family     | Browser chrome URL field | Web content `AXURL` |
+## Browser Observations
+
+| Browser        | Bundle ID                    | Kind       | Browser chrome URL field | Web content `AXURL` |
 | -------------- | ---------------------------- | ---------- | ------------------------ | ------------------- |
 | Brave          | `com.brave.Browser`          | `chromium` | Found                    | Found               |
 | Google Chrome  | `com.google.Chrome`          | `chromium` | Found                    | Found               |
 | Microsoft Edge | `com.microsoft.edgemac`      | `chromium` | Found                    | Found               |
 | Opera          | `com.operasoftware.Opera`    | `chromium` | Found                    | Not observed        |
 | Arc            | `company.thebrowser.Browser` | `chromium` | Found                    | Found               |
+| Vivaldi        | `com.vivaldi.Vivaldi`        | `vivaldi` | Found                    | Found               |
 | Safari         | `com.apple.Safari`           | `safari`   | Found                    | Found               |
 | Firefox        | `org.mozilla.firefox`        | `gecko`    | Found (`AXComboBox`)     | Found               |
 | Zen            | `app.zen-browser.zen`        | `gecko`    | Not observed             | Found               |
@@ -77,9 +90,9 @@ browser exposes a new structure.
 ### Brave
 
 - Bundle ID: `com.brave.Browser`
-- Extraction family: `chromium`
+- Browser kind: `chromium`
 - Browser version: 1.91.171, Chromium 149.0.7827.103 (arm64)
-- Tested: 2026-06-23 on macOS 26.5.1 (25F80)
+- Observed: 2026-06-23 on macOS 26.5.1 (25F80)
 
 Browser chrome URL field: Found.
 
@@ -112,9 +125,9 @@ AXWindow
 ### Google Chrome
 
 - Bundle ID: `com.google.Chrome`
-- Extraction family: `chromium`
+- Browser kind: `chromium`
 - Browser version: 151.0.7922.108 (7922.108)
-- Tested: 2026-08-08 on macOS 26.5.2 (25F84)
+- Observed: 2026-08-08 on macOS 26.5.2 (25F84)
 
 Browser chrome URL field: Found.
 
@@ -145,9 +158,9 @@ AXWindow
 ### Microsoft Edge
 
 - Bundle ID: `com.microsoft.edgemac`
-- Extraction family: `chromium`
+- Browser kind: `chromium`
 - Browser version: 149.0.4022.80 (arm64)
-- Tested: 2026-06-23 on macOS 26.5.1 (25F80)
+- Observed: 2026-06-23 on macOS 26.5.1 (25F80)
 
 Browser chrome URL field: Found.
 
@@ -182,9 +195,9 @@ AXWindow
 ### Opera
 
 - Bundle ID: `com.operasoftware.Opera`
-- Extraction family: `chromium`
+- Browser kind: `chromium`
 - Browser version: 132.0.5905.73 (arm64)
-- Tested: 2026-06-23 on macOS 26.5.1 (25F80)
+- Observed: 2026-06-23 on macOS 26.5.1 (25F80)
 
 Browser chrome URL field: Found. Opera exposed a parent address-bar text field
 and a nested field containing the URL.
@@ -213,9 +226,9 @@ Web content `AXURL`: Not observed.
 ### Arc
 
 - Bundle ID: `company.thebrowser.Browser`
-- Extraction family: `chromium`
+- Browser kind: `chromium`
 - Browser version: 1.152.0 (82313), Chromium 149.0.7827.156
-- Tested: 2026-06-23 on macOS 26.5.1 (25F80)
+- Observed: 2026-06-23 on macOS 26.5.1 (25F80)
 
 Browser chrome URL field: Found.
 
@@ -232,12 +245,36 @@ AXWindow
 > AXWebArea
 ```
 
+### Vivaldi
+
+- Bundle ID: `com.vivaldi.Vivaldi`
+- Browser kind: `vivaldi`
+- Browser version: 8.2.4133.52
+- Observed: 2026-09-12 on macOS 26.6.2
+
+Vivaldi renders its browser interface in an `AXWebArea` with the URL
+`chrome-extension://mpognobbkildjkofajifpdfhcoklimli/window.html`. The address bar
+is an `AXTextField` with `AXDOMIdentifier="urlFieldInput"` inside that interface.
+
+The actual page is a nested `AXWebArea` under `webpage-stack`. Extraction follows
+the `webpageview` container with the `active` DOM class, including through the
+intermediate containers used by tiled tabs. It skips `panels-container` because web
+panels expose independent page URLs and bounds. Content bounds exclude web panels
+and browser controls.
+
+In tiled views, only the selected tile's URL and bounds are reported. Other visible
+tiles are not tracked independently.
+
+Native internal content uses the `internal-page` DOM class within the active page.
+After a complete traversal finds no web document, mado reports it as `about:blank`.
+An unreadable document or incomplete traversal cannot confirm an internal page.
+
 ### Safari
 
 - Bundle ID: `com.apple.Safari`
-- Extraction family: `safari`
+- Browser kind: `safari`
 - Browser version: 26.5.2 (21624.2.5.11.8)
-- Tested: 2026-08-08 on macOS 26.5.2 (25F84)
+- Observed: 2026-08-08 on macOS 26.5.2 (25F84)
 
 Browser chrome URL field: Found.
 
@@ -269,9 +306,9 @@ can also lag behind the loaded page and are not used for this decision.
 ### Firefox
 
 - Bundle ID: `org.mozilla.firefox`
-- Extraction family: `gecko`
+- Browser kind: `gecko`
 - Browser version: 155.0.1
-- Tested: 2026-09-11 on macOS 26.6.2 (25G83)
+- Observed: 2026-09-11 on macOS 26.6.2 (25G83)
 
 Browser chrome URL field: `AXComboBox` with the description "Search with Google or enter address".
 Same-title switches between `example.com` and `example.org` produced window updates.
@@ -291,9 +328,9 @@ AXWindow
 ### Zen
 
 - Bundle ID: `app.zen-browser.zen`
-- Extraction family: `gecko`
+- Browser kind: `gecko`
 - Browser version: 1.21.12b (126.8.7)
-- Tested: 2026-08-08 on macOS 26.5.2 (25F84)
+- Observed: 2026-08-08 on macOS 26.5.2 (25F84)
 
 Browser chrome URL field: Not observed.
 

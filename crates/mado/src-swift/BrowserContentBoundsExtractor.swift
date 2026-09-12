@@ -2,25 +2,10 @@ import ApplicationServices
 import Foundation
 
 enum BrowserContentBoundsExtractor {
-    static func extract(from windowElement: AXUIElement) -> [String: Double]? {
-        guard
-            let contentBounds = findTopLevelWebContentBounds(in: windowElement)
-        else {
-            return nil
-        }
-
-        // Note: Some browsers (like Safari) expose document-sized web frames rather than the visible
-        // viewport, so exported content bounds are clipped to the window
-        return clamp(contentBounds, to: getBounds(from: windowElement))
-    }
-
-    private static func findTopLevelWebContentBounds(
-        in element: AXUIElement
-    ) -> [String: Double]? {
-        return BrowserWebContent.findTopLevelValue(
-            in: element,
-            extract: { getBounds(from: $0) }
-        )
+    static func extract(from content: AXUIElement?, in window: AXUIElement) -> [String: Double]? {
+        guard let content, let bounds = getBounds(from: content) else { return nil }
+        // Note: Some browsers expose document-sized frames, so clip the selected content to the window
+        return clamp(bounds, to: getBounds(from: window))
     }
 
     static func clamp(

@@ -28,38 +28,48 @@ struct BrowserInfo {
     )
         -> BrowserInfo?
     {
-        guard let family = SupportedBrowsers.family(for: bundleId) else {
+        guard let kind = SupportedBrowsers.kind(for: bundleId) else {
             return nil
         }
-        guard
-            let url = BrowserURLExtractor.extract(
-                family: family,
-                from: windowElement
-            )
-        else {
-            return nil
+        let page: BrowserPage?
+        switch kind {
+        case .vivaldi:
+            page = VivaldiWebContent.extract(from: windowElement)
+        case .safari:
+            page = SafariWebContent.extract(from: windowElement)
+        case .chromium, .gecko:
+            page = BrowserWebContent.extract(from: windowElement)
         }
+        guard let page else { return nil }
 
-        let contentBounds = BrowserContentBoundsExtractor.extract(
-            from: windowElement
-        )
         let isPrivate = detectPrivateMode(
             windowTitle: windowTitle ?? getTitle(from: windowElement)
         )
 
         let website: WebsiteInfo? =
             if includeWebsiteInfo {
-                WebsiteInfo.extract(from: url)
+                WebsiteInfo.extract(from: page.url)
             } else {
                 nil
             }
 
         return BrowserInfo(
-            url: url,
-            contentBounds: contentBounds,
+            url: page.url,
+            contentBounds: page.contentBounds,
             isPrivate: isPrivate,
             website: website
         )
+    }
+
+    static func findAddressBar(bundleId: String, in window: AXUIElement) -> AXUIElement? {
+        guard let kind = SupportedBrowsers.kind(for: bundleId) else { return nil }
+        switch kind {
+        case .vivaldi:
+            guard let interface = VivaldiWebContent.findInterface(in: window) else { return nil }
+            return BrowserURLExtractor.findAddressBar(in: interface)
+        case .chromium, .gecko, .safari:
+            return BrowserURLExtractor.findAddressBar(in: window)
+        }
     }
 
     // MARK: - Private Mode Detection

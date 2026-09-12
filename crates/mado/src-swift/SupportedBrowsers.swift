@@ -1,5 +1,5 @@
 enum SupportedBrowsers {
-    private static let familiesByBundleId: [String: BrowserFamily] = [
+    private static let kindsByBundleId: [String: BrowserKind] = [
         // Chromium family
         "com.google.chrome": .chromium,
         "com.google.chrome.beta": .chromium,
@@ -19,6 +19,7 @@ enum SupportedBrowsers {
         "com.operasoftware.operagx": .chromium,
         "company.thebrowser.browser": .chromium,
         "net.imput.helium": .chromium,
+        "com.vivaldi.vivaldi": .vivaldi,
 
         // Safari
         "com.apple.safari": .safari,
@@ -31,14 +32,16 @@ enum SupportedBrowsers {
         "app.zen-browser.zen": .gecko,
     ]
 
-    /// Returns the extraction family for an explicitly supported browser.
-    static func family(for bundleId: String) -> BrowserFamily? {
-        return familiesByBundleId[bundleId.lowercased()]
+    /// Returns the browser kind for an explicitly supported browser.
+    static func kind(for bundleId: String) -> BrowserKind? {
+        return kindsByBundleId[bundleId.lowercased()]
     }
 }
 
-enum BrowserFamily: Equatable {
+// Note: Browsers share family handling unless their Accessibility structure requires a distinct path
+enum BrowserKind: Equatable {
     case chromium
-    case safari
     case gecko
+    case safari
+    case vivaldi
 }

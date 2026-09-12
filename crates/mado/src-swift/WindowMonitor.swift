@@ -10,7 +10,7 @@ import SwiftRs
 /// Refresh and stop enqueue work from any thread.
 final class WindowMonitor: NSObject {
     private static let instanceLock = NSLock()
-    // Note: FFI accesses the singleton from multiple threads, so shared uses instanceLock
+    // Note: FFI calls can access shared from threads other than the monitor thread, so guard it with instanceLock
     nonisolated(unsafe) private static var instance: WindowMonitor?
 
     static var shared: WindowMonitor? {
@@ -403,7 +403,7 @@ final class WindowMonitor: NSObject {
             pid, includeIcon: includeAppIcon, includeColor: includeAppColor)
         let isBrowser =
             trackWindowChanges && includeBrowserInfo
-            && appInfo.bundleId.flatMap { SupportedBrowsers.family(for: $0) } != nil
+            && appInfo.bundleId.flatMap { SupportedBrowsers.kind(for: $0) } != nil
         let observedWindow = ObservedWindow(
             element: windowElement,
             windowId: findWindowId(
@@ -411,7 +411,9 @@ final class WindowMonitor: NSObject {
                 bounds: getBounds(from: windowElement)
             ),
             app: appInfo,
-            addressBar: isBrowser ? BrowserURLExtractor.findAddressBar(in: windowElement) : nil
+            addressBar: isBrowser ? appInfo.bundleId.flatMap {
+                BrowserInfo.findAddressBar(bundleId: $0, in: windowElement)
+            } : nil
         )
 
         let context = Unmanaged.passUnretained(self).toOpaque()
@@ -891,7 +893,7 @@ final class WindowMonitor: NSObject {
         if includeBrowserInfo,
             let windowInfo,
             let bundleId = windowInfo.app.bundleId,
-            SupportedBrowsers.family(for: bundleId) != nil,
+            SupportedBrowsers.kind(for: bundleId) != nil,
             windowInfo.browser == nil
         {
             return .browserInfoUnavailable
@@ -903,7 +905,7 @@ final class WindowMonitor: NSObject {
     private func sendWindowBoundsChangedEvent(at index: Int, bounds: [String: Double]?) {
         guard trackWindowBoundsChanges else { return }
         let observed = windowObservations[index].window
-        // Note: Notifications and reconciliation share emitted bounds, independently of content snapshots
+        // Note: Deduplicate bounds across notifications and reconciliation without suppressing separate content updates
         guard windowObservations[index].bounds.update(windowId: observed.windowId, bounds: bounds)
         else { return }
         sendEvent(

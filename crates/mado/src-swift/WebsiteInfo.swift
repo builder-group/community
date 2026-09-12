@@ -207,7 +207,7 @@ final class WebsiteAssetsCache: @unchecked Sendable {
         lock.lock()
         defer { lock.unlock() }
 
-        // Note: Fetches run outside the lock, so compare and insert together to preserve richer results
+        // Note: An icon-only fetch must not replace a cache entry whose color lookup has already completed
         if let cached = cache[assets.hostname] {
             if !assets.isColorResolved || cached.isColorResolved {
                 return cached
