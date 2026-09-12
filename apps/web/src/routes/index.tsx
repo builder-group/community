@@ -33,23 +33,9 @@ export const Route = createFileRoute('/')({
 function RouteComponent() {
 	const { npmDownloads } = Route.useLoaderData();
 
-	// const statusOrder = React.useMemo(
-	// 	() => ({
-	// 		'in-progress': 0,
-	// 		'maintenance': 1,
-	// 		'paused': 2,
-	// 		'completed': 3,
-	// 		'pivoted': 4,
-	// 		'discontinued': 5
-	// 	}),
-	// 	[]
-	// );
-
 	const saasProjects = projectsConfig.projects
 		.filter((p) => p.category === 'saas')
 		.sort((a, b) => {
-			// const statusDiff = (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
-			// if (statusDiff !== 0) return statusDiff;
 			const aDate = a.startedAt.year * 12 + (a.startedAt.month ?? 0);
 			const bDate = b.startedAt.year * 12 + (b.startedAt.month ?? 0);
 			return bDate - aDate;

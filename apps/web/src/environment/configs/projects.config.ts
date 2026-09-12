@@ -19,8 +19,7 @@ export const projectsConfig: {
 		{
 			id: 'abstand',
 			name: 'Abstand',
-			description:
-				'macOS app to schedule focus sessions with automatic app blocking and forced breaks',
+			description: 'macOS app for focus sessions, app and website blocking, and scheduled breaks',
 			logo: { type: 'image', src: '/illustrations/logos/abstand.png' },
 			startedAt: { year: 2026, month: 4 },
 			status: 'maintenance',
@@ -50,7 +49,7 @@ export const projectsConfig: {
 		{
 			id: 'focuscat',
 			name: 'FocusCat',
-			description: 'macOS pomodoro timer with a cat companion and app blocking',
+			description: 'macOS Pomodoro timer with a cat companion and app blocking',
 			logo: { type: 'image', src: '/illustrations/logos/focuscat.png' },
 			startedAt: { year: 2026, month: 1 },
 			status: 'maintenance',
@@ -103,7 +102,7 @@ export const projectsConfig: {
 		{
 			id: 'learnlinesfaster',
 			name: 'LearnLinesFaster',
-			description: 'Web app for learning scripts using the first-letter mnemonic method',
+			description: 'Web app for memorizing lines using first-letter hints',
 			logo: { type: 'emoji', value: '✨' },
 			startedAt: { year: 2025, month: 10 },
 			status: 'maintenance',
@@ -200,6 +199,17 @@ export const projectsConfig: {
 		},
 		// MARK: - SaaS: Discontinued
 		{
+			id: 'actorpal',
+			name: 'ActorPal',
+			description: 'Suite of tools for actor line learning, scene practice, and mock auditions',
+			logo: { type: 'emoji', value: '✨' },
+			startedAt: { year: 2025, month: 10 },
+			endedAt: { year: 2025, month: 10 },
+			status: 'discontinued',
+			category: 'saas',
+			tags: []
+		},
+		{
 			id: 'tasu',
 			name: 'Tasu',
 			description: 'Open-source, video-first customer support tool',
@@ -211,12 +221,12 @@ export const projectsConfig: {
 			tags: []
 		},
 		{
-			id: 'actorpal',
-			name: 'ActorPal',
-			description: 'Suite of tools for actor line learning, scene practice, and mock auditions',
-			logo: { type: 'emoji', value: '✨' },
-			startedAt: { year: 2025, month: 10 },
-			endedAt: { year: 2025, month: 10 },
+			id: 'open-box',
+			name: 'Open Box',
+			description: 'Shopify app for deferred shipping and bulk order bundling',
+			logo: { type: 'emoji', value: '📦' },
+			startedAt: { year: 2024, month: 10 },
+			endedAt: { year: 2024, month: 11 },
 			status: 'discontinued',
 			category: 'saas',
 			tags: []
@@ -244,17 +254,6 @@ export const projectsConfig: {
 			tags: [{ type: 'youtube', url: 'https://www.youtube.com/@midimarble' }]
 		},
 		{
-			id: 'eu-blocks',
-			name: 'EU Blocks',
-			description: 'Shopify app with pre-built GDPR and EU energy label compliant UI blocks',
-			logo: { type: 'image', src: '/illustrations/logos/eu-blocks.png' },
-			startedAt: { year: 2024, month: 7 },
-			endedAt: { year: 2024, month: 9 },
-			status: 'discontinued',
-			category: 'saas',
-			tags: []
-		},
-		{
 			id: 'shortify',
 			name: 'Shortify',
 			description: 'AI tool to automate short-form video content creation',
@@ -266,12 +265,12 @@ export const projectsConfig: {
 			tags: []
 		},
 		{
-			id: 'open-box',
-			name: 'Open Box',
-			description: 'Shopify app for deferred shipping and bulk order bundling',
-			logo: { type: 'emoji', value: '📦' },
-			startedAt: { year: 2024, month: 10 },
-			endedAt: { year: 2024, month: 11 },
+			id: 'eu-blocks',
+			name: 'EU Blocks',
+			description: 'Shopify app with pre-built GDPR and EU energy label compliant UI blocks',
+			logo: { type: 'image', src: '/illustrations/logos/eu-blocks.png' },
+			startedAt: { year: 2024, month: 7 },
+			endedAt: { year: 2024, month: 9 },
 			status: 'discontinued',
 			category: 'saas',
 			tags: []
@@ -293,8 +292,7 @@ export const projectsConfig: {
 		{
 			id: 'feature-core',
 			name: 'feature-core',
-			description:
-				'Typed .with() feature composition with dependency checks for TypeScript objects',
+			description: 'Composable features for TypeScript objects with typed dependencies',
 			startedAt: { year: 2026 },
 			status: 'maintenance',
 			category: 'package',
@@ -306,8 +304,7 @@ export const projectsConfig: {
 		{
 			id: 'feature-fetch',
 			name: 'feature-fetch',
-			description:
-				'Typed fetch client with tuple results and opt-in REST, OpenAPI, GraphQL, retry, cache',
+			description: 'Typed fetch client for REST, OpenAPI, and GraphQL',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -319,8 +316,7 @@ export const projectsConfig: {
 		{
 			id: 'feature-form',
 			name: 'feature-form',
-			description:
-				'Framework-agnostic reactive form state with Standard Schema validation and triggers',
+			description: 'Reactive form state with Standard Schema validation',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -332,8 +328,7 @@ export const projectsConfig: {
 		{
 			id: 'feature-logger',
 			name: 'feature-logger',
-			description:
-				'Composable console logger with levels, formatting, middleware, and testable output',
+			description: 'Console logger with levels, formatting, and middleware',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -383,8 +378,7 @@ export const projectsConfig: {
 		{
 			id: 'xml-tokenizer',
 			name: 'xml-tokenizer',
-			description:
-				'Streaming XML, HTML, and SVG tokenizer with typed tokens, selectors, object helpers',
+			description: 'XML, HTML, and SVG tokenizer with typed tokens and path selectors',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -396,8 +390,7 @@ export const projectsConfig: {
 		{
 			id: 'tuple-result',
 			name: 'tuple-result',
-			description:
-				'Plain TypeScript Result tuples with typed errors, narrowing, helpers, JSON-friendly arrays',
+			description: 'TypeScript tuples for returning success values or errors',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -409,8 +402,7 @@ export const projectsConfig: {
 		{
 			id: 'validatenv',
 			name: 'validatenv',
-			description:
-				'Typed env validation with Standard Schema validators, built-in parsers, error reports',
+			description: 'Typed environment variable validation with Standard Schema support',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
@@ -422,7 +414,7 @@ export const projectsConfig: {
 		{
 			id: 'validation-adapter',
 			name: 'validation-adapter',
-			description: 'Universal validation abstraction for Zod, Valibot, and Yup',
+			description: 'Shared validation interface for Zod, Valibot, and Yup',
 			startedAt: { year: 2024 },
 			endedAt: { year: 2026, month: 5 },
 			status: 'discontinued',
@@ -520,7 +512,7 @@ export const projectsConfig: {
 			id: 'config',
 			name: '@blgc/config',
 			description:
-				'Shared TypeScript, ESLint, Prettier, and Vitest configs for Builder Group projects',
+				'Shared TypeScript, ESLint, Prettier, and Vitest configs for builder.group projects',
 			startedAt: { year: 2024 },
 			status: 'maintenance',
 			category: 'package',
