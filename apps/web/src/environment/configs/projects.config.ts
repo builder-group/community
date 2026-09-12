@@ -6,6 +6,17 @@ export const projectsConfig: {
 	projects: [
 		// MARK: - SaaS: In Progress
 		{
+			id: 'saku',
+			name: 'Saku',
+			description: 'Shopify link-in-bio page builder for brands and creators',
+			logo: { type: 'image', src: '/illustrations/logos/saku.png' },
+			startedAt: { year: 2026, month: 8 },
+			status: 'in-progress',
+			category: 'saas',
+			tags: [{ type: 'shopify-store', url: 'https://apps.shopify.com/saku-bio-link' }]
+		},
+		// MARK: - SaaS: Maintenance
+		{
 			id: 'abstand',
 			name: 'Abstand',
 			description:
@@ -19,7 +30,6 @@ export const projectsConfig: {
 				{ type: 'github', url: 'https://github.com/builder-group/abstand' }
 			]
 		},
-		// MARK: - SaaS: Maintenance
 		{
 			id: 'kairos',
 			name: 'Kairos',
@@ -105,19 +115,6 @@ export const projectsConfig: {
 			]
 		},
 		{
-			id: 'saku',
-			name: 'Saku',
-			description: 'Free Shopify link-in-bio page hosted on your store domain',
-			logo: { type: 'image', src: '/illustrations/logos/saku.png' },
-			startedAt: { year: 2025, month: 6 },
-			status: 'maintenance',
-			category: 'saas',
-			tags: [
-				{ type: 'shopify-store', url: 'https://apps.shopify.com/saku-bio-link' },
-				{ type: 'github', url: `${appConfig.social.github}/saku` }
-			]
-		},
-		{
 			id: 'nodox',
 			name: 'NoDox',
 			description: 'Chrome extension that blurs sensitive data on webpages',
@@ -165,6 +162,17 @@ export const projectsConfig: {
 			]
 		},
 		// MARK: - SaaS: Pivoted
+		{
+			id: 'saku-v2',
+			name: 'Saku v2',
+			description: 'Free Shopify link-in-bio page hosted on your store domain',
+			logo: { type: 'image', src: '/illustrations/logos/saku-v2.png' },
+			startedAt: { year: 2025, month: 6 },
+			endedAt: { year: 2026, month: 8 },
+			status: 'pivoted',
+			category: 'saas',
+			tags: [{ type: 'github', url: `${appConfig.social.github}/saku` }]
+		},
 		{
 			id: 'saku-v1',
 			name: 'Saku v1',
@@ -456,15 +464,16 @@ export const projectsConfig: {
 		{
 			id: 'mado',
 			name: 'mado',
-			description: 'macOS active app and window monitoring with browser metadata',
+			description: 'macOS app and window monitoring with browser metadata',
 			startedAt: { year: 2026, month: 1 },
-			status: 'maintenance',
+			endedAt: { year: 2026, month: 9 },
+			status: 'discontinued',
 			category: 'package',
 			tags: [
 				{ type: 'crate', url: 'https://crates.io/crates/mado' },
 				{
 					type: 'github',
-					url: `${appConfig.social.github}/community/tree/develop/crates/mado`
+					url: `${appConfig.social.github}/community/tree/develop/crates/_deprecated/mado`
 				}
 			]
 		},

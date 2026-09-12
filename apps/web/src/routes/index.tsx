@@ -143,16 +143,16 @@ function RouteComponent() {
 							<PackageRow key={pkg.id} project={pkg} downloads={npmDownloads[pkg.name]} />
 						))}
 						{discontinuedPackages.length > 0 && (
-							<>
-								<div className="bg-base-100 px-5 py-3">
-									<p className="text-base-500 text-sm">
-										Discontinued libraries, kept available for existing users
-									</p>
+							<details>
+								<summary className="bg-base-100 text-base-500 hover:text-base-800 cursor-pointer px-5 py-3 text-sm focus-visible:outline-2 focus-visible:outline-offset-2">
+									Deprecated packages ({discontinuedPackages.length})
+								</summary>
+								<div className="bg-base-300 flex flex-col gap-px pt-px">
+									{discontinuedPackages.map((pkg) => (
+										<PackageRow key={pkg.id} project={pkg} downloads={npmDownloads[pkg.name]} />
+									))}
 								</div>
-								{discontinuedPackages.map((pkg) => (
-									<PackageRow key={pkg.id} project={pkg} downloads={npmDownloads[pkg.name]} />
-								))}
-							</>
+							</details>
 						)}
 					</div>
 				</CanvasFrame>
