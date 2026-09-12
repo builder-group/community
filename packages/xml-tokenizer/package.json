@@ -53,12 +53,12 @@
 		"@blgc/config": "workspace:*",
 		"@types/sax": "^1.2.7",
 		"@types/xml2js": "^0.4.14",
-		"camaro": "^6.5.0",
-		"fast-xml-parser": "^5.10.1",
+		"camaro": "^6.7.2",
+		"fast-xml-parser": "^5.11.1",
 		"rollup-presets": "workspace:*",
 		"sax": "^1.6.1",
 		"saxen": "^11.1.1",
-		"txml": "^6.0.0",
+		"txml": "^6.0.3",
 		"xml2js": "^0.6.2"
 	},
 	"size-limit": [

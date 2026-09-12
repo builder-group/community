@@ -52,7 +52,7 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@0no-co/graphql.web": "^1.3.3",
+		"@0no-co/graphql.web": "^1.3.4",
 		"feature-core": "workspace:*",
 		"openapi-typescript-helpers": "^0.1.0",
 		"tuple-result": "workspace:*"

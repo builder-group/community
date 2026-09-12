@@ -20,17 +20,17 @@ name = "desktop_tauri_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.6.0", features = [] }
+tauri-build = { version = "2.6.3", features = [] }
 
 [dependencies]
-tauri = { version = "2.11.0", features = [] }
-tauri-plugin-opener = "2.5.4"
+tauri = { version = "2.11.5", features = [] }
+tauri-plugin-opener = "2.5.5"
 tauri-plugin-os = "2.3.2"
 
-serde = { version = "1.0.228", features = ["derive"] }
-serde_json = "1.0.149"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
 specta = { version = "2.0.0-rc.21", features = ["derive"] }
 tauri-specta = { version = "2.0.0-rc.21", features = ["derive", "typescript"] }
-specta-typescript = "0.0.9"
+specta-typescript = "0.0.12"
 
 desktop-tauri-macos = { path = "../crates/macos" }
