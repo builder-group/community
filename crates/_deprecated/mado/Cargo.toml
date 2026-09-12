@@ -1,0 +1,27 @@
+[package]
+name = "mado"
+version = "0.0.16"
+publish = false
+description = "macOS active app and window monitoring with browser metadata"
+authors = ["@bennobuilder"]
+license = "MIT"
+edition = "2021"
+repository = "https://github.com/builder-group/community"
+readme = "README.md"
+homepage = "https://github.com/builder-group/community/tree/develop/crates/_deprecated/mado"
+keywords = ["macos", "window", "monitoring", "browser", "accessibility"]
+categories = ["api-bindings", "os::macos-apis"]
+
+[workspace]
+
+[dependencies]
+thiserror = "2.0.19"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+specta = { version = "2.0.0-rc.21", features = ["derive"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+swift-rs = "1.0.7"
+
+[target.'cfg(target_os = "macos")'.build-dependencies]
+swift-rs = { version = "1.0.7", features = ["build"] }

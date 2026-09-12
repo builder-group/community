@@ -1,0 +1,478 @@
+# mado (窓)
+
+> Mado moved back to [Abstand](https://github.com/builder-group/abstand/tree/develop/crates/mado) for faster iteration alongside its main consumer, without treating every change as a shared-library release. It remains available on crates.io and may return here when more builder.group projects need it. This archive preserves `0.0.16` for reference.
+
+`mado` is a macOS-focused Rust crate for reading the active app and focused window. It wraps native macOS APIs through Swift, listens to app, window, and bounds changes, and can enrich browser windows with URL and website metadata. Use it in desktop apps, productivity tools, and agents that need current user context.
+
+- Query the active app or focused window when you need a snapshot
+- Listen to app lifecycle, focused-window, title, and opt-in window bounds changes without continuous polling
+- Add browser URLs, content-area bounds, private-mode state, website hostnames, favicons, and favicon-derived colors only when needed
+- Read installed app names, bundle IDs, icons, and display colors without Accessibility permission
+- Handle macOS Accessibility and sandbox limits explicitly
+
+```rust
+use mado::{MonitorConfig, WindowEvent, WindowListener, WindowMonitor};
+
+struct FocusListener;
+
+impl WindowListener for FocusListener {
+    fn on_focus_change(&self, event: WindowEvent) {
+        match event {
+            WindowEvent::AppActivated { app } => {
+                println!("App activated: {:?}", app.name);
+            }
+            WindowEvent::AppTerminated { app } => {
+                println!("App terminated: {:?}", app.name);
+            }
+            WindowEvent::WindowChanged { window } => {
+                let app_name = window.app.name.as_deref().unwrap_or("Unknown app");
+                let title = window.title.as_deref().unwrap_or("Untitled window");
+                println!("{app_name}: {title}");
+
+                if let Some(browser) = &window.browser {
+                    println!("URL: {:?}", browser.url);
+                }
+            }
+            WindowEvent::WindowBoundsChanged { window } => {
+                println!("Window moved/resized: {:?}", window.bounds);
+            }
+            WindowEvent::WindowMinimized { window } => {
+                println!("Window minimized: {:?}", window.window_id);
+            }
+            WindowEvent::WindowRestored { window } => {
+                println!("Window restored: {:?}", window.window_id);
+            }
+            WindowEvent::WindowDestroyed { window } => {
+                println!("Window destroyed: {:?}", window.window_id);
+            }
+        }
+    }
+}
+
+fn main() -> Result<(), mado::Error> {
+    if !mado::is_accessibility_trusted() {
+        eprintln!("Grant Accessibility access in System Settings before tracking windows");
+        return Ok(());
+    }
+
+    let monitor = WindowMonitor::with_config(
+        FocusListener,
+        MonitorConfig {
+            include_browser_info: true,
+            track_window_changes: true,
+            track_window_bounds_changes: true,
+            ..Default::default()
+        },
+    );
+
+    monitor.run()
+}
+```
+
+## Install
+
+```toml
+[dependencies]
+mado = "0.0.16"
+```
+
+## Requirements
+
+`mado` currently targets macOS.
+
+| Platform | Status    | Notes                                |
+| -------- | --------- | ------------------------------------ |
+| macOS    | Supported | macOS 10.15+ with a Swift toolchain  |
+| Linux    | Planned   | APIs return a platform error for now |
+| Windows  | Planned   | APIs return a platform error for now |
+
+Window focus, window title, window bounds, and browser URL extraction require macOS Accessibility permission. Active app queries, installed app scans, app icons, and app display colors do not require that permission.
+
+## Usage
+
+Pick the API that matches the job:
+
+- Snapshot queries: `get_active_app()`, `get_active_window()`, and their `_with_config` variants
+- Event monitoring: `WindowMonitor` with a `WindowListener`
+- Installed apps: `get_installed_apps()`, `get_installed_app()`, `get_app_icon()`, and `get_app_color()`
+- Website assets: `get_website_icon()`
+- Permission checks: `is_accessibility_trusted()`
+
+### Query Current State
+
+Use snapshot queries when you only need the current app or window:
+
+```rust
+fn main() -> Result<(), mado::Error> {
+    let app = mado::get_active_app()?;
+    println!("Current app: {}", app);
+
+    let window = mado::get_active_window_with_config(mado::QueryConfig {
+        include_browser_info: true,
+        include_website_info: true,
+        ..Default::default()
+    })?;
+
+    if let Some(browser) = &window.browser {
+        println!("URL: {:?}", browser.url);
+
+        if let Some(website) = &browser.website {
+            println!("Hostname: {}", website.hostname);
+        }
+    }
+
+    Ok(())
+}
+```
+
+`include_website_info` depends on `include_browser_info` because it needs the current URL. Website metadata can fetch favicons over the network and is cached by hostname.
+
+### Listen To Focus Changes
+
+Use `WindowMonitor` when you want event-driven updates:
+
+```rust
+use mado::{WindowEvent, WindowListener, WindowMonitor};
+
+struct FocusListener;
+
+impl WindowListener for FocusListener {
+    fn on_focus_change(&self, event: WindowEvent) {
+        match event {
+            WindowEvent::AppActivated { app } => {
+                println!("App: {}", app);
+            }
+            WindowEvent::AppTerminated { app } => {
+                println!("App terminated: {}", app);
+            }
+            WindowEvent::WindowChanged { window } => {
+                println!("Window: {}", window);
+            }
+            WindowEvent::WindowBoundsChanged { window } => {
+                println!("Window moved/resized: {:?}", window.bounds);
+            }
+            WindowEvent::WindowMinimized { window } => {
+                println!("Window minimized: {:?}", window.window_id);
+            }
+            WindowEvent::WindowRestored { window } => {
+                println!("Window restored: {:?}", window.window_id);
+            }
+            WindowEvent::WindowDestroyed { window } => {
+                println!("Window destroyed: {:?}", window.window_id);
+            }
+        }
+    }
+}
+
+fn main() -> Result<(), mado::Error> {
+    let monitor = WindowMonitor::new(FocusListener);
+    monitor.run()
+}
+```
+
+`run()` blocks until `WindowMonitor::stop()` is called. Only one monitor can run at a time. A second monitor returns `Error::AlreadyRunning`.
+
+Stop a monitor from another thread:
+
+```rust
+use std::thread;
+use std::time::Duration;
+
+thread::spawn(|| {
+    thread::sleep(Duration::from_secs(5));
+    let _ = mado::WindowMonitor::stop();
+});
+```
+
+Keep `on_focus_change()` callbacks fast. Send events to another thread or async task when processing needs I/O, database work, or network calls. Panics inside callbacks are caught and logged so the monitor can continue.
+
+### Browser And Website Info
+
+Enable browser metadata when you need the active tab URL, browser content-area bounds, private-mode state, website hostname, favicon, or favicon-derived color:
+
+```rust
+use mado::{MonitorConfig, WindowEvent, WindowListener, WindowMonitor};
+
+struct BrowserListener;
+
+impl WindowListener for BrowserListener {
+    fn on_focus_change(&self, event: WindowEvent) {
+        let window = match event {
+            WindowEvent::WindowChanged { window } => window,
+            WindowEvent::AppActivated { .. } => return,
+            WindowEvent::AppTerminated { .. } => return,
+            WindowEvent::WindowBoundsChanged { .. } => return,
+            WindowEvent::WindowMinimized { .. } => return,
+            WindowEvent::WindowRestored { .. } => return,
+            WindowEvent::WindowDestroyed { .. } => return,
+        };
+
+        let Some(browser) = &window.browser else {
+            return;
+        };
+
+        println!("URL: {:?}", browser.url);
+        println!("Content bounds: {:?}", browser.content_bounds);
+        println!("Private mode: {:?}", browser.is_private);
+
+        if let Some(website) = &browser.website {
+            println!("Hostname: {}", website.hostname);
+            println!("Color: {:?}", website.color);
+        }
+    }
+}
+
+fn main() -> Result<(), mado::Error> {
+    let monitor = WindowMonitor::with_config(
+        BrowserListener,
+        MonitorConfig {
+            include_browser_info: true,
+            include_website_info: true,
+            ..Default::default()
+        },
+    );
+
+    monitor.run()
+}
+```
+
+Supported browsers are grouped by extraction family:
+
+- Chromium: Google Chrome (Beta, Dev, and Canary), Chromium, Brave (Beta and
+  Nightly), Microsoft Edge (Beta, Dev, and Canary), Opera (Beta, Developer, and
+  GX), Arc, and Helium
+- Safari: Safari (Technology Preview)
+- Gecko: Firefox (Developer Edition and Nightly) and Zen
+
+Browser content bounds are best-effort Accessibility data and may be `None`
+when the browser does not expose a top-level web content frame.
+
+Browser information can become available shortly after a focus or title event.
+The monitor retries while the browser remains active and emits another
+`WindowChanged` event when the information becomes available.
+
+### Installed Apps
+
+Installed app queries do not need Accessibility permission:
+
+```rust
+use mado::InstalledAppsConfig;
+
+fn main() {
+    let apps = mado::get_installed_apps(InstalledAppsConfig::default());
+
+    for app in apps.iter().take(10) {
+        println!("{}: {}", app.name, app.bundle_id);
+    }
+
+    if let Some(preview) = mado::get_installed_app(
+        "com.apple.Preview",
+        InstalledAppsConfig::default(),
+    ) {
+        println!("Preview: {}", preview.path);
+    }
+
+    let icon = mado::get_app_icon("com.apple.finder", 64, false);
+    if let Some(data_url) = &icon.data_url {
+        println!("Finder icon: {} bytes", data_url.len());
+    }
+
+    if let Some(color) = mado::get_app_color("com.apple.finder") {
+        println!("Finder color: {}", color);
+    }
+}
+```
+
+`get_installed_apps()` recursively scans the standard user, local, and system application
+directories while excluding helpers embedded inside application bundles. Unreadable directories
+and invalid application bundles are skipped. Use `get_installed_app()` when you have a bundle
+identifier and need an exact lookup through macOS application registration; this lookup is not
+limited to those scanned directories.
+
+### Website Icons
+
+Resolve a website favicon directly from a website URL:
+
+```rust
+fn main() {
+    let icon = mado::get_website_icon("https://github.com/builder-group/community", true);
+
+    if let Some(data_url) = &icon.data_url {
+        println!("GitHub favicon: {} bytes", data_url.len());
+    }
+
+    if let Some(color) = &icon.color {
+        println!("GitHub color: {}", color);
+    }
+}
+```
+
+`get_website_icon()` treats URLs without a scheme as HTTPS. Only the URL hostname is used for lookup and caching.
+
+## Configuration
+
+`QueryConfig` controls snapshot queries:
+
+| Option                 | Default | Description                                                                |
+| ---------------------- | ------- | -------------------------------------------------------------------------- |
+| `include_app_icon`     | `false` | Adds a base64 PNG app icon to `AppInfo`                                    |
+| `include_app_color`    | `false` | Adds app display color when app icon extraction is enabled                 |
+| `include_browser_info` | `false` | Extracts the active browser URL and private-mode state                     |
+| `include_website_info` | `false` | Extracts hostname, favicon, and favicon-derived color from the browser URL |
+
+`MonitorConfig` supports the same enrichment options and adds monitor behavior flags:
+
+| Option                        | Default | Description                                                                |
+| ----------------------------- | ------- | -------------------------------------------------------------------------- |
+| `track_window_changes`        | `true`  | Tracks window focus and title changes in addition to app activation events |
+| `track_window_bounds_changes` | `false` | Tracks focused window move and resize changes                              |
+| `include_app_icon`            | `false` | Adds a base64 PNG app icon to emitted app or window data                   |
+| `include_app_color`           | `false` | Adds app display color when app icon extraction is enabled                 |
+| `include_browser_info`        | `false` | Extracts the active browser URL and private-mode state                     |
+| `include_website_info`        | `false` | Extracts hostname, favicon, and favicon-derived color from the browser URL |
+
+`InstalledAppsConfig` controls installed app scans:
+
+| Option              | Default | Description                                            |
+| ------------------- | ------- | ------------------------------------------------------ |
+| `include_icon`      | `false` | Adds a base64 PNG icon to each installed app           |
+| `include_app_color` | `false` | Adds app display color when icon extraction is enabled |
+| `icon_size`         | `32`    | Icon size in pixels                                    |
+
+## Events
+
+`WindowEvent` has these variants:
+
+| Event                 | When it fires                                                               |
+| --------------------- | --------------------------------------------------------------------------- |
+| `AppActivated`        | Immediately when the active app changes, even if no window is available yet |
+| `AppTerminated`       | When an app activated during the monitor run terminates                     |
+| `WindowChanged`       | When focused window information becomes available or changes                |
+| `WindowBoundsChanged` | When the focused window moves or resizes, if enabled                        |
+| `WindowMinimized`     | When the observed focused window is minimized                               |
+| `WindowRestored`      | When the observed focused window is restored from minimized state           |
+| `WindowDestroyed`     | When a window observed while focused is later destroyed                     |
+
+Lifecycle events only cover windows observed after the active app observer is installed. Minimize and restore events refer to the currently focused window. A destruction event may arrive after focus moves to another window and uses cached data for the destroyed window. A restore that activates an app may appear as `AppActivated` followed by `WindowChanged` instead of `WindowRestored`.
+
+Use `event.app()` when all variants should be handled by app identity.
+
+## macOS Permissions
+
+Check permission before enabling window tracking:
+
+```rust
+if !mado::is_accessibility_trusted() {
+    eprintln!("Open System Settings > Privacy & Security > Accessibility");
+}
+```
+
+Accessibility permission is required for:
+
+- `track_window_changes: true`
+- `track_window_bounds_changes: true`
+- active window title and bounds
+- browser URL and private-mode extraction
+- website metadata based on the browser URL
+
+Accessibility permission is not required for:
+
+- `get_active_app()`
+- app activation events when `track_window_changes` and `track_window_bounds_changes` are both `false`
+- `get_installed_apps()`
+- `get_installed_app()`
+- `get_app_icon()` and `get_app_color()`
+- `get_website_icon()`
+
+## App Sandbox
+
+macOS App Sandbox blocks cross-process Accessibility and CoreGraphics access. That changes which features can work:
+
+| Feature                                    | Sandboxed | Unsandboxed |
+| ------------------------------------------ | --------- | ----------- |
+| App activation tracking with `NSWorkspace` | Works     | Works       |
+| Window title and focus tracking            | Blocked   | Works       |
+| Browser URL extraction                     | Blocked   | Works       |
+| Window bounds                              | Blocked   | Works       |
+| Installed apps and app icons               | Works     | Works       |
+
+Use this config in sandboxed builds:
+
+```rust
+let config = mado::MonitorConfig {
+    track_window_changes: false,
+    track_window_bounds_changes: false,
+    include_app_icon: true,
+    ..Default::default()
+};
+```
+
+With this setup, the monitor emits app activation and termination events only.
+
+## Examples
+
+From the repository root:
+
+```bash
+cargo run --manifest-path crates/_deprecated/mado/Cargo.toml --example poll
+cargo run --manifest-path crates/_deprecated/mado/Cargo.toml --example listen
+cargo run --manifest-path crates/_deprecated/mado/Cargo.toml --example installed_apps
+```
+
+## FAQ
+
+### Why does mado use callbacks instead of polling?
+
+Event-driven monitoring reacts to app and window changes as they happen. It only performs bounded polling when focused window or browser information is not ready yet. Use snapshot queries when continuous polling is the better fit for your app.
+
+### Why are there separate `AppActivated` and `WindowChanged` events?
+
+macOS can activate an app before a focused window exists, for example after launching from Spotlight or switching to an app with no open windows. `AppActivated` lets you react immediately. `WindowChanged` follows when window data becomes available.
+
+### Why does browser URL extraction need Accessibility permission?
+
+Browsers expose the current URL through their UI tree in different ways. `mado` uses Accessibility APIs to read that state without per-browser AppleScript Automation permissions.
+
+### Does `mado` validate or classify websites?
+
+No. It extracts the current URL, hostname, favicon, and favicon-derived color when those options are enabled. Website classification, allow lists, and policy decisions belong in app code.
+
+### What happens on Linux or Windows today?
+
+The crate compiles with platform stubs, but monitoring and query APIs return `Error::Platform` because Linux and Windows support is not implemented yet.
+
+### What does `mado` mean?
+
+`mado` means window in Japanese.
+
+## Contributing
+
+### Add Browser Support
+
+`mado` extracts browser metadata only for explicit bundle IDs with observed
+Accessibility behavior. Before adding a browser:
+
+1. Open `https://example.com/` in the browser.
+2. Run the probe from the repository root:
+
+   ```bash
+   cd crates/_deprecated/mado
+   swift run browser-ax-probe /tmp/mado-browser-ax-probe.md
+   ```
+
+3. Focus the browser during the three-second delay. The terminal running the
+   probe needs macOS Accessibility permission.
+4. Compare the generated Markdown with
+   [the existing browser observations](docs/browser-accessibility-extraction.md).
+5. Add the bundle ID to the matching extraction family, update
+   `SupportedBrowsersTests`, and record the new observation.
+
+The specific page content is not relevant to extraction-family matching.
+`example.com` provides a stable top-level HTTPS page without redirects or
+embedded application UI.
+
+## Resources
+
+- [swift-rs](https://github.com/Brendonovich/swift-rs)
+- [Apple Accessibility API](https://developer.apple.com/documentation/applicationservices/axuielement_h)
+- [Swift Package Manager](https://www.swift.org/package-manager/)

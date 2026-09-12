@@ -6,7 +6,7 @@ Use this file first when working in this repository. It defines the default agen
 
 - This is the builder.group community monorepo for reusable packages, crates, templates, and examples
 - TypeScript workspaces are managed with pnpm and Turbo across `packages/*`, `apps/*`, `templates/*`, and `examples/**`
-- Rust workspace members live under `crates/*` and `templates/*/src-tauri`
+- Rust workspace members live under `templates/*/src-tauri`, with app-local crates alongside them
 - Active TypeScript libraries live in `packages/*`; `packages/_deprecated/*` is historical and should not be used as the model for new work
 - Many packages are published APIs. Treat exported types, runtime behavior, README examples, and package entrypoints as public surface.
 

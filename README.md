@@ -32,12 +32,6 @@ Open source packages, crates, and templates from [builder.group](https://builder
 | [validatenv](https://github.com/builder-group/community/tree/develop/packages/validatenv)               | Typed env validation with Standard Schema validators, built-in parsers, error reports      | [`validatenv`](https://www.npmjs.com/package/validatenv)               |
 | [xml-tokenizer](https://github.com/builder-group/community/tree/develop/packages/xml-tokenizer)         | Streaming XML, HTML, and SVG tokenizer with typed tokens, selectors, object helpers        | [`xml-tokenizer`](https://www.npmjs.com/package/xml-tokenizer)         |
 
-## Crates
-
-| Crate                                                                       | Description                                                  | Crates.io                               |
-| --------------------------------------------------------------------------- | ------------------------------------------------------------ | --------------------------------------- |
-| [mado](https://github.com/builder-group/community/tree/develop/crates/mado) | macOS active app and window monitoring with browser metadata | [`mado`](https://crates.io/crates/mado) |
-
 ## Deprecated Packages
 
 > These packages live under `packages/_deprecated`. They remain listed for existing users and historical context, but they are not actively maintained. Prefer the active packages above when starting new work.
@@ -57,6 +51,12 @@ Open source packages, crates, and templates from [builder.group](https://builder
 | [validation-adapter](https://github.com/builder-group/community/tree/develop/packages/_deprecated/validation-adapter)         | Universal validation abstraction for Zod, Valibot, and Yup                   | [`validation-adapter`](https://www.npmjs.com/package/validation-adapter)         | May 26, 2026     |
 | [validation-adapters](https://github.com/builder-group/community/tree/develop/packages/_deprecated/validation-adapters)       | Validator adapter implementations for Zod, Valibot, Yup, and Standard Schema | [`validation-adapters`](https://www.npmjs.com/package/validation-adapters)       | May 26, 2026     |
 | [webito](https://github.com/builder-group/community/tree/develop/packages/_deprecated/webito)                                 | ECS-powered visual web editor with plugin-based customization                | [`webito`](https://www.npmjs.com/package/webito)                                 | May 17, 2026     |
+
+## Deprecated Crates
+
+| Crate                           | Description                                                                                                                            | Crates.io                               | Deprecated Since   |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | ------------------ |
+| [mado](crates/_deprecated/mado) | Historical mado 0.0.16 snapshot. Development continues in [Abstand](https://github.com/builder-group/abstand/tree/develop/crates/mado) | [`mado`](https://crates.io/crates/mado) | September 12, 2026 |
 
 ## Templates
 

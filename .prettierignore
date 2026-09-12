@@ -25,6 +25,9 @@
 **/gen/
 **/graphql-env.d.ts
 
+# Archives
+**/_deprecated/
+
 # Local files
 .todo
 .DS_Store
