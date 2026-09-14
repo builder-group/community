@@ -1,115 +1,139 @@
-import { htmlConfig, select, TXmlNode } from 'xml-tokenizer';
-import { TExtractCollectionKeys, TExtractors, TExtractSingleKeys } from './types';
+import { decodeHTML, decodeHTMLAttribute } from 'entities';
+import { htmlConfig, select, type TXmlNode } from 'xml-tokenizer';
+import { type TCollectionExtractor, type TExtractor, type TExtractors } from './types';
 
+/**
+ * Extracts configured metadata from the first `<head>` element.
+ *
+ * Config keys name output fields, while each extractor's `tag` selects an HTML
+ * element. Collections contain every non-null result in document order. Singles
+ * keep the first non-null result and are omitted when no value is found.
+ *
+ * Attribute values and ordinary text are decoded before callbacks run. Script,
+ * style, and CDATA content remain literal. Tokenizer and callback errors propagate.
+ */
 export function extractHeadMetadata<GExtractors extends TExtractors>(
 	html: string,
 	extractors: GExtractors
 ): TExtractMetadata<GExtractors> {
-	const metadata: TExtractMetadata<GExtractors> = Object.keys(extractors).reduce((acc, key) => {
-		// @ts-expect-error -- We know that the key is a valid key since it comes from the extractors object
-		acc[key] = {};
-		return acc;
-	}, {} as TExtractMetadata<GExtractors>);
-	const stack: TXmlNode[] = [];
+	const metadata = new Map<string, unknown>();
 
+	const extractorsByTag = new Map<string, [string, TExtractor][]>();
+	for (const [key, extractor] of Object.entries(extractors)) {
+		const entries = extractorsByTag.get(extractor.tag) ?? [];
+		entries.push([key, extractor]);
+		extractorsByTag.set(extractor.tag, entries);
+		if (extractor.type === 'collection') {
+			metadata.set(key, []);
+		}
+	}
+
+	// Note: Keep one stack entry per open element. `null` marks an element that no
+	// extractor targets and that is outside a collected subtree. Its descendants
+	// are still scanned for extractor tags.
+	const stack: (TXmlNode | null)[] = [];
 	select(
 		html,
 		[[{ axis: 'self-or-descendant', local: 'head' }]],
 		(token, stream) => {
 			switch (token.type) {
-				// Since HTML only has one head element, we can just go to the end of the file
-				// after we've processed the first head element
 				case 'SelectionEnd': {
 					stream.goToEnd();
 					break;
 				}
 				case 'ElementStart': {
-					if (token.local in extractors) {
-						const newNode: TXmlNode = {
-							local: token.local,
-							prefix: token.prefix.length > 0 ? token.prefix : undefined,
-							attributes: [],
-							content: []
-						};
-
-						const currentNode = stack[stack.length - 1];
-						if (currentNode != null) {
-							currentNode.content.push(newNode);
-						}
-
-						stack.push(newNode);
+					const parent = stack[stack.length - 1];
+					if (parent == null && !extractorsByTag.has(token.local)) {
+						stack.push(null);
+						break;
 					}
+					const node: TXmlNode = {
+						local: token.local,
+						prefix: token.prefix.length > 0 ? token.prefix : undefined,
+						attributes: [],
+						content: []
+					};
+					parent?.content.push(node);
+					stack.push(node);
 					break;
 				}
 				case 'ElementEnd': {
-					if (token.end.type === 'Close' || token.end.type === 'Empty') {
-						const node = stack[stack.length - 1];
-						if (node == null) {
-							break;
-						}
-
-						const extractor = extractors[node.local];
-						if (extractor != null) {
-							switch (extractor.type) {
-								case 'collection': {
-									const result = extractor.callback(node);
-									if (result != null) {
-										(metadata as any)[extractor.parent][result.key] = result.value;
-									}
-									break;
-								}
-								case 'single': {
-									const value = extractor.callback(node);
-									if (value != null) {
-										(metadata as any)[extractor.key] = value;
-									}
-									break;
-								}
-							}
-						}
-
-						stack.pop();
+					if (token.end.type === 'Open') {
+						break;
+					}
+					const node = stack.pop();
+					if (node == null) {
+						break;
+					}
+					// Note: Process a collected subtree after its outermost node closes so callbacks
+					// receive complete nodes in document order
+					if (stack[stack.length - 1] == null) {
+						collectNodeAndDescendants(node);
 					}
 					break;
 				}
 				case 'Attribute': {
-					const currentNode = stack[stack.length - 1];
-					if (currentNode != null) {
-						currentNode.attributes.push({
-							local: token.local,
-							prefix: token.prefix.length > 0 ? token.prefix : undefined,
-							value: token.value
-						});
-					}
+					const node = stack[stack.length - 1];
+					node?.attributes.push({
+						local: token.local,
+						prefix: token.prefix.length > 0 ? token.prefix : undefined,
+						value: decodeHTMLAttribute(token.value)
+					});
 					break;
 				}
 				case 'Text':
 				case 'Cdata': {
-					const currentNode = stack[stack.length - 1];
-					if (currentNode != null) {
-						const trimmedText = token.text.trim();
-						if (trimmedText.length > 0) {
-							currentNode.content.push(token.text);
-						}
+					const node = stack[stack.length - 1];
+					if (node == null) {
+						break;
+					}
+					const isRawText = node.local === 'script' || node.local === 'style';
+					const text = token.type === 'Cdata' || isRawText ? token.text : decodeHTML(token.text);
+					if (text.trim().length > 0) {
+						node.content.push(text);
 					}
 					break;
 				}
-				case 'Comment':
-				case 'ProcessingInstruction':
-				case 'EntityDeclaration':
-				case 'SelectionStart':
 			}
 		},
 		htmlConfig
 	);
 
-	return metadata;
+	function collectNodeAndDescendants(node: TXmlNode): void {
+		for (const [key, extractor] of extractorsByTag.get(node.local) ?? []) {
+			if (extractor.type === 'single' && metadata.has(key)) {
+				continue;
+			}
+			const value = extractor.callback(node);
+			if (value == null) {
+				continue;
+			}
+			if (extractor.type === 'collection') {
+				(metadata.get(key) as unknown[]).push(value);
+			} else {
+				metadata.set(key, value);
+			}
+		}
+		for (const child of node.content) {
+			if (typeof child !== 'string') {
+				collectNodeAndDescendants(child);
+			}
+		}
+	}
+
+	return Object.fromEntries(metadata) as TExtractMetadata<GExtractors>;
 }
 
 export type TExtractMetadata<GExtractors extends TExtractors> = {
-	// Single value fields
-	[K in TExtractSingleKeys<GExtractors>]: string;
+	[
+		K in keyof GExtractors as GExtractors[K]['type'] extends 'collection' ? never : K
+	]?: TExtractorResult<GExtractors[K]>;
 } & {
-	// Collection fields
-	[K in TExtractCollectionKeys<GExtractors>]: Record<string, string>;
+	[
+		K in keyof GExtractors as GExtractors[K]['type'] extends 'collection' ? K : never
+	]: TExtractorResult<GExtractors[K]>;
 };
+
+type TExtractorResult<GExtractor extends TExtractor> = GExtractor extends TCollectionExtractor
+	? NonNullable<ReturnType<GExtractor['callback']>>[]
+	: NonNullable<ReturnType<GExtractor['callback']>>;

@@ -1,8 +1,9 @@
-import { TSingleExtractor } from '../types';
+import type { TSingleExtractor } from '../types';
 
+/** Extracts trimmed text from a `<title>` element. */
 export const titleExtractor = {
-	type: 'single' as const,
-	key: 'title' as const,
+	type: 'single',
+	tag: 'title',
 	callback: (node) => {
 		const text = node.content[0];
 		return typeof text === 'string' ? text.trim() : null;

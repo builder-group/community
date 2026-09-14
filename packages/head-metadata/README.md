@@ -17,36 +17,40 @@
     </a>
 </p>
 
-`head-metadata` extracts structured metadata from the `<head>` of an HTML document. It tokenizes the first head element with `xml-tokenizer`, ships extractors for `title`, `meta`, and `link`, and lets you add focused extractors for project-specific tags.
+`head-metadata` extracts typed values from the first `<head>` element in an HTML
+document. Choose an output field and extractor for each value you need. Single
+extractors keep one value, while collection extractors preserve repeated values in
+document order.
 
-- Read page title, meta tags, Open Graph tags, charset, and canonical links into typed output
-- Stop after the first `<head>` so full-page HTML does not need a DOM parse
-- Combine built-in extractors with custom `single` and `collection` extractors
-- Keep the extraction shape explicit: output keys come from the extractor config
+- Extract titles, base URLs, meta tags, and links without building a full-page DOM
+- Preserve repeated Open Graph images, icons, alternates, and other metadata
+- Infer result fields and value types from the extractor config
+- Decode character references in attributes and ordinary text
+- Add custom extractors for project-specific head elements
 
 ```ts
 import { extractHeadMetadata, linkExtractor, metaExtractor, titleExtractor } from 'head-metadata';
 
-const html = `
-  <head>
+const metadata = extractHeadMetadata(
+  `<head>
     <title>Example</title>
-    <meta name="description" content="An example page" />
-    <meta property="og:title" content="Example OG title" />
-    <link rel="canonical" href="https://example.com" />
-  </head>
-`;
+    <meta property="og:image" content="/first.png">
+    <meta property="og:image" content="/second.png">
+    <link rel="icon" sizes="48x48" href="/favicon.png">
+  </head>`,
+  {
+    title: titleExtractor,
+    meta: metaExtractor,
+    links: linkExtractor
+  }
+);
 
-const metadata = extractHeadMetadata(html, {
-  title: titleExtractor,
-  meta: metaExtractor,
-  link: linkExtractor
-});
-
-console.log(metadata.title);
-console.log(metadata.meta.description);
-console.log(metadata.meta['og:title']);
-console.log(metadata.link.canonical);
+metadata.title; // 'Example' | undefined
+metadata.meta; // both og:image entries, in document order
+metadata.links; // [{ rel: ['icon'], sizes: ['48x48'], href: '/favicon.png' }]
 ```
+
+Migrating from `0.0.x`? See [MIGRATION.md](./MIGRATION.md).
 
 ## Install
 
@@ -56,42 +60,72 @@ npm install head-metadata
 
 ## Usage
 
-Pass HTML and the extractors you want to run:
+Pass the HTML string and an extractor config to `extractHeadMetadata()`:
 
 ```ts
-import { extractHeadMetadata, linkExtractor, metaExtractor, titleExtractor } from 'head-metadata';
-
-const html = `
-  <html>
-    <head>
-      <title>Example</title>
-      <meta name="description" content="An example page" />
-      <meta property="og:title" content="Example OG title" />
-      <link rel="canonical" href="https://example.com" />
-    </head>
-    <body>Hello</body>
-  </html>
-`;
+import {
+  baseExtractor,
+  extractHeadMetadata,
+  linkExtractor,
+  metaExtractor,
+  titleExtractor
+} from 'head-metadata';
 
 const metadata = extractHeadMetadata(html, {
   title: titleExtractor,
+  baseHref: baseExtractor,
   meta: metaExtractor,
-  link: linkExtractor
+  links: linkExtractor
 });
-
-metadata.title; // Example
-metadata.meta.description; // An example page
-metadata.meta['og:title']; // Example OG title
-metadata.link.canonical; // https://example.com
 ```
 
-The output shape follows the extractor config. Config object keys choose the element names each extractor receives. `key` and `parent` choose metadata fields. Collection extractors write records under `parent`, while single extractors set a string under `key` when the callback returns a value.
+Config keys name the output fields. Each extractor's `tag` selects the HTML element
+it receives. Multiple extractors can select the same tag and produce different
+fields.
 
-## Built-in Extractors
+The extractor kind determines whether an output field is optional or always present:
+
+| Extractor kind | Result                                                                 |
+| -------------- | ---------------------------------------------------------------------- |
+| `single`       | First non-null result. The field is omitted when nothing produces one. |
+| `collection`   | All non-null results in document order. An empty array when unmatched. |
+
+## API
+
+### `extractHeadMetadata(html, extractors)`
+
+Extracts configured values from the first `<head>` element.
+
+```ts
+const metadata = extractHeadMetadata(html, {
+  pageTitle: titleExtractor,
+  meta: metaExtractor
+});
+
+metadata.pageTitle; // string | undefined
+metadata.meta; // TMetaMetadata[]
+```
+
+The function stops parsing after the first selected head. Tokenizer errors and
+extractor callback errors propagate to the caller.
+
+Extractor callbacks receive a `TXmlNode`:
+
+| Field        | Description                                 |
+| ------------ | ------------------------------------------- |
+| `local`      | Lowercase local element name                |
+| `prefix`     | Lowercase namespace prefix, when present    |
+| `attributes` | Attributes with decoded values              |
+| `content`    | Child nodes and non-whitespace text content |
+
+Character references are decoded in ordinary text and attribute values. Script,
+style, and CDATA content remain literal. URLs are not resolved or otherwise changed.
+
+## Built-In Extractors
 
 ### `titleExtractor`
 
-Reads text content from `<title>` and returns it as `metadata.title`.
+Selects `<title>` and returns its trimmed text. Configure it as a single field:
 
 ```ts
 const metadata = extractHeadMetadata(html, {
@@ -99,130 +133,134 @@ const metadata = extractHeadMetadata(html, {
 });
 ```
 
-### `metaExtractor`
+The first title that produces text wins. `metadata.title` is `undefined` when no
+title produces text.
 
-Reads `<meta>` tags into `metadata.meta`.
+### `baseExtractor`
 
-```html
-<meta charset="utf-8" />
-<meta name="description" content="An example page" />
-<meta property="og:title" content="Example OG title" />
+Selects `<base>` and returns its `href` without resolving it:
+
+```ts
+const metadata = extractHeadMetadata(html, {
+  baseHref: baseExtractor
+});
 ```
 
-The extractor uses `charset`, `name`, or `property` as the record key.
+The first base element with an `href` wins.
+
+### `metaExtractor`
+
+Selects `<meta>` elements and returns `TMetaMetadata[]`. Each entry preserves the
+supported attributes that are present:
+
+```ts
+const metadata = extractHeadMetadata(
+  `<head>
+    <meta name="description" content="An example page">
+    <meta property="og:image" content="/first.png">
+    <meta property="og:image" content="/second.png">
+  </head>`,
+  { meta: metaExtractor }
+);
+
+metadata.meta;
+// [
+//   { name: 'description', content: 'An example page' },
+//   { property: 'og:image', content: '/first.png' },
+//   { property: 'og:image', content: '/second.png' }
+// ]
+```
+
+Supported fields are `charset`, `name`, `property`, `httpEquiv`, and `content`.
+An element without any supported attribute is skipped.
 
 ### `linkExtractor`
 
-Reads `<link>` tags into `metadata.link`.
+Selects `<link>` elements that contain both `rel` and `href`, and returns
+`TLinkMetadata[]`:
 
-```html
-<link rel="canonical" href="https://example.com" />
+```ts
+const metadata = extractHeadMetadata(
+  `<head>
+    <link rel="icon" type="image/png" sizes="32x32 48x48" href="/favicon.png">
+  </head>`,
+  { links: linkExtractor }
+);
+
+metadata.links;
+// [{
+//   rel: ['icon'],
+//   href: '/favicon.png',
+//   type: 'image/png',
+//   sizes: ['32x32', '48x48']
+// }]
 ```
 
-The extractor uses `rel` as the record key and `href` as the value.
+`rel` and `sizes` are split on ASCII whitespace. Relation tokens are lowercase.
+The extractor also preserves `media` and `hreflang` when present.
 
 ## Custom Extractors
 
-Use a `single` extractor for one output value:
+Use `TSingleExtractor<GValue>` for the first matching value and
+`TCollectionExtractor<GValue>` for every matching value. Return `null` to skip an
+element.
 
 ```ts
-import type { TSingleExtractor } from 'head-metadata';
+import { extractHeadMetadata, type TSingleExtractor } from 'head-metadata';
 
-const viewportExtractor = {
+const descriptionExtractor = {
+  tag: 'meta',
   type: 'single',
-  key: 'viewport',
   callback: (node) => {
-    const name = node.attributes.find((attr) => attr.local === 'name');
-    const content = node.attributes.find((attr) => attr.local === 'content');
-
-    return name?.value === 'viewport' && content != null ? content.value : null;
+    const name = node.attributes.find((attribute) => attribute.local === 'name')?.value;
+    const content = node.attributes.find((attribute) => attribute.local === 'content')?.value;
+    return name === 'description' ? (content ?? null) : null;
   }
-} satisfies TSingleExtractor;
+} satisfies TSingleExtractor<string>;
+
+const metadata = extractHeadMetadata(html, {
+  description: descriptionExtractor
+});
+
+metadata.description; // string | undefined
 ```
+
+Set `tag` to the lowercase HTML tag name. Config keys remain independent from tag
+names, so several extractors can read the same element:
 
 ```ts
 const metadata = extractHeadMetadata(html, {
-  meta: viewportExtractor
-});
-
-metadata.viewport;
-```
-
-In this example, `meta` means the extractor receives `<meta>` elements. `key: 'viewport'` controls the output field.
-
-Use a `collection` extractor when many tags should contribute to one record:
-
-```ts
-import type { TCollectionExtractor } from 'head-metadata';
-
-const iconExtractor = {
-  type: 'collection',
-  parent: 'link',
-  callback: (node) => {
-    const rel = node.attributes.find((attr) => attr.local === 'rel');
-    const href = node.attributes.find((attr) => attr.local === 'href');
-
-    if (rel?.value.includes('icon') === true && href != null) {
-      return { key: rel.value, value: href.value };
-    }
-
-    return null;
-  }
-} satisfies TCollectionExtractor;
-```
-
-Install custom extractors under the tag name they should receive:
-
-```ts
-const metadata = extractHeadMetadata(html, {
-  link: iconExtractor
+  meta: metaExtractor,
+  description: descriptionExtractor
 });
 ```
 
-## API
+## Scope
 
-### `extractHeadMetadata(html, extractors)`
+`head-metadata` parses HTML you already have. The calling application remains
+responsible for:
 
-Tokenizes the first `<head>` element and returns metadata collected by the provided extractors.
-
-```ts
-const metadata = extractHeadMetadata(html, {
-  title: titleExtractor,
-  meta: metaExtractor
-});
-```
-
-Extractor callbacks receive a `TXmlNode` with this shape:
-
-| Field        | Description                                      |
-| ------------ | ------------------------------------------------ |
-| `local`      | Local element name                               |
-| `prefix`     | Namespace prefix when present                    |
-| `attributes` | Parsed attributes with local name, prefix, value |
-| `content`    | Child nodes and text content                     |
+- Fetching pages and following redirects
+- Limiting response size and request duration
+- Resolving relative URLs against the page URL and `<base href>`
+- Selecting preferred Open Graph, Twitter, and fallback values
+- Validating or downloading referenced resources
 
 ## FAQ
 
-### Is this a full metadata crawler?
+### Why use extractors instead of returning every head element?
 
-No. `head-metadata` extracts metadata from HTML you already have. Fetching pages, following redirects, resolving relative URLs, and crawling links stay in your application code.
+Extractors keep parsing separate from application policy. They also keep the result
+small and typed: callers choose the elements and output fields they need.
 
-### Why does it use extractors instead of returning every head tag?
+### Are repeated metadata values preserved?
 
-Extractors keep the output shape explicit and typed. You choose which tags matter, how keys are derived, and which tags should be ignored.
+Yes. Collection extractors append every non-null result in document order. This
+allows callers to choose among repeated Open Graph images, icons, and alternate
+links.
 
-### Can I extract Open Graph and Twitter metadata?
+### Does it parse the entire document?
 
-Yes. `metaExtractor` stores both `name` and `property` attributes as keys, so tags such as `og:title` and `twitter:card` are included in `metadata.meta`.
-
-### What happens with multiple `<head>` elements?
-
-Only the first matched `<head>` is read. Later `<head>` elements are ignored.
-
-### What happens when two tags produce the same key?
-
-Collection output is a record. The later value replaces the earlier value for the same key.
-
-### Does it validate SEO metadata?
-
-No. It extracts selected values only. It does not validate SEO rules, normalize metadata, or resolve relative URLs.
+No. It processes only the first `<head>` selected by `xml-tokenizer`, then advances
+the tokenizer to the end of its input. The HTML string is still supplied by the
+caller; network streaming and response limits are outside this package.

@@ -1,29 +1,116 @@
 {
-	"meta": {
-		"charset": "UTF-8",
-		"viewport": "width=device-width, initial-scale=1, minimum-scale=1, viewport-fit=cover",
-		"referrer": "origin-when-cross-origin",
-		"application-name": "Bluesky",
-		"generator": "bskyweb",
-		"og:site_name": "Bluesky Social",
-		"og:type": "profile",
-		"profile:username": "bennobuilder.bsky.social",
-		"og:url": "https://bsky.app/profile/bennobuilder.bsky.social",
-		"og:title": "Benno Builder (@bennobuilder.bsky.social)",
-		"description": "passionate builder :)",
-		"og:description": "passionate builder :)",
-		"twitter:card": "summary",
-		"twitter:label1": "Account DID",
-		"twitter:value1": "did:plc:hs2ktvfcphpglp6dami7cpxg"
-	},
-	"link": {
-		"preconnect": "https://bsky.social",
-		"preload": "https://web-cdn.bsky.app/static/media/InterVariable.c504db5c06caaf7cdfba.woff2",
-		"stylesheet": "https://web-cdn.bsky.app/static/css/main.b583bf74.css",
-		"apple-touch-icon": "https://web-cdn.bsky.app/static/apple-touch-icon.png",
-		"icon": "https://web-cdn.bsky.app/static/favicon-16x16.png",
-		"mask-icon": "https://web-cdn.bsky.app/static/safari-pinned-tab.svg",
-		"alternate": "at://did:plc:hs2ktvfcphpglp6dami7cpxg/app.bsky.actor.profile/self"
-	},
+	"meta": [
+		{
+			"charset": "UTF-8"
+		},
+		{
+			"name": "viewport",
+			"content": "width=device-width, initial-scale=1, minimum-scale=1, viewport-fit=cover"
+		},
+		{
+			"name": "referrer",
+			"content": "origin-when-cross-origin"
+		},
+		{
+			"name": "theme-color"
+		},
+		{
+			"name": "application-name",
+			"content": "Bluesky"
+		},
+		{
+			"name": "generator",
+			"content": "bskyweb"
+		},
+		{
+			"property": "og:site_name",
+			"content": "Bluesky Social"
+		},
+		{
+			"property": "og:site_name",
+			"content": "Bluesky Social"
+		},
+		{
+			"property": "og:type",
+			"content": "profile"
+		},
+		{
+			"property": "profile:username",
+			"content": "bennobuilder.bsky.social"
+		},
+		{
+			"property": "og:url",
+			"content": "https://bsky.app/profile/bennobuilder.bsky.social"
+		},
+		{
+			"property": "og:title",
+			"content": "Benno Builder (@bennobuilder.bsky.social)"
+		},
+		{
+			"name": "description",
+			"content": "passionate builder :)"
+		},
+		{
+			"property": "og:description",
+			"content": "passionate builder :)"
+		},
+		{
+			"name": "twitter:card",
+			"content": "summary"
+		},
+		{
+			"name": "twitter:label1",
+			"content": "Account DID"
+		},
+		{
+			"name": "twitter:value1",
+			"content": "did:plc:hs2ktvfcphpglp6dami7cpxg"
+		}
+	],
+	"links": [
+		{
+			"rel": ["preconnect"],
+			"href": "https://bsky.social"
+		},
+		{
+			"rel": ["preload"],
+			"href": "https://web-cdn.bsky.app/static/media/InterVariable.c504db5c06caaf7cdfba.woff2",
+			"type": "font/woff2"
+		},
+		{
+			"rel": ["stylesheet"],
+			"href": "https://web-cdn.bsky.app/static/css/main.b583bf74.css"
+		},
+		{
+			"rel": ["apple-touch-icon"],
+			"href": "https://web-cdn.bsky.app/static/apple-touch-icon.png",
+			"sizes": ["180x180"]
+		},
+		{
+			"rel": ["icon"],
+			"href": "https://web-cdn.bsky.app/static/favicon-32x32.png",
+			"type": "image/png",
+			"sizes": ["32x32"]
+		},
+		{
+			"rel": ["icon"],
+			"href": "https://web-cdn.bsky.app/static/favicon-16x16.png",
+			"type": "image/png",
+			"sizes": ["16x16"]
+		},
+		{
+			"rel": ["mask-icon"],
+			"href": "https://web-cdn.bsky.app/static/safari-pinned-tab.svg"
+		},
+		{
+			"rel": ["alternate"],
+			"href": "https://bsky.app/profile/did:plc:hs2ktvfcphpglp6dami7cpxg/rss",
+			"type": "application/rss+xml"
+		},
+		{
+			"rel": ["alternate"],
+			"href": "at://did:plc:hs2ktvfcphpglp6dami7cpxg/app.bsky.actor.profile/self"
+		}
+	],
 	"title": "@bennobuilder.bsky.social on Bluesky"
 }

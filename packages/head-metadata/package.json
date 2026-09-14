@@ -1,8 +1,8 @@
 {
 	"name": "head-metadata",
-	"version": "0.0.13",
+	"version": "0.1.0",
 	"private": false,
-	"description": "Typed HTML head metadata extraction for title, meta, link, and custom extractors",
+	"description": "Typed HTML head metadata extraction with configurable single and collection extractors",
 	"keywords": [
 		"html",
 		"metadata",
@@ -34,7 +34,8 @@
 	"types": "./dist/types/index.d.ts",
 	"files": [
 		"dist",
-		"README.md"
+		"README.md",
+		"MIGRATION.md"
 	],
 	"scripts": {
 		"build": "shx rm -rf dist && rollup -c rollup.config.js",
@@ -49,6 +50,7 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
+		"entities": "^8.1.0",
 		"xml-tokenizer": "workspace:*"
 	},
 	"devDependencies": {
