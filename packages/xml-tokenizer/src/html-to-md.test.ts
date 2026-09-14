@@ -2,6 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { htmlToMarkdown } from './html-to-md';
 
 describe('htmlToMarkdown', () => {
+	it('should convert mixed-case HTML names while preserving link values and text', () => {
+		const result = htmlToMarkdown(
+			'<H1>Title</h1><P><A HREF="https://example.com/Path">Link Text</a></p>'
+		);
+		expect(result.string).toBe('# Title\n\n[Link Text](https://example.com/Path)');
+	});
+
 	it('should convert basic headings', () => {
 		const html = '<h1>Title</h1><h2>Subtitle</h2>';
 		const result = htmlToMarkdown(html);

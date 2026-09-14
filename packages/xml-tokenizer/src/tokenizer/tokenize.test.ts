@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { htmlConfig, svgConfig, xmlConfig } from '../config';
 import { tokenize } from './tokenize';
 import { type TXmlToken } from './types';
 import { XmlError } from './XmlError';
@@ -2468,6 +2469,45 @@ describe('tokenize function', () => {
 		});
 	});
 
+	describe('lowercaseNames', () => {
+		it('should normalize ASCII names and prefixes while preserving content and source positions', () => {
+			const source = '<NS:ÄTAG NS:ÄATTR="VaLUE">TeXT</NS:ÄTAG>';
+			expect(collectTokens(source, { lowercaseNames: true })).toStrictEqual([
+				{ type: 'ElementStart', prefix: 'ns', local: 'Ätag', start: 0 },
+				{
+					type: 'Attribute',
+					prefix: 'ns',
+					local: 'Äattr',
+					value: 'VaLUE',
+					range: { start: 9, end: 25 }
+				},
+				{ type: 'ElementEnd', end: { type: 'Open' }, range: { start: 25, end: 26 } },
+				{ type: 'Text', text: 'TeXT', range: { start: 26, end: 30 } },
+				{
+					type: 'ElementEnd',
+					end: { type: 'Close', prefix: 'ns', local: 'Ätag' },
+					range: { start: 30, end: source.length }
+				}
+			]);
+		});
+
+		it.each([
+			{ name: 'default options', options: {} },
+			{ name: 'xmlConfig', options: xmlConfig },
+			{ name: 'svgConfig', options: svgConfig },
+			{ name: 'non-strict documents', options: { strictDocument: false } },
+			{
+				name: 'HTML with normalization disabled',
+				options: { ...htmlConfig, lowercaseNames: false }
+			}
+		])('should preserve names with $name', ({ options }) => {
+			const tokens = collectTokens('<SVG viewBox="0 0 10 10"></SVG>', options);
+			expect(tokens[0]).toMatchObject({ type: 'ElementStart', local: 'SVG' });
+			expect(tokens[1]).toMatchObject({ type: 'Attribute', local: 'viewBox' });
+			expect(tokens[3]).toMatchObject({ type: 'ElementEnd', end: { type: 'Close', local: 'SVG' } });
+		});
+	});
+
 	describe('rawTextElements', () => {
 		it('raw_text_01', () => {
 			assertTokens(
@@ -2624,6 +2664,49 @@ describe('tokenize function', () => {
 				{ rawTextElements: ['custom-raw'] }
 			);
 		});
+
+		it('should preserve non-ASCII case when matching custom raw text closing tags', () => {
+			const tokens = collectTokens('<ÄRAW>A</äraw>B</ÄrAw>', {
+				lowercaseNames: true,
+				rawTextElements: ['Äraw']
+			});
+			expect(tokens).toHaveLength(4);
+			expect(tokens[2]).toMatchObject({ type: 'Text', text: 'A</äraw>B' });
+			expect(tokens[3]).toMatchObject({
+				type: 'ElementEnd',
+				end: { type: 'Close', local: 'Äraw' }
+			});
+		});
+
+		it('should recognize mixed-case raw text and closing tags', () => {
+			const content = 'A < B; </scriptExtra>';
+			const tokens = collectTokens(`<ScRiPt>${content}</SCRIPT><P>After</p>`, htmlConfig);
+			expect(tokens).toHaveLength(8);
+			expect(tokens[0]).toMatchObject({ type: 'ElementStart', local: 'script' });
+			expect(tokens[2]).toMatchObject({ type: 'Text', text: content });
+			expect(tokens[3]).toMatchObject({
+				type: 'ElementEnd',
+				end: { type: 'Close', local: 'script' }
+			});
+			expect(tokens[4]).toMatchObject({ type: 'ElementStart', local: 'p' });
+			expect(tokens[6]).toMatchObject({ type: 'Text', text: 'After' });
+		});
+
+		it('should recognize an empty raw text element with a differently cased closing tag', () => {
+			const tokens = collectTokens('<script></SCRIPT><BR>', htmlConfig);
+			expect(tokens).toHaveLength(5);
+			expect(tokens[2]).toMatchObject({
+				type: 'ElementEnd',
+				end: { type: 'Close', local: 'script' }
+			});
+			expect(tokens[3]).toMatchObject({ type: 'ElementStart', local: 'br' });
+		});
+
+		it('should preserve case-sensitive raw text termination when normalization is disabled', () => {
+			const tokens = collectTokens('<script>A</SCRIPT>B</script>', { rawTextElements: ['script'] });
+			expect(tokens[2]).toMatchObject({ type: 'Text', text: 'A</SCRIPT>B' });
+			expect(tokens).toHaveLength(4);
+		});
 	});
 
 	describe('implicitSelfClosingElements', () => {
@@ -2670,6 +2753,22 @@ describe('tokenize function', () => {
 				],
 				{ implicitSelfClosingElements: ['meta'] }
 			);
+		});
+
+		it('should recognize mixed-case HTML void elements', () => {
+			expect(collectTokens('<BR><iMg SRC="Photo.PNG">', htmlConfig)).toStrictEqual([
+				{ type: 'ElementStart', prefix: '', local: 'br', start: 0 },
+				{ type: 'ElementEnd', end: { type: 'Empty' }, range: { start: 3, end: 4 } },
+				{ type: 'ElementStart', prefix: '', local: 'img', start: 4 },
+				{
+					type: 'Attribute',
+					prefix: '',
+					local: 'src',
+					value: 'Photo.PNG',
+					range: { start: 9, end: 24 }
+				},
+				{ type: 'ElementEnd', end: { type: 'Empty' }, range: { start: 24, end: 25 } }
+			]);
 		});
 	});
 });

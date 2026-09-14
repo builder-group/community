@@ -36,6 +36,7 @@ export class XmlStream {
 		const {
 			pos = 0,
 			strictDocument = true,
+			lowercaseNames = false,
 			allowDtd = true,
 			rawTextElements = null,
 			implicitSelfClosingElements = null,
@@ -46,6 +47,7 @@ export class XmlStream {
 		this._end = this._text.length;
 		this.config = {
 			strictDocument,
+			lowercaseNames,
 			allowDtd,
 			rawTextElements,
 			implicitSelfClosingElements,
@@ -217,10 +219,10 @@ export class XmlStream {
 	}
 
 	/**
-	 * Checks if the stream starts with the given text, case-insensitive.
+	 * Checks for text at the current position, ignoring ASCII letter case on both sides.
+	 * Compares non-ASCII characters exactly and leaves the stream position unchanged.
 	 *
-	 * @param text - The text to check for (should be uppercase).
-	 * @returns True if the stream starts with the text (case-insensitive), false otherwise.
+	 * @param text - The text to check for, in any letter case.
 	 */
 	public startsWithIgnoreCase(text: string): boolean {
 		if (this._pos + text.length > this._end) {
@@ -231,10 +233,11 @@ export class XmlStream {
 			const streamChar = this._text.charCodeAt(this._pos + i);
 			const textChar = text.charCodeAt(i);
 
-			// Convert to uppercase for comparison if it's a lowercase letter
+			// Convert ASCII letters to uppercase before comparing
 			const streamCharUpper = streamChar >= 97 && streamChar <= 122 ? streamChar - 32 : streamChar;
+			const textCharUpper = textChar >= 97 && textChar <= 122 ? textChar - 32 : textChar;
 
-			if (streamCharUpper !== textChar) {
+			if (streamCharUpper !== textCharUpper) {
 				return false;
 			}
 		}
@@ -495,6 +498,11 @@ export class XmlStream {
 			throw new XmlError({ type: 'InvalidName' }, this.genTextPosFrom(start));
 		}
 
+		if (this.config.lowercaseNames) {
+			prefix = prefix.replace(/[A-Z]/g, (char) => char.toLowerCase());
+			local = local.replace(/[A-Z]/g, (char) => char.toLowerCase());
+		}
+
 		return [prefix, local];
 	}
 
@@ -587,6 +595,14 @@ export interface TXmlStreamConfig {
 	 * @default true
 	 */
 	strictDocument: boolean;
+
+	/**
+	 * Convert ASCII A-Z to a-z in opening-tag, closing-tag, and attribute names, including prefixes.
+	 * Also match configured raw text closing tags ignoring ASCII case.
+	 * Preserve non-ASCII characters, text content, attribute values, and source positions.
+	 * @default false
+	 */
+	lowercaseNames: boolean;
 
 	/**
 	 * List of element names that should be treated as raw text elements.

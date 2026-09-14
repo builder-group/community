@@ -556,11 +556,7 @@ function parseContent(
 	parseContentUntil: string | number = LESS_THAN
 ): void {
 	while (!s.atEnd()) {
-		if (
-			typeof parseContentUntil === 'number'
-				? s.currCodeUnit() === parseContentUntil
-				: s.startsWith(parseContentUntil)
-		) {
+		if (startsWithContentDelimiter(s, parseContentUntil)) {
 			const nextCodeUnit = s.nextCodeUnit();
 			if (nextCodeUnit === EXCLAMATION_MARK) {
 				if (s.startsWith(COMMENT_START)) {
@@ -641,7 +637,7 @@ function parseText(
 	const text =
 		typeof parseTextUntil === 'number'
 			? s.consumeCodeUnitsWhile((c) => c !== parseTextUntil)
-			: s.consumeCodeUnitsWhile((_, _s) => !_s.startsWith(parseTextUntil));
+			: s.consumeCodeUnitsWhile((_, _s) => !startsWithContentDelimiter(_s, parseTextUntil));
 
 	// According to the spec, `]]>` must not appear inside a Text node.
 	// https://www.w3.org/TR/xml/#syntax
@@ -650,4 +646,11 @@ function parseText(
 	}
 
 	tokenCallback({ type: 'Text', text, range: s.rangeFrom(start) }, s);
+}
+
+function startsWithContentDelimiter(s: XmlStream, delimiter: string | number): boolean {
+	if (typeof delimiter === 'number') {
+		return s.currCodeUnit() === delimiter;
+	}
+	return s.config.lowercaseNames ? s.startsWithIgnoreCase(delimiter) : s.startsWith(delimiter);
 }
