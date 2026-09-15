@@ -1,4 +1,5 @@
 import { defineFeature, type TFeature } from 'feature-core';
+import { registerStateListener } from '../register-state-listener';
 import type {
 	TListener,
 	TListenerCallback,
@@ -23,6 +24,7 @@ export function asyncQueueFeature<GValue>(): TAsyncQueueFeature<GValue> {
 		install() {
 			return {
 				notify(this: TStateBase<GValue>, notifyOptions = {}) {
+					this._version++;
 					const { listenerContext = {}, prevValue } = notifyOptions;
 
 					for (const listener of this._listeners) {
@@ -42,15 +44,7 @@ export function asyncQueueFeature<GValue>(): TAsyncQueueFeature<GValue> {
 					const listener: TListener<GValue> = {
 						callback
 					};
-					this._listeners.push(listener);
-
-					return () => {
-						removeQueuedAsyncListenerCalls(callback);
-						const index = this._listeners.indexOf(listener);
-						if (index !== -1) {
-							this._listeners.splice(index, 1);
-						}
-					};
+					return registerStateListener(this, listener, removeQueuedAsyncListenerCalls);
 				},
 				subscribe(this: TStateBase<GValue> & TAsyncQueueFeatureApi<GValue>, callback) {
 					const unbind = this.listen(callback);

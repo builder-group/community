@@ -1,4 +1,5 @@
 import { createFeatureHost } from 'feature-core';
+import { registerStateListener } from './register-state-listener';
 import type { TListener, TListenerCallback, TListenerContext, TState, TStateBase } from './types';
 
 /**
@@ -11,6 +12,7 @@ import type { TListener, TListenerCallback, TListenerContext, TState, TStateBase
 export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 	return createFeatureHost<TStateBase<GValue>>({
 		_listeners: [],
+		_version: 0,
 		_v: initialValue,
 		get value() {
 			return this._v;
@@ -19,6 +21,7 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 			this.set(newValue);
 		},
 		notify(notifyOptions = {}) {
+			this._version++;
 			const { listenerContext = {}, prevValue } = notifyOptions;
 			// Note: Only the outermost notify drains the queue. Nested notify calls append work to the active flush.
 			const shouldProcessListenerQueue = !listenerQueue.length;
@@ -65,15 +68,7 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 			const listener: TListener<GValue> = {
 				callback
 			};
-			this._listeners.push(listener);
-
-			return () => {
-				removeQueuedListenerCalls(callback);
-				const index = this._listeners.indexOf(listener);
-				if (index !== -1) {
-					this._listeners.splice(index, 1);
-				}
-			};
+			return registerStateListener(this, listener, removeQueuedListenerCalls);
 		},
 		subscribe(callback) {
 			const unbind = this.listen(callback);

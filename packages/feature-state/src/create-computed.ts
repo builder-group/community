@@ -5,9 +5,8 @@ import type { TState, TStateBase, TStateValue } from './types';
 /**
  * Creates a read-only state derived from one source state or a tuple of source states.
  *
- * Recomputes and notifies listeners whenever a source changes. Calling `set()` or
- * assigning `value` throws: update the source states instead. Call `destroy()` when
- * the computed state is no longer needed to unsubscribe from its sources.
+ * Subscribes to sources while observed. Without listeners, reads refresh the cached value.
+ * Keep `compute` pure. Calling `set()` or assigning `value` throws: update source states instead.
  */
 export function createComputed<GState extends TAnyComputedSourceState, GValue>(
 	source: GState,
@@ -28,42 +27,79 @@ export function createComputed<GValue>(
 	const { isEqual = Object.is } = options;
 	const isTupleInput = Array.isArray(input);
 	const sources = (isTupleInput ? [...input] : [input]) as TAnyComputedSourceState[];
-	const cleanups: Array<() => void> = [];
+	const initialValues = sources.map((source) => source.get());
 
-	const computeValue = (): GValue =>
-		isTupleInput ? compute(sources.map((s) => s.get())) : compute(sources[0]?.get());
-
-	const computedState = createState(computeValue()).with(
+	const computedState = createState(compute(isTupleInput ? initialValues : initialValues[0])).with(
 		defineFeature<TComputedFeature<GValue, typeof sources>>({
 			key: 'computed',
-			overrides: ['value', 'set'],
+			overrides: ['value', 'get', 'set'],
 			install(host: Pick<TStateBase<GValue>, '_v'>) {
 				return {
-					value: host._v, // Note: Satisfies the override check; replaced by Object.defineProperty below
+					value: host._v, // Note: Replaced by Object.defineProperty below
 					_sources: sources,
-					destroy() {
-						for (const cleanup of cleanups) {
-							cleanup();
+					_sourceUnsubscribes: [],
+					_lastSourceVersions: sources.map((source) => source._version),
+					get(this: TComputedState<GValue, typeof sources>): GValue {
+						if (!this._sourceUnsubscribes.length) {
+							this._refresh(false);
 						}
-						cleanups.length = 0;
+						return this._v;
 					},
 					set(_value: never, _options?: never) {
 						throw new Error(
 							'Cannot call set() on a computed state. Update the source states instead.'
 						);
+					},
+					_refresh(
+						this: TComputedState<GValue, typeof sources>,
+						fromSourceNotification: boolean,
+						background?: boolean
+					): void {
+						// Note: Read values first because unobserved computed sources may advance their versions
+						const values = this._sources.map((source) => source.get());
+						const versions = this._sources.map((source) => source._version);
+						if (
+							// Note: Process every source notification because isEqual: false disables
+							// equality checking, even when queued callbacks see an already-cached version
+							!fromSourceNotification &&
+							versions.every((version, index) => version === this._lastSourceVersions[index])
+						) {
+							return;
+						}
+
+						const nextValue = compute(isTupleInput ? values : values[0]);
+						const prevValue = this._v;
+						const isValueEqual = isEqual !== false && isEqual(prevValue, nextValue);
+						this._lastSourceVersions = versions;
+						if (isValueEqual) {
+							return;
+						}
+
+						this._v = nextValue;
+						if (fromSourceNotification) {
+							this.notify({
+								listenerContext:
+									background === true
+										? { source: computedSourceKey, background }
+										: { source: computedSourceKey },
+								prevValue
+							});
+						} else {
+							// Note: Downstream computations need this revision to detect changes on their next read
+							this._version++;
+						}
 					}
 				};
 			}
 		})
 	);
 
-	// Note: feature-core installs via Object.assign() which cannot create a property setter;
-	// Object.defineProperty is needed to make value assignment throw.
+	// Note: Feature installation uses Object.assign(), which cannot install accessors
 	Object.defineProperty(computedState, 'value', {
 		configurable: true,
 		enumerable: true,
 		get() {
-			return computedState._v;
+			return computedState.get();
 		},
 		set() {
 			throw new Error(
@@ -72,32 +108,27 @@ export function createComputed<GValue>(
 		}
 	});
 
-	const subscribedSources = new Set<TAnyComputedSourceState>();
-	for (const source of sources) {
-		if (subscribedSources.has(source)) {
-			continue;
-		}
-
-		subscribedSources.add(source);
-		cleanups.push(
-			source.listen(({ background }) => {
-				const nextValue = computeValue();
-				const prevValue = computedState._v;
-				if (isEqual !== false && isEqual(prevValue, nextValue)) {
-					return;
+	computedState._listenerLifecycle = {
+		connect() {
+			try {
+				for (const source of new Set(sources)) {
+					computedState._sourceUnsubscribes.push(
+						source.listen(({ background }) => computedState._refresh(true, background))
+					);
 				}
-				// Note: _v is mutated directly because set() is overridden to throw on computed states
-				computedState._v = nextValue;
-				computedState.notify({
-					listenerContext:
-						background === true
-							? { source: computedSourceKey, background }
-							: { source: computedSourceKey },
-					prevValue
-				});
-			})
-		);
-	}
+				computedState._refresh(false);
+			} catch (error) {
+				this.disconnect();
+				throw error;
+			}
+		},
+		disconnect() {
+			for (const unsubscribe of computedState._sourceUnsubscribes) {
+				unsubscribe();
+			}
+			computedState._sourceUnsubscribes.length = 0;
+		}
+	};
 
 	return computedState;
 }
@@ -107,8 +138,8 @@ export const computedSourceKey = 'computed';
 
 export interface TCreateComputedOptions<GValue> {
 	/**
-	 * Compares the current computed value with the next one.
-	 * Pass `false` to notify on every source update.
+	 * Compares computed values. Defaults to `Object.is`.
+	 * Pass `false` to notify on every source update while observed.
 	 */
 	isEqual?: TComputedIsEqual<GValue>;
 }
@@ -125,17 +156,26 @@ export type TComputedState<GValue, GSources extends readonly TAnyComputedSourceS
 export type TComputedFeature<
 	GValue,
 	GSources extends readonly TAnyComputedSourceState[]
-> = TFeature<'computed', TComputedFeatureApi<GValue, GSources>, [], 'value' | 'set'>;
+> = TFeature<'computed', TComputedFeatureApi<GValue, GSources>, [], 'value' | 'get' | 'set'>;
 
 export interface TComputedFeatureApi<GValue, GSources extends readonly TAnyComputedSourceState[]> {
-	/** The current computed value. Read-only: update the source states to change it. */
-	readonly value: GValue;
 	/** @internal */
 	readonly _sources: GSources;
-	/** Unsubscribes from all source states. Call this when the computed state is no longer needed to prevent memory leaks. */
-	destroy(): void;
+	/** @internal */
+	_sourceUnsubscribes: Array<() => void>;
+	/** @internal */
+	_lastSourceVersions: number[];
+	/** The current computed value. Read-only: update the source states to change it. */
+	readonly value: GValue;
+	/** Returns the current value, refreshing from sources when unobserved. */
+	get(): GValue;
 	/** Always throws. Update the source states instead. */
 	set(value: never, options?: never): void;
+	/**
+	 * Refreshes the cached value.
+	 * @internal
+	 */
+	_refresh(fromSourceNotification: boolean, background?: boolean): void;
 }
 
 type TComputedValues<GSources extends readonly TAnyComputedSourceState[]> = {

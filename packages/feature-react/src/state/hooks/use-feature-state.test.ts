@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
-import { createState } from 'feature-state';
-import { act } from 'react';
+import { createComputed, createState } from 'feature-state';
+import React, { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createTrackedState, type TTrackedState } from '../../__tests__/create-tracked-state';
 import { cleanupRenderedHooks, renderHook } from '../../__tests__/render-hook';
@@ -74,5 +74,24 @@ describe('useFeatureState function', () => {
 		expect(hook.result).toBe(10);
 		expect($first.unlistenCount).toBe(1);
 		expect($second.listenCount).toBe(1);
+	});
+
+	it('should release render-created computations and reconnect through Strict Mode', () => {
+		const $count = createState(1);
+		const hook = renderHook(
+			() => {
+				const $computed = React.useMemo(() => createComputed($count, (count) => ({ count })), []);
+				return useFeatureState($computed);
+			},
+			{ strict: true }
+		);
+
+		expect(hook.result).toEqual({ count: 1 });
+		expect($count._listeners).toHaveLength(1);
+		act(() => $count.set(2));
+		expect(hook.result).toEqual({ count: 2 });
+
+		hook.unmount();
+		expect($count._listeners).toHaveLength(0);
 	});
 });

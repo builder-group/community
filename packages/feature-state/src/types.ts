@@ -14,13 +14,17 @@ export type TState<GValue, GFeatures extends TAnyFeature[] = []> = TFeatureHost<
 export interface TStateBase<GValue> {
 	/** @internal */
 	_listeners: TListener<GValue>[];
-	/** Raw backing value. Mutate it directly only when you will call `notify()` yourself. */
+	/** @internal */
+	_listenerLifecycle?: TStateListenerLifecycle;
+	/** @internal */
+	_version: number;
+	/** @internal */
 	_v: GValue;
 	/** Current state value. Assigning a new value is equivalent to calling `set()`. */
 	value: GValue;
 	/**
 	 * Notifies all listeners. Bypasses the equality check, so it fires even if the value
-	 * has not changed. Useful after mutating `_v` or `value` in place.
+	 * has not changed. Useful after mutating `value` in place.
 	 */
 	notify(options?: TStateNotifyOptions<GValue>): void;
 	/** Returns the current state value. */
@@ -34,6 +38,14 @@ export interface TStateBase<GValue> {
 	listen(callback: TListenerCallback<GValue>): () => void;
 	/** Like `listen`, but also calls the callback immediately with the current value. */
 	subscribe(callback: TListenerCallback<GValue>): () => void;
+}
+
+/** Hooks for connecting observed states to their dependencies. */
+export interface TStateListenerLifecycle {
+	/** Connects before the first listener is registered. */
+	connect(): void;
+	/** Disconnects after the last listener is removed. */
+	disconnect(): void;
 }
 
 export interface TStateNotifyOptions<GValue> {

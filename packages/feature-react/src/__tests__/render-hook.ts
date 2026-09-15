@@ -4,7 +4,10 @@ import { createRoot } from 'react-dom/client';
 // Note: React checks this flag before trusting act() in custom test renderers
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
-export function renderHook<GResult>(useHook: () => GResult): TRenderedHook<GResult> {
+export function renderHook<GResult>(
+	useHook: () => GResult,
+	options: { strict?: boolean } = {}
+): TRenderedHook<GResult> {
 	let result: TRenderHookResult<GResult> = { hasRendered: false };
 	const container = document.createElement('div');
 	const root = createRoot(container);
@@ -20,7 +23,8 @@ export function renderHook<GResult>(useHook: () => GResult): TRenderedHook<GResu
 
 	function render(): void {
 		act(() => {
-			root.render(React.createElement(HookHost));
+			const element = React.createElement(HookHost);
+			root.render(options.strict ? React.createElement(React.StrictMode, null, element) : element);
 		});
 	}
 

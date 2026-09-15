@@ -1,5 +1,13 @@
 # Migration Guide
 
+## 0.1.0 to 0.1.1
+
+### Computed Subscription Cleanup
+
+Remove calls to computed `destroy()`. Computed states now disconnect from their sources when the last listener unsubscribes. Continue using the unsubscribe functions returned by `listen()` and `subscribe()`.
+
+Without listeners, computations refresh on the next read or subscription instead of on every source update. Keep computation callbacks pure and use subscriptions for side effects.
+
 ## 0.0.x to 0.1.0
 
 `feature-state` now uses the shared `.with(feature())` composition model from `feature-core`. The base state API is smaller, while undo, storage, queueing, equality, and computed behavior live in features.

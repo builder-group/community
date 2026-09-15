@@ -82,7 +82,7 @@ $count.undo(); // 2
 $count.multiUndo(2); // 0
 ```
 
-Derive a read-only value from one or more states with `createComputed`. It recomputes whenever a source state changes:
+Derive a read-only value from one or more states with `createComputed`. It refreshes when read or observed:
 
 ```ts
 import { createComputed, createState } from 'feature-state';
@@ -213,9 +213,11 @@ const $filteredTasks = createComputed([$tasks, $filter] as const, ([tasks, filte
 );
 ```
 
-Computed states expose the normal read and subscription API (`value`, `get()`, `listen()`, and `subscribe()`), but `set()` and assigning `value` throw because source states own the data. Computed states are still feature hosts. Use queue-oriented features when the computed state needs custom scheduling, but keep write-oriented features such as `undoFeature`, `storageFeature`, and `isEqualFeature` on source states because they call or replace `set()`. Call `destroy()` when the containing object is torn down to unsubscribe from source states.
+Computed states support `get()`, `value`, `listen()`, and `subscribe()`. Calling `set()` or assigning `value` throws. Queue features can be installed on computed states, but keep write-oriented features on their sources.
 
-`isEqual` defaults to `Object.is`. Pass a custom comparator to suppress notifications when the computed structure is equivalent but not referentially identical. Pass `false` to notify on every source update.
+Sources stay subscribed while the computed state has listeners. With no listeners, reads refresh the cached value when sources change. Keep computation callbacks pure.
+
+`isEqual` defaults to `Object.is`. Pass a custom comparator to compare computed values, or `false` to notify on every source update while observed.
 
 ## Built-in Features
 

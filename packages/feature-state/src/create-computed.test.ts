@@ -1,7 +1,7 @@
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 import { computedSourceKey, createComputed, type TComputedState } from './create-computed';
 import { createState } from './create-state';
-import { priorityQueueFeature, undoFeature } from './features';
+import { asyncQueueFeature, priorityQueueFeature, undoFeature } from './features';
 
 describe('createComputed function', () => {
 	describe('types', () => {
@@ -20,7 +20,6 @@ describe('createComputed function', () => {
 			>();
 			expectTypeOf($computed.get()).toEqualTypeOf<string>();
 			expectTypeOf($computed._sources).toEqualTypeOf<readonly [typeof $a, typeof $b]>();
-			expectTypeOf($computed.destroy).toEqualTypeOf<() => void>();
 			expectTypeOf($doubled.get()).toEqualTypeOf<number>();
 		});
 
@@ -87,7 +86,141 @@ describe('createComputed function', () => {
 		});
 	});
 
+	describe('subscription lifecycle', () => {
+		it('should subscribe only while observed and reconnect with current values', () => {
+			const $count = createState(1);
+			const $doubled = createComputed($count, (count) => count * 2);
+			expect($count._listeners).toHaveLength(0);
+
+			const unlisten = $doubled.listen(vi.fn());
+			const secondUnlisten = $doubled.listen(vi.fn());
+			expect($count._listeners).toHaveLength(1);
+			unlisten();
+			unlisten();
+			expect($count._listeners).toHaveLength(1);
+			secondUnlisten();
+			expect($count._listeners).toHaveLength(0);
+
+			$count.set(3);
+			const listener = vi.fn();
+			const unsubscribe = $doubled.subscribe(listener);
+			expect(listener).toHaveBeenCalledExactlyOnceWith({ value: 6, prevValue: 6 });
+			expect($count._listeners).toHaveLength(1);
+			unsubscribe();
+			expect($count._listeners).toHaveLength(0);
+		});
+
+		it('should keep unobserved chains current without recomputing unchanged inputs', () => {
+			const $count = createState(1);
+			const compute = vi.fn((count: number) => ({ doubled: count * 2 }));
+			const $doubled = createComputed($count, compute);
+			const $label = createComputed($doubled, ({ doubled }) => `Value: ${doubled}`);
+			const initial = $doubled.get();
+			expect($doubled.value).toBe(initial);
+			expect(compute).toHaveBeenCalledTimes(1);
+
+			$count.set(3);
+			expect(compute).toHaveBeenCalledTimes(1);
+			expect($label.get()).toBe('Value: 6');
+			expect(compute).toHaveBeenCalledTimes(2);
+			expect($count._listeners).toHaveLength(0);
+
+			const listener = vi.fn();
+			const unsubscribe = $label.listen(listener);
+			$count.set(4);
+			expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ value: 'Value: 8' }));
+			unsubscribe();
+			expect($doubled._listeners).toHaveLength(0);
+			expect($count._listeners).toHaveLength(0);
+		});
+
+		it('should refresh after an unobserved in-place mutation followed by notify', () => {
+			const $source = createState({ count: 1 });
+			const $count = createComputed($source, (value) => value.count);
+
+			$source.value.count = 2;
+			$source.notify();
+
+			expect($count.value).toBe(2);
+		});
+
+		it('should release source subscriptions if connecting throws', () => {
+			const $source = createState(1);
+			const $computed = createComputed($source, (value) => {
+				if (value === 2) {
+					throw new Error('Cannot compute');
+				}
+				return value;
+			});
+			$source.set(2);
+
+			expect(() => $computed.listen(vi.fn())).toThrow('Cannot compute');
+			expect($source._listeners).toHaveLength(0);
+			expect($computed._listeners).toHaveLength(0);
+
+			$source.set(3);
+			const unsubscribe = $computed.listen(vi.fn());
+			expect($computed.get()).toBe(3);
+			unsubscribe();
+		});
+
+		it.each([
+			['async', asyncQueueFeature<number>],
+			['priority', priorityQueueFeature<number>]
+		] as const)(
+			'should manage subscriptions with the %s queue on a computed state',
+			async (_, queue) => {
+				const $source = createState(1);
+				const $computed = createComputed($source, (value) => value * 2).with(queue());
+				const listener = vi.fn();
+				const unsubscribe = $computed.subscribe(listener);
+				expect($source._listeners).toHaveLength(1);
+
+				$source.set(2);
+				await $computed.notify();
+				expect(listener).toHaveBeenLastCalledWith(expect.objectContaining({ value: 4 }));
+				unsubscribe();
+				expect($source._listeners).toHaveLength(0);
+
+				$source.set(3);
+				const reconnect = $computed.subscribe(listener);
+				expect(listener).toHaveBeenLastCalledWith({ value: 6, prevValue: 6 });
+				reconnect();
+			}
+		);
+
+		it.each([
+			['async', asyncQueueFeature<{ count: number }>],
+			['priority', priorityQueueFeature<{ count: number }>]
+		] as const)(
+			'should track explicit notifications from an unobserved %s source',
+			async (_, queue) => {
+				const $source = createState({ count: 1 }).with(queue());
+				const $count = createComputed($source, (value) => value.count);
+				$source.value.count = 2;
+
+				await $source.notify();
+
+				expect($count.get()).toBe(2);
+			}
+		);
+	});
+
 	describe('isEqual option', () => {
+		it('should retry an unobserved refresh when the comparator throws', () => {
+			// Prepare
+			const $source = createState(1);
+			const isEqual = vi.fn(Object.is).mockImplementationOnce(() => {
+				throw new Error('Cannot compare');
+			});
+			const $computed = createComputed($source, (value) => value * 2, { isEqual });
+			$source.set(2);
+
+			// Act & Assert
+			expect(() => $computed.get()).toThrow('Cannot compare');
+			expect($computed.get()).toBe(4);
+		});
+
 		it('should skip notifications when values are equal', () => {
 			// Prepare
 			const $obj = createState({ type: 'valid', count: 1 });
@@ -102,21 +235,6 @@ describe('createComputed function', () => {
 
 			// Assert
 			expect(listener).not.toHaveBeenCalled();
-		});
-	});
-
-	describe('destroy method', () => {
-		it('should stop recomputing', () => {
-			// Prepare
-			const $count = createState(2);
-			const $doubled = createComputed($count, (count) => count * 2);
-
-			// Act
-			$doubled.destroy();
-			$count.set(5);
-
-			// Assert
-			expect($doubled.get()).toBe(4);
 		});
 	});
 
