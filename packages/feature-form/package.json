@@ -1,6 +1,6 @@
 {
 	"name": "feature-form",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"private": false,
 	"description": "Framework-agnostic reactive form state with Standard Schema validation and per-field triggers",
 	"keywords": [

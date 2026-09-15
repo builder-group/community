@@ -1,6 +1,6 @@
 {
 	"name": "feature-state",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"private": false,
 	"description": "Reactive state with computed values and opt-in features for undo, storage, equality, and queues",
 	"keywords": [
