@@ -4,7 +4,7 @@ import type { TStateBase } from 'feature-state';
 /**
  * Exposes a state on `globalThis` under `key` for browser console debugging.
  * After installing, `globalThis[key]` holds the state object so you can call
- * `get()`, `set()`, and inspect `_v` directly from the browser console.
+ * `get()`, `set()`, and inspect `_value` directly from the browser console.
  */
 export function globalBindFeature<GValue>(key: string): TGlobalBindFeature {
 	return defineFeature<TGlobalBindFeature>({

@@ -10,7 +10,7 @@ describe('createState function', () => {
 
 			// Assert
 			expectTypeOf(state.get()).toEqualTypeOf<string>();
-			expectTypeOf(state._v).toEqualTypeOf<string>();
+			expectTypeOf(state._value).toEqualTypeOf<string>();
 			expectTypeOf(state.value).toEqualTypeOf<string>();
 			expectTypeOf(state._history).toEqualTypeOf<string[]>();
 			expectTypeOf(state.multiUndo).toEqualTypeOf<(count: number) => void>();
@@ -27,7 +27,7 @@ describe('createState function', () => {
 
 			// Assert
 			expect(state.get()).toBe(initialValue);
-			expect(state._v).toBe(initialValue);
+			expect(state._value).toBe(initialValue);
 			expect(state.value).toBe(initialValue);
 		});
 
@@ -57,7 +57,7 @@ describe('createState function', () => {
 			state.value.count = 1;
 
 			// Assert
-			expect(state._v.count).toBe(1);
+			expect(state._value.count).toBe(1);
 			expect(state.get().count).toBe(1);
 		});
 	});

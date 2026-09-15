@@ -19,7 +19,7 @@ export interface TStateBase<GValue> {
 	/** @internal */
 	_version: number;
 	/** @internal */
-	_v: GValue;
+	_value: GValue;
 	/** Current state value. Assigning a new value is equivalent to calling `set()`. */
 	value: GValue;
 	/**

@@ -82,7 +82,7 @@ function formFieldFeature<GValue>(
 					blur: []
 				},
 				key,
-				defaultValue: deepCopy(state._v),
+				defaultValue: deepCopy(state._value),
 				isTouched: createState(false),
 				isSubmitted: createState(false),
 				isValidating: createState(false),

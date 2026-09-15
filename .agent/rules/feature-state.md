@@ -15,7 +15,7 @@ Use `feature-state` for framework-independent state models. Apply
 ## Avoid
 
 - Do not put many unrelated fields into one state object when separate atoms would stay clearer
-- Do not read or mutate `state._v` directly when a public API fits
+- Do not read or mutate `state._value` directly when a public API fits
 - Do not mirror a feature-state value into ad-hoc React state unless the UI draft is intentionally separate
 - Do not create shared computed states for labels or booleans used by only one component render
 - Do not install write-oriented features on computed states; keep them on source states
@@ -47,6 +47,6 @@ const $listPage = createState({
   status: 'idle'
 });
 
-$listPage._v.items.push(nextItem);
+$listPage._value.items.push(nextItem);
 $listPage.notify();
 ```

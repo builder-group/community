@@ -158,7 +158,7 @@ $settings.value.theme = 'dark'; // mutate in place, no notification yet
 $settings.notify({ prevValue }); // notify listeners manually
 ```
 
-Use `_v` only inside features or low-level integrations. App code should prefer `set()`, `value`, `get()`, and `notify()`.
+Use `_value` only inside features or low-level integrations. App code should prefer `set()`, `value`, `get()`, and `notify()`.
 
 Pass custom metadata to every listener in the same notification:
 
@@ -367,9 +367,9 @@ Yes. The unsubscribe function removes the callback from `_listeners` and also re
 
 No. Both features override the same internal queue (`listen`, `subscribe`, and `notify`). Installing both means the last one installed takes effect and the first is silently ignored. Pick one.
 
-### When should I use `_v` directly instead of `set()`?
+### When should I use `_value` directly instead of `set()`?
 
-Use `_v` only inside features or low-level integrations that need raw backing-value access. For app code that mutates an object in place, use `value` or `get()` to reach the object, keep your own `prevValue` when listeners need it, then call `notify()`. This is an escape hatch; prefer replacing the value with `set()` when possible.
+Use `_value` only inside features or low-level integrations that need raw backing-value access. For app code that mutates an object in place, use `value` or `get()` to reach the object, keep your own `prevValue` when listeners need it, then call `notify()`. This is an escape hatch; prefer replacing the value with `set()` when possible.
 
 ### How does `storageFeature` prevent save loops?
 

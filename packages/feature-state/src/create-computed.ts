@@ -33,9 +33,9 @@ export function createComputed<GValue>(
 		defineFeature<TComputedFeature<GValue, typeof sources>>({
 			key: 'computed',
 			overrides: ['value', 'get', 'set'],
-			install(host: Pick<TStateBase<GValue>, '_v'>) {
+			install(host: Pick<TStateBase<GValue>, '_value'>) {
 				return {
-					value: host._v, // Note: Replaced by Object.defineProperty below
+					value: host._value, // Note: Replaced by Object.defineProperty below
 					_sources: sources,
 					_sourceUnsubscribes: [],
 					_lastSourceVersions: sources.map((source) => source._version),
@@ -43,7 +43,7 @@ export function createComputed<GValue>(
 						if (!this._sourceUnsubscribes.length) {
 							this._refresh(false);
 						}
-						return this._v;
+						return this._value;
 					},
 					set(_value: never, _options?: never) {
 						throw new Error(
@@ -68,14 +68,14 @@ export function createComputed<GValue>(
 						}
 
 						const nextValue = compute(isTupleInput ? values : values[0]);
-						const prevValue = this._v;
+						const prevValue = this._value;
 						const isValueEqual = isEqual !== false && isEqual(prevValue, nextValue);
 						this._lastSourceVersions = versions;
 						if (isValueEqual) {
 							return;
 						}
 
-						this._v = nextValue;
+						this._value = nextValue;
 						if (fromSourceNotification) {
 							this.notify({
 								listenerContext:

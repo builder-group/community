@@ -23,15 +23,15 @@ export function isEqualFeature<GValue>(isEqual: TStateEquality<GValue>): TIsEqua
 				) {
 					const newValue =
 						typeof newValueOrUpdater === 'function'
-							? (newValueOrUpdater as (value: GValue) => GValue)(this._v)
+							? (newValueOrUpdater as (value: GValue) => GValue)(this._value)
 							: newValueOrUpdater;
-					const prevValue = this._v;
+					const prevValue = this._value;
 					if (this._isEqual(prevValue, newValue)) {
 						return;
 					}
 
 					const { listenerContext = {} } = setOptions;
-					this._v = newValue;
+					this._value = newValue;
 					this.notify({
 						listenerContext: {
 							...listenerContext,

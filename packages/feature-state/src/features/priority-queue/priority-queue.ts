@@ -30,7 +30,7 @@ export function priorityQueueFeature<GValue>(): TPriorityQueueFeature<GValue> {
 								callback: listener.callback,
 								context: {
 									...listenerContext,
-									value: this._v,
+									value: this._value,
 									prevValue
 								}
 							},
@@ -53,7 +53,7 @@ export function priorityQueueFeature<GValue>(): TPriorityQueueFeature<GValue> {
 				subscribe(this: TStateBase<GValue> & TPriorityQueueFeatureApi<GValue>, callback, options) {
 					const unbind = this.listen(callback, options);
 					// Note: prevValue mirrors value on the initial call so listeners never receive undefined for prevValue
-					void callback({ value: this._v, prevValue: this._v });
+					void callback({ value: this._value, prevValue: this._value });
 					return unbind;
 				}
 			};

@@ -13,9 +13,9 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 	return createFeatureHost<TStateBase<GValue>>({
 		_listeners: [],
 		_version: 0,
-		_v: initialValue,
+		_value: initialValue,
 		get value() {
-			return this._v;
+			return this._value;
 		},
 		set value(newValue) {
 			this.set(newValue);
@@ -31,7 +31,7 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 					callback: listener.callback,
 					context: {
 						...listenerContext,
-						value: this._v,
+						value: this._value,
 						prevValue
 					}
 				});
@@ -42,20 +42,20 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 			}
 		},
 		get() {
-			return this._v;
+			return this._value;
 		},
 		set(newValueOrUpdater, setOptions = {}) {
 			const newValue =
 				typeof newValueOrUpdater === 'function'
-					? (newValueOrUpdater as (value: GValue) => GValue)(this._v)
+					? (newValueOrUpdater as (value: GValue) => GValue)(this._value)
 					: newValueOrUpdater;
-			const prevValue = this._v;
+			const prevValue = this._value;
 			if (Object.is(prevValue, newValue)) {
 				return;
 			}
 
 			const { listenerContext = {} } = setOptions;
-			this._v = newValue;
+			this._value = newValue;
 			this.notify({
 				listenerContext: {
 					...listenerContext,
@@ -73,7 +73,7 @@ export function createState<GValue>(initialValue: GValue): TState<GValue, []> {
 		subscribe(callback) {
 			const unbind = this.listen(callback);
 			// Note: prevValue mirrors value on the initial call so listeners never receive undefined for prevValue
-			void callback({ value: this._v, prevValue: this._v });
+			void callback({ value: this._value, prevValue: this._value });
 			return unbind;
 		}
 	});

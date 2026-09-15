@@ -8,6 +8,10 @@ Remove calls to computed `destroy()`. Computed states now disconnect from their 
 
 Without listeners, computations refresh on the next read or subscription instead of on every source update. Keep computation callbacks pure and use subscriptions for side effects.
 
+### Renamed Backing Value
+
+The internal `_v` field is now `_value`. Update direct accesses in custom features and integrations.
+
 ## 0.0.x to 0.1.0
 
 `feature-state` now uses the shared `.with(feature())` composition model from `feature-core`. The base state API is smaller, while undo, storage, queueing, equality, and computed behavior live in features.
