@@ -29,8 +29,8 @@ tauri-plugin-os = "2.4.0"
 
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
-specta = { version = "2.0.0-rc.21", features = ["derive"] }
-tauri-specta = { version = "2.0.0-rc.21", features = ["derive", "typescript"] }
+specta = { version = "2.0.0-rc.25", features = ["derive"] }
+tauri-specta = { version = "2.0.0-rc.25", features = ["derive", "typescript"] }
 specta-typescript = "0.0.12"
 
 desktop-tauri-macos = { path = "../crates/macos" }
