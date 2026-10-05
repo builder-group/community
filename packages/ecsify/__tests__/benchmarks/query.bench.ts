@@ -1,8 +1,8 @@
-import { bench, describe, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { And, createApp, With, Without } from '../../src';
 import { createSeededRandom } from '../create-seeded-random';
 
-describe('Query Performance', () => {
+describe('Query Performance', { timeout: 30_000 }, () => {
 	const seed = Math.random() * 1000000;
 	const random = createSeededRandom(seed);
 	const app = createApp({ plugins: [], systemSets: [] });
@@ -34,105 +34,111 @@ describe('Query Performance', () => {
 		}
 	}
 
-	describe('With(Position)', () => {
-		bench('bitmask + cached', () => {
-			const entities = app.queryEntities(With(Position), {
-				evaluationStrategy: 'bitmask',
-				cache: true
-			});
-			expect(entities.length).toBeGreaterThan(0);
-		});
+	test('With(Position)', async ({ bench }) => {
+		await bench.compare(
+			bench('bitmask + cached', () => {
+				const entities = app.queryEntities(With(Position), {
+					evaluationStrategy: 'bitmask',
+					cache: true
+				});
+				expect(entities.length).toBeGreaterThan(0);
+			}),
 
-		bench('bitmask + no cache', () => {
-			const entities = app.queryEntities(With(Position), {
-				evaluationStrategy: 'bitmask',
-				cache: false
-			});
-			expect(entities.length).toBeGreaterThan(0);
-		});
+			bench('bitmask + no cache', () => {
+				const entities = app.queryEntities(With(Position), {
+					evaluationStrategy: 'bitmask',
+					cache: false
+				});
+				expect(entities.length).toBeGreaterThan(0);
+			}),
 
-		bench('individual + cached', () => {
-			const entities = app.queryEntities(With(Position), {
-				evaluationStrategy: 'individual',
-				cache: true
-			});
-			expect(entities.length).toBeGreaterThan(0);
-		});
+			bench('individual + cached', () => {
+				const entities = app.queryEntities(With(Position), {
+					evaluationStrategy: 'individual',
+					cache: true
+				});
+				expect(entities.length).toBeGreaterThan(0);
+			}),
 
-		bench('individual + no cache', () => {
-			const entities = app.queryEntities(With(Position), {
-				evaluationStrategy: 'individual',
-				cache: false
-			});
-			expect(entities.length).toBeGreaterThan(0);
-		});
+			bench('individual + no cache', () => {
+				const entities = app.queryEntities(With(Position), {
+					evaluationStrategy: 'individual',
+					cache: false
+				});
+				expect(entities.length).toBeGreaterThan(0);
+			})
+		);
 	});
 
-	describe('And(With(Position), With(Velocity))', () => {
-		bench('bitmask + cached', () => {
-			const entities = app.queryEntities(And(With(Position), With(Velocity)), {
-				evaluationStrategy: 'bitmask',
-				cache: true
-			});
-			expect(entities.length).toBeGreaterThan(0);
-		});
+	test('And(With(Position), With(Velocity))', async ({ bench }) => {
+		await bench.compare(
+			bench('bitmask + cached', () => {
+				const entities = app.queryEntities(And(With(Position), With(Velocity)), {
+					evaluationStrategy: 'bitmask',
+					cache: true
+				});
+				expect(entities.length).toBeGreaterThan(0);
+			}),
 
-		bench('bitmask + no cache', () => {
-			const entities = app.queryEntities(And(With(Position), With(Velocity)), {
-				evaluationStrategy: 'bitmask',
-				cache: false
-			});
-			expect(entities.length).toBeGreaterThan(0);
-		});
+			bench('bitmask + no cache', () => {
+				const entities = app.queryEntities(And(With(Position), With(Velocity)), {
+					evaluationStrategy: 'bitmask',
+					cache: false
+				});
+				expect(entities.length).toBeGreaterThan(0);
+			}),
 
-		bench('individual + cached', () => {
-			const entities = app.queryEntities(And(With(Position), With(Velocity)), {
-				evaluationStrategy: 'individual',
-				cache: true
-			});
-			expect(entities.length).toBeGreaterThan(0);
-		});
+			bench('individual + cached', () => {
+				const entities = app.queryEntities(And(With(Position), With(Velocity)), {
+					evaluationStrategy: 'individual',
+					cache: true
+				});
+				expect(entities.length).toBeGreaterThan(0);
+			}),
 
-		bench('individual + no cache', () => {
-			const entities = app.queryEntities(And(With(Position), With(Velocity)), {
-				evaluationStrategy: 'individual',
-				cache: false
-			});
-			expect(entities.length).toBeGreaterThan(0);
-		});
+			bench('individual + no cache', () => {
+				const entities = app.queryEntities(And(With(Position), With(Velocity)), {
+					evaluationStrategy: 'individual',
+					cache: false
+				});
+				expect(entities.length).toBeGreaterThan(0);
+			})
+		);
 	});
 
-	describe('And(With(Position), Without(Health))', () => {
-		bench('bitmask + cached', () => {
-			const entities = app.queryEntities(And(With(Position), Without(Health)), {
-				evaluationStrategy: 'bitmask',
-				cache: true
-			});
-			expect(entities.length).toBeGreaterThanOrEqual(0);
-		});
+	test('And(With(Position), Without(Health))', async ({ bench }) => {
+		await bench.compare(
+			bench('bitmask + cached', () => {
+				const entities = app.queryEntities(And(With(Position), Without(Health)), {
+					evaluationStrategy: 'bitmask',
+					cache: true
+				});
+				expect(entities.length).toBeGreaterThanOrEqual(0);
+			}),
 
-		bench('bitmask + no cache', () => {
-			const entities = app.queryEntities(And(With(Position), Without(Health)), {
-				evaluationStrategy: 'bitmask',
-				cache: false
-			});
-			expect(entities.length).toBeGreaterThanOrEqual(0);
-		});
+			bench('bitmask + no cache', () => {
+				const entities = app.queryEntities(And(With(Position), Without(Health)), {
+					evaluationStrategy: 'bitmask',
+					cache: false
+				});
+				expect(entities.length).toBeGreaterThanOrEqual(0);
+			}),
 
-		bench('individual + cached', () => {
-			const entities = app.queryEntities(And(With(Position), Without(Health)), {
-				evaluationStrategy: 'individual',
-				cache: true
-			});
-			expect(entities.length).toBeGreaterThanOrEqual(0);
-		});
+			bench('individual + cached', () => {
+				const entities = app.queryEntities(And(With(Position), Without(Health)), {
+					evaluationStrategy: 'individual',
+					cache: true
+				});
+				expect(entities.length).toBeGreaterThanOrEqual(0);
+			}),
 
-		bench('individual + no cache', () => {
-			const entities = app.queryEntities(And(With(Position), Without(Health)), {
-				evaluationStrategy: 'individual',
-				cache: false
-			});
-			expect(entities.length).toBeGreaterThanOrEqual(0);
-		});
+			bench('individual + no cache', () => {
+				const entities = app.queryEntities(And(With(Position), Without(Health)), {
+					evaluationStrategy: 'individual',
+					cache: false
+				});
+				expect(entities.length).toBeGreaterThanOrEqual(0);
+			})
+		);
 	});
 });

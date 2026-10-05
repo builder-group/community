@@ -1,8 +1,8 @@
-import { bench, describe, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { createApp, With } from '../../src';
 import { createSeededRandom } from '../create-seeded-random';
 
-describe('Component Variants Performance', () => {
+describe('Component Variants Performance', { timeout: 30_000 }, () => {
 	const seed = Math.random() * 1000000;
 	const random = createSeededRandom(seed);
 
@@ -12,91 +12,95 @@ describe('Component Variants Performance', () => {
 	const Health: number[] = []; // Single value array
 	const Player: {} = {}; // Marker component
 
-	describe('Add Component', () => {
-		bench('AoS - Transform', () => {
-			const app = createApp({ plugins: [], systemSets: [] });
-			const eid = app.createEntity();
+	test('Add Component', async ({ bench }) => {
+		await bench.compare(
+			bench('AoS - Transform', () => {
+				const app = createApp({ plugins: [], systemSets: [] });
+				const eid = app.createEntity();
 
-			app.addComponent(eid, Transform);
-			Transform[eid] = { x: random.next() * 1000, y: random.next() * 1000 };
+				app.addComponent(eid, Transform);
+				Transform[eid] = { x: random.next() * 1000, y: random.next() * 1000 };
 
-			expect(app.hasComponent(eid, Transform)).toBe(true);
-		});
+				expect(app.hasComponent(eid, Transform)).toBe(true);
+			}),
 
-		bench('SoA - Position', () => {
-			const app = createApp({ plugins: [], systemSets: [] });
-			const eid = app.createEntity();
+			bench('SoA - Position', () => {
+				const app = createApp({ plugins: [], systemSets: [] });
+				const eid = app.createEntity();
 
-			app.addComponent(eid, Position);
-			Position.x[eid] = random.next() * 1000;
-			Position.y[eid] = random.next() * 1000;
+				app.addComponent(eid, Position);
+				Position.x[eid] = random.next() * 1000;
+				Position.y[eid] = random.next() * 1000;
 
-			expect(app.hasComponent(eid, Position)).toBe(true);
-		});
+				expect(app.hasComponent(eid, Position)).toBe(true);
+			}),
 
-		bench('Single Array - Health', () => {
-			const app = createApp({ plugins: [], systemSets: [] });
-			const eid = app.createEntity();
+			bench('Single Array - Health', () => {
+				const app = createApp({ plugins: [], systemSets: [] });
+				const eid = app.createEntity();
 
-			app.addComponent(eid, Health);
-			Health[eid] = Math.floor(random.next() * 100) + 1;
+				app.addComponent(eid, Health);
+				Health[eid] = Math.floor(random.next() * 100) + 1;
 
-			expect(app.hasComponent(eid, Health)).toBe(true);
-		});
+				expect(app.hasComponent(eid, Health)).toBe(true);
+			}),
 
-		bench('Marker - Player', () => {
-			const app = createApp({ plugins: [], systemSets: [] });
-			const eid = app.createEntity();
+			bench('Marker - Player', () => {
+				const app = createApp({ plugins: [], systemSets: [] });
+				const eid = app.createEntity();
 
-			app.addComponent(eid, Player);
+				app.addComponent(eid, Player);
 
-			expect(app.hasComponent(eid, Player)).toBe(true);
-		});
+				expect(app.hasComponent(eid, Player)).toBe(true);
+			})
+		);
 	});
 
-	describe('Remove Component', () => {
-		bench('AoS - Transform', () => {
-			const app = createApp({ plugins: [], systemSets: [] });
-			const eid = app.createEntity();
-			app.addComponent(eid, Transform);
-			Transform[eid] = { x: 100, y: 200 };
+	test('Remove Component', async ({ bench }) => {
+		await bench.compare(
+			bench('AoS - Transform', () => {
+				const app = createApp({ plugins: [], systemSets: [] });
+				const eid = app.createEntity();
+				app.addComponent(eid, Transform);
+				Transform[eid] = { x: 100, y: 200 };
 
-			const removed = app.removeComponent(eid, Transform);
-			expect(removed).toBe(true);
-		});
+				const removed = app.removeComponent(eid, Transform);
+				expect(removed).toBe(true);
+			}),
 
-		bench('SoA - Position', () => {
-			const app = createApp({ plugins: [], systemSets: [] });
-			const eid = app.createEntity();
-			app.addComponent(eid, Position);
-			Position.x[eid] = 100;
-			Position.y[eid] = 200;
+			bench('SoA - Position', () => {
+				const app = createApp({ plugins: [], systemSets: [] });
+				const eid = app.createEntity();
+				app.addComponent(eid, Position);
+				Position.x[eid] = 100;
+				Position.y[eid] = 200;
 
-			const removed = app.removeComponent(eid, Position);
-			expect(removed).toBe(true);
-		});
+				const removed = app.removeComponent(eid, Position);
+				expect(removed).toBe(true);
+			}),
 
-		bench('Single Array - Health', () => {
-			const app = createApp({ plugins: [], systemSets: [] });
-			const eid = app.createEntity();
-			app.addComponent(eid, Health);
-			Health[eid] = 100;
+			bench('Single Array - Health', () => {
+				const app = createApp({ plugins: [], systemSets: [] });
+				const eid = app.createEntity();
+				app.addComponent(eid, Health);
+				Health[eid] = 100;
 
-			const removed = app.removeComponent(eid, Health);
-			expect(removed).toBe(true);
-		});
+				const removed = app.removeComponent(eid, Health);
+				expect(removed).toBe(true);
+			}),
 
-		bench('Marker - Player', () => {
-			const app = createApp({ plugins: [], systemSets: [] });
-			const eid = app.createEntity();
-			app.addComponent(eid, Player);
+			bench('Marker - Player', () => {
+				const app = createApp({ plugins: [], systemSets: [] });
+				const eid = app.createEntity();
+				app.addComponent(eid, Player);
 
-			const removed = app.removeComponent(eid, Player);
-			expect(removed).toBe(true);
-		});
+				const removed = app.removeComponent(eid, Player);
+				expect(removed).toBe(true);
+			})
+		);
 	});
 
-	describe('Query Component', () => {
+	test('Query Component', async ({ bench }) => {
 		const appAoS = createApp({ plugins: [], systemSets: [] });
 		const appSoA = createApp({ plugins: [], systemSets: [] });
 		const appSingle = createApp({ plugins: [], systemSets: [] });
@@ -138,24 +142,26 @@ describe('Component Variants Performance', () => {
 			}
 		}
 
-		bench('AoS - Transform', () => {
-			const entities = appAoS.queryEntities(With(Transform));
-			expect(entities.length).toBeGreaterThan(0);
-		});
+		await bench.compare(
+			bench('AoS - Transform', () => {
+				const entities = appAoS.queryEntities(With(Transform));
+				expect(entities.length).toBeGreaterThan(0);
+			}),
 
-		bench('SoA - Position', () => {
-			const entities = appSoA.queryEntities(With(Position));
-			expect(entities.length).toBeGreaterThan(0);
-		});
+			bench('SoA - Position', () => {
+				const entities = appSoA.queryEntities(With(Position));
+				expect(entities.length).toBeGreaterThan(0);
+			}),
 
-		bench('Single Array - Health', () => {
-			const entities = appSingle.queryEntities(With(Health));
-			expect(entities.length).toBeGreaterThan(0);
-		});
+			bench('Single Array - Health', () => {
+				const entities = appSingle.queryEntities(With(Health));
+				expect(entities.length).toBeGreaterThan(0);
+			}),
 
-		bench('Marker - Player', () => {
-			const entities = appMarker.queryEntities(With(Player));
-			expect(entities.length).toBeGreaterThan(0);
-		});
+			bench('Marker - Player', () => {
+				const entities = appMarker.queryEntities(With(Player));
+				expect(entities.length).toBeGreaterThan(0);
+			})
+		);
 	});
 });

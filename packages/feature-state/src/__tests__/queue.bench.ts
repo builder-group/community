@@ -1,4 +1,4 @@
-import { bench, describe } from 'vitest';
+import { describe, test } from 'vitest';
 import { FlatQueue } from '../features';
 
 const dataSets: TBenchmarkDataSet[] = [
@@ -8,23 +8,25 @@ const dataSets: TBenchmarkDataSet[] = [
 	{ name: 'Large data (10,000 items)', data: createDataSet(10000) }
 ];
 
-describe('queue benchmark', () => {
+describe('queue benchmark', { timeout: 30_000 }, () => {
 	for (const { name, data } of dataSets) {
-		describe(name, () => {
-			bench('array insertion order', () => {
-				const queue = createArrayQueue(data);
-				drainArrayQueueInInsertionOrder(queue);
-			});
+		test(name, async ({ bench }) => {
+			await bench.compare(
+				bench('array insertion order', () => {
+					const queue = createArrayQueue(data);
+					drainArrayQueueInInsertionOrder(queue);
+				}),
 
-			bench('array priority sort', () => {
-				const queue = createArrayQueue(data);
-				drainArrayQueueByPriority(queue);
-			});
+				bench('array priority sort', () => {
+					const queue = createArrayQueue(data);
+					drainArrayQueueByPriority(queue);
+				}),
 
-			bench('FlatQueue priority heap', () => {
-				const queue = createFlatQueue(data);
-				drainFlatQueue(queue);
-			});
+				bench('FlatQueue priority heap', () => {
+					const queue = createFlatQueue(data);
+					drainFlatQueue(queue);
+				})
+			);
 		});
 	}
 });
