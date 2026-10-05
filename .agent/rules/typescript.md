@@ -1,58 +1,23 @@
-# TypeScript Rules
+# TypeScript Conventions
 
-This file covers TypeScript- and TSX-specific enforcement.
+Apply these defaults to TypeScript and TSX, following local exceptions. React component declarations follow `react.md`.
 
-## Enforce
-
-- Keep `strict`-friendly code. Prefer explicit types at module boundaries.
-- Prefer `interface` for object shapes. Use `type` for unions, mapped types, and aliases.
-- Use clear naming conventions consistently:
-  - `T*` for project types and interfaces
-  - `E*` for enums
-  - `S*` for schemas
-- Prefer function declarations for named functions; use arrow functions for callbacks and inline functions
-- For React components, follow `.agent/rules/react.md` instead of the function-declaration default
-- Use `== null` for absence and `!= null` for presence when handling both `null` and `undefined`
-- Prefer `??` over `||` for fallback values
-- Keep conditionals flat; use guard clauses for invalid states
-- Prefer the meaningful branch first in simple ternaries when the condition remains direct
-- Prefer named booleans for complex checks
+- Prefer `interface` for object shapes and `type` for unions, mapped types, and aliases
+- Prefix project types and interfaces with `T`, enums with `E`, and schemas with `S`
+- Prefer declarations for named functions. Use arrows for callbacks and inline functions.
+- Use `== null` / `!= null` when checking both null and undefined, and `??` for nullish fallbacks
 - Use `!items.length` for empty checks and `items.length > 0` for non-empty checks
-- Prefer inline defaults for simple option values instead of extracting a constant too early
-- Use `camelCase` for ordinary module-level values; use `UPPER_SNAKE_CASE` for immutable protocol constants, lookup tables, static query documents, and numeric constants when surrounding code does
+- Prefer named booleans for complex conditions. Use guard clauses for invalid or error cases, keeping the main success path last.
+- Prefer inline defaults for simple options. Do not extract constants or abstractions without a concrete use.
+- Use `camelCase` for functions and variables, and `PascalCase` for classes and React components. Keep established `UPPER_SNAKE_CASE` conventions for fixed constants.
+- Use `PascalCase` filenames for class and component modules, and `kebab-case` for other modules. Preserve framework-required filenames.
+- Let the main exported API lead the file unless a dependency must be declared first. Keep its supporting types, config, and helpers nearby, grouped by owner.
 - Use `export * from` in barrel files
-- Keep supporting types, config, and helpers close to the function, class, or exported value that owns or uses them
-- Let the main exported API lead a file unless a dependency must be declared first
-- Treat generated files such as `*.gen.ts` as outputs; change the source definition and regenerate instead
+- Keep explicit types at module boundaries. Use `any` only for a narrow, explained exception.
+- Change generated files through their source definitions and regeneration commands
 
-## Avoid
+## Tuple Results
 
-- Do not use `any` unless there is a narrow, explicit reason
-- Do not rely on truthiness when nullability matters
-- Do not use nested ternaries for non-trivial logic
-- Do not use static class constants as a default pattern
-- Do not use function expressions for named top-level functions without a reason
-- Do not group unrelated code at the file level just for ordering
-- Do not manually edit generated TypeScript files
+For application code using `tuple-result`, prefer domain-named destructuring such as `[isUserOk, userErr, user]`, handling the error branch before using the value. Use helpers when they simplify the call site.
 
-## Example
-
-```ts
-export function createClient(options: TCreateClientOptions = {}): TClient {
-  const { timeoutMs = 5000, baseUrl = 'https://api.example.com' } = options;
-  return {
-    timeoutMs,
-    baseUrl
-  };
-}
-
-interface TCreateClientOptions {
-  timeoutMs?: number;
-  baseUrl?: string;
-}
-
-interface TClient {
-  timeoutMs: number;
-  baseUrl: string;
-}
-```
+Consult the [tuple-result README](https://github.com/builder-group/community/blob/develop/packages/tuple-result/README.md) for API contracts. Preserve framework, validation-library, and package-specific result shapes.

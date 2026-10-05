@@ -1,6 +1,6 @@
 # Rust App Structure
 
-How Rust app code should be organized across builder.group projects.
+Use this structure as a default for new Rust apps. Follow established layouts unless restructuring is requested.
 
 ## Structure
 

@@ -1,6 +1,6 @@
 # React App Structure
 
-How React app code should be organized across builder.group projects.
+Use this structure as a default for new React apps. Follow established layouts unless restructuring is requested.
 
 ## Structure
 

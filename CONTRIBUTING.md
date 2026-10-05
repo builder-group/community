@@ -4,18 +4,13 @@ Thanks for improving Builder Group Community. This repository contains public pa
 
 Keep contributions focused. A small fix with tests and clear docs is easier to review than a broad cleanup mixed with behavior changes.
 
-If you are an agent, read `AGENTS.md` first. When you touch a package, also read the matching rule in `.agent/rules/`.
-
 ## Code of Conduct
 
-Please read and follow the [Code of Conduct](https://code.fb.com/codeofconduct).
+Please read and follow the [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 ## Local Setup
 
-Requirements:
-
-- Node.js 24 or newer
-- pnpm 10.33.2
+Use a Node.js version compatible with `engines.node` and the pnpm version specified in `packageManager` in the root `package.json`.
 
 Install dependencies and build the workspace:
 
@@ -29,7 +24,7 @@ pnpm build
 - `pnpm build`: build every workspace through Turbo
 - `pnpm test`: run tests across the workspace
 - `pnpm lint`: run ESLint across the workspace
-- `pnpm format`: format TypeScript, JavaScript, JSON, and Markdown files
+- `pnpm format`: format supported files across the repository
 - `pnpm build:packages`: build publishable packages
 - `pnpm --filter <workspace> test`: run a command for one package or example
 
@@ -76,10 +71,10 @@ For repository docs, follow the writing style in `.agent/rules/writing.md`. For 
 Before opening a pull request:
 
 - Run the relevant tests or explain why you did not
-- Run `pnpm format` for docs or formatting changes
+- Format changed files with `pnpm exec prettier --write <files>`
 - Update package metadata when the README changes the public positioning
 - Include enough context for reviewers to understand the problem, the fix, and the verification
 
 ## License
 
-By contributing to Builder Group Community, you agree that your contributions will be licensed under the license in [`LICENSE.md`](./LICENSE.md).
+By contributing to Builder Group Community, you agree that your contributions will be licensed under the license in [LICENSE](./LICENSE).

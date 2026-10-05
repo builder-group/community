@@ -1,65 +1,69 @@
 # Project Agent Guide
 
-Use this file first when working in this repository. It defines the default agent workflow and points to the more specific rules and commands.
-
 ## Repository Context
 
 - This is the builder.group community monorepo for reusable packages, crates, templates, and examples
-- TypeScript workspaces are managed with pnpm and Turbo across `packages/*`, `apps/*`, `templates/*`, and `examples/**`
+- TypeScript workspaces use pnpm and Turbo across `packages/*`, `apps/*`, `templates/*`, and `examples/**`
 - Rust workspace members live under `templates/*/src-tauri`, with app-local crates alongside them
-- Active TypeScript libraries live in `packages/*`; `packages/_deprecated/*` is historical and should not be used as the model for new work
-- Many packages are published APIs. Treat exported types, runtime behavior, README examples, and package entrypoints as public surface.
+- `packages/_deprecated/*` is historical. Use active packages as the model for new work.
+- Exported types, runtime behavior, README examples, and package entrypoints are public contracts
 
 ## Working Model
 
-- Follow the user request and explicit task constraints first
-- If a rule appears to conflict with the user's explicit request or clearly implied task goal, follow the user. Mention meaningful conflicts briefly so the rule can be improved.
-- Before editing, read the matching rule from `.agent/rules/` and the nearby implementation
-- Before behavior, public API, or package-level changes, read the local package README, package manifest, and nearby tests
-- Prefer repository conventions and local package patterns over generic defaults
-- Keep changes focused on the requested behavior. Do not do unrelated cleanup or opportunistic rewrites.
-- Match surrounding style unless a local, low-risk improvement makes the edited code clearer
-- Add abstractions only when they remove real complexity, reduce meaningful duplication, or match an existing pattern
-- Write comments, docs, and explanations for future maintainers rather than the current session
-- Treat matching rules as the target standard for new and touched code. If rules conflict, the more specific package, pattern, or framework rule wins.
-- Do repo-wide cleanup only when the task explicitly calls for migration
+- Treat clarification questions as requests for explanation. Edit files only when the user asks for changes.
+- Follow the task's explicit constraints. More specific package or pattern guidance takes precedence over general conventions.
+- Read the matching rules below and nearby implementation for the work at hand. Do not load every reference.
+- For library usage, consult the relevant README sections. For library changes, also inspect public types, the package manifest, and nearby tests.
+- Follow local patterns and keep changes focused. Avoid unrelated cleanup or migrations.
 
 ## Git
 
-- Use read-only git commands such as `git status`, `git diff`, `git log`, and `git show` when useful
+- Read-only git commands are allowed
 - Do not stage, commit, create or switch branches, push, or otherwise mutate git state unless the user explicitly asks for that specific git action
 
 ## Validation
 
-- Find the owning `package.json` or `Cargo.toml` for changed files before choosing validation
-- Prefer focused package checks such as `pnpm --filter <package> test`, `pnpm --filter <package> lint`, or `cargo test -p <crate>` when the package exposes them
-- Use Turbo filters or root `pnpm`/`cargo` commands when changes cross package boundaries or shared tooling
-- Do not validate routine changes with browser-driven, Playwright/Cypress-style, or manual browser e2e testing unless explicitly asked. For UI-specific tasks, ask before starting a browser-based validation workflow.
-- Report the checks you ran, and say clearly when a relevant check was skipped
+- Choose checks from the owning `package.json` or `Cargo.toml`
+- Prefer focused checks such as `pnpm --filter <package> test`, `pnpm --filter <package> lint`, or `cargo test -p <crate>`. Use workspace checks for shared tooling or changes across packages.
+- Do not validate routine changes with browser-driven, Playwright/Cypress-style, or manual browser e2e testing unless explicitly asked. For UI-specific tasks, ask before starting browser-based validation.
+- Report checks run and relevant checks skipped
 
-## Rule Map
+## Rules
 
-Use the closest matching rule for the file or behavior you are changing.
+These references capture project conventions. API details belong in package documentation.
 
-- TypeScript and TSX: `.agent/rules/typescript.md`
-- React and TSX components: `.agent/rules/react.md`
-- `feature-state` and `feature-react/state`: `.agent/rules/feature-state.md`
-- `feature-react` bindings and forms: `.agent/rules/feature-react.md`
-- `*Cx.ts` feature context pattern: `.agent/rules/cx-pattern.md`
-- General code style: `.agent/rules/style-guide.md`
-- Comments: `.agent/rules/comments.md`
-- Writing style (prose, READMEs, commit messages): `.agent/rules/writing.md`
-- Package READMEs: `.agent/rules/package-readme.md`
-- `tuple-result`: `.agent/rules/tuple-result.md`
-- Vitest tests: `.agent/rules/vitest.md`
-- `feature-fetch`: `.agent/rules/feature-fetch.md`
-- Rust: `.agent/rules/rust.md`
-- Swift and SwiftUI: `.agent/rules/swift.md`
-- Writing and updating rules: `.agent/rules/rule-authoring.md`
-- `xml-tokenizer`: `.agent/rules/xml-tokenizer.md`
+- TypeScript, file organization, and tuple-result usage: [.agent/rules/typescript.md](.agent/rules/typescript.md)
+- React components: [.agent/rules/react.md](.agent/rules/react.md)
+- Application state and forms using feature libraries: [.agent/rules/state-and-forms.md](.agent/rules/state-and-forms.md)
+- HTTP clients in application code: [.agent/rules/fetch-client.md](.agent/rules/fetch-client.md)
+- `Cx` ownership and lifecycle: [.agent/rules/cx-pattern.md](.agent/rules/cx-pattern.md)
+- Prose and comments: [.agent/rules/writing.md](.agent/rules/writing.md)
+- Package READMEs: [.agent/rules/package-readme.md](.agent/rules/package-readme.md)
+- Vitest tests: [.agent/rules/vitest.md](.agent/rules/vitest.md)
+- Rust: [.agent/rules/rust.md](.agent/rules/rust.md)
+- Swift and SwiftUI: [.agent/rules/swift.md](.agent/rules/swift.md)
 
-## Commands
+## Library References
 
-Commands are reusable workflows. Use them when the user asks for that workflow.
+Use the relevant sections when working with a library, rather than reading every README. In consumer repositories, consult documentation matching the installed dependency version.
 
-- Review staged changes before committing: `.agent/commands/review.md`
+- [feature-state](packages/feature-state/README.md): state mutation, computed values, and feature internals
+- [feature-react](packages/feature-react/README.md): subscriptions, derived rendering, callbacks, and form bindings
+- [feature-form](packages/feature-form/README.md): validation, field status, and form lifecycle
+- [feature-fetch](packages/feature-fetch/README.md): client setup, feature composition, errors, and cancellation
+- [tuple-result](packages/tuple-result/README.md): result contracts, narrowing, helpers, and serialization
+- [xml-tokenizer](packages/xml-tokenizer/README.md): content configs, streaming tokens, and object conversion
+
+## Architecture References
+
+Consult these when changing app structure or module boundaries.
+
+- [React app structure](docs/conventions/project-structure-react.md)
+- [Hono API structure](docs/conventions/project-structure-hono.md)
+- [Rust app structure](docs/conventions/project-structure-rust.md)
+- [Swift app structure](docs/conventions/project-structure-swift.md)
+
+## Workflows
+
+- Staged pre-commit review: [.agent/commands/review.md](.agent/commands/review.md)
+- Maintaining or sharing this setup: [.agent/README.md](.agent/README.md)

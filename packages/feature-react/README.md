@@ -187,6 +187,12 @@ const filtered = useCompute([$tasks, $filter], ([tasks, filter]) =>
 
 `compute` and `isEqual` must stay pure because React may call them during render.
 
+### `useEventCallback(callback)`
+
+Returns a stable function that delegates to the latest committed callback. Use it when a subscription, managing instance, or other long-lived owner retains a callback that reads changing props or state.
+
+Call the returned function from events or effects, not during rendering. `useListener` and `useSubscriber` already use this hook internally, so their callbacks do not need an additional wrapper.
+
 ### `useListener(state, callback)`
 
 Calls `callback` whenever the state changes without subscribing the component to re-renders. Use this for side effects triggered by state changes.

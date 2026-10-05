@@ -1,6 +1,6 @@
 # Swift App Structure
 
-How Swift and SwiftUI app code should be organized across builder.group projects.
+Use this structure as a default for new Swift and SwiftUI apps. Follow established layouts unless restructuring is requested.
 
 ## Structure
 

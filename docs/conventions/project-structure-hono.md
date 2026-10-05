@@ -1,6 +1,6 @@
 # Hono API Structure
 
-How Hono API code should be organized across builder.group projects.
+Use this structure as a default for new Hono APIs. Follow established layouts unless restructuring is requested.
 
 ## Structure
 
