@@ -56,4 +56,5 @@ Consult these when changing app structure or module boundaries.
 ## Workflows
 
 - Staged pre-commit review: [.agent/commands/review.md](.agent/commands/review.md)
+- Incremental implementation: [.agent/commands/incremental-implementation.md](.agent/commands/incremental-implementation.md)
 - Maintaining or sharing this setup: [.agent/README.md](.agent/README.md)
