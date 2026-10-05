@@ -13,7 +13,7 @@
 - Treat clarification questions as requests for explanation. Edit files only when the user asks for changes.
 - Follow the task's explicit constraints. More specific package or pattern guidance takes precedence over general conventions.
 - Read the matching rules below and nearby implementation for the work at hand. Do not load every reference.
-- For library usage, consult the relevant README sections. For library changes, also inspect public types, the package manifest, and nearby tests.
+- For library usage, consult the relevant README sections matching the installed dependency version. For library changes, also inspect public types, the package manifest, and nearby tests.
 - Follow local patterns and keep changes focused. Avoid unrelated cleanup or migrations.
 
 ## Git
@@ -45,7 +45,7 @@ These references capture project conventions. API details belong in package docu
 
 ## Library References
 
-Use the relevant sections when working with a library, rather than reading every README. In consumer repositories, consult documentation matching the installed dependency version.
+Use the relevant sections when working with a library, rather than reading every README.
 
 - [feature-state](packages/feature-state/README.md): state mutation, computed values, and feature internals
 - [feature-react](packages/feature-react/README.md): subscriptions, derived rendering, callbacks, and form bindings
