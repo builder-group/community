@@ -7,6 +7,7 @@
 - Rust workspace members live under `templates/*/src-tauri`, with app-local crates alongside them
 - `packages/_deprecated/*` is historical. Use active packages as the model for new work.
 - Exported types, runtime behavior, README examples, and package entrypoints are public contracts
+- Package catalog: [README.md](README.md#packages)
 
 ## Working Model
 
@@ -42,17 +43,6 @@ These references capture project conventions. API details belong in package docu
 - Vitest tests: [.agent/rules/vitest.md](.agent/rules/vitest.md)
 - Rust: [.agent/rules/rust.md](.agent/rules/rust.md)
 - Swift and SwiftUI: [.agent/rules/swift.md](.agent/rules/swift.md)
-
-## Library References
-
-Use the relevant sections when working with a library, rather than reading every README.
-
-- [feature-state](packages/feature-state/README.md): state mutation, computed values, and feature internals
-- [feature-react](packages/feature-react/README.md): subscriptions, derived rendering, callbacks, and form bindings
-- [feature-form](packages/feature-form/README.md): validation, field status, and form lifecycle
-- [feature-fetch](packages/feature-fetch/README.md): client setup, feature composition, errors, and cancellation
-- [tuple-result](packages/tuple-result/README.md): result contracts, narrowing, helpers, and serialization
-- [xml-tokenizer](packages/xml-tokenizer/README.md): content configs, streaming tokens, and object conversion
 
 ## Architecture References
 
