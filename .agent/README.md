@@ -2,7 +2,7 @@
 
 Root `AGENTS.md` is the repository entry point. It links to shared conventions in `rules/`, reusable prompts in `commands/`, and repository-specific documentation.
 
-The `.claude/` adapters import the root guide and shared review prompt.
+The `.claude/` adapters reuse the root guide and shared command prompts.
 
 ## Maintaining Instructions
 
