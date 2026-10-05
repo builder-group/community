@@ -1,4 +1,4 @@
-import { field, System, World } from '@lastolivegames/becsy/perf.js';
+import { field, System, World } from '@lastolivegames/becsy/lib/perf.js';
 
 export function createBecsyBenchmarks() {
 	return {

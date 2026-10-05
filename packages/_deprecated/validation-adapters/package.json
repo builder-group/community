@@ -92,7 +92,6 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint . --fix",
 		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
-		"size": "size-limit --why",
 		"start:dev": "tsc -w",
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest"
@@ -107,22 +106,5 @@
 		"valibot": "1.4.0",
 		"yup": "^1.7.1",
 		"zod": "^4.4.3"
-	},
-	"size-limit": [
-		{
-			"path": "dist/adapter/esm/index.js"
-		},
-		{
-			"path": "dist/valibot/esm/index.js"
-		},
-		{
-			"path": "dist/yup/esm/index.js"
-		},
-		{
-			"path": "dist/zod/esm/index.js"
-		},
-		{
-			"path": "dist/standard-schema/esm/index.js"
-		}
-	]
+	}
 }

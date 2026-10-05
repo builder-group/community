@@ -43,21 +43,15 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint .",
 		"publish:patch": "pnpm build:prod && pnpm version patch --no-git-tag-version && pnpm publish --no-git-checks --access=public",
-		"size": "size-limit --why",
 		"start:dev": "tsc -w",
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@lastolivegames/becsy": "^0.15.5",
+		"@lastolivegames/becsy": "^0.16.1",
 		"bitecs": "github:NateTheGreatt/bitECS#rc-0-4-0",
 		"elics": "^3.4.2",
 		"rollup-presets": "workspace:*"
-	},
-	"size-limit": [
-		{
-			"path": "dist/esm/index.js"
-		}
-	]
+	}
 }

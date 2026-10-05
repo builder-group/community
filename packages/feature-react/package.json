@@ -78,7 +78,6 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint .",
 		"publish:patch": "pnpm build:prod && pnpm version patch --no-git-tag-version && pnpm publish --no-git-checks --access=public",
-		"size": "size-limit --why",
 		"start:dev": "tsc -w",
 		"test": "vitest run",
 		"test:types": "vitest run --typecheck.only",
@@ -93,7 +92,7 @@
 		"@types/react-dom": "^19.3.0",
 		"feature-form": "workspace:*",
 		"feature-state": "workspace:*",
-		"happy-dom": "^20.14.3",
+		"happy-dom": "^20.14.5",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0",
 		"rollup-presets": "workspace:*"
@@ -110,13 +109,5 @@
 		"feature-state": {
 			"optional": true
 		}
-	},
-	"size-limit": [
-		{
-			"path": "dist/state/esm/index.js"
-		},
-		{
-			"path": "dist/form/esm/index.js"
-		}
-	]
+	}
 }

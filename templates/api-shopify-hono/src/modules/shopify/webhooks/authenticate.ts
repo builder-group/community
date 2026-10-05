@@ -62,8 +62,7 @@ export async function authenticateShopifyWebhook(
 		topic: validation.topic,
 		webhookId: validation.webhookId,
 		apiVersion: validation.apiVersion,
-		triggeredAt,
-		eventId: validation.eventId
+		triggeredAt
 	});
 }
 
@@ -73,5 +72,4 @@ export interface TShopifyWebhook {
 	webhookId: string;
 	apiVersion: string;
 	triggeredAt: Date;
-	eventId?: string;
 }

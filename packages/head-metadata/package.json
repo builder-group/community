@@ -44,7 +44,6 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint .",
 		"publish:patch": "pnpm build:prod && pnpm version patch --no-git-tag-version && pnpm publish --no-git-checks --access=public",
-		"size": "size-limit --why",
 		"start:dev": "tsc -w",
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest"
@@ -54,12 +53,7 @@
 		"xml-tokenizer": "workspace:*"
 	},
 	"devDependencies": {
-		"@types/node": "^26.5.1",
+		"@types/node": "^26.6.4",
 		"rollup-presets": "workspace:*"
-	},
-	"size-limit": [
-		{
-			"path": "dist/esm/index.js"
-		}
-	]
+	}
 }

@@ -6,11 +6,21 @@ export function createElicsBenchmarks() {
 			const world = new World({ entityCapacity: 1000, checksOn: false });
 
 			// Create 5 simple components
-			const A = createComponent({ value: { type: Types.Float32, default: 1 } });
-			const B = createComponent({ value: { type: Types.Float32, default: 1 } });
-			const C = createComponent({ value: { type: Types.Float32, default: 1 } });
-			const D = createComponent({ value: { type: Types.Float32, default: 1 } });
-			const E = createComponent({ value: { type: Types.Float32, default: 1 } });
+			const A = createComponent('packedIteration-A', {
+				value: { type: Types.Float32, default: 1 }
+			});
+			const B = createComponent('packedIteration-B', {
+				value: { type: Types.Float32, default: 1 }
+			});
+			const C = createComponent('packedIteration-C', {
+				value: { type: Types.Float32, default: 1 }
+			});
+			const D = createComponent('packedIteration-D', {
+				value: { type: Types.Float32, default: 1 }
+			});
+			const E = createComponent('packedIteration-E', {
+				value: { type: Types.Float32, default: 1 }
+			});
 
 			// System that processes all 5 component types separately
 			class PackedIterationSystem extends createSystem({
@@ -76,11 +86,21 @@ export function createElicsBenchmarks() {
 			const world = new World({ entityCapacity: 5000, checksOn: false });
 
 			// Create 5 components for different combinations
-			const A = createComponent({ value: { type: Types.Float32, default: 0 } });
-			const B = createComponent({ value: { type: Types.Float32, default: 0 } });
-			const C = createComponent({ value: { type: Types.Float32, default: 0 } });
-			const D = createComponent({ value: { type: Types.Float32, default: 0 } });
-			const E = createComponent({ value: { type: Types.Float32, default: 0 } });
+			const A = createComponent('simpleIteration-A', {
+				value: { type: Types.Float32, default: 0 }
+			});
+			const B = createComponent('simpleIteration-B', {
+				value: { type: Types.Float32, default: 0 }
+			});
+			const C = createComponent('simpleIteration-C', {
+				value: { type: Types.Float32, default: 0 }
+			});
+			const D = createComponent('simpleIteration-D', {
+				value: { type: Types.Float32, default: 0 }
+			});
+			const E = createComponent('simpleIteration-E', {
+				value: { type: Types.Float32, default: 0 }
+			});
 
 			// System 1: Swaps values between A and B components
 			class SystemAB extends createSystem({
@@ -170,12 +190,16 @@ export function createElicsBenchmarks() {
 			const world = new World({ entityCapacity: 3000, checksOn: false });
 
 			// Shared component across all entities
-			const Data = createComponent({ value: { type: Types.Float32, default: 0 } });
+			const Data = createComponent('fragmentedIteration-Data', {
+				value: { type: Types.Float32, default: 0 }
+			});
 
 			// Create 26 different component types (A-Z)
 			const components: TNumberComponent[] = [];
 			for (let i = 0; i < 26; i++) {
-				components[i] = createComponent({ value: { type: Types.Float32, default: 0 } });
+				components[i] = createComponent(`fragmentedIteration-${i}`, {
+					value: { type: Types.Float32, default: 0 }
+				});
 			}
 
 			// System that processes shared data and the last specialized component
@@ -228,8 +252,8 @@ export function createElicsBenchmarks() {
 		entityCycle() {
 			const world = new World({ entityCapacity: 2000, checksOn: false });
 
-			const A = createComponent({ value: { type: Types.Float32, default: 0 } });
-			const B = createComponent({ value: { type: Types.Float32, default: 0 } });
+			const A = createComponent('entityCycle-A', { value: { type: Types.Float32, default: 0 } });
+			const B = createComponent('entityCycle-B', { value: { type: Types.Float32, default: 0 } });
 
 			// System that creates and destroys entities each frame
 			class EntityCycleSystem extends createSystem({
@@ -267,8 +291,8 @@ export function createElicsBenchmarks() {
 		addRemove() {
 			const world = new World({ entityCapacity: 1000, checksOn: false });
 
-			const A = createComponent({ value: { type: Types.Float32, default: 0 } });
-			const B = createComponent({ value: { type: Types.Float32, default: 0 } });
+			const A = createComponent('addRemove-A', { value: { type: Types.Float32, default: 0 } });
+			const B = createComponent('addRemove-B', { value: { type: Types.Float32, default: 0 } });
 
 			// System that adds/removes components causing archetype migrations
 			class AddRemoveSystem extends createSystem({

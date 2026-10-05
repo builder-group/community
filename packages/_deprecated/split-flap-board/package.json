@@ -35,7 +35,6 @@
 		"install:clean": "pnpm run clean && pnpm install",
 		"lint": "eslint . --fix",
 		"publish:patch": "pnpm build:prod && pnpm version patch && pnpm publish --no-git-checks --access=public",
-		"size": "size-limit --why",
 		"start:dev": "vite --config ./dev/vite.config.mjs",
 		"test": "vitest run",
 		"update:latest": "pnpm update --latest"
@@ -46,10 +45,5 @@
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"rollup-presets": "workspace:*"
-	},
-	"size-limit": [
-		{
-			"path": "dist/esm/index.js"
-		}
-	]
+	}
 }

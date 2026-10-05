@@ -54,9 +54,9 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"@types/node": "^26.5.1",
-		"rollup": "^4.63.1",
-		"type-fest": "^5.9.0"
+		"@types/node": "^26.6.4",
+		"rollup": "^4.64.0",
+		"type-fest": "^5.10.0"
 	},
 	"engines": {
 		"node": ">=24"
