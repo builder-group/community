@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "desktop-tauri-macos",
     platforms: [
-        .macOS(.v10_15)
+        .macOS(.v12)
     ],
     products: [
         .library(

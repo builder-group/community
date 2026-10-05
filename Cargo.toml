@@ -8,3 +8,8 @@ authors = ["@bennobuilder"]
 license = "MIT"
 edition = "2021"
 repository = "https://github.com/builder-group/community"
+
+[patch.crates-io]
+# Fix Xcode 27's hidden SwiftRs runtime exports: https://github.com/Brendonovich/swift-rs/pull/82
+# TODO: Remove this patch when a swift-rs release includes the fix
+swift-rs = { git = "https://github.com/michakfromparis/swift-rs", rev = "3788d3d2bae8e7a863b3e281a59477438e12c632" }
