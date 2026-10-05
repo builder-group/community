@@ -12,10 +12,6 @@ on:
 permissions:
   contents: read
 
-env:
-  NODE_VERSION: "24"
-  PNPM_VERSION: "11.15.0"
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
@@ -24,6 +20,7 @@ jobs:
   lint_and_build:
     name: 🧪 Lint and Build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: ⬇️ Checkout
         id: checkout
@@ -32,38 +29,19 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      # Setup node
-      # https://github.com/actions/setup-node
-
-      - name: 🟢 Setup Node.js ${{ env.NODE_VERSION }}
-        id: setup-node
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      # Setup pnpm & Install dependencies
-      # https://github.com/pnpm/action-setup?tab=readme-ov-file#use-cache-to-reduce-installation-time
-
-      - name: 🥡 Setup pnpm ${{ env.PNPM_VERSION }}
+      - name: 🥡 Setup pnpm
         id: setup-pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
-          version: ${{ env.PNPM_VERSION }}
           run_install: false
 
-      - name: 🎈 Get pnpm store directory
-        id: get-pnpm-store-dir
-        run: |
-          echo "path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
-      - name: 🔆 Cache pnpm modules
-        id: cache-pnpm-modules
-        uses: actions/cache@v4
+      - name: 🟢 Setup Node.js
+        id: setup-node
+        uses: actions/setup-node@v6
         with:
-          path: ${{ steps.get-pnpm-store-dir.outputs.path }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: '24'
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: 🧩 Install Dependencies
         id: install-deps
