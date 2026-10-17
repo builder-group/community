@@ -28,25 +28,25 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"@tanstack/react-router": "^1.170.41",
+		"@tanstack/react-router": "^1.170.44",
 		"@tanstack/react-router-devtools": "^1.167.2",
-		"@tauri-apps/api": "^2.12.1",
-		"@tauri-apps/plugin-opener": "^2.7.0",
+		"@tauri-apps/api": "^2.12.4",
+		"@tauri-apps/plugin-opener": "^2.7.2",
 		"@tauri-apps/plugin-os": "^2.4.0",
 		"clsx": "^2.1.1",
-		"react": "^19.3.0",
-		"react-dom": "^19.3.0",
+		"react": "^19.3.1",
+		"react-dom": "^19.3.1",
 		"tailwind-merge": "^3.7.0"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
 		"@tailwindcss/vite": "^4.3.3",
-		"@tanstack/router-plugin": "^1.168.42",
-		"@tauri-apps/cli": "^2.12.1",
-		"@types/node": "^26.6.4",
+		"@tanstack/router-plugin": "^1.168.46",
+		"@tauri-apps/cli": "^2.12.3",
+		"@types/node": "^26.6.5",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
-		"@vitejs/plugin-react": "^6.1.1",
+		"@vitejs/plugin-react": "^6.1.2",
 		"tailwindcss": "^4.3.3"
 	}
 }

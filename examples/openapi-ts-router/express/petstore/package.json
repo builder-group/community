@@ -10,7 +10,7 @@
 	"dependencies": {
 		"express": "^5.2.1",
 		"openapi-ts-router": "workspace:*",
-		"valibot": "1.4.1"
+		"valibot": "1.5.0"
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
