@@ -75,7 +75,7 @@
 		"feature-fetch": "workspace:*",
 		"feature-logger": "workspace:*",
 		"gql.tada": "^1.11.4",
-		"hono": "^4.13.13",
+		"hono": "^4.13.14",
 		"pg": "^8.23.1",
 		"tuple-result": "workspace:*",
 		"validatenv": "workspace:*",

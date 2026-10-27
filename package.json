@@ -26,13 +26,13 @@
 	},
 	"devDependencies": {
 		"@blgc/config": "workspace:*",
-		"eslint": "^10.12.0",
+		"eslint": "^10.13.0",
 		"prettier": "^3.9.10",
-		"rollup": "^4.64.7",
+		"rollup": "^4.65.0",
 		"shx": "^0.4.0",
-		"turbo": "^2.11.8",
+		"turbo": "^2.11.10",
 		"typescript": "^6.0.3",
-		"vite": "^8.3.4",
+		"vite": "^8.3.5",
 		"vitest": "^5.0.5"
 	},
 	"packageManager": "pnpm@12.14.0",
