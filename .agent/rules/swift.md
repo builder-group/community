@@ -9,10 +9,20 @@ Apply these defaults to Swift and SwiftUI code.
 
 ## Native Boundaries
 
-Apply these constraints to Rust-callable Swift and platform integrations.
+- Keep UIKit, AppKit, WebKit, SwiftUI, and Accessibility mutations on their required thread
+- Keep run-loop ownership, native resource lifetime, and cancellation explicit
+- Restrict `nonisolated(unsafe)` to boundaries that require it
+
+### Rust Bridges
+
+Apply these constraints when Swift is called from Rust.
 
 - Preserve `_cdecl` exports, signatures, ownership, and return conventions, updating Rust declarations together when contracts change
 - Keep `SRString` conversion and nullable pointer handling explicit where the bridge uses them
-- Keep AppKit, WebKit, and Accessibility mutations on their required thread
-- Keep run-loop ownership, monitor lifetime, and cancellation explicit
-- Restrict `nonisolated(unsafe)` to boundaries that require it
+
+### Expo Modules
+
+Apply these constraints when Swift implements Expo modules.
+
+- Keep module names, method signatures, return values, and event payloads aligned with TypeScript declarations
+- Clean up owned native resources and listeners when the module or view is destroyed
