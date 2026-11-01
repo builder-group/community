@@ -1,0 +1,20 @@
+import { appConfig } from './app.config';
+
+const email = 'support@builder.group';
+
+export const selfiemirrorConfig = {
+	name: 'SelfieMirror',
+	website: `${appConfig.website}/apps/selfiemirror`,
+	help: {
+		email,
+		mailto: (subject?: string) => {
+			const fullSubject = subject ? `[SelfieMirror] ${subject}` : '[SelfieMirror] Support Request';
+			return `mailto:${email}?subject=${encodeURIComponent(fullSubject)}`;
+		},
+		discord: 'https://discord.com/invite/w4xE3bSjhQ'
+	},
+	legal: {
+		privacy: `${appConfig.website}/apps/selfiemirror/legal/privacy`
+	},
+	appstore: 'https://apps.apple.com/app/id6828735544'
+};
