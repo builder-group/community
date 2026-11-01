@@ -65,6 +65,7 @@ Open source packages, crates, and templates from [builder.group](https://builder
 | [api-hono](https://github.com/builder-group/community/tree/develop/templates/api-hono)                 | Hono API template with OpenAPI and Zod validation                 |
 | [api-shopify-hono](https://github.com/builder-group/community/tree/develop/templates/api-shopify-hono) | Shopify Hono API template with Drizzle and typed Admin API access |
 | [desktop-tauri](https://github.com/builder-group/community/tree/develop/templates/desktop-tauri)       | Tauri desktop app template with React and Specta                  |
+| [legal](https://github.com/builder-group/community/tree/develop/templates/legal)                       | Privacy-notice templates for offline apps, websites, and web apps |
 | [shopify-tanstack](https://github.com/builder-group/community/tree/develop/templates/shopify-tanstack) | Embedded Shopify app template with TanStack Start and App Bridge  |
 | [web-tanstack](https://github.com/builder-group/community/tree/develop/templates/web-tanstack)         | TanStack Start web app template with React and Vite               |
 
