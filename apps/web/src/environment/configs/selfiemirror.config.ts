@@ -14,7 +14,8 @@ export const selfiemirrorConfig = {
 		discord: 'https://discord.com/invite/w4xE3bSjhQ'
 	},
 	legal: {
-		privacy: `${appConfig.website}/apps/selfiemirror/legal/privacy`
+		privacy: `${appConfig.website}/apps/selfiemirror/legal/privacy`,
+		terms: `${appConfig.website}/apps/selfiemirror/legal/terms`
 	},
 	appstore: 'https://apps.apple.com/app/id6828735544'
 };

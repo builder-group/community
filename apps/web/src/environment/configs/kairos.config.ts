@@ -17,5 +17,5 @@ export const kairosConfig = {
 		privacy: `${appConfig.website}/apps/kairos/legal/privacy`,
 		terms: `${appConfig.website}/apps/kairos/legal/terms`
 	},
-	appstore: 'https://apps.apple.com/us/app/kairos-random-timer/id6743891997'
+	appstore: 'https://apps.apple.com/us/app/kairos-random-timer/id6759820843'
 };
