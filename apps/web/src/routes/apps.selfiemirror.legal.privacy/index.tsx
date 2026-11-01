@@ -8,7 +8,7 @@ export const Route = createFileRoute('/apps/selfiemirror/legal/privacy/')({
 
 function RouteComponent() {
 	return (
-		<article className="prose prose-base max-w-none">
+		<article className="prose prose-base mx-auto max-w-3xl px-6 py-12">
 			<Content components={mdxComponents} />
 		</article>
 	);

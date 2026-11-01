@@ -165,6 +165,13 @@ function RouteComponent() {
 					>
 						hello@builder.group
 					</a>
+					<span className="text-base-400 text-sm">|</span>
+					<a
+						href={appConfig.legal.privacy}
+						className="text-base-600 hover:text-base-900 text-sm underline-offset-2 transition-colors hover:underline focus-visible:outline-2 focus-visible:outline-offset-4"
+					>
+						Privacy Policy
+					</a>
 				</div>
 			</div>
 		</CanvasBackground>

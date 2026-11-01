@@ -3,6 +3,9 @@ const email = 'support@builder.group';
 export const appConfig = {
 	name: 'Builder.Group',
 	website: 'https://builder.group',
+	legal: {
+		privacy: '/legal/privacy/'
+	},
 	help: {
 		email,
 		mailto: (subject?: string) => {
