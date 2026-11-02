@@ -1,7 +1,7 @@
 import React from 'react';
 
-export const AppLandingPage: React.FC<TAppLandingPageProps> = (props) => {
-	const { app, description, iconSrc } = props;
+export const AppPage: React.FC<TAppPageProps> = (props) => {
+	const { app, title, description, iconSrc, footerLink, children } = props;
 
 	return (
 		<div className="flex min-h-svh flex-col px-6">
@@ -15,24 +15,11 @@ export const AppLandingPage: React.FC<TAppLandingPageProps> = (props) => {
 						className="ring-base-950/10 size-24 rounded-[22px] object-cover ring-1"
 					/>
 					<div className="flex flex-col items-center gap-2">
-						<h1 className="text-3xl font-semibold tracking-tight">{app.name}</h1>
+						<h1 className="text-3xl font-semibold tracking-tight">{title ?? app.name}</h1>
 						<p className="text-base-600 max-w-xs text-base leading-relaxed">{description}</p>
 					</div>
 				</header>
-				<a
-					href={app.appstore}
-					target="_blank"
-					rel="noopener noreferrer"
-					className="inline-flex rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4"
-				>
-					<img
-						src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&releaseDate=1704067200"
-						alt="Download on the App Store"
-						width={250}
-						height={83}
-						className="h-14 w-auto"
-					/>
-				</a>
+				{children}
 			</main>
 			<footer className="pb-6">
 				<nav
@@ -54,10 +41,10 @@ export const AppLandingPage: React.FC<TAppLandingPageProps> = (props) => {
 					</a>
 					<span aria-hidden="true">·</span>
 					<a
-						href={`${app.website}/help/`}
+						href={footerLink.href}
 						className="hover:text-base-800 rounded-sm py-2 underline underline-offset-4 transition-colors focus-visible:outline-2 focus-visible:outline-offset-4"
 					>
-						Support
+						{footerLink.label}
 					</a>
 				</nav>
 			</footer>
@@ -65,16 +52,20 @@ export const AppLandingPage: React.FC<TAppLandingPageProps> = (props) => {
 	);
 };
 
-export interface TAppLandingPageProps {
-	app: {
-		name: string;
-		appstore: string;
-		website: string;
-		legal: {
-			privacy: string;
-			terms: string;
-		};
-	};
+export interface TAppPageProps {
+	app: TAppPageConfig;
+	title?: string;
 	description: string;
 	iconSrc: string;
+	footerLink: { href: string; label: string };
+	children: React.ReactNode;
+}
+
+export interface TAppPageConfig {
+	name: string;
+	website: string;
+	legal: {
+		privacy: string;
+		terms: string;
+	};
 }
