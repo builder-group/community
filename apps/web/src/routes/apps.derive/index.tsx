@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { AppLandingPage } from '@/components';
 import { deriveConfig } from '@/environment';
 
 export const Route = createFileRoute('/apps/derive/')({
@@ -7,20 +8,10 @@ export const Route = createFileRoute('/apps/derive/')({
 
 function RouteComponent() {
 	return (
-		<div className="relative flex min-h-screen items-center justify-center">
-			<h1 className="text-4xl font-bold">{deriveConfig.name}</h1>
-			<a
-				href={deriveConfig.appstore}
-				target="_blank"
-				rel="noopener noreferrer"
-				className="absolute bottom-12 left-1/2 -translate-x-1/2"
-			>
-				<img
-					src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83&releaseDate=1704067200"
-					alt="Download on the App Store"
-					className="h-10"
-				/>
-			</a>
-		</div>
+		<AppLandingPage
+			app={deriveConfig}
+			description="Pick a color. Find nine things. Make a photo collection."
+			iconSrc="/illustrations/logos/derive.png"
+		/>
 	);
 }
