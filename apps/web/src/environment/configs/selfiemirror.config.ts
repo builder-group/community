@@ -4,6 +4,8 @@ const email = 'support@builder.group';
 
 export const selfiemirrorConfig = {
 	name: 'SelfieMirror',
+	description: 'Turn your mirror selfies into a timelapse.',
+	iconSrc: '/illustrations/logos/selfiemirror.png',
 	website: `${appConfig.website}/apps/selfiemirror`,
 	help: {
 		email,

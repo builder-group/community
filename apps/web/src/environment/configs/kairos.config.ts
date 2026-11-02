@@ -4,6 +4,8 @@ const email = 'support@builder.group';
 
 export const kairosConfig = {
 	name: 'Kairos',
+	description: 'Set a time range. Let the timer surprise you.',
+	iconSrc: '/illustrations/logos/kairos.png',
 	website: `${appConfig.website}/apps/kairos`,
 	help: {
 		email,

@@ -4,6 +4,8 @@ const email = 'support@builder.group';
 
 export const taplingConfig = {
 	name: 'Tapling',
+	description: 'Type with a Bongo Cat that taps along.',
+	iconSrc: '/illustrations/logos/tapling.png',
 	website: `${appConfig.website}/apps/tapling`,
 	help: {
 		email,

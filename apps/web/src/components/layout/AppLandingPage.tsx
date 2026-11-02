@@ -2,15 +2,10 @@ import React from 'react';
 import { AppPage, type TAppPageConfig } from './AppPage';
 
 export const AppLandingPage: React.FC<TAppLandingPageProps> = (props) => {
-	const { app, description, iconSrc } = props;
+	const { app } = props;
 
 	return (
-		<AppPage
-			app={app}
-			description={description}
-			iconSrc={iconSrc}
-			footerLink={{ href: `${app.website}/help/`, label: 'Support' }}
-		>
+		<AppPage app={app} footerLink={{ href: `${app.website}/help/`, label: 'Support' }}>
 			<a
 				href={app.appstore}
 				target="_blank"
@@ -31,6 +26,4 @@ export const AppLandingPage: React.FC<TAppLandingPageProps> = (props) => {
 
 export interface TAppLandingPageProps {
 	app: TAppPageConfig & { appstore: string };
-	description: string;
-	iconSrc: string;
 }

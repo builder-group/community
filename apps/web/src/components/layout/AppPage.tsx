@@ -1,14 +1,16 @@
+import { type AnyRouteMatch } from '@tanstack/react-router';
 import React from 'react';
+import { appConfig } from '@/environment/configs/app.config';
 
 export const AppPage: React.FC<TAppPageProps> = (props) => {
-	const { app, title, description, iconSrc, footerLink, children } = props;
+	const { app, title, description = app.description, footerLink, children } = props;
 
 	return (
 		<div className="flex min-h-svh flex-col px-6">
 			<main className="mx-auto flex w-full max-w-sm flex-1 flex-col items-center justify-center gap-10 py-12 text-center">
 				<header className="flex flex-col items-center gap-6">
 					<img
-						src={iconSrc}
+						src={app.iconSrc}
 						alt=""
 						width={96}
 						height={96}
@@ -55,17 +57,47 @@ export const AppPage: React.FC<TAppPageProps> = (props) => {
 export interface TAppPageProps {
 	app: TAppPageConfig;
 	title?: string;
-	description: string;
-	iconSrc: string;
+	description?: string;
 	footerLink: { href: string; label: string };
 	children: React.ReactNode;
 }
 
 export interface TAppPageConfig {
 	name: string;
+	description: string;
+	iconSrc: string;
 	website: string;
 	legal: {
 		privacy: string;
 		terms: string;
+	};
+}
+
+export function getAppPageHead(
+	app: TAppPageConfig,
+	page: 'landing' | 'support' = 'landing'
+): { meta: NonNullable<AnyRouteMatch['meta']> } {
+	const title = `${app.name}${page === 'support' ? ' support' : ''} | builder.group`;
+	const description =
+		page === 'support'
+			? `Get help with ${app.name}, report a problem, or send feedback.`
+			: app.description;
+	const image = new URL(app.iconSrc, appConfig.website).href;
+	const imageAlt = `${app.name} app icon`;
+
+	return {
+		meta: [
+			{ title },
+			{ name: 'description', content: description },
+			{ property: 'og:title', content: title },
+			{ property: 'og:description', content: description },
+			{ property: 'og:image', content: image },
+			{ property: 'og:image:alt', content: imageAlt },
+			{ name: 'twitter:card', content: 'summary' },
+			{ name: 'twitter:title', content: title },
+			{ name: 'twitter:description', content: description },
+			{ name: 'twitter:image', content: image },
+			{ name: 'twitter:image:alt', content: imageAlt }
+		]
 	};
 }

@@ -1,11 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { AppSupportPage } from '@/components';
+import { AppSupportPage, getAppPageHead } from '@/components';
 import { taplingConfig } from '@/environment';
 
 export const Route = createFileRoute('/apps/tapling/help/')({
+	head: () => getAppPageHead(taplingConfig, 'support'),
 	component: RouteComponent
 });
 
 function RouteComponent() {
-	return <AppSupportPage app={taplingConfig} iconSrc="/illustrations/logos/tapling.png" />;
+	return <AppSupportPage app={taplingConfig} />;
 }

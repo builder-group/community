@@ -4,6 +4,8 @@ const email = 'support@builder.group';
 
 export const deriveConfig = {
 	name: 'Dérive',
+	description: 'Pick a color. Find nine things. Make a photo collection.',
+	iconSrc: '/illustrations/logos/derive.png',
 	website: `${appConfig.website}/apps/derive`,
 	help: {
 		email,

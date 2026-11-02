@@ -2,14 +2,13 @@ import React from 'react';
 import { AppPage, type TAppPageConfig } from './AppPage';
 
 export const AppSupportPage: React.FC<TAppSupportPageProps> = (props) => {
-	const { app, iconSrc } = props;
+	const { app } = props;
 
 	return (
 		<AppPage
 			app={app}
 			title={`${app.name} support`}
 			description="Questions, feedback, or a problem?"
-			iconSrc={iconSrc}
 			footerLink={{ href: app.website, label: 'App page' }}
 		>
 			<div className="flex flex-col items-center gap-2">
@@ -39,5 +38,4 @@ export interface TAppSupportPageProps {
 			discord: string;
 		};
 	};
-	iconSrc: string;
 }
