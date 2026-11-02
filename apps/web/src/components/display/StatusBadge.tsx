@@ -17,8 +17,6 @@ export const StatusBadge: React.FC<TStatusBadgeProps> = (props) => {
 				return 'Paused';
 			case 'pivoted':
 				return 'Pivoted';
-			case 'completed':
-				return 'Completed';
 			default:
 				return null;
 		}
@@ -40,8 +38,7 @@ export const statusBadgeVariants = cva(
 				'maintenance': 'bg-purple-500/15 text-purple-500',
 				'discontinued': 'bg-red-500/15 text-red-500',
 				'paused': 'bg-amber-500/15 text-amber-500',
-				'pivoted': 'bg-orange-500/15 text-orange-500',
-				'completed': 'bg-green-500/15 text-green-500'
+				'pivoted': 'bg-orange-500/15 text-orange-500'
 			}
 		}
 	}

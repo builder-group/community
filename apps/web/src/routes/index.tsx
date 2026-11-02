@@ -33,8 +33,8 @@ export const Route = createFileRoute('/')({
 function RouteComponent() {
 	const { npmDownloads } = Route.useLoaderData();
 
-	const saasProjects = projectsConfig.projects
-		.filter((p) => p.category === 'saas')
+	const productProjects = projectsConfig.projects
+		.filter((p) => p.category === 'saas' || p.category === 'ecommerce')
 		.sort((a, b) => {
 			const aDate = a.startedAt.year * 12 + (a.startedAt.month ?? 0);
 			const bDate = b.startedAt.year * 12 + (b.startedAt.month ?? 0);
@@ -102,7 +102,7 @@ function RouteComponent() {
 							</p>
 						</div>
 						<div className="bg-base-300 grid grid-cols-1 gap-px sm:grid-cols-2 lg:grid-cols-3">
-							{saasProjects.map((project) => (
+							{productProjects.map((project) => (
 								<ProjectCell key={project.id} project={project} />
 							))}
 						</div>

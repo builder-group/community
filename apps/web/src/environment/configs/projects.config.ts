@@ -4,18 +4,38 @@ export const projectsConfig: {
 	projects: TProject[];
 } = {
 	projects: [
-		// MARK: - SaaS: In Progress
+		// MARK: - Products: In Progress
+		{
+			id: 'selfiemirror',
+			name: 'SelfieMirror',
+			description: 'iPhone app for aligning mirror selfies and creating timelapse videos',
+			logo: { type: 'image', src: '/illustrations/logos/selfiemirror.png' },
+			startedAt: { year: 2026, month: 11 },
+			status: 'in-progress',
+			category: 'saas',
+			tags: [{ type: 'app-store', url: 'https://apps.apple.com/app/id6828735544' }]
+		},
+		{
+			id: 'myedition',
+			name: 'MyEdition',
+			description: 'Online store for turning personal photos and memories into collectible cards',
+			logo: { type: 'image', src: '/illustrations/logos/myedition.png' },
+			startedAt: { year: 2026, month: 10 },
+			status: 'in-progress',
+			category: 'ecommerce',
+			tags: []
+		},
+		// MARK: - Products: Maintenance
 		{
 			id: 'saku',
 			name: 'Saku',
 			description: 'Shopify link-in-bio page builder for brands and creators',
 			logo: { type: 'image', src: '/illustrations/logos/saku.png' },
 			startedAt: { year: 2026, month: 8 },
-			status: 'in-progress',
+			status: 'maintenance',
 			category: 'saas',
 			tags: [{ type: 'shopify-store', url: 'https://apps.shopify.com/saku-bio-link' }]
 		},
-		// MARK: - SaaS: Maintenance
 		{
 			id: 'abstand',
 			name: 'Abstand',
@@ -129,38 +149,7 @@ export const projectsConfig: {
 				{ type: 'github', url: `${appConfig.social.github}/nodox` }
 			]
 		},
-		// MARK: - SaaS: Paused
-		{
-			id: 'isshin',
-			name: 'Isshin',
-			description: 'macOS app that auto-adapts app blockers to your daily task plan',
-			logo: { type: 'image', src: '/illustrations/logos/isshin.png' },
-			startedAt: { year: 2025, month: 11 },
-			status: 'paused',
-			category: 'saas',
-			tags: [{ type: 'website', url: 'https://isshin.app/' }]
-		},
-		// MARK: - SaaS: Completed
-		{
-			id: 'gazegames',
-			name: 'GazeGames',
-			description:
-				'Web tool that generates a set of images where eyes and objects gaze at a moving target',
-			logo: { type: 'emoji', value: '👀' },
-			startedAt: { year: 2025, month: 11 },
-			endedAt: { year: 2025, month: 11 },
-			status: 'completed',
-			category: 'saas',
-			tags: [
-				{ type: 'lab' },
-				{ type: 'website', url: 'https://gazegames.vercel.app/' },
-				{
-					type: 'github',
-					url: `${appConfig.social.github}/lab/tree/develop/apps/_deprecated/gazegames`
-				}
-			]
-		},
-		// MARK: - SaaS: Pivoted
+		// MARK: - Products: Pivoted
 		{
 			id: 'saku-v2',
 			name: 'Saku v2',
@@ -197,7 +186,36 @@ export const projectsConfig: {
 			category: 'saas',
 			tags: []
 		},
-		// MARK: - SaaS: Discontinued
+		// MARK: - Products: Discontinued
+		{
+			id: 'isshin',
+			name: 'Isshin',
+			description: 'macOS app that auto-adapts app blockers to your daily task plan',
+			logo: { type: 'image', src: '/illustrations/logos/isshin.png' },
+			startedAt: { year: 2025, month: 11 },
+			status: 'discontinued',
+			category: 'saas',
+			tags: [{ type: 'website', url: 'https://isshin.app/' }]
+		},
+		{
+			id: 'gazegames',
+			name: 'GazeGames',
+			description:
+				'Web tool that generates a set of images where eyes and objects gaze at a moving target',
+			logo: { type: 'emoji', value: '👀' },
+			startedAt: { year: 2025, month: 11 },
+			endedAt: { year: 2025, month: 11 },
+			status: 'discontinued',
+			category: 'saas',
+			tags: [
+				{ type: 'lab' },
+				{ type: 'website', url: 'https://gazegames.vercel.app/' },
+				{
+					type: 'github',
+					url: `${appConfig.social.github}/lab/tree/develop/apps/_deprecated/gazegames`
+				}
+			]
+		},
 		{
 			id: 'actorpal',
 			name: 'ActorPal',
@@ -676,10 +694,9 @@ export interface TProject {
 
 export type TProjectDate = { year: number; month?: number };
 
-export type TProjectCategory = 'saas' | 'package';
+export type TProjectCategory = 'saas' | 'ecommerce' | 'package';
 
-export type TProjectStatus =
-	'in-progress' | 'maintenance' | 'discontinued' | 'paused' | 'pivoted' | 'completed';
+export type TProjectStatus = 'in-progress' | 'maintenance' | 'discontinued' | 'paused' | 'pivoted';
 
 export type TProjectLogo = { type: 'image'; src: string } | { type: 'emoji'; value: string };
 
