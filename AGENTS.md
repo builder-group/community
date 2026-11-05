@@ -57,4 +57,5 @@ Consult these when changing app structure or module boundaries.
 
 - Staged pre-commit review: [.agent/commands/review.md](.agent/commands/review.md)
 - Incremental implementation: [.agent/commands/incremental-implementation.md](.agent/commands/incremental-implementation.md)
+- Orchestrating a project through sub-agents: [.agent/commands/orchestrate.md](.agent/commands/orchestrate.md)
 - Maintaining or sharing this setup: [.agent/README.md](.agent/README.md)
