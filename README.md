@@ -30,6 +30,7 @@ Open source packages, crates, and templates from [builder.group](https://builder
 | [rollup-presets](https://github.com/builder-group/community/tree/develop/packages/rollup-presets)       | Rollup presets for TypeScript libraries with package export discovery and declarations     | [`rollup-presets`](https://www.npmjs.com/package/rollup-presets)       |
 | [tuple-result](https://github.com/builder-group/community/tree/develop/packages/tuple-result)           | Plain TypeScript Result tuples with typed errors, narrowing, helpers, JSON-friendly arrays | [`tuple-result`](https://www.npmjs.com/package/tuple-result)           |
 | [validatenv](https://github.com/builder-group/community/tree/develop/packages/validatenv)               | Typed env validation with Standard Schema validators, built-in parsers, error reports      | [`validatenv`](https://www.npmjs.com/package/validatenv)               |
+| [versjon](https://github.com/builder-group/community/tree/develop/packages/versjon)                     | Versioned JSON values with Standard Schema validation and checked migrations               | [`versjon`](https://www.npmjs.com/package/versjon)                     |
 | [xml-tokenizer](https://github.com/builder-group/community/tree/develop/packages/xml-tokenizer)         | Streaming XML, HTML, and SVG tokenizer with typed tokens, selectors, object helpers        | [`xml-tokenizer`](https://www.npmjs.com/package/xml-tokenizer)         |
 
 ## Deprecated Packages

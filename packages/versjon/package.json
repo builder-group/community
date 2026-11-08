@@ -1,0 +1,61 @@
+{
+	"name": "versjon",
+	"version": "0.0.4",
+	"private": false,
+	"description": "Versioned JSON values with Standard Schema validation and checked migrations",
+	"keywords": [
+		"json",
+		"json-schema-version",
+		"schema",
+		"schema-version",
+		"versioning",
+		"versioned-data",
+		"migration",
+		"data-migration",
+		"validation",
+		"standard-schema",
+		"zod",
+		"valibot",
+		"typescript",
+		"type-safe"
+	],
+	"homepage": "https://builder.group/?utm_source=package-json",
+	"bugs": {
+		"url": "https://github.com/builder-group/community/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/builder-group/community.git"
+	},
+	"license": "MIT",
+	"author": "@bennobuilder",
+	"main": "./dist/cjs/index.js",
+	"module": "./dist/esm/index.js",
+	"source": "./src/index.ts",
+	"types": "./dist/types/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"scripts": {
+		"build": "shx rm -rf dist && rollup -c rollup.config.js",
+		"build:prod": "export NODE_ENV=production && pnpm build",
+		"clean": "shx rm -rf dist && shx rm -rf .turbo && shx rm -rf node_modules",
+		"install:clean": "pnpm run clean && pnpm install",
+		"lint": "eslint .",
+		"publish:patch": "pnpm build:prod && pnpm version patch --no-git-tag-version && pnpm publish --no-git-checks --access=public",
+		"start:dev": "tsc -w",
+		"test": "vitest run",
+		"test:types": "vitest run --typecheck.only",
+		"update:latest": "pnpm update --latest"
+	},
+	"dependencies": {
+		"@standard-schema/spec": "^1.1.0",
+		"tuple-result": "workspace:*"
+	},
+	"devDependencies": {
+		"@blgc/config": "workspace:*",
+		"rollup-presets": "workspace:*",
+		"zod": "^4.6.7"
+	}
+}

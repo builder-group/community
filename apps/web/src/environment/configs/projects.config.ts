@@ -430,6 +430,18 @@ export const projectsConfig: {
 			]
 		},
 		{
+			id: 'versjon',
+			name: 'versjon',
+			description: 'Versioned JSON values with Standard Schema validation and checked migrations',
+			startedAt: { year: 2026 },
+			status: 'maintenance',
+			category: 'package',
+			tags: [
+				{ type: 'npm', url: 'https://www.npmjs.com/package/versjon' },
+				{ type: 'github', url: `${appConfig.social.githubPackages}/versjon` }
+			]
+		},
+		{
 			id: 'validation-adapter',
 			name: 'validation-adapter',
 			description: 'Shared validation interface for Zod, Valibot, and Yup',
