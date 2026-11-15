@@ -3,6 +3,7 @@ import type express from 'express';
 import { OpenApiValidationError } from 'openapi-ts-router';
 import { describe, expect, it, vi } from 'vitest';
 import type { paths } from '../__tests__/resources/mock-openapi-types';
+import type { TTemplatePaths } from '../__tests__/resources/template-paths';
 import { createExpressOpenApiRouter } from './index';
 
 describe('createExpressOpenApiRouter function', () => {
@@ -87,6 +88,30 @@ describe('createExpressOpenApiRouter function', () => {
 
 		// Assert
 		expect(responseJson).toHaveBeenCalledWith({ name: 'Dog', photoUrls: [] });
+	});
+
+	it('should format OpenAPI path templates for Express 5', () => {
+		// Prepare
+		const { registeredRoutes, router } = createTestExpressRouter();
+		const openApiRouter = createExpressOpenApiRouter<TTemplatePaths>(router);
+		const config = {
+			pathSchema: createStandardSchema<Record<string, string>>((value) => ({
+				value: value as Record<string, string>
+			})),
+			handler: () => undefined
+		};
+
+		// Act
+		openApiRouter.get('/items/{item-id}', config);
+		openApiRouter.get('/files/{name}.{ext}', config);
+		openApiRouter.get('/v1/things/{id}:archive', config);
+
+		// Assert
+		expect(registeredRoutes.map((route) => route.path)).toEqual([
+			'/items/:"item-id"',
+			'/files/:"name".:ext',
+			'/v1/things/:"id"\\:archive'
+		]);
 	});
 
 	it('should preserve repeated query params before validation', async () => {

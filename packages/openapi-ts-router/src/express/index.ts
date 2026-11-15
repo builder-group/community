@@ -1,10 +1,5 @@
 import type express from 'express';
-import {
-	formatOpenApiPath,
-	OpenApiValidationError,
-	parseParams,
-	validateStandardSchema
-} from 'openapi-ts-router';
+import { OpenApiValidationError, parseParams, validateStandardSchema } from 'openapi-ts-router';
 import type {
 	TCreateOpenApiRouterOptions,
 	THttpMethod,
@@ -131,7 +126,7 @@ function createExpressOpenApiMethod<GPaths extends object, GMethod extends THttp
 		const registerRoute = router[method] as TExpressRouteRegister;
 		registerRoute.call(
 			router,
-			formatOpenApiPath(path),
+			formatExpressPath(path),
 			createExpressParamsMiddleware({
 				pathParamParser: config.pathParamParser ?? options.pathParamParser ?? parseParams,
 				queryParamParser: config.queryParamParser ?? options.queryParamParser ?? parseParams
@@ -141,6 +136,26 @@ function createExpressOpenApiMethod<GPaths extends object, GMethod extends THttp
 			config.handler as express.RequestHandler
 		);
 	} as TExpressOpenApiMethod<GPaths, GMethod>;
+}
+
+/**
+ * Converts an OpenAPI path to Express 5 (`path-to-regexp` 8) syntax.
+ * Escapes reserved characters in literal text and quotes param names unless they are
+ * simple identifiers that fill a whole segment.
+ */
+function formatExpressPath(path: string): string {
+	const parts = path.split(/\{([^{}]+)\}/);
+	return parts
+		.map((part, index) => {
+			// Note: The capture group keeps param names in the result, e.g. `['/things/', 'id', ':archive']`
+			if (index % 2 === 0) {
+				return part.replace(/[{}()[\]+?!:*\\]/g, '\\$&');
+			}
+			const next = parts[index + 1] ?? '';
+			const isSimple = /^[A-Za-z_$][\w$]*$/.test(part) && /^(\/|$)/.test(next);
+			return isSimple ? `:${part}` : `:"${part.replace(/["\\]/g, '\\$&')}"`;
+		})
+		.join('');
 }
 
 type TExpressRouteMethodName = 'delete' | 'get' | 'patch' | 'post' | 'put';

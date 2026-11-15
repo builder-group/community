@@ -133,7 +133,7 @@ function createHonoOpenApiMethod<GPaths extends object, GMethod extends THttpMet
 		const registerRoute = app[method] as THonoRouteRegister;
 		registerRoute.call(
 			app,
-			formatOpenApiPath(path),
+			formatHonoPath(path),
 			createHonoParamsMiddleware({
 				pathParamParser: config.pathParamParser ?? options.pathParamParser ?? parseParams,
 				queryParamParser: config.queryParamParser ?? options.queryParamParser ?? parseParams
@@ -143,6 +143,21 @@ function createHonoOpenApiMethod<GPaths extends object, GMethod extends THttpMet
 			config.handler
 		);
 	} as THonoOpenApiMethod<GPaths, GMethod>;
+}
+
+/**
+ * Converts an OpenAPI path to Hono syntax.
+ * Hono params span a whole path segment, so templates such as `{name}.{ext}` or `{id}:archive` are rejected.
+ */
+function formatHonoPath(path: string): string {
+	for (const segment of path.split('/')) {
+		if (segment.includes('{') && !/^\{[^{}]+\}$/.test(segment)) {
+			throw new OpenApiRouterError('#ERR_OPENAPI_PATH', {
+				message: `Hono requires each path param to fill a whole segment, got '${segment}' in '${path}'`
+			});
+		}
+	}
+	return formatOpenApiPath(path);
 }
 
 type THonoRouteMethodName = 'delete' | 'get' | 'patch' | 'post' | 'put';
