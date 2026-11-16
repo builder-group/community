@@ -1,1 +1,1 @@
-Read and follow `.agent/commands/review.md` from the repository root.
+Read and follow `.agents/commands/review.md` from the repository root.

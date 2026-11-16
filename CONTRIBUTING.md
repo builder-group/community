@@ -64,7 +64,7 @@ Package READMEs should help a new user decide and start quickly:
 - Prefer value and workflow over listing every exported API in order
 - Keep examples copyable and formatted with two-space indentation
 
-For repository docs, follow the writing style in `.agent/rules/writing.md`. For package READMEs, also follow `.agent/rules/package-readme.md`.
+For repository docs, follow the writing style in `.agents/rules/writing.md`. For package READMEs, also follow `.agents/rules/package-readme.md`.
 
 ## Pull Requests
 

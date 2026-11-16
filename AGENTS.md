@@ -33,16 +33,16 @@
 
 These references capture project conventions. API details belong in package documentation.
 
-- TypeScript, file organization, and tuple-result usage: [.agent/rules/typescript.md](.agent/rules/typescript.md)
-- React components: [.agent/rules/react.md](.agent/rules/react.md)
-- Application state and forms using feature libraries: [.agent/rules/state-and-forms.md](.agent/rules/state-and-forms.md)
-- HTTP clients in application code: [.agent/rules/fetch-client.md](.agent/rules/fetch-client.md)
-- `Cx` ownership and lifecycle: [.agent/rules/cx-pattern.md](.agent/rules/cx-pattern.md)
-- Prose and comments: [.agent/rules/writing.md](.agent/rules/writing.md)
-- Package READMEs: [.agent/rules/package-readme.md](.agent/rules/package-readme.md)
-- Vitest tests: [.agent/rules/vitest.md](.agent/rules/vitest.md)
-- Rust: [.agent/rules/rust.md](.agent/rules/rust.md)
-- Swift and SwiftUI: [.agent/rules/swift.md](.agent/rules/swift.md)
+- TypeScript, file organization, and tuple-result usage: [.agents/rules/typescript.md](.agents/rules/typescript.md)
+- React components: [.agents/rules/react.md](.agents/rules/react.md)
+- Application state and forms using feature libraries: [.agents/rules/state-and-forms.md](.agents/rules/state-and-forms.md)
+- HTTP clients in application code: [.agents/rules/fetch-client.md](.agents/rules/fetch-client.md)
+- `Cx` ownership and lifecycle: [.agents/rules/cx-pattern.md](.agents/rules/cx-pattern.md)
+- Prose and comments: [.agents/rules/writing.md](.agents/rules/writing.md)
+- Package READMEs: [.agents/rules/package-readme.md](.agents/rules/package-readme.md)
+- Vitest tests: [.agents/rules/vitest.md](.agents/rules/vitest.md)
+- Rust: [.agents/rules/rust.md](.agents/rules/rust.md)
+- Swift and SwiftUI: [.agents/rules/swift.md](.agents/rules/swift.md)
 
 ## Architecture References
 
@@ -55,7 +55,7 @@ Consult these when changing app structure or module boundaries.
 
 ## Workflows
 
-- Staged pre-commit review: [.agent/commands/review.md](.agent/commands/review.md)
-- Incremental implementation: [.agent/commands/incremental-implementation.md](.agent/commands/incremental-implementation.md)
-- Orchestrating a project through sub-agents: [.agent/commands/orchestrate.md](.agent/commands/orchestrate.md)
-- Maintaining or sharing this setup: [.agent/README.md](.agent/README.md)
+- Staged pre-commit review: [.agents/commands/review.md](.agents/commands/review.md)
+- Incremental implementation: [.agents/commands/incremental-implementation.md](.agents/commands/incremental-implementation.md)
+- Orchestrating a project through sub-agents: [.agents/commands/orchestrate.md](.agents/commands/orchestrate.md)
+- Maintaining or sharing this setup: [.agents/README.md](.agents/README.md)
