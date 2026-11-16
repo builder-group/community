@@ -2,7 +2,7 @@
 
 Root `AGENTS.md` is the repository entry point. It links to shared conventions in `rules/`, reusable prompts in `commands/`, and repository-specific documentation.
 
-Root `CLAUDE.md` imports `AGENTS.md`, and `.claude/commands/` reuses the shared command prompts.
+Root `CLAUDE.md` imports `AGENTS.md`, and `.claude/commands/` is a symlink to `commands/`.
 
 ## Maintaining Instructions
 
@@ -10,7 +10,7 @@ Root `CLAUDE.md` imports `AGENTS.md`, and `.claude/commands/` reuses the shared 
 - Give each reference a clear scope. Distinguish application usage from library implementation and platform-specific integration.
 - Keep API contracts in package READMEs or source documentation. Link to them instead of duplicating them, and keep examples only when they clarify a decision.
 
-The rules are ordinary Markdown, read through the root guide. The command prompts are used when requested. Placing them here does not register a slash command or skill.
+The rules are ordinary Markdown, read through the root guide. Each command prompt is also a Claude Code slash command through the symlink. Add `disable-model-invocation: true` frontmatter to a command that should run only when requested.
 
 ## Sharing Across Repositories
 

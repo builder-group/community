@@ -1,3 +1,8 @@
+---
+description: Review staged changes before committing and suggest a commit message
+disable-model-invocation: true
+---
+
 Review staged changes before committing. Include unstaged or untracked changes only when explicitly asked.
 
 This is review-only. Do not edit, stage, commit, switch branches, or run any git-mutating command.

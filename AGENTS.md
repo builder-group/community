@@ -21,6 +21,15 @@
 
 - Read-only git commands are allowed
 - Do not stage, commit, create or switch branches, push, or otherwise mutate git state unless the user explicitly asks for that specific git action
+- Commit messages: `<package or area>: <lowercase summary>`, adding ` (#<issue>)` when the work belongs to an issue, e.g. `openapi-ts-router: fix path templates for express and hono (#125)`
+
+## Pull Requests
+
+- Open a pull request only when the user asks for one
+- Title: the commit message format. Put `Resolves #<issue>` in the description when the PR closes an issue.
+- Description: the problem in a sentence or two, the fix, and the checks run
+- UI changes need before and after screenshots, and motion or timing changes need a short recording. Save them outside the repository, never commit them, and say where they are so they can be attached.
+- One request is one pull request
 
 ## Validation
 
@@ -56,6 +65,5 @@ Consult these when changing app structure or module boundaries.
 ## Workflows
 
 - Staged pre-commit review: [.agents/commands/review.md](.agents/commands/review.md)
-- Incremental implementation: [.agents/commands/incremental-implementation.md](.agents/commands/incremental-implementation.md)
-- Orchestrating a project through sub-agents: [.agents/commands/orchestrate.md](.agents/commands/orchestrate.md)
+- Orchestrating a task through sub-agents: [.agents/commands/orchestrate.md](.agents/commands/orchestrate.md)
 - Maintaining or sharing this setup: [.agents/README.md](.agents/README.md)
