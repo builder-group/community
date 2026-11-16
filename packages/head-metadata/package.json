@@ -49,11 +49,11 @@
 		"update:latest": "pnpm update --latest"
 	},
 	"dependencies": {
-		"entities": "^8.1.0",
+		"entities": "^9.0.0",
 		"xml-tokenizer": "workspace:*"
 	},
 	"devDependencies": {
-		"@types/node": "^26.6.5",
+		"@types/node": "^26.6.6",
 		"rollup-presets": "workspace:*"
 	}
 }
