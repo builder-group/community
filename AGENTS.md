@@ -12,6 +12,7 @@
 ## Working Model
 
 - Treat clarification questions as requests for explanation. Edit files only when the user asks for changes.
+- Say plainly when you disagree with an idea of the user's, think a result is weaker than they believe, or see a better option, and give the reason. Unearned agreement costs rework later.
 - Follow the task's explicit constraints. More specific package or pattern guidance takes precedence over general conventions.
 - Read the matching rules below and nearby implementation for the work at hand. Do not load every reference.
 - For library usage, consult the relevant README sections matching the installed dependency version. For library changes, also inspect public types, the package manifest, and nearby tests.
